@@ -74,6 +74,7 @@ export class UmbBlockSingleEntriesContext extends UmbBlockEntriesContext<
 						blocks: blockTypes,
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
+						openLibrary: routingInfo.view === 'library',
 						libraryAllowedElementTypeKeys,
 						clipboardFilter: async (clipboardEntryDetail) => {
 							const hasSupportedPasteTranslator = clipboardContext.hasSupportedPasteTranslator(
@@ -123,7 +124,7 @@ export class UmbBlockSingleEntriesContext extends UmbBlockEntriesContext<
 						throw new Error('Failed to create block');
 					}
 				} else if (value && 'library' in value) {
-					this._manager?.insertExternalContent(value.library.elementKey);
+					this._insertExternalContent(value.library.elementKey, data?.originData);
 				} else if (value && 'clipboard' in value && value.clipboard.selection?.length && data) {
 					const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
 					if (!clipboardContext) {
@@ -157,6 +158,8 @@ export class UmbBlockSingleEntriesContext extends UmbBlockEntriesContext<
 
 	protected _gotBlockManager() {
 		if (!this._manager) return;
+
+		this._observeLibraryBlockTypes(this._manager.blockTypes);
 
 		this.observe(
 			this._manager.layouts,

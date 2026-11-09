@@ -122,5 +122,7 @@ public class ValueEditorCacheTests
         public IDictionary<string, object> DefaultConfiguration { get; }
 
         public IConfigurationEditor GetConfigurationEditor() => throw new NotImplementedException();
+
+        public bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue) => Equals(editedValue, publishedValue);
     }
 }

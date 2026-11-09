@@ -376,7 +376,9 @@ public class Searcher : IExamineSearcher
                     var decimalRangeFieldName = FieldNameHelper.FieldName(decimalRangeFilter.FieldName, Constants.FieldValues.Decimals);
                     var decimalRangeSegmentFieldName = segment is not null ? FieldNameHelper.FieldName(decimalRangeFilter.FieldName, Constants.FieldValues.Decimals, segment) : null;
                     FilterRange<double>[] doubleRanges = decimalRangeFilter.Ranges
-                        .Select(r => new FilterRange<double>(Convert.ToDouble(r.MinValue ?? decimal.MinValue), Convert.ToDouble(r.MaxValue ?? decimal.MaxValue)))
+                        .Select(r => new FilterRange<double>(
+                            r.MinValue.HasValue ? decimal.ToDouble(r.MinValue.Value) : double.NegativeInfinity,
+                            r.MaxValue.HasValue ? decimal.ToDouble(r.MaxValue.Value) : double.PositiveInfinity))
                         .ToArray();
                     searchQuery.AddRangeFilter(decimalRangeFieldName, decimalRangeSegmentFieldName, decimalRangeFilter.Negate, doubleRanges);
                     break;
@@ -441,7 +443,7 @@ public class Searcher : IExamineSearcher
                             FieldNameHelper.FieldName(integerRangeFacet.FieldName, Constants.FieldValues.Integers),
                             integerRangeFacet.Ranges
                                 .Select(x =>
-                                    new Int64Range(x.Key, x.MinValue ?? 0, true, x.MaxValue ?? int.MaxValue, false))
+                                    new Int64Range(x.Key, x.MinValue ?? long.MinValue, true, x.MaxValue ?? long.MaxValue, false))
                                 .ToArray());
                         break;
                     case DecimalExactFacet decimalExactFacet:
@@ -452,9 +454,9 @@ public class Searcher : IExamineSearcher
                         DoubleRange[] doubleRanges = decimalRangeFacet.Ranges.Select(x =>
                                 new DoubleRange(
                                     x.Key,
-                                    decimal.ToDouble(x.MinValue ?? 0),
+                                    x.MinValue.HasValue ? decimal.ToDouble(x.MinValue.Value) : double.NegativeInfinity,
                                     true,
-                                    decimal.ToDouble(x.MaxValue ?? 0),
+                                    x.MaxValue.HasValue ? decimal.ToDouble(x.MaxValue.Value) : double.PositiveInfinity,
                                     false))
                             .ToArray();
                         facetOperations.FacetDoubleRange(

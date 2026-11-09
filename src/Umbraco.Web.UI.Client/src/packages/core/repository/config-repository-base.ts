@@ -4,7 +4,6 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbStoreObjectBase } from '@umbraco-cms/backoffice/store';
 import { type Observable, from, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Base class for a repository exposing a single configuration object backed by an {@link UmbStoreObjectBase}.
@@ -14,22 +13,6 @@ import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 export abstract class UmbConfigRepositoryBase<ConfigModel> extends UmbRepositoryBase implements UmbApi {
 	readonly #initialized: Promise<void>;
 	#dataStore?: UmbStoreObjectBase<ConfigModel>;
-
-	/**
-	 * Promise that resolves when the repository has been initialized, i.e. when the configuration has been fetched from the server.
-	 * @deprecated Deprecated since v17. Awaiting this is no longer necessary — all() and part() defer internally
-	 * until the configuration is ready, so you can subscribe directly. Scheduled for removal in Umbraco 19.
-	 * @returns {Promise<void>} A promise that resolves once the configuration has been fetched.
-	 */
-	get initialized(): Promise<void> {
-		new UmbDeprecation({
-			deprecated: 'The "initialized" property on config repositories is deprecated.',
-			removeInVersion: '19.0.0',
-			solution:
-				'Awaiting initialized is no longer necessary — all() and part() defer internally until the configuration is ready. Subscribe directly.',
-		}).warn();
-		return this.#initialized;
-	}
 
 	constructor(
 		host: UmbControllerHost,

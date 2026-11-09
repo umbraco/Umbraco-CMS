@@ -1,6 +1,7 @@
 import {
 	UMB_BLOCK_ENTRY_HAS_EXTERNAL_CONTENT_CONDITION_ALIAS,
 	UMB_BLOCK_ENTRY_IS_READ_ONLY_CONDITION_ALIAS,
+	UMB_BLOCK_ENTRY_IS_UNSUPPORTED_CONDITION_ALIAS,
 } from '../../../conditions/constants.js';
 import { UMB_BLOCK_ACTION_DISCONNECT_FROM_ELEMENT_LIBRARY_ALIAS } from './constants.js';
 
@@ -24,6 +25,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 			{
 				alias: UMB_BLOCK_ENTRY_HAS_EXTERNAL_CONTENT_CONDITION_ALIAS,
 				match: true,
+			},
+			{
+				alias: UMB_BLOCK_ENTRY_IS_UNSUPPORTED_CONDITION_ALIAS,
+				match: false,
 			},
 		],
 	},

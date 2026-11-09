@@ -18,6 +18,7 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
     private readonly IMediaService _mediaService;
     private readonly IMemberTypeService _memberTypeService;
     private readonly IMemberService _memberService;
+    private readonly IElementService _elementService;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
 
     /// <summary>
@@ -31,6 +32,7 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
     /// <param name="mediaService">The service used to page through media of the given types.</param>
     /// <param name="memberTypeService">The service used to resolve member type IDs and compositions.</param>
     /// <param name="memberService">The service used to retrieve members of the given types.</param>
+    /// <param name="elementService">The service used to page through elements of the given types.</param>
     /// <param name="backgroundTaskQueue">The queue used to run the re-index work in the background.</param>
     public ContentTypeIndexingService(
         IContentIndexingService contentIndexingService,
@@ -41,6 +43,7 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
         IMediaService mediaService,
         IMemberTypeService memberTypeService,
         IMemberService memberService,
+        IElementService elementService,
         IBackgroundTaskQueue backgroundTaskQueue)
     {
         _contentIndexingService = contentIndexingService;
@@ -51,6 +54,7 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
         _mediaService = mediaService;
         _memberTypeService = memberTypeService;
         _memberService = memberService;
+        _elementService = elementService;
         _backgroundTaskQueue = backgroundTaskQueue;
     }
 
@@ -59,14 +63,20 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
         => _backgroundTaskQueue.QueueBackgroundWorkItem(async cancellationToken =>
         {
             Guid[] contentKeys = await GetContentKeysByContentTypesAsync(contentTypeKeys, objectType, cancellationToken);
-            if (contentKeys.Length == 0)
+
+            // element types are document types, so their changes arrive as document type changes
+            Guid[] elementKeys = objectType is UmbracoObjectTypes.Document
+                ? await GetElementKeysByContentTypesAsync(contentTypeKeys, cancellationToken)
+                : [];
+
+            if (contentKeys.Length == 0 && elementKeys.Length == 0)
             {
                 return;
             }
 
-            await FlushDocumentIndexCacheAsync(contentKeys);
+            await FlushDocumentIndexCacheAsync([.. contentKeys, .. elementKeys]);
 
-            ContentChange[] changes = CreateContentChanges(contentKeys, objectType);
+            ContentChange[] changes = [.. CreateContentChanges(contentKeys, objectType), .. CreateContentChanges(elementKeys, UmbracoObjectTypes.Element)];
             _contentIndexingService.Handle(changes, origin);
         });
 
@@ -113,6 +123,41 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
                 break;
             }
         }
+
+        return keys.ToArray();
+    }
+
+    private async Task<Guid[]> GetElementKeysByContentTypesAsync(Guid[] contentTypeKeys, CancellationToken cancellationToken)
+    {
+        IContentType[] allContentTypes = (await _contentTypeService.GetAllAsync()).ToArray();
+        int[] directContentTypeIds = allContentTypes
+            .Where(ct => ct.IsElement && contentTypeKeys.Contains(ct.Key))
+            .Select(ct => ct.Id)
+            .ToArray();
+
+        if (directContentTypeIds.Length == 0)
+        {
+            return [];
+        }
+
+        int[] allContentTypeIds = ExpandWithDependentContentTypes(allContentTypes, directContentTypeIds);
+        Guid[] allContentTypeKeys = allContentTypes
+            .Where(ct => allContentTypeIds.Contains(ct.Id))
+            .Select(ct => ct.Key)
+            .ToArray();
+
+        var keys = new List<Guid>();
+        var skip = 0;
+        int take = ContentChangeStrategyBase.ContentEnumerationPageSize;
+        Guid[] pageKeys;
+        do
+        {
+            PagedModel<IElement> page = await _elementService.GetPagedOfTypesAsync(allContentTypeKeys, skip, take, ordering: null, cancellationToken);
+            pageKeys = page.Items.Select(element => element.Key).ToArray();
+            keys.AddRange(pageKeys);
+            skip += take;
+        }
+        while (pageKeys.Length == take);
 
         return keys.ToArray();
     }
@@ -233,6 +278,9 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
                 .ToArray(),
             UmbracoObjectTypes.Member => contentKeys
                 .Select(key => ContentChange.Member(key, ChangeImpact.Refresh, ContentState.Draft))
+                .ToArray(),
+            UmbracoObjectTypes.Element => contentKeys
+                .Select(key => ContentChange.Element(key, ChangeImpact.Refresh, ContentState.Draft))
                 .ToArray(),
             _ => [],
         };

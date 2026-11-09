@@ -5,7 +5,7 @@ import { css, customElement, html, nothing, property, state, when } from '@umbra
 import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
-import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
+import { renderHiddenUfm, renderUfm } from '@umbraco-cms/backoffice/ufm';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type {
@@ -98,9 +98,9 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			'observeMessagesForContent',
 		);
 	}
-	private _contentKey?: string | undefined;
+	private _contentKey: string | undefined;
 
-	#context = new UmbBlockSingleEntryContext(this);
+	readonly #context = new UmbBlockSingleEntryContext(this);
 
 	@state()
 	private _contentTypeAlias?: string;
@@ -152,6 +152,9 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	@state()
 	private _isReadOnly = false;
 
+	@state()
+	private _externalContentName?: string;
+
 	constructor() {
 		super();
 		this.#init();
@@ -184,8 +187,8 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		this.observe(
 			this.#context.label,
 			(label) => {
-				this.#updateBlockViewProps({ label });
 				this._label = label;
+				this.#updateBlockLabel();
 			},
 			null,
 		);
@@ -212,6 +215,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			},
 			null,
 		);
+		this.#observeExternalContentName();
 		this.observe(
 			this.#context.unsupported,
 			(unsupported) => {
@@ -306,6 +310,25 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		this.requestUpdate('_blockViewProps');
 	}
 
+	#updateBlockLabel() {
+		this.#updateBlockViewProps({ label: this._externalContentName ?? this._label });
+	}
+
+	#observeExternalContentName() {
+		this.observe(
+			this.#context.externalContentName,
+			(name) => {
+				this._externalContentName = name;
+				// The Element's name is its identity, so it takes over as the block's name/label instead of the block type's UFM label template.
+				if (name) {
+					this.#context.setName(name);
+				}
+				this.#updateBlockLabel();
+			},
+			null,
+		);
+	}
+
 	override connectedCallback(): void {
 		super.connectedCallback();
 		// element styling:
@@ -337,23 +360,35 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		);
 	}
 
-	#expose = () => {
+	readonly #expose = () => {
 		this.#context.expose();
 	};
 
-	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
+	readonly #onUfmResolved = (event: UmbUfmResolvedEvent) => {
+		if (this._externalContentName) return;
 		this.#context.setName(event.detail.text);
 	};
 
-	#renderHiddenUfm() {
-		const blockValue = {
+	get #blockValue() {
+		return {
 			...this._blockViewProps.content,
 			$settings: this._blockViewProps.settings,
 		};
-		return renderHiddenUfm(this._label, blockValue, this.#onUfmResolved);
 	}
 
-	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
+	#renderUfm() {
+		if (this._externalContentName) {
+			return html`<span slot="name">${this._externalContentName}</span>`;
+		}
+		return renderUfm(this._label, this.#blockValue, this.#onUfmResolved, 'name');
+	}
+
+	#renderHiddenUfm() {
+		if (this._externalContentName) return nothing;
+		return renderHiddenUfm(this._label, this.#blockValue, this.#onUfmResolved);
+	}
+
+	readonly #extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
 		if (this._unsupported) {
 			// If the block is unsupported, we should not allow any custom views to render.
 			return false;
@@ -371,34 +406,35 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		return true;
 	};
 
-	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
+	readonly #extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
 		ext.component?.setAttribute('part', 'component');
-		return html`${this.#renderHiddenUfm()}
-		${when(
-			this._exposed || this._isReadOnly,
-			() => ext.component,
-			() => html`
-				<div style="min-height: var(--uui-size-16);">
-					${ext.component}
-					<umb-block-overlay-expose-button
-						.contentTypeName=${this._contentTypeName}
-						@click=${this.#expose}></umb-block-overlay-expose-button>
-				</div>
-			`,
-		)}`;
+		return html`
+			${this.#renderHiddenUfm()}
+			${when(
+				this._exposed || this._isReadOnly,
+				() => ext.component,
+				() => html`
+					<div style="min-height: var(--uui-size-16);">
+						${ext.component}
+						<umb-block-overlay-expose-button
+							.contentTypeName=${this._contentTypeName}
+							@click=${this.#expose}></umb-block-overlay-expose-button>
+					</div>
+				`,
+			)}
+		`;
 	};
 
 	#renderRefBlock() {
 		return html`
 			<umb-ref-single-block
-				.label=${this._label}
 				.icon=${this._icon}
 				.unpublished=${!this._exposed}
-				.isExternalContent=${this._isExternalContent}
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
 				${umbDestroyOnDisconnect()}>
+				${this.#renderUfm()}
 			</umb-ref-single-block>
 		`;
 	}
@@ -406,14 +442,13 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	#renderInlineBlock() {
 		return html`
 			<umb-inline-single-block
-				.label=${this._label}
 				.icon=${this._icon}
 				.unpublished=${!this._exposed}
-				.isExternalContent=${this._isExternalContent}
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
 				${umbDestroyOnDisconnect()}>
+				${this.#renderUfm()}
 			</umb-inline-single-block>
 		`;
 	}
@@ -430,7 +465,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		`;
 	}
 
-	#renderBuiltinBlockView = () => {
+	readonly #renderBuiltinBlockView = () => {
 		if (this._unsupported) {
 			return this.#renderUnsupportedBlock();
 		}
@@ -441,27 +476,29 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	};
 
 	#renderBlock() {
-		return this.contentKey && (this._contentTypeAlias || this._unsupported)
-			? html`
-					<div class="umb-block-single__block">
-						<umb-entity-frame>
-							${when(this._isExternalContent, () => html`<uui-icon name="link"></uui-icon>`)} ${this._name}
-						</umb-entity-frame>
-						<umb-extension-slot
-							type="blockEditorCustomView"
-							default-element=${this._inlineEditingMode ? 'umb-inline-single-block' : 'umb-ref-single-block'}
-							.renderMethod=${this.#extensionSlotRenderMethod}
-							.fallbackRenderMethod=${this.#renderBuiltinBlockView}
-							.props=${this._blockViewProps}
-							.filter=${this.#extensionSlotFilterMethod}
-							single></umb-extension-slot>
-						${this.#renderActionBar()}
-						${!this._showContentEdit && this._contentInvalid
-							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
-							: nothing}
-					</div>
-				`
-			: nothing;
+		return when(
+			this.contentKey && (this._contentTypeAlias || this._unsupported),
+			() => html`
+				<div class="umb-block-single__block">
+					<umb-entity-frame>
+						${when(this._isExternalContent, () => html`<uui-icon name="link"></uui-icon>`)} ${this._name}
+					</umb-entity-frame>
+					<umb-extension-slot
+						type="blockEditorCustomView"
+						default-element=${this._inlineEditingMode ? 'umb-inline-single-block' : 'umb-ref-single-block'}
+						.renderMethod=${this.#extensionSlotRenderMethod}
+						.fallbackRenderMethod=${this.#renderBuiltinBlockView}
+						.props=${this._blockViewProps}
+						.filter=${this.#extensionSlotFilterMethod}
+						single></umb-extension-slot>
+					${this.#renderActionBar()}
+					${when(
+						!this._showContentEdit && this._contentInvalid,
+						() => html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`,
+					)}
+				</div>
+			`,
+		);
 	}
 
 	#renderActionBar() {
@@ -473,7 +510,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		return this.#renderBlock();
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UUIBlinkKeyframes,
 		css`
 			:host {
@@ -571,6 +608,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			.umb-block-single__block {
 				--umb-entity-frame-opacity: 0;
 				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
+				--umb-entity-frame-contrast-color: var(--uui-color-interactive-contrast);
 
 				&:hover,
 				&:focus-within {

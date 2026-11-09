@@ -2,6 +2,8 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbBlockTransferToElementLibraryModalData {
 	name?: string;
+	/** The Element Type of the block. When given, a location that does not allow it cannot be chosen. */
+	contentTypeKey?: string;
 }
 
 export interface UmbBlockTransferToElementLibraryModalValue {

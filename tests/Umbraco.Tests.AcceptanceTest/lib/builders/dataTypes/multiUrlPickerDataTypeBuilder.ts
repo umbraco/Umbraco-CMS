@@ -40,16 +40,13 @@ export class MultiUrlPickerDataTypeBuilder extends DataTypeBuilder {
 
   getValues() {
     let values: any = [];
-    if (this.minNumber !== undefined) {
+    if (this.minNumber !== undefined || this.maxNumber !== undefined) {
       values.push({
-        alias: 'minNumber',
-        value: this.minNumber
-      });
-    }
-    if (this.maxNumber !== undefined) {
-      values.push({
-        alias: 'maxNumber',
-        value: this.maxNumber
+        alias: 'validationLimit',
+        value: {
+          min: this.minNumber,
+          max: this.maxNumber
+        }
       });
     }
     if (this.ignoreUserStartNodes !== undefined) {

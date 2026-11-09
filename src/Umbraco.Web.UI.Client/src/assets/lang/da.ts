@@ -81,6 +81,17 @@ export default {
 		loadMore: 'Indlæs flere',
 		showMore: 'Vis flere',
 	},
+	actionGroups: {
+		clipboard: 'Udklipsholder',
+		create: 'Opret',
+		edit: 'Rediger',
+		importExport: 'Import og eksport',
+		notifications: 'Notificeringer',
+		other: 'Andet',
+		publishing: 'Udgivelse',
+		routing: 'Routing',
+		structure: 'Struktur',
+	},
 	actionCategories: {
 		content: 'Indhold',
 		administration: 'Administration',
@@ -400,6 +411,8 @@ export default {
 		},
 	},
 	media: {
+		chooseMediaTypeHeadline: 'Vælg medietype',
+		chooseMediaTypeMoreFiles: (count: number) => (count === 1 ? '1 fil mere' : `${count} filer mere`),
 		clickToUpload: 'Klik for at uploade',
 		browseFilesAction: 'Gennemse filer',
 		dropFilesOr: 'Træk og slip medier her<br />eller',
@@ -2235,8 +2248,8 @@ export default {
 		type: 'Type',
 		sortNameAscending: 'Navn (A-Å)',
 		sortNameDescending: 'Navn (Å-A)',
-		sortCreateDateAscending: 'Nyeste',
-		sortCreateDateDescending: 'Ældste',
+		sortCreateDateAscending: 'Ældste',
+		sortCreateDateDescending: 'Nyeste',
 		userKindDefault: 'Bruger',
 		userKindApi: 'API-bruger',
 		sortLastLoginDateDescending: 'Sidst logget ind',
@@ -2690,9 +2703,17 @@ export default {
 		notExposedLabel: 'ikke oprettet',
 		notExposedDescription: 'Denne blok er endnu ikke oprettet for denne variant',
 		notPublishedLibraryElementDescription: 'Det bibliotekselement, som denne blok bruger, er ikke udgivet',
+		publishedPendingChangesLibraryElementDescription:
+			'Det bibliotekselement, som denne blok bruger, har ændringer, der endnu ikke er udgivet',
+		trashedLibraryElementDescription: 'Det bibliotekselement, som denne blok bruger, ligger i papirkurven',
 		unsupportedBlockName: 'Ugyldigt indhold',
 		unsupportedBlockDescription:
 			'Dette indhold er ikke længere understøttet. Hvis du mangler dette indhold bør du kontakte din administrator. Ellers bør du slette dette indhold.',
+		deletedLibraryElementName: 'Slettet bibliotekselement',
+		deletedLibraryElementDescription:
+			'Det bibliotekselement, som denne blok bruger, er slettet. Fjern denne blok.',
+		noAccessLibraryElementName: 'Utilgængeligt bibliotekselement',
+		noAccessLibraryElementDescription: 'Du har ikke adgang til det bibliotekselement, som denne blok bruger.',
 		blockVariantConfigurationNotSupported:
 			'En eller flere bloktyper i denne blokeditor bruger en elementtype, der er konfigureret til at variere efter kultur eller segment. Dette understøttes ikke på et indholdselement, som ikke varierer efter kultur eller segment.',
 		areaValidationEntriesNotAllowed: '<strong>%0%</strong> er ikke tilladt i dette område.',

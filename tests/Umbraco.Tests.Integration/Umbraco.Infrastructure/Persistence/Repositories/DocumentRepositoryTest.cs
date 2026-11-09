@@ -15,14 +15,14 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Tests.Common.Attributes;
-using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -3731,7 +3731,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         // Re-persist keeping only the release entry (by its existing Id) and dropping the expire entry —
         // mirrors the real update-schedule workflow of mutating a previously-read ContentScheduleCollection.
         var secondSchedule = new ContentScheduleCollection();
-        secondSchedule.Add(new ContentSchedule(releaseEntryId, Constants.System.InvariantCulture, releaseDate, ContentScheduleAction.Release));
+        secondSchedule.Add(new ContentSchedule(releaseEntryId, Constants.System.InvariantCulture, releaseDate, ContentScheduleAction.Release, includeInvariantForVariant: false));
         await repository.PersistContentScheduleAsync(_textpage, secondSchedule, CancellationToken.None);
 
         ContentScheduleCollection final = await repository.GetContentScheduleAsync(_textpage.Key, CancellationToken.None);

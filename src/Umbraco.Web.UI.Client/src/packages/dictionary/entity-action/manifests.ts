@@ -1,12 +1,17 @@
 import { UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS, UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
+import {
+	UMB_ENTITY_ACTION_GROUP_CREATE,
+	UMB_ENTITY_ACTION_GROUP_IMPORT_EXPORT,
+} from '@umbraco-cms/backoffice/entity-action';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.Dictionary.Create',
+		group: UMB_ENTITY_ACTION_GROUP_CREATE,
 		name: 'Create Dictionary Entity Action',
 		weight: 1200,
 		api: () => import('./create/create.action.js'),
@@ -21,6 +26,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.Dictionary.Export',
+		group: UMB_ENTITY_ACTION_GROUP_IMPORT_EXPORT,
 		name: 'Export Dictionary Entity Action',
 		weight: 400,
 		api: () => import('./export/export.action.js'),
@@ -35,6 +41,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.Dictionary.Import',
+		group: UMB_ENTITY_ACTION_GROUP_IMPORT_EXPORT,
 		name: 'Import Dictionary Entity Action',
 		weight: 300,
 		api: () => import('./import/import.action.js'),

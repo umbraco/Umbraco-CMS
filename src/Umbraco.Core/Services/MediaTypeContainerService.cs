@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Locking;
@@ -15,6 +17,8 @@ namespace Umbraco.Cms.Core.Services;
 /// </remarks>
 internal sealed class MediaTypeContainerService : EntityTypeContainerService<IMediaType, IMediaTypeContainerRepository>, IMediaTypeContainerService
 {
+    private readonly IMediaTypeRepository _mediaTypeRepository;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="MediaTypeContainerService" /> class.
     /// </summary>
@@ -25,6 +29,8 @@ internal sealed class MediaTypeContainerService : EntityTypeContainerService<IMe
     /// <param name="auditService">The audit service for recording audit entries.</param>
     /// <param name="entityRepository">The entity repository for entity operations.</param>
     /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="mediaTypeRepository">The media type repository.</param>
     public MediaTypeContainerService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -32,9 +38,25 @@ internal sealed class MediaTypeContainerService : EntityTypeContainerService<IMe
         IMediaTypeContainerRepository entityContainerRepository,
         IAuditService auditService,
         IEntityRepository entityRepository,
-        IUserIdKeyResolver userIdKeyResolver)
-        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IEntityService entityService,
+        IMediaTypeRepository mediaTypeRepository)
+        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver, entityService)
+        => _mediaTypeRepository = mediaTypeRepository;
+
+    /// <inheritdoc />
+    protected override Task<IMediaType?> GetContainedEntityAsync(IEntitySlim descendant) => _mediaTypeRepository.GetAsync(descendant.Id, CancellationToken.None);
+
+    /// <inheritdoc />
+    protected override Task SaveContainedEntityAsync(IMediaType entity) => _mediaTypeRepository.SaveAsync(entity, CancellationToken.None);
+
+    /// <inheritdoc />
+    protected override void PublishContainedEntitiesMovedNotifications(ICoreScope scope, IReadOnlyCollection<MoveEventInfo<IMediaType>> movedEntities, EventMessages eventMessages)
     {
+        if (movedEntities.Count > 0)
+        {
+            scope.Notifications.Publish(new MediaTypeMovedNotification(movedEntities, eventMessages));
+        }
     }
 
     /// <inheritdoc />

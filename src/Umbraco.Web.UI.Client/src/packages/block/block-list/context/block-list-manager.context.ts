@@ -62,13 +62,17 @@ export class UmbBlockListManagerContext<
 		return await super._createBlockData(contentElementTypeKey, partialLayoutEntry);
 	}
 
+	override setOneLayout(layoutEntry: BlockLayoutType, originData?: UmbBlockListWorkspaceOriginData) {
+		this._layouts.appendOneAt(layoutEntry, originData?.index ?? -1);
+	}
+
 	insert(
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataModel,
 		settings: UmbBlockDataModel | undefined,
 		originData: UmbBlockListWorkspaceOriginData,
 	) {
-		this._layouts.appendOneAt(layoutEntry, originData.index ?? -1);
+		this.setOneLayout(layoutEntry, originData);
 		this.insertBlockData(layoutEntry, content, settings, originData);
 		this.notifyBlockInserted(layoutEntry, originData);
 

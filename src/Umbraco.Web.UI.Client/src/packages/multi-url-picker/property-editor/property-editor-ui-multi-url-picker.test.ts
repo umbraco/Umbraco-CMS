@@ -1,4 +1,5 @@
 import { UmbPropertyEditorUIMultiUrlPickerElement } from './property-editor-ui-multi-url-picker.element.js';
+import { manifests } from './manifests.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
@@ -33,6 +34,31 @@ describe('UmbPropertyEditorUIMultiUrlPickerElement', () => {
 			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
 		});
 	}
+
+	describe('clear', () => {
+		it('should register a clear property action for the multi url picker', () => {
+			const clearAction = manifests.find(
+				(manifest) =>
+					manifest.type === 'propertyAction' &&
+					'kind' in manifest &&
+					manifest.kind === 'clear' &&
+					'forPropertyEditorUis' in manifest &&
+					manifest.forPropertyEditorUis.includes('Umb.PropertyEditorUi.MultiUrlPicker'),
+			);
+			expect(clearAction).to.not.be.undefined;
+		});
+
+		it('should show no links once the value is cleared', async () => {
+			element.value = [{ name: 'Umbraco', type: 'external', url: 'https://umbraco.com' }];
+			await element.updateComplete;
+
+			element.value = undefined;
+			await element.updateComplete;
+
+			const input = element.shadowRoot!.querySelector<UmbInputMultiUrlElement>('umb-input-multi-url')!;
+			expect(input.urls).to.have.lengthOf(0);
+		});
+	});
 
 	// The link picker modal reaches the input's memory scope over context; from there the memories
 	// travel up to this property editor as a property and an event, and end up in the app-root store

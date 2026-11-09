@@ -13,11 +13,21 @@ public abstract class PublishStatusService
     private ConcurrentDictionary<Guid, ISet<string>> _publishedCultures = new();
     private readonly ILogger _logger;
     private readonly string _entityTypeName;
+    private string? _defaultCulture;
+    private volatile bool _defaultCultureIsStale;
 
     /// <summary>
     /// Gets or sets the default culture ISO code used when no culture is specified.
     /// </summary>
-    protected string? DefaultCulture { get; set; }
+    protected string? DefaultCulture
+    {
+        get => _defaultCulture;
+        set
+        {
+            _defaultCultureIsStale = false;
+            _defaultCulture = value;
+        }
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PublishStatusService"/> class.
@@ -40,9 +50,9 @@ public abstract class PublishStatusService
     /// <returns><c>true</c> if the item is published in the specified culture; otherwise, <c>false</c>.</returns>
     protected bool IsPublished(Guid key, string culture)
     {
-        if (string.IsNullOrEmpty(culture) && DefaultCulture is not null)
+        if (string.IsNullOrEmpty(culture) && GetDefaultCulture() is { } defaultCulture)
         {
-            culture = DefaultCulture;
+            culture = defaultCulture;
         }
 
         if (_publishedCultures.TryGetValue(key, out ISet<string>? publishedCultures))
@@ -117,4 +127,76 @@ public abstract class PublishStatusService
     /// <param name="key">The item's key.</param>
     protected void RemoveStatus(Guid key)
         => _publishedCultures.TryRemove(key, out _);
+
+    /// <summary>
+    /// Brings the cached publish status for a single culture in line with the given set of published items.
+    /// </summary>
+    /// <remarks>
+    /// The culture is added to every item in <paramref name="publishedKeys"/> and removed from every other item.
+    /// </remarks>
+    /// <param name="culture">The culture code.</param>
+    /// <param name="publishedKeys">The keys of all items that are published in the culture.</param>
+    protected void RefreshCulture(string culture, ISet<Guid> publishedKeys)
+    {
+        // The cached sets are read concurrently, so they are replaced rather than modified in place.
+        ConcurrentDictionary<Guid, ISet<string>> publishedCultures = Volatile.Read(ref _publishedCultures);
+        foreach (Guid key in publishedKeys)
+        {
+            publishedCultures.AddOrUpdate(
+                key,
+                _ => new HashSet<string> { culture },
+                (_, existing) => existing.Contains(culture, StringComparer.InvariantCultureIgnoreCase)
+                    ? existing
+                    : new HashSet<string>(existing) { culture });
+        }
+
+        foreach ((Guid key, ISet<string> existing) in publishedCultures)
+        {
+            if (publishedKeys.Contains(key) || existing.Contains(culture, StringComparer.InvariantCultureIgnoreCase) is false)
+            {
+                continue;
+            }
+
+            var remaining = existing
+                .Where(x => string.Equals(x, culture, StringComparison.InvariantCultureIgnoreCase) is false)
+                .ToHashSet();
+
+            // A failed swap means the entry was reloaded from the database after the language change, so it is
+            // already correct and is left as it is.
+            if (remaining.Count > 0)
+            {
+                publishedCultures.TryUpdate(key, remaining, existing);
+            }
+            else
+            {
+                publishedCultures.TryRemove(new KeyValuePair<Guid, ISet<string>>(key, existing));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Marks the default culture as stale, so it is re-read with <see cref="ReadDefaultCulture"/> before it is next used.
+    /// </summary>
+    /// <remarks>
+    /// The default culture is re-read on the next query that needs it, rather than straight away, so a language
+    /// change does not reload the languages on every server unless a query without a culture is made.
+    /// </remarks>
+    protected void InvalidateDefaultCulture() => _defaultCultureIsStale = true;
+
+    /// <summary>
+    /// Reads the current default culture ISO code, when the default culture is needed after
+    /// <see cref="InvalidateDefaultCulture"/> has been called.
+    /// </summary>
+    /// <returns>The default culture ISO code.</returns>
+    protected virtual string? ReadDefaultCulture() => _defaultCulture;
+
+    private string? GetDefaultCulture()
+    {
+        if (_defaultCultureIsStale)
+        {
+            DefaultCulture = ReadDefaultCulture();
+        }
+
+        return DefaultCulture;
+    }
 }

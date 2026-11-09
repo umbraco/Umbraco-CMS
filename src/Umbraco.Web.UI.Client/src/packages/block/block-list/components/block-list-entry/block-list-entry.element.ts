@@ -5,7 +5,7 @@ import { css, customElement, html, nothing, property, state, when } from '@umbra
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
-import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
+import { renderHiddenUfm, renderUfm } from '@umbraco-cms/backoffice/ufm';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type {
@@ -97,7 +97,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	public get contentKey(): string | undefined {
 		return this._contentKey;
 	}
-	private _contentKey?: string | undefined;
+	private _contentKey: string | undefined;
 
 	#context = new UmbBlockListEntryContext(this);
 
@@ -154,6 +154,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _isReadOnly = false;
 
+	@state()
+	private _externalContentName?: string;
+
 	constructor() {
 		super();
 		this.#init();
@@ -186,8 +189,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.label,
 			(label) => {
-				this.#updateBlockViewProps({ label });
 				this._label = label;
+				this.#updateBlockLabel();
 			},
 			null,
 		);
@@ -228,6 +231,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
+		this.#observeExternalContentName();
 
 		// Data props:
 		this.observe(
@@ -304,6 +308,25 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.requestUpdate('_blockViewProps');
 	}
 
+	#updateBlockLabel() {
+		this.#updateBlockViewProps({ label: this._externalContentName ?? this._label });
+	}
+
+	#observeExternalContentName() {
+		this.observe(
+			this.#context.externalContentName,
+			(name) => {
+				this._externalContentName = name;
+				// The Element's name is its identity, so it takes over as the block's name/label instead of the block type's UFM label template.
+				if (name) {
+					this.#context.setName(name);
+				}
+				this.#updateBlockLabel();
+			},
+			null,
+		);
+	}
+
 	override connectedCallback(): void {
 		super.connectedCallback();
 		// element styling:
@@ -340,6 +363,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
+		if (this._externalContentName) return;
 		this.#context.setName(event.detail.text);
 	};
 
@@ -387,18 +411,14 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderUfm() {
-		return html`
-			<umb-ufm-render
-				slot="name"
-				inline
-				.markdown=${this._label}
-				.value=${this.#blockValue}
-				@umb-ufm-resolved=${this.#onUfmResolved}>
-			</umb-ufm-render>
-		`;
+		if (this._externalContentName) {
+			return html`<span slot="name">${this._externalContentName}</span>`;
+		}
+		return renderUfm(this._label, this.#blockValue, this.#onUfmResolved, 'name');
 	}
 
 	#renderHiddenUfm() {
+		if (this._externalContentName) return nothing;
 		return renderHiddenUfm(this._label, this.#blockValue, this.#onUfmResolved);
 	}
 
@@ -409,7 +429,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				.icon=${this._icon}
 				.index=${this._blockViewProps.index}
 				.unpublished=${!this._exposed}
-				.isExternalContent=${this._isExternalContent}
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
@@ -425,7 +444,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				.icon=${this._icon}
 				.index=${this._blockViewProps.index}
 				.unpublished=${!this._exposed}
-				.isExternalContent=${this._isExternalContent}
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
@@ -480,9 +498,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 						`,
 					)}
 					${this.#renderActionBar()}
-					${!this._showContentEdit && this._contentInvalid
-						? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
-						: nothing}
+					${when(
+						!this._showContentEdit && this._contentInvalid,
+						() => html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`,
+					)}
 				</div>
 			`,
 		);
@@ -596,6 +615,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			.umb-block-list__block {
 				--umb-entity-frame-opacity: 0;
 				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
+				--umb-entity-frame-contrast-color: var(--uui-color-interactive-contrast);
 
 				&:hover,
 				&:focus-within {

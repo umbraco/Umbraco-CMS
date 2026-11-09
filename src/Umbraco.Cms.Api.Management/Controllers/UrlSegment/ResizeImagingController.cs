@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UrlSegment;
@@ -16,22 +17,37 @@ public class ResizeImagingController : ImagingControllerBase
 {
     private readonly IMediaService _mediaService;
     private readonly IResizeImageUrlFactory _resizeImageUrlFactory;
+    private readonly IMediaPermissionService _mediaPermissionService;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ResizeImagingController"/> class.
     /// </summary>
     /// <param name="mediaService">The media service used to perform media-related operations.</param>
     /// <param name="resizeImageUrlFactory">The factory responsible for generating URLs for resized images.</param>
-    public ResizeImagingController(IMediaService mediaService, IResizeImageUrlFactory resizeImageUrlFactory)
+    /// <param name="mediaPermissionService">Service for determining the media the current user can access.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for the current back office user.</param>
+    public ResizeImagingController(
+        IMediaService mediaService,
+        IResizeImageUrlFactory resizeImageUrlFactory,
+        IMediaPermissionService mediaPermissionService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _mediaService = mediaService;
         _resizeImageUrlFactory = resizeImageUrlFactory;
+        _mediaPermissionService = mediaPermissionService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
     /// <summary>
-    /// Retrieves a collection of URLs for resized versions of the specified images, using the provided dimensions and options.
+    /// Retrieves a collection of URLs for resized versions of the specified images the current user has access to, using the provided dimensions and options.
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <param name="ids">A set of unique identifiers for the images to be resized.</param>
+    /// <param name="dataTypeId">
+    /// The optional identifier of the data type the request originates from. Media outside the user's start nodes
+    /// is only included when this data type is configured to ignore user start nodes.
+    /// </param>
     /// <param name="height">The target height, in pixels, for the resized images. Defaults to 200.</param>
     /// <param name="width">The target width, in pixels, for the resized images. Defaults to 200.</param>
     /// <param name="mode">The cropping mode to apply when resizing the images. Optional.</param>
@@ -44,11 +60,22 @@ public class ResizeImagingController : ImagingControllerBase
     [ProducesResponseType(typeof(IEnumerable<MediaUrlInfoResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets URLs for image resizing.")]
     [EndpointDescription("Gets a collection of URLs for resizing images with the provided dimensions and options.")]
-    public Task<IActionResult> Urls([FromQuery(Name = "id")] HashSet<Guid> ids, int height = 200, int width = 200, ImageCropMode? mode = null, string? format = null)
+    public async Task<IActionResult> Urls(
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "id")] HashSet<Guid> ids,
+        [FromQuery] Guid? dataTypeId,
+        int height = 200,
+        int width = 200,
+        ImageCropMode? mode = null,
+        string? format = null)
     {
-        IEnumerable<IMedia> items = _mediaService.GetByIds(ids);
+        ISet<Guid> authorizedIds = await _mediaPermissionService.FilterAuthorizedAccessAsync(
+            CurrentUser(_backOfficeSecurityAccessor),
+            ids,
+            dataTypeId);
+        IEnumerable<IMedia> items = _mediaService.GetByIds(authorizedIds);
         var options = new ImageResizeOptions(height, width, mode, format);
 
-        return Task.FromResult<IActionResult>(Ok(_resizeImageUrlFactory.CreateUrlSets(items, options)));
+        return Ok(_resizeImageUrlFactory.CreateUrlSets(items, options));
     }
 }

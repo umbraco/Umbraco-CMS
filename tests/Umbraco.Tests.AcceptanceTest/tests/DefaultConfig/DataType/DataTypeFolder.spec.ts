@@ -2,18 +2,21 @@ import {NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'TestDataType';
+const dataTypeTargetFolderName = 'TestDataTypeTargetFolder';
 const dataTypeFolderName = 'TestDataTypeFolder';
 const editorAlias = 'Umbraco.ColorPicker';
 const editorUiAlias = 'Umb.PropertyEditorUi.ColorPicker';
 const propertyEditorName = 'Color Picker';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
+  await umbracoApi.dataType.ensureNameNotExists(dataTypeTargetFolderName);
   await umbracoApi.dataType.ensureNameNotExists(dataTypeFolderName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
 });
 
 test.afterEach(async ({umbracoApi}) => {
+  await umbracoApi.dataType.ensureNameNotExists(dataTypeTargetFolderName);
   await umbracoApi.dataType.ensureNameNotExists(dataTypeFolderName);
 });
 
@@ -170,6 +173,7 @@ test('can move a data type to a data type folder', {tag: '@release'}, async ({um
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
   const dataTypeId = await umbracoApi.dataType.create(dataTypeName, editorAlias, editorUiAlias,[]);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
+  await umbracoApi.dataType.ensureNameNotExists(dataTypeTargetFolderName);
   await umbracoApi.dataType.ensureNameNotExists(dataTypeFolderName);
   const dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
   expect(await umbracoApi.dataType.doesFolderExist(dataTypeFolderId)).toBeTruthy();
@@ -193,6 +197,7 @@ test('can duplicate a data type to a data type folder', {tag: '@release'}, async
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
   await umbracoApi.dataType.create(dataTypeName, editorAlias, editorUiAlias, []);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
+  await umbracoApi.dataType.ensureNameNotExists(dataTypeTargetFolderName);
   await umbracoApi.dataType.ensureNameNotExists(dataTypeFolderName);
   const dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
   expect(await umbracoApi.dataType.doesFolderExist(dataTypeFolderId)).toBeTruthy();
@@ -210,4 +215,20 @@ test('can duplicate a data type to a data type folder', {tag: '@release'}, async
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
+});
+
+test('can move a data type folder to another data type folder', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const folderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
+  const targetFolderId = await umbracoApi.dataType.createFolder(dataTypeTargetFolderName);
+
+  // Act
+  await umbracoUi.dataType.clickRootFolderCaretButton();
+  await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
+  await umbracoUi.dataType.moveToFolder(dataTypeTargetFolderName);
+
+  // Assert
+  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);
+  const targetFolderChildren = await umbracoApi.dataType.getChildren(targetFolderId);
+  expect(targetFolderChildren.some((child) => child.id === folderId)).toBeTruthy();
 });

@@ -41,7 +41,6 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 				const model: UmbMediaCollectionItemModel = {
 					unique: item.id,
 					entityType: UMB_MEDIA_ENTITY_TYPE,
-					contentTypeAlias: item.mediaType.alias,
 					contentType,
 					createDate: new Date(variant.createDate),
 					creator: item.creator,

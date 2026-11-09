@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core;
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 using Microsoft.EntityFrameworkCore;
@@ -178,6 +179,11 @@ public class WebhookRepository : IWebhookRepository
 
         await scope.ExecuteWithContextAsync<Task>(async db =>
         {
+            // Queued requests reference the webhook by key without a foreign key, so they don't cascade. The request
+            // table is not part of the EF Core model yet, hence the raw statement.
+            Guid webhookKey = webhook.Key;
+            await db.Database.ExecuteSqlAsync($"DELETE FROM {Constants.DatabaseSchema.Tables.WebhookRequest} WHERE webhookKey = {webhookKey}");
+
             await db.Webhooks.Where(x => x.Key == webhook.Key).ExecuteDeleteAsync();
         });
     }

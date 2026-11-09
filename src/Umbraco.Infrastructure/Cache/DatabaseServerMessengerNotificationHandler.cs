@@ -1,9 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
@@ -17,7 +15,6 @@ namespace Umbraco.Cms.Core.Cache;
 /// </summary>
 public sealed class DatabaseServerMessengerNotificationHandler :
     INotificationHandler<UmbracoApplicationStartingNotification>,
-    INotificationHandler<UmbracoRequestEndNotification>,
     INotificationAsyncHandler<UmbracoRequestEndNotification>
 {
     private readonly IUmbracoDatabaseFactory _databaseFactory;
@@ -25,24 +22,6 @@ public sealed class DatabaseServerMessengerNotificationHandler :
     private readonly IServerMessenger _messenger;
     private readonly IRuntimeState _runtimeState;
     private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="DatabaseServerMessengerNotificationHandler" /> class.
-    /// </summary>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public DatabaseServerMessengerNotificationHandler(
-        IServerMessenger serverMessenger,
-        IUmbracoDatabaseFactory databaseFactory,
-        ILogger<DatabaseServerMessengerNotificationHandler> logger,
-        IRuntimeState runtimeState)
-        : this(
-            serverMessenger,
-            databaseFactory,
-            logger,
-            runtimeState,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
-    {
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DatabaseServerMessengerNotificationHandler" /> class.
@@ -79,11 +58,6 @@ public sealed class DatabaseServerMessengerNotificationHandler :
         // Sync on startup, this will run through the messenger's initialization sequence
         _messenger?.Sync();
     }
-
-    /// <inheritdoc />
-    [Obsolete("Please use HandleAsync. Scheduled for removal in Umbraco 19.")]
-    public void Handle(UmbracoRequestEndNotification notification)
-        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
     /// <summary>
     /// Handles the end of an Umbraco request: writes the batched distributed cache instructions, then publishes the

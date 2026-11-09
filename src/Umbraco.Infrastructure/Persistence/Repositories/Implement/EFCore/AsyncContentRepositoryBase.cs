@@ -378,14 +378,18 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
 
         // Batched to stay within SQL Server's 2100-parameter limit.
         // versionIds can reach 2× the entity count (current + published version per entity).
+        // The property aliases are parameters of the same statement as each batch of version ids. If there are too many
+        // to leave a useful batch size, load all properties instead, which includes the requested ones.
+        var filterByAliases = propertyAliases is { Length: > 0 } && propertyAliases.Length <= Constants.Sql.MaxParameterCount / 2;
+        var batchSize = filterByAliases ? Constants.Sql.MaxParameterCount - propertyAliases!.Length : Constants.Sql.MaxParameterCount;
         var allPropertyData = new List<PropertyDataDto>();
-        foreach (IEnumerable<int> batch in versionIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        foreach (IEnumerable<int> batch in versionIds.InGroupsOf(batchSize))
         {
             var batchIds = batch.ToList();
 
-            if (propertyAliases is { Length: > 0 })
+            if (filterByAliases)
             {
-                List<string> aliases = new(propertyAliases);
+                List<string> aliases = new(propertyAliases!);
                 allPropertyData.AddRange(await db.PropertyData
                     .Where(propertyData => batchIds.Contains(propertyData.VersionId))
                     .Join(

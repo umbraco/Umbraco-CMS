@@ -8,7 +8,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Upload Field Property Editor UI',
 		element: () => import('./property-editor-ui-upload-field.element.js'),
 		meta: {
-			supportsVariantChange: true,
 			label: 'Upload Field',
 			propertyEditorSchemaAlias: 'Umbraco.UploadField',
 			icon: 'icon-download-alt',

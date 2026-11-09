@@ -33,6 +33,16 @@ public static class HttpRequestExtensions
     }
 
     /// <summary>
+    ///     Returns true if the request is a Delivery API request
+    /// </summary>
+    public static bool IsDeliveryApiRequest(this HttpRequest request)
+    {
+        PathString absPath = request.Path;
+        UmbracoRequestPaths? umbReqPaths = request.HttpContext.RequestServices.GetService<UmbracoRequestPaths>();
+        return umbReqPaths?.IsDeliveryApiRequest(absPath) ?? false;
+    }
+
+    /// <summary>
     ///     Returns true if the request is for a client side extension
     /// </summary>
     public static bool IsClientSideRequest(this HttpRequest request)

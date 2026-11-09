@@ -5,6 +5,7 @@ import type {
 	UmbConditionConfigBase,
 } from '../types/index.js';
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
+import { compareExtensionsByWeight } from '../functions/compare-extensions-by-weight.function.js';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { map, distinctUntilChanged, combineLatest, of, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
@@ -117,8 +118,6 @@ function extensionAndKindMatchSingleMemoization<
 		(previousValue as any).conditions?.length !== (currentValue as any).conditions?.length
 	);
 }
-
-const sortExtensions = (a: ManifestBase, b: ManifestBase): number => (b.weight || 0) - (a.weight || 0);
 
 export class UmbExtensionRegistry<
 	IncomingManifestTypes extends ManifestBase,
@@ -410,7 +409,7 @@ export class UmbExtensionRegistry<
 				}
 				return ext;
 			})
-			.sort(sortExtensions);
+			.sort(compareExtensionsByWeight);
 	}
 
 	/**
@@ -535,7 +534,7 @@ export class UmbExtensionRegistry<
 		const kinds = this._kinds.getValue();
 		return exts
 			.map((ext) => (ext?.kind ? (this.#mergeExtensionWithKinds([ext, kinds]) ?? ext) : ext))
-			.sort(sortExtensions);
+			.sort(compareExtensionsByWeight);
 	}
 
 	/**
@@ -596,7 +595,7 @@ export class UmbExtensionRegistry<
 		const kinds = this._kinds.getValue();
 		return exts
 			.map((ext) => (ext?.kind ? (this.#mergeExtensionWithKinds([ext, kinds]) ?? ext) : ext))
-			.sort(sortExtensions);
+			.sort(compareExtensionsByWeight);
 	}
 
 	/**

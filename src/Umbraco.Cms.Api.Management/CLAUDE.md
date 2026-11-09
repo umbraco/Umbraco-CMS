@@ -113,6 +113,9 @@ These are firm design rules for this API. Prefer an extra round-trip over bendin
      (see `BatchDataTypesController`, `BatchUsersController`). The batch controller lives under
      the resource's normal controller base so it carries the **same authorization** as the
      single-item `GET` (section access + per-resource checks).
+     Exception: a batch endpoint for a resource that other sections render as references may use a
+     broader section policy covering those sections, provided it filters every requested id through
+     per-resource permission checks (see `BatchElementsController`).
 
 2. **Do not add data to item endpoints (`/item/{resource}`).**
    Item endpoints (`Item*Controller`, used to hydrate pickers/lists) sit on

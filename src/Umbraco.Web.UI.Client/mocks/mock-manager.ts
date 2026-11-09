@@ -51,6 +51,7 @@ class UmbMockManager {
 			label: 'Blocks: Reusable Content',
 			loader: () => import('./data/sets/blocks-reusable-content/index.js') as Promise<UmbMockDataSet>,
 			visible: true,
+			userSwitcher: true,
 		},
 		languagePermissions: {
 			label: 'Language Permissions',

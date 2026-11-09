@@ -97,6 +97,7 @@ test('can create document blueprint with permission enabled', {tag: '@release'},
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   await umbracoUi.content.clickCreateBlueprintActionMenuOption();
+  await umbracoUi.content.clickModalMenuItemWithName('Document Blueprints');
   await umbracoUi.content.enterDocumentBlueprintName(documentBlueprintName);
   await umbracoUi.content.clickSaveDocumentBlueprintButton();
 

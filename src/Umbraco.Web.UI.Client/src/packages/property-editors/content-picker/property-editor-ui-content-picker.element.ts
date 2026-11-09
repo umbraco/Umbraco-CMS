@@ -14,6 +14,7 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 // import of local component
@@ -62,6 +63,9 @@ export class UmbPropertyEditorUIContentPickerElement
 
 	@state()
 	private _rootUnique?: string | null;
+
+	@state()
+	private _rootUniques?: Array<string>;
 
 	@state()
 	private _rootEntityType?: string;
@@ -116,8 +120,9 @@ export class UmbPropertyEditorUIContentPickerElement
 			}
 		}
 
-		this._min = this.#parseInt(config.getValueByAlias('minNumber'), 0);
-		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
+		const minMax = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
+		this._min = this.#parseInt(minMax?.min, 0);
+		this._max = this.#parseInt(minMax?.max, Infinity);
 
 		this._allowedContentTypeUniques = config.getValueByAlias('filter');
 
@@ -137,7 +142,7 @@ export class UmbPropertyEditorUIContentPickerElement
 
 		if (this._min && this._max && this._min > this._max) {
 			console.warn(
-				`Property (Content Picker) has been misconfigured, 'minNumber' is greater than 'maxNumber'. Please correct your data type configuration.`,
+				`Property (Content Picker) has been misconfigured, the minimum is greater than the maximum. Please correct your data type configuration.`,
 				this,
 			);
 		}
@@ -151,10 +156,11 @@ export class UmbPropertyEditorUIContentPickerElement
 		// If we have a root unique value, we don't need to fetch it from the dynamic root
 		if (this._rootUnique) return;
 
-		const resolved = await this.#dynamicRootResolver.resolveStartNodeUnique(this.#dynamicRoot);
-		if (resolved) {
-			this._rootUnique = resolved;
-		}
+		if (!this.#dynamicRoot) return;
+
+		const resolved = await this.#dynamicRootResolver.resolveStartNodeUniques(this.#dynamicRoot);
+		this._rootUnique = resolved?.[0];
+		this._rootUniques = resolved;
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputContentElement }) {
@@ -187,10 +193,15 @@ export class UmbPropertyEditorUIContentPickerElement
 	}
 
 	override render() {
-		const startNode: UmbTreeStartNode | undefined =
-			this._rootUnique && this._rootEntityType
-				? { unique: this._rootUnique, entityType: this._rootEntityType }
+		const entityType = this._rootEntityType;
+
+		// A dynamic root query can resolve to more than one node, and all of them are made available to the picker.
+		const startNodes: Array<UmbTreeStartNode> | undefined =
+			this._rootUniques && this._rootUniques.length > 1 && entityType
+				? this._rootUniques.map((unique) => ({ unique, entityType }))
 				: undefined;
+		const startNode: UmbTreeStartNode | undefined =
+			!startNodes && this._rootUnique && entityType ? { unique: this._rootUnique, entityType } : undefined;
 
 		return html`
 			<umb-input-content
@@ -201,6 +212,7 @@ export class UmbPropertyEditorUIContentPickerElement
 				.max=${this._max}
 				.maxMessage=${this._maxMessage}
 				.startNode=${startNode}
+				.startNodes=${startNodes}
 				.allowedContentTypeIds=${this._allowedContentTypeUniques}
 				?readonly=${this.readonly}
 				?required=${this.mandatory}

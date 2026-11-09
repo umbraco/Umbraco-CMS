@@ -20,6 +20,25 @@ public class ExpressionFilterTests
         Assert.IsFalse(filter.TakeLogEvent(CreateLogEvent("say goodbye world")));
     }
 
+    [TestCase("HELLO")]
+    [TestCase("Hello World")]
+    public void Text_Search_Filter_Is_Case_Insensitive(string filterExpression)
+    {
+        var filter = new ExpressionFilter(filterExpression);
+
+        Assert.IsTrue(filter.TakeLogEvent(CreateLogEvent("say hello world")));
+        Assert.IsFalse(filter.TakeLogEvent(CreateLogEvent("say goodbye world")));
+    }
+
+    [Test]
+    public void Expression_Filter_Keeps_Its_Own_Case_Sensitivity()
+    {
+        var filter = new ExpressionFilter("@Message like '%HELLO%'");
+
+        Assert.IsFalse(filter.TakeLogEvent(CreateLogEvent("say hello world")));
+        Assert.IsTrue(filter.TakeLogEvent(CreateLogEvent("say HELLO world")));
+    }
+
     [Test]
     public void Can_Match_Log_Event_With_Expression_Filter()
     {

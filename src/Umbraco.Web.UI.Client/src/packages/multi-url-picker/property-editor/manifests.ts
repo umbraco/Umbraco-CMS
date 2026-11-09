@@ -23,14 +23,15 @@ const settingsProperties = [
 	},
 ];
 
+const propertyEditorUiAlias = 'Umb.PropertyEditorUi.MultiUrlPicker';
+
 export const manifests = [
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.MultiUrlPicker',
+		alias: propertyEditorUiAlias,
 		name: 'Multi URL Picker Property Editor UI',
 		element: () => import('./property-editor-ui-multi-url-picker.element.js'),
 		meta: {
-			supportsVariantChange: true,
 			label: 'URL Picker',
 			propertyEditorSchemaAlias: 'Umbraco.MultiUrlPicker',
 			icon: 'icon-link',
@@ -62,4 +63,11 @@ export const manifests = [
 	schemaManifest,
 	singleSchemaManifest,
 	...valueSummaryManifests,
+	{
+		type: 'propertyAction',
+		kind: 'clear',
+		alias: 'Umb.PropertyAction.MultiUrlPicker.Clear',
+		name: 'Clear Multi URL Picker Property Action',
+		forPropertyEditorUis: [propertyEditorUiAlias],
+	},
 ];

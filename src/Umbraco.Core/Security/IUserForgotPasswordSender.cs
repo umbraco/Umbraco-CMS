@@ -15,13 +15,6 @@ public interface IUserForgotPasswordSender
     Task SendForgotPassword(UserForgotPasswordMessage message);
 
     /// <summary>
-    ///     Determines whether the sender is configured and able to send messages.
-    /// </summary>
-    /// <returns><c>true</c> if the sender can send messages; otherwise, <c>false</c>.</returns>
-    [Obsolete("Please use IsPasswordResetConfigured to check configuration only, or IsPasswordResetAvailableAsync to also check that messages can currently be delivered. Scheduled for removal in Umbraco 19.")]
-    bool CanSend();
-
-    /// <summary>
     ///     Determines whether password reset is enabled and the sender is configured to send messages.
     /// </summary>
     /// <returns><c>true</c> if password reset is configured; otherwise, <c>false</c>.</returns>
@@ -29,11 +22,7 @@ public interface IUserForgotPasswordSender
     ///     This checks configuration only and performs no I/O, so it is suitable for deciding whether to offer password reset.
     ///     Use <see cref="IsPasswordResetAvailableAsync"/> immediately before sending to also check that messages can be delivered.
     /// </remarks>
-    // TODO (V19): Remove the default implementation when CanSend is removed.
-    bool IsPasswordResetConfigured()
-#pragma warning disable CS0618 // Type or member is obsolete
-        => CanSend();
-#pragma warning restore CS0618 // Type or member is obsolete
+    bool IsPasswordResetConfigured();
 
     /// <summary>
     ///     Determines whether password reset is configured and the sender can currently deliver messages.
@@ -44,7 +33,5 @@ public interface IUserForgotPasswordSender
     ///     Implementations may perform network I/O, so prefer <see cref="IsPasswordResetConfigured"/> unless a message is
     ///     about to be sent.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    Task<bool> IsPasswordResetAvailableAsync(CancellationToken cancellationToken = default)
-        => Task.FromResult(IsPasswordResetConfigured());
+    Task<bool> IsPasswordResetAvailableAsync(CancellationToken cancellationToken = default);
 }

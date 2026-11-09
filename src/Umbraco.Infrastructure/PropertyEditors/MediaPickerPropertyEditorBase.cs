@@ -547,7 +547,7 @@ public abstract class MediaPickerPropertyEditorBase : DataEditor, IValueSchemaPr
                     return validationResults;
                 }
 
-                if (validationLimit.Min is not null && mediaWithCropsDtos.Count < validationLimit.Min)
+                if (ItemCountValidationHelper.IsAboveZeroAndBelowMinimum(mediaWithCropsDtos.Count, validationLimit.Min))
                 {
                     validationResults.Add(new ValidationResult(
                         _localizedTextService.Localize(

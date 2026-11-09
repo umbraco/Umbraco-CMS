@@ -42,6 +42,17 @@ public interface IPublishableContentService<TContent> : IAsyncContentServiceBase
     Task<IEnumerable<TContent>> GetByIdsAsync(IEnumerable<Guid> keys, string[]? propertyAliases, bool loadTemplates, CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Gets a paged list of content whose content type is one of the specified content types.
+    /// </summary>
+    /// <param name="contentTypeKeys">The keys of the content types.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification, or <c>null</c> to order by sort order.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the matching content.</returns>
+    Task<PagedModel<TContent>> GetPagedOfTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Gets a dictionary of content keys and their matching content schedules.
     /// </summary>
     /// <param name="keys">The content keys.</param>

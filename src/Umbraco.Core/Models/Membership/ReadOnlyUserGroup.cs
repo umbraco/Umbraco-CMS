@@ -18,6 +18,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     /// <param name="startContentId">The starting content node identifier.</param>
     /// <param name="startMediaId">The starting media node identifier.</param>
     /// <param name="startElementId">The starting element node identifier.</param>
+    /// <param name="startDocumentBlueprintId">The starting document blueprint container identifier.</param>
     /// <param name="alias">The alias of the user group.</param>
     /// <param name="allowedLanguages">The collection of allowed language identifiers.</param>
     /// <param name="allowedSections">The collection of allowed section aliases.</param>
@@ -34,6 +35,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         int? startContentId,
         int? startMediaId,
         int? startElementId,
+        int? startDocumentBlueprintId,
         string? alias,
         IEnumerable<int> allowedLanguages,
         IEnumerable<string> allowedSections,
@@ -55,6 +57,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         StartContentId = startContentId == 0 ? null : startContentId;
         StartMediaId = startMediaId == 0 ? null : startMediaId;
         StartElementId = startElementId == 0 ? null : startElementId;
+        StartDocumentBlueprintId = startDocumentBlueprintId == 0 ? null : startDocumentBlueprintId;
         HasAccessToAllLanguages = hasAccessToAllLanguages;
         HasAccessToInvariantForVariant = hasAccessToInvariantForVariant;
         Permissions = permissions;
@@ -83,6 +86,9 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     public int? StartMediaId { get; }
 
     public int? StartElementId { get; }
+
+    /// <inheritdoc />
+    public int? StartDocumentBlueprintId { get; }
 
     /// <inheritdoc />
     public string Alias { get; }

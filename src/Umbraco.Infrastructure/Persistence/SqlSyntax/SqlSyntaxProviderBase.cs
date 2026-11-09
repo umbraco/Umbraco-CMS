@@ -674,6 +674,8 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     /// <inheritdoc />
     public virtual string FormatAddColumn(ColumnDefinition column) => Format(column);
+    public virtual string FormatAlterColumn(string? tableName, ColumnDefinition column)
+        => string.Format(AlterColumn, GetQuotedTableName(tableName), Format(column));
 
     /// <summary>
     /// Formats a <see cref="ColumnDefinition"/> for a specific table into a SQL string suitable for use in a CREATE or ALTER TABLE statement.

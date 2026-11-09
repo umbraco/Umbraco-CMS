@@ -54,12 +54,15 @@ public class IndexedEntitySearchServiceWithUserStartNodesTests : BackOfficeTestB
         MediaService.MoveToRecycleBin(mediaAtRoot.Last());
 
         int rootContentId = (await ContentService.GetRootContentAsync(CancellationToken.None)).First().Id;
+        await ElementContainerService.MoveToRecycleBinAsync(ElementContainers.Last().Key, Constants.Security.SuperUserKey);
+
         User limitedUser = new UserBuilder()
             .WithKey(LimitedUserKey)
             .WithEmail("limited@local")
             .WithName("Limited User")
             .WithStartContentId(rootContentId)
             .WithStartMediaId(MediaService.GetRootMedia().First().Id)
+            .WithStartElementId(ElementContainers.First().Id)
             .Build();
         GetRequiredService<IUserService>().Save(limitedUser);
 
@@ -112,6 +115,27 @@ public class IndexedEntitySearchServiceWithUserStartNodesTests : BackOfficeTestB
     {
         PagedModel<IEntitySlim> result = await IndexedEntitySearchService.SearchAsync(
             UmbracoObjectTypes.Media,
+            query: query,
+            parentId: null,
+            contentTypeIds: null,
+            trashed: trashed);
+
+        Assert.That(result.Total, Is.EqualTo(expectedTotal));
+    }
+
+    // the limited user's element start node is the first element container; root elements are outside it
+    [TestCase("single0libroot", false, 0)]
+    [TestCase("single0libroot", true, 0)]
+    [TestCase("single1libchild", false, 1)]
+    [TestCase("single1libchild", true, 0)]
+    [TestCase("shared0lib", false, 10)]
+    [TestCase("shared1lib", false, 0)]
+    [TestCase("shared2lib", false, 0)]
+    [TestCase("shared2lib", true, 0)]
+    public async Task Elements_RespectsUserStartNodes(string query, bool trashed, int expectedTotal)
+    {
+        PagedModel<IEntitySlim> result = await IndexedEntitySearchService.SearchAsync(
+            UmbracoObjectTypes.Element,
             query: query,
             parentId: null,
             contentTypeIds: null,

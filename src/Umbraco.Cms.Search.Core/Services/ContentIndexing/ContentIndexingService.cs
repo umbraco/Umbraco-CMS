@@ -128,6 +128,11 @@ internal sealed class ContentIndexingService : IContentIndexingService
 
         await contentChangeStrategy.RebuildAsync(new ContentIndexInfo(indexRegistration.IndexAlias, indexRegistration.ContainedObjectTypes, indexer), cancellationToken);
 
+        if (cancellationToken.IsCancellationRequested is false)
+        {
+            await _eventAggregator.PublishAsync(new IndexRebuildingNotification(indexRegistration.IndexAlias), cancellationToken);
+        }
+
         await _eventAggregator.PublishAsync(new IndexRebuildCompletedNotification(indexRegistration.IndexAlias), cancellationToken);
     }
 

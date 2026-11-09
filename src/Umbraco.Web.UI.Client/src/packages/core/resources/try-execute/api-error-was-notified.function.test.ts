@@ -31,9 +31,16 @@ describe('apiErrorWasNotified', () => {
 		});
 	});
 
-	it('reports that a cancelled-by-notification operation was not notified', () => {
-		// The server already messaged the user via the Umb-Notifications header.
-		expect(apiErrorWasNotified(apiError({ status: 400, operationStatus: 'CancelledByNotification' }))).to.be.false;
+	it('reports that a cancelled operation was not notified when the server notified about it', () => {
+		expect(
+			apiErrorWasNotified(
+				apiError({ status: 400, operationStatus: 'CancelledByNotification', notifiedByServer: true }),
+			),
+		).to.be.false;
+	});
+
+	it('reports that a cancelled operation was notified when the server did not notify about it', () => {
+		expect(apiErrorWasNotified(apiError({ status: 400, operationStatus: 'CancelledByNotification' }))).to.be.true;
 	});
 
 	it('reports that another operation status was notified', () => {
@@ -49,8 +56,7 @@ describe('apiErrorWasNotified', () => {
 		expect(apiErrorWasNotified(new Error('boom'))).to.be.true;
 	});
 
-	// The UmbError type guards read `.name` off the argument, so these would throw without the guard. They also
-	// never came from tryExecute, so nothing was notified for them.
+	// These never came from tryExecute, so nothing was notified for them.
 	it('reports that a missing or primitive error was not notified', () => {
 		expect(apiErrorWasNotified(undefined)).to.be.false;
 		expect(apiErrorWasNotified(null)).to.be.false;

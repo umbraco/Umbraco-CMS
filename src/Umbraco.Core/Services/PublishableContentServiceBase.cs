@@ -619,6 +619,50 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
+    /// <inheritdoc />
+    /// <remarks>
+    ///     Bridges onto the page-indexed repository read, so <paramref name="skip" /> has to be a multiple of
+    ///     <paramref name="take" />.
+    /// </remarks>
+    public async Task<PagedModel<TContent>> GetPagedOfTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
+    {
+        if (skip < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(skip));
+        }
+
+        if (take <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(take));
+        }
+
+        if (skip % take != 0)
+        {
+            throw new ArgumentException("Skip must be a multiple of take.", nameof(skip));
+        }
+
+        ordering ??= Ordering.By("sortOrder");
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+
+        List<int> contentTypeIds = (await _contentTypeRepository.GetManyAsync(contentTypeKeys, cancellationToken))
+            .Select(contentType => contentType.Id)
+            .ToList();
+
+        IEnumerable<TContent> items = _contentRepository.GetPage(
+            Query<TContent>()?.Where(x => contentTypeIds.Contains(x.ContentTypeId)),
+            skip / take,
+            take,
+            out long totalRecords,
+            null,
+            null,
+            ordering);
+
+        scope.Complete();
+        return new PagedModel<TContent> { Items = items, Total = totalRecords };
+    }
+
     /// <summary>
     ///     Gets a single version of a content item.
     /// </summary>
@@ -1420,7 +1464,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 if (d.ContentType.VariesByCulture())
                 {
                     // find which cultures have pending schedules
-                    var pendingCultures = contentSchedule.GetPending(ContentScheduleAction.Release, date)
+                    IReadOnlyList<ContentSchedule> pendingReleases = contentSchedule.GetPending(ContentScheduleAction.Release, date);
+                    var pendingCultures = pendingReleases
                         .Select(x => x.Culture)
                         .Distinct()
                         .ToList();
@@ -1429,6 +1474,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     {
                         continue; // shouldn't happen but no point in processing this content if there's nothing there
                     }
+
+                    // The release applies the invariant-for-variant access stored when it was scheduled, so the invariant properties
+                    // are released with the cultures if any of them was scheduled with that access. The writer's access can't be used
+                    // instead: the writer is the last user to save the content, not the user who scheduled it.
+                    var includeInvariantForVariant = pendingReleases.Any(x => x.IncludeInvariantForVariant);
                     SavingNotification<TContent> savingNotification = SavingNotification(d, evtMsgs);
                     if (scope.Notifications.PublishCancelable(savingNotification))
                     {
@@ -1451,11 +1501,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                         // publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                         IProperty[]? invalidProperties = null;
 
-                        // NOTE: hardcoding allowEditInvariantForVariant as true works for now, but it will need replacing if we ever introduce
-                        //       "invariance as opt-in" for save/publish/schedule operations.
-                        //       The writer's permission can't be used instead: the writer is the last user to save the content,
-                        //       not the user who scheduled it.
-                        CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, includeInvariantForVariant: true);
+                        CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, includeInvariantForVariant);
                         var tryPublish = d.PublishCulture(impact, date, _propertyEditorCollection) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                         if (invalidProperties != null && invalidProperties.Length > 0)
@@ -1487,7 +1533,14 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     else
                     {
                         _contentRepository.PersistContentSchedule(d, contentSchedule);
-                        result = CommitContentChanges(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId, includeInvariantForVariant: true);
+                        result = CommitContentChanges(
+                            scope,
+                            d,
+                            evtMsgs,
+                            allLangs.Value,
+                            savingNotification.State,
+                            d.WriterId,
+                            includeInvariantForVariant);
                     }
 
                     if (result.Success == false)

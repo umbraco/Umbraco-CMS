@@ -262,17 +262,6 @@ public interface IContentService : IPublishableContentService<IContent>
     Task<PagedModel<IContent>> GetPagedOfTypeAsync(Guid contentTypeKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets a paged list of documents whose content type is one of the specified content types.
-    /// </summary>
-    /// <param name="contentTypeKeys">The Guid keys of the content types.</param>
-    /// <param name="skip">The number of items to skip.</param>
-    /// <param name="take">The maximum number of items to return.</param>
-    /// <param name="ordering">The ordering specification, or <c>null</c> to order by sort order.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A paged result containing the matching documents.</returns>
-    Task<PagedModel<IContent>> GetPagedOfTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
-
-    /// <summary>
     ///     Counts documents of a given document type.
     /// </summary>
     /// <param name="contentTypeAlias">The document type alias, or null for all types.</param>

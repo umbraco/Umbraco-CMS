@@ -36,11 +36,17 @@ export class UmbTestVariantTreeRepository {
 	static root: UmbTreeRootModel = DEFAULT_TEST_ROOT;
 	static ancestors: Array<UmbTestVariantTreeItemModel> = [];
 	static requestTreeItemAncestorsCalls: Array<UmbEntityModel> = [];
+	static createdCount = 0;
 
 	static reset() {
+		UmbTestVariantTreeRepository.createdCount = 0;
 		UmbTestVariantTreeRepository.root = DEFAULT_TEST_ROOT;
 		UmbTestVariantTreeRepository.ancestors = [];
 		UmbTestVariantTreeRepository.requestTreeItemAncestorsCalls = [];
+	}
+
+	constructor() {
+		UmbTestVariantTreeRepository.createdCount++;
 	}
 
 	async requestTreeRoot() {

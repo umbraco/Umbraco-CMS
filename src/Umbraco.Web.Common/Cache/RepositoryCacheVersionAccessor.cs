@@ -131,15 +131,6 @@ public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
     }
 
     /// <inheritdoc />
-    [Obsolete("Use the overload that takes the adopted versions. Scheduled for removal in Umbraco 19.")]
-    public void CachesSynced()
-    {
-        // Clear scope cache so fresh versions are read from the DB after a full reload.
-        GetOrRegisterScopeVersionCache()?.Clear();
-        _requestCache.ClearOfType<RepositoryCacheVersion>();
-    }
-
-    /// <inheritdoc />
     public void CachesSynced(IEnumerable<RepositoryCacheVersion> adoptedVersions)
     {
         // Move the scope cache to the adopted snapshot rather than clearing it. The scope keeps its distributed

@@ -10,7 +10,8 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 - **[Manifests & Aliases](./docs/manifests.md)** - Manifest shape, alias conventions, alias constants, how aliases connect extensions, registration, registry operations, kind merging
 - **[Entities](./docs/entities.md)** - Entity types, entity context, how entityType connects workspaces/trees/actions/routing
 - **[Workspaces](./docs/workspaces.md)** - Workspace types, base classes, extension points, workspace contexts, save flow, routing
-- **[Core Primitives](./docs/core-primitives.md)** - UmbLitElement, observable state, Context API, controller lifecycle
+- **[Core Primitives](./docs/core-primitives.md)** - UmbLitElement (observe, consume/provide context, localization), observable state overview, controller lifecycle
+- **[Context API](./docs/context-api.md)** - Context tokens, shared aliases, resolution rules, token lookup
 - **[State System](./docs/state-system.md)** - `Umb*State` change-detection contract, per-type comparison semantics, `asObservablePart`, mute/unmute, observer-guard anti-patterns
 - **[Data Flow](./docs/data-flow.md)** - Data flow chain, data sources, tryExecute, generated API clients, stores, complete worked example
 - **[Repositories](./docs/repositories.md)** - Repository categories (detail, item, tree, collection, action-specific), file structure, naming, extension registration, data source delegation
@@ -57,6 +58,7 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 | Work with auth or security                              | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md)                                            |
 | Scaffold a new package or module                        | [docs/package-development.md](./docs/package-development.md)                                                                   |
 | Change how a package is bundled or chunked              | [docs/package-development.md](./docs/package-development.md#coalescing-a-packages-lazy-modules) — a wrong `eagerModules` list makes boot heavier, and the build still succeeds |
+| Consume or provide a context, or create a context token | [docs/context-api.md](./docs/context-api.md) — tokens can share an alias; consume the most specific one once                   |
 | Write or change observers / `Umb*State` usage           | [docs/state-system.md](./docs/state-system.md) — states already deduplicate; do not add "is this a re-emit?" guards            |
 | Add, rename, or remove a key in `src/assets/lang/en.ts` | [docs/package-development.md](./docs/package-development.md#type-safe-localization-keys)                                       |
 

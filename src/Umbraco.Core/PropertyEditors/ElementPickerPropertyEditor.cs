@@ -135,7 +135,7 @@ public class ElementPickerPropertyEditor : DataEditor
                 return validationResults;
             }
 
-            if (configuration.ValidationLimit.Min is int min and > 0 && (value is null || value.Count < min))
+            if (configuration.ValidationLimit.Min is int min && ItemCountValidationHelper.IsAboveZeroAndBelowMinimum(value?.Count ?? 0, min))
             {
                 validationResults.Add(new ValidationResult(
                     _localizedTextService.Localize(

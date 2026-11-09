@@ -1,7 +1,9 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -28,13 +30,14 @@ public class DefaultUrlProvider : IUrlProvider
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly UriUtility _uriUtility;
     private RequestHandlerSettings _requestSettings;
-    private readonly ILanguageService _languageService;
+    private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
     // TODO See if we can make GetUrlFromRoute asynchronous and avoid the GetAwaiter().GetResult() in when using ILanguageService.
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultUrlProvider"/> class.
     /// </summary>
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 20.")]
     public DefaultUrlProvider(
         IOptionsMonitor<RequestHandlerSettings> requestSettings,
         ILogger<DefaultUrlProvider> logger,
@@ -48,6 +51,78 @@ public class DefaultUrlProvider : IUrlProvider
         IDocumentNavigationQueryService navigationQueryService,
         IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
         ILanguageService languageService)
+        : this(
+            requestSettings,
+            logger,
+            siteDomainMapper,
+            umbracoContextAccessor,
+            uriUtility,
+            publishedContentCache,
+            domainCache,
+            idKeyMap,
+            documentUrlService,
+            navigationQueryService,
+            publishedContentStatusFilteringService,
+            languageService,
+            StaticServiceProvider.Instance.GetRequiredService<IDefaultCultureAccessor>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NewDefaultUrlProvider"/> class.
+    /// </summary>
+    /// <remarks>
+    /// Its parameters cover those of the other constructors, so the container can choose between them.
+    /// </remarks>
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 20.")]
+    public DefaultUrlProvider(
+        IOptionsMonitor<RequestHandlerSettings> requestSettings,
+        ILogger<DefaultUrlProvider> logger,
+        ISiteDomainMapper siteDomainMapper,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        UriUtility uriUtility,
+        IPublishedContentCache publishedContentCache,
+        IDomainCache domainCache,
+        IIdKeyMap idKeyMap,
+        IDocumentUrlService documentUrlService,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
+#pragma warning disable IDE0060 // Remove unused parameter
+        ILanguageService languageService,
+#pragma warning restore IDE0060 // Remove unused parameter
+        IDefaultCultureAccessor defaultCultureAccessor)
+        : this(
+            requestSettings,
+            logger,
+            siteDomainMapper,
+            umbracoContextAccessor,
+            uriUtility,
+            publishedContentCache,
+            domainCache,
+            idKeyMap,
+            documentUrlService,
+            navigationQueryService,
+            publishedContentStatusFilteringService,
+            defaultCultureAccessor)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NewDefaultUrlProvider"/> class.
+    /// </summary>
+    public DefaultUrlProvider(
+        IOptionsMonitor<RequestHandlerSettings> requestSettings,
+        ILogger<DefaultUrlProvider> logger,
+        ISiteDomainMapper siteDomainMapper,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        UriUtility uriUtility,
+        IPublishedContentCache publishedContentCache,
+        IDomainCache domainCache,
+        IIdKeyMap idKeyMap,
+        IDocumentUrlService documentUrlService,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
+        IDefaultCultureAccessor defaultCultureAccessor)
     {
         _requestSettings = requestSettings.CurrentValue;
         _logger = logger;
@@ -60,7 +135,7 @@ public class DefaultUrlProvider : IUrlProvider
         _documentUrlService = documentUrlService;
         _navigationQueryService = navigationQueryService;
         _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
-        _languageService = languageService;
+        _defaultCultureAccessor = defaultCultureAccessor;
 
         requestSettings.OnChange(x => _requestSettings = x);
     }
@@ -250,7 +325,7 @@ public class DefaultUrlProvider : IUrlProvider
                 culture);
         }
 
-        var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+        var defaultCulture = _defaultCultureAccessor.DefaultCulture;
         if (domainUri is not null ||
             string.IsNullOrEmpty(culture) ||
             culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))

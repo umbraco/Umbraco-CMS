@@ -1,8 +1,11 @@
 using System.Collections.Concurrent;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Sync;
@@ -45,6 +48,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     private readonly IContentService _contentService;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private readonly IServerRoleAccessor _serverRoleAccessor;
+    private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
     // Lookup: alias -> list of matching document keys (multiple docs can have same alias).
     private readonly ConcurrentDictionary<AliasCacheKey, List<Guid>> _aliasCache = new();
@@ -98,6 +102,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentUrlAliasService"/> class.
     /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 20.")]
     public DocumentUrlAliasService(
         ILogger<DocumentUrlAliasService> logger,
         IDocumentUrlAliasRepository documentUrlAliasRepository,
@@ -107,6 +112,32 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         IContentService contentService,
         IDocumentNavigationQueryService documentNavigationQueryService,
         IServerRoleAccessor serverRoleAccessor)
+        : this(
+            logger,
+            documentUrlAliasRepository,
+            coreScopeProvider,
+            languageService,
+            keyValueService,
+            contentService,
+            documentNavigationQueryService,
+            serverRoleAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IDefaultCultureAccessor>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentUrlAliasService"/> class.
+    /// </summary>
+    public DocumentUrlAliasService(
+        ILogger<DocumentUrlAliasService> logger,
+        IDocumentUrlAliasRepository documentUrlAliasRepository,
+        ICoreScopeProvider coreScopeProvider,
+        ILanguageService languageService,
+        IKeyValueService keyValueService,
+        IContentService contentService,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IServerRoleAccessor serverRoleAccessor,
+        IDefaultCultureAccessor defaultCultureAccessor)
     {
         _logger = logger;
         _documentUrlAliasRepository = documentUrlAliasRepository;
@@ -116,6 +147,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         _contentService = contentService;
         _documentNavigationQueryService = documentNavigationQueryService;
         _serverRoleAccessor = serverRoleAccessor;
+        _defaultCultureAccessor = defaultCultureAccessor;
     }
 
     /// <inheritdoc/>
@@ -208,7 +240,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         }
 
         // Default to the default language when culture is not specified (like DocumentUrlService)
-        culture ??= await _languageService.GetDefaultIsoCodeAsync();
+        culture ??= _defaultCultureAccessor.DefaultCulture;
 
         var languageId = await TryGetLanguageIdAsync(culture);
         if (languageId is null)
@@ -239,7 +271,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         ThrowIfNotInitialized();
 
         // Default to the default language when culture is not specified (like DocumentUrlService)
-        culture ??= await _languageService.GetDefaultIsoCodeAsync();
+        culture ??= _defaultCultureAccessor.DefaultCulture;
 
         var languageId = await TryGetLanguageIdAsync(culture);
         if (languageId is null)

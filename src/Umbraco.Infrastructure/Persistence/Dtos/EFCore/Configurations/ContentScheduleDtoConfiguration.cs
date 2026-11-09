@@ -28,6 +28,10 @@ public class ContentScheduleDtoConfiguration : IEntityTypeConfiguration<ContentS
             .HasColumnName(ContentScheduleDto.ActionColumnName)
             .IsRequired();
 
+        builder.Property(x => x.IncludeInvariantForVariant)
+            .HasColumnName(ContentScheduleDto.IncludeInvariantForVariantColumnName)
+            .HasDefaultValue(false);
+
         // FK: NodeId -> umbracoContent.nodeId
         builder.HasOne<ContentDto>()
             .WithMany()

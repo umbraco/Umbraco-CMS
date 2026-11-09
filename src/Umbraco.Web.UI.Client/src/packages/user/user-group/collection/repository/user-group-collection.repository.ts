@@ -5,7 +5,6 @@ import { UmbUserGroupCollectionServerDataSource } from './user-group-collection.
 import type { UmbCollectionDataSource, UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { fetchAllPages } from '@umbraco-cms/backoffice/repository';
 
 // Mirrors the server's default page size for `GET /filter/user-group` — chosen so the underlying request matches
@@ -32,14 +31,6 @@ export class UmbUserGroupCollectionRepository extends UmbControllerBase implemen
 
 	async requestCollection(filter: UmbUserGroupCollectionFilterModel = { skip: 0, take: 100 }) {
 		await this.#init;
-
-		if (filter.query) {
-			new UmbDeprecation({
-				removeInVersion: '19.0.0',
-				deprecated: 'User Group requestCollection filter model .query property.',
-				solution: 'Use the .filter property instead',
-			}).warn();
-		}
 
 		const { data, error } = await this.#collectionSource.getCollection(filter);
 

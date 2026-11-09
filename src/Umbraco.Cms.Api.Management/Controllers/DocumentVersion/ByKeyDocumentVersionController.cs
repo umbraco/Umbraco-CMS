@@ -2,11 +2,9 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security.Authorization;
@@ -33,7 +31,6 @@ public class ByKeyDocumentVersionController : DocumentVersionControllerBase
     /// <param name="contentVersionService">An instance of <see cref="IContentVersionService"/> used to manage content versions.</param>
     /// <param name="umbracoMapper">An instance of <see cref="IUmbracoMapper"/> used for mapping Umbraco objects.</param>
     /// <param name="authorizationService">Service for handling authorization checks for the current user.</param>
-    [ActivatorUtilitiesConstructor]
     public ByKeyDocumentVersionController(
         IContentVersionService contentVersionService,
         IUmbracoMapper umbracoMapper,
@@ -42,22 +39,6 @@ public class ByKeyDocumentVersionController : DocumentVersionControllerBase
         _contentVersionService = contentVersionService;
         _umbracoMapper = umbracoMapper;
         _authorizationService = authorizationService;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.DocumentVersion.ByKeyDocumentVersionController"/> class.
-    /// </summary>
-    /// <param name="contentVersionService">An instance of <see cref="IContentVersionService"/> used to manage content versions.</param>
-    /// <param name="umbracoMapper">An instance of <see cref="IUmbracoMapper"/> used for mapping Umbraco objects.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public ByKeyDocumentVersionController(
-        IContentVersionService contentVersionService,
-        IUmbracoMapper umbracoMapper)
-        : this(
-            contentVersionService,
-            umbracoMapper,
-            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>())
-    {
     }
 
     /// <summary>

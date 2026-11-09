@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -114,6 +115,44 @@ public class UserExtensionsTests
             Assert.Fail("Expected \"" + string.Join(",", expectedA) + "\" but got \"" + string.Join(",", combinedA) +
                         "\".");
         }
+    }
+
+    // The combining itself is covered by CombineStartNodes. What matters here is that the blueprint
+    // start nodes are read from the blueprint properties, and resolved against the blueprint tree.
+    [TestCase(new[] { 1 }, new int[0], new[] { 1 })] // granted by the group
+    [TestCase(new int[0], new[] { 2 }, new[] { 2 })] // granted to the user directly
+    [TestCase(new[] { 1 }, new[] { 2 }, new[] { 1, 2 })] // granted by both
+    public void CalculateDocumentBlueprintStartNodeIds_Reads_The_Group_And_User_Start_Nodes(
+        int[] groupStartNodes,
+        int[] userStartNodes,
+        int[] expected)
+    {
+        var paths = new Dictionary<int, string> { { 1, "-1,1" }, { 2, "-1,2" } };
+
+        var entityService = new Mock<IEntityService>();
+        entityService
+            .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+            .Returns<UmbracoObjectTypes, int[]>((_, ids) =>
+                paths.Where(x => ids.Contains(x.Key)).Select(x => new TreeEntityPath { Id = x.Key, Path = x.Value }));
+
+        var groups = groupStartNodes
+            .Select(id => Mock.Of<IReadOnlyUserGroup>(group => group.StartDocumentBlueprintId == id))
+            .ToArray();
+
+        var user = Mock.Of<IUser>(u =>
+            u.Key == Guid.NewGuid() &&
+            u.Groups == groups &&
+            u.StartDocumentBlueprintIds == userStartNodes);
+
+        var combined = user.CalculateDocumentBlueprintStartNodeIds(entityService.Object, AppCaches.Disabled);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(combined, Is.EquivalentTo(expected));
+            entityService.Verify(
+                x => x.GetAllPaths(UmbracoObjectTypes.DocumentBlueprintContainer, It.IsAny<int[]>()),
+                Times.AtLeastOnce);
+        });
     }
 
     [Test]

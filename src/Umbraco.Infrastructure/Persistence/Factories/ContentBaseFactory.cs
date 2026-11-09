@@ -252,6 +252,7 @@ internal sealed class ContentBaseFactory
                     NodeId = entity.Id,
                     LanguageId = languageRepository.GetIdByIsoCodeAsync(x.Culture, false).GetAwaiter().GetResult(),
                     Id = x.Id,
+                    IncludeInvariantForVariant = x.IncludeInvariantForVariant,
                 }));
 
     /// <summary>

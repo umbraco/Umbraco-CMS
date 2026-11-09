@@ -6,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -34,7 +35,6 @@ public class DocumentUrlAliasServicePersistAliasesTests
 
         var languageServiceMock = new Mock<ILanguageService>();
         languageServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(languages ?? []);
-        languageServiceMock.Setup(x => x.GetDefaultIsoCodeAsync()).ReturnsAsync("en-US");
 
         var keyValueServiceMock = new Mock<IKeyValueService>();
         keyValueServiceMock.Setup(x => x.GetValueAsync(DocumentUrlAliasService.RebuildKey)).ReturnsAsync("1");
@@ -65,7 +65,8 @@ public class DocumentUrlAliasServicePersistAliasesTests
             keyValueServiceMock.Object,
             contentServiceMock.Object,
             Mock.Of<IDocumentNavigationQueryService>(),
-            serverRoleAccessorMock.Object);
+            serverRoleAccessorMock.Object,
+            Mock.Of<IDefaultCultureAccessor>(x => x.DefaultCulture == "en-US"));
 
         return new ServiceUnderTest(service, aliasRepositoryMock, contentServiceMock, coreScopeMock);
     }
@@ -325,51 +326,5 @@ public class DocumentUrlAliasServicePersistAliasesTests
         Assert.That(sut.Service.IsInitialized, Is.False);
         sut.Service.InitAsync(forceEmpty: true, CancellationToken.None).GetAwaiter().GetResult();
         Assert.That(sut.Service.IsInitialized, Is.True);
-    }
-
-    [Test]
-    public async Task InterfaceDefaults_KeepAnExistingImplementationOnItsOldPath()
-    {
-        var implementation = new MinimalAliasService();
-        IContent content = CreateInvariantContent("my-alias", PublishedState.Publishing).Object;
-
-        await ((IDocumentUrlAliasService)implementation).PersistAliasesAsync(content);
-        await ((IDocumentUrlAliasService)implementation).PersistAliasesAsync(content, contentTreeWriteLockHeld: true);
-
-        Assert.That(((IDocumentUrlAliasService)implementation).IsInitialized, Is.True);
-        Assert.That(implementation.CreatedOrUpdatedKeys, Is.EqualTo(new[] { content.Key, content.Key }));
-    }
-
-    /// <summary>
-    /// Implements only the members that existed before <see cref="IDocumentUrlAliasService.PersistAliasesAsync(IContent, bool)"/> was
-    /// added, as an external implementation compiled against the previous interface would.
-    /// </summary>
-    private sealed class MinimalAliasService : IDocumentUrlAliasService
-    {
-        public List<Guid> CreatedOrUpdatedKeys { get; } = [];
-
-        public Task InitAsync(bool forceEmpty, CancellationToken cancellationToken) => Task.CompletedTask;
-
-        public Task<IEnumerable<Guid>> GetDocumentKeysByAliasAsync(string alias, string? culture) => Task.FromResult(Enumerable.Empty<Guid>());
-
-        public Task<IEnumerable<string>> GetAliasesAsync(Guid documentKey, string? culture) => Task.FromResult(Enumerable.Empty<string>());
-
-        public Task CreateOrUpdateAliasesAsync(Guid documentKey)
-        {
-            CreatedOrUpdatedKeys.Add(documentKey);
-            return Task.CompletedTask;
-        }
-
-        public Task CreateOrUpdateAliasesWithDescendantsAsync(Guid documentKey) => Task.CompletedTask;
-
-        public Task DeleteAliasesFromCacheAsync(IEnumerable<Guid> documentKeys) => Task.CompletedTask;
-
-        public Task RebuildAllAliasesAsync() => Task.CompletedTask;
-
-        public bool HasAny() => false;
-
-        public Task UpdateAliasCacheAsync(Guid documentKey) => Task.CompletedTask;
-
-        public Task UpdateAliasCacheWithDescendantsAsync(Guid documentKey) => Task.CompletedTask;
     }
 }

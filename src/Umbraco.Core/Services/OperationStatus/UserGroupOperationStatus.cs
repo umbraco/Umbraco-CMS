@@ -105,4 +105,9 @@ public enum UserGroupOperationStatus
     /// </summary>
     UserNotInGroup,
     ElementStartNodeKeyNotFound,
+
+    /// <summary>
+    ///     The operation failed because the specified document blueprint start node could not be found.
+    /// </summary>
+    DocumentBlueprintStartNodeKeyNotFound,
 }

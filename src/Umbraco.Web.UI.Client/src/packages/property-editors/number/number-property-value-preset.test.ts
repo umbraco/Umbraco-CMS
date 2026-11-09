@@ -3,8 +3,9 @@ import { UmbIntegerPropertyValuePreset } from './integer-property-value-preset.j
 import { UmbDecimalPropertyValuePreset } from './decimal-property-value-preset.js';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 
-const config = (values: Record<string, unknown>): UmbPropertyEditorConfig =>
-	Object.entries(values).map(([alias, value]) => ({ alias, value }));
+const config = (range: Record<string, unknown>): UmbPropertyEditorConfig => [
+	{ alias: 'validationRange', value: range },
+];
 
 describe('UmbIntegerPropertyValuePreset', () => {
 	const preset = new UmbIntegerPropertyValuePreset();

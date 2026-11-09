@@ -228,6 +228,10 @@ export class UiBaseLocators extends BasePage {
   public readonly confirmActionModalEntityReferences: Locator;
   public readonly referenceHeadline: Locator;
   public readonly entityItemRef: Locator;
+  public readonly viewDependentItemsBtn: Locator;
+  public readonly viewReferencedDescendantsBtn: Locator;
+  public readonly entityReferencesModal: Locator;
+  public readonly entityReferencesModalCloseBtn: Locator;
   public readonly entityItem: Locator;
 
   // Workspace & Action
@@ -252,6 +256,8 @@ export class UiBaseLocators extends BasePage {
   // User & User Group
   public readonly allowAccessToAllElementsBtn: Locator;
   public readonly elementStartNode: Locator;
+  public readonly allowAccessToAllDocumentBlueprintsBtn: Locator;
+  public readonly documentBlueprintStartNode: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -594,12 +600,18 @@ export class UiBaseLocators extends BasePage {
     this.confirmActionModalEntityReferences = page.locator(
       "umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references",
     );
-    this.entityItemRef = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references,umb-entity-references-workspace-info-app').locator('uui-ref-list').first().getByTestId('entity-item-ref');
+    // Single-entity confirm dialogs summarise references behind a "View items that depend on this…" button that
+    // opens umb-entity-references-modal; bulk dialogs and the workspace info app still list them inline.
+    this.entityReferencesModal = page.locator('umb-entity-references-modal');
+    // Target the uui-button host: its inner native button sits behind the slotted label, which intercepts clicks.
+    this.viewDependentItemsBtn = page.locator('umb-entity-references-summary uui-button').filter({hasText: 'View items that depend on this'});
+    this.viewReferencedDescendantsBtn = page.locator('umb-entity-references-summary uui-button').filter({hasText: 'View referenced descendants'});
+    this.entityReferencesModalCloseBtn = this.entityReferencesModal.getByLabel('Close');
+    this.entityItemRef = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references,umb-entity-references-workspace-info-app,umb-entity-references-modal').locator('uui-ref-list').first().getByTestId('entity-item-ref');
     this.referenceHeadline = page
       .locator(
-        "umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references",
+        'umb-confirm-action-modal-entity-references #reference-headline, umb-confirm-bulk-action-modal-entity-references #reference-headline, umb-entity-references-modal umb-localize[key="references_labelDependsOnThis"], umb-entity-references-modal umb-localize[key="references_labelDependentDescendants"]',
       )
-      .locator("#reference-headline")
       .first();
     this.entityItem = page.locator("umb-entity-item-ref");
 
@@ -637,6 +649,8 @@ export class UiBaseLocators extends BasePage {
     // User & User Group
     this.allowAccessToAllElementsBtn = page.getByText('Allow access to all elements');
     this.elementStartNode = page.locator('[label="Select element start node"]').locator('umb-input-entity-data');
+    this.allowAccessToAllDocumentBlueprintsBtn = page.getByText('Allow access to all document blueprints');
+    this.documentBlueprintStartNode = page.locator('umb-input-document-blueprint');
   }
 
   // Helper Methods
@@ -1073,6 +1087,10 @@ export class UiBaseLocators extends BasePage {
       this.sidebarModal.locator(`uui-menu-item[label="${name}"]`),
       isVisible,
     );
+  }
+
+  async clickCaretButtonForModalMenuItemWithName(name: string) {
+    await this.click(this.sidebarModal.locator(`uui-menu-item[label="${name}"] #caret-button`).last());
   }
 
   async doesModalHaveText(text: string) {
@@ -1891,6 +1909,19 @@ export class UiBaseLocators extends BasePage {
     await this.containsText(this.confirmActionModalEntityReferences, text);
   }
 
+  async clickViewItemsThatDependOnThisButton() {
+    await this.click(this.viewDependentItemsBtn);
+  }
+
+  async clickViewReferencedDescendantsButton() {
+    await this.click(this.viewReferencedDescendantsBtn);
+  }
+
+  async clickCloseEntityReferencesModalButton() {
+    await this.click(this.entityReferencesModalCloseBtn);
+    await this.isVisible(this.entityReferencesModal, false);
+  }
+
   // Entity Action Methods
   async clickEntityActionWithName(name: string) {
     const regex = new RegExp(`^entity-action:.*${name}$`);
@@ -1911,6 +1942,12 @@ export class UiBaseLocators extends BasePage {
 
   async clickMoveToActionMenuOption() {
     await this.clickEntityActionWithName("MoveTo");
+  }
+
+  async moveToFolder(folderName: string) {
+    await this.clickMoveToActionMenuOption();
+    await this.click(this.sidebarModal.getByText(folderName, {exact: true}));
+    await this.click(this.chooseModalBtn);
   }
 
   async clickCreateBlueprintActionMenuOption() {
@@ -2235,6 +2272,22 @@ export class UiBaseLocators extends BasePage {
 
   async clickRemoveButtonForElementNodeWithName(elementStartNodeName: string) {
     await this.click(this.elementStartNode.filter({hasText: elementStartNodeName}).getByLabel('Remove'));
+  }
+
+  async clickAllowAccessToAllDocumentBlueprints() {
+    await this.click(this.allowAccessToAllDocumentBlueprintsBtn);
+  }
+
+  async clickChooseDocumentBlueprintStartNodeButton() {
+    await this.click(this.documentBlueprintStartNode.getByLabel('Choose'));
+  }
+
+  async clickRemoveButtonForDocumentBlueprintNodeWithName(documentBlueprintStartNodeName: string) {
+    await this.click(this.documentBlueprintStartNode.filter({hasText: documentBlueprintStartNodeName}).getByLabel('Remove'));
+  }
+
+  async isDocumentBlueprintStartNodeWithNameVisible(documentBlueprintStartNodeName: string, isVisible: boolean = true) {
+    return this.isVisible(this.documentBlueprintStartNode.filter({hasText: documentBlueprintStartNodeName}), isVisible);
   }
 
   async isRestoreFromRecycleBinMessageVisible(restoreItem: string, targetFolderName: string) {

@@ -38,5 +38,10 @@ public enum ContentVersionOperationStatus
     /// <summary>
     ///     The operation was cancelled by a notification handler.
     /// </summary>
-    CancelledByNotification
+    CancelledByNotification,
+
+    /// <summary>
+    ///     A culture was specified for content that does not vary by culture.
+    /// </summary>
+    InvalidCulture,
 }

@@ -126,4 +126,29 @@ describe('UmbDocumentDynamicRootResolver', () => {
 			expect(result).to.equal(undefined);
 		});
 	});
+
+	describe('resolveStartNodeUniques', () => {
+		it('resolves nothing, without asking the server, when there is no dynamic root', async () => {
+			const result = await createResolver().resolveStartNodeUniques(undefined);
+
+			expect(result).to.equal(undefined);
+			expect(requestRootCalls).to.have.length(0);
+		});
+
+		it('resolves to every root the server returns, in order', async () => {
+			requestRootResult = ['first-root', 'second-root'];
+
+			const result = await createResolver().resolveStartNodeUniques(dynamicRoot);
+
+			expect(result).to.deep.equal(['first-root', 'second-root']);
+		});
+
+		it('resolves nothing when the server returns no roots', async () => {
+			requestRootResult = [];
+
+			const result = await createResolver().resolveStartNodeUniques(dynamicRoot);
+
+			expect(result).to.equal(undefined);
+		});
+	});
 });

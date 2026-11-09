@@ -916,7 +916,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
         Guid? runnerKey = GetStartNodeKey(documentStartNodeId);
         var hideTopLevelNodeFromPath = _globalSettings.HideTopLevelNodeFromPath;
 
-        culture ??= _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+        culture ??= _defaultCultureAccessor.DefaultCulture;
 
         if (!_globalSettings.ForceCombineUrlPathLeftToRight
             && CultureInfo.GetCultureInfo(culture).TextInfo.IsRightToLeft)
@@ -1211,7 +1211,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     private string GetCultureOrDefault(string? culture)
         => string.IsNullOrWhiteSpace(culture) is false
             ? culture
-            : _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+            : _defaultCultureAccessor.DefaultCulture;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool ArePathsLeftToRight(string cultureOrDefault)

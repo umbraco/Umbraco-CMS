@@ -73,7 +73,6 @@ export const handlers = [
 		return HttpResponse.json<SearchResultResponseModel>({
 			total: documents.length,
 			documents,
-			facets: [],
 		});
 	}),
 

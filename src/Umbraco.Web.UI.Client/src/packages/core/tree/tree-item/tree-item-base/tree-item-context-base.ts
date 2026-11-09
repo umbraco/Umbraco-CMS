@@ -6,7 +6,6 @@ import { UmbTreeItemTargetExpansionManager } from '../tree-item-expansion.manage
 import type { UMB_TREE_CONTEXT } from '../../tree.context.token.js';
 import { UmbTreeItemApiContextBase } from '../../tree-item-api/tree-item-api-context-base.js';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export abstract class UmbTreeItemContextBase<
@@ -47,21 +46,6 @@ export abstract class UmbTreeItemContextBase<
 		super(host);
 		// TODO: Get take size from Tree context
 		this._treeItemChildrenManager.setTakeSize(100);
-	}
-
-	/**
-	 * Returns the manifest.
-	 * @returns {ManifestType | undefined} The tree item manifest
-	 * @memberof UmbTreeItemContextBase
-	 * @deprecated Use the `.manifest` property instead.
-	 */
-	public getManifest() {
-		new UmbDeprecation({
-			removeInVersion: '18.0.0',
-			deprecated: 'getManifest',
-			solution: 'Use .manifest property instead',
-		}).warn();
-		return this.manifest;
 	}
 
 	public override setTreeItem(treeItem: TreeItemType | undefined) {

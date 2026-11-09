@@ -21,6 +21,7 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
     private readonly IElementService _elementService;
     private readonly IIdKeyMap _idKeyMap;
     private readonly ILogger<ContentTypeService> _logger;
+    private readonly ContentTypeFilterCollection _contentTypeFilters;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentTypeService" /> class.
@@ -71,6 +72,7 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
         _elementService = elementService;
         _idKeyMap = idKeyMap;
         _logger = loggerFactory.CreateLogger<ContentTypeService>();
+        _contentTypeFilters = contentTypeFilters;
     }
 
     /// <inheritdoc />
@@ -81,6 +83,29 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
 
     /// <inheritdoc />
     protected override Guid ContainedObjectType => Constants.ObjectTypes.DocumentType;
+
+    /// <inheritdoc />
+    public async Task<PagedModel<IContentType>> GetAllAllowedForBlueprintsAsync(Guid? parentKey, int skip, int take)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(ReadLockIds);
+
+        IEnumerable<IContentType> contentTypes = (await Repository.GetManyAsync(Array.Empty<Guid>(), CancellationToken.None))
+            .Where(contentType => contentType.IsElement is false);
+
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            contentTypes = await filter.FilterAllowedForBlueprintsAsync(contentTypes, parentKey);
+        }
+
+        IContentType[] materialized = contentTypes.ToArray();
+
+        return new PagedModel<IContentType>
+        {
+            Total = materialized.Length,
+            Items = materialized.Skip(skip).Take(take),
+        };
+    }
 
     /// <summary>
     ///     Gets the content service.

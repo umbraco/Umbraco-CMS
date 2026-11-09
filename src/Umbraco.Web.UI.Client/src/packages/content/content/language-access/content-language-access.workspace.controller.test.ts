@@ -117,6 +117,7 @@ describe('UmbContentLanguageAccessWorkspaceController', () => {
 		]);
 		host.currentUserContext.setLanguages(['da-DK']);
 		host.currentUserContext.setHasAccessToAllLanguages(false);
+		host.workspaceContext.setVariesByCulture(false);
 	});
 
 	afterEach(() => {
@@ -364,6 +365,19 @@ describe('UmbContentLanguageAccessWorkspaceController', () => {
 
 			expect(isSharedPropertyWritable(daDK)).to.be.false;
 		});
+	});
+
+	it('applies no rules until every input is known', async () => {
+		await createContext();
+
+		expect(host.workspaceContext.nameWriteGuard.getIsPermittedForName(enUS)).to.be.true;
+		expect(host.workspaceContext.readOnlyGuard.getIsPermittedForVariant(enUS)).to.be.false;
+
+		host.currentUserContext.setHasAccessToInvariantForVariant(false);
+		await flushMicrotasks();
+
+		expect(host.workspaceContext.nameWriteGuard.getIsPermittedForName(enUS)).to.be.false;
+		expect(host.workspaceContext.readOnlyGuard.getIsPermittedForVariant(enUS)).to.be.true;
 	});
 
 	it('makes the name of a culture editable when the user gains access to all languages', async () => {

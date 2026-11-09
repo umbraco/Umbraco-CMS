@@ -16,6 +16,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		{ alias: 'documentAccess', value: { rootAccess: false, startNodes: [] } },
 		{ alias: 'mediaAccess', value: { rootAccess: false, startNodes: [] } },
 		{ alias: 'elementAccess', value: { rootAccess: false, startNodes: [] } },
+		{ alias: 'documentBlueprintAccess', value: { rootAccess: false, startNodes: [] } },
 	];
 
 	constructor() {
@@ -51,6 +52,13 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 					this.#setValue('elementAccess', { rootAccess: rootAccess ?? false, startNodes: startNodes ?? [] }),
 				'_observeElementAccess',
 			);
+
+			this.observe(
+				observeMultiple([instance.hasDocumentBlueprintRootAccess, instance.documentBlueprintStartNodeUniques]),
+				([rootAccess, startNodes]) =>
+					this.#setValue('documentBlueprintAccess', { rootAccess: rootAccess ?? false, startNodes: startNodes ?? [] }),
+				'_observeDocumentBlueprintAccess',
+			);
 		});
 	}
 
@@ -80,6 +88,11 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 			| UmbStartNodeAccessValue
 			| undefined;
 		if (elementAccess) this.#workspaceContext?.setElementAccess(elementAccess);
+
+		const documentBlueprintAccess = values.find((entry) => entry.alias === 'documentBlueprintAccess')?.value as
+			| UmbStartNodeAccessValue
+			| undefined;
+		if (documentBlueprintAccess) this.#workspaceContext?.setDocumentBlueprintAccess(documentBlueprintAccess);
 	}
 
 	#getFields(): Array<PropertyEditorSettingsProperty> {
@@ -110,6 +123,13 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 				description: this.localize.term('user_selectElementStartNodeDescription'),
 				propertyEditorUiAlias: 'Umb.PropertyEditorUi.ElementStartNodeAccess',
 				config: [{ alias: 'rootAccessLabel', value: this.localize.term('user_allowAccessToAllElements') }],
+			},
+			{
+				alias: 'documentBlueprintAccess',
+				label: this.localize.term('user_selectDocumentBlueprintStartNode'),
+				description: this.localize.term('user_selectDocumentBlueprintStartNodeDescription'),
+				propertyEditorUiAlias: 'Umb.PropertyEditorUi.DocumentBlueprintStartNodeAccess',
+				config: [{ alias: 'rootAccessLabel', value: this.localize.term('user_allowAccessToAllDocumentBlueprints') }],
 			},
 		];
 	}

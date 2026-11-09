@@ -25,6 +25,8 @@ public partial class IndexedEntitySearchServiceTests : BackOfficeTestBase
         IMedia[] mediaAtRoot = MediaService.GetRootMedia().OrderBy(media => media.SortOrder).ToArray();
         MediaService.MoveToRecycleBin(mediaAtRoot.Last());
 
+        await ElementContainerService.MoveToRecycleBinAsync(ElementContainers.Last().Key, Constants.Security.SuperUserKey);
+
         _fixtureIsInitialized = true;
     }
 }

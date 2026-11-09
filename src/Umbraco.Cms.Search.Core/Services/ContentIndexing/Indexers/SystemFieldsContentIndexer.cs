@@ -113,7 +113,7 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
         }
 
         // TODO (V20): await this once the indexer contract goes async.
-        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForIdAsync(content.ParentId, objectType).GetAwaiter().GetResult();
+        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForIdAsync(content.ParentId, AncestorObjectType(objectType)).GetAwaiter().GetResult();
         if (parentKeyAttempt.Success is false)
         {
             _logger.LogWarning(
@@ -149,7 +149,7 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
         IEnumerable<int> ancestorIds = content.AncestorIds();
         foreach (var ancestorId in ancestorIds)
         {
-            Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(ancestorId, objectType).GetAwaiter().GetResult();
+            Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(ancestorId, AncestorObjectType(objectType)).GetAwaiter().GetResult();
             if (attempt.Success is false)
             {
                 _logger.LogWarning(
@@ -203,9 +203,17 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
     }
 
     private Guid? GetRecycleBinId(UmbracoObjectTypes objectType)
-        => objectType is UmbracoObjectTypes.Document
-            ? Cms.Core.Constants.System.RecycleBinContentKey
-            : objectType is UmbracoObjectTypes.Media
-                ? Cms.Core.Constants.System.RecycleBinMediaKey
-                : null;
+        => objectType switch
+        {
+            UmbracoObjectTypes.Document => Cms.Core.Constants.System.RecycleBinContentKey,
+            UmbracoObjectTypes.Media => Cms.Core.Constants.System.RecycleBinMediaKey,
+            UmbracoObjectTypes.Element => Cms.Core.Constants.System.RecycleBinElementKey,
+            _ => null,
+        };
+
+    // elements are organised in element containers, so their ancestors are containers rather than elements
+    private static UmbracoObjectTypes AncestorObjectType(UmbracoObjectTypes objectType)
+        => objectType is UmbracoObjectTypes.Element
+            ? UmbracoObjectTypes.ElementContainer
+            : objectType;
 }

@@ -6,6 +6,8 @@ export interface UmbUserGroupDetailModel {
 	aliasCanBeChanged: boolean;
 	documentRootAccess: boolean;
 	documentStartNode: { unique: string } | null;
+	documentBlueprintRootAccess: boolean;
+	documentBlueprintStartNode: { unique: string } | null;
 	elementRootAccess: boolean;
 	elementStartNode: { unique: string } | null;
 	entityType: UmbUserGroupEntityType;

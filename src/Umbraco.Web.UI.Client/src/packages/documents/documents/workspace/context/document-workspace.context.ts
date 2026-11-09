@@ -1,7 +1,7 @@
 import { UmbDocumentTypeDetailRepository } from '../../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentPropertyDatasetContext } from '../../property-dataset-context/document-property-dataset.context.js';
 import type { UmbDocumentDetailRepository } from '../../repository/index.js';
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UmbDocumentSegmentRepository } from '../../repository/index.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { UmbDocumentDetailModel, UmbDocumentVariantModel } from '../../types.js';
 import {
 	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
@@ -19,6 +19,7 @@ import { UmbDocumentValidationRepository } from '../../repository/validation/ind
 import { UMB_DOCUMENTS_SECTION_PATH } from '../../../section/paths.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
@@ -55,7 +56,6 @@ export class UmbDocumentWorkspaceContext
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
-	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
 	#previewController = new UmbPreviewController(this);
 
 	constructor(host: UmbControllerHost) {
@@ -164,11 +164,15 @@ export class UmbDocumentWorkspaceContext
 		return UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
+	#enforcedVerbs = new Map<string, Promise<UmbApi>>();
+
 	#enforceUserPermission(verb: string, message: string) {
+		if (this.#enforcedVerbs.has(verb)) return;
+
 		// We set the initial permission state to false because the condition is false by default and only execute the callback if it changes.
 		this.#handleUserPermissionChange(verb, false, message);
 
-		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
+		const condition = createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
 			{
 				config: {
 					allOf: [verb],
@@ -178,18 +182,13 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 		]);
+		this.#enforcedVerbs.set(verb, condition);
 	}
 
-	protected override async _loadSegmentsFor(unique: string): Promise<void> {
-		if (!unique) {
-			this._segments.setValue([]);
-			return;
-		}
-		const { data } = await this.#documentSegmentRepository.getDocumentByIdSegmentOptions(unique, {
-			skip: 0,
-			take: 9999,
-		});
-		this._segments.setValue(data?.items ?? []);
+	override resetState() {
+		this.#enforcedVerbs.forEach((condition) => condition.then((api) => api.destroy()).catch(() => undefined));
+		this.#enforcedVerbs.clear();
+		super.resetState();
 	}
 
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {

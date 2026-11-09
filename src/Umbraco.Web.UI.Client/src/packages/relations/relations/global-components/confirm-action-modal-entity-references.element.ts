@@ -1,29 +1,33 @@
 import type { UmbEntityReferenceRepository, UmbReferenceItemModel } from '../reference/types.js';
-import {
-	html,
-	customElement,
-	css,
-	state,
-	nothing,
-	type PropertyValues,
-	property,
-} from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbEntityReferencesConfig } from './types.js';
+import { customElement, css, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
-export interface UmbConfirmActionModalEntityReferencesConfig {
-	itemRepositoryAlias: string;
-	referenceRepositoryAlias: string;
-	unique: string;
-}
+/** @deprecated Scheduled for removal in Umbraco 21. Use `UmbEntityReferencesConfig` instead. [LK] */
+export type UmbConfirmActionModalEntityReferencesConfig = UmbEntityReferencesConfig;
 
+/**
+ * @deprecated Use `umb-entity-references-summary` instead. Scheduled for removal in Umbraco 21. [LK]
+ */
 @customElement('umb-confirm-action-modal-entity-references')
 export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
-	config?: UmbConfirmActionModalEntityReferencesConfig;
+	config?: UmbEntityReferencesConfig;
+
+	constructor() {
+		super();
+		new UmbDeprecation({
+			deprecated: 'umb-confirm-action-modal-entity-references',
+			removeInVersion: '21.0.0',
+			solution: 'Use umb-entity-references-summary instead.',
+		}).warn();
+	}
 
 	@state()
 	private _referencedByItems: Array<UmbReferenceItemModel> = [];

@@ -31,4 +31,5 @@ public enum EFCoreMigration
     RemoveUserGroupDefaultPermissionsFromModel = 23,
     AddHasAccessToInvariantForVariantToModel = 24,
     AddElementDtos = 25,
+    AddIncludeInvariantForVariantToContentScheduleModel = 26,
 }

@@ -1,4 +1,4 @@
-import type { UmbConfirmBulkActionModalEntityReferencesConfig } from '../../../global-components/types.js';
+import type { UmbEntityReferencesBulkConfig } from '../../../global-components/types.js';
 import type { UmbConfirmBulkActionModalEntityReferencesElement } from '../../../global-components/confirm-bulk-action-modal-entity-references.element.js';
 import type {
 	UmbBulkTrashWithRelationConfirmModalData,
@@ -16,7 +16,7 @@ export class UmbBulkTrashWithRelationConfirmModalElement extends UmbModalBaseEle
 	UmbBulkTrashWithRelationConfirmModalValue
 > {
 	@state()
-	private _referencesConfig?: UmbConfirmBulkActionModalEntityReferencesConfig;
+	private _referencesConfig?: UmbEntityReferencesBulkConfig;
 
 	// Three-state model for reference-aware trashing:
 	//   undefined = loading (button disabled, no message yet)

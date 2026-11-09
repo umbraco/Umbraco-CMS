@@ -4,6 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputMultipleTextStringElement } from '@umbraco-cms/backoffice/components';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -20,8 +21,9 @@ export class UmbPropertyEditorUIMultipleTextStringElement
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		this._min = Number(config.getValueByAlias('min')) || 0;
-		this._max = Number(config.getValueByAlias('max')) || Infinity;
+		const minMax = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
+		this._min = Number(minMax?.min) || 0;
+		this._max = Number(minMax?.max) || Infinity;
 	}
 
 	/**

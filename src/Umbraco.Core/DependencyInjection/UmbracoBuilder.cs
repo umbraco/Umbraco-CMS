@@ -29,6 +29,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
@@ -311,6 +312,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IDictionaryPermissionService, DictionaryPermissionService>();
             Services.AddUnique<IElementPermissionService, ElementPermissionService>();
             Services.AddUnique<IElementContainerPermissionService, ElementContainerPermissionService>();
+            Services.AddUnique<IDocumentBlueprintPermissionService, DocumentBlueprintPermissionService>();
             Services.AddUnique<IContentService, ContentService>();
             Services.AddUnique<IElementService, ElementService>();
             Services.AddUnique<IElementVersionService, ElementVersionService>();
@@ -377,6 +379,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<CompiledPackageXmlParser>();
             Services.AddUnique<IPreviewService, PreviewService>();
             Services.AddUnique<IPreviewSessionService, PreviewSessionService>();
+            Services.AddUnique<IPreviewAccessEvaluator, PreviewAccessEvaluator>();
             Services.AddUnique<DocumentNavigationService, DocumentNavigationService>();
             Services.AddUnique<IDocumentNavigationQueryService>(x => x.GetRequiredService<DocumentNavigationService>());
             Services.AddUnique<IDocumentNavigationManagementService>(x => x.GetRequiredService<DocumentNavigationService>());
@@ -450,6 +453,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<IDictionaryPermissionAuthorizer, DictionaryPermissionAuthorizer>();
             Services.AddSingleton<IElementPermissionAuthorizer, ElementPermissionAuthorizer>();
             Services.AddSingleton<IElementContainerPermissionAuthorizer, ElementContainerPermissionAuthorizer>();
+            Services.AddSingleton<IDocumentBlueprintPermissionAuthorizer, DocumentBlueprintPermissionAuthorizer>();
             Services.AddSingleton<IFeatureAuthorizer, FeatureAuthorizer>();
             Services.AddSingleton<IMediaPermissionAuthorizer, MediaPermissionAuthorizer>();
             Services.AddSingleton<IUserGroupPermissionAuthorizer, UserGroupPermissionAuthorizer>();

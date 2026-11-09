@@ -1207,6 +1207,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
                     dto.Date = model.Date;
                     dto.Action = model.Action.ToString();
                     dto.LanguageId = languageId;
+                    dto.IncludeInvariantForVariant = model.IncludeInvariantForVariant;
                 }
                 else
                 {
@@ -1218,6 +1219,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
                         LanguageId = languageId,
                         Date = model.Date,
                         Action = model.Action.ToString(),
+                        IncludeInvariantForVariant = model.IncludeInvariantForVariant,
                     });
                 }
 
@@ -2208,7 +2210,8 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             dto.Id,
             await LanguageRepository.GetIsoCodeByIdAsync(dto.LanguageId) ?? Constants.System.InvariantCulture,
             dto.Date,
-            dto.Action == ContentScheduleAction.Release.ToString() ? ContentScheduleAction.Release : ContentScheduleAction.Expire);
+            dto.Action == ContentScheduleAction.Release.ToString() ? ContentScheduleAction.Release : ContentScheduleAction.Expire,
+            dto.IncludeInvariantForVariant);
 
     /// <summary>
     ///     Gets a value indicating whether saving must keep names unique among siblings.

@@ -134,14 +134,20 @@ internal abstract class ContentVersionServiceBase<TContent>
             return Attempt<ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.NotFound);
         }
 
-        Attempt<Guid> keyAttempt = _entityService.GetKey(version.ContentId, ItemObjectType);
-        if (keyAttempt.Success is false)
+        TContent? content = await _asyncContentService.GetVersionAsync(version.VersionId, CancellationToken.None);
+        if (content is null)
         {
             return Attempt<ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.ContentNotFound);
         }
 
+        // A culture can only be rolled back for content that varies by culture.
+        if (culture is not null && content.ContentType.VariesByCulture() is false)
+        {
+            return Attempt<ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.InvalidCulture);
+        }
+
         Attempt<ContentRollbackOperationStatus> rollBackResult = await _asyncContentService.RollbackAsync(
-            keyAttempt.Result,
+            content.Key,
             version.VersionId,
             culture ?? "*",
             userKey,

@@ -71,7 +71,21 @@ export class UmbContentLanguageAccessWorkspaceController extends UmbControllerBa
 	}
 
 	async #checkForLanguageAccess() {
+		// always clear any previously installed rules from both guards before re-applying, so that
+		// switching between "has invariant access" and "no invariant access" leaves no orphaned rules
+		this.#clearPreviousRules();
+
 		if (!this.#workspaceContext) return;
+		if (
+			this.#variantOptions === undefined ||
+			this.#contentTypeProperties === undefined ||
+			this.#ownerVariesByCulture === undefined ||
+			this.#currentUserAllowedLanguages === undefined ||
+			this.#currentUserHasAccessToAllLanguages === undefined ||
+			this.#currentUserHasAccessToInvariantForVariant === undefined
+		) {
+			return;
+		}
 
 		// find all disallowed language variants
 		const disallowedVariants =
@@ -88,10 +102,6 @@ export class UmbContentLanguageAccessWorkspaceController extends UmbControllerBa
 			}) ?? [];
 
 		const datasetVariantIds = disallowedVariants.map((variant) => new UmbVariantId(variant.culture, variant.segment));
-
-		// always clear any previously installed rules from both guards before re-applying, so that
-		// switching between "has invariant access" and "no invariant access" leaves no orphaned rules
-		this.#clearPreviousRules();
 
 		// Regardless of invariant access, the name of a culture the user has no access to is read-only.
 		const nameWriteRules = datasetVariantIds.map((variantId) => ({

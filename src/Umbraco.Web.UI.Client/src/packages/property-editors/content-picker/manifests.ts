@@ -4,13 +4,14 @@ import { manifest as schemaManifest } from './Umbraco.MultiNodeTreePicker.js';
 import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
+const propertyEditorUiAlias = 'Umb.PropertyEditorUi.ContentPicker';
+
 const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
-	alias: 'Umb.PropertyEditorUi.ContentPicker',
+	alias: propertyEditorUiAlias,
 	name: 'Multi Node Tree Picker Property Editor UI',
 	element: () => import('./property-editor-ui-content-picker.element.js'),
 	meta: {
-		supportsVariantChange: true,
 		label: 'Multi Node Tree Picker',
 		icon: 'icon-page-add',
 		group: '#propertyEditorUIGroups_pickers',
@@ -45,4 +46,16 @@ const manifest: ManifestPropertyEditorUi = {
 
 const config: Array<ManifestPropertyEditorUi> = [sourceManifest, sourceTypeManifest];
 
-export const manifests: Array<UmbExtensionManifest> = [manifest, ...config, schemaManifest, ...valueSummaryManifests];
+export const manifests: Array<UmbExtensionManifest> = [
+	manifest,
+	...config,
+	schemaManifest,
+	...valueSummaryManifests,
+	{
+		type: 'propertyAction',
+		kind: 'clear',
+		alias: 'Umb.PropertyAction.ContentPicker.Clear',
+		name: 'Clear Content Picker Property Action',
+		forPropertyEditorUis: [propertyEditorUiAlias],
+	},
+];

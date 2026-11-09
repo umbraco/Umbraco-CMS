@@ -15,12 +15,12 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261012093337_AddElementDtos";
+    public override string LastMigrationId => "20261109084752_AddIncludeInvariantForVariantToContentScheduleModel";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
 #pragma warning disable 612, 618
-        modelBuilder.HasAnnotation("ProductVersion", "11.0.0-rc.1.26425.128");
+        modelBuilder.HasAnnotation("ProductVersion", "11.0.0-rc.3.26522.148");
 
         modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreApplication", b =>
             {
@@ -530,6 +530,12 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
                 b.Property<DateTime>("Date")
                     .HasColumnType("TEXT")
                     .HasColumnName("date");
+
+                b.Property<bool>("IncludeInvariantForVariant")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("INTEGER")
+                    .HasDefaultValue(false)
+                    .HasColumnName("includeInvariantForVariant");
 
                 b.Property<int?>("LanguageId")
                     .HasColumnType("INTEGER")

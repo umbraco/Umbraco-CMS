@@ -13,23 +13,34 @@ public class ContentSchedule : IDeepCloneable
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentSchedule" /> class.
     /// </summary>
-    public ContentSchedule(string culture, DateTime date, ContentScheduleAction action)
+    /// <param name="culture">The culture of the scheduled action.</param>
+    /// <param name="date">The date of the scheduled action.</param>
+    /// <param name="action">The action to take.</param>
+    /// <param name="includeInvariantForVariant">
+    ///     Whether a scheduled release of variant content includes its invariant properties.
+    /// </param>
+    public ContentSchedule(string culture, DateTime date, ContentScheduleAction action, bool includeInvariantForVariant)
+        : this(Guid.Empty, culture, date, action, includeInvariantForVariant)
     {
-        Id = Guid.Empty; // will be assigned by document repository
-        Culture = culture;
-        Date = date;
-        Action = action;
     }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentSchedule" /> class.
     /// </summary>
-    public ContentSchedule(Guid id, string culture, DateTime date, ContentScheduleAction action)
+    /// <param name="id">The unique identifier of the scheduled action.</param>
+    /// <param name="culture">The culture of the scheduled action.</param>
+    /// <param name="date">The date of the scheduled action.</param>
+    /// <param name="action">The action to take.</param>
+    /// <param name="includeInvariantForVariant">
+    ///     Whether a scheduled release of variant content includes its invariant properties.
+    /// </param>
+    public ContentSchedule(Guid id, string culture, DateTime date, ContentScheduleAction action, bool includeInvariantForVariant)
     {
-        Id = id;
+        Id = id; // Guid.Empty will be assigned by document repository
         Culture = culture;
         Date = date;
         Action = action;
+        IncludeInvariantForVariant = includeInvariantForVariant;
     }
 
     /// <summary>
@@ -59,8 +70,17 @@ public class ContentSchedule : IDeepCloneable
     [DataMember]
     public ContentScheduleAction Action { get; }
 
+    /// <summary>
+    ///     Gets a value indicating whether a scheduled release of variant content includes its invariant properties.
+    /// </summary>
+    /// <remarks>
+    ///     Determined by the invariant-for-variant access of the user who scheduled the release.
+    /// </remarks>
+    [DataMember]
+    public bool IncludeInvariantForVariant { get; }
+
     /// <inheritdoc />
-    public object DeepClone() => new ContentSchedule(Id, Culture, Date, Action);
+    public object DeepClone() => new ContentSchedule(Id, Culture, Date, Action, IncludeInvariantForVariant);
 
     /// <inheritdoc />
     public override bool Equals(object? obj)
@@ -73,13 +93,14 @@ public class ContentSchedule : IDeepCloneable
     /// <returns><c>true</c> if the schedules are equal; otherwise, <c>false</c>.</returns>
     /// <remarks>
     ///     Two ContentSchedule instances are equal if they are for the same action,
-    ///     for the same culture, on the same date. The Id is not compared.
+    ///     for the same culture, on the same date, including the same invariant properties. The Id is not compared.
     /// </remarks>
     public bool Equals(ContentSchedule other) =>
 
         // don't compare Ids, two ContentSchedule are equal if they are for the same change
         // for the same culture, on the same date - and the collection deals w/duplicates
-        Culture.InvariantEquals(other.Culture) && Date == other.Date && Action == other.Action;
+        Culture.InvariantEquals(other.Culture) && Date == other.Date && Action == other.Action
+        && IncludeInvariantForVariant == other.IncludeInvariantForVariant;
 
     /// <inheritdoc />
     public override int GetHashCode() => throw new NotImplementedException();

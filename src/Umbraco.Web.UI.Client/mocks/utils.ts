@@ -40,6 +40,7 @@ export const queryFilter = (filterBy: string, value?: string) => {
  * @param {string} problemDetails.detail A human-readable explanation specific to this occurrence of the problem, which will be shown to the user.
  * @param {number} problemDetails.status The HTTP status code for this occurrence of the problem.
  * @param {string} problemDetails.type A URI reference that identifies the problem type.
+ * @param {string} problemDetails.operationStatus The operation status the Management API adds as a problem details extension.
  * @returns {object} The problem details object.
  */
 export function createProblemDetails(problemDetails: {
@@ -47,6 +48,7 @@ export function createProblemDetails(problemDetails: {
 	detail?: string;
 	type?: string;
 	status?: number;
+	operationStatus?: string;
 }): object {
 	return problemDetails;
 }

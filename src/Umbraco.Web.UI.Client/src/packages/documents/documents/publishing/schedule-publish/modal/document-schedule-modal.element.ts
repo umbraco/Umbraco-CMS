@@ -13,8 +13,11 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { umbBindToValidation, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import type { UmbEntityReferencesConfig } from '@umbraco-cms/backoffice/relations';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
 import type { UUIBooleanInputElement, UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+
+import '@umbraco-cms/backoffice/relations';
 
 @customElement('umb-document-schedule-modal')
 export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
@@ -43,6 +46,9 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _submitButtonState?: UUIButtonState;
+
+	@state()
+	private _referencesConfig?: UmbEntityReferencesConfig;
 
 	#validation = new UmbValidationContext(this);
 
@@ -91,6 +97,17 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	override firstUpdated() {
 		this._internalValues = this.data?.prevalues ? [...this.data.prevalues] : [];
 		this.#configureSelectionManager();
+		this.#configureReferences();
+	}
+
+	#configureReferences() {
+		if (!this.data) return;
+		const { unique, itemRepositoryAlias, referenceRepositoryAlias } = this.data;
+		if (!unique) return;
+		if (!itemRepositoryAlias) return;
+		if (!referenceRepositoryAlias) return;
+
+		this._referencesConfig = { unique, itemRepositoryAlias, referenceRepositoryAlias };
 	}
 
 	async #configureSelectionManager() {
@@ -194,7 +211,22 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`<uui-dialog-layout headline=${this.localize.term('content_saveAndScheduleModalTitle')}>
+			${when(
+				this.data?.ancestorPublishCoverage?.isPathPublished === false,
+				() =>
+					html`<p class="ancestor-not-published">
+						<umb-localize key="content_ancestorNotPublishedScheduleWarning"></umb-localize>
+					</p>`,
+			)}
 			${this.#renderOptions()}
+			${when(
+				this._referencesConfig,
+				() =>
+					html`<umb-entity-references-summary
+						.config=${this._referencesConfig}
+						.entitiesNeedingAttention=${this.data
+							?.entitiesNeedingAttention}></umb-entity-references-summary>`,
+			)}
 
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
@@ -240,8 +272,9 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		const pickable = this.#pickableFilter(option);
 		const fromDate = this.#fromDate(option.unique);
 		const toDate = this.#toDate(option.unique);
-		const isChanged =
-			fromDate !== option.variant?.scheduledPublishDate || toDate !== option.variant?.scheduledUnpublishDate;
+		const persistedFromDate = option.variant?.scheduledPublishDate ?? null;
+		const persistedToDate = option.variant?.scheduledUnpublishDate ?? null;
+		const isChanged = fromDate !== persistedFromDate || toDate !== persistedToDate;
 
 		const mirrored = this.#isMirrored(option.unique);
 
@@ -256,7 +289,19 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				<uui-icon slot="icon" name="icon-globe"></uui-icon>
 				${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
 			</uui-menu-item>
-			${when(this.#isSelected(option.unique), () => this.#renderPublishDateInput(option, fromDate, toDate, mirrored))}
+			${when(
+				this.#isSelected(option.unique),
+				() => html`
+					${when(
+						this.#isCultureNotPublishedInAncestors(option),
+						() =>
+							html`<p class="ancestor-culture-not-published">
+								<umb-localize key="content_ancestorCultureNotPublishedScheduleWarning"></umb-localize>
+							</p>`,
+					)}
+					${this.#renderPublishDateInput(option, fromDate, toDate, mirrored)}
+				`,
+			)}
 			${when(
 				isChanged,
 				() =>
@@ -265,6 +310,12 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 					</p>`,
 			)}
 		`;
+	}
+
+	#isCultureNotPublishedInAncestors(option: UmbDocumentVariantOptionModel): boolean {
+		const coverage = this.data?.ancestorPublishCoverage;
+		if (!coverage?.isPathPublished || !option.culture || !coverage.publishedCultures) return false;
+		return !coverage.publishedCultures.includes(option.culture);
 	}
 
 	#attachValidatorsToPublish(element: UmbInputDateElement | null) {
@@ -529,6 +580,16 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 			uui-menu-item {
 				--uui-menu-item-flat-structure: 1;
+			}
+
+			.ancestor-not-published {
+				margin-top: 0;
+			}
+
+			.ancestor-culture-not-published {
+				margin: 0;
+				font-size: var(--uui-type-small-size);
+				color: var(--uui-color-text-alt);
 			}
 		`,
 	];

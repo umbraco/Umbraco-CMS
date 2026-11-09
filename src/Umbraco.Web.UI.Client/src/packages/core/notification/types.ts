@@ -21,10 +21,6 @@ export interface UmbNotificationDefaultData {
 	 */
 	htmlMessage?: string | TemplateResult;
 	headline?: string;
-	/**
-	 * @deprecated Use {@link UmbPeekErrorArgs} instead. Scheduled for removal in Umbraco 19.
-	 */
-	structuredList?: Record<string, Array<unknown>>;
 	whitespace?: 'normal' | 'pre-line' | 'pre-wrap' | 'nowrap' | 'pre';
 }
 
@@ -50,11 +46,6 @@ export interface UmbPeekErrorArgs extends UmbNotificationDefaultData {
 	detail?: string;
 	/** Validation errors keyed by field name (from ProblemDetails.errors). */
 	errors?: Record<string, string[]>;
-	/**
-	 * Validation errors keyed by field name (from ProblemDetails.errors).
-	 * @deprecated Use `errors` instead. Scheduled for removal in Umbraco 19.
-	 */
-	details?: Record<string, string[]>;
 	/** The notification color. Defaults to 'danger'. */
 	color?: UmbNotificationColor;
 }

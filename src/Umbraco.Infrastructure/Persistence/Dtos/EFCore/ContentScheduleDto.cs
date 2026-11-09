@@ -13,6 +13,7 @@ public class ContentScheduleDto
     public const string LanguageIdColumnName = "languageId";
     public const string DateColumnName = "date";
     public const string ActionColumnName = "action";
+    public const string IncludeInvariantForVariantColumnName = "includeInvariantForVariant";
 
     /// <summary>
     /// Gets or sets the unique identifier of the content schedule.
@@ -39,4 +40,9 @@ public class ContentScheduleDto
     /// Gets or sets the action to be performed as part of the content schedule.
     /// </summary>
     public string Action { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether a scheduled release of variant content includes its invariant properties.
+    /// </summary>
+    public bool IncludeInvariantForVariant { get; set; }
 }

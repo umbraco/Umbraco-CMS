@@ -10,6 +10,7 @@ import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboar
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+
 export class UmbBlockSingleEntryContext extends UmbBlockEntryContext<
 	typeof UMB_BLOCK_SINGLE_MANAGER_CONTEXT,
 	typeof UMB_BLOCK_SINGLE_MANAGER_CONTEXT.TYPE,
@@ -34,12 +35,6 @@ export class UmbBlockSingleEntryContext extends UmbBlockEntryContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_SINGLE_MANAGER_CONTEXT, UMB_BLOCK_SINGLE_ENTRIES_CONTEXT);
-	}
-
-	protected override _needsLegacyLabelRenderer(): boolean {
-		// Block Single entry element owns the canonical `<umb-ufm-render>` (via its child
-		// views) and pushes resolved text via `setName()`. No hidden virtual renderer needed.
-		return false;
 	}
 
 	protected override _gotManager() {
@@ -73,6 +68,7 @@ export class UmbBlockSingleEntryContext extends UmbBlockEntryContext<
 
 		clipboardContext.write({
 			icon: this.getContentElementTypeIcon(),
+			thumbnail: this.getThumbnailUrl(),
 			name: entryName,
 			propertyValue: this.#buildPropertyValue(),
 			propertyEditorUiAlias: UMB_BLOCK_SINGLE_PROPERTY_EDITOR_UI_ALIAS,

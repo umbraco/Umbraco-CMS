@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Locking;
@@ -15,6 +17,8 @@ namespace Umbraco.Cms.Core.Services;
 /// </remarks>
 internal sealed class MemberTypeContainerService : EntityTypeContainerService<IMemberType, IMemberTypeContainerRepository>, IMemberTypeContainerService
 {
+    private readonly IMemberTypeRepository _memberTypeRepository;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberTypeContainerService" /> class.
     /// </summary>
@@ -25,6 +29,8 @@ internal sealed class MemberTypeContainerService : EntityTypeContainerService<IM
     /// <param name="auditService">The audit service for recording audit entries.</param>
     /// <param name="entityRepository">The entity repository for entity operations.</param>
     /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="memberTypeRepository">The member type repository.</param>
     public MemberTypeContainerService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -32,9 +38,25 @@ internal sealed class MemberTypeContainerService : EntityTypeContainerService<IM
         IMemberTypeContainerRepository entityContainerRepository,
         IAuditService auditService,
         IEntityRepository entityRepository,
-        IUserIdKeyResolver userIdKeyResolver)
-        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IEntityService entityService,
+        IMemberTypeRepository memberTypeRepository)
+        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver, entityService)
+        => _memberTypeRepository = memberTypeRepository;
+
+    /// <inheritdoc />
+    protected override Task<IMemberType?> GetContainedEntityAsync(IEntitySlim descendant) => _memberTypeRepository.GetAsync(descendant.Id, CancellationToken.None);
+
+    /// <inheritdoc />
+    protected override Task SaveContainedEntityAsync(IMemberType entity) => _memberTypeRepository.SaveAsync(entity, CancellationToken.None);
+
+    /// <inheritdoc />
+    protected override void PublishContainedEntitiesMovedNotifications(ICoreScope scope, IReadOnlyCollection<MoveEventInfo<IMemberType>> movedEntities, EventMessages eventMessages)
     {
+        if (movedEntities.Count > 0)
+        {
+            scope.Notifications.Publish(new MemberTypeMovedNotification(movedEntities, eventMessages));
+        }
     }
 
     /// <inheritdoc />

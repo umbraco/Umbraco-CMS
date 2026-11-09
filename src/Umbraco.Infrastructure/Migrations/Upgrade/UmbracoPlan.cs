@@ -128,6 +128,14 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_19_0_0.MigrateSingleUrlPickerDataTypes>("{4E0B7D51-6C89-4A3F-B1D2-7F5A9E30C48B}");
         To<V_19_0_0.MigrateSingleDropDownDataTypes>("{A21C6F84-3B5D-4E92-8C07-1D4F6B8A5E30}");
         To<V_19_0_0.AddHasAccessToInvariantForVariantToUserGroup>("{B2C4E7A8-9F31-4D56-8E7B-C1A2F3D4E5F6}");
+        To<V_19_0_0.GrantDocumentBlueprintAccessToSettingsGroups>("{E973CB74-26BC-4092-AA46-01FE48301E29}");
+        To<V_19_0_0.MigrateMultiUrlPickerMinMaxToRange>("{B1E4A7C2-3F5D-4A98-9C1E-0D2F6B7A81C4}");
+        To<V_19_0_0.MigrateMultiNodeTreePickerMinMaxToRange>("{C2F5B8D3-4A6E-4BA9-8D2F-1E3A7C8B92D5}");
+        To<V_19_0_0.MigrateMultipleTextStringMinMaxToRange>("{D3A6C9E4-5B7F-4CBA-9E30-2F4B8D9CA3E6}");
+        To<V_19_0_0.MigrateIntegerMinMaxToRange>("{E4B7DAF5-6C80-4DCB-8F41-3A5C9EADB4F7}");
+        To<V_19_0_0.MigrateDecimalMinMaxToRange>("{F5C8EB06-7D91-4EDC-9052-4B6DAFBEC508}");
+        To<V_19_0_0.MigrateSliderMinMaxToRange>("{06D9FC17-8EA2-4FED-A163-5C7EB0CFD619}");
+        To<V_19_0_0.MigrateBlockGridAreaMinMaxToRange>("{17EA0D28-9FB3-40FE-B274-6D8FC1D0E72A}");
 
         // To EFCore
         To<V_18_0_0.AddWebhookDto>("{F3CC0076-0692-41E5-9B2B-C58D46E556D4}");
@@ -152,6 +160,7 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_19_0_0.RemoveUserGroupDefaultPermissionsFromModel>("{F6C49C99-3805-4ED8-AA5B-39937DC4081C}");
         To<V_19_0_0.AddHasAccessToInvariantForVariantToModel>("{A08A7C9C-2EDD-4457-8C9F-9D1EAF4FB325}");
         To<V_19_0_0.AddElementDtos>("{1EC33267-3D0C-4D67-BC41-5AA5D0DFF3F2}");
+        To<V_19_0_0.AddIncludeInvariantForVariantToContentScheduleModel>("{20E34D98-66A1-41EB-91E9-11CE6BF334C6}");
     }
 
     /// <summary>
