@@ -8,7 +8,7 @@ export class UmbSchemaLockdownWorkspaceActionApi extends UmbWorkspaceActionBase 
 	public override async execute(): Promise<void> {
 		await umbInfoModal(this, {
 			headline: this.#localize.term('schemaLockdown_locked'),
-			content: this.#localize.term('schemaLockdown_lockedDescription'),
+			content: this.#localize.term('schemaLockdown_updateLockedDescription'),
 		}).catch(() => undefined);
 	}
 }

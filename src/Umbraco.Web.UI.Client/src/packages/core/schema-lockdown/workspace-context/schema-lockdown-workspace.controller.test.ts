@@ -104,6 +104,16 @@ describe('UmbSchemaLockdownWorkspaceController', () => {
 		expect(entityReadOnlyGuard.getPermitted()).to.be.true;
 	});
 
+	it('explains that creating a new entity is locked', async () => {
+		allowedOperations = { create: false, update: true, delete: true };
+		setup('document-type', true);
+
+		await waitUntil(() => forbidden.getIsOn(), 'the new entity was not forbidden');
+		const [state] = forbidden.getStates();
+		expect(state.title).to.equal('#schemaLockdown_createLockedTitle');
+		expect(state.message).to.equal('#schemaLockdown_createLockedDescription');
+	});
+
 	it('keeps a new entity editable while it can be created, even if it cannot be updated', async () => {
 		allowedOperations = { create: true, update: false, delete: true };
 		setup('document-type', true);

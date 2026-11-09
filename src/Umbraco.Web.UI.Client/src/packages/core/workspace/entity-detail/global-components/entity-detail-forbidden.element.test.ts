@@ -29,6 +29,32 @@ describe('UmbEntityDetailForbiddenElement', () => {
 		expect(element).to.be.instanceOf(UmbEntityDetailForbiddenElement);
 	});
 
+	it('shows the default access denied text', () => {
+		const text = element.shadowRoot?.textContent ?? '';
+		expect(text).to.contain('entityDetail_forbiddenTitle');
+		expect(text).to.contain('entityDetail_forbiddenDescription');
+	});
+
+	it('shows the headline and message instead of the default text when a headline is set', async () => {
+		element.headline = 'Custom headline';
+		element.message = 'Custom message';
+		await element.updateComplete;
+
+		const text = element.shadowRoot?.textContent ?? '';
+		expect(text).to.contain('Custom headline');
+		expect(text).to.contain('Custom message');
+		expect(text).to.not.contain('entityDetail_forbiddenTitle');
+	});
+
+	it('keeps the default text when only a message is set', async () => {
+		element.message = 'Custom message';
+		await element.updateComplete;
+
+		const text = element.shadowRoot?.textContent ?? '';
+		expect(text).to.contain('entityDetail_forbiddenTitle');
+		expect(text).to.not.contain('Custom message');
+	});
+
 	it('does not render a close button when not shown inside a modal', () => {
 		const button = element.shadowRoot?.querySelector('uui-button');
 		expect(button).to.be.null;

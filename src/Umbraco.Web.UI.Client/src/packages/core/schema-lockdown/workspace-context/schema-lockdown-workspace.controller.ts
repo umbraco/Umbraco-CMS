@@ -56,7 +56,11 @@ export class UmbSchemaLockdownWorkspaceController extends UmbControllerBase {
 		const isForbidden = this.#isNew === true && !this.#createAllowed.getAllowed();
 		const hasForbiddenState = context.forbidden.getStates().some((state) => state.unique === SCHEMA_LOCKDOWN_UNIQUE);
 		if (isForbidden && !hasForbiddenState) {
-			context.forbidden.addState({ unique: SCHEMA_LOCKDOWN_UNIQUE });
+			context.forbidden.addState({
+				unique: SCHEMA_LOCKDOWN_UNIQUE,
+				title: '#schemaLockdown_createLockedTitle',
+				message: '#schemaLockdown_createLockedDescription',
+			});
 		} else if (!isForbidden && hasForbiddenState) {
 			context.forbidden.removeState(SCHEMA_LOCKDOWN_UNIQUE);
 		}

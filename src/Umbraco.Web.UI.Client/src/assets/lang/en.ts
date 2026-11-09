@@ -3143,7 +3143,10 @@ export default {
 	},
 	schemaLockdown: {
 		locked: 'Locked',
-		lockedDescription:
-			'Changes to this item are locked in this environment. Make the change where this item is managed, or contact your developer or administrator.',
+		updateLockedDescription:
+			'Changes to this item are locked in this environment.<br />Make the change where this item is managed, or contact your developer or administrator.',
+		createLockedTitle: (entityType: string) => `Creating a new ${entityType ?? 'item'} is locked`,
+		createLockedDescription:
+			"New items of this type can't be created in this environment.<br />Create it where this item is managed, or contact your developer or administrator.",
 	},
 } as UmbLocalizationDictionary;

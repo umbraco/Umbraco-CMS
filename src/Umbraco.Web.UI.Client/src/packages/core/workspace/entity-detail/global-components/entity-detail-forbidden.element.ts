@@ -9,6 +9,21 @@ export class UmbEntityDetailForbiddenElement extends UmbLitElement {
 	@property({ type: String, attribute: 'entity-type' })
 	entityType = '';
 
+	/**
+	 * Replaces the default headline, together with `message`. Can contain localization keys prefixed with `#`, which
+	 * receive the entity type as their argument.
+	 */
+	@property({ type: String })
+	headline?: string;
+
+	/**
+	 * Replaces the default description when a `headline` is set. Can contain localization keys prefixed with `#`, which
+	 * receive the entity type as their argument.
+	 * Rendered as HTML, so it must come from a trusted source.
+	 */
+	@property({ type: String })
+	message?: string;
+
 	#modalContext?: UmbModalContext;
 
 	@state()
@@ -29,8 +44,11 @@ export class UmbEntityDetailForbiddenElement extends UmbLitElement {
 	override render() {
 		return html`
 			<div class="uui-text">
-				<h4>${this.localize.term('entityDetail_forbiddenTitle', this.entityType)}</h4>
-				${this.localize.term('entityDetail_forbiddenDescription', this.entityType)}
+				${this.headline
+					? html`<h4>${this.localize.string(this.headline, this.entityType)}</h4>
+							${this.localize.htmlString(this.message ?? '', this.entityType)}`
+					: html`<h4>${this.localize.term('entityDetail_forbiddenTitle', this.entityType)}</h4>
+							${this.localize.term('entityDetail_forbiddenDescription', this.entityType)}`}
 				${this._isInModal
 					? html`<uui-button
 							look="secondary"
@@ -58,6 +76,7 @@ export class UmbEntityDetailForbiddenElement extends UmbLitElement {
 				align-items: center;
 				height: 100%;
 				gap: var(--uui-size-space-4);
+				text-align: center;
 			}
 
 			@keyframes fadeIn {
