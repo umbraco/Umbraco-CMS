@@ -116,7 +116,46 @@ public class PublishedContentTests
         }
     }
 
-    private static PublishedContent CreatePublishedContent(int propertyCount)
+    [Test]
+    public void CreateDate_And_UpdateDate_With_Unspecified_Kind_Are_Exposed_As_Utc()
+    {
+        var unspecified = new DateTime(2026, 1, 2, 3, 4, 5, DateTimeKind.Unspecified);
+        PublishedContent content = CreatePublishedContent(propertyCount: 1, createDate: unspecified, versionDate: unspecified);
+
+        Assert.That(content.CreateDate.Kind, Is.EqualTo(DateTimeKind.Utc));
+        Assert.That(content.UpdateDate.Kind, Is.EqualTo(DateTimeKind.Utc));
+        Assert.That(content.CreateDate, Is.EqualTo(unspecified));
+        Assert.That(content.UpdateDate, Is.EqualTo(unspecified));
+    }
+
+    [Test]
+    public void Cultures_With_Unspecified_Kind_Dates_Are_Exposed_As_Utc()
+    {
+        var unspecified = new DateTime(2026, 1, 2, 3, 4, 5, DateTimeKind.Unspecified);
+        var cultureInfos = new Dictionary<string, CultureVariation>
+        {
+            ["en-US"] = new() { Name = "English", Date = unspecified },
+            ["da-DK"] = new() { Name = "Dansk", Date = unspecified },
+        };
+        PublishedContent content = CreatePublishedContent(
+            propertyCount: 1,
+            variation: ContentVariation.Culture,
+            cultureInfos: cultureInfos);
+
+        Assert.That(content.Cultures.Count, Is.EqualTo(2));
+        foreach (PublishedCultureInfo culture in content.Cultures.Values)
+        {
+            Assert.That(culture.Date.Kind, Is.EqualTo(DateTimeKind.Utc));
+            Assert.That(culture.Date, Is.EqualTo(unspecified));
+        }
+    }
+
+    private static PublishedContent CreatePublishedContent(
+        int propertyCount,
+        DateTime? createDate = null,
+        DateTime? versionDate = null,
+        ContentVariation variation = ContentVariation.Nothing,
+        IReadOnlyDictionary<string, CultureVariation>? cultureInfos = null)
     {
         IPublishedModelFactory modelFactory = new NoopPublishedModelFactory();
         var converters = new PropertyValueConverterCollection(() => Enumerable.Empty<IPropertyValueConverter>());
@@ -144,7 +183,7 @@ public class PublishedContentTests
             PublishedItemType.Content,
             Enumerable.Empty<string>(),
             CreatePropertyTypes,
-            ContentVariation.Nothing);
+            variation);
 
         var properties = new Dictionary<string, PropertyData[]>();
         for (var i = 0; i < propertyCount; i++)
@@ -164,18 +203,18 @@ public class PublishedContentTests
             "Test",
             null,
             1,
-            DateTime.UtcNow,
+            versionDate ?? DateTime.UtcNow,
             -1,
             0,
             true,
             properties,
-            null);
+            cultureInfos);
 
         var contentNode = new ContentNode(
             1,
             Guid.NewGuid(),
             0,
-            DateTime.UtcNow,
+            createDate ?? DateTime.UtcNow,
             -1,
             contentType,
             draftData: null,
