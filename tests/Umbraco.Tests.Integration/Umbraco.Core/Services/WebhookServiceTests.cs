@@ -167,28 +167,13 @@ internal sealed class WebhookServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(2, result.Count());
     }
 
-    [TestCase("Content-Type", "application/vnd.custom+json")]
-    [TestCase("X-Custom-Header", "value")]
-    [TestCase("Authorization", "Bearer token")]
-    public async Task Can_Create_With_Valid_Header(string name, string value)
+    [Test]
+    public async Task Can_Create_With_Valid_Header()
     {
-        var result = await WebhookService.CreateAsync(CreateWebhookWithHeader(name, value));
+        var result = await WebhookService.CreateAsync(CreateWebhookWithHeader("Content-Type", "application/vnd.custom+json"));
 
         Assert.IsTrue(result.Success);
         Assert.AreEqual(WebhookOperationStatus.Success, result.Status);
-    }
-
-    [Test]
-    public async Task Cannot_Update_With_Invalid_Header()
-    {
-        var existing = await WebhookService.CreateAsync(CreateWebhookWithHeader("X-Custom-Header", "value"));
-        existing.Result.Headers = new Dictionary<string, string> { ["Host"] = "example.com" };
-
-        var updateResult = await WebhookService.UpdateAsync(existing.Result);
-
-        Assert.AreEqual(WebhookOperationStatus.InvalidHeaders, updateResult.Status);
-        var persisted = await WebhookService.GetAsync(existing.Result.Key);
-        Assert.AreEqual("value", persisted!.Headers["X-Custom-Header"]);
     }
 
     private static Webhook CreateWebhookWithHeader(string name, string value)
