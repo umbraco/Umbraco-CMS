@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -71,6 +72,8 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
         base.CustomTestSetup(builder);
         builder.Services.AddUnique<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
+        builder.AddNotificationHandler<MemberSavedNotification, MemberSavedDistributedCacheNotificationHandler>();
+        builder.AddNotificationHandler<MemberCacheRefresherNotification, MemberIndexingNotificationHandler>();
         builder.AddExamineIndexes();
         builder.Services.AddHostedService<QueuedHostedService>();
     }
@@ -904,5 +907,76 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
                 },
                 Constants.UmbracoIndexes.InternalIndexName);
         }
+    }
+
+    [TestCase("member.search@example.com")]
+    [TestCase("member-search-login")]
+    public async Task Search_Matches_Member_Identity_Fields_With_Members_Section_Access(string query)
+    {
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await CreateMember("Jane Doe", "member-search-login", "member.search@example.com");
+
+        ISearchResult[] searchResults = BackOfficeExamineMemberSearch($"\"{query}\"").ToArray();
+
+        Assert.AreEqual(1, searchResults.Length);
+        Assert.AreEqual("Jane Doe", searchResults[0].Values["nodeName"]);
+    }
+
+    [TestCase("member.search@example.com")]
+    [TestCase("member-search-login")]
+    public async Task Search_Does_Not_Match_Member_Identity_Fields_Without_Members_Section_Access(string query)
+    {
+        await SetupUserIdentity(await CreateUserInGroup(Constants.Security.WriterGroupKey));
+        await CreateMember("Jane Doe", "member-search-login", "member.search@example.com");
+
+        ISearchResult[] searchResults = BackOfficeExamineMemberSearch($"\"{query}\"").ToArray();
+
+        Assert.AreEqual(0, searchResults.Length);
+    }
+
+    [Test]
+    public async Task Search_Matches_Member_Name_Without_Members_Section_Access()
+    {
+        await SetupUserIdentity(await CreateUserInGroup(Constants.Security.WriterGroupKey));
+        await CreateMember("Jane Doe", "member-search-login", "member.search@example.com");
+
+        ISearchResult[] searchResults = BackOfficeExamineMemberSearch("Jane").ToArray();
+
+        Assert.AreEqual(1, searchResults.Length);
+        Assert.AreEqual("Jane Doe", searchResults[0].Values["nodeName"]);
+    }
+
+    private IEnumerable<ISearchResult> BackOfficeExamineMemberSearch(string query) =>
+        BackOfficeExamineSearcher.Search(
+            query,
+            UmbracoEntityTypes.Member,
+            pageSize: 20,
+            pageIndex: 0,
+            totalFound: out _,
+            contentTypeAliases: null,
+            trashed: null,
+            searchFrom: null);
+
+    private async Task CreateMember(string name, string username, string email)
+    {
+        var memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await GetRequiredService<IMemberTypeService>().CreateAsync(memberType, Constants.Security.SuperUserKey);
+
+        IMemberService memberService = GetRequiredService<IMemberService>();
+
+        IMember member = memberService.CreateMember(username, email, name, memberType);
+        await ExecuteAndWaitForIndexing(() => memberService.Save(member), Constants.UmbracoIndexes.MembersIndexName);
+    }
+
+    private async Task<string> CreateUserInGroup(Guid groupKey)
+    {
+        IUserService userService = GetRequiredService<IUserService>();
+        IUserGroup group = (await GetRequiredService<IUserGroupService>().GetAsync(groupKey))!;
+
+        IUser user = userService.CreateUserWithIdentity("restricted", "restricted@example.com");
+        user.AddGroup(group.ToReadOnlyGroup());
+        userService.Save(user);
+
+        return user.Id.ToString();
     }
 }
