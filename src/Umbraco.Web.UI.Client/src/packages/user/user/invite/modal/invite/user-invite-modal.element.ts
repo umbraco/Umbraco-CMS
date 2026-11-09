@@ -46,14 +46,14 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 	}
 
 	override render() {
-		return html`<uui-dialog-layout headline="Invite User">
+		return html`<uui-dialog-layout headline=${this.localize.term('user_inviteUser')}>
 			${this.#renderForm()}
-			<uui-button @click=${this._rejectModal} slot="actions" label="Cancel" look="secondary"></uui-button>
+			<uui-button @click=${this._rejectModal} slot="actions" label=${this.localize.term('general_cancel')} look="secondary"></uui-button>
 			<uui-button
 				form="InviteUserForm"
 				slot="actions"
 				type="submit"
-				label="Send invite"
+				label=${this.localize.term('user_sendInvite')}
 				look="primary"
 				color="positive"></uui-button
 		></uui-dialog-layout>`;
@@ -61,26 +61,35 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 
 	#renderForm() {
 		return html` <p style="margin-top: 0">
-				Invite new users to give them access to Umbraco. An invite email will be sent to the user with information on
-				how to log in to Umbraco. Invites last for 72 hours.
+				<umb-localize key="user_inviteUserHelp"></umb-localize>
 			</p>
 			<uui-form>
 				<form id="InviteUserForm" name="form" @submit="${this.#onSubmit}">
 					<uui-form-layout-item>
-						<uui-label id="nameLabel" slot="label" for="name" required>Name</uui-label>
+						<uui-label id="nameLabel" slot="label" for="name" required>
+							<umb-localize key="general_name"></umb-localize>
+						</uui-label>
 						<uui-input id="name" label="name" type="text" name="name" required></uui-input>
 					</uui-form-layout-item>
 					<uui-form-layout-item>
-						<uui-label id="emailLabel" slot="label" for="email" required>Email</uui-label>
+						<uui-label id="emailLabel" slot="label" for="email" required>
+							<umb-localize key="general_email"></umb-localize>
+						</uui-label>
 						<uui-input id="email" label="email" type="email" name="email" required></uui-input>
 					</uui-form-layout-item>
 					<uui-form-layout-item>
-						<uui-label id="userGroupsLabel" slot="label" for="userGroups" required>User group</uui-label>
-						<span slot="description">Add groups to assign access and permissions</span>
+						<uui-label id="userGroupsLabel" slot="label" for="userGroups" required>
+							<umb-localize key="user_usergroups"></umb-localize>
+						</uui-label>
+						<span slot="description">
+							<umb-localize key="user_groupsHelp"></umb-localize>
+						</span>
 						<umb-user-group-input id="userGroups" name="userGroups"></umb-user-group-input>
 					</uui-form-layout-item>
 					<uui-form-layout-item>
-						<uui-label id="messageLabel" slot="label" for="message" required>Message</uui-label>
+						<uui-label id="messageLabel" slot="label" for="message" required>
+							<umb-localize key="general_message"></umb-localize>
+						</uui-label>
 						<uui-textarea id="message" label="message" name="message" required></uui-textarea>
 					</uui-form-layout-item>
 				</form>

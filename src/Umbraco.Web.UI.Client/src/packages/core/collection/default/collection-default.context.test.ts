@@ -3,7 +3,9 @@ import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbCollectionFilterModel } from '../collection-filter-model.interface.js';
+import type { UmbCollectionRepository } from '../repository/collection-repository.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbPagedModel, UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 
 const FILTER_MEMORY_UNIQUE = 'UmbCollectionFilter';
 const ORDER_MEMORY_UNIQUE = 'UmbCollectionOrder';
@@ -17,27 +19,69 @@ type UmbTestCollectionFilterModel = UmbCollectionFilterModel & {
 	orderDirection?: string;
 };
 
+type UmbTestCollectionItem = { unique: string };
+
+type UmbTestCollectionResponse = UmbRepositoryResponse<UmbPagedModel<UmbTestCollectionItem>>;
+
 /**
- * Exposes the protected total items setter, which a collection calls when a request has been answered.
+ * A collection repository whose requests stay open until the test answers them, identified by the order they were made in.
+ * An answer may be given before the request reaches the repository.
+ */
+class UmbTestDeferredCollectionRepository {
+	#responses: Array<{
+		promise: Promise<UmbTestCollectionResponse>;
+		resolve: (response: UmbTestCollectionResponse) => void;
+	}> = [];
+	#requestCount = 0;
+
+	#getResponse(index: number) {
+		if (!this.#responses[index]) {
+			let resolve!: (response: UmbTestCollectionResponse) => void;
+			const promise = new Promise<UmbTestCollectionResponse>((r) => (resolve = r));
+			this.#responses[index] = { promise, resolve };
+		}
+		return this.#responses[index];
+	}
+
+	requestCollection() {
+		return this.#getResponse(this.#requestCount++).promise;
+	}
+
+	answer(index: number, items: Array<UmbTestCollectionItem>) {
+		this.#getResponse(index).resolve({ data: { items, total: items.length } });
+	}
+}
+
+/**
+ * Exposes the protected members a collection uses when it requests its items and when a request has been answered.
  */
 class UmbTestCollectionContext extends UmbDefaultCollectionContext<any, UmbTestCollectionFilterModel> {
 	receiveTotalItems(totalItems: number) {
 		this._setTotalItems(totalItems);
+	}
+
+	useRepository(repository: UmbTestDeferredCollectionRepository) {
+		this._repository = repository as unknown as UmbCollectionRepository;
+		this._init = Promise.resolve();
+	}
+
+	request() {
+		return this._requestCollection();
 	}
 }
 
 const PAGE_SIZE = 10;
 const DEFAULT_VIEW_ALIAS = 'Umb.CollectionView.Test';
 
+const readOnce = <T>(observable: Observable<T>): T => {
+	let value!: T;
+	observable.subscribe((emitted) => (value = emitted)).unsubscribe();
+	return value;
+};
+
 describe('UmbDefaultCollectionContext action affordances', () => {
 	let hostElement: UmbTestControllerHostElement;
 	let context: UmbTestCollectionContext;
-
-	const readOnce = <T>(observable: Observable<T>): T => {
-		let value!: T;
-		observable.subscribe((emitted) => (value = emitted)).unsubscribe();
-		return value;
-	};
 
 	beforeEach(() => {
 		hostElement = new UmbTestControllerHostElement();
@@ -209,5 +253,67 @@ describe('UmbDefaultCollectionContext interaction memory', () => {
 			expect(context.pagination.getCurrentPageNumber()).to.equal(3);
 			expect(getFilter()).to.include({ skip: PAGE_SIZE * 2 });
 		});
+	});
+});
+
+describe('UmbDefaultCollectionContext requesting the collection', () => {
+	let hostElement: UmbTestControllerHostElement;
+	let context: UmbTestCollectionContext;
+	let repository: UmbTestDeferredCollectionRepository;
+
+	beforeEach(() => {
+		hostElement = new UmbTestControllerHostElement();
+		context = new UmbTestCollectionContext(hostElement, DEFAULT_VIEW_ALIAS);
+		repository = new UmbTestDeferredCollectionRepository();
+		context.setConfig({ pageSize: PAGE_SIZE });
+		context.useRepository(repository);
+	});
+
+	it('applies the response of the latest request when an earlier request answers last', async () => {
+		const earlier = context.request();
+		const latest = context.request();
+
+		repository.answer(1, [{ unique: 'latest' }]);
+		await latest;
+		repository.answer(0, [{ unique: 'earlier-1' }, { unique: 'earlier-2' }]);
+		await earlier;
+
+		expect(readOnce(context.items)).to.eql([{ unique: 'latest' }]);
+		expect(readOnce(context.totalItems)).to.equal(1);
+	});
+
+	it('stays loading until the latest request has answered', async () => {
+		const earlier = context.request();
+		const latest = context.request();
+
+		repository.answer(0, [{ unique: 'earlier' }]);
+		await earlier;
+		expect(readOnce(context.loading)).to.be.true;
+
+		repository.answer(1, [{ unique: 'latest' }]);
+		await latest;
+		expect(readOnce(context.loading)).to.be.false;
+	});
+
+	it('does not hand a superseded response to a collection that applies the data itself', async () => {
+		const appliedItems: Array<Array<string>> = [];
+		const overridingContext = new (class extends UmbTestCollectionContext {
+			protected override _setCollectionData(data: UmbPagedModel<UmbTestCollectionItem>) {
+				appliedItems.push(data.items.map((item) => item.unique));
+				super._setCollectionData(data);
+			}
+		})(hostElement, DEFAULT_VIEW_ALIAS);
+		overridingContext.setConfig({ pageSize: PAGE_SIZE });
+		overridingContext.useRepository(repository);
+
+		const earlier = overridingContext.request();
+		const latest = overridingContext.request();
+
+		repository.answer(1, [{ unique: 'latest' }]);
+		await latest;
+		repository.answer(0, [{ unique: 'earlier' }]);
+		await earlier;
+
+		expect(appliedItems).to.eql([['latest']]);
 	});
 });

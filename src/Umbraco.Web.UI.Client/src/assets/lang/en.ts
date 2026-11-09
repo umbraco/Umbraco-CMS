@@ -241,6 +241,8 @@ export default {
 		noItemsTitle: 'No items',
 		addCollectionConfiguration: 'Add collection',
 		cardViewLabel: 'Cards',
+		gridViewLabel: 'Grid',
+		listViewLabel: 'List',
 		tableViewLabel: 'Table',
 	},
 	content: {
@@ -279,6 +281,10 @@ export default {
 		otherElements: 'Properties',
 		parentNotPublished: "This document is published but is not visible because the parent '%0%' is unpublished",
 		parentCultureNotPublished: "This culture is published but is not visible because it is unpublished on parent '%0%'",
+		ancestorNotPublishedScheduleWarning:
+			"An ancestor isn't published. The scheduled publish will fail unless every ancestor is published by then.",
+		ancestorCultureNotPublishedScheduleWarning:
+			"An ancestor isn't published in this language. The scheduled publish will fail unless every ancestor is published in this language by then.",
 		parentNotPublishedAnomaly: 'This document is published but is not in the cache',
 		getUrlException: 'Could not get the URL',
 		routeError: 'This document is published but its URL would collide with content %0%',
@@ -297,6 +303,7 @@ export default {
 		unpublishDate: 'Unpublish at',
 		removeDate: 'Clear date',
 		scheduledPublishing: 'Scheduled publishing',
+		scheduleForAllLanguages: 'Schedule for all selected languages',
 		setDate: 'Set date',
 		sortDone: 'Sort order is updated',
 		sortHelp:
@@ -409,6 +416,8 @@ export default {
 		},
 	},
 	media: {
+		chooseMediaTypeHeadline: 'Choose media type',
+		chooseMediaTypeMoreFiles: (count: number) => (count === 1 ? '1 more file' : `${count} more files`),
 		clickToUpload: 'Click to upload',
 		browseFilesAction: 'Browse files',
 		dropFilesOr: 'Drag and drop media here<br />or',
@@ -733,6 +742,7 @@ export default {
 		indexCannotRebuild: 'This index cannot be rebuilt because it has no assigned',
 		iIndexPopulator: 'IIndexPopulator',
 		noResults: 'No results were found',
+		searchNotAllowed: 'You do not have permission to search this index.',
 		searchResultsFound: 'Showing %0% - %1% of %2% result(s) - Page %3% of %4%',
 		corruptStatus: 'Possible corrupt index detected',
 		corruptErrorDescription: 'Error received when evaluating the index:',
@@ -998,6 +1008,7 @@ export default {
 		status: 'Status',
 		submit: 'Submit',
 		success: 'Success',
+		switchView: 'Switch view',
 		type: 'Type',
 		typeName: 'Type Name',
 		typeToSearch: 'Type to search...',
@@ -1494,6 +1505,7 @@ export default {
 	},
 	scripts: {
 		editscript: 'Edit script file',
+		tabCode: 'Code',
 	},
 	sections: {
 		content: 'Content',
@@ -1695,6 +1707,7 @@ export default {
 		notAllowed: 'The selected template is no longer allowed on this document type.',
 		productionMode: 'Production Mode',
 		runtimeModeProduction: 'Content is not editable when using runtime mode <code>Production</code>.',
+		tabCode: 'Code',
 		deleteByIdFailed: 'Failed to delete template with ID %0%',
 		edittemplate: 'Edit template',
 		insertSections: 'Sections',
@@ -1908,6 +1921,9 @@ export default {
 			'A Document Type cannot be changed to an Element Type once it has been used to create one or more content items.',
 		elementDoesNotSupport: 'This is not applicable for an Element Type',
 		propertyHasChanges: 'You have made changes to this property. Are you sure you want to discard them?',
+		confirmPropertyAliasChangeHeadline: 'Changing the alias may cause data loss',
+		confirmPropertyAliasChangeMessage:
+			'Existing content for <strong>%0%</strong> will be removed where it is used as embedded content, such as in a local Block.',
 		displaySettingsHeadline: 'Appearance',
 		displaySettingsLabelOnLeft: 'Label to the left',
 		displaySettingsLabelOnTop: 'Label above (full-width)',
@@ -2139,6 +2155,8 @@ export default {
 		changePassword: 'Change your password',
 		changePhoto: 'Change photo',
 		configureMfa: 'Configure 2FA',
+		disableUserHeadline: (name: string) => `Disable ${name}`,
+		disableUserConfirmation: 'Are you sure you want to disable this user?',
 		emailRequired: 'Required - enter an email address for this user',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail
@@ -2317,6 +2335,10 @@ export default {
 		avatarDeleteSuccess: 'Avatar deleted',
 		unknownFailure: 'Unknown failure',
 		usersNotManagedFromGroup: 'not manageable from this screen.',
+		enableUserHeadline: (name: string) => `Enable ${name}`,
+		enableUserConfirmation: 'Are you sure you want to enable this user?',
+		unlockUserHeadline: (name: string) => `Unlock ${name}`,
+		unlockUserConfirmation: 'Are you sure you want to unlock this user?',
 	},
 	validation: {
 		validation: 'Validation',
@@ -2346,10 +2368,14 @@ export default {
 		invalidEmpty: 'Value cannot be empty',
 		invalidFalse: 'This field must be turned on',
 		invalidPattern: 'Value is invalid, it does not match the correct pattern',
+		invalidValue: 'Value is invalid',
 		customValidation: 'Custom validation',
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
 		entriesExceed: 'Maximum %0% entries, you have entered <strong>%1%</strong> too many.',
+		itemMissingValueMessage: 'Item %0% is missing a value',
 		entriesAreasMismatch: 'The content amount requirements are not met for one or more areas.',
+		minimumOnlyWhenInUse:
+			'The minimum applies once items have been added. To require a value, mark the property as mandatory.',
 		invalidMemberGroupName: 'Invalid member group name',
 		invalidUserGroupName: 'Invalid user group name',
 		invalidToken: 'Invalid token',
@@ -2920,6 +2946,8 @@ export default {
 		viewPublishedContentDeclineButton: 'Stay in preview mode',
 		connectionFailed: 'Could not establish a connection to the server, preview live updates will not work.',
 		connectionLost: 'Connection to the server lost, preview live updates will not work.',
+		connectionReconnecting: 'Connection to the server lost, trying to reconnect…',
+		connectionRestored: 'Connection to the server restored, preview live updates are working again.',
 	},
 	permissions: {
 		FolderCreation: 'Folder creation',

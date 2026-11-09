@@ -113,5 +113,5 @@ public class EmailUserInviteSender : IUserInviteSender
     /// Determines whether the system can send user invite emails.
     /// </summary>
     /// <returns><c>true</c> if invites can be sent; otherwise, <c>false</c>.</returns>
-    public bool CanSendInvites() => _emailSender.CanSendRequiredEmail();
+    public bool CanSendInvites() => _emailSender.IsEmailConfigured();
 }

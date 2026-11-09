@@ -36,11 +36,17 @@ export class UmbTestVariantTreeRepository {
 	static root: UmbTreeRootModel = DEFAULT_TEST_ROOT;
 	static ancestors: Array<UmbTestVariantTreeItemModel> = [];
 	static requestTreeItemAncestorsCalls: Array<UmbEntityModel> = [];
+	static createdCount = 0;
 
 	static reset() {
+		UmbTestVariantTreeRepository.createdCount = 0;
 		UmbTestVariantTreeRepository.root = DEFAULT_TEST_ROOT;
 		UmbTestVariantTreeRepository.ancestors = [];
 		UmbTestVariantTreeRepository.requestTreeItemAncestorsCalls = [];
+	}
+
+	constructor() {
+		UmbTestVariantTreeRepository.createdCount++;
 	}
 
 	async requestTreeRoot() {
@@ -65,11 +71,12 @@ export const createTestVariantTreeRepositoryManifest = (alias: string): Manifest
 export function createTestVariantAncestorItem(
 	entity: UmbEntityModel,
 	name = entity.unique ?? 'unnamed',
+	isFolder = false,
 ): UmbTestVariantTreeItemModel {
 	return {
 		...entity,
 		name,
-		isFolder: false,
+		isFolder,
 		hasChildren: false,
 		parent: { unique: null, entityType: 'test-root-entity-type' },
 		variants: [{ name, culture: null, segment: null }],

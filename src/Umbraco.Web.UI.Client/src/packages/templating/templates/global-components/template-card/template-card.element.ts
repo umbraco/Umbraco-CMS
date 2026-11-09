@@ -91,9 +91,9 @@ export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 				id="open-part"
 				aria-label="Open ${this.name}"
 				tabindex=${ifDefined(!this.disabled ? 0 : undefined)}
-				href=${this.href!}>
-				${this.#renderContent()}
-			</a>
+				href=${ifDefined(!this.disabled ? this.href : undefined)}
+				>${this.#renderContent()}</a
+			>
 		`;
 	}
 

@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		element: () => import('./partial-view-tree-item-table-collection-view.element.js'),
 		weight: 300,
 		meta: {
-			label: 'Table',
+			label: '#collection_tableViewLabel',
 			icon: 'icon-table',
 			pathName: 'table',
 		},

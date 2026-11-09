@@ -3,8 +3,8 @@ import {
 	catchError,
 	distinctUntilChanged,
 	filter,
-	from,
 	map,
+	Observable,
 	of,
 	switchMap,
 	tap,
@@ -145,17 +145,20 @@ export class UmbLocalizationRegistry {
 					const currAliases = curr.map((ext) => ext.alias).sort();
 					return this.#arraysEqual(prevAliases, currAliases);
 				}),
-				// With switchMap, if a new language is selected before the previous translations finish loading,
-				// the previous promise is canceled (unsubscribed), and only the latest one is processed.
-				// This prevents race conditions and stale state.
+				// With switchMap, selecting a new language before the previous translations finish loading
+				// unsubscribes from the previous load. Unsubscribing cannot stop a promise that is already
+				// running, so the teardown marks the load as superseded and its result is dropped. This also
+				// applies when the registry is destroyed, so a late load never overwrites newer state.
 				switchMap((extensions) =>
-					from(
+					new Observable<void>((subscriber) => {
+						let superseded = false;
+
 						(async () => {
 							// Load all localizations
 							const translations = await Promise.all(extensions.map(this.#loadExtension));
 
-							// If there are no translations, return early
-							if (!translations.length) return;
+							// If a newer language was selected, or there are no translations, return early
+							if (superseded || !translations.length) return;
 
 							// Sort translations by their original extension weight (highest-to-lowest)
 							// This ensures that the translations with the lowest weight override the others
@@ -166,15 +169,23 @@ export class UmbLocalizationRegistry {
 
 							// Set the browser language and direction based on the translations
 							this.#setBrowserLanguage(locale!, translations);
-						})(),
+						})().then(
+							() => subscriber.complete(),
+							(error) => subscriber.error(error),
+						);
+
+						return () => {
+							superseded = true;
+						};
+					}).pipe(
+						// Caught on the inner observable so that an error only drops this load; caught on
+						// the outer pipe it would complete the subscription and stop all later language loads.
+						catchError((error) => {
+							console.error('Error loading translations:', error);
+							return of(undefined);
+						}),
 					),
 				),
-				// Catch any errors that occur while loading the translations
-				// This is important to ensure that the observable does not error out and stop the subscription
-				catchError((error) => {
-					console.error('Error loading translations:', error);
-					return of([]);
-				}),
 			)
 			// Subscribe to the observable to trigger the loading of translations
 			.subscribe();
@@ -191,13 +202,18 @@ export class UmbLocalizationRegistry {
 		}
 
 		// If extension contains a js file, load it and add the default dictionary to the inner dictionary.
+		// A failing file (e.g. a 404 on a stale chunk after a deploy) must not take down the other dictionaries.
 		if (extension.js) {
-			const loadedExtension = await loadManifestPlainJs(extension.js);
+			try {
+				const loadedExtension = await loadManifestPlainJs(extension.js);
 
-			if (loadedExtension && hasDefaultExport<UmbLocalizationDictionary>(loadedExtension)) {
-				for (const [dictionaryName, dictionary] of Object.entries(loadedExtension.default)) {
-					addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
+				if (loadedExtension && hasDefaultExport<UmbLocalizationDictionary>(loadedExtension)) {
+					for (const [dictionaryName, dictionary] of Object.entries(loadedExtension.default)) {
+						addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
+					}
 				}
+			} catch (error) {
+				console.error(`Localization extension "${extension.alias}" failed to load and was skipped:`, error);
 			}
 		}
 

@@ -8,7 +8,9 @@ export interface ManifestCollectionView
 
 export interface MetaCollectionView {
 	/**
-	 * The friendly name of the collection view
+	 * The friendly name of the collection view.
+	 * Core collection views use localization keys prefixed with `#` (e.g. `"#collection_tableViewLabel"`).
+	 * @example ["#collection_tableViewLabel", "Table"]
 	 */
 	label: string;
 

@@ -6,6 +6,7 @@ import type { UmbMenuItemExpansionEntryModel } from './types.js';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbEntityExpansionModel } from '@umbraco-cms/backoffice/utils';
+import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 import '../menu-item/menu-item-default.element.js';
 
@@ -23,6 +24,11 @@ export class UmbMenuElement extends UmbLitElement {
 
 	#context = new UmbDefaultMenuContext(this);
 
+	#renderMenuItem = (ext: UmbExtensionElementAndApiInitializer) => {
+		(ext.component as HTMLElement | undefined)?.setAttribute('data-mark', `menu-item:${ext.alias}`);
+		return ext.component;
+	};
+
 	override render() {
 		//TODO: We should probably have resolved the MENU ITEM CONTEXT not by providing it not as an API, currently this work cause menu items does not have APIs as of their manifest. But if they do this, this would be a problem. [NL]
 		return html`
@@ -30,7 +36,8 @@ export class UmbMenuElement extends UmbLitElement {
 				type="menuItem"
 				default-element="umb-menu-item-default"
 				.defaultApi=${UmbDefaultMenuItemContext}
-				.filter=${(items: ManifestMenuItem) => items.meta.menus.includes(this.manifest!.alias)}>
+				.filter=${(items: ManifestMenuItem) => items.meta.menus.includes(this.manifest!.alias)}
+				.renderMethod=${this.#renderMenuItem}>
 			</umb-extension-with-api-slot>
 		`;
 	}

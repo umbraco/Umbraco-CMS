@@ -1,13 +1,16 @@
 import { manifest as schemaManifest } from './Umbraco.ContentPicker.js';
 import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
+const propertyEditorUiAlias = 'Umb.PropertyEditorUi.DocumentPicker';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.DocumentPicker',
+		alias: propertyEditorUiAlias,
 		name: 'Document Picker Property Editor UI',
 		element: () => import('./property-editor-ui-document-picker.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Document Picker',
 			propertyEditorSchemaAlias: 'Umbraco.ContentPicker',
 			icon: 'icon-document',
@@ -34,4 +37,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	schemaManifest,
 	...valueSummaryManifests,
+	{
+		type: 'propertyAction',
+		kind: 'clear',
+		alias: 'Umb.PropertyAction.DocumentPicker.Clear',
+		name: 'Clear Document Picker Property Action',
+		forPropertyEditorUis: [propertyEditorUiAlias],
+	},
 ];

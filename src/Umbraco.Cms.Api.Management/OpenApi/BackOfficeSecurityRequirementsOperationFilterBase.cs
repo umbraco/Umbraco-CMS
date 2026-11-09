@@ -12,17 +12,21 @@ namespace Umbraco.Cms.Api.Management.OpenApi;
 /// </summary>
 public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOperationFilter
 {
+    // The AuthorizeAttributes on ManagementApiControllerBase: backoffice access and feature flags.
+    private const int BaseAuthorizeAttributeCount = 2;
+
     protected abstract string ApiName { get; }
 
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        if (context.MethodInfo.HasMapToApiAttribute(ApiName) == false)
+        if (context.ApiDescription.ActionDescriptor.HasMapToApiAttribute(ApiName) == false)
         {
             return;
         }
 
-        if (!context.MethodInfo.GetCustomAttributes(true).Any(x => x is AllowAnonymousAttribute) &&
-            !(context.MethodInfo.DeclaringType?.GetCustomAttributes(true).Any(x => x is AllowAnonymousAttribute) ?? false))
+        IList<object> endpointMetadata = context.ApiDescription.ActionDescriptor.EndpointMetadata;
+
+        if (endpointMetadata.Any(x => x is AllowAnonymousAttribute) is false)
         {
             operation.Responses ??= new OpenApiResponses();
             operation.Responses.Add(
@@ -37,18 +41,15 @@ public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOpera
             operation.Security.Add(new OpenApiSecurityRequirement { [schemaRef] = [] });
         }
 
-        // Assuming if and endpoint have more then one AuthorizeAttribute, there is a risk the user do not have access while still being authorized.
-        // The two is the simple two on ManagementApiControllerBase that just requires access to backoffice and feature flags
-        var numberOfAuthorizeAttributes =
-            context.MethodInfo.GetCustomAttributes(true).Count(x => x is AuthorizeAttribute)
-            + context.MethodInfo.DeclaringType?.GetCustomAttributes(true).Count(x => x is AuthorizeAttribute);
-
+        var numberOfAuthorizeAttributes = endpointMetadata.Count(x => x is AuthorizeAttribute);
 
         var hasConstructorInjectingIAuthorizationService = context.MethodInfo.DeclaringType?.GetConstructors()
             .Any(ctor =>
                 ctor.GetParameters().Any(parameter => parameter.GetType() == typeof(IAuthorizationService))) ?? false;
 
-        if (numberOfAuthorizeAttributes > 2 || hasConstructorInjectingIAuthorizationService)
+        // An endpoint with more AuthorizeAttributes than ManagementApiControllerBase, or one that authorizes in code,
+        // may refuse a user who is authenticated.
+        if (numberOfAuthorizeAttributes > BaseAuthorizeAttributeCount || hasConstructorInjectingIAuthorizationService)
         {
             operation.Responses ??= new OpenApiResponses();
             operation.Responses.Add(

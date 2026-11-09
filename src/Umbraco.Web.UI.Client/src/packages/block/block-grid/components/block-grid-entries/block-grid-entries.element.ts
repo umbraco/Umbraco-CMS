@@ -18,7 +18,11 @@ import {
 	getInterpolatedIndexOfPositionInWeightMap,
 	isWithinRect,
 } from '@umbraco-cms/backoffice/utils';
-import { UmbFormControlMixin, UmbFormControlValidator } from '@umbraco-cms/backoffice/validation';
+import {
+	isAboveZeroAndBelowMinimum,
+	UmbFormControlMixin,
+	UmbFormControlValidator,
+} from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -166,8 +170,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			// Only when there is a area key we should create a validator, otherwise it is the root entries element, which is taking part of the Property Editor Form Control. [NL]
 			// Currently there is no server validation for areas. So we can leave out the data path for it for now. [NL]
 			this.#controlValidator = new UmbFormControlValidator(this, this);
-
-			//new UmbBindServerValidationToFormControl(this, this, "$.values.[?(@.alias == 'my-input-alias')].value");
 		}
 	}
 	public get areaKey(): string | null | undefined {
@@ -330,7 +332,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 						(rangeLimit!.min ?? 0) - this._layoutEntries.length,
 					);
 				},
-				() => this._layoutEntries.length < (rangeLimit?.min ?? 0),
+				() => isAboveZeroAndBelowMinimum(this._layoutEntries.length, rangeLimit?.min),
 			);
 		}
 
@@ -425,7 +427,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				)}
 			</div>
 			${when(this._allowedBlockTypes && this._allowedBlockTypes.length > 0, () => this.#renderCreateButtonGroup())}
-			${when(this._areaKey, () => html`<uui-form-validation-message .for=${this}></uui-form-validation-message>`)}
+			${when(this._areaKey, () => html`<umb-form-validation-message .for=${this}></umb-form-validation-message>`)}
 		`;
 	}
 

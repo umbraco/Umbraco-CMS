@@ -1,7 +1,7 @@
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../workspace/media-workspace.context-token.js';
 import type { UmbDropzoneMediaElement } from '../dropzone/index.js';
-import type { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.js';
+import { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.js';
 import { customElement, html, ref, state, when, css, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -24,6 +24,10 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (context) => {
+			this.#collectionContext = context;
+		});
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (instance) => {
 			this.observe(instance?.unique, (unique) => {
@@ -114,11 +118,11 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 			}
 
 			umb-empty-media-state {
-				position: absolute;
-				top: var(--uui-size-layout-4);
-				left: var(--uui-size-layout-1);
-				right: var(--uui-size-layout-1);
-				bottom: calc(var(--uui-size-60) * 2);
+				padding-top: var(--uui-size-layout-1);
+				padding-bottom: var(--uui-size-layout-1);
+				min-height: fit-content;
+				height: 100%;
+				box-sizing: border-box;
 			}
 		`,
 	];

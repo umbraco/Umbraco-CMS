@@ -314,7 +314,28 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="totalRecords">Total number of documents.</param>
     /// <param name="filter">Query filter.</param>
     /// <param name="ordering">Ordering infos.</param>
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter = null, Ordering? ordering = null);
+
+    /// <summary>
+    ///     Gets descendant documents of a given parent with optional property filtering.
+    /// </summary>
+    /// <param name="id">The parent identifier.</param>
+    /// <param name="pageIndex">The page number.</param>
+    /// <param name="pageSize">The page size.</param>
+    /// <param name="totalRecords">Total number of documents.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load. If null, all properties are loaded.
+    ///     If empty array, no custom properties are loaded.
+    /// </param>
+    /// <param name="filter">Query filter.</param>
+    /// <param name="ordering">Ordering infos.</param>
+    /// <returns>The descendant documents in the page.</returns>
+    // TODO (V19): Remove the default implementation.
+#pragma warning disable CS0618 // Type or member is obsolete
+    IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering)
+        => GetPagedDescendants(id, pageIndex, pageSize, out totalRecords, filter, ordering);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Gets paged documents of a content type.
@@ -618,14 +639,20 @@ public interface IContentService : IContentServiceBase<IContent>
     ///     <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
     ///     <para>
     ///         The save and publish run in the same scope. If publishing fails for a business reason (for example,
-    ///         invalid content or an expired schedule) the save still takes effect; both are skipped only when a
-    ///         saving notification handler cancels the operation.
+    ///         invalid content or an expired schedule) the save still takes effect. Both are skipped when a handler of
+    ///         either the saving or the publishing notification cancels the operation, as the publishing notification is
+    ///         raised before the document is persisted.
+    ///     </para>
+    ///     <para>
+    ///         The default implementation of this method saves and publishes as two separate operations, so it retains
+    ///         the save when a publishing notification handler cancels. Implementations that combine the two should
+    ///         follow the contract described above.
     ///     </para>
     /// </remarks>
     /// <param name="content">The document to publish.</param>
     /// <param name="culturesToPublish">The cultures to publish, or an empty array for invariant content.</param>
     /// <param name="userId">The identifier of the user performing the action.</param>
-    // TODO (V19): Remove the default implementation when the method is no longer new.
+    // TODO (V19): Remove the default implementation when the method is no longer new (along with the last paragraph of the remarks above).
     PublishResult SaveAndPublish(IContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId)
     {
         OperationResult saveResult = Save(content, userId);

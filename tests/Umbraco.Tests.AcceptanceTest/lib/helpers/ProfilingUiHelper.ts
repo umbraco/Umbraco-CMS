@@ -6,12 +6,14 @@ export class ProfilingUiHelper extends UiBaseLocators {
   private readonly profilingTab: Locator;
   private readonly activateProfilerByDefaultToggle: Locator;
   private readonly activateProfilerByDefaultCheckbox: Locator;
+  private readonly notInDebugModeMessage: Locator;
 
   constructor(page: Page) {
     super(page);
     this.profilingTab = page.getByRole('tab', {name: 'Profiling'});
     this.activateProfilerByDefaultToggle = page.locator("[label='Activate the profiler by default'] #toggle");
     this.activateProfilerByDefaultCheckbox = page.locator("[label='Activate the profiler by default'] input[type='checkbox']");
+    this.notInDebugModeMessage = page.getByText('Umbraco currently does not run in debug mode');
   }
 
   async clickProfilingTab() {
@@ -33,5 +35,13 @@ export class ProfilingUiHelper extends UiBaseLocators {
 
   async isActivateProfilerByDefaultToggleChecked(isChecked: boolean) {
     return expect(this.activateProfilerByDefaultCheckbox).toBeChecked({checked: isChecked});
+  }
+
+  async isActivateProfilerByDefaultToggleVisible(isVisible: boolean = true) {
+    await this.isVisible(this.activateProfilerByDefaultToggle, isVisible);
+  }
+
+  async isNotInDebugModeMessageVisible(isVisible: boolean = true) {
+    await this.isVisible(this.notInDebugModeMessage, isVisible);
   }
 }

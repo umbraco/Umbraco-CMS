@@ -1,5 +1,6 @@
 import { extractUmbNotificationColor } from './extractUmbNotificationColor.function.js';
 import { isUmbNotifications, UMB_NOTIFICATION_HEADER } from './isUmbNotifications.function.js';
+import type { UmbNotificationsEventModel } from './isUmbNotifications.function.js';
 import { isProblemDetailsLike } from './apiTypeValidators.function.js';
 import { UmbAuthSignalerContext } from './auth-signaler.context.js';
 import type { UmbProblemDetails } from './types.js';
@@ -277,37 +278,45 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
-	 * Interceptor which checks responses for the umb-notifications header and displays them as a notification if any. Removes the umb-notifications from the headers.
-	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
+	 * Interceptor which checks responses for the umb-notifications header and displays them as a notification if any.
+	 * The error of a failed response that carried notifications is marked with `notifiedByServer`.
+	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response, Request and Error interceptors.
 	 * @internal
 	 */
 	addUmbNotificationsInterceptor(client: typeof umbHttpClient) {
 		client.interceptors.response.use((response) => {
-			// Check if the response has the umb-notifications header
-			// If not, we just return the response
-			const umbNotifications = response.headers.get(UMB_NOTIFICATION_HEADER);
-			if (!umbNotifications) return response;
-
-			// Parse the notifications from the header
-			// If the header is not a valid JSON, we just return the response
-			try {
-				const notifications = JSON.parse(umbNotifications);
-				if (!isUmbNotifications(notifications)) return response;
-
-				for (const notification of notifications) {
-					this.#peekError(
-						notification.category,
-						notification.message,
-						undefined,
-						extractUmbNotificationColor(notification.type),
-					);
-				}
-			} catch {
-				// Ignore JSON parse errors
+			for (const notification of this.#getUmbNotifications(response)) {
+				this.#peekError(
+					notification.category,
+					notification.message,
+					undefined,
+					extractUmbNotificationColor(notification.type),
+				);
 			}
 
 			return response;
 		});
+
+		client.interceptors.error?.use((error, response) => {
+			if (!response || !isProblemDetailsLike(error) || this.#getUmbNotifications(response).length === 0) {
+				return error;
+			}
+
+			return { ...error, notifiedByServer: true };
+		});
+	}
+
+	#getUmbNotifications(response: Response): Array<UmbNotificationsEventModel> {
+		const umbNotifications = response.headers.get(UMB_NOTIFICATION_HEADER);
+		if (!umbNotifications) return [];
+
+		try {
+			const notifications = JSON.parse(umbNotifications);
+			return isUmbNotifications(notifications) ? notifications : [];
+		} catch {
+			// Ignore JSON parse errors
+			return [];
+		}
 	}
 
 	/**
@@ -364,10 +373,13 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		const contentType = isString ? 'text/plain' : 'application/json';
 		const responseBody = isString ? body : JSON.stringify(body);
 
-		// Construct new headers but preserve "X-" headers from the original response
+		// Construct new headers but preserve "X-" headers and Umbraco's own "Umb-" headers from the original
+		// response, so interceptors running after the one that rebuilt it can still read them.
+		// @see https://github.com/umbraco/Umbraco-CMS/issues/23589
 		const headersOverride: Record<string, string> = {};
 		originalResponse.headers.forEach((value, key) => {
-			if (key.toLowerCase().startsWith('x-')) {
+			const name = key.toLowerCase();
+			if (name.startsWith('x-') || name.startsWith('umb-')) {
 				headersOverride[key] = value;
 			}
 		});

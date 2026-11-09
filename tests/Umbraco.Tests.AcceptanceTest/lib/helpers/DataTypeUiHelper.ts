@@ -392,12 +392,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async isDataTypeTreeItemVisible(name: string, isVisible: boolean = true) {
-    const hasShowChildren = await this.dataTypeTreeRoot.getAttribute('show-children') !== null;
-
-    if (!hasShowChildren) {
-      await this.click(this.dataTypeTreeRoot.locator(this.caretBtn).first());
-    }
-
+    await this.expandTreeRoot(this.dataTypeTreeRoot);
     await this.isTreeItemVisible(name, isVisible);
   }
 

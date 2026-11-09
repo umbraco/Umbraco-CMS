@@ -53,8 +53,8 @@ namespace Umbraco.Extension.Composers
             protected override string ApiName => Constants.ApiName;
         }
 
-        // This is used to generate nice operation IDs in our swagger json file
-        // So that the gnerated TypeScript client has nice method names and not too verbose
+        // Gives the operations of our own controllers the same operation IDs as the Management API, such as GetWhoAmI,
+        // so the generated TypeScript client gets readable function names
         // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/umbraco-schema-and-operation-ids#operation-ids
         public class CustomOperationHandler : OperationIdHandler
         {
@@ -66,8 +66,6 @@ namespace Umbraco.Extension.Composers
             {
                 return controllerActionDescriptor.ControllerTypeInfo.Namespace?.StartsWith("Umbraco.Extension.Controllers", comparisonType: StringComparison.InvariantCultureIgnoreCase) is true;
             }
-
-            public override string Handle(ApiDescription apiDescription) => $"{apiDescription.ActionDescriptor.RouteValues["action"]}";
         }
     }
 }

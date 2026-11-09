@@ -28,7 +28,7 @@ public abstract class DataTypeControllerBase : ManagementApiControllerBase
             DataTypeOperationStatus.NotFound => DataTypeNotFound(problemDetailsBuilder),
             DataTypeOperationStatus.InvalidName => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid data type name")
-                .WithDetail("The data type name must be non-empty and no longer than 255 characters.")
+                .WithDetail($"The data type name must be non-empty and no longer than {Constants.Validation.MaxNameLength} characters.")
                 .Build()),
             DataTypeOperationStatus.ParentNotContainer => BadRequest(problemDetailsBuilder
                 .WithTitle("parent id is not a container")

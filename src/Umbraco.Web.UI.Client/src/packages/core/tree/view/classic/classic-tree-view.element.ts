@@ -31,6 +31,9 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 	@state()
 	private _startNode?: UmbTreeStartNode;
 
+	@state()
+	private _startNodes: Array<UmbTreeStartNode> = [];
+
 	protected override _gotTreeContext() {
 		super._gotTreeContext();
 		this.observe(this._treeContext?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []), '_observeRootItems');
@@ -66,6 +69,12 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 		);
 		this.observe(this._treeContext?.isMenu, (value) => (this._isMenu = value ?? false), '_observeIsMenu');
 		this.observe(this._treeContext?.startNode, (value) => (this._startNode = value), '_observeStartNode');
+		this.observe(this._treeContext?.startNodes, (value) => (this._startNodes = value ?? []), '_observeStartNodes');
+	}
+
+	// The start nodes replace the tree root as the top level, exactly as a single start node does.
+	get #hasStartNode(): boolean {
+		return this._startNode !== undefined || this._startNodes.length > 0;
 	}
 
 	#onLoadPrev(event: Event) {
@@ -84,7 +93,7 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 		}
 		// When the tree root is hidden or we are drilled into a start node only the children are shown.
 		// With no children there is nothing to frame, so render nothing and let the tree host present the empty state.
-		if ((this._hideTreeRoot || this._startNode) && this._rootItems.length === 0) {
+		if ((this._hideTreeRoot || this.#hasStartNode) && this._rootItems.length === 0) {
 			return nothing;
 		}
 		return html` <uui-box> ${this.#renderTreeRoot()} ${this.#renderRootItems()} </uui-box> `;
@@ -92,7 +101,7 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 
 	#renderTreeRoot() {
 		// When drilled into a start node, the root node is replaced by the drilled children via #renderRootItems.
-		if (this._hideTreeRoot || this._startNode || this._treeRoot === undefined) return nothing;
+		if (this._hideTreeRoot || this.#hasStartNode || this._treeRoot === undefined) return nothing;
 		return html`
 			<umb-tree-item
 				.entityType=${(this._treeRoot as UmbTreeRootModel).entityType}
@@ -106,7 +115,7 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 
 	#renderRootItems() {
 		// Render when hideTreeRoot is true, OR when drilled into a start node (startNode replaces the root node).
-		if (!this._hideTreeRoot && !this._startNode) return nothing;
+		if (!this._hideTreeRoot && !this.#hasStartNode) return nothing;
 		return html`
 			${this.#renderLoadPrevButton()}
 			${repeat(

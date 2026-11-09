@@ -251,7 +251,7 @@
 		<key alias="parentNotPublishedAnomaly"><![CDATA[Questo documento è pubblicato, ma non è nella cache]]></key>
 		<key alias="getUrlException">Impossibile ottenere l'URL</key>
 		<key alias="routeError">
-			<![CDATA[Questo documento è pubblicato ma il suo URL entrerebbe in conflitto con il contenuto %0%]]>
+			<![CDATA[Questo documento è pubblicato ma il suo URL entrerebbe in conflitto con il contenuto '%0%']]>
 		</key>
 		<key alias="routeErrorCannotRoute">
 			<![CDATA[Questo documento è pubblicato ma il suo URL non può essere instradato]]>

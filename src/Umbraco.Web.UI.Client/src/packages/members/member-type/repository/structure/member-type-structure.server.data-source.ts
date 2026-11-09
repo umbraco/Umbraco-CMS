@@ -4,6 +4,7 @@ import type { AllowedMemberTypeModel } from '@umbraco-cms/backoffice/external/ba
 import { MemberTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContentTypeStructureServerDataSourceBase } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbOffsetPaginationRequestModel } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @class UmbMemberTypeStructureServerDataSource
@@ -18,9 +19,15 @@ export class UmbMemberTypeStructureServerDataSource extends UmbContentTypeStruct
 	}
 }
 
-const getAllowedChildrenOf = () => {
+const getAllowedChildrenOf = (
+	_unique: string | null,
+	_parentContentUnique: string | null,
+	paging?: UmbOffsetPaginationRequestModel,
+) => {
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	return MemberTypeService.getMemberTypeAllowedAtRoot({});
+	return MemberTypeService.getMemberTypeAllowedAtRoot({
+		query: { skip: paging?.skip, take: paging?.take },
+	});
 };
 
 const mapper = (item: AllowedMemberTypeModel): UmbAllowedMemberTypeModel => {

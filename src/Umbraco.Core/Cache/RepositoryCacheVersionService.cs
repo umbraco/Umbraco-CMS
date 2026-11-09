@@ -10,10 +10,13 @@ namespace Umbraco.Cms.Core.Cache;
 /// <inheritdoc />
 internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
 {
+    private const string PendingCacheKeysKey = "Umbraco.Cms.Core.Cache.RepositoryCacheVersionService.PendingCacheKeys";
+
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IRepositoryCacheVersionRepository _repositoryCacheVersionRepository;
     private readonly ILogger<RepositoryCacheVersionService> _logger;
     private readonly IRepositoryCacheVersionAccessor _repositoryCacheVersionAccessor;
+    private readonly IRequestCache _requestCache;
     private readonly ConcurrentDictionary<string, Guid> _cacheVersions = new();
     private readonly ConcurrentDictionary<Guid, ConcurrentHashSet<string>> _writtenKeysByScope = new();
 
@@ -24,16 +27,19 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     /// <param name="repositoryCacheVersionRepository">The repository cache version repository.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="repositoryCacheVersionAccessor">The repository cache version accessor.</param>
+    /// <param name="requestCache">The request cache, which holds the cache updates deferred until the request ends.</param>
     public RepositoryCacheVersionService(
         ICoreScopeProvider scopeProvider,
         IRepositoryCacheVersionRepository repositoryCacheVersionRepository,
         ILogger<RepositoryCacheVersionService> logger,
-        IRepositoryCacheVersionAccessor repositoryCacheVersionAccessor)
+        IRepositoryCacheVersionAccessor repositoryCacheVersionAccessor,
+        IRequestCache requestCache)
     {
         _scopeProvider = scopeProvider;
         _repositoryCacheVersionRepository = repositoryCacheVersionRepository;
         _logger = logger;
         _repositoryCacheVersionAccessor = repositoryCacheVersionAccessor;
+        _requestCache = requestCache;
     }
 
     /// <inheritdoc />
@@ -45,9 +51,145 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
         var cacheKey = GetCacheKey<TEntity>();
-
         RepositoryCacheVersion? databaseVersion = await _repositoryCacheVersionAccessor.GetAsync(cacheKey);
+        return IsCacheSynced<TEntity>(cacheKey, databaseVersion);
+    }
 
+    /// <inheritdoc />
+    public bool IsCacheSynced<TEntity>()
+        where TEntity : class
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Checking if cache for {EntityType} is synced", typeof(TEntity).Name);
+        }
+
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+
+        var cacheKey = GetCacheKey<TEntity>();
+        RepositoryCacheVersion? databaseVersion = _repositoryCacheVersionAccessor.Get(cacheKey);
+        return IsCacheSynced<TEntity>(cacheKey, databaseVersion);
+    }
+
+    /// <inheritdoc />
+    public async Task SetCacheUpdatedAsync<TEntity>()
+        where TEntity : class
+    {
+        if (TryDeferCacheUpdate<TEntity>(out var cacheKey))
+        {
+            return;
+        }
+
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.CacheVersion);
+        await WriteVersionAsync(cacheKey);
+        scope.Complete();
+    }
+
+    /// <inheritdoc />
+    public void SetCacheUpdated<TEntity>()
+        where TEntity : class
+    {
+        if (TryDeferCacheUpdate<TEntity>(out var cacheKey))
+        {
+            return;
+        }
+
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.CacheVersion);
+        WriteVersion(cacheKey);
+        scope.Complete();
+    }
+
+    /// <inheritdoc />
+    public async Task FlushCacheUpdatesAsync()
+    {
+        ConcurrentHashSet<string>? pendingCacheKeys = TakePendingCacheKeys();
+        if (pendingCacheKeys is null)
+        {
+            return;
+        }
+
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.CacheVersion);
+
+        foreach (var cacheKey in pendingCacheKeys)
+        {
+            await WriteVersionAsync(cacheKey);
+        }
+
+        scope.Complete();
+    }
+
+    /// <inheritdoc />
+    public void FlushCacheUpdates()
+    {
+        ConcurrentHashSet<string>? pendingCacheKeys = TakePendingCacheKeys();
+        if (pendingCacheKeys is null)
+        {
+            return;
+        }
+
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.CacheVersion);
+
+        foreach (var cacheKey in pendingCacheKeys)
+        {
+            WriteVersion(cacheKey);
+        }
+
+        scope.Complete();
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyCollection<RepositoryCacheVersion>> GetCacheVersionsAsync()
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        return (await _repositoryCacheVersionRepository.GetAllAsync()).ToList();
+    }
+
+    /// <inheritdoc />
+    public IReadOnlyCollection<RepositoryCacheVersion> GetCacheVersions()
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        return _repositoryCacheVersionRepository.GetAll().ToList();
+    }
+
+    /// <inheritdoc />
+    public async Task SetCachesSyncedAsync()
+        => await SetCachesSyncedAsync(await GetCacheVersionsAsync());
+
+    /// <inheritdoc />
+    public Task SetCachesSyncedAsync(IEnumerable<RepositoryCacheVersion> cacheVersions)
+    {
+        var adopted = new List<RepositoryCacheVersion>();
+        foreach (RepositoryCacheVersion version in cacheVersions)
+        {
+            if (version.Version is null)
+            {
+                continue;
+            }
+
+            _cacheVersions[version.Identifier] = Guid.Parse(version.Version);
+            adopted.Add(version);
+        }
+
+        _repositoryCacheVersionAccessor.CachesSynced(adopted);
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    ///     Gets the cache key for the specified entity type.
+    /// </summary>
+    /// <typeparam name="TEntity">The entity type.</typeparam>
+    /// <returns>The cache key for the entity type.</returns>
+    internal string GetCacheKey<TEntity>()
+        where TEntity : class =>
+        typeof(TEntity).FullName ?? typeof(TEntity).Name;
+
+    private bool IsCacheSynced<TEntity>(string cacheKey, RepositoryCacheVersion? databaseVersion)
+        where TEntity : class
+    {
         if (databaseVersion?.Version is null)
         {
             _logger.LogDebug("Cache for {EntityType} has no version in the database, considering it synced", typeof(TEntity).Name);
@@ -81,61 +223,79 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
         return true;
     }
 
-    /// <inheritdoc />
-    public async Task SetCacheUpdatedAsync<TEntity>()
+    /// <summary>
+    /// Registers the update for the scope and, inside a request, defers its publication to the end of the request.
+    /// </summary>
+    /// <returns><c>true</c> when nothing has to be written now; <c>false</c> when the caller must publish the version.</returns>
+    private bool TryDeferCacheUpdate<TEntity>(out string cacheKey)
         where TEntity : class
     {
-        string cacheKey = GetCacheKey<TEntity>();
+        cacheKey = GetCacheKey<TEntity>();
 
         ConcurrentHashSet<string>? writtenKeys = GetOrRegisterScopeWrittenKeys();
         if (writtenKeys?.TryAdd(cacheKey) is false)
         {
             _logger.LogDebug("Cache version for {EntityType} already written in this scope, skipping", typeof(TEntity).Name);
-            return;
+            return true;
         }
 
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        scope.WriteLock(Constants.Locks.CacheVersion);
-
-        var newVersion = Guid.NewGuid();
-        _logger.LogDebug("Setting cache for {EntityType} to version {Version}", typeof(TEntity).Name, newVersion);
-        await _repositoryCacheVersionRepository.SaveAsync(new RepositoryCacheVersion { Identifier = cacheKey, Version = newVersion.ToString() });
-        _cacheVersions[cacheKey] = newVersion;
-        _repositoryCacheVersionAccessor.VersionChanged(cacheKey, newVersion);
-
-        scope.Complete();
-    }
-
-    /// <inheritdoc />
-    public async Task SetCachesSyncedAsync()
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
-
-        // We always sync all caches versions, so it's safe to assume all caches are synced at this point.
-        IEnumerable<RepositoryCacheVersion> cacheVersions = await _repositoryCacheVersionRepository.GetAllAsync();
-
-        foreach (RepositoryCacheVersion version in cacheVersions)
+        if (_requestCache.IsAvailable)
         {
-            if (version.Version is null)
+            // Published at the end of the request, after the cache instructions. The local version and the accessor
+            // are left as they are: this server's isolated cache was updated in place, so its local version must keep
+            // matching the published one until the new version is published.
+            if (writtenKeys is null)
             {
-                continue;
+                AddPendingCacheKey(cacheKey);
             }
 
-            _cacheVersions[version.Identifier] = Guid.Parse(version.Version);
+            return true;
         }
 
-        _repositoryCacheVersionAccessor.CachesSynced();
-        scope.Complete();
+        return false;
     }
 
-    /// <summary>
-    ///     Gets the cache key for the specified entity type.
-    /// </summary>
-    /// <typeparam name="TEntity">The entity type.</typeparam>
-    /// <returns>The cache key for the entity type.</returns>
-    internal string GetCacheKey<TEntity>()
-        where TEntity : class =>
-        typeof(TEntity).FullName ?? typeof(TEntity).Name;
+    private ConcurrentHashSet<string>? TakePendingCacheKeys()
+    {
+        if (_requestCache.IsAvailable is false)
+        {
+            return null;
+        }
+
+        var pendingCacheKeys = _requestCache.Get(PendingCacheKeysKey) as ConcurrentHashSet<string>;
+        _requestCache.Remove(PendingCacheKeysKey);
+        return pendingCacheKeys is null || pendingCacheKeys.Count == 0 ? null : pendingCacheKeys;
+    }
+
+    private async Task WriteVersionAsync(string cacheKey)
+    {
+        var newVersion = NewVersion(cacheKey);
+        await _repositoryCacheVersionRepository.SaveAsync(new RepositoryCacheVersion { Identifier = cacheKey, Version = newVersion.ToString() });
+        VersionWritten(cacheKey, newVersion);
+    }
+
+    private void WriteVersion(string cacheKey)
+    {
+        var newVersion = NewVersion(cacheKey);
+        _repositoryCacheVersionRepository.Save(new RepositoryCacheVersion { Identifier = cacheKey, Version = newVersion.ToString() });
+        VersionWritten(cacheKey, newVersion);
+    }
+
+    private Guid NewVersion(string cacheKey)
+    {
+        var newVersion = Guid.NewGuid();
+        _logger.LogDebug("Setting cache for {CacheKey} to version {Version}", cacheKey, newVersion);
+        return newVersion;
+    }
+
+    private void VersionWritten(string cacheKey, Guid newVersion)
+    {
+        _cacheVersions[cacheKey] = newVersion;
+        _repositoryCacheVersionAccessor.VersionChanged(cacheKey, newVersion);
+    }
+
+    private void AddPendingCacheKey(string cacheKey)
+        => (_requestCache.Get(PendingCacheKeysKey, () => new ConcurrentHashSet<string>()) as ConcurrentHashSet<string>)?.TryAdd(cacheKey);
 
     private ConcurrentHashSet<string>? GetOrRegisterScopeWrittenKeys()
     {
@@ -150,8 +310,24 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
 
         context.Enlist(
             $"RepositoryCacheVersionService_{contextId}",
-            completed => _writtenKeysByScope.TryRemove(contextId, out _));
+            completed => OnScopeExit(contextId, completed));
 
         return writtenKeys;
+    }
+
+    // Runs after the scope's transaction has been committed or rolled back, so only committed changes are published.
+    private void OnScopeExit(Guid contextId, bool completed)
+    {
+        if (_writtenKeysByScope.TryRemove(contextId, out ConcurrentHashSet<string>? writtenKeys) is false
+            || completed is false
+            || _requestCache.IsAvailable is false)
+        {
+            return;
+        }
+
+        foreach (var cacheKey in writtenKeys)
+        {
+            AddPendingCacheKey(cacheKey);
+        }
     }
 }

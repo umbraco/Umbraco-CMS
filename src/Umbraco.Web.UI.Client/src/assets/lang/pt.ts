@@ -279,6 +279,7 @@ export default {
 		noVariantsToProcess: 'Não há variantes disponíveis',
 		releaseDate: 'Publicar em',
 		unpublishDate: 'Despublicar em',
+		scheduleForAllLanguages: 'Agendar para todos os idiomas selecionados',
 		removeDate: 'Limpar data',
 		setDate: 'Definir data',
 		sortDone: 'A ordem foi atualizada',

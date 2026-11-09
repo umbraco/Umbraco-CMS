@@ -1,3 +1,4 @@
+import { auditLogHandlers } from './audit-log.handlers.js';
 import { recycleBinHandlers } from './recycle-bin.handlers.js';
 import { treeHandlers } from './tree.handlers.js';
 import { itemHandlers } from './item.handlers.js';
@@ -8,6 +9,7 @@ import { urlHandlers } from './url.handlers.js';
 import { moveHandlers } from './move.handlers.js';
 
 export const handlers = [
+	...auditLogHandlers,
 	...recycleBinHandlers,
 	...treeHandlers,
 	...itemHandlers,
