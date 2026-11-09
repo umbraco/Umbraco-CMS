@@ -1,9 +1,8 @@
 import type { UmbContentLikeDetailModel, UmbPotentialContentValueModel } from '../types.js';
 import { _sortContentValuesByVariant } from '../utils/sort-content-values-by-variant.function.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbPropertyValueIndex } from '@umbraco-cms/backoffice/property';
+import { UmbExtensionApiCacheIndex } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyValueIndex, type ManifestPropertyValueResolver } from '@umbraco-cms/backoffice/property';
 import {
 	umbVariantObjectSortCompare,
 	type UmbVariantDataModel,
@@ -21,6 +20,11 @@ function defaultCompareVariantMethod(a: UmbVariantDataModel, b: UmbVariantDataMo
 }
 
 export class UmbMergeContentVariantDataController extends UmbControllerBase {
+	#resolvers = new UmbExtensionApiCacheIndex<ManifestPropertyValueResolver>(
+		this,
+		'propertyValueResolver',
+		(manifest, editorAlias) => manifest.forEditorAlias === editorAlias,
+	);
 	#persistedValuesIndex?: UmbPropertyValueIndex<UmbPotentialContentValueModel>;
 	#draftValuesIndex?: UmbPropertyValueIndex<UmbPotentialContentValueModel>;
 
@@ -155,23 +159,11 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 			return undefined;
 		}
 
-		// Find the resolver for this editor alias:
-		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
-			'propertyValueResolver',
-			(x) => x.forEditorAlias === editorAlias,
-		)[0];
-
-		if (!manifest) {
-			// No resolver found, then we can continue using the draftValue as is.
-			return draftValue;
-		}
-
-		const api = await createExtensionApi(this, manifest);
+		const api = await this.#resolvers.createApi(editorAlias);
 		if (!api) {
-			// If api is not to be found, then we can continue using the draftValue as is.
+			// No resolver found, or its api could not be created, then we can continue using the draftValue as is.
 			return draftValue;
 		}
-		api.manifest = manifest;
 
 		let newValue = draftValue;
 

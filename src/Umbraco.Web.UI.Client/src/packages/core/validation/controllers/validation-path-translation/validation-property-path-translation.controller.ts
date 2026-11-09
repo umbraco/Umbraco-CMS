@@ -1,11 +1,17 @@
 import { umbQueryMapperForJsonPaths } from '../../utils/query-mapper-json-paths.function.js';
+import type { ManifestPropertyValidationPathTranslator } from './property-validation-path-translator.extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionApiCacheIndex } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbPropertyValueDataPotentiallyWithEditorAlias } from '@umbraco-cms/backoffice/property';
 
 // Write interface that can be handed to the API for the Host, so each path Translator can communicate back to the host here. For translating inner values.
 export class UmbValidationPropertyPathTranslationController extends UmbControllerBase {
+	#translators = new UmbExtensionApiCacheIndex<ManifestPropertyValidationPathTranslator<unknown>>(
+		this,
+		'propertyValidationPathTranslator',
+		(manifest, editorAlias) => manifest.forEditorAlias === editorAlias,
+	);
+
 	/**
 	 * translates the property data.
 	 * @param {Array<string>} paths - The paths to be translated.
@@ -39,22 +45,10 @@ export class UmbValidationPropertyPathTranslationController extends UmbControlle
 			return propertyPaths;
 		}
 
-		// Find the cloner for this editor alias:
-		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
-			'propertyValidationPathTranslator',
-			(x) => x.forEditorAlias === editorAlias,
-		)[0];
-
-		if (!manifest) {
-			return propertyPaths;
-		}
-
-		const api = await createExtensionApi(this, manifest);
+		const api = await this.#translators.createApi(editorAlias);
 		if (!api) {
 			return propertyPaths;
 		}
-
-		(api as any).manifest = manifest;
 
 		propertyPaths = (await api.translate(propertyPaths, propertyData)) ?? propertyPaths;
 

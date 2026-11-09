@@ -1,9 +1,21 @@
 import type { UmbPropertyValueDataPotentiallyWithEditorAlias } from '../index.js';
+import type { ManifestPropertyValueResolver } from '../property-value-resolver/property-value-resolver.extension.js';
+import type { ManifestPropertyValueCloner } from './property-value-cloner.extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionApiCacheIndex } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbPropertyValueCloneController extends UmbControllerBase {
+	#cloners = new UmbExtensionApiCacheIndex<ManifestPropertyValueCloner>(
+		this,
+		'propertyValueCloner',
+		(manifest, editorAlias) => manifest.forEditorAlias === editorAlias,
+	);
+	#resolvers = new UmbExtensionApiCacheIndex<ManifestPropertyValueResolver>(
+		this,
+		'propertyValueResolver',
+		(manifest, editorAlias) => manifest.forEditorAlias === editorAlias,
+	);
+
 	/**
 	 * Clones the property data.
 	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} property - The property data.
@@ -35,22 +47,10 @@ export class UmbPropertyValueCloneController extends UmbControllerBase {
 			return incomingProperty;
 		}
 
-		// Find the cloner for this editor alias:
-		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
-			'propertyValueCloner',
-			(x) => x.forEditorAlias === editorAlias,
-		)[0];
-
-		if (!manifest) {
-			return incomingProperty;
-		}
-
-		const api = await createExtensionApi(this, manifest);
+		const api = await this.#cloners.createApi(editorAlias);
 		if (!api) {
 			return incomingProperty;
 		}
-
-		(api as any).manifest = manifest;
 
 		let clonedProperty = incomingProperty;
 
@@ -72,22 +72,10 @@ export class UmbPropertyValueCloneController extends UmbControllerBase {
 			return incomingProperty;
 		}
 
-		// Find the resolver for this editor alias:
-		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
-			'propertyValueResolver',
-			(x) => x.forEditorAlias === editorAlias,
-		)[0];
-
-		if (!manifest) {
-			return incomingProperty;
-		}
-
-		const api = await createExtensionApi(this, manifest);
+		const api = await this.#resolvers.createApi(editorAlias);
 		if (!api) {
 			return incomingProperty;
 		}
-
-		(api as any).manifest = manifest;
 
 		if (api.processValues) {
 			return (
