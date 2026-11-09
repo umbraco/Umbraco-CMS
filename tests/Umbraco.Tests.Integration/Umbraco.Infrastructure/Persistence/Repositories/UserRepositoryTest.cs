@@ -44,22 +44,29 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
     private IAppPolicyCache AppPolicyCache => GetRequiredService<IAppPolicyCache>();
 
     private UserRepository CreateRepository(ICoreScopeProvider provider)
+        => CreateRepository(provider, AppCaches.Disabled, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+
+    private UserRepository CreateRepository(
+        ICoreScopeProvider provider,
+        AppCaches appCaches,
+        IRepositoryCacheVersionService cacheVersionService,
+        ICacheSyncService cacheSyncService)
     {
         var accessor = (IScopeAccessor)provider;
         var mockRuntimeState = CreateMockRuntimeState(RuntimeLevel.Run);
 
         var repository = new UserRepository(
             accessor,
-            AppCaches.Disabled,
+            appCaches,
             LoggerFactory.CreateLogger<UserRepository>(),
             Mappers,
             Options.Create(GlobalSettings),
             Options.Create(new UserPasswordConfigurationSettings()),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             mockRuntimeState.Object,
-            Mock.Of<IRepositoryCacheVersionService>(),
+            cacheVersionService,
             PermissionMappers,
-            Mock.Of<ICacheSyncService>());
+            cacheSyncService);
         return repository;
     }
 
@@ -199,6 +206,71 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
 
             // Assert
             AssertPropertyValues(updatedItem, user);
+        }
+    }
+
+    [Test]
+    public void Get_By_Int_Id_Syncs_Cache_And_Returns_Updated_User_When_Cache_Version_Is_Stale()
+    {
+        const string NewStamp = "stamp-from-other-server";
+        ICoreScopeProvider provider = ScopeProvider;
+        using (provider.CreateCoreScope(autoComplete: true))
+        {
+            var caches = new AppCaches(
+                new ObjectCacheAppCache(),
+                NoAppCache.Instance,
+                new IsolatedCaches(_ => new ObjectCacheAppCache()));
+            var versionService = new Mock<IRepositoryCacheVersionService>();
+            var syncService = new Mock<ICacheSyncService>();
+            var repository = CreateRepository(provider, caches, versionService.Object, syncService.Object);
+
+            var user = UserBuilderInstance.WithoutIdentity().Build();
+            repository.Save(user);
+
+            versionService.Setup(x => x.IsCacheSynced<IUser>()).Returns(true);
+            Assert.AreEqual(user.SecurityStamp, repository.Get(user.Id)!.SecurityStamp);
+
+            // Another server changes the stamp in the database.
+            ScopeAccessor.AmbientScope.Database.Execute(ScopeAccessor.AmbientScope.SqlContext.Sql()
+                .Update<UserDto>(u => u.Set(x => x.SecurityStampToken, NewStamp))
+                .Where<UserDto>(x => x.Id == user.Id));
+
+            // Syncing is what clears the stale entry, as processing the cache instructions would.
+            versionService.Setup(x => x.IsCacheSynced<IUser>()).Returns(false);
+            syncService.Setup(x => x.SyncInternal(It.IsAny<CancellationToken>()))
+                .Callback(() => caches.IsolatedCaches.GetOrCreate<IUser>().Clear());
+
+            Assert.AreEqual(NewStamp, repository.Get(user.Id)!.SecurityStamp);
+            syncService.Verify(x => x.SyncInternal(It.IsAny<CancellationToken>()), Times.Once);
+        }
+    }
+
+    [Test]
+    public void Get_By_Int_Id_Serves_From_Cache_When_Cache_Version_Is_Current()
+    {
+        const string NewStamp = "stamp-from-other-server";
+        ICoreScopeProvider provider = ScopeProvider;
+        using (provider.CreateCoreScope(autoComplete: true))
+        {
+            var caches = new AppCaches(
+                new ObjectCacheAppCache(),
+                NoAppCache.Instance,
+                new IsolatedCaches(_ => new ObjectCacheAppCache()));
+            var versionService = new Mock<IRepositoryCacheVersionService>();
+            versionService.Setup(x => x.IsCacheSynced<IUser>()).Returns(true);
+            var syncService = new Mock<ICacheSyncService>();
+            var repository = CreateRepository(provider, caches, versionService.Object, syncService.Object);
+
+            var user = UserBuilderInstance.WithoutIdentity().Build();
+            repository.Save(user);
+            var originalStamp = repository.Get(user.Id)!.SecurityStamp;
+
+            ScopeAccessor.AmbientScope.Database.Execute(ScopeAccessor.AmbientScope.SqlContext.Sql()
+                .Update<UserDto>(u => u.Set(x => x.SecurityStampToken, NewStamp))
+                .Where<UserDto>(x => x.Id == user.Id));
+
+            Assert.AreEqual(originalStamp, repository.Get(user.Id)!.SecurityStamp);
+            syncService.Verify(x => x.SyncInternal(It.IsAny<CancellationToken>()), Times.Never);
         }
     }
 
