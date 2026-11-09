@@ -258,7 +258,9 @@ internal sealed class ImageCropperPropertyValueEditor : DataValueEditor, IDispos
 
     private ImageCropperValue? ParseImageCropperValue(object? editorValue)
     {
-        if (editorValue is null)
+        // Earlier versions could persist an empty value as the JSON text "null" (#24335). Treat it as no value, otherwise
+        // validating such a stored value (e.g. on publish) throws until the property is saved again.
+        if (editorValue is null || (editorValue is string stringValue && stringValue.Trim() == "null"))
         {
             return null;
         }

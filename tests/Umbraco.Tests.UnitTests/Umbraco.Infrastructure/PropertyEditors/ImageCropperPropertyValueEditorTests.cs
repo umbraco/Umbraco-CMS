@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.IO.MediaPathSchemes;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
@@ -65,6 +66,28 @@ public class ImageCropperPropertyValueEditorTests
         var result = editor.FromEditor(
             new ContentPropertyData(null, null) { ContentKey = EditingItem, PropertyTypeKey = PropertyType },
             currentValue);
+
+        Assert.IsNull(result);
+    }
+
+    [Test]
+    public void Empty_Value_Stored_As_Json_Null_Text_Passes_Validation()
+    {
+        ImageCropperPropertyValueEditor editor = CreateEditor(out _, out _);
+
+        var results = editor.Validate("null", false, null, PropertyValidationContext.Empty());
+
+        Assert.IsEmpty(results);
+    }
+
+    [Test]
+    public void Empty_Value_Supplied_As_Json_Null_Text_Is_Stored_As_Null()
+    {
+        ImageCropperPropertyValueEditor editor = CreateEditor(out _, out _);
+
+        var result = editor.FromEditor(
+            new ContentPropertyData("null", null) { ContentKey = EditingItem, PropertyTypeKey = PropertyType },
+            "null");
 
         Assert.IsNull(result);
     }
