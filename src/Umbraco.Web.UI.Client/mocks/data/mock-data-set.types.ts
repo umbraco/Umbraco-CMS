@@ -276,6 +276,8 @@ export interface UmbMockDataSet {
 
 	// Tracked references
 	trackedReferenceItems?: Array<UmbMockTrackedReferenceItemModel>;
+	/** The items referencing each target, keyed by the target's id. When set, the reference endpoints use it instead of `trackedReferenceItems`. */
+	referencedBy?: Record<string, Array<UmbMockTrackedReferenceItemModel>>;
 
 	// News
 	news?: Array<NewsDashboardItemResponseModel>;

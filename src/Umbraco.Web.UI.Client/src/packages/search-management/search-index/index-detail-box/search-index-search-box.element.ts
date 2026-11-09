@@ -13,6 +13,7 @@ import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import { UmbApiError } from '@umbraco-cms/backoffice/resources';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UUIInputElement, UUIPaginationElement, UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
 
@@ -367,7 +368,10 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 		}
 
 		if (error || !data) {
-			this._error = this.localize.term('searchManagement_searchError');
+			this._error =
+				UmbApiError.isUmbApiError(error) && error.status === 403
+					? this.localize.term('searchManagement_searchNotAllowed')
+					: this.localize.term('searchManagement_searchError');
 			this._searchResults = undefined;
 			this._tableItems = [];
 			this._searchStatusMessage = this.localize.term('searchManagement_searchFailed');

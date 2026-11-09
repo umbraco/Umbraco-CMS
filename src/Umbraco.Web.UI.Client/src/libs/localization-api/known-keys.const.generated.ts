@@ -2006,6 +2006,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'searchManagement_searching',
 	'searchManagement_searchInputAriaLabel',
 	'searchManagement_searchInputLabel',
+	'searchManagement_searchNotAllowed',
 	'searchManagement_searchPlaceholder',
 	'searchManagement_tableColumnAlias',
 	'searchManagement_tableColumnDocumentCount',

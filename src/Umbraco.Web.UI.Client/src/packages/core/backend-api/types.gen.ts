@@ -3542,8 +3542,17 @@ export type WebhookEventResponseModel = {
 export type WebhookItemResponseModel = {
     enabled: boolean;
     name: string;
+    /**
+     * @deprecated
+     */
     events: string;
+    /**
+     * @deprecated
+     */
     url: string;
+    /**
+     * @deprecated
+     */
     types: string;
     id: string;
     flags: Array<FlagModel>;
@@ -20187,6 +20196,10 @@ export type GetItemWebhookErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetItemWebhookResponses = {

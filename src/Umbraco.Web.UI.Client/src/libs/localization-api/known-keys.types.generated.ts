@@ -2033,6 +2033,7 @@ declare global {
 		searchManagement_searching: string;
 		searchManagement_searchInputAriaLabel: (indexAlias: string) => string;
 		searchManagement_searchInputLabel: string;
+		searchManagement_searchNotAllowed: string;
 		searchManagement_searchPlaceholder: string;
 		searchManagement_tableColumnAlias: string;
 		searchManagement_tableColumnDocumentCount: string;

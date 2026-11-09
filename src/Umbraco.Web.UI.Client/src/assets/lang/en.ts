@@ -3347,6 +3347,7 @@ export default {
 		cultureSelectLabel: 'Culture',
 		searchDisabled: 'Search unavailable. Index status:',
 		searchError: 'Search failed. Try again.',
+		searchNotAllowed: 'You do not have permission to search this index.',
 	},
 	uiCulture: {
 		ar: 'العربية',

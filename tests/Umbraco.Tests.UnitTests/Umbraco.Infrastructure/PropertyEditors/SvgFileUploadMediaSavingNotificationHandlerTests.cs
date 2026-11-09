@@ -5,41 +5,31 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PropertyEditors;
 
 [TestFixture]
-public class SvgFileUploadMediaSavingNotificationHandlerTests
+public class SvgFileUploadMediaSavingNotificationHandlerTests : MediaSavingMetadataHandlerTestsBase
 {
-    private Mock<ISvgDimensionExtractor> _svgDimensionExtractor = null!;
-    private Mock<IFileSystem> _fileSystem = null!;
-    private SvgFileUploadMediaSavingNotificationHandler _handler = null!;
+    protected override string EditorAlias => Constants.PropertyEditors.Aliases.UploadField;
 
-    [SetUp]
-    public void SetUp()
+    protected override string FileExtension => "svg";
+
+    protected override string MediaTypeAlias => Constants.Conventions.MediaTypes.VectorGraphicsAlias;
+
+    protected override int PopulatedBytes => 30;
+
+    protected override INotificationHandler<MediaSavingNotification> CreateHandler() =>
+        new SvgFileUploadMediaSavingNotificationHandler(
+            NullLogger<SvgFileUploadMediaSavingNotificationHandler>.Instance, SvgDimensions.Object, FileManager);
+
+    protected override void VerifyDimensions(Times times)
     {
-        _svgDimensionExtractor = new Mock<ISvgDimensionExtractor>();
-        _fileSystem = new Mock<IFileSystem>();
-
-        var mediaFileManager = new MediaFileManager(
-            _fileSystem.Object,
-            Mock.Of<IMediaPathScheme>(),
-            NullLogger<MediaFileManager>.Instance,
-            Mock.Of<IShortStringHelper>(),
-            Mock.Of<IServiceProvider>(),
-            new Lazy<ICoreScopeProvider>(() => Mock.Of<ICoreScopeProvider>()));
-
-        _handler = new SvgFileUploadMediaSavingNotificationHandler(
-            NullLogger<SvgFileUploadMediaSavingNotificationHandler>.Instance,
-            _svgDimensionExtractor.Object,
-            mediaFileManager);
+        SvgDimensions.Verify(x => x.GetDimensions(It.IsAny<Stream>()), times);
+        Dimensions.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never());
     }
 
     [Test]
@@ -47,9 +37,9 @@ public class SvgFileUploadMediaSavingNotificationHandlerTests
     {
         IMedia media = CreateMedia(Constants.Conventions.MediaTypes.Image);
 
-        _handler.Handle(CreateNotification(media));
+        CreateHandler().Handle(CreateNotification(media));
 
-        _svgDimensionExtractor.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never);
+        SvgDimensions.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never);
     }
 
     [Test]
@@ -60,9 +50,9 @@ public class SvgFileUploadMediaSavingNotificationHandlerTests
             hasWidthProperty: false,
             hasHeightProperty: true);
 
-        _handler.Handle(CreateNotification(media));
+        CreateHandler().Handle(CreateNotification(media));
 
-        _svgDimensionExtractor.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never);
+        SvgDimensions.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never);
     }
 
     [Test]
@@ -73,9 +63,9 @@ public class SvgFileUploadMediaSavingNotificationHandlerTests
             hasWidthProperty: true,
             hasHeightProperty: false);
 
-        _handler.Handle(CreateNotification(media));
+        CreateHandler().Handle(CreateNotification(media));
 
-        _svgDimensionExtractor.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never);
+        SvgDimensions.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never);
     }
 
     [Test]
@@ -85,9 +75,9 @@ public class SvgFileUploadMediaSavingNotificationHandlerTests
             Constants.Conventions.MediaTypes.VectorGraphicsAlias,
             uploadFieldAlias: null);
 
-        _handler.Handle(CreateNotification(media));
+        CreateHandler().Handle(CreateNotification(media));
 
-        _svgDimensionExtractor.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never);
+        SvgDimensions.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never);
     }
 
     [Test]
@@ -97,9 +87,9 @@ public class SvgFileUploadMediaSavingNotificationHandlerTests
             Constants.Conventions.MediaTypes.VectorGraphicsAlias,
             uploadValue: string.Empty);
 
-        _handler.Handle(CreateNotification(media));
+        CreateHandler().Handle(CreateNotification(media));
 
-        _svgDimensionExtractor.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never);
+        SvgDimensions.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never);
     }
 
     [Test]
@@ -109,12 +99,12 @@ public class SvgFileUploadMediaSavingNotificationHandlerTests
             Constants.Conventions.MediaTypes.VectorGraphicsAlias,
             uploadValue: "/media/test.svg");
 
-        _fileSystem.Setup(x => x.GetRelativePath(It.IsAny<string>())).Returns("media/test.svg");
-        _fileSystem.Setup(x => x.FileExists("media/test.svg")).Returns(false);
+        FileSystem.Setup(x => x.GetRelativePath(It.IsAny<string>())).Returns("media/test.svg");
+        FileSystem.Setup(x => x.FileExists("media/test.svg")).Returns(false);
 
-        _handler.Handle(CreateNotification(media));
+        CreateHandler().Handle(CreateNotification(media));
 
-        _svgDimensionExtractor.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never);
+        SvgDimensions.Verify(x => x.GetDimensions(It.IsAny<Stream>()), Times.Never);
     }
 
     [Test]
@@ -128,12 +118,12 @@ public class SvgFileUploadMediaSavingNotificationHandlerTests
 
         var svgStream = new MemoryStream(Encoding.UTF8.GetBytes("<svg/>"));
 
-        _fileSystem.Setup(x => x.GetRelativePath(It.IsAny<string>())).Returns("media/test.svg");
-        _fileSystem.Setup(x => x.FileExists("media/test.svg")).Returns(true);
-        _fileSystem.Setup(x => x.OpenFile("media/test.svg")).Returns(svgStream);
-        _svgDimensionExtractor.Setup(x => x.GetDimensions(svgStream)).Returns(new Size(200, 100));
+        FileSystem.Setup(x => x.GetRelativePath(It.IsAny<string>())).Returns("media/test.svg");
+        FileSystem.Setup(x => x.FileExists("media/test.svg")).Returns(true);
+        FileSystem.Setup(x => x.OpenFile("media/test.svg")).Returns(svgStream);
+        SvgDimensions.Setup(x => x.GetDimensions(svgStream)).Returns(new Size(200, 100));
 
-        _handler.Handle(CreateNotification(media));
+        CreateHandler().Handle(CreateNotification(media));
 
         widthProperty.Verify(x => x.SetValue(200, null, null), Times.Once);
         heightProperty.Verify(x => x.SetValue(100, null, null), Times.Once);
@@ -150,15 +140,19 @@ public class SvgFileUploadMediaSavingNotificationHandlerTests
 
         var svgStream = new MemoryStream(Encoding.UTF8.GetBytes("<svg/>"));
 
-        _fileSystem.Setup(x => x.GetRelativePath(It.IsAny<string>())).Returns("media/test.svg");
-        _fileSystem.Setup(x => x.FileExists("media/test.svg")).Returns(true);
-        _fileSystem.Setup(x => x.OpenFile("media/test.svg")).Returns(svgStream);
-        _svgDimensionExtractor.Setup(x => x.GetDimensions(svgStream)).Returns((Size?)null);
+        FileSystem.Setup(x => x.GetRelativePath(It.IsAny<string>())).Returns("media/test.svg");
+        FileSystem.Setup(x => x.FileExists("media/test.svg")).Returns(true);
+        FileSystem.Setup(x => x.OpenFile("media/test.svg")).Returns(svgStream);
+        SvgDimensions.Setup(x => x.GetDimensions(svgStream)).Returns((Size?)null);
 
-        _handler.Handle(CreateNotification(media));
+        CreateHandler().Handle(CreateNotification(media));
 
-        widthProperty.Verify(x => x.SetValue(It.IsAny<object?>(), It.IsAny<string?>(), It.IsAny<string?>()), Times.Never);
-        heightProperty.Verify(x => x.SetValue(It.IsAny<object?>(), It.IsAny<string?>(), It.IsAny<string?>()), Times.Never);
+        widthProperty.Verify(
+            x => x.SetValue(It.IsAny<object?>(), It.IsAny<string?>(), It.IsAny<string?>()),
+            Times.Never);
+        heightProperty.Verify(
+            x => x.SetValue(It.IsAny<object?>(), It.IsAny<string?>(), It.IsAny<string?>()),
+            Times.Never);
     }
 
     [Test]
@@ -174,12 +168,12 @@ public class SvgFileUploadMediaSavingNotificationHandlerTests
 
         var svgStream = new MemoryStream(Encoding.UTF8.GetBytes("<svg/>"));
 
-        _fileSystem.Setup(x => x.GetRelativePath(It.IsAny<string>())).Returns("media/test.svg");
-        _fileSystem.Setup(x => x.FileExists("media/test.svg")).Returns(true);
-        _fileSystem.Setup(x => x.OpenFile("media/test.svg")).Returns(svgStream);
-        _svgDimensionExtractor.Setup(x => x.GetDimensions(svgStream)).Returns(new Size(200, 100));
+        FileSystem.Setup(x => x.GetRelativePath(It.IsAny<string>())).Returns("media/test.svg");
+        FileSystem.Setup(x => x.FileExists("media/test.svg")).Returns(true);
+        FileSystem.Setup(x => x.OpenFile("media/test.svg")).Returns(svgStream);
+        SvgDimensions.Setup(x => x.GetDimensions(svgStream)).Returns(new Size(200, 100));
 
-        _handler.Handle(CreateNotification(media));
+        CreateHandler().Handle(CreateNotification(media));
 
         widthProperty.Verify(x => x.SetValue(200, "en-US", "seg1"), Times.Once);
         heightProperty.Verify(x => x.SetValue(100, "en-US", "seg1"), Times.Once);

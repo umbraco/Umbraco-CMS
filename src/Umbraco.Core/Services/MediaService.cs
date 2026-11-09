@@ -1430,7 +1430,7 @@ namespace Umbraco.Cms.Core.Services
                     .WhereNotNull()
                     .ToArray();
 
-                var savingNotification = new MediaSavingNotification(itemsA, messages);
+                var savingNotification = new MediaSavingNotification(itemsA, messages) { IsSorting = true };
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
