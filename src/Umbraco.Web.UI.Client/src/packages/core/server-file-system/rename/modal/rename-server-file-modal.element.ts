@@ -69,7 +69,6 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 	async #onSubmit(event: SubmitEvent) {
 		event.preventDefault();
 		if (this.#submitting) return;
-		if (!this.data?.unique) throw new Error('Unique identifier is not available');
 
 		const form = event.target as HTMLFormElement;
 		if (!form) return;
@@ -82,24 +81,30 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 
 		this.#submitting = true;
 		try {
-			// The form can be submitted before the repositories have loaded.
-			await this.#init;
-			if (!this.#renameRepository) throw new Error('Rename repository is not available');
-
-			const { data } = await this.#renameRepository.rename(this.data.unique, name);
-
-			if (data) {
-				this.value = {
-					name: data.name,
-					unique: data.unique,
-				};
-
-				this._submitModal();
-			} else {
-				this._rejectModal();
-			}
+			await this.#rename(name);
 		} finally {
 			this.#submitting = false;
+		}
+	}
+
+	async #rename(name: string) {
+		if (!this.data?.unique) throw new Error('Unique identifier is not available');
+
+		// The form can be submitted before the repositories have loaded.
+		await this.#init;
+		if (!this.#renameRepository) throw new Error('Rename repository is not available');
+
+		const { data } = await this.#renameRepository.rename(this.data.unique, name);
+
+		if (data) {
+			this.value = {
+				name: data.name,
+				unique: data.unique,
+			};
+
+			this._submitModal();
+		} else {
+			this._rejectModal();
 		}
 	}
 
