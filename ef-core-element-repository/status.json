@@ -2,7 +2,7 @@
   "campaign": "Element repository and service from NPoco to EF Core",
   "targetBranch": "v18/feature/ef-core-repositories",
   "planFile": ".claude/campaign/ef-core-element-repository/CAMPAIGN.md",
-  "updated": "20-10-2026",
+  "updated": "09-11-2026",
   "artifact": {
     "url": "https://claude.ai/artifact/Q5Bttu57VfLyS1ajt7nKtU",
     "title": "Element Repository Campaign"
@@ -249,7 +249,8 @@
           "done": false
         }
       ],
-      "acceptance": "New fixture green on both providers; Document fixtures unchanged."
+      "acceptance": "New fixture green on both providers; Document fixtures unchanged.",
+      "notes": "Merge-up note 09-11-2026: the write hooks on EntityTypeContainerService are now GetContainedEntityAsync(IEntitySlim)/SaveContainedEntityAsync (element container service wraps the NPoco repository); IPublishableContentService gained GetPagedOfTypesAsync(Guid[] keys, skip, take, ordering, ct) with a bridge on the sync PublishableContentServiceBase that PR 5 removes; ContentSchedule carries IncludeInvariantForVariant and the EF Core schedule DTO/mapping already handle it; upstream's library-element search indexing (DraftContentChangeStrategy, ContentTypeIndexingService) calls IElementService async members, so PR 5 must keep GetByIdsAsync/GetPagedOfTypesAsync/GetContentSchedulesByKeysAsync."
     },
     {
       "id": 5,
@@ -345,6 +346,10 @@
     }
   ],
   "log": [
+    {
+      "date": "09-11-2026",
+      "text": "v19/dev (fb17c75d01a, 300 commits) merged into v18/feature/ef-core-repositories: 36 conflicts resolved keeping the async form; ported by hand the includeInvariantForVariant schedule column (EF Core DTO + no-op snapshot migration AddIncludeInvariantForVariantToContentScheduleModel, enum 26), the scheduled-release flag in the async publish engine, the container-move hooks (now async, key-aware), the PropertyFactory equivalence check and the property-loader parameter guard; ~200 upstream test call sites ported to the async API. Audits clean; full rebuild clean; unit 7881 green; integration 868 + 588 targeted green; frontend build green. Merge staged, awaiting the user's commit."
+    },
     {
       "date": "20-10-2026",
       "text": "#24203 (PR 2b, carrying PR 3) approved and squash-merged as f53d471a4dd. PRs 1, 2, 2b and 3 are on the integration branch; no v19/dev merge-up since 95111fe68ac, so no merge audit is due. PR 4 (element repository) can start from origin/v18/feature/ef-core-repositories."
