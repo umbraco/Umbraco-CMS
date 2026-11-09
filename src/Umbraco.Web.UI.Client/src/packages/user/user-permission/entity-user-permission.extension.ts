@@ -11,6 +11,11 @@ export interface MetaEntityUserPermission {
 	label?: string;
 	description?: string;
 	group?: string;
+
+	/**
+	 * When true, the permission is only offered when editing granular permissions and is left out of group-level default permissions.
+	 */
+	granularOnly?: boolean;
 }
 
 declare global {

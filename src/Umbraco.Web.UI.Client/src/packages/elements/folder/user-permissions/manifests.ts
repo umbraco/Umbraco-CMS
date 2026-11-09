@@ -106,6 +106,7 @@ const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 				label: `#userPermissions_${key}`,
 				description: `#userPermissions_${key}_element`,
 				group: 'elements',
+				granularOnly: true,
 			},
 		}),
 	),
