@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using System.Linq.Expressions;
-using System.Runtime;
 using NUnit.Framework;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 
@@ -124,26 +123,14 @@ public class ExpressionValueEvaluatorTests
     [Test]
     public void Does_Not_Compile_Code_Per_Evaluation()
     {
-        const int iterations = 200;
         var item = new Item { Name = "name", Child = new Item { Field = 1 } };
 
-        void Evaluate(int i)
+        JitCompilationAssert.DoesNotCompilePerRun(i =>
         {
             ExpressionValueEvaluator.GetValue(Body(() => i));
             ExpressionValueEvaluator.GetValue(Body(() => item.Child.Field));
             ExpressionValueEvaluator.GetValue(Body(() => item.Name!.ToUpperInvariant()));
-        }
-
-        Evaluate(0);
-        var compiledBefore = JitInfo.GetCompiledMethodCount(currentThread: true);
-
-        for (var i = 0; i < iterations; i++)
-        {
-            Evaluate(i);
-        }
-
-        var compiled = JitInfo.GetCompiledMethodCount(currentThread: true) - compiledBefore;
-        Assert.Less(compiled, iterations, $"{compiled} methods were JIT-compiled over {iterations} iterations.");
+        });
     }
 
     private static Expression Body<T>(Expression<Func<T>> expression) => expression.Body;
