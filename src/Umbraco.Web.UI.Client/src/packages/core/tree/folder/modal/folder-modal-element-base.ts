@@ -16,6 +16,9 @@ export abstract class UmbFolderModalElementBase<
 
 	folderRepository?: UmbDetailRepository<UmbFolderModel>;
 
+	#repositoryReady?: Promise<void>;
+	#init?: void | Promise<void>;
+
 	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#observeRepository();
@@ -24,7 +27,7 @@ export abstract class UmbFolderModalElementBase<
 	#observeRepository() {
 		if (!this.data?.folderRepositoryAlias) throw new Error('A folder repository alias is required');
 
-		new UmbExtensionApiInitializer(
+		this.#repositoryReady = new UmbExtensionApiInitializer(
 			this,
 			umbExtensionsRegistry,
 			this.data.folderRepositoryAlias,
@@ -32,13 +35,13 @@ export abstract class UmbFolderModalElementBase<
 			(permitted, ctrl) => {
 				this.folderRepository = permitted ? (ctrl.api as UmbDetailRepository<UmbFolderModel>) : undefined;
 				if (this.folderRepository) {
-					this.init();
+					this.#init = this.init();
 				}
 			},
-		);
+		).asPromise();
 	}
 
-	abstract init(): void;
+	abstract init(): void | Promise<void>;
 	abstract onFormSubmit({ name }: { name: string }): void;
 
 	async #onSubmit(event: SubmitEvent) {
@@ -52,6 +55,10 @@ export abstract class UmbFolderModalElementBase<
 
 		const formData = new FormData(form);
 		const name = formData.get('name') as string;
+
+		// The form can be submitted before the repository has loaded and the modal has initialised.
+		await this.#repositoryReady;
+		await this.#init;
 
 		this.onFormSubmit({ name });
 	}

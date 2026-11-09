@@ -62,12 +62,11 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 		if (!this.#itemRepository) throw new Error('Item repository is not available');
 
 		const { data } = await this.#itemRepository.requestItems([this.data.unique]);
-		this._name = data?.[0].name ?? '';
+		this._name = data?.[0]?.name ?? '';
 	}
 
 	async #onSubmit(event: SubmitEvent) {
 		event.preventDefault();
-		if (!this.#renameRepository) throw new Error('Rename repository is not available');
 		if (!this.data?.unique) throw new Error('Unique identifier is not available');
 
 		const form = event.target as HTMLFormElement;
@@ -78,6 +77,10 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 
 		const formData = new FormData(form);
 		const name = formData.get('name') as string;
+
+		// The form can be submitted before the repositories have loaded.
+		await this.#init;
+		if (!this.#renameRepository) throw new Error('Rename repository is not available');
 
 		const { data } = await this.#renameRepository.rename(this.data.unique, name);
 

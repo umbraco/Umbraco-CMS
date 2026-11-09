@@ -55,9 +55,10 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 			},
 			(manifest: ManifestType) => manifest.forEntityTypes.includes(data.entityType),
 			async (controllers) => {
-				this._apiControllers = controllers as unknown as Array<UmbExtensionApiInitializer<ManifestType>>;
-				const hrefPromises = this._apiControllers.map((controller) => controller.api?.getHref());
-				this._hrefList = await Promise.all(hrefPromises);
+				const apiControllers = controllers as unknown as Array<UmbExtensionApiInitializer<ManifestType>>;
+				// Render the options together with their hrefs, so a link option is never shown as a button.
+				this._hrefList = await Promise.all(apiControllers.map((controller) => controller.api?.getHref()));
+				this._apiControllers = apiControllers;
 			},
 		);
 	}
@@ -85,9 +86,8 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 			return;
 		}
 
-		if (!href) {
-			throw new Error('No href found');
-		}
+		// Options without an href are buttons, handled by the open event.
+		if (!href) return;
 
 		this._submitModal();
 	}
