@@ -17,7 +17,8 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 - **[Repositories](./docs/repositories.md)** - Repository categories (detail, item, tree, collection, action-specific), file structure, naming, extension registration, data source delegation
 - **[Package Development](./docs/package-development.md)** - Package & module structure, folder structure conventions, localization, organizational rules
 - **[Value Type](./docs/value-type.md)** - Compile-time type map (`UmbValueTypeMap`); declaring typed value type constants via declaration merging
-- **[Value Summary](./docs/value-summary.md)** - `valueSummary` extension type; rendering compact values in collection views, batch resolver pattern, coordinator
+- **[Display Batch Resolver](./docs/display-batch-resolver.md)** - Shared resolver contract and `UmbDisplayBatchResolverCoordinatorContext`; resolving values that elements display, batched across elements, one instance per owner
+- **[Value Summary](./docs/value-summary.md)** - `valueSummary` extension type; rendering compact values in collection views, resolvers, coordinator
 
 ### Development
 

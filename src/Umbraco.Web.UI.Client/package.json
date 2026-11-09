@@ -43,6 +43,7 @@
 		"./data-type": "./dist-cms/packages/data-type/index.js",
 		"./debug": "./dist-cms/packages/core/debug/index.js",
 		"./dictionary": "./dist-cms/packages/dictionary/index.js",
+		"./display-batch-resolver": "./dist-cms/packages/core/display-batch-resolver/index.js",
 		"./document-blueprint": "./dist-cms/packages/documents/document-blueprints/index.js",
 		"./document-type": "./dist-cms/packages/documents/document-types/index.js",
 		"./document": "./dist-cms/packages/documents/documents/index.js",

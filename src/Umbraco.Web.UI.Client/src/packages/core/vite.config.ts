@@ -24,6 +24,7 @@ export default defineConfig({
 			'dashboard/index': './dashboard/index.ts',
 			'datalist-data-source/index': './datalist-data-source/index.ts',
 			'debug/index': './debug/index.ts',
+			'display-batch-resolver/index': './display-batch-resolver/index.ts',
 			'entity-action/index': './entity-action/index.ts',
 			'entity-bulk-action/index': './entity-bulk-action/index.ts',
 			'entity-create-option-action/index': './entity-create-option-action/index.ts',

@@ -3,7 +3,7 @@
 **Module**: `@umbraco-cms/backoffice/value-summary`
 **Location**: `src/packages/core/value-summary/`
 
-Depends on: [Value Type](./value-type.md)
+Depends on: [Value Type](./value-type.md), [Display Batch Resolver](./display-batch-resolver.md)
 
 ---
 
@@ -73,8 +73,10 @@ Use when displaying the value requires a server call — e.g., resolving referen
 
 ### Resolver interface
 
+`UmbValueSummaryResolver` extends `UmbDisplayBatchResolver` from `@umbraco-cms/backoffice/display-batch-resolver`. See [Display Batch Resolver](./display-batch-resolver.md) for the full contract.
+
 ```typescript
-interface UmbValueSummaryResolver<TValue, TResolved> extends UmbApi {
+interface UmbValueSummaryResolver<TValue, TResolved> extends UmbDisplayBatchResolver<TValue, TResolved> {
   resolveValues(
     values: ReadonlyArray<TValue>,
   ): Promise<{
@@ -108,7 +110,7 @@ Provide `asObservable` only when the resolved data can change after initial load
 
 ## Coordinator (automatic — do not configure)
 
-`UmbValueSummaryCoordinatorContext` is instantiated on the collection default context automatically. It batches all calls and passes the values to a resolver.
+`UmbValueSummaryCoordinatorContext` is instantiated on the collection default context automatically. It is an `UmbDisplayBatchResolverCoordinatorContext` keyed by value type: it batches all calls and passes the values to the `valueResolver` of the matching `valueSummary` manifest.
 
 ## Collection integration
 
