@@ -240,6 +240,58 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
+    public async Task GetContentSources_Without_An_Ambient_Scope_Returns_Matching_Sources()
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
+        var requestedKeys = new[] { Textpage.Key, Subpage.Key };
+
+        var sources = DatabaseCacheRepository.GetContentSources(requestedKeys, preview: true).ToList();
+
+        Assert.That(sources.Select(s => s.Key), Is.EquivalentTo(requestedKeys));
+    }
+
+    [Test]
+    public void GetMediaSource_Without_An_Ambient_Scope_Returns_The_Source()
+    {
+        ContentCacheNode? source = DatabaseCacheRepository.GetMediaSource(MediaItem1.Key);
+
+        Assert.IsNotNull(source);
+        Assert.AreEqual(MediaItem1.Key, source!.Key);
+    }
+
+    [Test]
+    public async Task GetContentSourceForPublishStatesAsync_Without_An_Ambient_Scope_Returns_Both_States()
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
+
+        (ContentCacheNode? draft, ContentCacheNode? published) = await DatabaseCacheRepository.GetContentSourceForPublishStatesAsync(Textpage.Key);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(draft?.Key, Is.EqualTo(Textpage.Key));
+            Assert.That(draft?.IsDraft, Is.True);
+            Assert.That(published?.Key, Is.EqualTo(Textpage.Key));
+            Assert.That(published?.IsDraft, Is.False);
+        });
+    }
+
+    [Test]
+    public async Task GetContentSourceForPublishStates_Without_An_Ambient_Scope_Returns_Both_States()
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
+
+        (ContentCacheNode? draft, ContentCacheNode? published) = DatabaseCacheRepository.GetContentSourceForPublishStates(Textpage.Key);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(draft?.Key, Is.EqualTo(Textpage.Key));
+            Assert.That(draft?.IsDraft, Is.True);
+            Assert.That(published?.Key, Is.EqualTo(Textpage.Key));
+            Assert.That(published?.IsDraft, Is.False);
+        });
+    }
+
+    [Test]
     public async Task GetContentSourceAsync_In_A_Scope_Sees_The_Uncommitted_Changes_Of_The_Scope()
     {
         await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
