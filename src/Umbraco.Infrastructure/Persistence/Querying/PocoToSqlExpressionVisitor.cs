@@ -60,10 +60,7 @@ internal sealed class PocoToSqlExpressionVisitor<TDto> : ExpressionVisitorBase
         else
         {
             // though... we probably should avoid doing this
-            UnaryExpression member = Expression.Convert(arg, typeof(object));
-            var lambda = Expression.Lambda<Func<object>>(member);
-            Func<object> getter = lambda.Compile();
-            name = getter().ToString();
+            name = ExpressionValueEvaluator.GetValue(arg)!.ToString();
         }
 
         SqlParameters.Add(new SqlTemplate.TemplateArg(RemoveQuote(name)));
@@ -91,10 +88,7 @@ internal sealed class PocoToSqlExpressionVisitor<TDto> : ExpressionVisitorBase
             return Visited ? string.Empty : GetFieldName(_pd, m.Member.Name, _alias);
         }
 
-        UnaryExpression member = Expression.Convert(m, typeof(object));
-        var lambda = Expression.Lambda<Func<object>>(member);
-        Func<object> getter = lambda.Compile();
-        var o = getter();
+        var o = ExpressionValueEvaluator.GetValue(m)!;
 
         SqlParameters.Add(o);
 
@@ -194,10 +188,7 @@ internal sealed class PocoToSqlExpressionVisitor<TDto1, TDto2> : ExpressionVisit
             }
         }
 
-        UnaryExpression member = Expression.Convert(m, typeof(object));
-        var lambda = Expression.Lambda<Func<object>>(member);
-        Func<object> getter = lambda.Compile();
-        var o = getter();
+        var o = ExpressionValueEvaluator.GetValue(m)!;
 
         SqlParameters.Add(o);
 
@@ -316,10 +307,7 @@ internal sealed class PocoToSqlExpressionVisitor<TDto1, TDto2, TDto3> : Expressi
             }
         }
 
-        UnaryExpression member = Expression.Convert(m, typeof(object));
-        var lambda = Expression.Lambda<Func<object>>(member);
-        Func<object> getter = lambda.Compile();
-        var o = getter();
+        var o = ExpressionValueEvaluator.GetValue(m)!;
 
         SqlParameters.Add(o);
 
