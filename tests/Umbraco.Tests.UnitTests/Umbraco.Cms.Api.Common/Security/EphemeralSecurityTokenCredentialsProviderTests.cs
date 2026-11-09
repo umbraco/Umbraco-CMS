@@ -5,12 +5,12 @@ using Umbraco.Cms.Api.Common.Security;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Common.Security;
 
 [TestFixture]
-internal class EphemeralOpenIddictServerCredentialsProviderTests
+internal class EphemeralSecurityTokenCredentialsProviderTests
 {
     [Test]
     public void Provides_An_Asymmetric_Signing_Credential_And_An_Encryption_Credential()
     {
-        var sut = new EphemeralOpenIddictServerCredentialsProvider();
+        var sut = new EphemeralSecurityTokenCredentialsProvider();
 
         SigningCredentials signingCredentials = sut.GetSigningCredentials().Single();
         EncryptingCredentials encryptionCredentials = sut.GetEncryptionCredentials().Single();
@@ -25,7 +25,7 @@ internal class EphemeralOpenIddictServerCredentialsProviderTests
     [Test]
     public void Provides_The_Same_Credentials_For_The_Lifetime_Of_The_Instance()
     {
-        var sut = new EphemeralOpenIddictServerCredentialsProvider();
+        var sut = new EphemeralSecurityTokenCredentialsProvider();
 
         Assert.Multiple(() =>
         {
@@ -37,8 +37,8 @@ internal class EphemeralOpenIddictServerCredentialsProviderTests
     [Test]
     public void Provides_Different_Credentials_Per_Instance()
     {
-        var first = new EphemeralOpenIddictServerCredentialsProvider();
-        var second = new EphemeralOpenIddictServerCredentialsProvider();
+        var first = new EphemeralSecurityTokenCredentialsProvider();
+        var second = new EphemeralSecurityTokenCredentialsProvider();
 
         Assert.Multiple(() =>
         {
@@ -47,9 +47,9 @@ internal class EphemeralOpenIddictServerCredentialsProviderTests
         });
     }
 
-    private static byte[] GetModulus(IOpenIddictServerCredentialsProvider provider)
+    private static byte[] GetModulus(ISecurityTokenCredentialsProvider provider)
         => ((RsaSecurityKey)provider.GetSigningCredentials().Single().Key).Rsa.ExportParameters(false).Modulus!;
 
-    private static byte[] GetEncryptionKey(IOpenIddictServerCredentialsProvider provider)
+    private static byte[] GetEncryptionKey(ISecurityTokenCredentialsProvider provider)
         => ((SymmetricSecurityKey)provider.GetEncryptionCredentials().Single().Key).Key;
 }

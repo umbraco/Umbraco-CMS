@@ -3,9 +3,13 @@ using Microsoft.IdentityModel.Tokens;
 namespace Umbraco.Cms.Api.Common.Security;
 
 /// <summary>
-///     Provides the signing and encryption credentials used by the OpenIddict server.
+///     Provides the credentials used to sign and encrypt the security tokens issued by the authorization server.
 /// </summary>
 /// <remarks>
+///     <para>
+///         The credentials apply to every token the authorization server issues, including back-office, member and
+///         client credentials tokens.
+///     </para>
 ///     <para>
 ///         Tokens issued in the ASP.NET Core Data Protection format do not use these credentials, but identity tokens
 ///         are always issued as JWTs signed with the signing credentials, and the public signing keys are published
@@ -27,7 +31,7 @@ namespace Umbraco.Cms.Api.Common.Security;
 ///         the provider, rather than in place of them, so provide them from here instead.
 ///     </para>
 /// </remarks>
-public interface IOpenIddictServerCredentialsProvider
+public interface ISecurityTokenCredentialsProvider
 {
     /// <summary>
     ///     Gets the credentials used to sign tokens. At least one asymmetric signing credential is required.

@@ -4,24 +4,22 @@ using System.Text.Json;
 using Microsoft.IdentityModel.Tokens;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Common.Security;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Security;
 
 /// <summary>
-/// Verifies that the OpenIddict server credentials come from the registered <see cref="IOpenIddictServerCredentialsProvider"/>.
+/// Verifies that the OpenIddict server credentials come from the registered <see cref="ISecurityTokenCredentialsProvider"/>.
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture, Boot = true)]
-public class OpenIddictServerCredentialsProviderTests : UmbracoTestServerTestBase
+public class SecurityTokenCredentialsProviderTests : UmbracoTestServerTestBase
 {
     private static readonly RSA _signingKey = RSA.Create(2048);
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.Services.AddUnique<IOpenIddictServerCredentialsProvider, FixedCredentialsProvider>();
+        => builder.Services.AddUnique<ISecurityTokenCredentialsProvider, FixedCredentialsProvider>();
 
     [Test]
     public async Task Published_Signing_Keys_Are_Those_Of_The_Registered_Provider()
@@ -40,7 +38,7 @@ public class OpenIddictServerCredentialsProviderTests : UmbracoTestServerTestBas
         Assert.That(publishedModuli, Is.EqualTo(new[] { Base64UrlEncoder.Encode(_signingKey.ExportParameters(false).Modulus) }));
     }
 
-    private sealed class FixedCredentialsProvider : IOpenIddictServerCredentialsProvider
+    private sealed class FixedCredentialsProvider : ISecurityTokenCredentialsProvider
     {
         private static readonly byte[] _encryptionKey = RandomNumberGenerator.GetBytes(32);
 

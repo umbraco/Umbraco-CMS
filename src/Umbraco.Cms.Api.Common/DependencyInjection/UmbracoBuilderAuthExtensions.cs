@@ -107,7 +107,7 @@ public static class UmbracoBuilderAuthExtensions
                 options.UseDataProtection();
 
                 // The encryption and signing credentials are registered by ConfigureOpenIddictServerCredentials, from the
-                // replaceable IOpenIddictServerCredentialsProvider - identity tokens are JWTs signed with them, even with
+                // replaceable ISecurityTokenCredentialsProvider - identity tokens are JWTs signed with them, even with
                 // Data Protection enabled.
 
                 // Add custom handler for the "ProcessRequestContext" server event, to stop OpenIddict from handling
@@ -177,7 +177,7 @@ public static class UmbracoBuilderAuthExtensions
 
         builder.Services.AddSingleton<IDistributedBackgroundJob, OpenIddictCleanupJob>();
         builder.Services.ConfigureOptions<ConfigureOpenIddict>();
-        builder.Services.AddUnique<IOpenIddictServerCredentialsProvider, EphemeralOpenIddictServerCredentialsProvider>();
+        builder.Services.AddUnique<ISecurityTokenCredentialsProvider, EphemeralSecurityTokenCredentialsProvider>();
         builder.Services.ConfigureOptions<ConfigureOpenIddictServerCredentials>();
 
         builder.AddNotificationHandler<UserLogoutSuccessNotification, HideBackOfficeTokensHandler>();

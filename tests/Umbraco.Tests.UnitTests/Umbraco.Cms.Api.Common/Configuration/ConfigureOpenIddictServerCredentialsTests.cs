@@ -24,7 +24,7 @@ internal class ConfigureOpenIddictServerCredentialsTests
             new(new SymmetricSecurityKey(RandomNumberGenerator.GetBytes(32)), SecurityAlgorithms.Aes256KW, SecurityAlgorithms.Aes256CbcHmacSha512),
         ];
 
-        var provider = new Mock<IOpenIddictServerCredentialsProvider>();
+        var provider = new Mock<ISecurityTokenCredentialsProvider>();
         provider.Setup(x => x.GetSigningCredentials()).Returns(signingCredentials);
         provider.Setup(x => x.GetEncryptionCredentials()).Returns(encryptionCredentials);
 
