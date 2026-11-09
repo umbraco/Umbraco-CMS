@@ -1065,6 +1065,15 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return sql;
     }
 
+    // Ordering names are matched case-insensitively, but quoted identifiers are case-sensitive on some databases,
+    // so resolve the name to the column's declared casing.
+    private string GetNodeColumnName(string orderBy)
+        => SqlContext.PocoDataFactory.ForType(typeof(NodeDto)).Columns.Keys
+            .FirstOrDefault(column => column.InvariantEquals(orderBy))
+           ?? throw new ArgumentException(
+               $"Cannot order entities by '{orderBy}', which is not a column of the {NodeDto.TableName} table.",
+               nameof(orderBy));
+
     private void ApplyOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
     {
         if (sql == null)
@@ -1102,7 +1111,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                     break;
                 default:
                     orderBy = runner.OrderBy != null
-                        ? SqlSyntax.GetQuotedColumn(NodeDto.TableName, runner.OrderBy)
+                        ? SqlSyntax.GetQuotedColumn(NodeDto.TableName, GetNodeColumnName(runner.OrderBy))
                         : string.Empty;
                     break;
             }
