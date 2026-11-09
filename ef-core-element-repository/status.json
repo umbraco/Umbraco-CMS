@@ -348,7 +348,7 @@
   "log": [
     {
       "date": "09-11-2026",
-      "text": "v19/dev (fb17c75d01a, 300 commits) merged into v18/feature/ef-core-repositories: 36 conflicts resolved keeping the async form; ported by hand the includeInvariantForVariant schedule column (EF Core DTO + no-op snapshot migration AddIncludeInvariantForVariantToContentScheduleModel, enum 26), the scheduled-release flag in the async publish engine, the container-move hooks (now async, key-aware), the PropertyFactory equivalence check and the property-loader parameter guard; ~200 upstream test call sites ported to the async API. Audits clean; full rebuild clean; unit 7881 green; integration 868 + 588 targeted green; frontend build green. Merge staged, awaiting the user's commit."
+      "text": "v19/dev (fb17c75d01a, 300 commits) merged into v18/feature/ef-core-repositories: 36 conflicts resolved keeping the async form; ported by hand the includeInvariantForVariant schedule column (EF Core DTO + no-op snapshot migration AddIncludeInvariantForVariantToContentScheduleModel, enum 26), the scheduled-release flag in the async publish engine, the container-move hooks (now async, key-aware), the PropertyFactory equivalence check and the property-loader parameter guard; ~200 upstream test call sites ported to the async API. Audits clean; full rebuild clean; unit 7881 green; integration 868 + 588 targeted green; frontend build green. Merged as c6b0ec18aa5 and pushed."
     },
     {
       "date": "20-10-2026",
