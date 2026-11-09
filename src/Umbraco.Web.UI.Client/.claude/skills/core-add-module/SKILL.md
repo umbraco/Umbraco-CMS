@@ -29,10 +29,12 @@ Core modules should not implement CMS-specific features. They provide the buildi
 ```
 src/packages/core/{module-name}/
 ├── index.ts                   # Public API exports
-├── manifests.ts               # Extension registrations (if any)
-├── constants.ts               # Module constants
+├── manifests.ts               # Extension registrations (only if the module registers extensions)
+├── constants.ts               # Module constants (only if it has any)
 └── types.ts                   # Module types
 ```
+
+Only create `manifests.ts` and `constants.ts` when they have content. Many core modules (`utils`, `sorter`, `datalist-data-source`, …) have neither. Don't add empty files or empty wiring.
 
 ## Step 1: Create the module directory and files
 
@@ -57,7 +59,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 ];
 ```
 
-If the module has no extensions (pure utility), export an empty array.
+Skip this file if the module has no extensions (pure utility), and skip Step 2.
 
 ### {module-name}/constants.ts
 
@@ -71,7 +73,7 @@ If the module has no extensions (pure utility), export an empty array.
 // Type definitions, interfaces, meta types
 ```
 
-## Step 2: Wire into core's manifests.ts
+## Step 2: Wire into core's manifests.ts (only if the module has a `manifests.ts`)
 
 Add the module's manifests to `src/packages/core/manifests.ts`:
 
@@ -131,9 +133,8 @@ import type { MyType } from '@umbraco-cms/backoffice/{module-name}';
 
 - [ ] Module directory created under `src/packages/core/`
 - [ ] `index.ts` exports only the public API
-- [ ] `manifests.ts` exports extension registrations (or empty array)
-- [ ] `constants.ts` and `types.ts` created
-- [ ] Module manifests imported in `src/packages/core/manifests.ts` (alphabetical order)
+- [ ] `types.ts` created; `manifests.ts` and `constants.ts` only if they have content
+- [ ] If there is a `manifests.ts`: imported in `src/packages/core/manifests.ts` (alphabetical order)
 - [ ] Entry point added to `src/packages/core/vite.config.ts` (alphabetical order)
 - [ ] Subpath export added to root `package.json`
 - [ ] `npm run generate:tsconfig` executed
