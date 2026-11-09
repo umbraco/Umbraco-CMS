@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRepository
 {
     private readonly IContentCacheDataSerializerFactory _contentCacheDataSerializerFactory;
+    private readonly IUmbracoDatabaseFactory _databaseFactory;
     private readonly ILogger<DatabaseCacheRepository> _logger;
     private readonly IOptions<NuCacheSettings> _nucacheSettings;
     private readonly IShortStringHelper _shortStringHelper;
@@ -31,6 +32,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// </summary>
     public DatabaseCacheRepository(
         IScopeAccessor scopeAccessor,
+        IUmbracoDatabaseFactory databaseFactory,
         AppCaches appCaches,
         ILogger<DatabaseCacheRepository> logger,
         IShortStringHelper shortStringHelper,
@@ -39,6 +41,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         IOptions<NuCacheSettings> nucacheSettings)
         : base(scopeAccessor, appCaches)
     {
+        _databaseFactory = databaseFactory;
         _logger = logger;
         _shortStringHelper = shortStringHelper;
         _urlSegmentProviders = urlSegmentProviders;
@@ -125,11 +128,11 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
-        => CreateContentSourceNode(await Database.FirstOrDefaultAsync<ContentSourceDto>(GetContentSourceSql(key)), preview);
+        => CreateContentSourceNode(await ReadAsync(database => database.FirstOrDefaultAsync<ContentSourceDto>(GetContentSourceSql(key))), preview);
 
     /// <inheritdoc/>
     public ContentCacheNode? GetContentSource(Guid key, bool preview = false)
-        => CreateContentSourceNode(Database.FirstOrDefault<ContentSourceDto>(GetContentSourceSql(key)), preview);
+        => CreateContentSourceNode(Read(database => database.FirstOrDefault<ContentSourceDto>(GetContentSourceSql(key))), preview);
 
     private ContentCacheNode? CreateContentSourceNode(ContentSourceDto? dto, bool preview)
     {
@@ -156,11 +159,11 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetContentSourceForPublishStatesAsync(Guid key)
-        => ToPublishStateNodes(key, await Database.FirstOrDefaultAsync<ContentSourceDto>(GetContentSourceSql(key)));
+        => ToPublishStateNodes(key, await ReadAsync(database => database.FirstOrDefaultAsync<ContentSourceDto>(GetContentSourceSql(key))));
 
     /// <inheritdoc/>
     public (ContentCacheNode? Draft, ContentCacheNode? Published) GetContentSourceForPublishStates(Guid key)
-        => ToPublishStateNodes(key, Database.FirstOrDefault<ContentSourceDto>(GetContentSourceSql(key)));
+        => ToPublishStateNodes(key, Read(database => database.FirstOrDefault<ContentSourceDto>(GetContentSourceSql(key))));
 
     private (ContentCacheNode? Draft, ContentCacheNode? Published) ToPublishStateNodes(Guid key, ContentSourceDto? dto)
     {
@@ -191,6 +194,60 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return (draftNode, publishedNode);
     }
 
+    // The scope's SQL context is the database factory's, so the SQL for a read without an ambient scope is built the same way.
+    private new ISqlContext SqlContext => _databaseFactory.SqlContext;
+
+    // A content source read without an ambient scope (a cache miss while rendering) runs on its own connection and
+    // commits on its own, one round trip instead of beginning and committing a transaction around it. Inside a scope
+    // it runs in the scope's transaction, so it sees what the scope has written.
+    private T Read<T>(Func<IUmbracoDatabase, T> read)
+    {
+        if (ScopeAccessor.AmbientScope is not null)
+        {
+            return read(Database);
+        }
+
+        using IUmbracoDatabase database = _databaseFactory.CreateDatabase();
+        return read(database);
+    }
+
+    private async Task<T> ReadAsync<T>(Func<IUmbracoDatabase, Task<T>> read)
+    {
+        if (ScopeAccessor.AmbientScope is not null)
+        {
+            return await read(Database);
+        }
+
+        using IUmbracoDatabase database = _databaseFactory.CreateDatabase();
+        return await read(database);
+    }
+
+    // Batches the WHERE IN to stay within SQL Server's parameter limit. Each batch selects different rows, so they
+    // need not see the same snapshot.
+    private Task<List<ContentSourceDto>> FetchContentSourcesAsync(Guid[] keys, Func<IEnumerable<Guid>, Sql<ISqlContext>> sql)
+        => ReadAsync(async database =>
+        {
+            var dtos = new List<ContentSourceDto>(keys.Length);
+            foreach (IEnumerable<Guid> group in keys.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                dtos.AddRange(await database.FetchAsync<ContentSourceDto>(sql(group)));
+            }
+
+            return dtos;
+        });
+
+    private List<ContentSourceDto> FetchContentSources(Guid[] keys, Func<IEnumerable<Guid>, Sql<ISqlContext>> sql)
+        => Read(database =>
+        {
+            var dtos = new List<ContentSourceDto>(keys.Length);
+            foreach (IEnumerable<Guid> group in keys.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                dtos.AddRange(database.Fetch<ContentSourceDto>(sql(group)));
+            }
+
+            return dtos;
+        });
+
     private Sql<ISqlContext> GetContentSourceSql(Guid key)
         => SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
@@ -216,11 +273,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         // Batch the WHERE IN to stay within SQL Server's parameter limit.
         // The configurable document seed batch size is applied upstream; this method only enforces MaxParameterCount.
         Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
-        var dtos = new List<ContentSourceDto>(keysArray.Length);
-        foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
-        {
-            dtos.AddRange(await Database.FetchAsync<ContentSourceDto>(GetContentSourcesSql(group)));
-        }
+        List<ContentSourceDto> dtos = await FetchContentSourcesAsync(keysArray, GetContentSourcesSql);
 
         return CreateContentSourceNodes(dtos, preview);
     }
@@ -230,11 +283,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     {
         // Batch the WHERE IN to stay within SQL Server's parameter limit, as GetContentSourcesAsync does.
         Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
-        var dtos = new List<ContentSourceDto>(keysArray.Length);
-        foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
-        {
-            dtos.AddRange(Database.Fetch<ContentSourceDto>(GetContentSourcesSql(group)));
-        }
+        List<ContentSourceDto> dtos = FetchContentSources(keysArray, GetContentSourcesSql);
 
         return CreateContentSourceNodes(dtos, preview);
     }
@@ -385,11 +434,11 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetMediaSourceAsync(Guid key)
-        => CreateMediaSourceNode(await Database.FirstOrDefaultAsync<ContentSourceDto>(GetMediaSourceSql(key)));
+        => CreateMediaSourceNode(await ReadAsync(database => database.FirstOrDefaultAsync<ContentSourceDto>(GetMediaSourceSql(key))));
 
     /// <inheritdoc/>
     public ContentCacheNode? GetMediaSource(Guid key)
-        => CreateMediaSourceNode(Database.FirstOrDefault<ContentSourceDto>(GetMediaSourceSql(key)));
+        => CreateMediaSourceNode(Read(database => database.FirstOrDefault<ContentSourceDto>(GetMediaSourceSql(key))));
 
     private Sql<ISqlContext> GetMediaSourceSql(Guid key)
         => SqlMediaSourcesSelect()
@@ -421,11 +470,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         // Batch the WHERE IN by Constants.Sql.MaxParameterCount so callers configuring
         // CacheSettings.MediaSeedBatchSize above that limit do not hit SQL Server's 2100 parameter limit.
         Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
-        var dtos = new List<ContentSourceDto>(keysArray.Length);
-        foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
-        {
-            dtos.AddRange(await Database.FetchAsync<ContentSourceDto>(GetMediaSourcesSql(group)));
-        }
+        List<ContentSourceDto> dtos = await FetchContentSourcesAsync(keysArray, GetMediaSourcesSql);
 
         return CreateMediaSourceNodes(dtos);
     }
@@ -435,11 +480,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     {
         // Batch the WHERE IN to stay within SQL Server's parameter limit, as GetMediaSourcesAsync does.
         Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
-        var dtos = new List<ContentSourceDto>(keysArray.Length);
-        foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
-        {
-            dtos.AddRange(Database.Fetch<ContentSourceDto>(GetMediaSourcesSql(group)));
-        }
+        List<ContentSourceDto> dtos = FetchContentSources(keysArray, GetMediaSourcesSql);
 
         return CreateMediaSourceNodes(dtos);
     }

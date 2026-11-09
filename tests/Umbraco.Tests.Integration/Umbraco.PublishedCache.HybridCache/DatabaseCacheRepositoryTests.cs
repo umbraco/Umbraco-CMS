@@ -189,6 +189,75 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
         => node is null ? null : (node.Id, node.Key, node.IsDraft, node.Data?.Name);
 
     [Test]
+    public async Task GetContentSourceAsync_Without_An_Ambient_Scope_Returns_The_Published_Source()
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
+
+        ContentCacheNode? source = await DatabaseCacheRepository.GetContentSourceAsync(Textpage.Key);
+
+        Assert.IsNotNull(source);
+        Assert.AreEqual(Textpage.Key, source!.Key);
+    }
+
+    [Test]
+    public async Task GetContentSource_Without_An_Ambient_Scope_Returns_The_Published_Source()
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
+
+        ContentCacheNode? source = DatabaseCacheRepository.GetContentSource(Textpage.Key);
+
+        Assert.IsNotNull(source);
+        Assert.AreEqual(Textpage.Key, source!.Key);
+    }
+
+    [Test]
+    public async Task GetContentSourcesAsync_Without_An_Ambient_Scope_Returns_Matching_Sources()
+    {
+        var requestedKeys = new[] { Textpage.Key, Subpage.Key };
+
+        var sources = (await DatabaseCacheRepository.GetContentSourcesAsync(requestedKeys, preview: true)).ToList();
+
+        Assert.That(sources.Select(s => s.Key), Is.EquivalentTo(requestedKeys));
+    }
+
+    [Test]
+    public async Task GetMediaSourceAsync_Without_An_Ambient_Scope_Returns_The_Source()
+    {
+        ContentCacheNode? source = await DatabaseCacheRepository.GetMediaSourceAsync(MediaItem1.Key);
+
+        Assert.IsNotNull(source);
+        Assert.AreEqual(MediaItem1.Key, source!.Key);
+    }
+
+    [Test]
+    public void GetMediaSources_Without_An_Ambient_Scope_Returns_Matching_Sources()
+    {
+        var requestedKeys = new[] { MediaItem1.Key, MediaItem2.Key };
+
+        var sources = DatabaseCacheRepository.GetMediaSources(requestedKeys).ToList();
+
+        Assert.That(sources.Select(s => s.Key), Is.EquivalentTo(requestedKeys));
+    }
+
+    [Test]
+    public async Task GetContentSourceAsync_In_A_Scope_Sees_The_Uncommitted_Changes_Of_The_Scope()
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
+
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            scope.Database.Execute(SqlContext.Sql()
+                .Delete<ContentNuDto>()
+                .Where<ContentNuDto>(x => x.NodeId == Textpage.Id && x.Published));
+
+            Assert.IsNull(await DatabaseCacheRepository.GetContentSourceAsync(Textpage.Key));
+        }
+
+        // The scope was not completed, so the published source is back.
+        Assert.IsNotNull(await DatabaseCacheRepository.GetContentSourceAsync(Textpage.Key));
+    }
+
+    [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureSmallDeleteBatchSize))]
     public void Rebuild_Deletes_Stale_Rows_In_Batches_And_Repopulates()
     {
