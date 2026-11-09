@@ -67,12 +67,13 @@ export abstract class UmbContentPublishedPendingChangesManagerBase<
 
 		const publishedData = args.publishedData;
 		const mergedData = await mergeController.process(publishedData, args.persistedData, [variantId], [variantId]);
+		const mergedDataClone = structuredClone(mergedData);
 		// remove dates from the comparison
-		mergedData.variants.forEach((variant) => this.#cleanVariantForComparison(variant));
+		mergedDataClone.variants.forEach((variant) => this.#cleanVariantForComparison(variant));
 
-		this.cleanDataBeforeComparison(mergedData, publishedData);
+		this.cleanDataBeforeComparison(mergedDataClone, publishedData);
 
-		const hasChanges = jsonStringComparison(mergedData, publishedData) === false;
+		const hasChanges = jsonStringComparison(mergedDataClone, publishedData) === false;
 		return hasChanges ? { variantId } : null;
 	}
 
