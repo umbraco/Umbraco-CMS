@@ -194,8 +194,9 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return (draftNode, publishedNode);
     }
 
-    // The scope's SQL context is the database factory's, so the SQL for a read without an ambient scope is built the same way.
-    private new ISqlContext SqlContext => _databaseFactory.SqlContext;
+    // The source reads can run without an ambient scope, where the base SqlContext and the helpers built on it (Sql(),
+    // SqlSyntax, QuoteTableName, Query<T>()) throw, so their SQL builders use only this. In a scope it is the same object.
+    private ISqlContext ScopelessSqlContext => _databaseFactory.SqlContext;
 
     // A content source read without an ambient scope (a cache miss while rendering) runs on its own connection and
     // commits on its own, one round trip instead of beginning and committing a transaction around it. Inside a scope
@@ -250,15 +251,15 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     private Sql<ISqlContext> GetContentSourceSql(Guid key)
         => SqlContentSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
-            .Append(SqlWhereNodeKey(SqlContext, key))
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+            .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Document))
+            .Append(SqlWhereNodeKey(ScopelessSqlContext, key))
+            .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
 
     private Sql<ISqlContext> GetContentSourcesSql(IEnumerable<Guid> keys)
         => SqlContentSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+            .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Document))
             .WhereIn<NodeDto>(x => x.UniqueId, keys)
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+            .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
 
     private ContentCacheNode? CreateContentNodeKit(bool preview, ContentSourceDto dto)
     {
@@ -442,15 +443,15 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     private Sql<ISqlContext> GetMediaSourceSql(Guid key)
         => SqlMediaSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
-            .Append(SqlWhereNodeKey(SqlContext, key))
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+            .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Media))
+            .Append(SqlWhereNodeKey(ScopelessSqlContext, key))
+            .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
 
     private Sql<ISqlContext> GetMediaSourcesSql(IEnumerable<Guid> keys)
         => SqlMediaSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
+            .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Media))
             .WhereIn<NodeDto>(x => x.UniqueId, keys)
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+            .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
 
     private ContentCacheNode? CreateMediaSourceNode(ContentSourceDto? dto)
     {
@@ -1679,7 +1680,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     private Sql<ISqlContext> SqlContentSourcesSelect(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
     {
-        SqlTemplate sqlTemplate = SqlContext.Templates.Get(
+        SqlTemplate sqlTemplate = ScopelessSqlContext.Templates.Get(
             Constants.SqlTemplates.NuCacheDatabaseDataSource.ContentSourcesSelect,
             tsql =>
                 tsql.Select<NodeDto>(
@@ -1811,7 +1812,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     private Sql<ISqlContext> SqlMediaSourcesSelect(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
     {
-        SqlTemplate sqlTemplate = SqlContext.Templates.Get(
+        SqlTemplate sqlTemplate = ScopelessSqlContext.Templates.Get(
             Constants.SqlTemplates.NuCacheDatabaseDataSource.MediaSourcesSelect, tsql =>
                 tsql.Select<NodeDto>(
                         x => Alias(x.NodeId, "Id"),
