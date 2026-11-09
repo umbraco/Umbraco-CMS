@@ -2,6 +2,7 @@ import { UmbElementFolderItemRepository } from '../repository/item/element-folde
 import { UMB_ELEMENT_PICKER_MODAL } from '../../modals/element-picker-modal.token.js';
 import type { UmbElementFolderItemModel } from '../repository/item/types.js';
 import type { UmbElementTreeItemModel } from '../../tree/types.js';
+import { UMB_ELEMENT_FOLDER_ELEMENTS_PERMISSION_GROUP } from './constants.js';
 import type { UmbElementFolderUserPermissionModel } from './types.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -227,8 +228,12 @@ export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormC
 		const toLabels = (items: Array<ManifestEntityUserPermission>) =>
 			items.map((m) => (m.meta.label ? this.localize.string(m.meta.label) : m.name)).join(', ');
 
-		const folderLabels = toLabels(manifests.filter((m) => m.meta.group !== 'elements'));
-		const elementLabels = toLabels(manifests.filter((m) => m.meta.group === 'elements'));
+		const folderLabels = toLabels(
+			manifests.filter((m) => m.meta.group !== UMB_ELEMENT_FOLDER_ELEMENTS_PERMISSION_GROUP),
+		);
+		const elementLabels = toLabels(
+			manifests.filter((m) => m.meta.group === UMB_ELEMENT_FOLDER_ELEMENTS_PERMISSION_GROUP),
+		);
 
 		return [folderLabels, elementLabels && `${this.localize.term('actionCategories_elements')}: ${elementLabels}`]
 			.filter(Boolean)

@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-element-entity-actions-table-column-view')
 export class UmbElementEntityActionsTableColumnViewElement extends UmbLitElement {
-	#ancestorsContext = new UmbElementTreeItemAncestorsEntityContext(this);
+	readonly #ancestorsContext = new UmbElementTreeItemAncestorsEntityContext(this);
 
 	@property({ attribute: false })
 	public set value(value: UmbElementTreeItemModel | undefined) {

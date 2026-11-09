@@ -77,49 +77,28 @@ export class UmbElementUserPermissionCondition
 		if (this.#elementPermissions === undefined) return;
 		if (this.#fallbackPermissions === undefined) return;
 
-		const hasElementPermissions = this.#elementPermissions.length > 0;
+		// If no permission is defined on the path to the current element we use the fallback permissions
+		this.#check(this.#findClosestVerbs(this.#elementPermissions) ?? this.#fallbackPermissions);
+	}
 
-		// if there is no permissions for any elements we use the fallback permissions
-		if (!hasElementPermissions) {
-			this.#check(this.#fallbackPermissions);
-			return;
+	#findClosestVerbs(permissions: Array<ElementOrContainerPermission>): Array<string> | undefined {
+		// Element entries are inserted last so they take precedence over a container entry with the same id
+		const permissionsById = new Map<string, ElementOrContainerPermission>();
+		for (const p of permissions) {
+			if (p.$type === 'ElementContainerPermissionPresentationModel') {
+				permissionsById.set(p.elementContainer.id, p);
+			}
+		}
+		for (const p of permissions) {
+			if (p.$type === 'ElementPermissionPresentationModel') {
+				permissionsById.set(p.element.id, p);
+			}
 		}
 
-		// If there are element permissions, we need to check the full path to see if any permissions are defined for the current element
-		// If we find multiple permissions in the same path, we will apply the closest one
-		if (hasElementPermissions) {
-			// Path including the current element and all ancestors
-			const path = [...this.#ancestors, this.#unique].filter((unique) => unique !== null);
-			// Reverse the path to find the closest element permission quickly
-			const reversedPath = [...path].reverse();
-			// Element entries are inserted last so they take precedence over a container entry with the same id
-			const elementPermissionsMap = new Map<string, ElementOrContainerPermission>();
-			for (const p of this.#elementPermissions) {
-				if (p.$type === 'ElementContainerPermissionPresentationModel') {
-					elementPermissionsMap.set(p.elementContainer.id, p);
-				}
-			}
-			for (const p of this.#elementPermissions) {
-				if (p.$type === 'ElementPermissionPresentationModel') {
-					elementPermissionsMap.set(p.element.id, p);
-				}
-			}
-
-			// Find the closest element permission in the path
-			const closestElementPermission = reversedPath.find((id) => elementPermissionsMap.has(id));
-
-			// Retrieve the corresponding permission data
-			const match = closestElementPermission ? elementPermissionsMap.get(closestElementPermission) : undefined;
-
-			// no permissions for the current element - use the fallback permissions
-			if (!match) {
-				this.#check(this.#fallbackPermissions);
-				return;
-			}
-
-			// we found permissions - check them
-			this.#check(match.verbs);
-		}
+		// Walk from the current element up through its ancestors to find the closest permission
+		const path = [...this.#ancestors, this.#unique].filter((unique): unique is string => typeof unique === 'string');
+		const closestId = path.reverse().find((id) => permissionsById.has(id));
+		return closestId ? permissionsById.get(closestId)?.verbs : undefined;
 	}
 
 	#check(verbs: Array<string>) {
