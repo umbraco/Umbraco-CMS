@@ -76,6 +76,8 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	 * and trailing /collection segments. This ensures that internal workspace
 	 * navigation (e.g., switching tabs or variants) does not create separate
 	 * history entries, while still creating an entry for the base entity path.
+	 * @param {string} path The path to normalize
+	 * @returns {string} The normalized path
 	 */
 	#normalizePath(path: string): string {
 		// Strip sub-route suffixes: variant paths (/invariant, /en-us), /root
@@ -120,6 +122,8 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 
 	/**
 	 * Get the last segment of a path.
+	 * @param {string} path The path to get the last segment of
+	 * @returns {string} The last segment of the path
 	 */
 	#getLastPathSegment(path: string): string {
 		return path.split('/').filter(Boolean).pop() ?? '';
@@ -128,6 +132,8 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	/**
 	 * Extract a readable label from a path.
 	 * Tries to get the last meaningful segment (usually entity ID or section name).
+	 * @param {string} path The path to extract a label from
+	 * @returns {string} The extracted label
 	 */
 	#extractLabelFromPath(path: string): string {
 		return this.#formatSegmentAsLabel(this.#getLastPathSegment(path));
@@ -136,6 +142,8 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	/**
 	 * Format a URL segment as a readable label.
 	 * Handles special suffixes and converts kebab-case to Title Case.
+	 * @param {string} segment The URL segment to format
+	 * @returns {string} The formatted label
 	 */
 	#formatSegmentAsLabel(segment: string): string {
 		if (!segment) return '';
@@ -160,6 +168,8 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	/**
 	 * Convert a kebab-case string to Title Case.
 	 * e.g., "models-builder" -> "Models Builder"
+	 * @param {string} str The string to convert
+	 * @returns {string} The Title Case string
 	 */
 	#toTitleCase(str: string): string {
 		if (!str) return '';
@@ -172,6 +182,8 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	/**
 	 * Format a path for display by stripping common prefixes.
 	 * e.g., "/umbraco/section/content/..." -> "content/..."
+	 * @param {string} path The path to format
+	 * @returns {string} The formatted display path
 	 */
 	#formatDisplayPath(path: string): string {
 		return path.replace(/^\/(umbraco\/)?(section\/)?/, '');
@@ -245,7 +257,8 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 
 	/**
 	 * Pushes a new history item, removing any existing item with the same path.
-	 * @returns true if the item was added, false if it was a duplicate of the last item
+	 * @param {UmbCurrentUserHistoryItem} historyItem The history item to push
+	 * @returns {boolean} true if the item was added, false if it was a duplicate of the last item
 	 */
 	#pushIfNew(historyItem: UmbCurrentUserHistoryItem): boolean {
 		const history = this._data.getValue();
@@ -266,8 +279,8 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	/**
 	 * Pushes a new history item to the history array
 	 * @public
-	 * @param {UmbCurrentUserHistoryItem} historyItem
-	 * @memberof UmbHistoryService
+	 * @param {UmbCurrentUserHistoryItem} historyItem The history item to push
+	 * @memberof UmbCurrentUserHistoryStore
 	 */
 	public push(historyItem: UmbCurrentUserHistoryItem): void {
 		this.#pushIfNew(historyItem);
@@ -276,7 +289,7 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	/**
 	 * Clears the history array
 	 * @public
-	 * @memberof UmbHistoryService
+	 * @memberof UmbCurrentUserHistoryStore
 	 */
 	public clear() {
 		this._data.setValue([]);

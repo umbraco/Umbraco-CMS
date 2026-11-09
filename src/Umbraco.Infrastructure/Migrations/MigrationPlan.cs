@@ -127,7 +127,7 @@ public class MigrationPlan
 
         // throw if we already have a transition for that state which is not null,
         // null is used to keep track of the last step of the chain
-        if (_transitions.ContainsKey(sourceState) && _transitions[sourceState] != null)
+        if (_transitions.TryGetValue(sourceState, out Transition? value) && value != null)
         {
             throw new InvalidOperationException($"A transition from state \"{sourceState}\" has already been defined.");
         }

@@ -19,7 +19,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  * A data source for the PartialView tree that fetches data from the server
  * @class UmbPartialViewTreeServerDataSource
- * @implements {UmbTreeDataSource}
+ * @implements {UmbTreeServerDataSourceBase}
  */
 export class UmbPartialViewTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	FileSystemTreeItemPresentationModel,
@@ -46,7 +46,10 @@ const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
 	const { data, ...rest } = await PartialViewService.getTreePartialViewRoot({
 		query: { skip, take },
 	});
-	return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
+	return {
+		data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) },
+		...rest,
+	};
 };
 
 const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
@@ -60,7 +63,10 @@ const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
 		const { data, ...rest } = await PartialViewService.getTreePartialViewChildren({
 			query: { parentPath, skip, take },
 		});
-		return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
+		return {
+			data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) },
+			...rest,
+		};
 	}
 };
 

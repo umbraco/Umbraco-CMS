@@ -15,6 +15,7 @@ export class UmbRelationTypeWorkspaceContext extends UmbContextBase {
 	readonly data = this.#data.asObservable();
 
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
+	readonly entityType = this.#data.asObservablePart((data) => data?.entityType);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly alias = this.#data.asObservablePart((data) => data?.alias);
 	readonly parent = this.#data.asObservablePart((data) => data?.parent);

@@ -1,5 +1,10 @@
 const CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
+/**
+ * Maps random bytes to a string of characters from {@link CHARSET}.
+ * @param {Uint8Array} buffer The random bytes to map.
+ * @returns {string} The resulting string.
+ */
 function bufferToString(buffer: Uint8Array): string {
 	const state: string[] = [];
 	for (let i = 0; i < buffer.byteLength; i += 1) {
@@ -8,6 +13,11 @@ function bufferToString(buffer: Uint8Array): string {
 	return state.join('');
 }
 
+/**
+ * Encodes a buffer as URL-safe base64 (no `+`, `/`, or padding).
+ * @param {ArrayBuffer} buffer The buffer to encode.
+ * @returns {string} The URL-safe base64 string.
+ */
 function urlSafeBase64(buffer: ArrayBuffer): string {
 	const bytes = new Uint8Array(buffer);
 	let binary = '';
@@ -17,12 +27,22 @@ function urlSafeBase64(buffer: ArrayBuffer): string {
 	return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 
+/**
+ * Generates a cryptographically random string of the given length.
+ * @param {number} size The number of random bytes to generate.
+ * @returns {string} The generated random string.
+ */
 function generateRandom(size: number): string {
 	const buffer = new Uint8Array(size);
 	crypto.getRandomValues(buffer);
 	return bufferToString(buffer);
 }
 
+/**
+ * Derives the PKCE code challenge from a code verifier via SHA-256.
+ * @param {string} codeVerifier The PKCE code verifier.
+ * @returns {Promise<string>} The derived code challenge.
+ */
 async function deriveChallenge(codeVerifier: string): Promise<string> {
 	const encoder = new TextEncoder();
 	const data = encoder.encode(codeVerifier);
@@ -187,6 +207,9 @@ export class UmbAuthClient {
 
 	/**
 	 * Generates PKCE parameters and builds the authorization URL.
+	 * @param {string} identityProvider The provider to use for login.
+	 * @param {string} [usernameHint] The username hint to use for login.
+	 * @returns {Promise<string>} The authorization URL.
 	 */
 	async buildAuthorizationUrl(identityProvider: string, usernameHint?: string): Promise<string> {
 		this.#codeVerifier = generateRandom(128);
@@ -223,6 +246,9 @@ export class UmbAuthClient {
 	 * Exchanges an authorization code for tokens.
 	 * Real tokens are stored in httpOnly cookies by the server.
 	 * We only extract session timing from the response.
+	 * @param {string} code The authorization code to exchange.
+	 * @param {string} codeVerifier The PKCE code verifier matching the original request.
+	 * @returns {Promise<UmbTokenEndpointResponse | undefined>} The token response timing, or undefined on failure.
 	 */
 	async exchangeCode(code: string, codeVerifier: string): Promise<UmbTokenEndpointResponse | undefined> {
 		/* eslint-disable @typescript-eslint/naming-convention */
@@ -244,6 +270,7 @@ export class UmbAuthClient {
 	 * `HideBackOfficeTokensHandler` intercepts the request and swaps it for
 	 * the real token from the httpOnly cookie. The parameter must be present
 	 * (OpenIddict's pipeline requires it) but the value is ignored by the handler.
+	 * @returns {Promise<UmbTokenRequestResult>} The token request result.
 	 */
 	async refreshToken(): Promise<UmbTokenRequestResult> {
 		/* eslint-disable @typescript-eslint/naming-convention */

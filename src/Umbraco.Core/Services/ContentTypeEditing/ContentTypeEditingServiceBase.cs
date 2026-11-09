@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -17,7 +18,7 @@ namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 ///     This base class provides shared validation, mapping, and update logic for all content type
 ///     editing services including document types, media types, and member types.
 /// </remarks>
-internal abstract class ContentTypeEditingServiceBase<TContentType, TContentTypeService, TPropertyTypeModel, TPropertyTypeContainer>
+internal abstract partial class ContentTypeEditingServiceBase<TContentType, TContentTypeService, TPropertyTypeModel, TPropertyTypeContainer>
     where TContentType : class, IContentTypeComposition
     where TContentTypeService : IContentTypeBaseService<TContentType>
     where TPropertyTypeModel : PropertyTypeModelBase
@@ -271,6 +272,13 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             return operationStatus;
         }
 
+        // verify that no newly introduced property/composition alias collides with a property already effective on a descendant
+        operationStatus = ValidateDescendantPropertyAliases(contentType, model, allContentTypeCompositions);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return operationStatus;
+        }
+
         // verify that all property/container relationships (groups/tabs) are valid
         operationStatus = ValidateContainers(model, allContentTypeCompositions);
         if (operationStatus is not ContentTypeOperationStatus.Success)
@@ -279,7 +287,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         }
 
         // element types cannot vary by segment
-        if (model.IsElement && model.VariesBySegment)
+        if (model is { IsElement: true, VariesBySegment: true })
         {
             return ContentTypeOperationStatus.InvalidSegmentVariationForElementType;
         }
@@ -432,33 +440,25 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     /// <param name="model">The model to validate.</param>
     /// <param name="allContentTypeCompositions">All existing content type compositions.</param>
     /// <returns>The validation status.</returns>
-    private ContentTypeOperationStatus ValidateCompositions(TContentType? contentType, ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, IContentTypeComposition[] allContentTypeCompositions)
+    private ContentTypeOperationStatus ValidateCompositions(
+        TContentType? contentType,
+        ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model,
+        IContentTypeComposition[] allContentTypeCompositions)
     {
-        // get the content type keys we want to use for compositions
         Guid[] compositionKeys = KeysForCompositionTypes(model, CompositionType.Composition);
 
-        // if the content type keys are already set as compositions, don't perform any additional validation
-        // - this covers an edge case where compositions are configured for a content type before child content types are created
-        if (contentType is not null && contentType.ContentTypeComposition
-            .Select(c => c.Key)
-            .ContainsAll(compositionKeys))
-        {
-            return ContentTypeOperationStatus.Success;
-        }
-
-        // verify that all compositions keys are allowed
-        Guid[] allowedCompositionKeys = _contentTypeService.GetAvailableCompositeContentTypes(contentType, allContentTypeCompositions, isElement: model.IsElement)
+        Guid[] allowedCompositionKeys = _contentTypeService.GetAvailableCompositeContentTypes(
+                contentType,
+                allContentTypeCompositions,
+                isElement: model.IsElement)
             .Results
             .Where(x => x.Allowed)
             .Select(x => x.Composition.Key)
             .ToArray();
 
-        if (allowedCompositionKeys.ContainsAll(compositionKeys) is false)
-        {
-            return ContentTypeOperationStatus.InvalidComposition;
-        }
-
-        return ContentTypeOperationStatus.Success;
+        return allowedCompositionKeys.ContainsAll(compositionKeys) is false
+            ? ContentTypeOperationStatus.InvalidComposition
+            : ContentTypeOperationStatus.Success;
     }
 
     /// <summary>
@@ -484,6 +484,31 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         }
 
         return ContentTypeOperationStatus.Success;
+    }
+
+    /// <summary>
+    ///     Validates that no property alias on this content type's own properties collides with a property alias
+    ///     already effective on one of its descendants.
+    /// </summary>
+    /// <remarks>
+    ///     Descendants inherit this content type's properties (through tree inheritance and/or composition), so an
+    ///     alias that a descendant already defines would produce a duplicate effective alias on that descendant.
+    ///     <see cref="ValidateProperties"/> only guards the edited type's own model, so this handles the case where
+    ///     the edited type is itself inherited from or composed by others. Collisions caused by a newly selected
+    ///     composition are caught separately by <see cref="ValidateCompositions"/>.
+    /// </remarks>
+    private static ContentTypeOperationStatus ValidateDescendantPropertyAliases(
+        TContentType? contentType,
+        ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model,
+        IContentTypeComposition[] allContentTypeCompositions)
+    {
+        HashSet<string> descendantPropertyAliases = contentType.GetPropertyAliasesReservedByDescendants(allContentTypeCompositions);
+
+        var collidesWithDescendants = model.Properties.Select(p => p.Alias).Any(descendantPropertyAliases.InvariantContains);
+
+        return collidesWithDescendants
+            ? ContentTypeOperationStatus.DuplicatePropertyTypeAlias
+            : ContentTypeOperationStatus.Success;
     }
 
     /// <summary>
@@ -680,16 +705,14 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         // build a dictionary of all data types within the model by their keys (we need it when mapping properties)
         var dataTypesByKey = (await GetDataTypesAsync(model)).ToDictionary(d => d.Key);
 
-        // build a dictionary of parent container IDs and their names (we need it when mapping property groups)
-        var parentContainerNamesById = model
+        // collect the keys of all parent containers (we need them when mapping property groups)
+        var parentContainerKeys = model
             .Containers
             .Where(container => container.ParentKey is not null)
-            .DistinctBy(container => container.ParentKey)
-            .ToDictionary(
-                container => container.ParentKey!.Value,
-                // NOTE: this look-up appears to be a little dangerous, but at this point we should have validated
-                //       the containers and their parent relationships in the model, so it's ok
-                container => model.Containers.First(c => c.Key == container.ParentKey).Name);
+            .Select(container => container.ParentKey!.Value)
+            .ToHashSet();
+
+        Dictionary<Guid, string> propertyGroupAliasesByKey = ResolvePropertyGroupAliases(contentType, model);
 
         // Store the existing property types in a list to reference when processing properties.
         // This ensures we correctly handle property types that may have been filtered out from groups.
@@ -715,13 +738,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
                 // NOTE: eventually group.Type should be a string to make the client more flexible; for now we'll have to parse the string value back to its expected enum
                 propertyGroup.Type = Enum.Parse<PropertyGroupType>(container.Type);
                 propertyGroup.Name = container.Name;
-                // this is not pretty, but this is how the data structure is at the moment; we just have to live with it for the time being.
-                var alias = PropertyGroupAlias(container.Name);
-                if (container.ParentKey is not null)
-                {
-                    alias = $"{PropertyGroupAlias(parentContainerNamesById[container.ParentKey.Value])}/{alias}";
-                }
-                propertyGroup.Alias = alias;
+                propertyGroup.Alias = propertyGroupAliasesByKey[container.Key];
                 propertyGroup.SortOrder = container.SortOrder;
 
                 IPropertyType[] properties = model
@@ -730,7 +747,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
                     .Select(property => MapProperty(contentType, property, propertyGroup, existingPropertyTypes, dataTypesByKey))
                     .ToArray();
 
-                if (properties.Any() is false && parentContainerNamesById.ContainsKey(container.Key) is false)
+                if (properties.Any() is false && parentContainerKeys.Contains(container.Key) is false)
                 {
                     // FIXME: if at all possible, retain empty containers (bad DX to remove stuff that's been attempted saved)
                     return null;
@@ -761,20 +778,142 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     }
 
     /// <summary>
-    ///     Generates a property group alias from a container name.
+    ///     Resolves the property group aliases for the containers in a model.
     /// </summary>
-    /// <param name="containerName">The container name to convert.</param>
-    /// <returns>The generated alias in camelCase format.</returns>
-    private static string PropertyGroupAlias(string? containerName)
+    /// <param name="contentType">The content type being updated.</param>
+    /// <param name="model">The model containing the container definitions.</param>
+    /// <returns>The property group aliases keyed by container key.</returns>
+    /// <remarks>
+    ///     An existing property group keeps its own alias unless its name or type has changed, because that alias can have
+    ///     been set outside of this service and need not match the container name. A property group within another
+    ///     container is prefixed with the resolved alias of that container, as the alias path is what defines the hierarchy.
+    ///     An alias that differs from the one stored is made unique by appending a number, so unchanged aliases take precedence.
+    /// </remarks>
+    private static Dictionary<Guid, string> ResolvePropertyGroupAliases(
+        TContentType contentType,
+        ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
     {
-        if (containerName.IsNullOrWhiteSpace())
+        var existingGroupsByKey = contentType.PropertyGroups.ToDictionary(group => group.Key);
+        var existingAliases = contentType.PropertyGroups.Select(group => group.Alias).ToHashSet();
+
+        // NOTE: at this point we have validated the containers and their parent relationships in the model
+        var containersByKey = model.Containers.ToDictionary(container => container.Key);
+
+        string OwnAlias(TPropertyTypeContainer container)
         {
-            throw new ArgumentException("Container name cannot be empty", nameof(containerName));
+            if (existingGroupsByKey.TryGetValue(container.Key, out PropertyGroup? existingGroup) is false
+                || existingGroup.Name != container.Name
+                || existingGroup.Type != Enum.Parse<PropertyGroupType>(container.Type))
+            {
+                return PropertyGroupAlias(container);
+            }
+
+            // a root container whose stored parent is not one of the groups of this content type (for example a tab
+            // from a composition) was never presented with a parent, so it keeps its full alias
+            var parentSeparatorIndex = existingGroup.Alias.IndexOf('/');
+            if (container.ParentKey is null
+                && parentSeparatorIndex >= 0
+                && existingAliases.Contains(existingGroup.Alias[..parentSeparatorIndex]) is false)
+            {
+                return existingGroup.Alias;
+            }
+
+            return existingGroup.Alias[(existingGroup.Alias.LastIndexOf('/') + 1)..];
         }
 
-        var parts = containerName.Split(Constants.CharArrays.Space);
-        return $"{parts.First().ToFirstLowerInvariant()}{string.Join(string.Empty, parts.Skip(1).Select(part => part.ToFirstUpperInvariant()))}";
+        var aliasesByKey = new Dictionary<Guid, string>();
+
+        string AliasPath(TPropertyTypeContainer container)
+        {
+            if (container.ParentKey is null)
+            {
+                return OwnAlias(container);
+            }
+
+            TPropertyTypeContainer parent = containersByKey[container.ParentKey.Value];
+
+            // only one level of nesting is supported, so a parent within another container contributes its own alias only
+            var parentAlias = parent.ParentKey is null ? aliasesByKey[parent.Key] : OwnAlias(parent);
+            return $"{parentAlias}/{OwnAlias(container)}";
+        }
+
+        var usedAliases = new HashSet<string>();
+        foreach (IGrouping<bool, TPropertyTypeContainer> level in model.Containers
+                     .GroupBy(container => container.ParentKey is null)
+                     .OrderByDescending(level => level.Key))
+        {
+            IEnumerable<(Guid Key, string Alias)> candidates = level
+                .Select(container => (container.Key, Alias: AliasPath(container)))
+                .OrderBy(candidate => existingGroupsByKey.GetValueOrDefault(candidate.Key)?.Alias == candidate.Alias ? 0 : 1)
+                .ToArray();
+
+            foreach ((Guid key, string alias) in candidates)
+            {
+                aliasesByKey[key] = ReserveUniqueAlias(alias, usedAliases);
+            }
+        }
+
+        return aliasesByKey;
     }
+
+    /// <summary>
+    ///     Reserves an alias, appending a number when it is already in use.
+    /// </summary>
+    /// <param name="alias">The alias to reserve.</param>
+    /// <param name="usedAliases">The aliases in use, which the reserved alias is added to.</param>
+    /// <returns>The reserved alias.</returns>
+    private static string ReserveUniqueAlias(string alias, HashSet<string> usedAliases)
+    {
+        var uniqueAlias = alias;
+        var suffix = 1;
+        while (usedAliases.Add(uniqueAlias) is false)
+        {
+            uniqueAlias = $"{alias}{suffix++}";
+        }
+
+        return uniqueAlias;
+    }
+
+    /// <summary>
+    ///     Generates the local property group alias for a container.
+    /// </summary>
+    /// <param name="container">The container to generate the alias for.</param>
+    /// <returns>
+    ///     The container name in camelCase, keeping only letters and digits, or the container key when the name
+    ///     contains neither.
+    /// </returns>
+    /// <remarks>
+    ///     The alias must not contain the "/" separator, as the full alias of a nested container is its parent alias
+    ///     and its local alias separated by "/".
+    /// </remarks>
+    private static string PropertyGroupAlias(TPropertyTypeContainer container)
+    {
+        // Same rules as the alias generation in the AngularJS backoffice (String.prototype.toUmbracoAlias),
+        // except letters and digits outside ASCII are kept rather than stripped.
+        var pascalCasedName = string.Concat(
+            PropertyGroupAliasWordSeparatorRegex()
+                .Split(PropertyGroupAliasInvalidCharactersRegex().Replace(container.Name ?? string.Empty, string.Empty))
+                .Where(word => word.Length > 0)
+                .Select(word => word.ToFirstUpperInvariant()));
+        if (pascalCasedName.Length == 0)
+        {
+            return container.Key.ToString();
+        }
+
+        Match leadingCapitals = PropertyGroupAliasLeadingCapitalsRegex().Match(pascalCasedName);
+        return leadingCapitals.Success
+            ? $"{leadingCapitals.Groups[1].Value.ToLowerInvariant()}{leadingCapitals.Groups[2].Value}".ToFirstLowerInvariant()
+            : pascalCasedName;
+    }
+
+    [GeneratedRegex(@"[^\p{L}\p{M}\p{Nd}\s.-]+")]
+    private static partial Regex PropertyGroupAliasInvalidCharactersRegex();
+
+    [GeneratedRegex(@"[\s.-]+")]
+    private static partial Regex PropertyGroupAliasWordSeparatorRegex();
+
+    [GeneratedRegex(@"^(\p{Lu}*)(\p{Lu}.*)$", RegexOptions.Singleline)]
+    private static partial Regex PropertyGroupAliasLeadingCapitalsRegex();
 
     /// <summary>
     ///     Maps a property model to an <see cref="IPropertyType"/>.

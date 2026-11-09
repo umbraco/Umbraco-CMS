@@ -181,6 +181,12 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
 
     /// <inheritdoc />
+    /// <remarks>
+    /// SQLite has no <c>TRUNCATE TABLE</c> statement.
+    /// </remarks>
+    public override string TruncateTable => "DELETE FROM {0}";
+
+    /// <inheritdoc />
     public override string ConvertIntegerToOrderableString => "substr('0000000000'||'{0}', -10, 10)";
 
     /// <inheritdoc />

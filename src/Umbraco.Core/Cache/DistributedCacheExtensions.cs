@@ -506,7 +506,7 @@ public static class DistributedCacheExtensions
     /// <param name="dc">The distributed cache.</param>
     /// <param name="changes">The content type changes to refresh.</param>
     public static void RefreshContentTypeCache(this DistributedCache dc, IEnumerable<ContentTypeChange<IContentType>> changes)
-        => dc.RefreshByPayload(ContentTypeCacheRefresher.UniqueId, changes.DistinctBy(x => (x.Item.Id, x.ChangeTypes)).Select(x => new ContentTypeCacheRefresher.JsonPayload(typeof(IContentType).Name, x.Item.Id, x.ChangeTypes)));
+        => dc.RefreshByPayload(ContentTypeCacheRefresher.UniqueId, changes.DistinctBy(x => (x.Item.Id, x.ChangeTypes)).Select(x => new ContentTypeCacheRefresher.JsonPayload(typeof(IContentType).Name, x.Item.Id, x.ChangeTypes, x.Item.IsElement)));
 
     /// <summary>
     ///     Refreshes the content type cache for the specified media type changes.
@@ -564,9 +564,11 @@ public static class DistributedCacheExtensions
         => dc.RefreshByPayload(LanguageCacheRefresher.UniqueId, languages.DistinctBy(x => (x.Id, x.IsoCode)).Select(x => new LanguageCacheRefresher.JsonPayload(
             x.Id,
             x.IsoCode,
-            x.WasPropertyDirty(nameof(ILanguage.IsoCode))
-            ? LanguageCacheRefresher.JsonPayload.LanguageChangeType.ChangeCulture
-            : LanguageCacheRefresher.JsonPayload.LanguageChangeType.Update)));
+            x.WasPropertyDirty(nameof(ILanguage.Id))
+                ? LanguageCacheRefresher.JsonPayload.LanguageChangeType.Add
+                : x.WasPropertyDirty(nameof(ILanguage.IsoCode))
+                    ? LanguageCacheRefresher.JsonPayload.LanguageChangeType.ChangeCulture
+                    : LanguageCacheRefresher.JsonPayload.LanguageChangeType.Update)));
 
     /// <summary>
     ///     Removes the specified languages from the distributed cache.

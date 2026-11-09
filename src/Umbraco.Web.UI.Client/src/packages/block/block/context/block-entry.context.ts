@@ -17,7 +17,13 @@ import {
 	mergeObservables,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
-import { encodeFilePath, UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import {
+	encodeFilePath,
+	escapeHTML,
+	transformServerPathToClientPath,
+	UmbDeprecation,
+	UmbReadOnlyVariantGuardManager,
+} from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
@@ -32,6 +38,7 @@ import type {
 	UmbPropertyTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,
@@ -53,6 +60,8 @@ export abstract class UmbBlockEntryContext<
 
 	protected _manager?: BlockManagerContextType;
 	protected _entries?: BlockEntriesContextType;
+
+	#serverUrl = '';
 
 	#contentKey?: string;
 	#unsupported = new UmbBooleanState(undefined);
@@ -137,6 +146,25 @@ export abstract class UmbBlockEntryContext<
 	public readonly settingsElementTypeKey = this._blockType.asObservablePart((x) =>
 		x ? (x.settingsElementTypeKey ?? undefined) : null,
 	);
+
+	/**
+	 * Returns the thumbnail path as stored in the block type configuration.
+	 * Use {@link getThumbnailUrl} to get the resolved, client-usable URL.
+	 * @returns {string | undefined} The configured thumbnail path, or undefined when the block type has none.
+	 */
+	public getThumbnail(): string | undefined {
+		return this._blockType.getValue()?.thumbnail;
+	}
+
+	/**
+	 * Returns the thumbnail as a resolved, client-usable URL.
+	 * Use {@link getThumbnail} to get the raw path instead.
+	 * @returns {{ src: string } | undefined} The thumbnail URL, or undefined when the block type has no thumbnail.
+	 */
+	public getThumbnailUrl(): { src: string } | undefined {
+		const rawPath = this.getThumbnail();
+		return rawPath ? { src: new URL(transformServerPathToClientPath(rawPath), this.#serverUrl).href } : undefined;
+	}
 
 	protected _layout = new UmbObjectState<BlockLayoutType | undefined>(undefined);
 	public readonly layout = this._layout.asObservable();
@@ -309,7 +337,7 @@ export abstract class UmbBlockEntryContext<
 		x ? (x.contentTypeKey ?? undefined) : null,
 	);
 	/**
-	 * @deprecated Use {@link _settingsDataContentTypeKey} instead. This will be removed in Umbraco 18.
+	 * @deprecated Use {@link UmbBlockEntryContext#_settingsDataContentTypeKey} instead. This will be removed in Umbraco 18.
 	 */
 	// eslint-disable-next-line
 	private readonly settingsDataContentTypeKey = this._settingsDataContentTypeKey;
@@ -371,11 +399,15 @@ export abstract class UmbBlockEntryContext<
 				}).warn();
 			}
 			this.#labelRender = new UmbUfmVirtualRenderController(this);
-			this.observe(this.label, (label) => {
-				if (this.#labelRender) {
-					this.#labelRender.markdown = label;
-				}
-			});
+			this.observe(
+				this.label,
+				(label) => {
+					if (this.#labelRender) {
+						this.#labelRender.markdown = label;
+					}
+				},
+				null,
+			);
 			this.#watchContentForLabelRender();
 		}
 
@@ -391,6 +423,10 @@ export abstract class UmbBlockEntryContext<
 			this._entries = entries;
 			this._gotEntries();
 			this.#gotEntries();
+		});
+
+		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+			this.#serverUrl = instance?.getServerUrl() ?? '';
 		});
 
 		// Observe key:
@@ -787,7 +823,7 @@ export abstract class UmbBlockEntryContext<
 		const blockName = this.getName();
 		await umbConfirmModal(this, {
 			headline: this.localize.term('blockEditor_confirmDeleteBlockTitle', blockName),
-			content: this.localize.term('blockEditor_confirmDeleteBlockMessage', blockName),
+			content: this.localize.term('blockEditor_confirmDeleteBlockMessage', escapeHTML(blockName)),
 			confirmLabel: '#general_delete',
 			color: 'danger',
 		});

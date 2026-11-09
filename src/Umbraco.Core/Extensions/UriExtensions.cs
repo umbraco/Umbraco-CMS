@@ -141,9 +141,7 @@ public static class UriExtensions
         {
             if (path != "/")
             {
-                uri = new Uri(
-                    $"{uri.GetLeftPart(UriPartial.Authority)}{path.AsSpan().TrimEnd('/')}{uri.Query}"
-                );
+                uri = new Uri($"{uri.GetLeftPart(UriPartial.Authority)}{path.AsSpan().TrimEnd('/')}{uri.Query}");
             }
         }
         else

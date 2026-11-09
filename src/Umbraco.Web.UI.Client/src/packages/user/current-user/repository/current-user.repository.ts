@@ -1,7 +1,17 @@
+import type {
+	UmbCurrentUserExternalLoginProviderModel,
+	UmbCurrentUserMfaProviderModel,
+	UmbCurrentUserModel,
+} from '../types.js';
 import { UmbCurrentUserServerDataSource } from './current-user.server.data-source.js';
 import { UMB_CURRENT_USER_STORE_CONTEXT } from './current-user.store.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbRepositoryResponse,
+	UmbRepositoryResponseWithAsObservable,
+} from '@umbraco-cms/backoffice/repository';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { TemporaryFileStatus, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
@@ -44,10 +54,10 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 
 	/**
 	 * Request the current user
-	 * @returns {*}
+	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<UmbCurrentUserModel | undefined>>} The current user data, error and an observable of the current user store
 	 * @memberof UmbCurrentUserRepository
 	 */
-	async requestCurrentUser() {
+	async requestCurrentUser(): Promise<UmbRepositoryResponseWithAsObservable<UmbCurrentUserModel | undefined>> {
 		await this.#init;
 		const { data, error } = await this.#currentUserSource.getCurrentUser();
 
@@ -60,9 +70,15 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 
 	/**
 	 * Request the current user's external login providers
+	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<Array<UmbCurrentUserExternalLoginProviderModel> | undefined, Array<UmbCurrentUserExternalLoginProviderModel>>>} The external login providers data, error and an observable of the external login providers store
 	 * @memberof UmbCurrentUserRepository
 	 */
-	async requestExternalLoginProviders() {
+	async requestExternalLoginProviders(): Promise<
+		UmbRepositoryResponseWithAsObservable<
+			Array<UmbCurrentUserExternalLoginProviderModel> | undefined,
+			Array<UmbCurrentUserExternalLoginProviderModel>
+		>
+	> {
 		await this.#init;
 		const { data, error } = await this.#currentUserSource.getExternalLoginProviders();
 
@@ -75,9 +91,15 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 
 	/**
 	 * Request the current user's available MFA login providers
+	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<Array<UmbCurrentUserMfaProviderModel> | undefined, Array<UmbCurrentUserMfaProviderModel>>>} The MFA login providers data, error and an observable of the MFA providers store
 	 * @memberof UmbCurrentUserRepository
 	 */
-	async requestMfaLoginProviders() {
+	async requestMfaLoginProviders(): Promise<
+		UmbRepositoryResponseWithAsObservable<
+			Array<UmbCurrentUserMfaProviderModel> | undefined,
+			Array<UmbCurrentUserMfaProviderModel>
+		>
+	> {
 		await this.#init;
 
 		const { data, error } = await this.#currentUserSource.getMfaLoginProviders();
@@ -91,13 +113,13 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 
 	/**
 	 * Enable an MFA provider
-	 * @param provider The provider to enable
-	 * @param providerName
-	 * @param code The activation code of the provider to enable
-	 * @param secret
+	 * @param {string} providerName The name of the provider to enable
+	 * @param {string} code The activation code of the provider to enable
+	 * @param {string} secret The secret used to verify the provider's activation code
+	 * @returns {Promise<UmbDataSourceErrorResponse>} An error if the provider could not be enabled
 	 * @memberof UmbCurrentUserRepository
 	 */
-	async enableMfaProvider(providerName: string, code: string, secret: string) {
+	async enableMfaProvider(providerName: string, code: string, secret: string): Promise<UmbDataSourceErrorResponse> {
 		const { error } = await this.#currentUserSource.enableMfaProvider(providerName, code, secret);
 
 		if (error) {
@@ -111,12 +133,12 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 
 	/**
 	 * Disable an MFA provider
-	 * @param provider The provider to disable
-	 * @param providerName
-	 * @param code The activation code of the provider to disable
+	 * @param {string} providerName The name of the provider to disable
+	 * @param {string} code The activation code of the provider to disable
+	 * @returns {Promise<UmbDataSourceErrorResponse>} An error if the provider could not be disabled
 	 * @memberof UmbCurrentUserRepository
 	 */
-	async disableMfaProvider(providerName: string, code: string) {
+	async disableMfaProvider(providerName: string, code: string): Promise<UmbDataSourceErrorResponse> {
 		const { error } = await this.#currentUserSource.disableMfaProvider(providerName, code);
 
 		if (error) {
@@ -129,13 +151,11 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	}
 	/**
 	 * Change password for current user
-	 * @param userId
-	 * @param newPassword
-	 * @param oldPassword
-	 * @param isCurrentUser
-	 * @returns
+	 * @param {string} newPassword The new password
+	 * @param {string} oldPassword The old password
+	 * @returns {Promise<UmbRepositoryResponse<unknown>>} The result of the change password request
 	 */
-	async changePassword(newPassword: string, oldPassword: string) {
+	async changePassword(newPassword: string, oldPassword: string): Promise<UmbRepositoryResponse<unknown>> {
 		if (!newPassword) throw new Error('New password is missing');
 		if (!oldPassword) throw new Error('Old password is missing');
 
@@ -155,8 +175,9 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	/**
 	 * Upload an avatar for the current user
 	 * @param {File} file - The image file to use as avatar
+	 * @returns {Promise<UmbDataSourceErrorResponse>} An error if the avatar upload failed
 	 */
-	async uploadAvatar(file: File) {
+	async uploadAvatar(file: File): Promise<UmbDataSourceErrorResponse> {
 		await this.#init;
 
 		const temporaryUnique = UmbId.new();
@@ -191,8 +212,9 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 
 	/**
 	 * Delete the current user's avatar
+	 * @returns {Promise<UmbDataSourceErrorResponse>} An error if the avatar deletion failed
 	 */
-	async deleteAvatar() {
+	async deleteAvatar(): Promise<UmbDataSourceErrorResponse> {
 		await this.#init;
 
 		const { error } = await this.#currentUserSource.deleteCurrentUserAvatar();
@@ -213,9 +235,10 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 
 	/**
 	 * Update the current user's profile settings
-	 * @param languageIsoCode
+	 * @param {string} languageIsoCode The ISO code of the language to set for the current user
+	 * @returns {Promise<UmbDataSourceErrorResponse>} An error if the profile update failed
 	 */
-	async updateProfile(languageIsoCode: string) {
+	async updateProfile(languageIsoCode: string): Promise<UmbDataSourceErrorResponse> {
 		await this.#init;
 
 		const { error } = await this.#currentUserSource.updateCurrentUserProfile(languageIsoCode);

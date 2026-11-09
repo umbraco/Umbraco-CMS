@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services.Filters;
@@ -557,6 +556,35 @@ public partial class ElementEditingServiceTests
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
         Assert.AreEqual(Constants.System.Root, result.Result.Content!.ParentId);
+    }
+
+    [Test]
+    public async Task Cannot_Create_Element_Under_Another_Element()
+    {
+        var parentElement = await CreateInvariantElement();
+        var elementType = await CreateInvariantElementType();
+
+        var createModel = new ElementCreateModel
+        {
+            ContentTypeKey = elementType.Key,
+            ParentKey = parentElement.Key,
+            Variants =
+            [
+                new VariantModel { Name = "Should Not Be Created" }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" },
+                new PropertyValueModel { Alias = "text", Value = "The text value" }
+            ],
+        };
+
+        var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.ParentNotFound, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
     }
 
     private static ElementCreateModel CreateElementModel(Guid contentTypeKey, Guid? parentKey)

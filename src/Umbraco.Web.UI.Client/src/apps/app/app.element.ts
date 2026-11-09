@@ -4,6 +4,7 @@ import { UmbAppAuthController } from './app-auth.controller.js';
 import { UmbAppAuthElement } from './app-auth.element.js';
 import { UmbAppOauthElement } from './app-oauth.element.js';
 import { UmbNetworkConnectionStatusManager } from './network-connection-status.manager.js';
+import { UmbOutlineStyleController } from './outline-style.controller.js';
 import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { UmbServerConnection, UmbServerContext } from '@umbraco-cms/backoffice/server';
@@ -30,11 +31,7 @@ import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 
 import './app-logo.element.js';
-import {
-	UMB_CURRENT_USER_CONTEXT,
-	UmbUserEntryPointExtensionInitializer,
-} from '@umbraco-cms/backoffice/current-user';
-import { UmbOutlineStyleController } from './outline-style.controller.js';
+import { UMB_CURRENT_USER_CONTEXT, UmbUserEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/current-user';
 
 const CORE_PACKAGES: Array<Promise<{ name: string; extensions: Array<ManifestBase | UmbExtensionManifestKind> }>> = [
 	import('../../packages/block/umbraco-package.js'),
@@ -365,7 +362,19 @@ export class UmbAppElement extends UmbLitElement {
 
 	#loadCurrentUser() {
 		if (!this.#currentUser || !this.#packageModules) return;
-		this.#currentUser.load();
+		const currentUser = this.#currentUser;
+		currentUser.load().catch((error) => {
+			// Once a user has loaded, the backoffice may hold unsaved work, so only replace a shell without a user.
+			if (currentUser.getUnique()) {
+				console.error('[UmbAppElement] Failed to reload the current user', error);
+				return;
+			}
+			this.#errorPage(
+				'The current user could not be loaded. This might be due to a network issue or a server error.',
+				error,
+				{ headline: 'Failed to load the current user' },
+			);
+		});
 	}
 
 	#redirect() {
@@ -447,6 +456,8 @@ export class UmbAppElement extends UmbLitElement {
 		this._routes = [
 			{
 				path: '**',
+				// A unique of its own, so the router also replaces a backoffice that has already rendered.
+				unique: 'umbAppError',
 				component: () => import('./app-error.element.js'),
 				setup: (component) => {
 					(component as UmbAppErrorElement).errorMessage = errorMsg;

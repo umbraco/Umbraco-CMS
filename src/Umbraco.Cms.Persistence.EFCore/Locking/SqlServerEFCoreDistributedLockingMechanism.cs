@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Extensions;
 
@@ -68,6 +69,23 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
     /// </summary>
     private sealed class SqlServerDistributedLock : IDistributedLock
     {
+        /// <summary>
+        ///     The SQL Server error number reported when the server gives up waiting for a lock, having
+        ///     waited for the period set by <c>SET LOCK_TIMEOUT</c>.
+        /// </summary>
+        private const int LockRequestTimeoutError = 1222;
+
+        /// <summary>
+        ///     The SQL Server error number reported when the client gives up waiting for the command,
+        ///     having waited for its command timeout.
+        /// </summary>
+        /// <remarks>
+        ///     The lock statement runs under a command timeout derived from the lock timeout, so a command
+        ///     that times out obtaining the lock is reported as a lock timeout too, rather than escaping
+        ///     the mechanism untranslated.
+        /// </remarks>
+        private const int CommandTimeoutError = -2;
+
         private readonly SqlServerEFCoreDistributedLockingMechanism<T> _parent;
         private readonly TimeSpan _timeout;
 
@@ -105,7 +123,7 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
                         throw new ArgumentOutOfRangeException(nameof(lockType), lockType, @"Unsupported lockType");
                 }
             }
-            catch (SqlException ex) when (ex.Number == 1222)
+            catch (SqlException ex) when (ex.Number is LockRequestTimeoutError or CommandTimeoutError)
             {
                 if (LockType == DistributedLockType.ReadLock)
                 {
@@ -157,7 +175,11 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
                         "A transaction with minimum ReadCommitted isolation level is required.");
                 }
 
-                var number = await dbContext.Database.ExecuteScalarAsync<int?>($"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};SELECT value FROM dbo.umbracoLock WITH (ROWLOCK, REPEATABLEREAD) WHERE id={LockId}");
+                // This path can pass the timeout straight to the command, so it needs no save and restore.
+                var number = await dbContext.Database.ExecuteScalarAsync<int?>(
+                    $"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};SELECT value FROM dbo.umbracoLock WITH (ROWLOCK, REPEATABLEREAD) WHERE id=@id",
+                    [new SqlParameter("@id", LockId)],
+                    commandTimeOut: TimeSpan.FromSeconds(CommandTimeoutSeconds));
 
                 if (number == null)
                 {
@@ -189,9 +211,27 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
                         "A transaction with minimum ReadCommitted isolation level is required.");
                 }
 
-#pragma warning disable EF1002
-                var rowsAffected = await dbContext.Database.ExecuteSqlRawAsync(@$"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};UPDATE umbracoLock WITH (ROWLOCK, REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}");
-#pragma warning restore EF1002
+                // Unlike the read lock, this path has no per-command timeout hook, so the context-wide
+                // one has to be set and put back.
+                int? originalCommandTimeout = dbContext.Database.GetCommandTimeout();
+                dbContext.Database.SetCommandTimeout(CommandTimeoutSeconds);
+
+                int rowsAffected;
+                try
+                {
+                    // S2077: SET LOCK_TIMEOUT only accepts a literal, so the timeout cannot be a
+                    // parameter. It is an int, and the lock id is parameterized, so no part of the
+                    // statement comes from a string.
+#pragma warning disable EF1002, S2077
+                    rowsAffected = await dbContext.Database.ExecuteSqlRawAsync(
+                        @$"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};UPDATE umbracoLock WITH (ROWLOCK, REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={{0}}",
+                        LockId);
+#pragma warning restore EF1002, S2077
+                }
+                finally
+                {
+                    dbContext.Database.SetCommandTimeout(originalCommandTimeout);
+                }
 
                 if (rowsAffected == 0)
                 {
@@ -200,5 +240,15 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
                 }
             }).GetAwaiter().GetResult();
         }
+
+        /// <summary>
+        ///     Gets the command timeout, in whole seconds, that the statement obtaining this lock runs
+        ///     under, derived from the lock's own timeout.
+        /// </summary>
+        /// <remarks>
+        ///     Without this the ambient command timeout can abort the statement while the server is still
+        ///     waiting for the row lock, surfacing a raw timeout instead of a lock timeout exception.
+        /// </remarks>
+        private int CommandTimeoutSeconds => _timeout.ToLockCommandTimeoutSeconds();
     }
 }

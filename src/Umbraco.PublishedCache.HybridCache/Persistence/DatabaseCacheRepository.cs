@@ -48,12 +48,11 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task DeleteContentItemAsync(int id)
-    {
-        Sql<ISqlContext> sql = Sql()
-            .Delete<ContentNuDto>()
-            .Where<ContentNuDto>(x => x.NodeId == id);
-        await Database.ExecuteAsync(sql);
-    }
+        => await Database.ExecuteAsync(DeleteContentItemSql(id));
+
+    /// <inheritdoc/>
+    public void DeleteContentItem(int id)
+        => Database.Execute(DeleteContentItemSql(id));
 
     /// <inheritdoc/>
     public async Task RefreshDocumentAsync(ContentCacheNode contentCacheNode)
@@ -64,6 +63,14 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc/>
+    public void RefreshDocument(ContentCacheNode contentCacheNode)
+    {
+        IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+
+        OnRepositoryRefreshedSync(serializer, contentCacheNode, contentCacheNode.IsDraft);
+    }
+
+    /// <inheritdoc/>
     public async Task RefreshMediaAsync(ContentCacheNode contentCacheNode)
     {
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
@@ -71,16 +78,22 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc/>
+    public void RefreshMedia(ContentCacheNode contentCacheNode)
+    {
+        IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
+        OnRepositoryRefreshedSync(serializer, contentCacheNode, true);
+    }
+
+    /// <inheritdoc/>
     public Task RemovePublishedDocumentAsync(int id)
         => RemovePublishedAsync(id);
 
+    /// <inheritdoc/>
+    public void RemovePublishedDocument(int id)
+        => Database.Execute(RemovePublishedSql(id));
+
     private Task RemovePublishedAsync(int id)
-    {
-        Sql<ISqlContext> sql = Sql()
-            .Delete<ContentNuDto>()
-            .Where<ContentNuDto>(x => x.NodeId == id && x.Published);
-        return Database.ExecuteAsync(sql);
-    }
+        => Database.ExecuteAsync(RemovePublishedSql(id));
 
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetElementSourceAsync(Guid key, bool preview = false)
@@ -191,12 +204,10 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     public Task RemovePublishedElementAsync(int id)
         => RemovePublishedAsync(id);
 
-
     /// <inheritdoc/>
     public void Rebuild(
         IReadOnlyCollection<int>? contentTypeIds,
         IReadOnlyCollection<int>? mediaTypeIds,
-        IReadOnlyCollection<int>? memberTypeIds,
         IReadOnlyCollection<int>? elementTypeIds,
         Action<Action>? executeStep)
     {
@@ -206,37 +217,27 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(
             ContentCacheDataSerializerEntityType.Document
             | ContentCacheDataSerializerEntityType.Media
-            | ContentCacheDataSerializerEntityType.Member
             | ContentCacheDataSerializerEntityType.Element);
 
-        // If all type ID collections are non-null but empty,
-        // truncate the table as all records will be deleted.
+        // All collections non-null but empty means every row this method writes is about to be replaced,
+        // so clear the whole table in one statement rather than once per object type.
         if (contentTypeIds is not null && contentTypeIds.Count == 0 &&
             mediaTypeIds is not null && mediaTypeIds.Count == 0 &&
-            memberTypeIds is not null && memberTypeIds.Count == 0 &&
             elementTypeIds is not null && elementTypeIds.Count == 0)
         {
-            TruncateContent();
+            ClearContent();
         }
 
         RebuildDocumentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds, executeStep);
         RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds, executeStep);
-        RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds, executeStep);
         RebuildElementDbCache(serializer, _nucacheSettings.Value.SqlPageSize, elementTypeIds, executeStep);
     }
 
-    private void TruncateContent()
-    {
-        if (Database.DatabaseType == DatabaseType.SqlServer2012)
-        {
-            Database.Execute($"TRUNCATE TABLE cmsContentNu");
-        }
-
-        if (Database.DatabaseType == DatabaseType.SQLite)
-        {
-            Database.Execute($"DELETE FROM cmsContentNu");
-        }
-    }
+    // Deletes rather than truncates. Truncating needs ALTER permission on the table where deleting needs
+    // only DELETE, and this runs from a backoffice action on sites whose runtime database user may have
+    // been reduced to read/write.
+    private void ClearContent()
+        => Database.Execute($"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.NodeData)}");
 
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetDocumentSourceAsync(Guid key, bool preview = false)
@@ -267,9 +268,14 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetDocumentSourceForPublishStatesAsync(Guid key)
-    {
-        ContentSourceDto? dto = await GetDocumentSourceDto(key);
+        => ToPublishStateNodes(key, await GetDocumentSourceDto(key));
 
+    /// <inheritdoc/>
+    public (ContentCacheNode? Draft, ContentCacheNode? Published) GetDocumentSourceForPublishStates(Guid key)
+        => ToPublishStateNodes(key, Database.FirstOrDefault<ContentSourceDto>(GetDocumentSourceSql(key)));
+
+    private (ContentCacheNode? Draft, ContentCacheNode? Published) ToPublishStateNodes(Guid key, ContentSourceDto? dto)
+    {
         if (dto is null)
         {
             return (null, null);
@@ -297,15 +303,14 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return (draftNode, publishedNode);
     }
 
-    private async Task<ContentSourceDto?> GetDocumentSourceDto(Guid key)
-    {
-        Sql<ISqlContext>? sql = SqlContentSourcesSelect()
+    private Task<ContentSourceDto?> GetDocumentSourceDto(Guid key)
+        => Database.FirstOrDefaultAsync<ContentSourceDto>(GetDocumentSourceSql(key));
+
+    private Sql<ISqlContext> GetDocumentSourceSql(Guid key)
+        => SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
             .Append(SqlWhereNodeKey(SqlContext, key))
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
-
-        return await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
-    }
 
     private ContentCacheNode? CreateDocumentNodeKit(bool preview, ContentSourceDto dto)
     {
@@ -527,13 +532,35 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             .Select(x => CreateMediaNodeKit(x, serializer));
     }
 
+    private Sql<ISqlContext> DeleteContentItemSql(int id)
+        => Sql()
+            .Delete<ContentNuDto>()
+            .Where<ContentNuDto>(x => x.NodeId == id);
+
+    private Sql<ISqlContext> RemovePublishedSql(int id)
+        => Sql()
+            .Delete<ContentNuDto>()
+            .Where<ContentNuDto>(x => x.NodeId == id && x.Published);
+
     private async Task OnRepositoryRefreshed(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
+    {
+        (ContentNuDto dto, string updateCommand, object updateArgs) = GetRefreshStatement(serializer, content, preview);
+        await Database.InsertOrUpdateAsync(dto, updateCommand, updateArgs);
+    }
+
+    private void OnRepositoryRefreshedSync(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
+    {
+        (ContentNuDto dto, string updateCommand, object updateArgs) = GetRefreshStatement(serializer, content, preview);
+        Database.InsertOrUpdate(dto, updateCommand, updateArgs);
+    }
+
+    private (ContentNuDto Dto, string UpdateCommand, object UpdateArgs) GetRefreshStatement(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
     {
         ContentNuDto dto = GetDtoFromCacheNode(content, !preview, serializer);
 
         string C(string s) => SqlSyntax.GetQuotedColumnName(s);
 
-        await Database.InsertOrUpdateAsync(
+        return (
             dto,
             $"SET data = @data, {C("dataRaw")} = @dataRaw, rv = rv + 1 WHERE {C("nodeId")} = @id AND published = @published",
             new
@@ -1450,87 +1477,10 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return new ContentNuDto
         {
             NodeId = content.NodeId,
-            Published = false, // Media and members don't have published state
+            Published = false, // Media does not have a published state
             Data = serialized.StringData,
             RawData = serialized.ByteData,
         };
-    }
-
-    /// <summary>
-    /// Rebuilds the content database cache for members by clearing and repopulating the cache with the latest member data.
-    /// </summary>
-    /// <remarks>
-    /// Assumes content tree lock.
-    /// Uses an optimized query approach that bypasses IMember entity hydration for better performance.
-    /// </remarks>
-    private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds, Action<Action> executeStep)
-    {
-        if (contentTypeIds is null)
-        {
-            return;
-        }
-
-        Guid memberObjectType = Constants.ObjectTypes.Member;
-
-        Dictionary<int, List<string>>? propertyAliasesByContentType = null;
-
-        // Delete stale rows in batches (each its own step); the returned count of affected nodes is the
-        // number to repopulate, so no separate count query is needed.
-        long total = RemoveByObjectTypeInBatches(memberObjectType, contentTypeIds, executeStep);
-
-        if (total == 0)
-        {
-            return;
-        }
-
-        executeStep(() =>
-        {
-            propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
-        });
-
-        long processed = 0;
-        long pageIndex = 0;
-
-        while (processed < total)
-        {
-            var pageComplete = false;
-
-            executeStep(() =>
-            {
-                List<int> nodeIds = GetPagedContentNodeIds(memberObjectType, contentTypeIds, pageIndex, groupSize);
-                if (nodeIds.Count == 0)
-                {
-                    return;
-                }
-
-                List<CacheRebuildContentDto> memberDtos = GetContentMetadataForNodes(nodeIds);
-                List<CacheRebuildPropertyDto> propertyDtos = GetPropertyDataForNodes(nodeIds);
-
-                var items = memberDtos
-                    .AsParallel()
-                    .WithDegreeOfParallelism(Environment.ProcessorCount)
-                    .Select(member => BuildCacheDtoForContent(member, propertyDtos, propertyAliasesByContentType!, serializer))
-                    .ToList();
-
-                BulkInsertSkipExisting(items);
-
-                processed += nodeIds.Count;
-                pageComplete = true;
-            });
-
-            // The break IS reachable: the executeStep delegate's early return (a page yielding no nodes — e.g.
-            // content removed concurrently, leaving the total row count stale) leaves pageComplete false, which
-            // guards against looping indefinitely. SonarLint cannot see through the delegate, so it incorrectly
-            // reports the condition as always false.
-#pragma warning disable S2583 // Conditionally executed code should be reachable
-            if (!pageComplete)
-            {
-                break;
-            }
-#pragma warning restore S2583
-
-            pageIndex++;
-        }
     }
 
     /// <summary>
@@ -1757,7 +1707,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         try
         {
-            Database.BulkInsertRecords(items);
+            Database.ExecuteInSavepoint(() => Database.BulkInsertRecords(items));
         }
         catch (Exception ex) when (IsPrimaryKeyViolation(ex))
         {
@@ -1773,24 +1723,37 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     private void InsertNewRows(List<ContentNuDto> items)
     {
         string C(string s) => SqlSyntax.GetQuotedColumnName(s);
-        var tableName = ContentNuDto.TableName;
+        var tableName = QuoteTableName(ContentNuDto.TableName);
         var nodeId = C(ContentNuDto.NodeIdColumnName);
         var published = C("published");
 
         foreach (ContentNuDto dto in items)
         {
+            // Null values are left out rather than passed as untyped NULL parameters, which some providers
+            // cannot convert to the binary column type.
+            var columns = new List<string> { nodeId, published, C("rv") };
+            var values = new List<object> { dto.NodeId, dto.Published, dto.Rv };
+            if (dto.Data is not null)
+            {
+                columns.Add(C("data"));
+                values.Add(dto.Data);
+            }
+
+            if (dto.RawData is not null)
+            {
+                columns.Add(C("dataRaw"));
+                values.Add(dto.RawData);
+            }
+
+            var parameters = string.Join(", ", values.Select((_, i) => $"@{i}"));
             Database.Execute(
-                $@"INSERT INTO [{tableName}] ({nodeId}, {published}, {C("data")}, {C("dataRaw")}, {C("rv")})
-                SELECT @0, @1, @2, @3, @4
+                $@"INSERT INTO {tableName} ({string.Join(", ", columns)})
+                SELECT {parameters}
                 WHERE NOT EXISTS (
-                    SELECT 1 FROM [{tableName}]
+                    SELECT 1 FROM {tableName}
                     WHERE {nodeId} = @0 AND {published} = @1
                 )",
-                dto.NodeId,
-                dto.Published,
-                (object?)dto.Data ?? DBNull.Value,
-                (object?)dto.RawData ?? DBNull.Value,
-                dto.Rv);
+                values.ToArray());
         }
     }
 
@@ -2088,20 +2051,22 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 if (Debugger.IsAttached)
                 {
                     throw new InvalidOperationException("Missing cmsContentNu edited content for node " + dto.Id +
-                                                        ", consider rebuilding.");
+                                                        " (key " + dto.Key + "), consider rebuilding.");
                 }
 
                 _logger.LogWarning(
-                    "Missing cmsContentNu edited content for node {NodeId}, consider rebuilding.",
-                    dto.Id);
+                    "Missing cmsContentNu edited content for node {NodeId} (key {NodeKey}), consider rebuilding.",
+                    dto.Id,
+                    dto.Key);
                 return null;
             }
 
             if (dto.EditName is null)
             {
                 _logger.LogError(
-                    "Node {NodeId} has edited data but EditName is null, indicating an inconsistent database state. Skipping node.",
-                    dto.Id);
+                    "Node {NodeId} (key {NodeKey}) has edited data but EditName is null, indicating an inconsistent database state. Skipping node.",
+                    dto.Id,
+                    dto.Key);
                 return null;
             }
 
@@ -2137,20 +2102,22 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             if (Debugger.IsAttached)
             {
                 throw new InvalidOperationException("Missing cmsContentNu published content for node " + dto.Id +
-                                                    ", consider rebuilding.");
+                                                    " (key " + dto.Key + "), consider rebuilding.");
             }
 
             _logger.LogWarning(
-                "Missing cmsContentNu published content for node {NodeId}, consider rebuilding.",
-                dto.Id);
+                "Missing cmsContentNu published content for node {NodeId} (key {NodeKey}), consider rebuilding.",
+                dto.Id,
+                dto.Key);
             return null;
         }
 
         if (dto.PubName is null)
         {
             _logger.LogError(
-                "Node {NodeId} has published data but PubName is null, indicating an inconsistent database state. Consider republishing or rebuilding the cache. Skipping node.",
-                dto.Id);
+                "Node {NodeId} (key {NodeKey}) has published data but PubName is null, indicating an inconsistent database state. Consider republishing or rebuilding the cache. Skipping node.",
+                dto.Id,
+                dto.Key);
             return null;
         }
 

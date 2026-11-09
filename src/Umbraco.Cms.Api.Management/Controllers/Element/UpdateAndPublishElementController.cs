@@ -81,11 +81,11 @@ public class UpdateAndPublishElementController : UpdateElementControllerBase
 
             ElementUpdateModel model = _elementEditingPresentationFactory.MapUpdateModel(requestModel);
             Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
-            Attempt<ElementUpdateResult, ContentEditingOperationStatus> result =
-                await _elementEditingService.UpdateAndPublishAsync(id, model, requestModel.CulturesToPublish, currentUserKey);
+            Attempt<ElementUpdateResult, ContentEditingAndPublishingStatus> result =
+                await _elementEditingService.UpdateAndPublishAsync(id, model, requestModel.CulturesToPublish.ToHashSet(), currentUserKey);
 
             return result.Success
                 ? Ok()
-                : ContentEditingOperationStatusResult(result.Status);
+                : ElementEditingAndPublishingOperationStatusResult(result.Status, result.Result.InvalidPropertyAliases);
         });
 }

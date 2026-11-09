@@ -194,24 +194,33 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         // If there are no autolink options then the attempt is failed (user does not exist)
         if (autoLinkOptions == null || !autoLinkOptions.AutoLinkExternalAccount)
         {
+            Logger.LogInformation(
+                "External login auto-link skipped for provider '{LoginProvider}': auto-linking is not enabled for this provider.",
+                loginInfo.LoginProvider);
             return SignInResult.Failed;
         }
 
         var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
 
-        //we are allowing auto-linking/creating of local accounts
+        // We are allowing auto-linking/creating of local accounts
         if (email.IsNullOrWhiteSpace())
         {
+            // Only claim *types* are logged here, never claim values, to avoid leaking personal
+            // information such as email addresses or names into the logs.
+            Logger.LogWarning(
+                "External login auto-link failed for provider '{LoginProvider}': no claim resolving to ClaimTypes.Email was present. Available claim types: {ClaimTypes}",
+                loginInfo.LoginProvider,
+                string.Join(", ", loginInfo.Principal.Claims.Select(c => c.Type).Distinct()));
             return AutoLinkSignInResult.FailedNoEmail;
         }
 
-        //Now we need to perform the auto-link, so first we need to lookup/create a user with the email address
+        // Now we need to perform the auto-link, so first we need to lookup/create a user with the email address
         BackOfficeIdentityUser? autoLinkUser = await UserManager.FindByEmailAsync(email!);
         if (autoLinkUser != null)
         {
             try
             {
-                //call the callback if one is assigned
+                // Call the callback if one is assigned
                 autoLinkOptions.OnAutoLinking?.Invoke(autoLinkUser, loginInfo);
             }
             catch (Exception ex)
@@ -234,7 +243,10 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         var name = loginInfo.Principal?.Identity?.Name;
         if (name.IsNullOrWhiteSpace())
         {
-            throw new InvalidOperationException("The Name value cannot be null");
+            Logger.LogWarning(
+                "External login auto-link failed for provider '{LoginProvider}': a Name value could not be resolved for the new user, and creating a user without a name is not supported.",
+                loginInfo.LoginProvider);
+            return AutoLinkSignInResult.FailedNoName;
         }
 
         autoLinkUser = BackOfficeIdentityUser.CreateNew(_globalSettings, email, email!, autoLinkOptions.GetUserAutoLinkCulture(_globalSettings), name);
@@ -244,7 +256,7 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
             autoLinkUser.AddRole(userGroup);
         }
 
-        //call the callback if one is assigned
+        // Call the callback if one is assigned
         try
         {
             autoLinkOptions.OnAutoLinking?.Invoke(autoLinkUser, loginInfo);
@@ -335,7 +347,8 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
 
     private void LogFailedExternalLogin(ExternalLoginInfo loginInfo, BackOfficeIdentityUser user) =>
         Logger.LogWarning(
-            "The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'",
+            "The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}', key: '{UserKey}'",
             loginInfo.LoginProvider,
-            user.Id);
+            user.Id,
+            user.Key);
 }

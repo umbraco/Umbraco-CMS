@@ -3,13 +3,11 @@ import { umbScopeMapperForJsonPaths } from './scope-mapper-json-paths.function.j
 
 /**
  * Helper method to replace paths index with queries and additionally map the paths.
- * @param {Array<string>} paths - the JSON paths to map.
- * @param {string} scopePath - the JSON path to scope the mapping to.
- * @param {(Array<string>)} scopedMapper - Map function which receives the paths in the scope and returns the resolved paths.
- * @param scopePaths
- * @param scopeData
- * @param queryConstructor
- * @param mapper
+ * @template T
+ * @param {Array<string>} scopePaths - the JSON paths to map.
+ * @param {Array<T>} scopeData - the data corresponding to each entry, used to construct queries.
+ * @param {(entry: T) => string} queryConstructor - constructs a JSON-Path query for a given data entry.
+ * @param {(scopedPaths: Array<string>, propertyData: T | undefined) => Promise<Array<string>>} mapper - map function which receives the paths in the scope and returns the resolved paths.
  * @returns {string} - the paths, including the once mapped by the scoped mapper. Notice the order is kept.
  */
 export async function umbQueryMapperForJsonPaths<T>(

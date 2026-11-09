@@ -4,6 +4,7 @@ import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { MemberGroupResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import { MemberGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
@@ -25,11 +26,13 @@ export class UmbMemberGroupCollectionServerDataSource implements UmbCollectionDa
 
 	/**
 	 * Gets the member group collection filtered by the given filter.
-	 * @param {UmbMemberGroupCollectionFilterModel} filter
-	 * @returns {*}
+	 * @param {UmbMemberGroupCollectionFilterModel} query The filter to apply to the collection.
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbMemberGroupCollectionItemModel>>>} The member group collection.
 	 * @memberof UmbMemberGroupCollectionServerDataSource
 	 */
-	async getCollection(query: UmbMemberGroupCollectionFilterModel) {
+	async getCollection(
+		query: UmbMemberGroupCollectionFilterModel,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbMemberGroupCollectionItemModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			MemberGroupService.getMemberGroup({ query: { skip: query.skip, take: query.take } }),

@@ -4,12 +4,14 @@ import type { UmbUserCollectionFilterModel } from '../types.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type {
 	DirectionModel,
+	UserKindModel,
 	UserOrderModel,
 	UserResponseModel,
 	UserStateModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -31,11 +33,13 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 
 	/**
 	 * Gets the user collection filtered by the given filter.
-	 * @param {UmbUserCollectionFilterModel} filter
-	 * @returns {*}
+	 * @param {UmbUserCollectionFilterModel} filter - The filter to apply to the user collection.
+	 * @returns {Promise<UmbDataSourceResponse<{ items: Array<UmbUserDetailModel>; total: number }>>} The filtered user collection.
 	 * @memberof UmbUserCollectionServerDataSource
 	 */
-	async getCollection(filter: UmbUserCollectionFilterModel) {
+	async getCollection(
+		filter: UmbUserCollectionFilterModel,
+	): Promise<UmbDataSourceResponse<{ items: Array<UmbUserDetailModel>; total: number }>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			UserService.getFilterUser({
@@ -47,6 +51,7 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 					take: filter.take,
 					userGroupIds: filter.userGroupIds,
 					userStates: filter.userStates as unknown as Array<UserStateModel>, // TODO: This is a temporary workaround to avoid a type error.
+					userKinds: filter.userKinds as unknown as Array<UserKindModel>, // TODO: This is a temporary workaround to avoid a type error.
 				},
 			}),
 		);

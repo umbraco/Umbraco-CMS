@@ -4,6 +4,7 @@ import { css, html, customElement, property, state, repeat } from '@umbraco-cms/
 import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { isAboveZeroAndBelowMinimum } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-stylesheet-input')
 export class UmbStylesheetInputElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
@@ -81,7 +82,7 @@ export class UmbStylesheetInputElement extends UUIFormControlWithBasicsMixin(Umb
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => isAboveZeroAndBelowMinimum(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(
@@ -90,8 +91,8 @@ export class UmbStylesheetInputElement extends UUIFormControlWithBasicsMixin(Umb
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), null);
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), null);
 	}
 
 	protected override getFormElement() {

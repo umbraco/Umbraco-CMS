@@ -78,8 +78,8 @@ export class UmbTargetPaginationManager<
 
 	/**
 	 * Gets the number of items per page
-	 * @returns {number}
-	 * @memberof UmbPaginationManager
+	 * @returns {number} The number of items per page
+	 * @memberof UmbTargetPaginationManager
 	 */
 	public getTakeSize(): number {
 		return this.#takeSize.getValue();
@@ -87,8 +87,8 @@ export class UmbTargetPaginationManager<
 
 	/**
 	 * Sets the number of items per page and recalculates the total number of pages
-	 * @param {number} pageSize
-	 * @memberof UmbPaginationManager
+	 * @param {number} pageSize - The number of items per page
+	 * @memberof UmbTargetPaginationManager
 	 */
 	public setTakeSize(pageSize: number) {
 		this.#takeSize.setValue(pageSize);
@@ -133,7 +133,7 @@ export class UmbTargetPaginationManager<
 
 	/**
 	 * Removes an item from the current items
-	 * @param {UmbEntityModel} entity
+	 * @param {UmbEntityModel} entity - The entity to remove
 	 * @memberof UmbTargetPaginationManager
 	 */
 	public removeFromCurrentItems(entity: UmbEntityModel) {
@@ -142,8 +142,8 @@ export class UmbTargetPaginationManager<
 
 	/**
 	 * Gets the total number of items
-	 * @returns {number}
-	 * @memberof UmbPaginationManager
+	 * @returns {number} The total number of items
+	 * @memberof UmbTargetPaginationManager
 	 */
 	public getTotalItems(): number {
 		return this.#totalItems.getValue();
@@ -151,8 +151,8 @@ export class UmbTargetPaginationManager<
 
 	/**
 	 * Sets the total number of items and recalculates the total number of pages
-	 * @param {number} totalItems
-	 * @memberof UmbPaginationManager
+	 * @param {number} totalItems - The total number of items
+	 * @memberof UmbTargetPaginationManager
 	 */
 	public setTotalItems(totalItems: number) {
 		this.#totalItems.setValue(totalItems);
@@ -262,7 +262,7 @@ export class UmbTargetPaginationManager<
 
 	/**
 	 * Clears the pagination manager values and resets them to their default values
-	 * @memberof UmbPaginationManager
+	 * @memberof UmbTargetPaginationManager
 	 */
 	public clear() {
 		this.#totalItems.setValue(0);

@@ -158,8 +158,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         doc = ContentService.GetById(doc.Id); // re-get
 
         Assert.AreEqual("Hello2", doc.GetCultureName("en-US"));
-        Assert.AreEqual("hello world",
-            doc.GetValue("title")); // We are not checking against en-US here because properties will remain invariant
+        Assert.AreEqual("hello world", doc.GetValue("title")); // We are not checking against en-US here because properties will remain invariant
         Assert.IsTrue(doc.Edited);
         Assert.IsTrue(doc.IsCultureEdited("en-US"));
 
@@ -180,7 +179,8 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.Culture, ContentVariation.Segment)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Nothing)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment)]
-    public async Task Change_Content_Type_From_Culture_To_No_Culture(ContentVariation startingContentTypeVariation,
+    public async Task Change_Content_Type_From_Culture_To_No_Culture(
+        ContentVariation startingContentTypeVariation,
         ContentVariation changeContentTypeVariationTo)
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
@@ -256,7 +256,8 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Culture)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.CultureAndSegment)]
-    public async Task Preserve_Content_Name_After_Content_Type_Variation_Change(ContentVariation contentTypeVariationFrom,
+    public async Task Preserve_Content_Name_After_Content_Type_Variation_Change(
+        ContentVariation contentTypeVariationFrom,
         ContentVariation contentTypeVariationTo)
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
@@ -440,7 +441,8 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.Culture, ContentVariation.Segment)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Nothing)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment)]
-    public async Task Change_Property_Type_From_Variant_Invariant_On_A_Composition(ContentVariation variant,
+    public async Task Change_Property_Type_From_Variant_Invariant_On_A_Composition(
+        ContentVariation variant,
         ContentVariation invariant)
     {
         // create content type with a property type that varies by culture
@@ -492,7 +494,8 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.Culture, ContentVariation.Segment)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Nothing)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment)]
-    public async Task Change_Content_Type_From_Variant_Invariant_On_A_Composition(ContentVariation variant,
+    public async Task Change_Content_Type_From_Variant_Invariant_On_A_Composition(
+        ContentVariation variant,
         ContentVariation invariant)
     {
         // create content type with a property type that varies by culture
@@ -918,8 +921,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         document = ContentService.GetById(document.Id);
-        Assert.AreEqual("v1inv",
-            document.GetValue("value1", "en")); // The invariant property value gets copied over to the default language
+        Assert.AreEqual("v1inv", document.GetValue("value1", "en")); // The invariant property value gets copied over to the default language
         Assert.AreEqual("v1inv", document.GetValue("value1", "en", published: true));
         Assert.AreEqual("v1fr", document.GetValue("value1", "fr")); // values are still retained
         Assert.AreEqual("v1fr-init", document.GetValue("value1", "fr", published: true)); // values are still retained
@@ -981,8 +983,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Assert.IsFalse(document.IsCultureEdited("fr"));
         Assert.IsFalse(document.Edited);
 
-        document.SetValue("value1",
-            "v1en"); // change the property value, so now the invariant (default) culture will be edited
+        document.SetValue("value1", "v1en"); // change the property value, so now the invariant (default) culture will be edited
         ContentService.Save(document);
 
         document = ContentService.GetById(document.Id);
@@ -1016,8 +1017,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Assert.AreEqual("doc1en", document.GetCultureName("en"));
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
         Assert.IsNull(document.GetValue("value1")); // The values are there but the business logic returns null
-        Assert.IsNull(document.GetValue("value1",
-            published: true)); // The values are there but the business logic returns null
+        Assert.IsNull(document.GetValue("value1", published: true)); // The values are there but the business logic returns null
         Assert.AreEqual("v1en2", document.GetValue("value1", "en"));
         Assert.AreEqual("v1en2", document.GetValue("value1", "en", published: true));
         Assert.IsFalse(document.IsCultureEdited("en")); // This returns false, everything is published
@@ -1029,8 +1029,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         document = ContentService.GetById(document.Id);
-        Assert.AreEqual("v1en2",
-            document.GetValue("value1")); // The variant property value gets copied over to the invariant
+        Assert.AreEqual("v1en2", document.GetValue("value1")); // The variant property value gets copied over to the invariant
         Assert.AreEqual("v1en2", document.GetValue("value1", published: true));
         Assert.IsNull(document.GetValue("value1", "fr")); // The values are there but the business logic returns null
         Assert.IsNull(document.GetValue(

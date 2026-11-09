@@ -11,7 +11,7 @@ TypeScript/Lit login SPA for Umbraco CMS backoffice authentication. Provides the
 
 ## ⚠️ Type resolution against the sibling Umbraco.Web.UI.Client
 
-Login uses the in-repo Client's TypeScript source for types via **generated `tsconfig.json` path aliases**, not via an npm dependency. This keeps Login's types aligned with the in-repo v18 backoffice (UUI 2.0 etc.) without waiting for an npm release.
+Login uses the in-repo Client's TypeScript source for types via **generated `tsconfig.json` path aliases**, not via an npm dependency. This keeps Login's types aligned with the in-repo backoffice of whichever branch it sits on (UUI 2.x etc.) without waiting for an npm release.
 
 **The three layers:**
 
@@ -92,7 +92,7 @@ Umbraco.Web.UI.Login/
 ├── package.json                      # npm configuration
 ├── tsconfig.json                     # TypeScript config
 ├── vite.config.ts                    # Vite build config
-├── .nvmrc                            # Node version (24)
+├── .nvmrc                            # Node version pin
 └── .prettierrc.json                  # Prettier config
 ```
 
@@ -217,10 +217,9 @@ Form waits for localization availability before rendering. Retries 40 times with
 
 - `vite` - Build tooling
 - `typescript` - Type checking
-- `msw` - API mocking
-- `@hey-api/openapi-ts` - API client generation
+- `msw` - API mocking (dev only)
 
-`@umbraco-cms/backoffice` is **not** an npm dependency — its types resolve from the sibling Client's source via generated tsconfig path aliases.
+`@umbraco-cms/backoffice` is **not** an npm dependency — its types resolve from the sibling Client's source via generated tsconfig path aliases. It supplies the UI components, the Lit element base, and the backoffice API services (`SecurityService`, `UserService`) that replaced the generated client.
 
 ### Known Technical Debt
 
@@ -231,8 +230,6 @@ Form waits for localization availability before rendering. Retries 40 times with
     - `login.page.element.ts:203,226`
     - `new-password-layout.element.ts:221`
     - `reset-password.page.element.ts:110`
-
-2. **API Client Error Types** (`api/client/client.gen.ts:207`): Error handling and types need improvement
 
 ### TypeScript Configuration
 

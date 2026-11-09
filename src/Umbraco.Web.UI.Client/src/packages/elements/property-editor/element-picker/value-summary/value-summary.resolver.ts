@@ -1,8 +1,8 @@
+import { UmbElementItemRepository } from '../../../item/repository/index.js';
+import type { UmbElementItemModel } from '../../../types.js';
 import type { UmbValueSummaryResolveResult, UmbValueSummaryResolver } from '@umbraco-cms/backoffice/value-summary';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
-import { UmbElementItemRepository } from '../../../item/repository/index.js';
-import type { UmbElementItemModel } from '../../../types.js';
 
 /** Batch-resolves Element Picker value (array of element uniques) to their item models. */
 export class UmbElementPickerValueSummaryResolver
@@ -23,8 +23,7 @@ export class UmbElementPickerValueSummaryResolver
 		return {
 			data: this.#map(values, items),
 			asObservable: asObservable
-				? () =>
-						createObservablePart(asObservable()!, (latest) => this.#map(values, latest))
+				? () => createObservablePart(asObservable()!, (latest) => this.#map(values, latest))
 				: undefined,
 		};
 	}

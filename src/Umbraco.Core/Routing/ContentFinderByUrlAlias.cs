@@ -99,9 +99,10 @@ public class ContentFinderByUrlAlias : IContentFinder
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
                     _logger.LogDebug(
-                        "Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}",
+                        "Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}, key={PublishedContentKey}",
                         frequest.Uri.AbsolutePath,
-                        node.Id);
+                        node.Id,
+                        node.Key);
                 }
             }
         }

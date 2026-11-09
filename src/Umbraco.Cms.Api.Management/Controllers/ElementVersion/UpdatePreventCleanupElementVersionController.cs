@@ -1,10 +1,18 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ElementVersion;
 
@@ -16,18 +24,39 @@ public class UpdatePreventCleanupElementVersionController : ElementVersionContro
 {
     private readonly IElementVersionService _elementVersionService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IAuthorizationService _authorizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdatePreventCleanupElementVersionController"/> class.
     /// </summary>
     /// <param name="elementVersionService">Service for managing element versions.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="authorizationService">Service for handling authorization checks for the current user.</param>
+    [ActivatorUtilitiesConstructor]
     public UpdatePreventCleanupElementVersionController(
         IElementVersionService elementVersionService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IAuthorizationService authorizationService)
     {
         _elementVersionService = elementVersionService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _authorizationService = authorizationService;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdatePreventCleanupElementVersionController"/> class.
+    /// </summary>
+    /// <param name="elementVersionService">Service for managing element versions.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
+    public UpdatePreventCleanupElementVersionController(
+        IElementVersionService elementVersionService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        : this(
+            elementVersionService,
+            backOfficeSecurityAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>())
+    {
     }
 
     /// <summary>
@@ -46,6 +75,23 @@ public class UpdatePreventCleanupElementVersionController : ElementVersionContro
     [EndpointDescription("Sets the prevent clean up boolean status for an element version to the provided value. This controls whether the version will be a candidate for removal in content history clean up.")]
     public async Task<IActionResult> Set(CancellationToken cancellationToken, Guid id, bool preventCleanup)
     {
+        Attempt<IElement?, ContentVersionOperationStatus> getElementAttempt = await _elementVersionService.GetAsync(id);
+        if (getElementAttempt.Success is false || getElementAttempt.Result is null)
+        {
+            return MapFailure(getElementAttempt.Status);
+        }
+
+        IElement element = getElementAttempt.Result;
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ElementPermissionResource.WithKeys(ActionElementRollback.ActionLetter, element.Key),
+            AuthorizationPolicies.ElementPermissionByResource);
+
+        if (authorizationResult.Succeeded is false)
+        {
+            return Forbidden();
+        }
+
         Attempt<ContentVersionOperationStatus> attempt =
             await _elementVersionService.SetPreventCleanupAsync(id, preventCleanup, CurrentUserKey(_backOfficeSecurityAccessor));
 

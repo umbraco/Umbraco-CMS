@@ -71,6 +71,7 @@
       <DependentUpon>ImportResources.resx</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Umbraco.Web.BackOffice\UrlAndDomains\package.xml" />
+    <EmbeddedResource Include="Umbraco.Examine.Lucene\UmbracoExamine\ContentIndexRebuild\Snapshots\*.txt" LogicalName="ContentIndexRebuild.Snapshots.%(Filename)%(Extension)" />
     <Content Include="appsettings.Tests.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Umbraco.Api.Delivery\OpenApi\ExpectedContracts\**" CopyToOutputDirectory="PreserveNewest" />
     <Compile Update="Umbraco.Infrastructure\Services\ContentTypeServiceTests.GetAllAllowedInLibrary.cs">
@@ -161,6 +162,9 @@
       <DependentUpon>ContentTypeEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Core\Services\ContentTypeEditingServiceTests.Update.cs">
+      <DependentUpon>ContentTypeEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentTypeEditingServiceTests.Variance.cs">
       <DependentUpon>ContentTypeEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.Create.cs">

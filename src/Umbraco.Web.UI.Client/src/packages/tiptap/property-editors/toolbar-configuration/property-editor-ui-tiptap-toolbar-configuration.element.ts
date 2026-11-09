@@ -14,6 +14,8 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/propert
 
 import './tiptap-toolbar-group-configuration.element.js';
 
+const UMB_TIPTAP_TOOLBAR_ITEM_DRAG_TYPE = 'text/umb-tiptap-toolbar-item';
+
 @customElement('umb-property-editor-ui-tiptap-toolbar-configuration')
 export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	extends UmbLitElement
@@ -89,29 +91,40 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		this.#context.insertToolbarItem(item.alias, [lastRow, lastGroup, lastItem]);
 	}
 
+	#isOwnDragItem(event: DragEvent) {
+		return event.dataTransfer?.types.includes(UMB_TIPTAP_TOOLBAR_ITEM_DRAG_TYPE) === true;
+	}
+
 	#onDragStart(event: DragEvent, alias: string, fromPos?: [number, number, number]) {
 		event.dataTransfer!.effectAllowed = 'move';
+		event.dataTransfer!.setData(UMB_TIPTAP_TOOLBAR_ITEM_DRAG_TYPE, alias);
 		this.#currentDragItem = { alias, fromPos };
 	}
 
 	#onDragOver(event: DragEvent) {
+		if (!this.#isOwnDragItem(event)) return;
 		event.preventDefault();
 		event.dataTransfer!.dropEffect = 'move';
 	}
 
 	#onDragEnd(event: DragEvent) {
 		event.preventDefault();
-		if (event.dataTransfer?.dropEffect === 'none') {
-			const { fromPos } = this.#currentDragItem ?? {};
-			if (!fromPos) return;
+		const { fromPos } = this.#currentDragItem ?? {};
+		this.#currentDragItem = undefined;
 
+		if (event.dataTransfer?.dropEffect === 'none' && fromPos) {
 			this.#context.removeToolbarItem(fromPos);
 		}
 	}
 
 	#onDrop(event: DragEvent, toPos?: [number, number, number]) {
+		// A group also receives the drops of the sorter that reorders the items within it, as those bubble out of the
+		// group element. Acting on one of those would re-insert the item of the preceding drag. (#23524)
+		if (!this.#isOwnDragItem(event)) return;
+
 		event.preventDefault();
 		const { alias, fromPos } = this.#currentDragItem ?? {};
+		this.#currentDragItem = undefined;
 
 		// Remove item if no destination position is provided
 		if (fromPos && !toPos) {
@@ -261,7 +274,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				class="group"
 				dropzone="move"
 				@dragover=${this.#onDragOver}
-				@drop=${(e: DragEvent) => this.#onDrop(e, [rowIndex, groupIndex, group.data.length - 1])}>
+				@drop=${(e: DragEvent) => this.#onDrop(e, [rowIndex, groupIndex, group.data.length])}>
 				<umb-tiptap-toolbar-group-configuration
 					.items=${items}
 					.rowIndex=${rowIndex}

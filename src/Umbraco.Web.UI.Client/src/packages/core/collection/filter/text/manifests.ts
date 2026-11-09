@@ -1,6 +1,6 @@
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbDefaultCollectionTextFilterElement } from './default-collection-text-filter.element.js';
 import { UmbDefaultCollectionTextFilterApi } from './default-collection-text-filter.api.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{

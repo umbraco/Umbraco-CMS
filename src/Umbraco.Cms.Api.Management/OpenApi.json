@@ -2940,7 +2940,7 @@
         ],
         "summary": "Validates updating a document.",
         "description": "Validates the request model for updating a document without actually updating it.",
-        "operationId": "PutUmbracoManagementApiV1.1DocumentByIdValidate1.1",
+        "operationId": "PutDocumentByIdValidate",
         "parameters": [
           {
             "name": "id",
@@ -16625,8 +16625,7 @@
             "name": "baseUrl",
             "in": "query",
             "schema": {
-              "type": "string",
-              "default": "https://our.umbraco.com"
+              "type": "string"
             }
           }
         ],
@@ -16680,6 +16679,14 @@
                 "type": "string",
                 "format": "uuid"
               }
+            }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           },
           {
@@ -16844,6 +16851,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -16894,6 +16904,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -17013,6 +17026,23 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -20155,6 +20185,14 @@
                 "type": "string",
                 "format": "uuid"
               }
+            }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -29608,6 +29646,23 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -29638,6 +29693,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -29675,6 +29733,23 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -31385,6 +31460,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -31460,6 +31538,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -34891,7 +34972,7 @@
           "User"
         ],
         "summary": "Gets a filtered collection of users.",
-        "description": "Filters users based on the provided criteria with support for pagination.",
+        "description": "Returns a paged collection of users matching the provided criteria — user groups, user states, user kinds (default or API users) and a name/username search term.",
         "operationId": "GetFilterUser",
         "parameters": [
           {
@@ -34946,6 +35027,16 @@
               "type": "array",
               "items": {
                 "$ref": "#/components/schemas/UserStateModel"
+              }
+            }
+          },
+          {
+            "name": "userKinds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/UserKindModel"
               }
             }
           },
@@ -43283,6 +43374,7 @@
       },
       "DocumentBlueprintTreeItemResponseModel": {
         "required": [
+          "variants",
           "isFolder",
           "noAccess",
           "name",
@@ -43301,6 +43393,12 @@
                 "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
               }
             ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentVariantItemResponseModel"
+            }
           },
           "isFolder": {
             "type": "boolean"
@@ -43343,6 +43441,7 @@
           "isProtected",
           "ancestors",
           "sortOrder",
+          "hasChildren",
           "id",
           "flags",
           "values",
@@ -43380,6 +43479,9 @@
           "sortOrder": {
             "type": "integer",
             "format": "int32"
+          },
+          "hasChildren": {
+            "type": "boolean"
           },
           "id": {
             "type": "string",
@@ -44193,11 +44295,11 @@
       },
       "DocumentUrlInfoModel": {
         "required": [
-          "isExternal",
           "message",
           "provider",
           "culture",
-          "url"
+          "url",
+          "isExternal"
         ],
         "type": "object",
         "properties": {
@@ -46650,6 +46752,7 @@
         "required": [
           "mediaType",
           "sortOrder",
+          "hasChildren",
           "id",
           "flags",
           "values",
@@ -46660,6 +46763,12 @@
           "mediaType": {
             "$ref": "#/components/schemas/MediaTypeCollectionReferenceResponseModel"
           },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "creator": {
             "type": [
               "null",
@@ -46669,6 +46778,9 @@
           "sortOrder": {
             "type": "integer",
             "format": "int32"
+          },
+          "hasChildren": {
+            "type": "boolean"
           },
           "id": {
             "type": "string",
@@ -46738,6 +46850,12 @@
           },
           "mediaType": {
             "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+          },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "variants": {
             "type": "array",
@@ -46855,6 +46973,12 @@
         "properties": {
           "mediaType": {
             "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+          },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "variants": {
             "type": "array",
@@ -51015,7 +51139,8 @@
           "version",
           "assemblyVersion",
           "baseUtcOffset",
-          "runtimeMode"
+          "runtimeMode",
+          "isDebugMode"
         ],
         "type": "object",
         "properties": {
@@ -51030,6 +51155,9 @@
           },
           "runtimeMode": {
             "$ref": "#/components/schemas/RuntimeModeModel"
+          },
+          "isDebugMode": {
+            "type": "boolean"
           }
         }
       },
@@ -54281,9 +54409,11 @@
             "type": "string"
           },
           "httpStatusCode": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "isSuccessStatusCode": {
             "type": "boolean"

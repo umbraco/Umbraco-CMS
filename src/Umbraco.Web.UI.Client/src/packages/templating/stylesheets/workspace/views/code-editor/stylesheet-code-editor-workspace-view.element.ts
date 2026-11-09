@@ -72,10 +72,6 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 				/* remove header border bottom as code editor looks better in this box */
 				--uui-color-divider-standalone: transparent;
 			}
-
-			#workspace-header {
-				width: 100%;
-			}
 		`,
 	];
 }

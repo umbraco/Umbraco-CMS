@@ -10,6 +10,7 @@ import { html, customElement, state, css, nothing } from '@umbraco-cms/backoffic
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-user-workspace-client-credentials')
 export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
@@ -94,7 +95,7 @@ export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
 
 		await umbConfirmModal(this, {
 			headline: `Delete ${client.unique}`,
-			content: `Are you sure you want to delete ${client.unique}?`,
+			content: this.localize.term('defaultdialogs_confirmdelete', escapeHTML(client.unique)),
 			confirmLabel: 'Delete',
 			color: 'danger',
 		});

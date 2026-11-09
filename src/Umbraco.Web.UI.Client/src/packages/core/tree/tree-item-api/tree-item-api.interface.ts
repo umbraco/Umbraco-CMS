@@ -25,6 +25,10 @@ export interface UmbTreeItemApi<
 	readonly isSelected: Observable<boolean>;
 	readonly isActive: Observable<boolean>;
 	readonly hasChildren: Observable<boolean>;
+	/**
+	 * @deprecated Deprecated since v17. Render `<umb-entity-actions-bundle>`, which resolves the entity actions that
+	 * are permitted for the item, instead of asking whether any are registered for the entity type. Will be removed in v19.
+	 */
 	readonly hasActions: Observable<boolean>;
 	readonly noAccess: Observable<boolean>;
 	readonly path: Observable<string>;

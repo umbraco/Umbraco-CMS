@@ -74,4 +74,28 @@ public class ElementPublishStatusService :
         RemoveStatus(elementKey);
         return Task.CompletedTask;
     }
+
+    /// <inheritdoc/>
+    public async Task RefreshCultureAsync(string culture, CancellationToken cancellationToken)
+    {
+        HashSet<Guid> publishedKeys;
+        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
+        {
+            publishedKeys = (await _publishStatusRepository.GetPublishedElementKeysAsync(culture, cancellationToken)).ToHashSet();
+            scope.Complete();
+        }
+
+        RefreshCulture(culture, publishedKeys);
+    }
+
+    /// <inheritdoc/>
+    public Task RefreshDefaultCultureAsync(CancellationToken cancellationToken)
+    {
+        InvalidateDefaultCulture();
+        return Task.CompletedTask;
+    }
+
+    /// <inheritdoc/>
+    protected override string? ReadDefaultCulture()
+        => _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
 }

@@ -48,10 +48,14 @@ export class UmbCurrentUserContext extends UmbContextBase {
 			this.#addActionEventListeners();
 		});
 
-		this.observe(this.languageIsoCode, (currentLanguageIsoCode) => {
-			if (!currentLanguageIsoCode) return;
-			umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
-		});
+		this.observe(
+			this.languageIsoCode,
+			(currentLanguageIsoCode) => {
+				if (!currentLanguageIsoCode) return;
+				umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
+			},
+			null,
+		);
 	}
 
 	#loadPromise?: Promise<void>;
@@ -59,10 +63,15 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	 * Loads the current user. Concurrent callers share the same in-flight promise,
 	 * so awaiting `load()` always waits for `#currentUser` to be populated.
 	 * @returns {Promise<void>} Resolves once the current user observable has emitted.
+	 * @throws {Error} Rejects if the current user could not be fetched, after which the next call fetches again.
 	 */
 	public async load(): Promise<void> {
 		if (!this.#loadPromise) {
-			this.#loadPromise = this.#doLoad();
+			const loading = this.#doLoad().catch((error) => {
+				if (this.#loadPromise === loading) this.#loadPromise = undefined;
+				throw error;
+			});
+			this.#loadPromise = loading;
 		}
 		return this.#loadPromise;
 	}
@@ -83,8 +92,15 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	}
 
 	async #doLoad(): Promise<void> {
-		const { asObservable } = await this.#currentUserRepository.requestCurrentUser();
+		const { data, error, asObservable } = await this.#currentUserRepository.requestCurrentUser();
 
+		// Without fresh data the store still holds whichever user was loaded before, who may not be the user
+		// signed in now, so do not settle on it.
+		if (!data) {
+			throw error ?? new Error('The current user could not be loaded.');
+		}
+
+		// TODO: Fail early? if no asObservable method is available on the server response, we should probably throw an error or handle it differently. [NL]
 		if (asObservable) {
 			await this.observe(
 				asObservable(),
@@ -93,7 +109,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 				},
 				'observeUser',
 			)
-				.asPromise()
+				?.asPromise()
 				// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
 				.catch(() => undefined);
 		}
@@ -101,13 +117,13 @@ export class UmbCurrentUserContext extends UmbContextBase {
 
 	#loadDebounced = debounce(() => {
 		this.invalidate();
-		this.load();
+		this.load().catch((error) => console.error('[UmbCurrentUserContext] Failed to reload the current user', error));
 	}, 100);
 
 	/**
 	 * Checks if a user is the current user.
-	 * @param userUnique The user id to check
-	 * @returns True if the user is the current user, otherwise false
+	 * @param {string} userUnique The user id to check
+	 * @returns {Promise<boolean>} True if the user is the current user, otherwise false
 	 */
 	async isUserCurrentUser(userUnique: string): Promise<boolean> {
 		const currentUser = await firstValueFrom(this.currentUser);
@@ -116,7 +132,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 
 	/**
 	 * Checks if the current user is an admin.
-	 * @returns True if the current user is an admin, otherwise false
+	 * @returns {Promise<boolean>} True if the current user is an admin, otherwise false
 	 */
 	async isCurrentUserAdmin(): Promise<boolean> {
 		const currentUser = await firstValueFrom(this.currentUser);

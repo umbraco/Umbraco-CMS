@@ -2,6 +2,7 @@ import { MemberTypeService } from '@umbraco-cms/backoffice/external/backend-api'
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbMoveDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/tree';
+import type { UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Move Member Type Server Data Source
@@ -21,13 +22,11 @@ export class UmbMoveMemberTypeServerDataSource implements UmbMoveDataSource {
 
 	/**
 	 * Move an item for the given id to the target unique
-	 * @param {string} unique
-	 * @param {(string | null)} targetUnique
-	 * @param args
-	 * @returns {*}
+	 * @param {UmbMoveToRequestArgs} args - The arguments for the move operation
+	 * @returns {UmbDataSourceErrorResponse} An error, if the move failed
 	 * @memberof UmbMoveMemberTypeServerDataSource
 	 */
-	async moveTo(args: UmbMoveToRequestArgs) {
+	async moveTo(args: UmbMoveToRequestArgs): Promise<UmbDataSourceErrorResponse> {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 

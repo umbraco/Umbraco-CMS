@@ -9,7 +9,7 @@ const autoScrollSpeed = 16;
  *
  * @param {Element} el - The element to check for ability to scroll
  * @param {boolean} includeSelf - If true, the element itself will be included in the check
- * @returns {Element | null}
+ * @returns {Element | null} The closest scrollable parent element, or null if none is found
  */
 function getParentScrollElement(el: Element, includeSelf: boolean) {
 	if (!el || !el.getBoundingClientRect) return null;
@@ -239,7 +239,7 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
 
 /**
  * @class UmbSorterController
- * @implements {UmbControllerInterface}
+ * @augments {UmbControllerBase}
  * @description This controller can make user able to sort items.
  * @example
  *
@@ -338,7 +338,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	/**
 	 * Enables the sorter, this will allow sorting to happen.
-	 * @returns {*}  {void}
+	 * @returns {void}
 	 * @memberof UmbSorterController
 	 */
 	enable(): void {
@@ -351,7 +351,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	/**
 	 * Disables the sorter, this will prevent any sorting to happen.
-	 * @returns {*}  {void}
+	 * @returns {void}
 	 * @memberof UmbSorterController
 	 */
 	disable(): void {

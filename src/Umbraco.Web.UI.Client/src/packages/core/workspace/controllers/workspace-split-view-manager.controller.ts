@@ -1,7 +1,7 @@
+import { UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from './constants.js';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from './constants.js';
 
 export type UmbActiveVariant = {
 	index: number;
@@ -131,6 +131,8 @@ export class UmbWorkspaceSplitViewManager {
 	}
 
 	/**
+	 * @param {number} index - the split view index to set the active variant for.
+	 * @param {string} folderPart - the variant folder part of the route.
 	 * @deprecated Use {@link openVariants} instead. This will be removed in Umbraco 20.
 	 */
 	public handleVariantFolderPart(index: number, folderPart: string) {

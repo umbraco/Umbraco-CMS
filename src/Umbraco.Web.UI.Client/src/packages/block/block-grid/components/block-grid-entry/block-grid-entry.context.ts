@@ -113,7 +113,7 @@ export class UmbBlockGridEntryContext
 
 	/**
 	 * Set the column span of this entry.
-	 * @param columnSpan {number} The new column span.
+	 * @param {number} columnSpan The new column span.
 	 */
 	setColumnSpan(columnSpan: number) {
 		if (!this._entries) return;
@@ -139,7 +139,7 @@ export class UmbBlockGridEntryContext
 
 	/**
 	 * Set the row span of this entry.
-	 * @param rowSpan {number} The new row span.
+	 * @param {number} rowSpan The new row span.
 	 */
 	setRowSpan(rowSpan: number) {
 		const minMax = this.getMinMaxRowSpan();
@@ -361,6 +361,7 @@ export class UmbBlockGridEntryContext
 
 		clipboardContext.write({
 			icon: this.getContentElementTypeIcon(),
+			thumbnail: this.getThumbnailUrl(),
 			name: entryName,
 			propertyValue,
 			propertyEditorUiAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,

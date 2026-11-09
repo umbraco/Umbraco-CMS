@@ -7,7 +7,12 @@ import '../components/umb-auth-view.element.js';
 
 @customElement('umb-app-auth-modal')
 export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthConfig, UmbModalAppAuthValue> {
+	#succeeded = false;
+
+	// Runs once, although both the authorization state and the sign-in view report the same success
 	#onSuccess = () => {
+		if (this.#succeeded) return;
+		this.#succeeded = true;
 		this.value = { success: true };
 		this._submitModal();
 	};

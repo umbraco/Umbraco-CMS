@@ -26,7 +26,7 @@ public partial class ElementEditingServiceTests
             ],
         };
 
-        var result = await ElementEditingService.UpdateAndPublishAsync(element.Key, updateModel, [], Constants.Security.SuperUserKey);
+        var result = await ElementEditingService.UpdateAndPublishAsync(element.Key, updateModel, new HashSet<string>(), Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         VerifyUpdateAndPublish(result.Result.Content);
 
@@ -63,7 +63,7 @@ public partial class ElementEditingServiceTests
             ],
         };
 
-        var result = await ElementEditingService.UpdateAndPublishAsync(element.Key, updateModel, ["en-US"], Constants.Security.SuperUserKey);
+        var result = await ElementEditingService.UpdateAndPublishAsync(element.Key, updateModel, new HashSet<string> { "en-US" }, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         VerifyUpdateAndPublish(await ElementEditingService.GetAsync(element.Key));
 
@@ -90,8 +90,70 @@ public partial class ElementEditingServiceTests
             ],
         };
 
-        var result = await ElementEditingService.UpdateAndPublishAsync(Guid.NewGuid(), updateModel, [], Constants.Security.SuperUserKey);
+        var result = await ElementEditingService.UpdateAndPublishAsync(Guid.NewGuid(), updateModel, new HashSet<string>(), Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotFound, result.Status);
+        Assert.AreEqual(ContentEditingOperationStatus.NotFound, result.Status.ContentEditingOperationStatus);
+    }
+
+    [Test]
+    public async Task Cannot_UpdateAndPublish_With_Invalid_Property_Values()
+    {
+        var element = await CreateCultureVariantElement();
+
+        // "variantTitle" is mandatory, so publishing is rejected while saving is not
+        var updateModel = new ElementUpdateModel
+        {
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = null, Culture = "en-US" },
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "Updated English Name" },
+                new VariantModel { Culture = "da-DK", Name = "Updated Danish Name" }
+            ],
+        };
+
+        var result = await ElementEditingService.UpdateAndPublishAsync(element.Key, updateModel, new HashSet<string> { "en-US" }, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
+            Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, result.Status.ContentPublishingOperationStatus);
+            Assert.AreEqual(new[] { "variantTitle" }, result.Result.InvalidPropertyAliases.ToArray());
+        });
+
+        var updated = await ElementEditingService.GetAsync(element.Key);
+        Assert.IsNotNull(updated);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Updated English Name", updated.GetCultureName("en-US"));
+            Assert.IsFalse(updated.IsCulturePublished("en-US"));
+            Assert.AreEqual("The updated invariant title", updated.GetValue<string>("invariantTitle"));
+        });
+    }
+
+    [TestCase("*")]
+    [TestCase("zz-ZZ")]
+    public async Task Cannot_UpdateAndPublish_With_An_Invalid_Culture_To_Publish(string culture)
+    {
+        var element = await CreateCultureVariantElement();
+
+        var updateModel = new ElementUpdateModel
+        {
+            Properties = [new PropertyValueModel { Alias = "variantTitle", Value = "The updated English title", Culture = "en-US" }],
+            Variants = [new VariantModel { Culture = "en-US", Name = "Updated English Name" }],
+        };
+
+        var result = await ElementEditingService.UpdateAndPublishAsync(element.Key, updateModel, new HashSet<string> { culture }, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(ContentEditingOperationStatus.InvalidCulture, result.Status.ContentEditingOperationStatus);
+            Assert.IsNull(result.Status.ContentPublishingOperationStatus);
+        });
     }
 }

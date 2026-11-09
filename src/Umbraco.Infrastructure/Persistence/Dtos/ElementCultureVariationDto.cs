@@ -8,18 +8,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 /// Represents a data transfer object for the culture-specific variation of an element in the database.
 /// </summary>
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyColumnName)]
+[PrimaryKey(ICultureVariationDto.Columns.Id)]
 [ExplicitColumns]
 internal sealed class ElementCultureVariationDto : ICultureVariationDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ElementCultureVariation;
 
-    private const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
-
     /// <summary>
     /// Gets or sets the unique identifier for the element culture variation.
     /// </summary>
-    [Column(PrimaryKeyColumnName)]
+    [Column(ICultureVariationDto.Columns.Id)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
 

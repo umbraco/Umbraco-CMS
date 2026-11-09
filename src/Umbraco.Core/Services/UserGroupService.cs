@@ -705,6 +705,13 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return UserGroupOperationStatus.MediaStartNodeKeyNotFound;
         }
 
+        if (userGroup.StartElementId is not null
+            && userGroup.StartElementId is not Constants.System.Root
+            && _entityService.Exists(userGroup.StartElementId.Value, UmbracoObjectTypes.ElementContainer) is false)
+        {
+            return UserGroupOperationStatus.ElementStartNodeKeyNotFound;
+        }
+
         return UserGroupOperationStatus.Success;
     }
 

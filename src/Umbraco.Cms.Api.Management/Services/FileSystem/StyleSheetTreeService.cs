@@ -19,5 +19,5 @@ public class StyleSheetTreeService : FileSystemTreeServiceBase, IStyleSheetTreeS
         _scriptFileSystem = fileSystems.StylesheetsFileSystem ??
                             throw new ArgumentException("Missing stylesheets file system", nameof(fileSystems));
 
-    protected override bool FilterFile(string file) => file.ToLowerInvariant().EndsWith(".css");
+    protected override bool FilterFile(string file) => file.EndsWith(".css", StringComparison.OrdinalIgnoreCase);
 }

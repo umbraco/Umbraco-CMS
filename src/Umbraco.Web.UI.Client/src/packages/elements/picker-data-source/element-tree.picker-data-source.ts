@@ -1,12 +1,15 @@
 import { UmbElementFolderItemRepository } from '../folder/repository/item/element-folder-item.repository.js';
 import { UmbElementItemRepository } from '../item/repository/element-item.repository.js';
 import { UmbElementTreeRepository } from '../tree/element-tree.repository.js';
-import type { UmbElementTreeChildrenOfRequestArgs, UmbElementTreeRootItemsRequestArgs } from '../tree/types.js';
-import type { UmbElementTreeItemModel } from '../tree/types.js';
-import { getConfigValue } from '@umbraco-cms/backoffice/utils';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type {
+	UmbElementTreeChildrenOfRequestArgs,
+	UmbElementTreeRootItemsRequestArgs,
+	UmbElementTreeItemModel,
+} from '../tree/types.js';
 import { UmbElementFolderItemDataResolver } from '../folder/data-resolver/element-folder-item-data-resolver.js';
 import { UmbElementItemDataResolver } from '../item/data-resolver/element-item-data-resolver.js';
+import { getConfigValue } from '@umbraco-cms/backoffice/utils';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type {
 	UmbTreeAncestorsOfRequestArgs,

@@ -1,10 +1,12 @@
 using System.Net;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Security;
@@ -20,6 +22,7 @@ public class BasicAuthenticationMiddleware : IMiddleware
 {
     private readonly IBasicAuthService _basicAuthService;
     private readonly IRuntimeState _runtimeState;
+    private readonly IPreviewService _previewService;
     private readonly string _backOfficePath;
 
     /// <summary>
@@ -28,14 +31,36 @@ public class BasicAuthenticationMiddleware : IMiddleware
     /// <param name="runtimeState">The runtime state used to determine if the application is running.</param>
     /// <param name="basicAuthService">The service providing basic authentication configuration and validation.</param>
     /// <param name="hostingEnvironment">The hosting environment used to resolve the backoffice path.</param>
+    /// <param name="previewService">The service used to resolve the back-office user previewing the front-end.</param>
+    public BasicAuthenticationMiddleware(
+        IRuntimeState runtimeState,
+        IBasicAuthService basicAuthService,
+        IHostingEnvironment hostingEnvironment,
+        IPreviewService previewService)
+    {
+        _runtimeState = runtimeState;
+        _basicAuthService = basicAuthService;
+        _previewService = previewService;
+        _backOfficePath = hostingEnvironment.GetBackOfficePath();
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BasicAuthenticationMiddleware"/> class.
+    /// </summary>
+    /// <param name="runtimeState">The runtime state used to determine if the application is running.</param>
+    /// <param name="basicAuthService">The service providing basic authentication configuration and validation.</param>
+    /// <param name="hostingEnvironment">The hosting environment used to resolve the backoffice path.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public BasicAuthenticationMiddleware(
         IRuntimeState runtimeState,
         IBasicAuthService basicAuthService,
         IHostingEnvironment hostingEnvironment)
+        : this(
+            runtimeState,
+            basicAuthService,
+            hostingEnvironment,
+            StaticServiceProvider.Instance.GetRequiredService<IPreviewService>())
     {
-        _runtimeState = runtimeState;
-        _basicAuthService = basicAuthService;
-        _backOfficePath = hostingEnvironment.GetBackOfficePath();
     }
 
     /// <inheritdoc />
@@ -59,7 +84,7 @@ public class BasicAuthenticationMiddleware : IMiddleware
             return;
         }
 
-        if (await IsAuthenticatedBackOfficeRequestAsync(context))
+        if (await IsAuthenticatedBackOfficeRequestAsync(context) || await IsAuthenticatedPreviewRequestAsync())
         {
             await next(context);
             return;
@@ -124,6 +149,23 @@ public class BasicAuthenticationMiddleware : IMiddleware
 
         AuthenticateResult authenticateResult = await context.AuthenticateBackOfficeAsync();
         return authenticateResult.Succeeded;
+    }
+
+    /// <summary>
+    /// Checks if the request carries a valid preview token, identifying a back-office user previewing the
+    /// front-end. The back-office cookie alone is not enough: it expires a fixed period after sign-in and is
+    /// not renewed by the token-authenticated back-office client, so preview would otherwise start
+    /// challenging mid-session (https://github.com/umbraco/Umbraco-CMS/issues/23475).
+    /// </summary>
+    /// <remarks>
+    /// The attempt succeeds whenever the preview token verifies, even when no back-office identity could be
+    /// resolved from it — <see cref="IPreviewService"/> reports success carrying a null identity in that case.
+    /// Checking the identity rather than the attempt keeps an unresolvable token from authenticating the request.
+    /// </remarks>
+    private async Task<bool> IsAuthenticatedPreviewRequestAsync()
+    {
+        Attempt<ClaimsIdentity> previewIdentityAttempt = await _previewService.TryGetPreviewClaimsIdentityAsync();
+        return previewIdentityAttempt.Success && previewIdentityAttempt.Result.IsBackOfficeAuthenticationType();
     }
 
     private void HandleUnauthorized(HttpContext context)

@@ -29,7 +29,7 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 	suggestionQuery?: string;
 
 	/**
-	 * @param {string} dataTypeId
+	 * @param {string} dataTypeId - The unique id of the selected data type.
 	 * @default
 	 */
 	@property({ type: String, attribute: false })

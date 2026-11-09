@@ -11,16 +11,24 @@ namespace Umbraco.Cms.Core.Templates;
 /// <remarks>
 /// Needs to support media and document links, order of attributes should not matter nor should other attributes mess with things:
 /// <![CDATA[
-/// <a type = "media" href="/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}" title="media">media</a>
+/// <a type="media" href="/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}" title="media">media</a>
 /// <a type="document" href="/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" title="other page">other page</a>
 /// ]]>
 /// </remarks>
 public sealed partial class HtmlLocalLinkParser
 {
-    [GeneratedRegex(@"<a.+?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)})[^>]*?>", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace, "en-GB")]
+    /// <summary>
+    ///     The name of the capture group holding the local link.
+    /// </summary>
+    /// <remarks>
+    ///     Must match the group name used by every local link pattern below.
+    /// </remarks>
+    private const string LocalLinkGroupName = "locallink";
+
+    [GeneratedRegex(@"<a\b[^>]*?href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-fA-F0-9-]+)(?:\}|\%7D))[^>]*?>", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
     private static partial Regex GetLocalLinkTagPattern();
 
-    [GeneratedRegex("""type=['"](?<type>(?:media|document))['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
+    [GeneratedRegex("""\s*(?<![\w-])type=['"](?<type>(?:media|document))['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
     private static partial Regex GetTypePattern();
 
     [GeneratedRegex("""data-culture=['"](?<culture>[a-zA-Z0-9-_]+)['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-GB")]
@@ -38,14 +46,14 @@ public sealed partial class HtmlLocalLinkParser
     ///     &lt;a type="document" href="/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" title="other page"&gt;other page&lt;/a&gt;
     /// </remarks>
     internal static readonly Regex LocalLinkTagPattern = new(
-        @"<a.+?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)})[^>]*?>",
-        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+        @"<a\b[^>]*?href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-fA-F0-9-]+)(?:\}|\%7D))[^>]*?>",
+        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
     /// <summary>
     ///     Regex pattern to match the type attribute (media or document) in local link tags.
     /// </summary>
     internal static readonly Regex TypePattern = new(
-        """type=['"](?<type>(?:media|document))['"]""",
+        """\s*(?<![\w-])type=['"](?<type>(?:media|document))['"]""",
         RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
     /// <summary>
@@ -58,9 +66,6 @@ public sealed partial class HtmlLocalLinkParser
     [GeneratedRegex(@"href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-zA-Z0-9-://]+)(?:\}|\%7D))", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
     private static partial Regex GetLocalLinkPattern();
 
-    [GeneratedRegex(@"(<a\b(?=[^>]*data-culture=['""](?<culture>[a-zA-Z0-9-_]+)['""])(?=[^>]*href=['""])[^>]*href=['""])(?<href>[^""']*)(?<closequote>[""'])", RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-GB")]
-    private static partial Regex GetLinkPattern();
-
     private static readonly Regex _localLinkTagPattern = GetLocalLinkTagPattern();
 
     private static readonly Regex _typePattern = GetTypePattern();
@@ -68,8 +73,6 @@ public sealed partial class HtmlLocalLinkParser
     private static readonly Regex _localLinkPattern = GetLocalLinkPattern();
 
     private static readonly Regex _culturePattern = GetCulturePattern();
-
-    private static readonly Regex _linkPattern = GetLinkPattern();
 
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 
@@ -108,85 +111,115 @@ public sealed partial class HtmlLocalLinkParser
     /// </summary>
     public string EnsureInternalLinks(string text, UrlMode urlMode)
     {
-        foreach (LocalLinkTag tagData in FindLocalLinkIds(text))
+        text = _localLinkTagPattern.Replace(text, match => ReplaceLocalLinkTag(match, urlMode));
+
+        return ReplaceLegacyLocalLinks(text, urlMode);
+    }
+
+    // Rewrites a single matched tag, replacing the local link with the resolved URL and removing the type
+    // attribute that identified the entity. Every edit is confined to the matched tag, so a tag that
+    // resolves to nothing keeps its original markup even when a neighbouring tag holds the same local link.
+    private string ReplaceLocalLinkTag(Match tagMatch, UrlMode urlMode)
+    {
+        LocalLinkTagData? tagData = ReadLocalLinkTagData(tagMatch);
+        if (tagData is null)
+        {
+            return tagMatch.Value;
+        }
+
+        var newLink = tagData.EntityType switch
+        {
+            Constants.UdiEntityType.Document => _publishedUrlProvider.GetUrl(tagData.Key, urlMode, tagData.Culture),
+            Constants.UdiEntityType.Media => _publishedUrlProvider.GetMediaUrl(tagData.Key, urlMode),
+            _ => string.Empty,
+        };
+
+        Group localLink = tagMatch.Groups[LocalLinkGroupName];
+        var localLinkIndex = localLink.Index - tagMatch.Index;
+        Match typeMatch = tagData.TypeMatch;
+
+        // Both offsets are relative to the tag, so the later edit is applied first to keep the other valid.
+        if (typeMatch.Index > localLinkIndex)
+        {
+            return tagMatch.Value
+                .Remove(typeMatch.Index, typeMatch.Length)
+                .Remove(localLinkIndex, localLink.Length)
+                .Insert(localLinkIndex, newLink);
+        }
+
+        return tagMatch.Value
+            .Remove(localLinkIndex, localLink.Length)
+            .Insert(localLinkIndex, newLink)
+            .Remove(typeMatch.Index, typeMatch.Length);
+    }
+
+    private string ReplaceLegacyLocalLinks(string text, UrlMode urlMode)
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        foreach (LocalLinkTag tagData in FindLegacyLocalLinkIds(text))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             if (tagData.Udi is not null)
             {
-                var newLink = tagData.Udi?.EntityType switch
+                var newLink = tagData.Udi.EntityType switch
                 {
                     Constants.UdiEntityType.Document => _publishedUrlProvider.GetUrl(tagData.Udi.Guid, urlMode, tagData.Culture),
                     Constants.UdiEntityType.Media => _publishedUrlProvider.GetMediaUrl(tagData.Udi.Guid, urlMode),
                     _ => string.Empty,
                 };
 
-                text = StripTypeAttributeFromTag(text, tagData.Udi!.EntityType);
-                text = ReplaceLink(text, tagData.TagHref, newLink, tagData.Culture);
+                text = text.Replace(tagData.TagHref, newLink);
             }
             else if (tagData.IntId.HasValue)
             {
-                var newLink = _publishedUrlProvider.GetUrl(tagData.IntId.Value, urlMode);
-                text = text.Replace(tagData.TagHref, newLink);
+                text = text.Replace(tagData.TagHref, _publishedUrlProvider.GetUrl(tagData.IntId.Value, urlMode));
             }
         }
 
         return text;
     }
 
-    private string ReplaceLink(string text, string tagHref, string newLink, string? culture = null)
+    private static LocalLinkTagData? ReadLocalLinkTagData(Match tagMatch)
     {
-        if (string.IsNullOrEmpty(culture))
+        if (Guid.TryParse(tagMatch.Groups["guid"].ValueSpan, out Guid key) is false)
         {
-            return text.Replace(tagHref, newLink);
+            return null;
         }
-        else
-        {
-            return _linkPattern.Replace(text, match =>
-            {
-                if (match.Groups["culture"].ValueSpan.Equals(culture, StringComparison.OrdinalIgnoreCase)
-                    && match.Groups["href"].Value == tagHref)
-                {
-                    return $"{match.Groups[1].ValueSpan}{newLink}{match.Groups["closequote"].ValueSpan}";
-                }
-                return match.Value;
-            });
-        }
-    }
 
-    // Under normal circumstances, the type attribute is preceded by a space
-    // to cover the rare occasion where it isn't, we first replace with a space and then without.
-    // Case-insensitive to tolerate historic mis-cased values written by the (now fixed) ConvertLocalLinks
-    // migration for Umbraco 15 (see #22597).
-    private static string StripTypeAttributeFromTag(string tag, string type) =>
-        tag.Replace($" type=\"{type}\"", string.Empty, StringComparison.OrdinalIgnoreCase)
-            .Replace($"type=\"{type}\"", string.Empty, StringComparison.OrdinalIgnoreCase);
+        // A tag that carries no type of its own cannot be resolved, as the entity type is what tells the
+        // document and media URL providers apart.
+        Match typeMatch = _typePattern.Match(tagMatch.Value);
+        if (typeMatch.Success is false)
+        {
+            return null;
+        }
+
+        Match cultureMatch = _culturePattern.Match(tagMatch.Value);
+
+        // Normalize the type to lower case to tolerate historic mis-cased values written by the (now fixed)
+        // ConvertLocalLinks migration (see #22597). Constants.UdiEntityType.* values are lower case.
+        return new LocalLinkTagData(
+            key,
+            typeMatch.Groups["type"].Value.ToLowerInvariant(),
+            cultureMatch.Success ? cultureMatch.Groups["culture"].Value : null,
+            typeMatch);
+    }
 
     private IEnumerable<LocalLinkTag> FindLocalLinkIds(string text)
     {
-        MatchCollection localLinkTagMatches = _localLinkTagPattern.Matches(text);
-        foreach (Match linkTag in localLinkTagMatches)
+        foreach (Match linkTag in _localLinkTagPattern.Matches(text))
         {
-            if (Guid.TryParse(linkTag.Groups["guid"].ValueSpan, out Guid guid) is false)
+            LocalLinkTagData? tagData = ReadLocalLinkTagData(linkTag);
+            if (tagData is null)
             {
                 continue;
             }
 
-            // Find the type attribute
-            Match typeMatch = _typePattern.Match(linkTag.Value);
-            if (typeMatch.Success is false)
-            {
-                continue;
-            }
-
-            // Find the culture attribute if it exists
-            Match cultureMatch = _culturePattern.Match(linkTag.Value);
-
-            // Normalize the type to lower case to tolerate historic mis-cased values written by the (now fixed)
-            // ConvertLocalLinks migration (see #22597). Constants.UdiEntityType.* values are lower case.
             yield return new LocalLinkTag(
                 null,
-                new GuidUdi(typeMatch.Groups["type"].Value.ToLowerInvariant(), guid),
-                linkTag.Groups["locallink"].Value,
-                cultureMatch.Success ? cultureMatch.Groups["culture"].Value : null);
+                new GuidUdi(tagData.EntityType, tagData.Key),
+                linkTag.Groups[LocalLinkGroupName].Value,
+                tagData.Culture);
         }
 
         // also return legacy results for values that have not been migrated
@@ -195,6 +228,8 @@ public sealed partial class HtmlLocalLinkParser
             yield return legacyResult;
         }
     }
+
+    private sealed record LocalLinkTagData(Guid Key, string EntityType, string? Culture, Match TypeMatch);
 
     /// <summary>
     ///     Finds legacy local link identifiers in the specified text.
@@ -220,13 +255,13 @@ public sealed partial class HtmlLocalLinkParser
             {
                 if (udi is GuidUdi guidUdi)
                 {
-                    yield return new LocalLinkTag(null, guidUdi, tag.Groups["locallink"].Value);
+                    yield return new LocalLinkTag(null, guidUdi, tag.Groups[LocalLinkGroupName].Value);
                 }
             }
 
             if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
             {
-                yield return new LocalLinkTag (intId, null, tag.Groups["locallink"].Value);
+                yield return new LocalLinkTag (intId, null, tag.Groups[LocalLinkGroupName].Value);
             }
         }
     }

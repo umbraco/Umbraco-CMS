@@ -72,6 +72,16 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
     }
 
     /// <inheritdoc />
+    /// <remarks>
+    /// Documents are admitted one request per process into the content write path; see <see cref="ContentWriteGate"/>.
+    /// Elements write under their own lock and are not gated.
+    /// </remarks>
+    protected override Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> RunInWritePathAsync(
+        Func<Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>>> publish,
+        bool callerIsInScope)
+        => ContentWriteGate.Shared.RunAsync(publish, callerIsInScope);
+
+    /// <inheritdoc />
     public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(
         Guid key,
         IEnumerable<string> cultures,
@@ -86,7 +96,7 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
             return MapInternalPublishingAttempt(minimalAttempt);
         }
 
-        _logger.LogDebug("Starting long running operation for publishing branch {Key} on background thread.", key);
+        _logger.LogDebug("Starting long running operation for publishing branch {DocumentKey} on background thread.", key);
         Attempt<Guid, LongRunningOperationEnqueueStatus> enqueueAttempt = await _longRunningOperationService.RunAsync(
             PublishBranchOperationType,
             async _ => await PerformPublishBranchAsync(key, cultures, publishBranchFilter, userKey, returnContent: false),
@@ -147,7 +157,7 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
         IEnumerable<PublishResult> result = _contentService.PublishBranch(content, publishBranchFilter, cultures.ToArray(), userId);
         scope.Complete();
 
-        var itemResults = result.ToDictionary(r => r.Content.Key, ToContentPublishingOperationStatus);
+        var itemResults = result.ToDictionary(r => r.Content.Key, r => r.ToContentPublishingOperationStatus());
         var branchResult = new ContentPublishingBranchInternalResult
         {
             ContentKey = content.Key,

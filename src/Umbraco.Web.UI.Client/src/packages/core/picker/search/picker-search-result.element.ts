@@ -126,9 +126,7 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 	}
 
 	#renderEmptyResult() {
-		return html`<uui-box>
-			<small>No result for <strong>"${this._executedQuery?.query}"</strong>.</small>
-		</uui-box>`;
+		return html`<uui-box>${this.localize.term('general_noResults')}</uui-box>`;
 	}
 
 	#renderResultItem(item: UmbSearchResultItemModel) {

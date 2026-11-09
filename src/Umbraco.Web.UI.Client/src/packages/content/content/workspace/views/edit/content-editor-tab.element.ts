@@ -1,4 +1,4 @@
-import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	UmbContentTypeModel,
@@ -28,10 +28,10 @@ export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 
 	@state()
-	private _groups: Array<UmbPropertyTypeContainerMergedModel> = [];
+	private _groups?: Array<UmbPropertyTypeContainerMergedModel>;
 
 	@state()
-	private _hasProperties = false;
+	private _hasProperties?: boolean;
 
 	constructor() {
 		super();
@@ -42,15 +42,26 @@ export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 				workspaceContext?.structure as unknown as UmbContentTypeStructureManager<UmbContentTypeModel>,
 			);
 		});
-		this.observe(this.#groupStructureHelper.childContainers, (groups) => {
-			this._groups = groups;
-		});
-		this.observe(this.#groupStructureHelper.hasProperties, (hasProperties) => {
-			this._hasProperties = hasProperties;
-		});
+		this.observe(
+			this.#groupStructureHelper.childContainers,
+			(groups) => {
+				this._groups = groups;
+			},
+			null,
+		);
+		this.observe(
+			this.#groupStructureHelper.hasProperties,
+			(hasProperties) => {
+				this._hasProperties = hasProperties;
+			},
+			null,
+		);
 	}
 
 	override render() {
+		if (this._hasProperties === undefined || this._groups === undefined) {
+			return html`<umb-view-loader></umb-view-loader>`;
+		}
 		return html`
 			${this._hasProperties
 				? html`
@@ -60,7 +71,7 @@ export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 								.containerId=${this._containerId}></umb-content-workspace-view-edit-properties>
 						</uui-box>
 					`
-				: ''}
+				: nothing}
 			${repeat(
 				this._groups,
 				(group) => group.key,

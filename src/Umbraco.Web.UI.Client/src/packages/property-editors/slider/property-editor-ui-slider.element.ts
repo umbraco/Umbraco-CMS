@@ -11,8 +11,9 @@ import type {
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
- *
- * @param value
+ * Parses a comma-separated `from,to` string into a value object.
+ * @param {string | undefined} value - The comma-separated string to parse.
+ * @returns {Partial<UmbSliderPropertyEditorUiValueObject>} The resulting value object.
  */
 function stringToValueObject(value: string | undefined): Partial<UmbSliderPropertyEditorUiValueObject> {
 	const [from, to] = (value ?? ',').split(',');
@@ -21,9 +22,10 @@ function stringToValueObject(value: string | undefined): Partial<UmbSliderProper
 }
 
 /**
- *
- * @param value
- * @param fallback
+ * Converts a string to a number, falling back if it is undefined or not a number.
+ * @param {string | undefined} value - The value to convert.
+ * @param {number | undefined} fallback - The fallback to use when the value is missing or invalid.
+ * @returns {number | undefined} The parsed number, or the fallback.
  */
 function makeNumberOrUndefined(value: string | undefined, fallback?: undefined | number) {
 	if (value === undefined) {
@@ -37,9 +39,10 @@ function makeNumberOrUndefined(value: string | undefined, fallback?: undefined |
 }
 
 /**
- *
- * @param value
- * @param fallback
+ * Returns the value, or the fallback if the value is undefined.
+ * @param {number | undefined} value - The value to check.
+ * @param {number} fallback - The fallback to use when the value is undefined.
+ * @returns {number} The value, or the fallback.
  */
 function undefinedFallback(value: number | undefined, fallback: number) {
 	return value === undefined ? fallback : value;

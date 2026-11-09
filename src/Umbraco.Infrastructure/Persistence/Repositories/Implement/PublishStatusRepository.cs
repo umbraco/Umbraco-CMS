@@ -73,13 +73,29 @@ public class PublishStatusRepository : IPublishStatusRepository
 
     public async Task<ISet<string>> GetPublishStatusAsync(Guid documentKey, CancellationToken cancellationToken)
     {
+        List<PublishStatusDto>? databaseRecords = await Database.FetchAsync<PublishStatusDto>(GetPublishStatusSql(documentKey), cancellationToken);
+        return ToPublishStatus(documentKey, databaseRecords);
+    }
+
+    /// <inheritdoc/>
+    public ISet<string> GetPublishStatus(Guid documentKey)
+    {
+        List<PublishStatusDto>? databaseRecords = Database.Fetch<PublishStatusDto>(GetPublishStatusSql(documentKey));
+        return ToPublishStatus(documentKey, databaseRecords);
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<Guid>> GetPublishedKeysAsync(string culture, CancellationToken cancellationToken)
+    {
         Sql<ISqlContext> sql = GetBaseQuery();
-        sql = sql.Where<NodeDto>(n => n.UniqueId == documentKey, "n");
+        sql = sql.Where<LanguageDto>(l => l.IsoCode == culture, "l");
 
         List<PublishStatusDto>? databaseRecords = await Database.FetchAsync<PublishStatusDto>(sql);
 
-        IDictionary<Guid, ISet<string>> result = Map(databaseRecords);
-        return result.TryGetValue(documentKey, out ISet<string>? value) ? value : new HashSet<string>();
+        return Map(databaseRecords)
+            .Where(x => x.Value.Count > 0)
+            .Select(x => x.Key)
+            .ToArray();
     }
 
     /// <summary>
@@ -92,25 +108,27 @@ public class PublishStatusRepository : IPublishStatusRepository
     /// </returns>
     public async Task<IDictionary<Guid, ISet<string>>> GetDescendantsOrSelfPublishStatusAsync(Guid rootDocumentKey, CancellationToken cancellationToken)
     {
-        var pathSql = Database.SqlContext.Sql()
-            .Select<NodeDto>(x => x.Path)
-            .From<NodeDto>()
-            .Where<NodeDto>(x => x.UniqueId == rootDocumentKey);
-        var rootPath = await Database.ExecuteScalarAsync<string>(pathSql);
+        var rootPath = await Database.ExecuteScalarAsync<string>(GetRootPathSql(rootDocumentKey), cancellationToken);
         if (string.IsNullOrWhiteSpace(rootPath))
         {
             return new Dictionary<Guid, ISet<string>>();
         }
 
-        Sql<ISqlContext> sql = GetBaseQuery()
-            .InnerJoin<NodeDto>("rn").On<NodeDto, NodeDto>((n, rn) => n.Path.StartsWith(rootPath), "n", "rn") //rn = root node
-            .Where<NodeDto>(rn => rn.UniqueId == rootDocumentKey, "rn");
+        List<PublishStatusDto>? databaseRecords = await Database.FetchAsync<PublishStatusDto>(GetDescendantsOrSelfSql(rootDocumentKey, rootPath), cancellationToken);
+        return Map(databaseRecords);
+    }
 
-        List<PublishStatusDto>? databaseRecords = await Database.FetchAsync<PublishStatusDto>(sql);
+    /// <inheritdoc/>
+    public IDictionary<Guid, ISet<string>> GetDescendantsOrSelfPublishStatus(Guid rootDocumentKey)
+    {
+        var rootPath = Database.ExecuteScalar<string>(GetRootPathSql(rootDocumentKey));
+        if (string.IsNullOrWhiteSpace(rootPath))
+        {
+            return new Dictionary<Guid, ISet<string>>();
+        }
 
-        IDictionary<Guid, ISet<string>> result = Map(databaseRecords);
-
-        return result;
+        List<PublishStatusDto>? databaseRecords = Database.Fetch<PublishStatusDto>(GetDescendantsOrSelfSql(rootDocumentKey, rootPath));
+        return Map(databaseRecords);
     }
 
     public async Task<IDictionary<Guid, ISet<string>>> GetAllElementPublishStatusAsync(CancellationToken cancellationToken)
@@ -129,6 +147,20 @@ public class PublishStatusRepository : IPublishStatusRepository
 
         IDictionary<Guid, ISet<string>> result = Map(databaseRecords);
         return result.TryGetValue(elementKey, out ISet<string>? value) ? value : new HashSet<string>();
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<Guid>> GetPublishedElementKeysAsync(string culture, CancellationToken cancellationToken)
+    {
+        Sql<ISqlContext> sql = GetElementBaseQuery();
+        sql = sql.Where<LanguageDto>(l => l.IsoCode == culture, "l");
+
+        List<PublishStatusDto>? databaseRecords = await Database.FetchAsync<PublishStatusDto>(sql);
+
+        return Map(databaseRecords)
+            .Where(x => x.Value.Count > 0)
+            .Select(x => x.Key)
+            .ToArray();
     }
 
     private Sql<ISqlContext> GetElementBaseQuery()
@@ -150,6 +182,26 @@ public class PublishStatusRepository : IPublishStatusRepository
 
         return sql;
     }
+
+    private Sql<ISqlContext> GetPublishStatusSql(Guid documentKey)
+        => GetBaseQuery().Where<NodeDto>(n => n.UniqueId == documentKey, "n");
+
+    private ISet<string> ToPublishStatus(Guid documentKey, List<PublishStatusDto> databaseRecords)
+    {
+        IDictionary<Guid, ISet<string>> result = Map(databaseRecords);
+        return result.TryGetValue(documentKey, out ISet<string>? value) ? value : new HashSet<string>();
+    }
+
+    private Sql<ISqlContext> GetRootPathSql(Guid rootDocumentKey)
+        => Database.SqlContext.Sql()
+            .Select<NodeDto>(x => x.Path)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.UniqueId == rootDocumentKey);
+
+    private Sql<ISqlContext> GetDescendantsOrSelfSql(Guid rootDocumentKey, string rootPath)
+        => GetBaseQuery()
+            .InnerJoin<NodeDto>("rn").On<NodeDto, NodeDto>((n, rn) => n.Path.StartsWith(rootPath), "n", "rn") //rn = root node
+            .Where<NodeDto>(rn => rn.UniqueId == rootDocumentKey, "rn");
 
     private IDictionary<Guid, ISet<string>> Map(List<PublishStatusDto> databaseRecords)
     {

@@ -24,7 +24,7 @@ export class UmbElementMockDB extends UmbEntityMockDbBase<UmbMockElementModel> {
 	item = new UmbMockEntityItemManager<UmbMockElementModel>(this, itemMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockElementModel>(this, createMockElementMapper, detailResponseMapper);
 	folder = new UmbMockEntityFolderManager<UmbMockElementModel>(this, createMockElementFolderMapper);
-	recycleBin = new UmbEntityRecycleBin<UmbMockElementModel>(this.data, recycleBinItemMapper);
+	recycleBin = new UmbEntityRecycleBin<UmbMockElementModel>(this, recycleBinItemMapper);
 	publishing = new UmbMockElementPublishingManager(this);
 
 	constructor(data: Array<UmbMockElementModel>) {

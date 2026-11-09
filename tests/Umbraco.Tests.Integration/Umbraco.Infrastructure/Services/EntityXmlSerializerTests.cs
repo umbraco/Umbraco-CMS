@@ -192,15 +192,20 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
         Assert.AreEqual(media.CreatorId.ToString(), (string)element.Attribute("writerID"));
         Assert.IsNull(element.Attribute("template"));
 
-        Assert.AreEqual(media.Properties[Constants.Conventions.Media.File].GetValue().ToString(),
+        Assert.AreEqual(
+            media.Properties[Constants.Conventions.Media.File].GetValue().ToString(),
             element.Elements(Constants.Conventions.Media.File).Single().Value);
-        Assert.AreEqual(media.Properties[Constants.Conventions.Media.Width].GetValue().ToString(),
+        Assert.AreEqual(
+            media.Properties[Constants.Conventions.Media.Width].GetValue().ToString(),
             element.Elements(Constants.Conventions.Media.Width).Single().Value);
-        Assert.AreEqual(media.Properties[Constants.Conventions.Media.Height].GetValue().ToString(),
+        Assert.AreEqual(
+            media.Properties[Constants.Conventions.Media.Height].GetValue().ToString(),
             element.Elements(Constants.Conventions.Media.Height).Single().Value);
-        Assert.AreEqual(media.Properties[Constants.Conventions.Media.Bytes].GetValue().ToString(),
+        Assert.AreEqual(
+            media.Properties[Constants.Conventions.Media.Bytes].GetValue().ToString(),
             element.Elements(Constants.Conventions.Media.Bytes).Single().Value);
-        Assert.AreEqual(media.Properties[Constants.Conventions.Media.Extension].GetValue().ToString(),
+        Assert.AreEqual(
+            media.Properties[Constants.Conventions.Media.Extension].GetValue().ToString(),
             element.Elements(Constants.Conventions.Media.Extension).Single().Value);
     }
 
@@ -228,11 +233,14 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.That(element.Element("HistoryCleanupPolicy")!.Attribute("preventCleanup")!.Value,
+            Assert.That(
+                element.Element("HistoryCleanupPolicy")!.Attribute("preventCleanup")!.Value,
                 Is.EqualTo("true"));
-            Assert.That(element.Element("HistoryCleanupPolicy")!.Attribute("keepAllVersionsNewerThanDays")!.Value,
+            Assert.That(
+                element.Element("HistoryCleanupPolicy")!.Attribute("keepAllVersionsNewerThanDays")!.Value,
                 Is.EqualTo("1"));
-            Assert.That(element.Element("HistoryCleanupPolicy")!.Attribute("keepLatestVersionPerDayForDays")!.Value,
+            Assert.That(
+                element.Element("HistoryCleanupPolicy")!.Attribute("keepLatestVersionPerDayForDays")!.Value,
                 Is.EqualTo("2"));
         });
     }

@@ -1,4 +1,5 @@
 using NPoco;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -12,6 +13,11 @@ internal interface ICultureVariationDto : INodeDto
     /// </summary>
     internal static class Columns
     {
+        /// <summary>
+        /// The column name for the culture variation identifier.
+        /// </summary>
+        internal const string Id = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+
         /// <summary>
         /// The column name for the node identifier.
         /// </summary>
@@ -42,6 +48,12 @@ internal interface ICultureVariationDto : INodeDto
         /// </summary>
         internal const string Published = IContentVersionDto.Columns.Published;
     }
+
+    /// <summary>
+    /// Gets or sets the unique identifier for this culture variation row.
+    /// </summary>
+    [Column(Columns.Id)]
+    int Id { get; set; }
 
     /// <summary>
     /// Gets or sets the language identifier.

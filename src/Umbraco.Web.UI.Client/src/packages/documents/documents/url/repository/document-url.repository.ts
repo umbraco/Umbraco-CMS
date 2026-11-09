@@ -1,7 +1,7 @@
 import type { UmbDocumentUrlsModel } from './types.js';
 import { UMB_DOCUMENT_URL_STORE_CONTEXT } from './document-url.store.context-token.js';
 import { UmbDocumentUrlServerDataSource } from './document-url.server.data-source.js';
-import { UmbItemRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import { UmbItemRepositoryBase, type UmbRepositoryResponseWithAsObservable } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDocumentUrlRepository extends UmbItemRepositoryBase<UmbDocumentUrlsModel> {
@@ -19,10 +19,13 @@ export class UmbDocumentUrlRepository extends UmbItemRepositoryBase<UmbDocumentU
 	 * Requests the urls for the given uniques, optionally restricted to a single culture.
 	 * @param {Array<string>} uniques The document uniques to request urls for.
 	 * @param {string} [culture] The culture to restrict variant document urls to, or undefined for all cultures.
-	 * @returns {*} The requested url data.
+	 * @returns {UmbRepositoryResponseWithAsObservable<Array<UmbDocumentUrlsModel> | undefined>} The requested url data.
 	 * @memberof UmbDocumentUrlRepository
 	 */
-	async requestUrls(uniques: Array<string>, culture?: string) {
+	async requestUrls(
+		uniques: Array<string>,
+		culture?: string,
+	): Promise<UmbRepositoryResponseWithAsObservable<Array<UmbDocumentUrlsModel> | undefined>> {
 		if (!uniques) throw new Error('Uniques are missing');
 
 		await this._init;

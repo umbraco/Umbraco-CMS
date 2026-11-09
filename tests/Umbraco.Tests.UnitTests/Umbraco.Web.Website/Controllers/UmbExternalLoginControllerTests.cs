@@ -219,6 +219,48 @@ public class UmbExternalLoginControllerTests
     }
 
     [Test]
+    public async Task ExternalLoginCallback_FailedNoEmail_ReturnsCurrentPageWithError()
+    {
+        var loginInfo = CreateLoginInfo();
+        _signInManagerMock
+            .Setup(x => x.GetExternalLoginInfoAsync(It.IsAny<string?>()))
+            .ReturnsAsync(loginInfo);
+        _signInManagerMock
+            .Setup(x => x.ExternalLoginSignInAsync(loginInfo, false, It.IsAny<bool>()))
+            .ReturnsAsync(MemberSignInManager.AutoLinkSignInResult.FailedNoEmail);
+
+        var controller = CreateController();
+
+        IActionResult result = await controller.ExternalLoginCallback("/after");
+
+        Assert.IsInstanceOf<UmbracoPageResult>(result);
+        var errors = controller.ViewData.GetExternalSignInProviderErrors();
+        Assert.IsNotNull(errors);
+        Assert.That(errors!.Errors.Single(), Does.Contain("has not provided the email claim"));
+    }
+
+    [Test]
+    public async Task ExternalLoginCallback_FailedNoName_ReturnsCurrentPageWithError()
+    {
+        var loginInfo = CreateLoginInfo();
+        _signInManagerMock
+            .Setup(x => x.GetExternalLoginInfoAsync(It.IsAny<string?>()))
+            .ReturnsAsync(loginInfo);
+        _signInManagerMock
+            .Setup(x => x.ExternalLoginSignInAsync(loginInfo, false, It.IsAny<bool>()))
+            .ReturnsAsync(MemberSignInManager.AutoLinkSignInResult.FailedNoName);
+
+        var controller = CreateController();
+
+        IActionResult result = await controller.ExternalLoginCallback("/after");
+
+        Assert.IsInstanceOf<UmbracoPageResult>(result);
+        var errors = controller.ViewData.GetExternalSignInProviderErrors();
+        Assert.IsNotNull(errors);
+        Assert.That(errors!.Errors.Single(), Does.Contain("has not provided a name"));
+    }
+
+    [Test]
     public async Task ExternalLinkLoginCallback_NoLocalUser_ReturnsCurrentPageWithError()
     {
         _memberManagerMock

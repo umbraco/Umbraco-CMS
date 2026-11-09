@@ -41,10 +41,11 @@ internal sealed class BlockGridPropertyValueCreator : BlockPropertyValueCreatorB
     /// <param name="referenceCacheLevel">The <see cref="PropertyCacheLevel"/> to use when resolving references within the block grid.</param>
     /// <param name="intermediateBlockModelValue">A string containing the intermediate (typically JSON) representation of the block grid's data.</param>
     /// <param name="preview">True if the model should be created in preview mode; otherwise, false.</param>
+    /// <param name="owningPropertyCulture">The culture of the stored property value the block value was loaded from, or <c>null</c> when the property does not vary by culture.</param>
     /// <param name="blockConfigurations">An array of <see cref="BlockGridConfiguration.BlockGridBlockConfiguration"/> objects that define the available block types and their settings.</param>
     /// <param name="gridColumns">The number of columns in the grid layout, or null to use the default configuration.</param>
     /// <returns>A <see cref="BlockGridModel"/> representing the structured block grid data for the given property and configuration.</returns>
-    public async Task<BlockGridModel> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, BlockGridConfiguration.BlockGridBlockConfiguration[] blockConfigurations, int? gridColumns)
+    public async Task<BlockGridModel> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, string? owningPropertyCulture, BlockGridConfiguration.BlockGridBlockConfiguration[] blockConfigurations, int? gridColumns)
     {
         BlockGridModel CreateEmptyModel() => BlockGridModel.Empty;
 
@@ -81,6 +82,7 @@ internal sealed class BlockGridPropertyValueCreator : BlockPropertyValueCreatorB
             referenceCacheLevel,
             intermediateBlockModelValue,
             preview,
+            owningPropertyCulture,
             blockConfigurations,
             CreateEmptyModel,
             CreateModel,

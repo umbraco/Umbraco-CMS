@@ -27,6 +27,33 @@ public interface IMediaCacheService : IContentCacheService
     Task<IPublishedContent?> GetByIdAsync(int id);
 
     /// <summary>
+    /// Gets multiple published media items by their unique keys, fetching any not already cached
+    /// from the database in a single batched query rather than one at a time.
+    /// </summary>
+    /// <param name="keys">The unique keys of the media to retrieve.</param>
+    /// <returns>The published media items that exist, in the same order as <paramref name="keys"/> (missing items omitted).</returns>
+    /// <remarks>
+    /// Used to materialise sets of keys (e.g. children/descendants) without the per-item database
+    /// round trip and scope of repeated <see cref="GetByKeyAsync"/> calls when the cache is cold.
+    /// The default implementation falls back to per-key retrieval so existing implementations keep working.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation and reference to it in the remarks.
+    async Task<IReadOnlyList<IPublishedContent>> GetByKeysAsync(IReadOnlyCollection<Guid> keys)
+    {
+        var result = new List<IPublishedContent>(keys.Count);
+        foreach (Guid key in keys)
+        {
+            IPublishedContent? content = await GetByKeyAsync(key);
+            if (content is not null)
+            {
+                result.Add(content);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Attempts to retrieve a media item from the in-memory converted-content cache without
     /// touching the distributed cache or the database.
     /// </summary>
@@ -59,6 +86,18 @@ public interface IMediaCacheService : IContentCacheService
     /// <param name="media">The media item to refresh in the cache.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task RefreshMediaAsync(IMedia media);
+
+    /// <summary>
+    /// Refreshes the cache for the specified media item without leaving the calling thread.
+    /// </summary>
+    /// <param name="media">The media item to refresh.</param>
+    /// <remarks>
+    /// Runs inside the transaction that persists the media, under the media tree lock; awaiting there would need a
+    /// second thread-pool thread while the first is blocked on the lock.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void RefreshMedia(IMedia media)
+        => RefreshMediaAsync(media).GetAwaiter().GetResult();
 
     /// <summary>
     /// Gets all published media items of the specified content type.

@@ -1,6 +1,16 @@
 import type { UmbPropertyActionArgs } from '../../types.js';
 import type { ManifestPropertyAction, MetaPropertyAction } from '../../property-action.extension.js';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	eventOptions,
+	html,
+	nothing,
+	property,
+	query,
+	repeat,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -9,8 +19,8 @@ import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffi
 
 /**
  *
- * @param manifest
- * @returns
+ * @param {ManifestPropertyAction} manifest - The property action manifest
+ * @returns {[UmbPropertyActionArgs<MetaPropertyAction>]} The API arguments built from the manifest
  */
 function ExtensionApiArgsMethod(manifest: ManifestPropertyAction): [UmbPropertyActionArgs<MetaPropertyAction>] {
 	return [{ meta: manifest.meta }];
@@ -41,6 +51,24 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	}
 	#propertyEditorUiAlias = '';
 
+	@query('#property-action-popover')
+	private _popover?: HTMLElement;
+
+	#popoverOpen = false;
+
+	#onPopoverToggle(event: ToggleEvent) {
+		this.#popoverOpen = event.newState === 'open';
+	}
+
+	// Capture phase, so the menu closes even though an action stops its click from propagating, and before an action
+	// opens a modal: WebKit otherwise leaves the trigger unresponsive once the modal light-dismisses the popover (#22777).
+	@eventOptions({ capture: true })
+	private _onPopoverClickCapture() {
+		if (this.#popoverOpen) {
+			this._popover?.hidePopover();
+		}
+	}
+
 	override render() {
 		if (!this._actions?.length) return nothing;
 		return html`
@@ -48,16 +76,22 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 				id="popover-trigger"
 				popovertarget="property-action-popover"
 				data-mark="open-property-actions"
-				label=${this.localize.term('actions_viewActionsFor')}
+				label=${this.localize.term('actions_viewActionsFor', '')}
 				compact>
 				<uui-symbol-more id="more-symbol"></uui-symbol-more>
 			</uui-button>
-			<uui-popover-container id="property-action-popover">
+			<uui-popover-container
+				id="property-action-popover"
+				@toggle=${this.#onPopoverToggle}
+				@click=${this._onPopoverClickCapture}>
 				<umb-popover-layout>
 					${repeat(
 						this._actions,
 						(action) => action.alias,
-						(action) => action.component,
+						(action, i) =>
+							html`${i > 0 && action.manifest?.separatorBefore
+								? html`<umb-separator></umb-separator>`
+								: nothing}${action.component}`,
 					)}
 				</umb-popover-layout>
 			</uui-popover-container>

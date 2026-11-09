@@ -33,7 +33,7 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
     this.createDocumentTypeWithTemplateBtn = this.createOptionActionListModal.locator('umb-ref-item', {hasText: 'Document Type with template'});
     this.createElementTypeBtn = this.createOptionActionListModal.locator('umb-ref-item', {hasText: 'Element Type'});
     this.createDocumentFolderBtn = this.createOptionActionListModal.locator('umb-ref-item', {hasText: 'Folder'});
-    this.preventCleanupBtn = page.getByText('Prevent clean up');
+    this.preventCleanupBtn = page.getByText('Prevent cleanup');
     this.setAsDefaultBtn = page.getByText('Set as default');
     this.documentTypesMenu = page.locator('#menu-item').getByRole('link', {name: 'Document Types'});
     this.allowedChildNodesChooseBtn = page.locator('umb-property-layout[alias="ChildNodeType"]').locator('umb-input-document-type');
@@ -159,7 +159,7 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForDocumentTypeToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentType, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentType, this.clickSaveButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
   }
 
   async clickConfirmToDeleteButtonAndWaitForDocumentTypeToBeDeleted() {

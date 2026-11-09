@@ -69,6 +69,7 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 			(originManifests: Array<ManifestDynamicRootOrigin>) => {
 				this._originManifests = originManifests;
 			},
+			null,
 		);
 
 		this.observe(
@@ -76,28 +77,37 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 			(queryStepManifests: Array<ManifestDynamicRootQueryStep>) => {
 				this._queryStepManifests = queryStepManifests;
 			},
+			null,
 		);
 
-		this.observe(this.#documentItemManager.items, (documents) => {
-			if (!documents?.length) return;
+		this.observe(
+			this.#documentItemManager.items,
+			(documents) => {
+				if (!documents?.length) return;
 
-			documents.forEach((document) => {
-				// TODO: [v17] Review usage of `item.variants[0].name` as this needs to be implemented properly! [LK]
-				this.#documentLookup[document.unique] = document.variants[0].name;
-			});
+				documents.forEach((document) => {
+					// TODO: [v17] Review usage of `item.variants[0].name` as this needs to be implemented properly! [LK]
+					this.#documentLookup[document.unique] = document.variants[0].name;
+				});
 
-			this.requestUpdate();
-		});
+				this.requestUpdate();
+			},
+			null,
+		);
 
-		this.observe(this.#documentTypeItemManager.items, (documentTypes) => {
-			if (!documentTypes?.length) return;
+		this.observe(
+			this.#documentTypeItemManager.items,
+			(documentTypes) => {
+				if (!documentTypes?.length) return;
 
-			documentTypes.forEach((documentType) => {
-				this.#documentTypeLookup[documentType.unique] = documentType.name;
-			});
+				documentTypes.forEach((documentType) => {
+					this.#documentTypeLookup[documentType.unique] = documentType.name;
+				});
 
-			this.requestUpdate();
-		});
+				this.requestUpdate();
+			},
+			null,
+		);
 	}
 
 	override connectedCallback() {
@@ -196,7 +206,8 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 				.sort()
 				.join(', ') ?? '';
 
-		const description = item.anyOfDocTypeKeys
+		// An empty set of document type keys means the step matches all of them, so there is nothing to list.
+		const description = item.anyOfDocTypeKeys?.length
 			? this.localize.term('dynamicRoot_queryStepTypes') + docTypeNames
 			: undefined;
 

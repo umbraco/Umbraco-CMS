@@ -25,8 +25,9 @@ export const umbracoColors = [
 ];
 
 /**
- *
- * @param colorAlias
+ * Gets the CSS variable name for a given Umbraco color alias.
+ * @param {string} colorAlias - The color alias to look up.
+ * @returns {string | undefined} The CSS variable name, if found.
  */
 export function extractUmbColorVariable(colorAlias: string): string | undefined {
 	const found = umbracoColors.find((umbColor) => umbColor.alias === colorAlias);

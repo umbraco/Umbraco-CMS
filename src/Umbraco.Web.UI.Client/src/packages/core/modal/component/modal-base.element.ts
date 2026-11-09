@@ -4,10 +4,10 @@ import { property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 export abstract class UmbModalBaseElement<
-		ModalDataType extends object = object,
-		ModalValueType = unknown,
-		ModalManifestType extends ManifestModal = ManifestModal,
-	>
+	ModalDataType extends object = object,
+	ModalValueType = unknown,
+	ModalManifestType extends ManifestModal = ManifestModal,
+>
 	extends UmbLitElement
 	implements UmbModalExtensionElement<ModalDataType, ModalValueType, ModalManifestType>
 {
@@ -69,7 +69,7 @@ export abstract class UmbModalBaseElement<
 
 	/**
 	 * Rejects the modal
-	 * @param reason
+	 * @param {UmbModalRejectReason} [reason] - The reason for rejecting the modal
 	 * @protected
 	 * @memberof UmbModalBaseElement
 	 */

@@ -917,11 +917,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             List<PropertyDataDto> propertyDataDtos;
 
-            if (propertyAliases is { Length: > 0 })
+            // The property aliases are parameters of the same statement as each batch of version ids. If there are too many
+            // to leave a useful batch size, load all properties instead, which includes the requested ones.
+            if (propertyAliases is { Length: > 0 } && propertyAliases.Length <= Constants.Sql.MaxParameterCount / 2)
             {
                 // Only specific properties are requested.
                 // Filter by property alias at SQL level using INNER JOIN to PropertyTypeDto.
-                propertyDataDtos = Database.FetchByGroups<PropertyDataDto, int>(versions, Constants.Sql.MaxParameterCount, batch =>
+                propertyDataDtos = Database.FetchByGroups<PropertyDataDto, int>(versions, Constants.Sql.MaxParameterCount - propertyAliases.Length, batch =>
                     SqlContext.Sql()
                         .Select<PropertyDataDto>()
                         .From<PropertyDataDto>()
@@ -1362,6 +1364,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 publishedVersionId,
                 entity.Properties,
                 LanguageRepository,
+                PropertyEditors,
                 out edited,
                 out editedCultures).ToList();
 
@@ -1401,7 +1404,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 propertyTypeToPropertyData[(p.PropertyTypeId, p.VersionId, p.LanguageId, p.Segment)] = p;
             }
 
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures).ToList();
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, PropertyEditors, out edited, out editedCultures).ToList();
 
             // Set sortable values for property editors that support custom sorting.
             SetEntitySortableValues(entity, propertyDataDtos);

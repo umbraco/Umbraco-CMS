@@ -6,6 +6,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Block Grid Column Span Property Editor UI',
 	element: () => import('./property-editor-ui-block-grid-column-span.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Block Grid Column Span',
 		icon: 'icon-document',
 		group: '#propertyEditorUIGroups_common',

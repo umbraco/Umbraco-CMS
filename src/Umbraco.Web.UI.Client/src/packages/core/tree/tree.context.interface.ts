@@ -31,6 +31,7 @@ export interface UmbTreeContext<
 	readonly hideTreeItemActions?: Observable<boolean>;
 	readonly isMenu?: Observable<boolean | undefined>;
 	readonly selectOnly?: Observable<boolean | undefined>;
+	readonly drillable?: Observable<boolean>;
 
 	selectableFilter?(item: TreeItemType): boolean;
 	filter?(item: TreeItemType): boolean;
@@ -44,6 +45,7 @@ export interface UmbTreeContext<
 	readonly pagination: UmbPaginationManager;
 	readonly targetPagination: UmbTargetPaginationManager;
 	readonly startNode: Observable<UmbTreeStartNode | undefined>;
+	readonly startNodes?: Observable<Array<UmbTreeStartNode>>;
 	readonly foldersOnly: Observable<boolean>;
 	readonly additionalRequestArgs: Observable<Partial<RequestArgsType> | object>;
 	readonly isLoading?: Observable<boolean>;
@@ -73,8 +75,14 @@ export interface UmbTreeContext<
 	setIsMenu?(value: boolean): void;
 	getIsMenu?(): boolean;
 
+	setDrillable?(value: boolean): void;
+	getDrillable?(): boolean;
+
 	setStartNode(startNode: UmbTreeStartNode | undefined): void;
 	getStartNode(): UmbTreeStartNode | undefined;
+
+	setStartNodes?(startNodes: Array<UmbTreeStartNode> | undefined): void;
+	getStartNodes?(): Array<UmbTreeStartNode>;
 
 	setFoldersOnly(foldersOnly: boolean): void;
 	getFoldersOnly(): boolean;

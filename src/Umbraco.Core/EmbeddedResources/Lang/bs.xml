@@ -62,7 +62,7 @@
     <key alias="parentCultureNotPublished">Ova kultura je objavljena, ali nije vidljiva jer nije objavljena na nadređenom '%0%'</key>
     <key alias="parentNotPublishedAnomaly">Ovaj dokument je objavljen, ali nije u kešu</key>
     <key alias="getUrlException">Nije moguće dobiti URL</key>
-    <key alias="routeError">Ovaj dokument je objavljen, ali njegov URL je u koliziji sa sadržajem %0%</key>
+    <key alias="routeError">Ovaj dokument je objavljen, ali njegov URL je u koliziji sa sadržajem '%0%'</key>
     <key alias="routeErrorCannotRoute">Ovaj dokument je objavljen, ali njegov URL se ne može preusmjeriti</key>
   </area>
   <area alias="member">

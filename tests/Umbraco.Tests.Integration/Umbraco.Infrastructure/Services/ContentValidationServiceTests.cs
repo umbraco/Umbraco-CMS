@@ -266,6 +266,57 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
         Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "title" && r.JsonPath == string.Empty));
     }
 
+    [TestCase(false, 0)]
+    [TestCase(true, 1)]
+    public async Task Can_Validate_Empty_Value_For_Property_With_Minimum_Number_Of_Items(bool mandatory, int expectedNumberOfErrors)
+    {
+        var documentType = await SetupMinimumNumberOfItemsTest(mandatory);
+
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = documentType.Key,
+                Variants = [new() { Name = "Test Document" }],
+                Properties = new[]
+                {
+                    new PropertyValueModel
+                    {
+                        Alias = "links",
+                        Value = null,
+                    },
+                },
+            },
+            documentType);
+
+        Assert.AreEqual(expectedNumberOfErrors, validationResult.ValidationErrors.Count());
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Cannot_Validate_Value_Below_Minimum_Number_Of_Items(bool mandatory)
+    {
+        var documentType = await SetupMinimumNumberOfItemsTest(mandatory);
+
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = documentType.Key,
+                Variants = [new() { Name = "Test Document" }],
+                Properties = new[]
+                {
+                    new PropertyValueModel
+                    {
+                        Alias = "links",
+                        Value = "[{\"name\":\"Page 1\",\"type\":\"external\",\"url\":\"https://umbraco.com\"}]",
+                    },
+                },
+            },
+            documentType);
+
+        Assert.AreEqual(1, validationResult.ValidationErrors.Count());
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "links"));
+    }
+
     [Test]
     public async Task Uses_Localizaton_Keys_For_Validation_Error_Messages()
     {
@@ -527,6 +578,80 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
         });
     }
 
+    [Test]
+    public async Task Can_Validate_Mandatory_Property_For_Default_Segment()
+    {
+        var contentType = await SetupSegmentTest(ContentVariation.Segment, titleIsMandatory: true);
+
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Properties =
+                [
+                    new()
+                    {
+                        Alias = "title",
+                        Value = null,
+                        Segment = null
+                    },
+                    new()
+                    {
+                        Alias = "title",
+                        Value = "Valid seg-1 value",
+                        Segment = "seg-1"
+                    }
+                ],
+                Variants = [
+                    new() { Name = "Test Document" },
+                    new() { Name = "Test Document", Segment = "seg-1" },
+                    new() { Name = "Test Document", Segment = "seg-2" }
+                ]
+            },
+            contentType);
+
+        Assert.AreEqual(1, validationResult.ValidationErrors.Count());
+        Assert.Multiple(() =>
+        {
+            var validationError = validationResult.ValidationErrors.First();
+            Assert.AreEqual("title", validationError.Alias);
+            Assert.AreEqual(null, validationError.Segment);
+            Assert.IsEmpty(validationError.JsonPath);
+
+            Assert.AreEqual(1, validationError.ErrorMessages.Length);
+            Assert.AreEqual(Constants.Validation.ErrorMessages.Properties.Missing, validationError.ErrorMessages.Single());
+        });
+    }
+
+    [Test]
+    public async Task Does_Not_Flag_Mandatory_Property_For_Segment_When_Default_Has_Value()
+    {
+        var contentType = await SetupSegmentTest(ContentVariation.Segment, titleIsMandatory: true);
+
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Properties =
+                [
+                    new()
+                    {
+                        Alias = "title",
+                        Value = "Valid default value",
+                        Segment = null
+                    }
+                ],
+                Variants = [
+                    new() { Name = "Test Document" },
+                    new() { Name = "Test Document", Segment = "seg-1" },
+                    new() { Name = "Test Document", Segment = "seg-2" }
+                ]
+            },
+            contentType);
+
+        Assert.AreEqual(0, validationResult.ValidationErrors.Count());
+    }
+
     private async Task<(IContentType DocumentType, IContentType ElementType)> SetupBlockListTest()
     {
         var propertyEditorCollection = GetRequiredService<PropertyEditorCollection>();
@@ -602,6 +727,44 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
         return (documentType, elementType);
     }
 
+    private async Task<IContentType> SetupMinimumNumberOfItemsTest(bool mandatory)
+    {
+        var propertyEditorCollection = GetRequiredService<PropertyEditorCollection>();
+        if (propertyEditorCollection.TryGet(Constants.PropertyEditors.Aliases.MultiUrlPicker, out IDataEditor dataEditor) is false)
+        {
+            Assert.Fail("Could not get the Multi URL Picker data editor");
+        }
+
+        var configurationEditorJsonSerializer = GetRequiredService<IConfigurationEditorJsonSerializer>();
+        IDataType dataType = new DataType(dataEditor, configurationEditorJsonSerializer)
+        {
+            Name = "Test Multi URL Picker",
+            ParentId = Constants.System.Root,
+            DatabaseType = ValueTypes.ToStorageType(dataEditor.GetValueEditor().ValueType),
+            ConfigurationData = new Dictionary<string, object>
+            {
+                { nameof(MultiUrlPickerConfiguration.MinNumber).ToFirstLowerInvariant(), 3 },
+            },
+        };
+
+        var dataTypeService = GetRequiredService<IDataTypeService>();
+        var dataTypeCreateResult = await dataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(dataTypeCreateResult.Success, "Could not create the multi URL picker data type");
+
+        var documentType = new ContentType(ShortStringHelper, Constants.System.Root)
+        {
+            Name = "Test Document Type", Alias = "testDocumentType", IsElement = false, AllowedAsRoot = true
+        };
+        documentType.AddPropertyType(new PropertyType(ShortStringHelper, dataTypeCreateResult.Result, "links")
+        {
+            Mandatory = mandatory,
+        });
+        await ContentTypeService.CreateAsync(documentType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(documentType.HasIdentity, "Could not create the document type");
+
+        return documentType;
+    }
+
     private async Task<IContentType> SetupSimpleTest()
     {
         var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type");
@@ -631,7 +794,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
         return contentType;
     }
 
-    private async Task<IContentType> SetupSegmentTest(ContentVariation variation)
+    private async Task<IContentType> SetupSegmentTest(ContentVariation variation, bool titleIsMandatory = false)
     {
         var language = new LanguageBuilder()
             .WithCultureInfo("da-DK")
@@ -643,6 +806,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
         var titlePropertyType = contentType.PropertyTypes.First(pt => pt.Alias == "title");
         titlePropertyType.Variations = variation;
         titlePropertyType.ValidationRegExp = "^Valid.*$";
+        titlePropertyType.Mandatory = titleIsMandatory;
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 

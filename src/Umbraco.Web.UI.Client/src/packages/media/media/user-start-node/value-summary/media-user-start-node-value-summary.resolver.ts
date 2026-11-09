@@ -12,7 +12,9 @@ export class UmbMediaUserStartNodeValueSummaryResolver
 {
 	#repo = new UmbMediaItemRepository(this);
 
-	async resolveValues(values: ReadonlyArray<StartNode>): Promise<UmbValueSummaryResolveResult<UmbMediaItemModel | null>> {
+	async resolveValues(
+		values: ReadonlyArray<StartNode>,
+	): Promise<UmbValueSummaryResolveResult<UmbMediaItemModel | null>> {
 		const uniques = [...new Set(values.filter(Boolean).map((v) => v!.unique))];
 
 		if (uniques.length === 0) {
@@ -38,4 +40,3 @@ export class UmbMediaUserStartNodeValueSummaryResolver
 		return values.map((v) => (v ? (itemByUnique.get(v.unique) ?? null) : null));
 	}
 }
-

@@ -11,19 +11,16 @@ internal sealed class MsgPackContentNestedDataSerializerFactory : IContentCacheD
     private readonly IContentTypeService _contentTypeService;
     private readonly ConcurrentDictionary<(int, string, bool), bool> _isCompressedCache = new();
     private readonly IMediaTypeService _mediaTypeService;
-    private readonly IMemberTypeService _memberTypeService;
     private readonly PropertyEditorCollection _propertyEditors;
 
     public MsgPackContentNestedDataSerializerFactory(
         IContentTypeService contentTypeService,
         IMediaTypeService mediaTypeService,
-        IMemberTypeService memberTypeService,
         PropertyEditorCollection propertyEditors,
         IPropertyCacheCompressionOptions compressionOptions)
     {
         _contentTypeService = contentTypeService;
         _mediaTypeService = mediaTypeService;
-        _memberTypeService = memberTypeService;
         _propertyEditors = propertyEditors;
         _compressionOptions = compressionOptions;
     }
@@ -47,14 +44,6 @@ internal sealed class MsgPackContentNestedDataSerializerFactory : IContentCacheD
         if ((types & ContentCacheDataSerializerEntityType.Media) == ContentCacheDataSerializerEntityType.Media)
         {
             foreach (IMediaType ct in _mediaTypeService.GetAll())
-            {
-                contentTypes[ct.Id] = ct;
-            }
-        }
-
-        if ((types & ContentCacheDataSerializerEntityType.Member) == ContentCacheDataSerializerEntityType.Member)
-        {
-            foreach (IMemberType ct in _memberTypeService.GetAll())
             {
                 contentTypes[ct.Id] = ct;
             }

@@ -107,7 +107,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		const parentUnique = currentPath?.unique ?? null;
 
 		// Fetch allowed children of the current parent's media type
-		const { data: allowedChildrenData } = await this.#mediaTypeStructureRepository.requestAllowedChildrenOf(
+		const { data: allowedChildrenData } = await this.#mediaTypeStructureRepository.requestAllAllowedChildrenOf(
 			mediaTypeUnique,
 			parentUnique,
 		);

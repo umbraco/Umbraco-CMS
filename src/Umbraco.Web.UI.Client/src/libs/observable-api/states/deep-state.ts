@@ -8,7 +8,8 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * @class UmbDeepState
- * @augments {BehaviorSubject<T>}
+ * @augments {UmbBasicState<T>}
+ * @template T
  * @description - A RxJS BehaviorSubject which deepFreezes the data to ensure its not manipulated from any implementations.
  * Additionally the Subject ensures the data is unique, not updating any Observes unless there is an actual change of the content.
  */
@@ -24,9 +25,9 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 
 	/**
 	 * @function createObservablePart
-	 * @param {(mappable: T) => R} mappingFunction - Method to return the part for this Observable to return.
-	 * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to compare two results. Should return true when data is the same (unchanged), preventing unnecessary emissions.
-	 * @returns {Observable<R>}
+	 * @param {(mappable: T) => ReturnType} mappingFunction - Method to return the part for this Observable to return.
+	 * @param {(previousResult: ReturnType, currentResult: ReturnType) => boolean} [memoizationFunction] - Method to compare two results. Should return true when data is the same (unchanged), preventing unnecessary emissions.
+	 * @returns {Observable<ReturnType>} The derived Observable.
 	 * @description - Creates an Observable from this State.
 	 */
 	override asObservablePart<ReturnType>(

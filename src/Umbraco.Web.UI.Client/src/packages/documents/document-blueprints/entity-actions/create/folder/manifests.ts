@@ -1,7 +1,4 @@
-import {
-	UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE,
-	UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
-} from '../../../entity.js';
+import { UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE, UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE } from '../../../entity.js';
 import { UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS } from '../../../tree/folder/constants.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 

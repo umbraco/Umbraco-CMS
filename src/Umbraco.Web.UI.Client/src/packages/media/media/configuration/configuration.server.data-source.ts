@@ -16,7 +16,7 @@ export class UmbMediaConfigurationServerDataSource extends UmbControllerBase {
 		if (data) {
 			const mappedData: UmbMediaConfigurationModel = {
 				disableDeleteWhenReferenced: data.disableDeleteWhenReferenced,
-				// eslint-disable-next-line @typescript-eslint/no-deprecated
+
 				disableUnpublishWhenReferenced: data.disableUnpublishWhenReferenced,
 			};
 

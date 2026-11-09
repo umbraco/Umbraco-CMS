@@ -10,7 +10,9 @@ export interface UmbContentWorkspaceContext<
 	ContentModel extends UmbContentDetailModel = UmbContentDetailModel,
 	ContentTypeModel extends UmbContentTypeModel = UmbContentTypeModel,
 	VariantModelType extends UmbEntityVariantModel = UmbEntityVariantModel,
-> extends UmbElementPropertyDataOwner<ContentModel, ContentTypeModel>,
+>
+	extends
+		UmbElementPropertyDataOwner<ContentModel, ContentTypeModel>,
 		UmbRoutableWorkspaceContext,
 		UmbVariantDatasetWorkspaceContext<VariantModelType>,
 		UmbPropertyStructureWorkspaceContext<ContentTypeModel> {

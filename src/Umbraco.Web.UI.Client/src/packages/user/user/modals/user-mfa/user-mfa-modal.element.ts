@@ -2,11 +2,14 @@ import { UmbUserRepository } from '../../repository/index.js';
 import type { UmbUserMfaProviderModel } from '../../types.js';
 import type { UmbUserMfaModalConfiguration } from './user-mfa-modal.token.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbConfirmModal, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
+import { of } from '@umbraco-cms/backoffice/external/rxjs';
 
 type UmbMfaLoginProviderOption = UmbUserMfaProviderModel & {
 	displayName: string;
@@ -30,7 +33,9 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 	}
 
 	async #loadProviders() {
-		const serverLoginProviders$ = (await this.#userRepository.requestMfaProviders(this.#unique)).asObservable();
+		// TODO: Fail early? if no asObservable method is available on the server response, we should probably throw an error or handle it differently. [NL]
+		const serverLoginProviders$ =
+			(await this.#userRepository.requestMfaProviders(this.#unique)).asObservable?.() ?? of([]);
 		const manifestLoginProviders$ = umbExtensionsRegistry.byType('mfaLoginProvider');
 
 		// Merge the server and manifest providers to get the final list of providers
@@ -89,9 +94,10 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 
 	/**
 	 * Render a provider with a toggle to enable/disable it
-	 * @param item
+	 * @param {UmbMfaLoginProviderOption} item - The provider to render.
+	 * @returns {TemplateResult} The rendered provider.
 	 */
-	#renderProvider(item: UmbMfaLoginProviderOption) {
+	#renderProvider(item: UmbMfaLoginProviderOption): TemplateResult {
 		return html`
 			<uui-box headline=${item.displayName}>
 				${when(
@@ -137,12 +143,12 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 	 * This method is called when the user clicks the disable button on a provider.
 	 * It will show a confirmation dialog and then disable the provider if the user confirms.
 	 * NB! The user must have administrative rights before doing so.
-	 * @param item
+	 * @param {UmbMfaLoginProviderOption} item - The provider to disable.
 	 */
 	async #onProviderDisable(item: UmbMfaLoginProviderOption) {
 		await umbConfirmModal(this, {
 			headline: '#actions_disable',
-			content: this.localize.term('user_2faDisableForUser', item.displayName),
+			content: this.localize.term('user_2faDisableForUser', escapeHTML(item.displayName)),
 			confirmLabel: '#actions_disable',
 			color: 'danger',
 		});

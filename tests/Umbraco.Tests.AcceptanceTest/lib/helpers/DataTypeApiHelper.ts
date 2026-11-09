@@ -157,6 +157,10 @@ export class DataTypeApiHelper {
   // FOLDER
   async getFolder(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/data-type/folder/' + id);
+    if (!response.ok()) {
+      return null;
+    }
+
     return await response.json();
   }
 
@@ -685,6 +689,42 @@ export class DataTypeApiHelper {
             .done()
           .addSpecifiedAllowance()
             .withElementTypeKey(secondSpecifiedAllowanceElementTypeId)
+            .done()
+          .done()
+        .done()
+      .addBlock()
+        .withContentElementTypeKey(firstSpecifiedAllowanceElementTypeId)
+        .withAllowInAreas(true)
+        .done()
+      .addBlock()
+        .withContentElementTypeKey(secondSpecifiedAllowanceElementTypeId)
+        .withAllowInAreas(true)
+        .done()
+      .build();
+
+    return await this.save(blockGrid);
+  }
+
+  async createBlockGridWithAnAreaWithTwoSpecifiedAllowancesWithMinMaxInABlock(blockGridName: string, contentElementTypeId: string, firstSpecifiedAllowanceElementTypeId: string, secondSpecifiedAllowanceElementTypeId: string, secondMinAllowed: number, secondMaxAllowed: number, areaAlias: string = 'area', createLabel: string = 'CreateLabel', columnSpan: number = 6, rowSpan: number = 1) {
+    await this.ensureNameNotExists(blockGridName);
+
+    const blockGrid = new BlockGridDataTypeBuilder()
+      .withName(blockGridName)
+      .addBlock()
+        .withContentElementTypeKey(contentElementTypeId)
+        .withAllowAtRoot(true)
+        .addArea()
+          .withAlias(areaAlias)
+          .withCreateLabel(createLabel)
+          .withColumnSpan(columnSpan)
+          .withRowSpan(rowSpan)
+          .addSpecifiedAllowance()
+            .withElementTypeKey(firstSpecifiedAllowanceElementTypeId)
+            .done()
+          .addSpecifiedAllowance()
+            .withElementTypeKey(secondSpecifiedAllowanceElementTypeId)
+            .withMinAllowed(secondMinAllowed)
+            .withMaxAllowed(secondMaxAllowed)
             .done()
           .done()
         .done()
@@ -1485,6 +1525,17 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
+  async updateApprovedColorItemLabel(dataTypeName: string, color: string, label: string) {
+    const dataTypeData = await this.getByName(dataTypeName);
+    const itemsValue = dataTypeData.values.find(item => item.alias === 'items');
+    const colorItem = itemsValue?.value?.find(item => item.value === color);
+    if (!colorItem) {
+      throw new Error(`No item with color '${color}' found on data type '${dataTypeName}'.`);
+    }
+    colorItem.label = label;
+    return await this.update(dataTypeData.id, dataTypeData);
+  }
+
   async getTiptapExtensionsCount(tipTapName: string) {
     const tipTapData = await this.getByName(tipTapName);
     const extensionsValue = tipTapData.values.find(value => value.alias === 'extensions');
@@ -1790,6 +1841,24 @@ export class DataTypeApiHelper {
       .addStartNode()
         .withType('content')
         .withOriginAlias(originAlias)
+        .done()
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createContentPickerSourceDataTypeWithDynamicRootAndQueryStep(name: string, originAlias: string, queryStepAlias: string, docTypeKeys: string[]) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultiNodeTreePickerDataTypeBuilder()
+      .withName(name)
+      .addStartNode()
+        .withType('content')
+        .withOriginAlias(originAlias)
+        .addQueryStep()
+          .withAlias(queryStepAlias)
+          .withDocTypeKeys(docTypeKeys)
+          .done()
         .done()
       .build();
 
@@ -2102,6 +2171,17 @@ export class DataTypeApiHelper {
       .addStartNode()
         .withType(startNodeType)
         .done()
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createMultiNodeTreePickerDataTypeWithMinNumberOfItems(name: string, minNumber: number) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultiNodeTreePickerDataTypeBuilder()
+      .withName(name)
+      .withMinNumber(minNumber)
       .build();
 
     return await this.save(dataType);

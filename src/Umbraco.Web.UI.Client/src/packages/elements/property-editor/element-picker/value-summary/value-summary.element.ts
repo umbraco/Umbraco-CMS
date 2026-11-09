@@ -1,7 +1,7 @@
-import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import { UmbElementItemDataResolver } from '../../../item/data-resolver/element-item-data-resolver.js';
 import type { UmbElementItemModel } from '../../../types.js';
+import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 /** Renders picked element names (variant-aware, comma-joined) for collection view cells. */

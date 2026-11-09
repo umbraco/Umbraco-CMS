@@ -80,7 +80,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 	/**
 	 * Add a path translator to this validation context.
-	 * @param translator
+	 * @param {UmbValidationMessageTranslator} translator - The translator to add.
 	 */
 	async addTranslator(translator: UmbValidationMessageTranslator) {
 		this.messages?.addTranslator(translator);
@@ -210,7 +210,8 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
 		}
-		// If set to 'autoReport'/#sync, the call to `clear()` will trigger the sync observation and clean up its messages from the parent validation context. [NL]
+		// Stop Sync to avoid 'autoReport'/#sync cleaning up its messages from the parent validation context. [NL]
+		this.#stopSync();
 		this.messages.clear();
 		this.#latestLocalMessages = undefined;
 		this.#latestParentMessages = undefined;
@@ -220,7 +221,12 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	#readyToSync() {
 		if (this.#sync && this.#parent) {
 			this.#parent.addValidator(this);
+			this.observe(this.messages.messages, this.#transferMessages, 'observeLocalMessages');
 		}
+	}
+
+	#stopSync() {
+		this.removeUmbControllerByAlias('observeLocalMessages');
 	}
 
 	/**
@@ -229,15 +235,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	autoReport() {
 		this.#sync = true;
 		this.#readyToSync();
-		this.observe(this.messages.messages, this.#transferMessages, 'observeLocalMessages');
 	}
-
-	// no need for this method at this movement. [NL]
-	/*
-	#stopSync() {
-		this.removeUmbControllerByAlias('observeLocalMessages');
-	}
-	*/
 
 	/**
 	 * Perform a one time transfer of the messages from this context to the parent context.
@@ -292,7 +290,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	/**
 	 * Get if this context is valid.
 	 * Notice this does not verify the validity.
-	 * @returns {boolean}
+	 * @returns {boolean} Whether this context is currently valid.
 	 */
 	get isValid(): boolean {
 		return this.#isValid;
@@ -302,7 +300,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 * Add a validator to this context.
 	 * This validator will have to be valid for the context to be valid.
 	 * If the context is in validation mode, the validator will be validated immediately.
-	 * @param validator { UmbValidator } - The validator to add to this context.
+	 * @param {UmbValidator} validator - The validator to add to this context.
 	 */
 	addValidator(validator: UmbValidator): void {
 		if (this.#validators.includes(validator)) return;
@@ -318,7 +316,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 	/**
 	 * Remove a validator from this context.
-	 * @param validator {UmbValidator} - The validator to remove from this context.
+	 * @param {UmbValidator} validator - The validator to remove from this context.
 	 */
 	removeValidator(validator: UmbValidator): void {
 		const index = this.#validators.indexOf(validator);
@@ -335,7 +333,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	/**
 	 * Validate this context, all the validators of this context will be validated.
 	 * Notice its a recursive check meaning sub validation contexts also validates their validators.
-	 * @returns succeed {Promise<boolean>} - Returns a promise that resolves to true if the validation succeeded.
+	 * @returns {Promise<void>} A promise that resolves once validation completes.
 	 */
 	async validate(): Promise<void> {
 		this.#validationMode = true;
@@ -462,6 +460,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		}
 		this.#destroyValidators();
 		this.unprovide();
+		this.#stopSync();
 		this.messages?.destroy();
 		(this.messages as unknown) = undefined;
 		if (this.#parent) {

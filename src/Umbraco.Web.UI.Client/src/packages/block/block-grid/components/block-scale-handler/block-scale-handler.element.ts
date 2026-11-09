@@ -59,7 +59,7 @@ export class UmbBlockGridScaleHandlerElement extends UmbLitElement implements Um
 				background-color: var(--uui-color-surface);
 				border: var(--uui-color-interactive) solid 1px;
 				box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
-				opacity: 0;
+				opacity: var(--umb-block-scale-handler-opacity, 0);
 				transition: opacity 120ms;
 			}
 			#handler:hover,

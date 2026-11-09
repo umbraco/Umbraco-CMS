@@ -5,7 +5,7 @@ import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 
 /**
  * @class UmbStylesheetFolderStore
- * @augments {UmbStoreBase}
+ * @augments {UmbDetailStoreBase}
  * @description - Data Store for Stylesheet Folders
  */
 export class UmbStylesheetFolderStore extends UmbDetailStoreBase<UmbFolderModel> {

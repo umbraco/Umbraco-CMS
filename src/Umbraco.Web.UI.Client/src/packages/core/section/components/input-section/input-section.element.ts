@@ -3,7 +3,7 @@ import { UmbSectionPickerInputContext } from './input-section.context.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { isAboveZeroAndBelowMinimum, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-section')
 export class UmbInputSectionElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -81,7 +81,7 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => isAboveZeroAndBelowMinimum(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(
@@ -90,10 +90,11 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), null);
 		this.observe(
 			this.#pickerContext.selectedItems,
 			(selectedItems) => (this._items = [...selectedItems].sort((a, b) => (b.weight ?? 0) - (a.weight ?? 0))),
+			null,
 		);
 	}
 
@@ -103,7 +104,13 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 
 	override render() {
 		return html`
-			<uui-ref-list>${repeat(this._items ?? [], (item) => item.unique, (item) => this._renderItem(item))}</uui-ref-list>
+			<uui-ref-list
+				>${repeat(
+					this._items ?? [],
+					(item) => item.unique,
+					(item) => this._renderItem(item),
+				)}</uui-ref-list
+			>
 			<uui-button
 				id="btn-add"
 				look="placeholder"

@@ -10,7 +10,8 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 - **[Manifests & Aliases](./docs/manifests.md)** - Manifest shape, alias conventions, alias constants, how aliases connect extensions, registration, registry operations, kind merging
 - **[Entities](./docs/entities.md)** - Entity types, entity context, how entityType connects workspaces/trees/actions/routing
 - **[Workspaces](./docs/workspaces.md)** - Workspace types, base classes, extension points, workspace contexts, save flow, routing
-- **[Core Primitives](./docs/core-primitives.md)** - UmbLitElement, observable state, Context API, controller lifecycle
+- **[Core Primitives](./docs/core-primitives.md)** - UmbLitElement (observe, consume/provide context, localization), observable state overview, controller lifecycle
+- **[Context API](./docs/context-api.md)** - Context tokens, shared aliases, resolution rules, token lookup
 - **[State System](./docs/state-system.md)** - `Umb*State` change-detection contract, per-type comparison semantics, `asObservablePart`, mute/unmute, observer-guard anti-patterns
 - **[Data Flow](./docs/data-flow.md)** - Data flow chain, data sources, tryExecute, generated API clients, stores, complete worked example
 - **[Repositories](./docs/repositories.md)** - Repository categories (detail, item, tree, collection, action-specific), file structure, naming, extension registration, data source delegation
@@ -46,17 +47,19 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 
 **Before performing any of these actions, you MUST read the linked doc first:**
 
-| Before you...                                 | Read                                                                                                                          |
-| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Deprecate or remove a public API              | [docs/deprecation.md](./docs/deprecation.md) — requires **both** `@deprecated` JSDoc **and** runtime `UmbDeprecation` warning |
-| Create a new element or component             | [docs/style-guide.md](./docs/style-guide.md)                                                                                  |
-| Build, style, or write copy for any UI        | [docs/design-choices.md](./docs/design-choices.md) — default to no icon, no colour, terse contextual copy                     |
-| Create a repository or data source            | [docs/repositories.md](./docs/repositories.md) + [docs/data-flow.md](./docs/data-flow.md)                                     |
-| Add error handling or debugging               | [docs/error-handling.md](./docs/error-handling.md)                                                                            |
-| Write or modify tests                         | [docs/testing.md](./docs/testing.md)                                                                                          |
-| Work with auth or security                    | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md)                                           |
-| Scaffold a new package or module              | [docs/package-development.md](./docs/package-development.md)                                                                  |
-| Write or change observers / `Umb*State` usage | [docs/state-system.md](./docs/state-system.md) — states already deduplicate; do not add "is this a re-emit?" guards           |
+| Before you...                                           | Read                                                                                                                           |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Deprecate or remove a public API                        | [docs/deprecation.md](./docs/deprecation.md) — requires **both** `@deprecated` JSDoc **and** runtime `UmbDeprecation` warning  |
+| Create a new element or component                       | [docs/style-guide.md](./docs/style-guide.md)                                                                                   |
+| Build, style, or write copy for any UI                  | [docs/design-choices.md](./docs/design-choices.md) — default to no icon, no colour, terse contextual copy                      |
+| Create a repository or data source                      | [docs/repositories.md](./docs/repositories.md) + [docs/data-flow.md](./docs/data-flow.md)                                      |
+| Add error handling or debugging                         | [docs/error-handling.md](./docs/error-handling.md)                                                                             |
+| Write or modify tests                                   | [docs/testing.md](./docs/testing.md)                                                                                           |
+| Work with auth or security                              | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md)                                            |
+| Scaffold a new package or module                        | [docs/package-development.md](./docs/package-development.md)                                                                   |
+| Consume or provide a context, or create a context token | [docs/context-api.md](./docs/context-api.md) — tokens can share an alias; consume the most specific one once                   |
+| Write or change observers / `Umb*State` usage           | [docs/state-system.md](./docs/state-system.md) — states already deduplicate; do not add "is this a re-emit?" guards            |
+| Add, rename, or remove a key in `src/assets/lang/en.ts` | [docs/package-development.md](./docs/package-development.md#type-safe-localization-keys)                                       |
 
 This is not optional. Skipping these leads to convention violations that are caught in review.
 
@@ -124,11 +127,11 @@ Uses the `semver` package (npm's own semver library) for robust parsing:
 **Pre-release packages (0.x.y)**
 
 ```
-Input:  ^0.85.0    or    0.85.0
-Output: >=0.85.0 <1.0.0
+Input:  ^0.99.0    or    0.99.0
+Output: >=0.99.0 <1.0.0
 
-Why: Pre-release caret (^0.85.0) only allows patch updates (0.85.x).
-     Explicit range allows plugins to use 0.91.1 without conflicts.
+Why: Pre-release caret (^0.99.0) only allows patch updates (0.99.x).
+     Explicit range allows plugins to use 0.99.5 without conflicts.
 ```
 
 **Stable packages with caret (major ≥ 1)**
@@ -159,7 +162,7 @@ Why: Normalizes to conventional semver format
 		"@umbraco-ui/uui": "^2.0.0",
 		"monaco-editor": "^0.55.1",
 		"@tiptap/core": "^3.16.0",
-		"@hey-api/openapi-ts": ">=0.85.0 <1.0.0"
+		"@hey-api/openapi-ts": ">=0.99.0 <1.0.0"
 	}
 }
 ```
@@ -169,16 +172,17 @@ Why: Normalizes to conventional semver format
 When using `@umbraco-cms/backoffice`:
 
 - **Declare dependencies explicitly** in your `package.json` (don't rely on transitive deps from backoffice)
-- **Version ranges are flexible**: `>=0.85.0 <1.0.0` means you can use `0.85.0`, `0.91.1`, or `0.99.99`
+- **Version ranges are flexible**: `>=0.99.0 <1.0.0` means you can use `0.99.0`, `0.99.5`, or `0.99.99`
 - **Types come from npm**: TypeScript gets types from your declared versions
 - **Runtime comes from importmap**: The actual code at runtime is managed by the backoffice (importmap)
 - **Future compatibility**: When `@hey-api` hits `1.0.0`, the published range will automatically become `^1.0.0`
 
 ### Key Files
 
-| File                            | Purpose                                                          |
-| ------------------------------- | ---------------------------------------------------------------- |
-| `package.json`                  | Root package with exports and workspace references               |
-| `devops/publish/cleanse-pkg.js` | Script that runs during `npm pack` to hoist and convert versions |
-| `src/external/*`                | Dependency wrapper packages                                      |
-| `src/packages/core`             | Contains `@hey-api/openapi-ts` and other utilities               |
+| File                                         | Purpose                                                                                                    |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `package.json`                               | Root package with exports and workspace references                                                         |
+| `devops/publish/cleanse-pkg.js`              | Script that runs during `npm pack` to hoist and convert versions                                           |
+| `devops/package/validate-hey-api-version.js` | Fails `package:validate` when the extension template's `@hey-api/openapi-ts` leaves the backoffice's range |
+| `src/external/*`                             | Dependency wrapper packages                                                                                |
+| `src/packages/core`                          | Contains `@hey-api/openapi-ts` and other utilities                                                         |

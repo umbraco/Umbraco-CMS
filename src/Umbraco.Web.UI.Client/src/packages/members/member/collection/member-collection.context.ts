@@ -14,7 +14,7 @@ export class UmbMemberCollectionContext extends UmbDefaultCollectionContext<
 
 	/**
 	 * Sets the member type filter for the collection and refreshes the collection.
-	 * @param {Array<string>} selection
+	 * @param {Array<string>} selection - The member type unique identifier to filter by.
 	 * @memberof UmbMemberCollectionContext
 	 */
 	setMemberTypeFilter(selection: string) {

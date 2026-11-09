@@ -1,7 +1,9 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -28,13 +30,14 @@ public class DefaultUrlProvider : IUrlProvider
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly UriUtility _uriUtility;
     private RequestHandlerSettings _requestSettings;
-    private readonly ILanguageService _languageService;
+    private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
     // TODO See if we can make GetUrlFromRoute asynchronous and avoid the GetAwaiter().GetResult() in when using ILanguageService.
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultUrlProvider"/> class.
     /// </summary>
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 20.")]
     public DefaultUrlProvider(
         IOptionsMonitor<RequestHandlerSettings> requestSettings,
         ILogger<DefaultUrlProvider> logger,
@@ -48,6 +51,78 @@ public class DefaultUrlProvider : IUrlProvider
         IDocumentNavigationQueryService navigationQueryService,
         IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
         ILanguageService languageService)
+        : this(
+            requestSettings,
+            logger,
+            siteDomainMapper,
+            umbracoContextAccessor,
+            uriUtility,
+            publishedContentCache,
+            domainCache,
+            idKeyMap,
+            documentUrlService,
+            navigationQueryService,
+            publishedContentStatusFilteringService,
+            languageService,
+            StaticServiceProvider.Instance.GetRequiredService<IDefaultCultureAccessor>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NewDefaultUrlProvider"/> class.
+    /// </summary>
+    /// <remarks>
+    /// Its parameters cover those of the other constructors, so the container can choose between them.
+    /// </remarks>
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 20.")]
+    public DefaultUrlProvider(
+        IOptionsMonitor<RequestHandlerSettings> requestSettings,
+        ILogger<DefaultUrlProvider> logger,
+        ISiteDomainMapper siteDomainMapper,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        UriUtility uriUtility,
+        IPublishedContentCache publishedContentCache,
+        IDomainCache domainCache,
+        IIdKeyMap idKeyMap,
+        IDocumentUrlService documentUrlService,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
+#pragma warning disable IDE0060 // Remove unused parameter
+        ILanguageService languageService,
+#pragma warning restore IDE0060 // Remove unused parameter
+        IDefaultCultureAccessor defaultCultureAccessor)
+        : this(
+            requestSettings,
+            logger,
+            siteDomainMapper,
+            umbracoContextAccessor,
+            uriUtility,
+            publishedContentCache,
+            domainCache,
+            idKeyMap,
+            documentUrlService,
+            navigationQueryService,
+            publishedContentStatusFilteringService,
+            defaultCultureAccessor)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NewDefaultUrlProvider"/> class.
+    /// </summary>
+    public DefaultUrlProvider(
+        IOptionsMonitor<RequestHandlerSettings> requestSettings,
+        ILogger<DefaultUrlProvider> logger,
+        ISiteDomainMapper siteDomainMapper,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        UriUtility uriUtility,
+        IPublishedContentCache publishedContentCache,
+        IDomainCache domainCache,
+        IIdKeyMap idKeyMap,
+        IDocumentUrlService documentUrlService,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
+        IDefaultCultureAccessor defaultCultureAccessor)
     {
         _requestSettings = requestSettings.CurrentValue;
         _logger = logger;
@@ -60,7 +135,7 @@ public class DefaultUrlProvider : IUrlProvider
         _documentUrlService = documentUrlService;
         _navigationQueryService = navigationQueryService;
         _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
-        _languageService = languageService;
+        _defaultCultureAccessor = defaultCultureAccessor;
 
         requestSettings.OnChange(x => _requestSettings = x);
     }
@@ -193,7 +268,7 @@ public class DefaultUrlProvider : IUrlProvider
 
         // will not use cache if previewing
 
-        return GetUrlFromRoute(route, content.Id, current, mode, culture);
+        return GetUrlFromRoute(route, content.Id, current, mode, culture, content.Key);
     }
 
     /// <summary>
@@ -204,15 +279,26 @@ public class DefaultUrlProvider : IUrlProvider
         int id,
         Uri current,
         UrlMode mode,
-        string? culture)
+        string? culture,
+        Guid? key = null)
     {
         if (string.IsNullOrWhiteSpace(route) || route.Equals(Constants.Routing.Unroutable))
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
+                // Callers with only the integer id (via IPublishedUrlProvider.GetUrlFromRoute) can't supply the key,
+                // so resolve it here. Kept inside the log level check so it costs nothing when debug isn't enabled.
+                Guid? nodeKey = key;
+                if (nodeKey is null)
+                {
+                    Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
+                    nodeKey = keyAttempt.Success ? keyAttempt.Result : null;
+                }
+
                 _logger.LogDebug(
-                "Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.",
-                id);
+                    "Couldn't find any page with nodeId={NodeId}, nodeKey={NodeKey}. This is most likely caused by the page not being published.",
+                    id,
+                    nodeKey);
             }
             return null;
         }
@@ -239,7 +325,7 @@ public class DefaultUrlProvider : IUrlProvider
                 culture);
         }
 
-        var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+        var defaultCulture = _defaultCultureAccessor.DefaultCulture;
         if (domainUri is not null ||
             string.IsNullOrEmpty(culture) ||
             culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))

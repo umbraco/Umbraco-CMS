@@ -57,9 +57,13 @@ export class UserGroupUiHelper extends UiBaseLocators {
   }
 
   async clickUserGroupsButton() {
-    await this.click(this.userGroupsBtn);
-    // Wait for the list to render (default groups always yield a row) instead of a fixed sleep.
-    await expect(this.firstUserGroupRow).toBeVisible({timeout: ConstantHelper.timeout.long});
+    // The nav click can land before the collection route is ready, leaving the list unrendered.
+    await expect(async () => {
+      if (!(await this.firstUserGroupRow.isVisible())) {
+        await this.click(this.userGroupsBtn);
+      }
+      await expect(this.firstUserGroupRow).toBeVisible({timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.long});
   }
 
   async enterUserGroupName(name: string) {
@@ -145,7 +149,7 @@ export class UserGroupUiHelper extends UiBaseLocators {
   }
 
   async doesUserGroupTableHaveSection(userGroupName: string, sectionName: string, hasSection = true) {
-    await this.isVisible(this.page.locator('uui-table-row', {hasText: userGroupName}).locator('umb-section-aliases-value-summary', {hasText: sectionName}), hasSection);
+    await this.isVisible(this.userGroupRowWithExactName(userGroupName).locator('umb-section-aliases-value-summary', {hasText: sectionName}), hasSection);
   }
 
   async doesUserGroupContainLanguage(languageName: string, isVisible = true) {
@@ -291,7 +295,8 @@ export class UserGroupUiHelper extends UiBaseLocators {
   }
 
   async isUserVisibleInUserGroup(userName: string, isVisible = true) {
-    await this.isVisible(this.workspaceUserItemRefs.filter({hasText: userName}), isVisible);
+    // Exact match, not a substring filter, to avoid ambiguity against leftover/residual users.
+    await this.isVisible(this.workspaceUserItemRefs.filter({has: this.page.getByText(userName, {exact: true})}), isVisible);
   }
 
   async getUsersInGroupCount() {
@@ -300,7 +305,7 @@ export class UserGroupUiHelper extends UiBaseLocators {
   }
 
   async clickUserCardWithName(userName: string) {
-    await this.click(this.page.locator('uui-card-user', {hasText: userName}));
+    await this.click(this.page.locator('uui-card-user').filter({has: this.page.getByText(userName, {exact: true})}));
   }
 
   async clickChooseModalButtonAndWaitForGroupUsersUpdate() {

@@ -84,7 +84,7 @@ export function provideContext<
 /**
  * Sets up a standard decorator (Stage 3 TC39 proposal) for auto-accessors.
  * This branch is used when decorating with the 'accessor' keyword.
- * Example: @provideContext({context: TOKEN}) accessor myProp = new MyContext();
+ * Example: `@provideContext({context: TOKEN}) accessor myProp = new MyContext();`
  *
  * The decorator receives a ClassAccessorDecoratorContext object and returns
  * an accessor descriptor that intercepts the property initialization.
@@ -92,10 +92,11 @@ export function provideContext<
  * This is the modern, standardized decorator API that will be the standard
  * when Lit 4.x is released.
  *
- * Note: Standard decorators currently don't work with @state()/@property()
+ * Note: Standard decorators currently don't work with `@state()`/`@property()`
  * decorators, which is why we still need the legacy branch.
- * @param protoOrTarget
- * @param context
+ * @param {ClassAccessorDecoratorTarget<unknown, InstanceType>} protoOrTarget The class prototype or target being decorated.
+ * @param {string | UmbContextToken<BaseType, ResultType>} context Context alias or token to provide.
+ * @returns {object} An accessor descriptor that intercepts the property initialization.
  */
 function setupStandardDecorator<
 	BaseType extends UmbContextMinimal,
@@ -119,23 +120,23 @@ function setupStandardDecorator<
 /**
  * Sets up a legacy decorator (TypeScript experimental) for regular properties.
  * This branch is used when decorating without the 'accessor' keyword.
- * Example: @provideContext({context: TOKEN}) myProp = new MyContext();
+ * Example: `@provideContext({context: TOKEN}) myProp = new MyContext();`
  *
  * The decorator receives:
  * - protoOrTarget: The class prototype
  * - propertyKey: The property name (string)
  *
  * This is the older TypeScript experimental decorator API, still widely used
- * in Umbraco because it works with @state() and @property() decorators.
+ * in Umbraco because it works with `@state()` and `@property()` decorators.
  * The 'accessor' keyword is not compatible with these decorators yet.
  *
  * We support three initialization strategies:
  * 1. addInitializer (if available, e.g., on LitElement classes)
  * 2. hostConnected wrapper (for UmbController classes)
  * 3. Warning (if neither is available)
- * @param protoOrTarget
- * @param propertyKey
- * @param context
+ * @param {Interface<ReactiveEntity>} protoOrTarget The class prototype being decorated.
+ * @param {string} propertyKey The property name.
+ * @param {string | UmbContextToken<BaseType, ResultType>} context Context alias or token to provide.
  */
 function setupLegacyDecorator<
 	BaseType extends UmbContextMinimal,
