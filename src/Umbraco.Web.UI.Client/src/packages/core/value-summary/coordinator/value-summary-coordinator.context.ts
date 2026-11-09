@@ -38,6 +38,7 @@ export class UmbValueSummaryCoordinatorContext extends UmbContextBase {
 
 	/**
 	 * Registers a value for display resolution.
+	 * Values of a value type without a `valueResolver` are passed through unchanged.
 	 * @param {string} valueType - The value type key identifying the resolver manifest.
 	 * @param {unknown} value - The raw value to resolve.
 	 */
@@ -78,11 +79,8 @@ export class UmbValueSummaryCoordinatorContext extends UmbContextBase {
 				this.#applyResolved(valueType, uniqueValues, data);
 
 				if (asObservable) {
-					this.observe(
-						asObservable(),
-						(resolved) => this.#applyResolved(valueType, uniqueValues, resolved),
-						`resolver-${valueType}`,
-					);
+					// Each flush covers different values, so its observer must not replace an earlier flush's observer.
+					this.observe(asObservable(), (resolved) => this.#applyResolved(valueType, uniqueValues, resolved), null);
 				}
 			} catch (e) {
 				console.warn('[ValueSummary] Resolution failed for', valueType, e);

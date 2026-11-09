@@ -4,14 +4,15 @@ import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { BehaviorSubject, Observable, map } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbValueSummaryResolveResult } from '../extensions/value-summary-resolver.interface.js';
 
 @customElement('test-coordinator-host')
 class TestHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 function makeManifest(
 	valueType: string,
-	resolverFn?: (values: ReadonlyArray<unknown>) => Promise<{ data: ReadonlyArray<unknown> }>,
+	resolverFn?: (values: ReadonlyArray<unknown>) => Promise<UmbValueSummaryResolveResult>,
 ): ManifestValueSummary {
 	const manifest: ManifestValueSummary = {
 		type: 'valueSummary',
@@ -196,5 +197,39 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 		});
 
 		expect(constructCount).to.equal(1);
+	});
+
+	it('should keep values from every flush following resolver updates', async () => {
+		const valueType = 'Umb.Test.LiveAcrossFlushes';
+		const source = new BehaviorSubject<Record<string, string>>({ a: 'A', b: 'B' });
+
+		const manifest = makeManifest(valueType, async (values) => ({
+			data: values.map((v) => source.getValue()[v as string]),
+			asObservable: () => source.pipe(map((names) => values.map((v) => names[v as string]))),
+		}));
+		umbExtensionsRegistry.register(manifest);
+
+		const waitFor = (rawValue: string, expected: string) =>
+			new Promise<void>((resolve) => {
+				coordinator.observeResolvedValue(valueType, rawValue).subscribe((v) => {
+					if (v === expected) resolve();
+				});
+			});
+
+		coordinator.register(valueType, 'a');
+		await waitFor('a', 'A');
+
+		coordinator.register(valueType, 'b');
+		await waitFor('b', 'B');
+
+		source.next({ a: 'A renamed', b: 'B renamed' });
+
+		let resolvedA: unknown;
+		let resolvedB: unknown;
+		coordinator.observeResolvedValue(valueType, 'a').subscribe((v) => (resolvedA = v));
+		coordinator.observeResolvedValue(valueType, 'b').subscribe((v) => (resolvedB = v));
+
+		expect(resolvedA).to.equal('A renamed');
+		expect(resolvedB).to.equal('B renamed');
 	});
 });
