@@ -15,6 +15,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Webhook.Item;
 /// </remarks>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/{Constants.UdiEntityType.Webhook}")]
 [ApiExplorerSettings(GroupName = "Webhook")]
+// TODO (V20): Remove this policy so webhook items are available to all back-office users, like other item endpoints,
+// once the obsolete configuration properties are removed from WebhookItemResponseModel and the name no longer falls back to the URL.
 [Authorize(Policy = AuthorizationPolicies.TreeAccessWebhooks)]
 public class WebhookItemControllerBase : ManagementApiControllerBase
 {

@@ -3265,8 +3265,17 @@ export type WebhookItemResponseModel = {
     flags: Array<FlagModel>;
     enabled: boolean;
     name: string;
+    /**
+     * @deprecated
+     */
     events: string;
+    /**
+     * @deprecated
+     */
     url: string;
+    /**
+     * @deprecated
+     */
     types: string;
 };
 
