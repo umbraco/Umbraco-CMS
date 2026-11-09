@@ -115,10 +115,16 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
             case UmbracoEntityTypes.Member:
                 indexName = Constants.UmbracoIndexes.MembersIndexName;
                 type = "member";
-                fields.AddRange(_treeSearcherFields.GetBackOfficeMembersFields());
-                foreach (var field in _treeSearcherFields.GetBackOfficeMembersFieldsToLoad())
+
+                // Member fields can hold identifying data (e.g. email), so matching on them would let a user
+                // without the Members section confirm whether a member exists.
+                if (CurrentUserHasSectionAccess(Constants.Applications.Members))
                 {
-                    fieldsToLoad.Add(field);
+                    fields.AddRange(_treeSearcherFields.GetBackOfficeMembersFields());
+                    foreach (var field in _treeSearcherFields.GetBackOfficeMembersFieldsToLoad())
+                    {
+                        fieldsToLoad.Add(field);
+                    }
                 }
 
                 if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId &&
@@ -532,6 +538,9 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 
         return path1.Length == path2.Length || path1[path2.Length] == ',';
     }
+
+    private bool CurrentUserHasSectionAccess(string section)
+        => _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasSectionAccess(section) is true;
 
     private int[] GetUserStartNodes(UmbracoObjectTypes objectType)
     {
