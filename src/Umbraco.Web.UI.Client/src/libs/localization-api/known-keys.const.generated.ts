@@ -14,6 +14,7 @@ import './known-keys.types.generated.js';
 export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'actionCategories_administration',
 	'actionCategories_content',
+	'actionCategories_elements',
 	'actionCategories_general',
 	'actionCategories_other',
 	'actionCategories_structure',

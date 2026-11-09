@@ -217,18 +217,22 @@ export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormC
 		const permission = this.#getPermissionForFolder(item.unique);
 		if (!permission) return;
 
-		return umbExtensionsRegistry
-			.getByTypeAndFilter(
-				'entityUserPermission',
-				(manifest) =>
-					manifest.forEntityTypes.includes(item.entityType) &&
-					manifest.meta.verbs.every((verb) => permission.verbs.includes(verb)),
-			)
-			.map((m) => {
-				const manifest = m as ManifestEntityUserPermission;
-				return manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
-			})
-			.join(', ');
+		const manifests = umbExtensionsRegistry.getByTypeAndFilter(
+			'entityUserPermission',
+			(manifest) =>
+				manifest.forEntityTypes.includes(item.entityType) &&
+				manifest.meta.verbs.every((verb) => permission.verbs.includes(verb)),
+		) as Array<ManifestEntityUserPermission>;
+
+		const toLabels = (items: Array<ManifestEntityUserPermission>) =>
+			items.map((m) => (m.meta.label ? this.localize.string(m.meta.label) : m.name)).join(', ');
+
+		const folderLabels = toLabels(manifests.filter((m) => m.meta.group !== 'elements'));
+		const elementLabels = toLabels(manifests.filter((m) => m.meta.group === 'elements'));
+
+		return [folderLabels, elementLabels && `${this.localize.term('actionCategories_elements')}: ${elementLabels}`]
+			.filter(Boolean)
+			.join(' · ');
 	}
 
 	#getFallbackPermissionVerbsForEntityType(entityType: string) {
@@ -244,7 +248,7 @@ export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormC
 		return [...new Set([...verbs])];
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			#btn-add {
 				width: 100%;

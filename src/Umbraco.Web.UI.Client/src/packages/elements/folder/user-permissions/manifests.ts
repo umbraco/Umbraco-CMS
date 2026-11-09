@@ -6,8 +6,22 @@ import {
 	UMB_USER_PERMISSION_ELEMENT_FOLDER_READ,
 	UMB_USER_PERMISSION_ELEMENT_FOLDER_UPDATE,
 } from './constants.js';
+import {
+	UMB_USER_PERMISSION_ELEMENT_CREATE,
+	UMB_USER_PERMISSION_ELEMENT_DELETE,
+	UMB_USER_PERMISSION_ELEMENT_DUPLICATE,
+	UMB_USER_PERMISSION_ELEMENT_MOVE,
+	UMB_USER_PERMISSION_ELEMENT_PUBLISH,
+	UMB_USER_PERMISSION_ELEMENT_READ,
+	UMB_USER_PERMISSION_ELEMENT_ROLLBACK,
+	UMB_USER_PERMISSION_ELEMENT_UNPUBLISH,
+	UMB_USER_PERMISSION_ELEMENT_UPDATE,
+} from '../../user-permissions/constants.js';
 import { manifests as conditions } from './conditions/manifests.js';
-import type { ManifestEntityUserPermission, ManifestGranularUserPermission } from '@umbraco-cms/backoffice/user-permission';
+import type {
+	ManifestEntityUserPermission,
+	ManifestGranularUserPermission,
+} from '@umbraco-cms/backoffice/user-permission';
 
 const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 	{
@@ -69,6 +83,32 @@ const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 			description: '#userPermissions_update_element_folder',
 		},
 	},
+	...(
+		[
+			['Create', UMB_USER_PERMISSION_ELEMENT_CREATE, 'create'],
+			['Delete', UMB_USER_PERMISSION_ELEMENT_DELETE, 'delete'],
+			['Duplicate', UMB_USER_PERMISSION_ELEMENT_DUPLICATE, 'duplicate'],
+			['Move', UMB_USER_PERMISSION_ELEMENT_MOVE, 'move'],
+			['Publish', UMB_USER_PERMISSION_ELEMENT_PUBLISH, 'publish'],
+			['Read', UMB_USER_PERMISSION_ELEMENT_READ, 'read'],
+			['Rollback', UMB_USER_PERMISSION_ELEMENT_ROLLBACK, 'rollback'],
+			['Unpublish', UMB_USER_PERMISSION_ELEMENT_UNPUBLISH, 'unpublish'],
+			['Update', UMB_USER_PERMISSION_ELEMENT_UPDATE, 'update'],
+		] as const
+	).map(
+		([name, verb, key]): ManifestEntityUserPermission => ({
+			type: 'entityUserPermission',
+			alias: `Umb.EntityUserPermission.ElementFolder.${name}Element`,
+			name: `${name} Element in Element Folder User Permission`,
+			forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
+			meta: {
+				verbs: [verb],
+				label: `#userPermissions_${key}`,
+				description: `#userPermissions_${key}_element`,
+				group: 'elements',
+			},
+		}),
+	),
 ];
 
 const granularPermissions: Array<ManifestGranularUserPermission> = [
