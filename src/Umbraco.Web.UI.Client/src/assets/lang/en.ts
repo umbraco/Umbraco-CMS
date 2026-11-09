@@ -680,6 +680,7 @@ export default {
 		linkedToService: 'Your account is linked to this service',
 		selectEditor: 'Select editor',
 		selectEditorConfiguration: 'Select configuration',
+		selectEditorConfigurationEmptyMessage: 'No configurations available',
 		selectSnippet: 'Select snippet',
 		variantdeletewarning:
 			'This will delete the node and all its languages. If you only want to delete one language, you should unpublish the node in that language instead.',
