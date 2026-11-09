@@ -21,6 +21,22 @@ public interface IElementCacheService : IContentCacheService
     Task<IPublishedElement?> GetByKeyAsync(Guid key, bool? preview = null);
 
     /// <summary>
+    /// Gets a published element by its unique key, for synchronous callers.
+    /// </summary>
+    /// <param name="key">The unique key of the element.</param>
+    /// <param name="preview">Optional value indicating whether to include unpublished content. If <c>null</c>, uses the default preview setting.</param>
+    /// <returns>The published element, or <c>null</c> if not found.</returns>
+    /// <remarks>
+    /// Implementations should avoid blocking on <see cref="GetByKeyAsync"/>, and read synchronously from the
+    /// backing stores that support it: a caller blocked on asynchronous work needs a second thread to complete it.
+    /// A store with no synchronous read, for example a distributed cache, may still have to be waited on.
+    /// The default implementation blocks on <see cref="GetByKeyAsync"/>.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation and reference to it in the remarks.
+    IPublishedElement? GetByKey(Guid key, bool? preview = null)
+        => GetByKeyAsync(key, preview).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Attempts to retrieve an element from the in-memory converted-content cache without
     /// touching the distributed cache or the database.
     /// </summary>

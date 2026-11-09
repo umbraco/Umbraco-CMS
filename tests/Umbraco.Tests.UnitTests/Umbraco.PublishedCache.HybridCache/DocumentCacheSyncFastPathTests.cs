@@ -2,80 +2,53 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.HybridCache;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.HybridCache;
 
 /// <summary>
-/// Tests that <see cref="DocumentCache.GetById(bool, Guid)"/> consults
-/// <see cref="IDocumentCacheService.TryGetCached"/> first and skips the async fallback
-/// entirely when the L0 cache has the requested item.
+/// Tests that the synchronous <see cref="DocumentCache"/> lookups use the synchronous
+/// <see cref="IDocumentCacheService"/> members rather than blocking on the asynchronous ones.
 /// </summary>
 /// <remarks>
-/// The async path (<c>GetByKeyAsync</c>) is the slow case — distributed cache + database +
-/// factory work. On a warm site we want to confirm the per-key sync calls inside
-/// <c>FilterAvailable</c>'s lazy chain take the fast path and never spin up an async state
-/// machine. This fixture asserts that contract by mocking the service and verifying call
-/// counts.
+/// The synchronous service members return converted (L0) cache hits without entering the asynchronous
+/// read logic, and read the database synchronously on a miss.
 /// </remarks>
 [TestFixture]
 public class DocumentCacheSyncFastPathTests
 {
-    [Test]
-    public void GetById_HitsL0ViaTryGetCached_ReturnsCachedAndSkipsAsync()
+    [TestCase(true)]
+    [TestCase(false)]
+    public void GetById_By_Key_Uses_The_Synchronous_Lookup(bool preview)
     {
         IPublishedContent expected = Mock.Of<IPublishedContent>();
+        var key = Guid.NewGuid();
         var cacheService = new Mock<IDocumentCacheService>();
-        cacheService
-            .Setup(s => s.TryGetCached(It.IsAny<Guid>(), It.IsAny<bool>(), out It.Ref<IPublishedContent?>.IsAny))
-            .Returns(new TryGetCachedDelegate((Guid _, bool _, out IPublishedContent? content) =>
-            {
-                content = expected;
-                return true;
-            }));
+        cacheService.Setup(s => s.GetByKey(key, preview)).Returns(expected);
 
-        DocumentCache cache = CreateCache(cacheService);
-
-        IPublishedContent? actual = cache.GetById(preview: false, contentId: Guid.NewGuid());
+        IPublishedContent? actual = CreateCache(cacheService).GetById(preview, key);
 
         Assert.That(actual, Is.SameAs(expected));
-        cacheService.Verify(
-            s => s.GetByKeyAsync(It.IsAny<Guid>(), It.IsAny<bool?>()),
-            Times.Never,
-            "Async path should not run when TryGetCached hits");
+        cacheService.Verify(s => s.GetByKeyAsync(It.IsAny<Guid>(), It.IsAny<bool?>()), Times.Never);
     }
 
-    [Test]
-    public void GetById_MissesL0_FallsThroughToAsyncPath()
+    [TestCase(true)]
+    [TestCase(false)]
+    public void GetById_By_Id_Uses_The_Synchronous_Lookup(bool preview)
     {
         IPublishedContent expected = Mock.Of<IPublishedContent>();
         var cacheService = new Mock<IDocumentCacheService>();
-        cacheService
-            .Setup(s => s.TryGetCached(It.IsAny<Guid>(), It.IsAny<bool>(), out It.Ref<IPublishedContent?>.IsAny))
-            .Returns(new TryGetCachedDelegate((Guid _, bool _, out IPublishedContent? content) =>
-            {
-                content = null;
-                return false;
-            }));
-        cacheService
-            .Setup(s => s.GetByKeyAsync(It.IsAny<Guid>(), It.IsAny<bool?>()))
-            .ReturnsAsync(expected);
+        cacheService.Setup(s => s.GetById(1234, preview)).Returns(expected);
 
-        DocumentCache cache = CreateCache(cacheService);
-
-        IPublishedContent? actual = cache.GetById(preview: false, contentId: Guid.NewGuid());
+        IPublishedContent? actual = CreateCache(cacheService).GetById(preview, 1234);
 
         Assert.That(actual, Is.SameAs(expected));
-        cacheService.Verify(
-            s => s.GetByKeyAsync(It.IsAny<Guid>(), It.IsAny<bool?>()),
-            Times.Once,
-            "Async path runs exactly once on TryGetCached miss");
+        cacheService.Verify(s => s.GetByIdAsync(It.IsAny<int>(), It.IsAny<bool?>()), Times.Never);
     }
 
     private static DocumentCache CreateCache(Mock<IDocumentCacheService> cacheService)
         => new(cacheService.Object);
-
-    // Moq cannot bind directly to ref / out parameters in the lambda overload, so we
-    // declare a delegate that matches the TryGetCached signature and pass it explicitly.
-    private delegate bool TryGetCachedDelegate(Guid key, bool preview, out IPublishedContent? content);
 }

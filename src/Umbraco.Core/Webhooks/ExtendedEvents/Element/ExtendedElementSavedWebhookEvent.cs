@@ -57,7 +57,7 @@ public class ExtendedElementSavedWebhookEvent : WebhookEventContentBase<ElementS
     protected override object? ConvertEntityToRequestPayload(IElement entity)
     {
         // Get preview/saved version of element
-        IPublishedElement? publishedElement = _elementCacheService.GetByKeyAsync(entity.Key, preview: true).GetAwaiter().GetResult();
+        IPublishedElement? publishedElement = _elementCacheService.GetByKey(entity.Key, preview: true);
         if (publishedElement is null)
         {
             return null;

@@ -10,6 +10,8 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.HybridCache;
+using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -77,6 +79,41 @@ internal sealed class ElementCacheServiceTests : UmbracoIntegrationTest
 
         // Assert
         Assert.That(result, Is.Null);
+    }
+
+    // The synchronous read must resolve the same way as the asynchronous one: a published element in and out of
+    // preview, a draft-only element only in preview.
+    [TestCase(true, true)]
+    [TestCase(true, false)]
+    [TestCase(false, true)]
+    [TestCase(false, false)]
+    public async Task GetByKey_Reads_The_Database_Like_GetByKeyAsync(bool publish, bool preview)
+    {
+        var (_, element) = publish ? await CreateSaveAndPublishElement() : await CreateAndSaveElement();
+        await ElementCacheService.ClearMemoryCacheAsync(CancellationToken.None);
+
+        IPublishedElement? actual = ElementCacheService.GetByKey(element.Key, preview);
+        IPublishedElement? expected = await ElementCacheService.GetByKeyAsync(element.Key, preview);
+
+        Assert.That(actual?.Key, Is.EqualTo(expected?.Key));
+        Assert.That(actual, publish || preview ? Is.Not.Null : Is.Null);
+    }
+
+    [TestCase(true, true)]
+    [TestCase(true, false)]
+    [TestCase(false, true)]
+    [TestCase(false, false)]
+    public async Task GetElementSource_Returns_The_Same_Source_As_GetElementSourceAsync(bool publish, bool preview)
+    {
+        var (_, element) = publish ? await CreateSaveAndPublishElement() : await CreateAndSaveElement();
+        IDatabaseCacheRepository repository = GetRequiredService<IDatabaseCacheRepository>();
+
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        ContentCacheNode? expected = await repository.GetElementSourceAsync(element.Key, preview);
+        ContentCacheNode? actual = repository.GetElementSource(element.Key, preview);
+
+        Assert.That(Describe(actual), Is.EqualTo(Describe(expected)));
+        Assert.That(actual, publish || preview ? Is.Not.Null : Is.Null);
     }
 
     [Test]
@@ -225,6 +262,9 @@ internal sealed class ElementCacheServiceTests : UmbracoIntegrationTest
             Assert.That(dtos.Any(x => x.Published == true), Is.True, "Published cache record should exist after publish");
         }
     }
+
+    private static (int Id, Guid Key, bool IsDraft, string? Name)? Describe(ContentCacheNode? node)
+        => node is null ? null : (node.Id, node.Key, node.IsDraft, node.Data?.Name);
 
     private async Task<(IContentType ElementType, IElement Element)> CreateAndSaveElement()
     {
