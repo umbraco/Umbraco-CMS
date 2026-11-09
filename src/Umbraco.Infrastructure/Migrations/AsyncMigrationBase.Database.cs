@@ -135,7 +135,8 @@ public abstract partial class AsyncMigrationBase
     protected bool IndexExists(string indexName)
     {
         IEnumerable<Tuple<string, string, string, bool>>? indexes = SqlSyntax.GetDefinedIndexes(Context.Database);
-        return indexes.Any(x => x.Item2.InvariantEquals(indexName));
+        var storedName = SqlSyntax.TruncateConstraintName<IndexDefinition>(indexName);
+        return indexes.Any(x => x.Item2.InvariantEquals(storedName));
     }
 
     protected void CreateIndex<T>(string toCreate)

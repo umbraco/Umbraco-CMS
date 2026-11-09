@@ -742,6 +742,7 @@ export default {
 		indexCannotRebuild: 'This index cannot be rebuilt because it has no assigned',
 		iIndexPopulator: 'IIndexPopulator',
 		noResults: 'No results were found',
+		searchNotAllowed: 'You do not have permission to search this index.',
 		searchResultsFound: 'Showing %0% - %1% of %2% result(s) - Page %3% of %4%',
 		corruptStatus: 'Possible corrupt index detected',
 		corruptErrorDescription: 'Error received when evaluating the index:',
@@ -1920,6 +1921,9 @@ export default {
 			'A Document Type cannot be changed to an Element Type once it has been used to create one or more content items.',
 		elementDoesNotSupport: 'This is not applicable for an Element Type',
 		propertyHasChanges: 'You have made changes to this property. Are you sure you want to discard them?',
+		confirmPropertyAliasChangeHeadline: 'Changing the alias may cause data loss',
+		confirmPropertyAliasChangeMessage:
+			'Existing content for <strong>%0%</strong> will be removed where it is used as embedded content, such as in a local Block.',
 		displaySettingsHeadline: 'Appearance',
 		displaySettingsLabelOnLeft: 'Label to the left',
 		displaySettingsLabelOnTop: 'Label above (full-width)',
@@ -2368,6 +2372,7 @@ export default {
 		customValidation: 'Custom validation',
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
 		entriesExceed: 'Maximum %0% entries, you have entered <strong>%1%</strong> too many.',
+		itemMissingValueMessage: 'Item %0% is missing a value',
 		entriesAreasMismatch: 'The content amount requirements are not met for one or more areas.',
 		minimumOnlyWhenInUse:
 			'The minimum applies once items have been added. To require a value, mark the property as mandatory.',

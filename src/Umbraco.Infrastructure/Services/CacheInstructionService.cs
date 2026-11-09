@@ -207,7 +207,7 @@ namespace Umbraco.Cms
                 {
                     using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
                     {
-                        IReadOnlyCollection<RepositoryCacheVersion> cacheVersions = _repositoryCacheVersionService.GetCacheVersionsAsync().GetAwaiter().GetResult();
+                        IReadOnlyCollection<RepositoryCacheVersion> cacheVersions = _repositoryCacheVersionService.GetCacheVersions();
                         var lastId = _lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0;
                         var previousLastId = lastId;
                         var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, RefreshTarget.AllCaches, ref lastId, out var processedAllPending);
@@ -248,7 +248,7 @@ namespace Umbraco.Cms
             {
                 using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing isolated caches from database..."))
                 {
-                    IReadOnlyCollection<RepositoryCacheVersion> cacheVersions = _repositoryCacheVersionService.GetCacheVersionsAsync().GetAwaiter().GetResult();
+                    IReadOnlyCollection<RepositoryCacheVersion> cacheVersions = _repositoryCacheVersionService.GetCacheVersions();
                     var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
                     var previousLastId = lastId;
                     var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, RefreshTarget.IsolatedCachesOnly, ref lastId, out var processedAllPending);
