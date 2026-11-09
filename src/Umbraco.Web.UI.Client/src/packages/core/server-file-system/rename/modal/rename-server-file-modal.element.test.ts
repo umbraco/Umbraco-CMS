@@ -68,14 +68,17 @@ describe('UmbRenameModalElement', () => {
 		umbExtensionsRegistry.unregister(RENAME_REPOSITORY_ALIAS);
 	});
 
-	it('renames the file when submitted before the rename repository has loaded', async () => {
+	async function submit(name: string) {
 		await element.updateComplete;
 		const input = element.shadowRoot!.querySelector<UUIInputElement>('#name')!;
-		input.value = 'renamed.js';
+		input.value = name;
 		// uui-input hands its value to the form on update.
 		await input.updateComplete;
 		element.shadowRoot!.querySelector('form')!.requestSubmit();
+	}
 
+	it('renames the file when submitted before the rename repository has loaded', async () => {
+		await submit('renamed.js');
 		releaseRenameRepository();
 
 		await waitUntil(() => renamed.length > 0, 'the file was never renamed');
@@ -101,5 +104,15 @@ describe('UmbRenameModalElement', () => {
 		} finally {
 			window.removeEventListener('unhandledrejection', onUnhandled);
 		}
+	});
+
+	it('renames the file once when submitted twice while it is not ready', async () => {
+		await submit('renamed.js');
+		element.shadowRoot!.querySelector('form')!.requestSubmit();
+		releaseRenameRepository();
+
+		await waitUntil(() => renamed.length > 0, 'the file was never renamed');
+		await new Promise((resolve) => setTimeout(resolve));
+		expect(renamed).to.have.lengthOf(1);
 	});
 });

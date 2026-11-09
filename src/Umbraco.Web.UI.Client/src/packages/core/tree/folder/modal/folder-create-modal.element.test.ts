@@ -83,4 +83,15 @@ describe('UmbFolderCreateModalElement', () => {
 		await waitUntil(() => created.length > 0, 'the folder was never created');
 		expect(created[0].folder.unique).to.equal('new-folder');
 	});
+
+	it('creates the folder once when submitted twice while it is not ready', async () => {
+		await submit('Early folder');
+		element.shadowRoot!.querySelector('form')!.requestSubmit();
+		releaseRepository();
+		releaseScaffold();
+
+		await waitUntil(() => created.length > 0, 'the folder was never created');
+		await new Promise((resolve) => setTimeout(resolve));
+		expect(created).to.have.lengthOf(1);
+	});
 });

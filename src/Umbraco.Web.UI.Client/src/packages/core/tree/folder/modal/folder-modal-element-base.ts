@@ -18,6 +18,7 @@ export abstract class UmbFolderModalElementBase<
 
 	#repositoryReady?: Promise<void>;
 	#init?: void | Promise<void>;
+	#submitting = false;
 
 	override connectedCallback(): void {
 		super.connectedCallback();
@@ -42,10 +43,11 @@ export abstract class UmbFolderModalElementBase<
 	}
 
 	abstract init(): void | Promise<void>;
-	abstract onFormSubmit({ name }: { name: string }): void;
+	abstract onFormSubmit({ name }: { name: string }): void | Promise<void>;
 
 	async #onSubmit(event: SubmitEvent) {
 		event.preventDefault();
+		if (this.#submitting) return;
 
 		const form = event.target as HTMLFormElement;
 		if (!form) return;
@@ -56,11 +58,16 @@ export abstract class UmbFolderModalElementBase<
 		const formData = new FormData(form);
 		const name = formData.get('name') as string;
 
-		// The form can be submitted before the repository has loaded and the modal has initialised.
-		await this.#repositoryReady;
-		await this.#init;
+		this.#submitting = true;
+		try {
+			// The form can be submitted before the repository has loaded and the modal has initialised.
+			await this.#repositoryReady;
+			await this.#init;
 
-		this.onFormSubmit({ name });
+			await this.onFormSubmit({ name });
+		} finally {
+			this.#submitting = false;
+		}
 	}
 
 	override render() {
