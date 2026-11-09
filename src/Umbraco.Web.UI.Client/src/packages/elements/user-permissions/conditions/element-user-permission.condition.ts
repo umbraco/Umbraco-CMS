@@ -4,8 +4,15 @@ import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_ENTITY_CONTEXT, type UmbEntityUnique 
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { IPermissionPresentationModelElementPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	IPermissionPresentationModelElementContainerPermissionPresentationModel,
+	IPermissionPresentationModelElementPermissionPresentationModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
+
+type ElementOrContainerPermission =
+	| IPermissionPresentationModelElementPermissionPresentationModel
+	| IPermissionPresentationModelElementContainerPermissionPresentationModel;
 
 export class UmbElementUserPermissionCondition
 	extends UmbConditionBase<UmbElementUserPermissionConditionConfig>
@@ -13,7 +20,7 @@ export class UmbElementUserPermissionCondition
 {
 	#entityType: string | undefined;
 	#unique: string | null | undefined;
-	#elementPermissions?: Array<IPermissionPresentationModelElementPermissionPresentationModel>;
+	#elementPermissions?: Array<ElementOrContainerPermission>;
 	#fallbackPermissions?: Array<string>;
 	#ancestors: Array<UmbEntityUnique> = [];
 
@@ -85,7 +92,18 @@ export class UmbElementUserPermissionCondition
 			const path = [...this.#ancestors, this.#unique].filter((unique) => unique !== null);
 			// Reverse the path to find the closest element permission quickly
 			const reversedPath = [...path].reverse();
-			const elementPermissionsMap = new Map(this.#elementPermissions.map((p) => [p.element.id, p]));
+			// Element entries are inserted last so they take precedence over a container entry with the same id
+			const elementPermissionsMap = new Map<string, ElementOrContainerPermission>();
+			for (const p of this.#elementPermissions) {
+				if (p.$type === 'ElementContainerPermissionPresentationModel') {
+					elementPermissionsMap.set(p.elementContainer.id, p);
+				}
+			}
+			for (const p of this.#elementPermissions) {
+				if (p.$type === 'ElementPermissionPresentationModel') {
+					elementPermissionsMap.set(p.element.id, p);
+				}
+			}
 
 			// Find the closest element permission in the path
 			const closestElementPermission = reversedPath.find((id) => elementPermissionsMap.has(id));
@@ -129,13 +147,9 @@ export class UmbElementUserPermissionCondition
 		this.permitted = allOfPermitted && oneOfPermitted;
 	}
 
-	#isElementUserPermission(
-		permission: unknown,
-	): permission is IPermissionPresentationModelElementPermissionPresentationModel {
-		return (
-			(permission as IPermissionPresentationModelElementPermissionPresentationModel).$type ===
-			'ElementPermissionPresentationModel'
-		);
+	#isElementUserPermission(permission: unknown): permission is ElementOrContainerPermission {
+		const type = (permission as ElementOrContainerPermission).$type;
+		return type === 'ElementPermissionPresentationModel' || type === 'ElementContainerPermissionPresentationModel';
 	}
 }
 
