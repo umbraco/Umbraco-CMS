@@ -342,7 +342,18 @@ public class Searcher : IExamineSearcher
                         textFields.Add(FieldNameHelper.FieldName(filter.FieldName, Constants.FieldValues.TextsR3, segment));
                     }
 
-                    IExamineValue[] query = textFilter.Values
+                    // as with free text, a leading wildcard character would yield a leading-wildcard query, which
+                    // Lucene rejects. such a value carries no text to match on, so drop it rather than fail the search.
+                    var values = textFilter.Values
+                        .Select(value => value.TrimStart('*', '?'))
+                        .Where(value => value.Length > 0)
+                        .ToArray();
+                    if (values.Length == 0)
+                    {
+                        break;
+                    }
+
+                    IExamineValue[] query = values
                         .SelectMany(value => new IExamineValue[]
                         {
                             new ExamineValue(Examineness.Explicit, value),
