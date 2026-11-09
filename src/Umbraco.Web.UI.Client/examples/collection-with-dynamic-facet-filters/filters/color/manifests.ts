@@ -4,14 +4,15 @@ import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collecti
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'facetFilter',
-		kind: 'select',
 		alias: 'Example.DynamicFacetFilter.ColorFilter',
 		name: 'Dynamic Facet Color Filter',
 		weight: 80,
+		element: () => import('./color-facet-filter.element.js'),
+		api: () => import('./color-facet-filter.api.js'),
 		meta: {
 			label: 'Color',
-			multiple: true,
 		},
+		valueResolver: () => import('./color-facet-filter-value.resolver.js'),
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,

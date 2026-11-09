@@ -11,6 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Category',
 		},
+		valueResolver: () => import('./category-facet-filter-value.resolver.js'),
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
