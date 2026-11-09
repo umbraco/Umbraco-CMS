@@ -210,6 +210,14 @@ public class HtmlImageSourceParserTests
                 <img src=""/media/1001/image.jpg?asd"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD6""/>
               </div>",
         TestName = "Multiple img tags are handled")]
+    [TestCase(
+        @"<div><img data-src=""/media/12354/test.jpg"" src="""" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
+        ExpectedResult = @"<div><img data-src=""/media/12354/test.jpg"" src=""/media/1001/image.jpg"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
+        TestName = "Source is updated and a data-src before it is not")]
+    [TestCase(
+        @"<div><img data-src=""/media/12354/test.jpg"" src=""/media/12354/test.jpg"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
+        ExpectedResult = @"<div><img data-src=""/media/12354/test.jpg"" src=""/media/1001/image.jpg"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
+        TestName = "Source is updated and a data-src before it with the same value is not")]
     [Category("Ensure image sources")]
     public string Ensure_ImageSources_Processing(string sourceHtml)
     {

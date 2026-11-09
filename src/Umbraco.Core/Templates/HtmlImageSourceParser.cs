@@ -142,7 +142,7 @@ public sealed partial class HtmlImageSourceParser
                 : mediaUrl.AppendQueryStringToUrl(queryString);
             var refreshedSrc = _imageUrlTokenGenerator.RefreshSignature(composedUrl);
 
-            return match.Value.Replace(src.Value, $"src=\"{refreshedSrc}\"");
+            return match.Value.Remove(src.Index, src.Length).Insert(src.Index, $"src=\"{refreshedSrc}\"");
         });
     }
 
