@@ -137,9 +137,11 @@ describe('UmbPropertyActionMenuElement', () => {
 			html`<umb-property-action-menu .propertyEditorUiAlias=${PROPERTY_EDITOR_UI_ALIAS}></umb-property-action-menu>`,
 		);
 		const findAction = () =>
-			element.shadowRoot?.querySelector<UmbTestStoppingPropertyActionElement>(
-				'umb-test-property-action-menu-stopping-action',
-			);
+			element.shadowRoot
+				?.querySelector('umb-action-group-list')
+				?.shadowRoot?.querySelector<UmbTestStoppingPropertyActionElement>(
+					'umb-test-property-action-menu-stopping-action',
+				);
 		await waitUntil(() => !!findAction(), 'action was not rendered');
 
 		const popover = element.shadowRoot!.querySelector<HTMLElement>('#property-action-popover')!;
