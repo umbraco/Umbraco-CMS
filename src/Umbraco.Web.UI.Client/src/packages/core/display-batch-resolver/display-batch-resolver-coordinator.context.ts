@@ -1,5 +1,6 @@
 import type { UmbDisplayBatchResolver, UmbDisplayBatchResolverLookup } from './display-batch-resolver.interface.js';
 import { loadDisplayBatchResolver } from './load-display-batch-resolver.function.js';
+import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -41,7 +42,9 @@ export class UmbDisplayBatchResolverCoordinatorContext extends UmbContextBase {
 
 	constructor(
 		host: UmbControllerHost,
-		contextToken: UmbContextToken<UmbDisplayBatchResolverCoordinatorContext>,
+		// Typed like UmbContextBase: context tokens are invariant, so a narrower type rejects subclass tokens.
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		contextToken: UmbContextToken<any>,
 		lookup: UmbDisplayBatchResolverLookup,
 	) {
 		super(host, contextToken);
@@ -115,9 +118,24 @@ export class UmbDisplayBatchResolverCoordinatorContext extends UmbContextBase {
 		const ResolverConstructor = await loadDisplayBatchResolver(property);
 		if (!ResolverConstructor) return undefined;
 
-		resolver = new ResolverConstructor(this) as UmbDisplayBatchResolver;
+		resolver = this._createResolver(key, ResolverConstructor);
 		this.#resolvers.set(key, resolver);
 		return resolver;
+	}
+
+	/**
+	 * Creates the resolver for a key, hosted by this coordinator. Called once per key.
+	 * Override to give the resolver what it needs to know about its key, for example the manifest it belongs to.
+	 * @param {string} key - The key the resolver is created for.
+	 * @param {ClassConstructor<UmbDisplayBatchResolver>} ResolverConstructor - The loaded resolver class.
+	 * @returns {UmbDisplayBatchResolver} The resolver instance.
+	 */
+
+	protected _createResolver(
+		key: string,
+		ResolverConstructor: ClassConstructor<UmbDisplayBatchResolver>,
+	): UmbDisplayBatchResolver {
+		return new ResolverConstructor(this);
 	}
 
 	override destroy() {

@@ -1,4 +1,5 @@
 import { UMB_FACET_FILTER_MANAGER_CONTEXT } from './facet-filter.manager.context-token.js';
+import { UmbFacetFilterValueCoordinatorContext } from './value-resolver/facet-filter-value-coordinator.context.js';
 import type { UmbActiveFacetFilterModel, UmbFacetFilterValueModel } from './types.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -18,6 +19,11 @@ export class UmbFacetFilterManager extends UmbContextBase {
 	);
 
 	#facetedResults = new UmbArrayState<UmbFacetedResultModel>([], (x) => x.alias);
+
+	/**
+	 * Resolves what is displayed for active filter values. Keyed by filter alias.
+	 */
+	public readonly valueCoordinator = new UmbFacetFilterValueCoordinatorContext(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_FACET_FILTER_MANAGER_CONTEXT);

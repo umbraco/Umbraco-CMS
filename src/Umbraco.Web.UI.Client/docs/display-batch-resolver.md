@@ -39,7 +39,7 @@ new UmbDisplayBatchResolverCoordinatorContext(host, MY_COORDINATOR_CONTEXT, (key
 - `register(key, value)` queues a value. Values registered within the same tick are deduplicated and resolved in one call per key.
 - `observeResolvedValue(key, value)` emits the resolved value, or `undefined` until it has been resolved.
 - The lookup returns the `UmbDisplayBatchResolverLoaderProperty` for a key. When it returns `undefined`, values for that key are **passed through unchanged**.
-- One resolver instance is created per key and hosted by the coordinator.
+- One resolver instance is created per key and hosted by the coordinator. Subclasses can override `_createResolver(key, ResolverConstructor)` to give the resolver what it needs to know about its key. For example, the facet filter coordinator sets the filter's `manifest` on its resolver.
 - Resolved values are kept for the **lifetime of the coordinator**. Create it on a context whose lifetime fits, such as a collection context.
 
 ## One instance per owner
