@@ -3,6 +3,7 @@ import { _sortContentValuesByVariant } from '../utils/sort-content-values-by-var
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyValueIndex } from '@umbraco-cms/backoffice/property';
 import { UmbVariantId, umbVariantObjectSortCompare, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
 
 /**
@@ -16,6 +17,29 @@ function defaultCompareVariantMethod(a: UmbVariantDataModel, b: UmbVariantDataMo
 }
 
 export class UmbMergeContentVariantDataController extends UmbControllerBase {
+	#persistedValuesIndex?: UmbPropertyValueIndex<UmbPotentialContentValueModel>;
+	#draftValuesIndex?: UmbPropertyValueIndex<UmbPotentialContentValueModel>;
+
+	/**
+	 * Supplies a prebuilt index over the persisted `values` passed to {@link process}, so it does not have to build its own.
+	 * Useful when several controllers merge against the same persisted data. The index must have been built from exactly
+	 * those values; no check is made. It applies to the top-level values only, not to values nested inside property values.
+	 * @param {UmbPropertyValueIndex<UmbPotentialContentValueModel>} index - An index over the persisted `values`.
+	 */
+	setPersistedValuesIndex(index: UmbPropertyValueIndex<UmbPotentialContentValueModel>): void {
+		this.#persistedValuesIndex = index;
+	}
+
+	/**
+	 * Supplies a prebuilt index over the draft (current) `values` passed to {@link process}, so it does not have to build its own.
+	 * Useful when several controllers merge the same draft data. The index must have been built from exactly
+	 * those values; no check is made. It applies to the top-level values only, not to values nested inside property values.
+	 * @param {UmbPropertyValueIndex<UmbPotentialContentValueModel>} index - An index over the draft `values`.
+	 */
+	setDraftValuesIndex(index: UmbPropertyValueIndex<UmbPotentialContentValueModel>): void {
+		this.#draftValuesIndex = index;
+	}
+
 	/**
 	 * Merges content variant data based on selected variants and variants to store.
 	 * @param {UmbContentLikeDetailModel | undefined} persistedData - The persisted content variant data.
@@ -38,6 +62,8 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 			persistedData?.values,
 			currentData.values,
 			variantsToStore,
+			this.#persistedValuesIndex,
+			this.#draftValuesIndex,
 		);
 
 		if (currentData.variants) {
@@ -60,33 +86,39 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 	 * @param {Array<UmbPotentialContentValueModel> | undefined} persistedValues - The persisted values.
 	 * @param {Array<UmbPotentialContentValueModel> | undefined} draftValues - The draft values.
 	 * @param {Array<UmbVariantId>}variantsToStore - The variants to store.
+	 * @param {UmbPropertyValueIndex<UmbPotentialContentValueModel>} [suppliedPersistedIndex] - A prebuilt index over `persistedValues`, built here when omitted.
+	 * @param {UmbPropertyValueIndex<UmbPotentialContentValueModel>} [suppliedDraftIndex] - A prebuilt index over `draftValues`, built here when omitted.
 	 * @returns {Promise<Array<UmbPotentialContentValueModel>>} - A promise that resolves to the saved values.
 	 */
 	async #processValues<T extends UmbPotentialContentValueModel = UmbPotentialContentValueModel>(
 		persistedValues: Array<T> | undefined,
 		draftValues: Array<T> | undefined,
 		variantsToStore: Array<UmbVariantId>,
+		suppliedPersistedIndex?: UmbPropertyValueIndex<UmbPotentialContentValueModel>,
+		suppliedDraftIndex?: UmbPropertyValueIndex<UmbPotentialContentValueModel>,
 	): Promise<Array<T>> {
-		// Make array of unique values, based on persistedValues and draftValues. Both alias, culture and segment has to be taken into account. [NL]
+		const persistedIndex = suppliedPersistedIndex ?? new UmbPropertyValueIndex(persistedValues ?? []);
+		const draftIndex = suppliedDraftIndex ?? new UmbPropertyValueIndex(draftValues ?? []);
 
-		const uniqueValues = [...(persistedValues ?? []), ...(draftValues ?? [])].filter(
-			(n, i, self) =>
-				i === self.findIndex((v) => v.alias === n.alias && v.culture === n.culture && v.segment === n.segment),
-		);
+		// Make array of unique values, based on persistedValues and draftValues. Both alias, culture and segment has to be taken into account. [NL]
+		// Each list is unique on its own, so a draft value only takes part when it is not already persisted.
+		const uniqueValues = [
+			...(persistedValues ?? []),
+			...(draftValues ?? []).filter(
+				(value) => persistedIndex.find(value.alias, UmbVariantId.CreateFromPartial(value)) === undefined,
+			),
+		];
 
 		// Map unique values to their respective draft values.
 		const values = (
 			await Promise.all(
 				uniqueValues.map((value) => {
-					const persistedValue = persistedValues?.find(
-						(x) => x.alias === value.alias && x.culture === value.culture && x.segment === value.segment,
-					);
+					const variantId = UmbVariantId.CreateFromPartial(value);
+					const persistedValue = persistedIndex.find(value.alias, variantId);
 
 					// Should this value be saved?
-					if (variantsToStore.some((x) => x.equal(UmbVariantId.CreateFromPartial(value)))) {
-						const draftValue = draftValues?.find(
-							(x) => x.alias === value.alias && x.culture === value.culture && x.segment === value.segment,
-						);
+					if (variantsToStore.some((x) => x.equal(variantId))) {
+						const draftValue = draftIndex.find(value.alias, variantId);
 
 						return this.#processValue(persistedValue, draftValue, variantsToStore);
 					} else {

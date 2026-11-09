@@ -1,7 +1,8 @@
-import type { UmbContentDetailModel } from '../types.js';
+import type { UmbContentDetailModel, UmbElementValueModel } from '../types.js';
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
 import type { UmbPublishedVariantWithPendingChanges } from './types.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbPropertyValueIndex } from '@umbraco-cms/backoffice/property';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { jsonStringComparison, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
@@ -38,7 +39,15 @@ export abstract class UmbContentPublishedPendingChangesManagerBase<
 			throw new Error('Persisted and published data does not have the same unique');
 
 		const variantIds = args.persistedData.variants?.map((x) => UmbVariantId.Create(x)) ?? [];
-		const pendingChangesPromises = variantIds.map((variantId) => this.#processVariant(args, variantId));
+
+		// Every variant merges the same two lists of values, so index each of them once and share it.
+		// Notice the published data is the persisted side of each merge, and the persisted data is the draft side.
+		const publishedValuesIndex = new UmbPropertyValueIndex(args.publishedData.values);
+		const persistedValuesIndex = new UmbPropertyValueIndex(args.persistedData.values);
+
+		const pendingChangesPromises = variantIds.map((variantId) =>
+			this.#processVariant(args, variantId, publishedValuesIndex, persistedValuesIndex),
+		);
 		const variantsWithPendingChanges = (await Promise.all(pendingChangesPromises)).filter((x) => x !== null);
 		this.#variantsWithChanges.setValue(variantsWithPendingChanges);
 	}
@@ -46,13 +55,13 @@ export abstract class UmbContentPublishedPendingChangesManagerBase<
 	async #processVariant(
 		args: UmbContentPublishedPendingChangesManagerProcessArgs<TDetailModel>,
 		variantId: UmbVariantId,
+		publishedValuesIndex: UmbPropertyValueIndex<UmbElementValueModel>,
+		persistedValuesIndex: UmbPropertyValueIndex<UmbElementValueModel>,
 	): Promise<UmbPublishedVariantWithPendingChanges | null> {
-		const mergedData = await new UmbMergeContentVariantDataController(this).process(
-			args.publishedData,
-			args.persistedData,
-			[variantId],
-			[variantId],
-		);
+		const mergeController = new UmbMergeContentVariantDataController(this);
+		mergeController.setPersistedValuesIndex(publishedValuesIndex);
+		mergeController.setDraftValuesIndex(persistedValuesIndex);
+		const mergedData = await mergeController.process(args.publishedData, args.persistedData, [variantId], [variantId]);
 
 		const mergedDataClone = structuredClone(mergedData);
 		const publishedDataClone = structuredClone(args.publishedData);

@@ -1,4 +1,5 @@
 import type { UmbPropertyValueData, UmbPropertyValueDataPotentiallyWithEditorAlias } from '../index.js';
+import { UmbPropertyValueIndex } from '../property-value-index/property-value-index.class.js';
 import type {
 	ManifestPropertyValuePreset,
 	UmbPropertyTypePresetModel,
@@ -10,11 +11,14 @@ import type {
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export class UmbPropertyValuePresetBuilderController<
 	ReturnType extends UmbPropertyValueData = UmbPropertyValueData | UmbPropertyValueDataPotentiallyWithEditorAlias,
 > extends UmbControllerBase {
 	#baseCreateArgs?: UmbPropertyValuePresetApiCallArgsEntityBase;
+	#hasCreated = false;
+	#existingValuesIndex?: UmbPropertyValueIndex<ReturnType>;
 	protected _existingValues?: Array<ReturnType>;
 
 	setValues(values: Array<ReturnType>): void {
@@ -22,16 +26,38 @@ export class UmbPropertyValuePresetBuilderController<
 	}
 
 	/**
+	 * Finds the first existing value with the given alias, and when a variant is given, the same variant.
+	 * @param {string} alias - The property alias.
+	 * @param {UmbVariantId} [variantId] - The variant to match. When omitted, the variant of the existing value is ignored.
+	 * @returns {ReturnType | undefined} The first matching existing value, if any.
+	 */
+	protected _findExistingValue(alias: string, variantId?: UmbVariantId): ReturnType | undefined {
+		if (!this._existingValues) {
+			return undefined;
+		}
+		this.#existingValuesIndex ??= new UmbPropertyValueIndex(this._existingValues);
+		return this.#existingValuesIndex.find(alias, variantId);
+	}
+
+	/**
 	 * Clones the property data.
+	 *
+	 * The controller destroys itself when done, so `create` can only be called once per controller instance.
 	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} propertyTypes - Data about the properties to make a preset for.
 	 * @param {Partial<UmbPropertyValuePresetApiCallArgsEntityBase>} [createArgs] - The base arguments used when calling the preset APIs.
 	 * @returns {Promise<UmbPropertyValueDataPotentiallyWithEditorAlias>} - A promise that resolves to the cloned property data.
+	 * @throws {Error} When `create` has already been called on this controller.
 	 */
 	async create<GivenPropertyTypesType extends UmbPropertyTypePresetModel>(
 		propertyTypes: Array<GivenPropertyTypesType>,
 		// TODO: Remove that the argument is Optional and as well remove Partial<> in v.17.0 [NL]
 		createArgs?: Partial<UmbPropertyValuePresetApiCallArgsEntityBase>,
 	): Promise<Array<ReturnType>> {
+		if (this.#hasCreated) {
+			throw new Error('create() can only be called once per controller instance, as it destroys the controller.');
+		}
+		this.#hasCreated = true;
+
 		//
 		// TODO: Clean up warnings in v.17.0 [NL]
 		this.#baseCreateArgs = {
@@ -108,7 +134,7 @@ export class UmbPropertyValuePresetBuilderController<
 		propertyType: UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel,
 	): Promise<Array<ReturnType>> {
 		const args: Partial<UmbPropertyValuePresetApiCallArgs> = {
-			value: this._existingValues?.find((x) => x.alias === propertyType.alias)?.value,
+			value: this._findExistingValue(propertyType.alias)?.value,
 		};
 		const property = await this._generatePropertyValue(apis, propertyType, args);
 		return property ? [property] : [];
