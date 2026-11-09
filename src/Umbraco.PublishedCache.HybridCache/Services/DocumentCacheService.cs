@@ -8,6 +8,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -35,11 +36,18 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     private readonly IEnumerable<IDocumentSeedKeyProvider> _seedKeyProviders;
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IPreviewService _previewService;
+    private readonly IPreviewAccessEvaluator _previewAccessEvaluator;
     private readonly IPublishStatusQueryService _publishStatusQueryService;
     private readonly CacheSettings _cacheSettings;
     private readonly ILogger<DocumentCacheService> _logger;
 
     private readonly IConvertedPublishedContentCache<string> _publishedContentCache;
+    private readonly KeyedLock<Guid> _refreshLocks = new();
+
+    private readonly ContentSourceReader _readContentSourceAsync;
+    private readonly ContentSourceReader _readContentSource;
+    private readonly ContentSourcesReader _readContentSourcesAsync;
+    private readonly ContentSourcesReader _readContentSources;
 
     // Monotonic counter bumped whenever the in-memory cache (L0/L1) is invalidated or refreshed.
     // GetNodeAsync captures it before reading the backing store and re-checks it before writing
@@ -95,6 +103,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     /// <param name="publishStatusQueryService">The service used to check published state and ancestor paths.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="cacheFactory">The factory that creates the in-memory converted-content (L0) cache.</param>
+    /// <param name="previewAccessEvaluator">The evaluator that decides whether the preview user may see a document's unpublished version.</param>
     public DocumentCacheService(
         IDatabaseCacheRepository databaseCacheRepository,
         IIdKeyMap idKeyMap,
@@ -108,7 +117,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         IPreviewService previewService,
         IPublishStatusQueryService publishStatusQueryService,
         ILogger<DocumentCacheService> logger,
-        IConvertedPublishedContentCacheFactory cacheFactory)
+        IConvertedPublishedContentCacheFactory cacheFactory,
+        IPreviewAccessEvaluator previewAccessEvaluator)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
@@ -119,11 +129,23 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         _seedKeyProviders = seedKeyProviders;
         _publishedModelFactory = publishedModelFactory;
         _previewService = previewService;
+        _previewAccessEvaluator = previewAccessEvaluator;
         _publishStatusQueryService = publishStatusQueryService;
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
         _publishedContentCache = cacheFactory.Create<string>(_cacheSettings.Entry.Document.MaximumLocalCacheItems, CacheName);
+
+        _readContentSourceAsync = _databaseCacheRepository.GetContentSourceAsync;
+        _readContentSource = (key, preview) => Task.FromResult(_databaseCacheRepository.GetContentSource(key, preview));
+        _readContentSourcesAsync = _databaseCacheRepository.GetContentSourcesAsync;
+        _readContentSources = (keys, preview) => Task.FromResult(_databaseCacheRepository.GetContentSources(keys, preview));
     }
+
+    // Reads content sources from the database. The synchronous members pass readers that read synchronously and
+    // return completed tasks, so the shared read logic only awaits what HybridCache itself has to wait for.
+    private delegate Task<ContentCacheNode?> ContentSourceReader(Guid key, bool preview);
+
+    private delegate Task<IEnumerable<ContentCacheNode>> ContentSourcesReader(IEnumerable<Guid> keys, bool preview);
 
     /// <inheritdoc />
     public string CacheName => "Published content (converted, L0)";
@@ -134,13 +156,35 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     /// <inheritdoc />
     public long? GetApproximateBytes() => _publishedContentCache.ApproximateSizeInBytes;
 
+    // The synchronous members return an L0 hit directly, and otherwise run the same read logic as the asynchronous
+    // ones with a synchronous database reader. The returned task has then already completed, unless HybridCache
+    // itself had to wait (an L2 round trip, or a concurrent read of the same key), so synchronous callers do not
+    // block on asynchronous I/O.
+
     /// <inheritdoc />
-    public async Task<IPublishedContent?> GetByKeyAsync(Guid key, bool? preview = null)
+    public Task<IPublishedContent?> GetByKeyAsync(Guid key, bool? preview = null)
+        => GetAccessibleNodeAsync(key, preview ?? GetPreview(), _readContentSourceAsync);
+
+    /// <inheritdoc />
+    public IPublishedContent? GetByKey(Guid key, bool? preview = null)
     {
         bool calculatedPreview = preview ?? GetPreview();
-
-        return await GetNodeAsync(key, calculatedPreview);
+        return TryGetCached(key, calculatedPreview, out IPublishedContent? cached)
+            ? cached
+            : GetByKeyWithSynchronousReadsAsync(key, calculatedPreview).GetAwaiter().GetResult();
     }
+
+    /// <summary>
+    /// Runs the read logic behind <see cref="GetByKey"/>, reading the database synchronously on a cache miss.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="GetByKey"/> blocks on the returned task, which only avoids sync-over-async if the task has already
+    /// completed when it is returned. That holds only while every await in the shared read logic completes
+    /// synchronously, so it is kept as a separate method for tests to assert on directly; the public member can't
+    /// show whether it blocked. It is internal because it exists only to verify that guarantee, not as an API.
+    /// </remarks>
+    internal Task<IPublishedContent?> GetByKeyWithSynchronousReadsAsync(Guid key, bool preview)
+        => GetAccessibleNodeAsync(key, preview, _readContentSource);
 
     /// <inheritdoc />
     public async Task<IPublishedContent?> GetByIdAsync(int id, bool? preview = null)
@@ -151,14 +195,37 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             return null;
         }
 
-        bool calculatedPreview = preview ?? GetPreview();
-        Guid key = keyAttempt.Result;
-
-        return await GetNodeAsync(key, calculatedPreview);
+        return await GetAccessibleNodeAsync(keyAttempt.Result, preview ?? GetPreview(), _readContentSourceAsync);
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<IPublishedContent>> GetByKeysAsync(IReadOnlyCollection<Guid> keys, bool? preview = null)
+    public IPublishedContent? GetById(int id, bool? preview = null)
+    {
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
+        if (keyAttempt.Success is false)
+        {
+            return null;
+        }
+
+        return GetByKey(keyAttempt.Result, preview);
+    }
+
+    /// <inheritdoc />
+    public Task<IReadOnlyList<IPublishedContent>> GetByKeysAsync(IReadOnlyCollection<Guid> keys, bool? preview = null)
+        => GetByKeysCoreAsync(keys, preview, _readContentSourcesAsync);
+
+    /// <inheritdoc />
+    public IReadOnlyList<IPublishedContent> GetByKeys(IReadOnlyCollection<Guid> keys, bool? preview = null)
+        => GetByKeysWithSynchronousReadsAsync(keys, preview).GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Runs the read logic behind <see cref="GetByKeys"/>, reading the database synchronously on a cache miss.
+    /// </summary>
+    /// <remarks>See <see cref="GetByKeyWithSynchronousReadsAsync"/>.</remarks>
+    internal Task<IReadOnlyList<IPublishedContent>> GetByKeysWithSynchronousReadsAsync(IReadOnlyCollection<Guid> keys, bool? preview)
+        => GetByKeysCoreAsync(keys, preview, _readContentSources);
+
+    private async Task<IReadOnlyList<IPublishedContent>> GetByKeysCoreAsync(IReadOnlyCollection<Guid> keys, bool? preview, ContentSourcesReader readContentSources)
     {
         bool calculatedPreview = preview ?? GetPreview();
 
@@ -180,7 +247,14 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
         if (pending.Count > 0)
         {
-            await ReadFromDatabaseAsync(pending, calculatedPreview, generation, resolved);
+            await ReadFromDatabaseAsync(pending, calculatedPreview, generation, resolved, readContentSources);
+        }
+
+        // Applied after all three tiers so the access check runs once over the whole resolved set, whichever
+        // tier each draft came from. Mirrors GetAccessibleNodeAsync for the single-key lookups.
+        if (calculatedPreview)
+        {
+            await ReplaceInaccessibleDraftsAsync(resolved, readContentSources);
         }
 
         // Return in input order; keys that resolved to nothing (missing/unpublished) are omitted. A key
@@ -196,6 +270,78 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         }
 
         return ordered;
+    }
+
+    /// <summary>
+    /// Gets a document, handing out its draft only when the preview user may access it.
+    /// </summary>
+    /// <param name="key">The key of the document.</param>
+    /// <param name="preview">Whether the draft is requested.</param>
+    /// <param name="readContentSource">Reads the document's source from the database on a cache miss.</param>
+    /// <returns>
+    /// The draft when <paramref name="preview"/> is <c>true</c> and the preview user may access the document;
+    /// otherwise the published version, or <c>null</c> when the document isn't published.
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    /// Every draft lookup (routing, <c>GetById</c>, and the batched reads behind <c>Children()</c> and
+    /// <c>Descendants()</c>) passes through this service, so this is where a preview session is held to what its
+    /// user may access. A preview session belongs to a back-office user, but the cookie that enables it is not tied
+    /// to a document: without this check any draft the router or a template resolves would be rendered, including
+    /// drafts outside the user's start nodes or browse permission.
+    /// </para>
+    /// <para>
+    /// A refused draft resolves as it would outside preview. That discloses nothing a front-end visitor couldn't
+    /// already see, and the same rule holds for content a template pulls in (pickers, navigation) as for the routed
+    /// document. The evaluator allows everything when there is no preview user, so explicit preview requests made
+    /// outside a preview session (for example webhooks or Delivery API preview) are unaffected.
+    /// </para>
+    /// </remarks>
+    private async Task<IPublishedContent?> GetAccessibleNodeAsync(Guid key, bool preview, ContentSourceReader readContentSource)
+    {
+        IPublishedContent? content = await GetNodeAsync(key, preview, readContentSource);
+
+        // The check needs the draft's path (start nodes and permissions are path-based), so the draft is resolved
+        // first and only re-read as published when it is refused.
+        return preview && content is not null && _previewAccessEvaluator.CanPreviewDocument(content) is false
+            ? await GetNodeAsync(key, false, readContentSource)
+            : content;
+    }
+
+    /// <summary>
+    /// Replaces the drafts the preview user may not access with their published versions; the batch equivalent of
+    /// <see cref="GetAccessibleNodeAsync"/>.
+    /// </summary>
+    /// <param name="resolved">The drafts resolved so far, keyed by document key. Updated in place.</param>
+    /// <param name="readContentSources">Reads the published sources from the database on a cache miss.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <remarks>
+    /// Refused drafts are removed from <paramref name="resolved"/> and re-read as published in a single batched
+    /// call. Keys with no published version stay out of the set, so the caller omits them from its result as it
+    /// does for any key that resolves to nothing.
+    /// </remarks>
+    private async Task ReplaceInaccessibleDraftsAsync(Dictionary<Guid, IPublishedContent> resolved, ContentSourcesReader readContentSources)
+    {
+        Guid[] inaccessibleKeys = resolved
+            .Where(entry => _previewAccessEvaluator.CanPreviewDocument(entry.Value) is false)
+            .Select(entry => entry.Key)
+            .ToArray();
+        if (inaccessibleKeys.Length == 0)
+        {
+            return;
+        }
+
+        foreach (Guid key in inaccessibleKeys)
+        {
+            resolved.Remove(key);
+        }
+
+        // Re-entering with preview: false takes the normal published path (L0, L1/L2, then the database with the
+        // published-ancestor guard), and never reaches this method again.
+        foreach (IPublishedContent content in await GetByKeysCoreAsync(inaccessibleKeys, false, readContentSources))
+        {
+            resolved[content.Key] = content;
+        }
     }
 
     // L0 (converted) fast path — published only, mirroring GetNodeAsync (via the shared TryGetCached).
@@ -268,12 +414,12 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     // result) and, once resolved, is promoted into L1 — an L1/L2 hit is already there. A key the
     // database has nothing for gets a cached null, as GetNodeAsync writes, so it is not re-read on
     // every request.
-    private async Task ReadFromDatabaseAsync(List<Guid> keys, bool preview, long generation, Dictionary<Guid, IPublishedContent> resolved)
+    private async Task ReadFromDatabaseAsync(List<Guid> keys, bool preview, long generation, Dictionary<Guid, IPublishedContent> resolved, ContentSourcesReader readContentSources)
     {
         IReadOnlyCollection<ContentCacheNode> coldNodes;
         using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
         {
-            coldNodes = (await _databaseCacheRepository.GetContentSourcesAsync(keys, preview)).ToArray();
+            coldNodes = (await readContentSources(keys, preview)).ToArray();
         }
 
         // Mirrors GetNodeAsync, which warms the id/key map for every node the database returns,
@@ -352,7 +498,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         return false;
     }
 
-    private async Task<IPublishedContent?> GetNodeAsync(Guid key, bool preview)
+    private async Task<IPublishedContent?> GetNodeAsync(Guid key, bool preview, ContentSourceReader readContentSource)
     {
         var cacheKey = GetCacheKey(key, preview);
 
@@ -427,7 +573,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         async Task<(ContentCacheNode? Node, bool AncestorCheckFailed)> GetContentCacheNodeFromRepo()
         {
             using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-            ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, preview);
+            ContentCacheNode? contentCacheNode = await readContentSource(key, preview);
 
             // If we can resolve the content cache node, we still need to check if the ancestor path is published.
             // This does cost some performance, but it's necessary to ensure that the content is actually published.
@@ -483,6 +629,49 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     }
 
     /// <inheritdoc />
+    public void RefreshMemoryCache(Guid key)
+    {
+        // Waiting for the distributed cache write needs a thread-pool thread. Under the content tree lock that wait
+        // can starve on a busy pool and hold the lock for seconds, so the writes are issued under the lock and only
+        // waited for once the scope is disposed.
+        //
+        // This keeps the ordering: HybridCache updates the in-process cache and sends the distributed write before
+        // its first await, so both still happen under the lock; only the wait for the acknowledgement moves out.
+        // The per-document lock makes the next refresh or removal of the same document on this node wait for these
+        // writes, so a slow write cannot land on top of a newer one from this node. A newer write from another node
+        // can still be overtaken; that is corrected when this node processes the instruction for that change, as its
+        // own refresh is ordered after the slow write.
+        // TODO (V20): await the cache writes directly once the refresh pipeline is asynchronous.
+        using (_refreshLocks.Enter(key))
+        {
+            ValueTask draftWrite;
+            ValueTask publishedWrite;
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+
+                (ContentCacheNode? draftNode, ContentCacheNode? publishedNode) = _databaseCacheRepository.GetContentSourceForPublishStates(key);
+
+                draftWrite = draftNode is not null
+                    ? _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(draftNode))
+                    : _hybridCache.RemoveAsync(GetCacheKey(key, true));
+
+                var cacheKey = GetCacheKey(key, false);
+                publishedWrite = publishedNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(publishedNode.Key)
+                    ? _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode))
+                    : _hybridCache.RemoveAsync(cacheKey);
+                _publishedContentCache.Remove(cacheKey);
+                InvalidateMemoryCacheGeneration();
+
+                scope.Complete();
+            }
+
+            // Both writes settle before the lock is released, even when one of them fails.
+            Task.WhenAll(draftWrite.AsTask(), publishedWrite.AsTask()).GetAwaiter().GetResult();
+        }
+    }
+
+    /// <inheritdoc />
     public async Task RefreshMemoryCacheAsync(Guid key)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -520,6 +709,20 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
     /// <inheritdoc />
     public async Task RemoveFromMemoryCacheAsync(Guid key)
+    {
+        // Ordered after a pending refresh of the same document, so a slow write from that refresh cannot bring the
+        // entries back. Not for callers holding the content tree lock: a refresh waiting for that lock holds this one.
+        using (await _refreshLocks.EnterAsync(key))
+        {
+            await RemoveFromMemoryCacheUnorderedAsync(key);
+        }
+    }
+
+    /// <summary>
+    /// Removes both entries of a document without waiting for a pending refresh of it, for callers that hold the
+    /// content tree lock. The refresh that follows their commit removes the entries again, in order.
+    /// </summary>
+    private async Task RemoveFromMemoryCacheUnorderedAsync(Guid key)
     {
         await _hybridCache.RemoveAsync(GetCacheKey(key, true));
         await ClearPublishedCacheAsync(key);
@@ -637,6 +840,38 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     }
 
     /// <inheritdoc />
+    public void RefreshContent(IContent content)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        if (content.Trashed)
+        {
+            _databaseCacheRepository.DeleteContentItem(content.Id);
+
+            // TODO (V20): await the memory-cache removals once the notification pipeline is asynchronous.
+            RemoveFromMemoryCacheUnorderedAsync(content.Key).GetAwaiter().GetResult();
+            scope.Complete();
+            return;
+        }
+
+        var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
+        _databaseCacheRepository.RefreshContent(draftCacheNode);
+
+        if (content.PublishedState is PublishedState.Publishing)
+        {
+            var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
+            _databaseCacheRepository.RefreshContent(publishedCacheNode);
+        }
+        else if (content.PublishedState is PublishedState.Unpublishing)
+        {
+            _databaseCacheRepository.RemovePublishedContent(content.Id);
+            ClearPublishedCacheAsync(content.Key).GetAwaiter().GetResult();
+        }
+
+        scope.Complete();
+    }
+
+    /// <inheritdoc />
     public async Task RefreshContentAsync(IContent content)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -644,7 +879,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         if (content.Trashed)
         {
             await _databaseCacheRepository.DeleteContentItemAsync(content.Id);
-            await RemoveFromMemoryCacheAsync(content.Key);
+            await RemoveFromMemoryCacheUnorderedAsync(content.Key);
             scope.Complete();
             return;
         }

@@ -6,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -34,7 +35,6 @@ public class DocumentUrlAliasServicePersistAliasesTests
 
         var languageServiceMock = new Mock<ILanguageService>();
         languageServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(languages ?? []);
-        languageServiceMock.Setup(x => x.GetDefaultIsoCodeAsync()).ReturnsAsync("en-US");
 
         var keyValueServiceMock = new Mock<IKeyValueService>();
         keyValueServiceMock.Setup(x => x.GetValue(DocumentUrlAliasService.RebuildKey)).Returns("1");
@@ -65,7 +65,8 @@ public class DocumentUrlAliasServicePersistAliasesTests
             keyValueServiceMock.Object,
             contentServiceMock.Object,
             Mock.Of<IDocumentNavigationQueryService>(),
-            serverRoleAccessorMock.Object);
+            serverRoleAccessorMock.Object,
+            Mock.Of<IDefaultCultureAccessor>(x => x.DefaultCulture == "en-US"));
 
         return new ServiceUnderTest(service, aliasRepositoryMock, contentServiceMock, coreScopeMock);
     }

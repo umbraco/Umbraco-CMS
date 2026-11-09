@@ -12,9 +12,10 @@ namespace Umbraco.Cms.Core.Cache;
 /// </summary>
 public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
 {
-    private readonly ISet<string> _keys = new HashSet<string>();
+    private readonly Dictionary<string, Lazy<object?>> _entries = new();
     private readonly ReaderWriterLockSlim _locker = new(LockRecursionPolicy.SupportsRecursion);
     private bool _disposedValue;
+    private int _completedEvictionCallbacks;
 
     private static readonly TimeSpan _readLockTimeout = TimeSpan.FromSeconds(5);
     private static readonly TimeSpan _writeLockTimeout = TimeSpan.FromSeconds(5);
@@ -26,6 +27,15 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     /// The memory cache.
     /// </value>
     internal MemoryCache MemoryCache { get; private set; }
+
+    /// <summary>
+    /// Gets the number of post-eviction callbacks that have completed.
+    /// </summary>
+    /// <remarks>
+    /// Marked as internal to allow access for tests. Eviction callbacks run on a background thread, 
+    /// so tests use this to wait for them deterministically.
+    /// </remarks>
+    internal int CompletedEvictionCallbacks => Volatile.Read(ref _completedEvictionCallbacks);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ObjectCacheAppCache" />.
@@ -87,7 +97,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
                 throw new TimeoutException("Timeout exceeded to the memory cache when searching items by predicate.");
             }
 
-            entries = _keys.Where(predicate)
+            entries = _entries.Keys.Where(predicate)
                 .Select(MemoryCache.Get)
                 .WhereNotNull()
                 .ToArray(); // evaluate while locked
@@ -134,7 +144,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
 
                     // NOTE: This does an add or update
                     MemoryCache.Set(key, result, GetOptions(timeout, isSliding));
-                    _keys.Add(key);
+                    _entries[key] = result;
                 }
                 finally
                 {
@@ -183,7 +193,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
 
             // NOTE: This does an add or update
             MemoryCache.Set(key, result, GetOptions(timeout, isSliding));
-            _keys.Add(key);
+            _entries[key] = result;
         }
         finally
         {
@@ -205,7 +215,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             }
 
             MemoryCache.Clear();
-            _keys.Clear();
+            _entries.Clear();
         }
         finally
         {
@@ -227,7 +237,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             }
 
             MemoryCache.Remove(key);
-            _keys.Remove(key);
+            _entries.Remove(key);
         }
         finally
         {
@@ -315,10 +325,10 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             }
 
             // ToArray required to remove
-            foreach (var key in _keys.Where(predicate).ToArray())
+            foreach (var key in _entries.Keys.Where(predicate).ToArray())
             {
                 MemoryCache.Remove(key);
-                _keys.Remove(key);
+                _entries.Remove(key);
             }
         }
         finally
@@ -367,34 +377,52 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             options.AbsoluteExpirationRelativeToNow = timeout;
         }
 
-        // Ensure key is removed from set when evicted from cache
-        return options.RegisterPostEvictionCallback((key, _, reason, _) =>
+        // Ensure key is no longer tracked when evicted from cache
+        return options.RegisterPostEvictionCallback((key, value, reason, _) =>
         {
-            // Removed and Replaced evictions don't need pruning here: the Remove/Clear call sites already
-            // prune the tracking set synchronously under the write lock, and a Replaced key still has a
-            // live entry (the synchronous Set re-added it). Pruning here instead runs on a background
-            // thread and races with that re-add, dropping a key whose entry is still cached. (#23064)
-            if (reason is EvictionReason.Removed or EvictionReason.Replaced)
-            {
-                return;
-            }
-
             try
             {
-                if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
-                {
-                    throw new TimeoutException("Timeout exceeded to the memory cache when removing key.");
-                }
-
-                _keys.Remove((string)key);
+                PruneEvictedEntry((string)key, value, reason);
             }
             finally
             {
-                if (_locker.IsWriteLockHeld)
-                {
-                    _locker.ExitWriteLock();
-                }
+                Interlocked.Increment(ref _completedEvictionCallbacks);
             }
         });
+    }
+
+    private void PruneEvictedEntry(string key, object? value, EvictionReason reason)
+    {
+        // Removed and Replaced evictions don't need pruning here: the Remove/Clear call sites already
+        // prune the tracked entries synchronously under the write lock, and a Replaced key still has a
+        // live entry (the synchronous Set re-added it).
+        if (reason is EvictionReason.Removed or EvictionReason.Replaced)
+        {
+            return;
+        }
+
+        try
+        {
+            if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+            {
+                throw new TimeoutException("Timeout exceeded to the memory cache when removing key.");
+            }
+
+            // The callback runs on a background thread, so the key may have been re-cached with a new
+            // entry since this one was evicted (e.g. an expired entry re-read through Get with a factory).
+            // Only prune the key while it still tracks the evicted entry. Every write stores a new Lazy, so a
+            // reference check identifies the entry even when the factory returns the same instance each time.
+            if (_entries.TryGetValue(key, out var tracked) && ReferenceEquals(tracked, value))
+            {
+                _entries.Remove(key);
+            }
+        }
+        finally
+        {
+            if (_locker.IsWriteLockHeld)
+            {
+                _locker.ExitWriteLock();
+            }
+        }
     }
 }

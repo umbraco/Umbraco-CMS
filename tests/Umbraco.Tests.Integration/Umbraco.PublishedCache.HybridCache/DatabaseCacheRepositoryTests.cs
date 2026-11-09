@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -37,6 +38,9 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
     // number of SQL statements other tests in this fixture issue.
     public static void ConfigureSmallDeleteBatchSize(IUmbracoBuilder builder) =>
         builder.Services.PostConfigure<NuCacheSettings>(options => options.ContentTypeRebuildDeleteBatchSize = 2);
+
+    public static void ConfigureJsonSerializer(IUmbracoBuilder builder) =>
+        builder.Services.PostConfigure<NuCacheSettings>(options => options.NuCacheSerializerType = NuCacheSerializerType.JSON);
 
     private IDatabaseCacheRepository DatabaseCacheRepository => GetRequiredService<IDatabaseCacheRepository>();
 
@@ -122,6 +126,68 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
         Assert.That(sources, Is.Empty);
     }
 
+    // The synchronous reads must return what their asynchronous counterparts return. The fixture's root is published
+    // and its subpages are draft only, so outside preview the subpages are filtered out.
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task GetContentSource_Returns_The_Same_Source_As_GetContentSourceAsync(bool preview)
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
+
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        foreach (Guid key in new[] { Textpage.Key, Subpage.Key })
+        {
+            ContentCacheNode? expected = await DatabaseCacheRepository.GetContentSourceAsync(key, preview);
+            ContentCacheNode? actual = DatabaseCacheRepository.GetContentSource(key, preview);
+
+            Assert.That(Describe(actual), Is.EqualTo(Describe(expected)), $"Key {key}, preview {preview}");
+        }
+
+        Assert.That(DatabaseCacheRepository.GetContentSource(Subpage.Key, preview), preview ? Is.Not.Null : Is.Null);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task GetContentSources_Returns_The_Same_Sources_As_GetContentSourcesAsync(bool preview)
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
+        var requestedKeys = new[] { Textpage.Key, Subpage.Key, Subpage2.Key };
+
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        var expected = (await DatabaseCacheRepository.GetContentSourcesAsync(requestedKeys, preview)).Select(Describe).ToList();
+        var actual = DatabaseCacheRepository.GetContentSources(requestedKeys, preview).Select(Describe).ToList();
+
+        Assert.That(actual, Is.EquivalentTo(expected));
+        Assert.That(actual, Has.Count.EqualTo(preview ? requestedKeys.Length : 1));
+    }
+
+    [Test]
+    public async Task GetMediaSource_Returns_The_Same_Source_As_GetMediaSourceAsync()
+    {
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        ContentCacheNode? expected = await DatabaseCacheRepository.GetMediaSourceAsync(MediaItem1.Key);
+        ContentCacheNode? actual = DatabaseCacheRepository.GetMediaSource(MediaItem1.Key);
+
+        Assert.That(actual, Is.Not.Null);
+        Assert.That(Describe(actual), Is.EqualTo(Describe(expected)));
+    }
+
+    [Test]
+    public async Task GetMediaSources_Returns_The_Same_Sources_As_GetMediaSourcesAsync()
+    {
+        var requestedKeys = new[] { MediaItem1.Key, MediaItem2.Key };
+
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        var expected = (await DatabaseCacheRepository.GetMediaSourcesAsync(requestedKeys)).Select(Describe).ToList();
+        var actual = DatabaseCacheRepository.GetMediaSources(requestedKeys).Select(Describe).ToList();
+
+        Assert.That(actual, Is.EquivalentTo(expected));
+        Assert.That(actual, Has.Count.EqualTo(requestedKeys.Length));
+    }
+
+    private static (int Id, Guid Key, bool IsDraft, string? Name)? Describe(ContentCacheNode? node)
+        => node is null ? null : (node.Id, node.Key, node.IsDraft, node.Data?.Name);
+
     [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureSmallDeleteBatchSize))]
     public void Rebuild_Deletes_Stale_Rows_In_Batches_And_Repopulates()
@@ -175,6 +241,35 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
         }
     }
 
+    /// <summary>
+    ///     Verifies that a cache row saved between the rebuild deleting a content type's rows and re-inserting them
+    ///     is kept, rather than overwritten by the rebuild's older data.
+    /// </summary>
+    /// <remarks>
+    ///     The rebuild re-inserts each page of rows with a single bulk insert. That bulk insert only fails when a row
+    ///     with the same node id and published flag already exists, which happens when a foreground save writes the
+    ///     row after the rebuild has deleted it. On that primary key violation, the rebuild falls back to
+    ///     <c>DatabaseCacheRepository.InsertNewRows</c>, which inserts each row with <c>INSERT ... WHERE NOT EXISTS</c>,
+    ///     so it skips the saved row and inserts the rest of the page.
+    /// </remarks>
+    [Test]
+    public void Rebuild_Does_Not_Overwrite_Row_Saved_During_Rebuild()
+        => AssertRebuildDoesNotOverwriteRowSavedDuringRebuild();
+
+    /// <summary>
+    ///     Verifies that a cache row saved during the rebuild is kept when the rows the rebuild inserts have no
+    ///     binary data, so the fallback in <c>DatabaseCacheRepository.InsertNewRows</c> has a null value to insert.
+    /// </summary>
+    /// <remarks>
+    ///     The JSON serializer stores no binary data, so the rebuilt rows leave the binary column empty. The fallback
+    ///     leaves null columns out of its insert, because some providers cannot convert an untyped null parameter to
+    ///     the binary column type.
+    /// </remarks>
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureJsonSerializer))]
+    public void Rebuild_Does_Not_Overwrite_Row_Saved_During_Rebuild_When_Binary_Data_Is_Null()
+        => AssertRebuildDoesNotOverwriteRowSavedDuringRebuild();
+
     [Test]
     public void GetContentByContentTypeKey_With_Keys_Returns_Matching_Nodes()
     {
@@ -192,4 +287,52 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
         Assert.That(returnedKeys, Does.Contain(Subpage2.Key));
         Assert.That(returnedKeys, Does.Contain(Subpage3.Key));
     }
+
+    private void AssertRebuildDoesNotOverwriteRowSavedDuringRebuild()
+    {
+        DocumentCacheService.Rebuild([ContentType.Id]);
+
+        const string foregroundMarker = "FOREGROUND";
+        var contentTypeNodeIds = new[] { Textpage.Id, Subpage.Id, Subpage2.Id, Subpage3.Id };
+        var written = false;
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            IUmbracoDatabase database = ScopeAccessor.AmbientScope!.Database;
+            DatabaseCacheRepository.Rebuild([ContentType.Id], null, step =>
+            {
+                // A save between the rebuild's delete and its inserts writes a row the rebuild then conflicts with.
+                if (written is false && CountCacheRows(database, Textpage.Id) == 0)
+                {
+                    database.Insert(new ContentNuDto { NodeId = Textpage.Id, Published = false, Data = foregroundMarker, Rv = 1 });
+                    written = true;
+                }
+
+                step();
+            });
+            scope.Complete();
+        }
+
+        using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+        {
+            List<ContentNuDto> dtos = ScopeAccessor.AmbientScope!.Database.Fetch<ContentNuDto>(
+                SqlContext.Sql()
+                    .Select<ContentNuDto>()
+                    .From<ContentNuDto>()
+                    .WhereIn<ContentNuDto>(x => x.NodeId, contentTypeNodeIds));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(written, Is.True, "The rebuild never ran a step after deleting the rows.");
+                Assert.That(dtos.Select(x => x.NodeId).Distinct(), Is.EquivalentTo(contentTypeNodeIds));
+                Assert.That(dtos.Single(x => x.NodeId == Textpage.Id && x.Published is false).Data, Is.EqualTo(foregroundMarker));
+            });
+        }
+    }
+
+    private int CountCacheRows(IUmbracoDatabase database, int nodeId)
+        => database.ExecuteScalar<int>(
+            SqlContext.Sql()
+                .SelectCount()
+                .From<ContentNuDto>()
+                .Where<ContentNuDto>(x => x.NodeId == nodeId));
 }

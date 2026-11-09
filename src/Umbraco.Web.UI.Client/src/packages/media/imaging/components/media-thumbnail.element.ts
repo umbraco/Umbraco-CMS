@@ -5,6 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 /**
  * Displays a thumbnail for a media item, with optional server-side cropping and transparency support.
@@ -97,6 +98,33 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
+	#dataTypeUnique?: string;
+
+	#hasRequestedThumbnail = false;
+
+	#latestRequest = 0;
+
+	constructor() {
+		super();
+
+		// A picker configured to ignore user start nodes may reference media outside them,
+		// which the server only resolves when told which data type the request originates from.
+		this.consumeContext(UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT, (context) => {
+			this.observe(
+				context?.dataType,
+				(dataType) => {
+					// The context is also lost when the element disconnects, which needs no new request.
+					if (!dataType?.unique) return;
+					this.#dataTypeUnique = dataType.unique;
+					if (this.#hasRequestedThumbnail) {
+						this.#generateThumbnailUrl();
+					}
+				},
+				'_observeDataType',
+			);
+		});
+	}
+
 	override render() {
 		return when(
 			this.externalLoading || this._isLoading,
@@ -179,13 +207,19 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 	async #generateThumbnailUrl() {
 		if (!this.unique) return;
 		this._isLoading = true;
+		this.#hasRequestedThumbnail = true;
+		const request = ++this.#latestRequest;
 
 		const { data } = await this.#imagingRepository.requestResizedItems([this.unique], {
 			height: this.height,
 			width: this.width,
 			mode: this.mode,
 			format: this.format,
+			dataTypeUnique: this.#dataTypeUnique,
 		});
+
+		// A newer request (for example after the data type resolved) supersedes this one.
+		if (request !== this.#latestRequest) return;
 
 		this._thumbnailUrl = data?.[0]?.url ?? '';
 		this._isLoading = false;
