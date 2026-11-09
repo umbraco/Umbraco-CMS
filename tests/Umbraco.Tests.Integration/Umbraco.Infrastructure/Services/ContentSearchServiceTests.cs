@@ -102,6 +102,24 @@ public class ContentSearchServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(_contentByName["Root 3/Child 2"].Key, result.Items.First().Key);
     }
 
+    [Test]
+    public async Task Can_Order_By_Published_With_Culture()
+    {
+        // ordering by "published" with a culture builds a CASE over the published flag and a 0/1 literal pair,
+        // which must use the provider's boolean literals (on PostgreSQL the flag is a boolean column)
+        Assert.IsTrue(ContentService.Publish(_contentByName["Root 3"], ["*"]).Success);
+        Assert.IsTrue(ContentService.Publish(_contentByName["Root 3/Child 2"], ["*"]).Success);
+        Assert.IsTrue(ContentService.Publish(_contentByName["Root 3/Child 4"], ["*"]).Success);
+
+        var result = await ContentSearchService.SearchChildrenAsync(null, _contentByName["Root 3"].Key, Ordering.By("published", Direction.Descending, culture: "en-US"), 0, 1000);
+        Assert.AreEqual(5, result.Total);
+
+        var firstTwo = result.Items.Take(2).Select(item => item.Key).ToArray();
+        CollectionAssert.AreEquivalent(
+            new[] { _contentByName["Root 3/Child 2"].Key, _contentByName["Root 3/Child 4"].Key },
+            firstTwo);
+    }
+
     [SetUp]
     public async Task SetUpTest()
     {
