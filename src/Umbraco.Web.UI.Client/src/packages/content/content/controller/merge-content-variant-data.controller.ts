@@ -4,7 +4,11 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbPropertyValueIndex } from '@umbraco-cms/backoffice/property';
-import { UmbVariantId, umbVariantObjectSortCompare, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
+import {
+	umbVariantObjectSortCompare,
+	type UmbVariantDataModel,
+	type UmbVariantId,
+} from '@umbraco-cms/backoffice/variant';
 
 /**
  * @function defaultCompareVariantMethod
@@ -104,21 +108,18 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 		// Each list is unique on its own, so a draft value only takes part when it is not already persisted.
 		const uniqueValues = [
 			...(persistedValues ?? []),
-			...(draftValues ?? []).filter(
-				(value) => persistedIndex.find(value.alias, UmbVariantId.CreateFromPartial(value)) === undefined,
-			),
+			...(draftValues ?? []).filter((value) => persistedIndex.find(value.alias, value) === undefined),
 		];
 
 		// Map unique values to their respective draft values.
 		const values = (
 			await Promise.all(
 				uniqueValues.map((value) => {
-					const variantId = UmbVariantId.CreateFromPartial(value);
-					const persistedValue = persistedIndex.find(value.alias, variantId);
+					const persistedValue = persistedIndex.find(value.alias, value);
 
 					// Should this value be saved?
-					if (variantsToStore.some((x) => x.equal(variantId))) {
-						const draftValue = draftIndex.find(value.alias, variantId);
+					if (variantsToStore.some((x) => x.compare(value))) {
+						const draftValue = draftIndex.find(value.alias, value);
 
 						return this.#processValue(persistedValue, draftValue, variantsToStore);
 					} else {

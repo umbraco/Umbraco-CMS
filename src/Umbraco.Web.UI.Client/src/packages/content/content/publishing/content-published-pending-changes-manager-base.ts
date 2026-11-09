@@ -44,6 +44,9 @@ export abstract class UmbContentPublishedPendingChangesManagerBase<
 		// Notice the published data is the persisted side of each merge, and the persisted data is the draft side.
 		const publishedValuesIndex = new UmbPropertyValueIndex(args.publishedData.values);
 		const persistedValuesIndex = new UmbPropertyValueIndex(args.persistedData.values);
+		args.publishedData = structuredClone(args.publishedData);
+		// remove dates from the comparison
+		args.publishedData.variants.forEach((variant) => this.#cleanVariantForComparison(variant));
 
 		const pendingChangesPromises = variantIds.map((variantId) =>
 			this.#processVariant(args, variantId, publishedValuesIndex, persistedValuesIndex),
@@ -61,18 +64,15 @@ export abstract class UmbContentPublishedPendingChangesManagerBase<
 		const mergeController = new UmbMergeContentVariantDataController(this);
 		mergeController.setPersistedValuesIndex(publishedValuesIndex);
 		mergeController.setDraftValuesIndex(persistedValuesIndex);
-		const mergedData = await mergeController.process(args.publishedData, args.persistedData, [variantId], [variantId]);
 
-		const mergedDataClone = structuredClone(mergedData);
-		const publishedDataClone = structuredClone(args.publishedData);
-
+		const publishedData = args.publishedData;
+		const mergedData = await mergeController.process(publishedData, args.persistedData, [variantId], [variantId]);
 		// remove dates from the comparison
-		mergedDataClone.variants.forEach((variant) => this.#cleanVariantForComparison(variant));
-		publishedDataClone.variants.forEach((variant) => this.#cleanVariantForComparison(variant));
+		mergedData.variants.forEach((variant) => this.#cleanVariantForComparison(variant));
 
-		this.cleanDataBeforeComparison(mergedDataClone, publishedDataClone);
+		this.cleanDataBeforeComparison(mergedData, publishedData);
 
-		const hasChanges = jsonStringComparison(mergedDataClone, publishedDataClone) === false;
+		const hasChanges = jsonStringComparison(mergedData, publishedData) === false;
 		return hasChanges ? { variantId } : null;
 	}
 

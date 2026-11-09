@@ -1,5 +1,5 @@
 import type { UmbPropertyValueData } from '../types.js';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, type UmbObjectWithVariantProperties } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A lookup over a list of property values, by alias and optionally by variant.
@@ -23,8 +23,7 @@ export class UmbPropertyValueIndex<ValueType extends UmbPropertyValueData = UmbP
 				this.#firstByAlias.set(value.alias, value);
 			}
 
-			const { culture, segment } = value as { culture?: string | null; segment?: string | null };
-			const variantKey = UmbPropertyValueIndex.#variantKey(new UmbVariantId(culture, segment));
+			const variantKey = UmbVariantId.ToString(value as Partial<UmbObjectWithVariantProperties>);
 			let byVariant = this.#firstByAliasAndVariant.get(value.alias);
 			if (!byVariant) {
 				byVariant = new Map();
@@ -39,17 +38,13 @@ export class UmbPropertyValueIndex<ValueType extends UmbPropertyValueData = UmbP
 	/**
 	 * Finds the first value with the given alias, and when a variant is given, the same variant.
 	 * @param {string} alias - The property alias.
-	 * @param {UmbVariantId} [variantId] - The variant to match. When omitted, the variant of the values is ignored.
+	 * @param {Partial<UmbObjectWithVariantProperties>} [variant] - The culture and segment to match, such as a Variant Id or a value. Omitted values are treated as invariant. When the argument is omitted, the variant of the values is ignored.
 	 * @returns {UmbPropertyValueData | undefined} The first matching value, if any.
 	 */
-	find(alias: string, variantId?: UmbVariantId): ValueType | undefined {
-		if (!variantId) {
+	find(alias: string, variant?: Partial<UmbObjectWithVariantProperties>): ValueType | undefined {
+		if (!variant) {
 			return this.#firstByAlias.get(alias);
 		}
-		return this.#firstByAliasAndVariant.get(alias)?.get(UmbPropertyValueIndex.#variantKey(variantId));
-	}
-
-	static #variantKey(variantId: UmbVariantId): string {
-		return JSON.stringify([variantId.culture, variantId.segment]);
+		return this.#firstByAliasAndVariant.get(alias)?.get(UmbVariantId.ToString(variant));
 	}
 }

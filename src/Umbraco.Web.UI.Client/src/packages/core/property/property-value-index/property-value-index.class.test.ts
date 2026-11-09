@@ -57,11 +57,16 @@ describe('UmbPropertyValueIndex', () => {
 		expect(index.find('a', new UmbVariantId(null, null))?.value).to.equal('x');
 	});
 
-	it('does not confuse a culture containing an underscore with a culture and segment', () => {
-		const index = new UmbPropertyValueIndex([{ alias: 'a', value: 'x', culture: 'a_b', segment: null }]);
+	it('finds a value by a plain culture and segment object, treating omitted values as invariant', () => {
+		const index = new UmbPropertyValueIndex([
+			{ alias: 'a', value: 'invariant', culture: null, segment: null },
+			{ alias: 'a', value: 'cultureA', culture: 'cultureA', segment: null },
+		]);
 
-		expect(index.find('a', new UmbVariantId('a', 'b'))).to.be.undefined;
-		expect(index.find('a', new UmbVariantId('a_b', null))?.value).to.equal('x');
+		expect(index.find('a', {})?.value).to.equal('invariant');
+		expect(index.find('a', { culture: 'invariant' })?.value).to.equal('invariant');
+		expect(index.find('a', { culture: 'cultureA' })?.value).to.equal('cultureA');
+		expect(index.find('a', { culture: 'cultureB' })).to.be.undefined;
 	});
 
 	it('handles an empty list', () => {
