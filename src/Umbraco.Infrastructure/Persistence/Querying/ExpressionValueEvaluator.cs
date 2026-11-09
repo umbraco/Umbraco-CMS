@@ -50,13 +50,12 @@ internal static class ExpressionValueEvaluator
         value = null;
 
         object? target = null;
-        if (member.Expression is not null)
+
+        // A null target is left to the interpreter so it throws the same exception compiled code would.
+        if (member.Expression is not null
+            && (TryGetValueDirectly(member.Expression, out target) is false || target is null))
         {
-            // A null target is left to the interpreter so it throws the same exception compiled code would.
-            if (TryGetValueDirectly(member.Expression, out target) is false || target is null)
-            {
-                return false;
-            }
+            return false;
         }
 
         switch (member.Member)

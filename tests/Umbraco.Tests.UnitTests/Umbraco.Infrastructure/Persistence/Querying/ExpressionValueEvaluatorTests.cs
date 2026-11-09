@@ -162,6 +162,6 @@ public class ExpressionValueEvaluatorTests
 
         public Item Child { get; set; } = null!;
 
-        public string Throwing => throw new ArgumentException("Thrown by the getter.");
+        public string Throwing => throw new ArgumentException($"Thrown by the getter of {Name}.");
     }
 }
