@@ -300,6 +300,9 @@ return BadRequest(problemDetails);
    - Requires shared Data Protection key ring
    - All servers must have synchronized clocks (NTP)
    - Reference tokens require database storage
+   - Signing/encryption credentials are not per-server: identity tokens are JWTs signed with them even with
+     Data Protection enabled, so `ConfigureOpenIddictServerCredentials` persists them in `umbracoKeyValue`
+     (Data Protection-protected) and every server loads the same ones
 
 ### External Dependencies
 
