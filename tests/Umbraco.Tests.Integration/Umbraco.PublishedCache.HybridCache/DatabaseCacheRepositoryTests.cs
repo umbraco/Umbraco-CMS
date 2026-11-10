@@ -240,6 +240,16 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
+    public async Task GetMediaSourcesAsync_Without_An_Ambient_Scope_Returns_Matching_Sources()
+    {
+        var requestedKeys = new[] { MediaItem1.Key, MediaItem2.Key };
+
+        var sources = (await DatabaseCacheRepository.GetMediaSourcesAsync(requestedKeys)).ToList();
+
+        Assert.That(sources.Select(s => s.Key), Is.EquivalentTo(requestedKeys));
+    }
+
+    [Test]
     public async Task GetContentSources_Without_An_Ambient_Scope_Returns_Matching_Sources()
     {
         await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
