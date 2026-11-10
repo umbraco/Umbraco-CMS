@@ -44,6 +44,15 @@ describe('UmbTiptapStatusbarElementPathElement', () => {
 				expect(separator!.left).to.be.at.least(first.right);
 				expect(separator!.right).to.be.at.most(second.left);
 			});
+
+			it('hides the separators from assistive technology', () => {
+				const separators = element.shadowRoot!.querySelectorAll('code + :not(code)');
+
+				expect(separators.length).to.be.greaterThan(0);
+				for (const separator of separators) {
+					expect(separator.getAttribute('aria-hidden')).to.equal('true');
+				}
+			});
 		});
 	}
 });

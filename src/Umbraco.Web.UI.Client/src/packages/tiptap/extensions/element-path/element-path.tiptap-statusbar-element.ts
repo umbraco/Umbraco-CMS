@@ -61,7 +61,7 @@ export class UmbTiptapStatusbarElementPathElement extends UmbLitElement {
 		if (!this._path) return nothing;
 		return join(
 			map(this._path, (item) => html`<code>${item}</code>`),
-			html`<span>&gt;</span>`,
+			html`<span aria-hidden="true">&gt;</span>`,
 		);
 	}
 
