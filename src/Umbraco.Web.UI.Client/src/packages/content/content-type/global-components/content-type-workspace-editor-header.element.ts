@@ -6,7 +6,6 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
-import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-content-type-workspace-editor-header')
 export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
@@ -41,12 +40,8 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 	}
 
 	#observeReadOnly() {
-		const context = this.#workspaceContext;
-		const entityDetailContext =
-			context && UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT.getDiscriminator()?.(context) ? context : undefined;
-
 		this.observe(
-			entityDetailContext?.readOnlyGuard.permitted,
+			this.#workspaceContext?.readOnlyGuard?.permitted,
 			(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
 			'_observeIsReadOnly',
 		);

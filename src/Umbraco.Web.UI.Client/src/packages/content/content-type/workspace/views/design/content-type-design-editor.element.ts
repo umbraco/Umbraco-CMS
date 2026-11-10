@@ -26,7 +26,6 @@ import type {
 	ManifestWorkspaceViewContentTypeDesignEditorKind,
 	UmbWorkspaceViewElement,
 } from '@umbraco-cms/backoffice/workspace';
-import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -185,12 +184,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	#observeReadOnly() {
-		const context = this.#workspaceContext;
-		const entityDetailContext =
-			context && UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT.getDiscriminator()?.(context) ? context : undefined;
-
 		this.observe(
-			entityDetailContext?.readOnlyGuard.permitted,
+			this.#workspaceContext?.readOnlyGuard?.permitted,
 			(isReadOnly) => {
 				this._isReadOnly = isReadOnly ?? false;
 				if (this.#currentTabComponent) {

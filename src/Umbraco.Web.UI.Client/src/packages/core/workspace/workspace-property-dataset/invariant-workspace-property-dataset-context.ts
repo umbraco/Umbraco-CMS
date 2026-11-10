@@ -1,5 +1,4 @@
 import type { UmbInvariantDatasetWorkspaceContext } from '../contexts/index.js';
-import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '../entity-detail/entity-detail-workspace.context-token.js';
 import type {
 	UmbPropertyDatasetContext,
 	UmbNameablePropertyDatasetContext,
@@ -57,10 +56,11 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 	}
 
 	#observeReadOnly() {
-		const workspace = this.#workspace;
-		if (!UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT.getDiscriminator()?.(workspace)) return;
-
-		this.observe(workspace.readOnlyGuard.permitted, (isReadOnly) => this.#readOnly.setValue(isReadOnly ?? false), null);
+		this.observe(
+			this.#workspace.readOnlyGuard?.permitted,
+			(isReadOnly) => this.#readOnly.setValue(isReadOnly ?? false),
+			null,
+		);
 	}
 
 	get properties(): Observable<Array<UmbPropertyValueData> | undefined> {
