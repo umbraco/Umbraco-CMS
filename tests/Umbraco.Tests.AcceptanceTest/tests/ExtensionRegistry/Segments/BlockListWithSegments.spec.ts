@@ -11,6 +11,7 @@ const blockElementTypeName = 'TestSegmentBlockElementType';
 const blockListDataTypeName = 'TestSegmentBlockList';
 const textstringDataTypeName = 'Textstring';
 const blockListEditorAlias = 'Umbraco.BlockList';
+const textstringEditorAlias = 'Umbraco.TextBox';
 // Segments
 const vipMemberSegment = 'VIP members';
 const vipMemberSegmentAlias = 'vip-members';
@@ -108,7 +109,7 @@ test('can update the VIP segment value of a block in a block list shared across 
     AliasHelper.toAlias(blockListDataTypeName),
     blockElementTypeId,
     AliasHelper.toAlias(textstringDataTypeName),
-    'Umbraco.TextBox',
+    textstringEditorAlias,
     [[{value: defaultBlockValue, segment: null}]]
   );
   await umbracoUi.goToBackOffice();
