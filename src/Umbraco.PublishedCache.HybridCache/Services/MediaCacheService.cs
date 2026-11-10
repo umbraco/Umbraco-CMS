@@ -735,10 +735,24 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
     private static string GetCacheKey(Guid key) => $"{key}";
 
-    // Generates the cache tags for a given CacheNode.
-    // We use the tags to be able to clear all cache entries that are related to a given content item.
-    // Null entries carry the media tag too, so that ClearMemoryCacheAsync removes them.
-    private static HashSet<string> GenerateTags(ContentCacheNode? cacheNode) => cacheNode is null ? [Constants.Cache.Tags.Media] : [Constants.Cache.Tags.Media, MediaTypeIdTag(cacheNode.ContentTypeId)];
+    /// <summary>
+    /// Generates the cache tags for a given <see cref="ContentCacheNode"/>.
+    /// </summary>
+    /// <param name="cacheNode">The cache node to generate tags for, or <c>null</c> for a negative-cache entry.</param>
+    /// <returns>
+    /// A set of tags that always includes <see cref="Constants.Cache.Tags.Media"/>.
+    /// When <paramref name="cacheNode"/> is non-null, the media type ID tag is also included.
+    /// </returns>
+    /// <remarks>
+    /// Tags are used to clear all cache entries related to a given media item or type.
+    /// The <see cref="Constants.Cache.Tags.Media"/> tag is always included — even for null entries — so
+    /// that <see cref="ClearMemoryCacheAsync"/> (which clears by this tag) can evict negative-cache entries.
+    /// Without this, null entries survive tag-based cache clears and become permanently stale.
+    /// </remarks>
+    private static HashSet<string> GenerateTags(ContentCacheNode? cacheNode) =>
+        cacheNode is null
+            ? [Constants.Cache.Tags.Media]
+            : [Constants.Cache.Tags.Media, MediaTypeIdTag(cacheNode.ContentTypeId)];
 
     private async Task ClearPublishedCacheAsync(Guid key)
     {
