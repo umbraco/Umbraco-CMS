@@ -4406,12 +4406,9 @@ public class ContentService : RepositoryService, IContentService
         }
 
         DateTime now = DateTime.UtcNow;
-        foreach (var culture in cultures)
+        foreach (var culture in cultures.Where(c => string.IsNullOrEmpty(c) is false))
         {
-            if (!string.IsNullOrEmpty(culture))
-            {
-                content.SetCultureInfo(culture, blueprint.GetCultureName(culture), now);
-            }
+            content.SetCultureInfo(culture, blueprint.GetCultureName(culture), now);
         }
 
         return content;

@@ -47,13 +47,21 @@ describe('UmbDocumentBlueprintWorkspaceContext', () => {
 			expect(variantOptions.map((option) => option.segment)).to.deep.equal([null, 's1', 's2']);
 		});
 
+		it('does not offer a segment that is limited to other cultures', async () => {
+			await context.load(SEGMENT_VARIANT_DOCUMENT_BLUEPRINT_ID);
+
+			const variantOptions = await context.getVariantOptions();
+
+			expect(variantOptions.map((option) => option.segment)).not.to.include('da-only');
+		});
+
 		it('links a segment option to the blueprint variant that exists for it', async () => {
 			await context.load(SEGMENT_VARIANT_DOCUMENT_BLUEPRINT_ID);
 
 			const variantOptions = await context.getVariantOptions();
 
 			expect(variantOptions.find((option) => option.segment === 's1')?.variant?.segment).to.equal('s1');
-			expect(variantOptions.find((option) => option.segment === 's2')?.variant).to.equal(undefined);
+			expect(variantOptions.find((option) => option.segment === 's2')?.variant).to.be.undefined;
 		});
 	});
 });
