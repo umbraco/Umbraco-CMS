@@ -360,4 +360,46 @@ public class RepositoryCacheVersionAccessorTests
             _actions.Clear();
         }
     }
+
+    [Test]
+    public void Get_WhenNeitherCacheHasVersion_QueriesTheDatabaseSynchronously_AndPopulatesBothCaches()
+    {
+        var dbVersion = new RepositoryCacheVersion { Identifier = CacheKey, Version = Guid.NewGuid().ToString() };
+        _repository.Setup(x => x.Get(CacheKey)).Returns(dbVersion);
+
+        RepositoryCacheVersion? result = _sut.Get(CacheKey);
+
+        Assert.AreEqual(dbVersion.Version, result?.Version);
+        Assert.AreEqual(dbVersion.Version, _requestCache.GetCacheItem<RepositoryCacheVersion>(CacheKey)?.Version);
+        _repository.Verify(x => x.GetAsync(It.IsAny<string>()), Times.Never);
+
+        // The second read within the same scope context is answered from the scope cache.
+        _sut.Get(CacheKey);
+        _repository.Verify(x => x.Get(CacheKey), Times.Once);
+    }
+
+    [Test]
+    public void Get_WhenRepositoryReturnsNull_ReturnsNullAndDoesNotCache()
+    {
+        _repository.Setup(x => x.Get(CacheKey)).Returns((RepositoryCacheVersion?)null);
+
+        Assert.IsNull(_sut.Get(CacheKey));
+        Assert.IsNull(_requestCache.GetCacheItem<RepositoryCacheVersion>(CacheKey));
+
+        _sut.Get(CacheKey);
+        _repository.Verify(x => x.Get(CacheKey), Times.Exactly(2));
+    }
+
+    [Test]
+    public async Task Get_AndGetAsync_ShareTheSameCaches()
+    {
+        var dbVersion = new RepositoryCacheVersion { Identifier = CacheKey, Version = Guid.NewGuid().ToString() };
+        _repository.Setup(x => x.Get(CacheKey)).Returns(dbVersion);
+
+        _sut.Get(CacheKey);
+        RepositoryCacheVersion? viaAsync = await _sut.GetAsync(CacheKey);
+
+        Assert.AreEqual(dbVersion.Version, viaAsync?.Version);
+        _repository.Verify(x => x.GetAsync(It.IsAny<string>()), Times.Never, "The asynchronous read must be answered from the cache the synchronous read populated.");
+    }
 }

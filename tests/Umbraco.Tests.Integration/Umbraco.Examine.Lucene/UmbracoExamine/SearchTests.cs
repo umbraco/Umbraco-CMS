@@ -58,7 +58,7 @@ internal sealed class SearchTests : ExamineBaseTest
             .ToArray();
         var contentService = Mock.Of<IContentService>(
             x => x.GetPagedDescendants(
-                     It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<IQuery<IContent>>(), It.IsAny<Ordering>())
+                     It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string[]>(), It.IsAny<IQuery<IContent>>(), It.IsAny<Ordering>())
                  ==
                  allRecs);
 

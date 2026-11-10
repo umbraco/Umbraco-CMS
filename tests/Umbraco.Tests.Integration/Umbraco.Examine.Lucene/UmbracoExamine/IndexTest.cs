@@ -1,5 +1,6 @@
 using Bogus;
 using Examine;
+using Examine.Lucene.Providers;
 using Lucene.Net.Util;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
@@ -172,6 +173,62 @@ internal sealed class IndexTest : ExamineBaseTest
             results = index.Searcher.CreateQuery().Id(2112).Execute();
             Assert.AreEqual(1, results.Count());
         }
+    }
+
+    [Test]
+    public void GivenValidatorIncludingSpecificFields_WhenContentIndexed_ThenOnlyThoseFieldsAreStored()
+    {
+        var validator = new ContentValueSetValidator(false, true, null, null, includeFields: ["path", "nodeName", "title"]);
+
+        ISearchResult result = IndexAndRetrieve(validator);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Values, Contains.Key("title"));
+            Assert.That(result.Values, Contains.Key("nodeName"));
+            Assert.That(result.Values, Does.Not.ContainKey("description"));
+        });
+    }
+
+    [Test]
+    public void GivenValidatorExcludingSpecificFields_WhenContentIndexed_ThenThoseFieldsAreNotStored()
+    {
+        var validator = new ContentValueSetValidator(false, true, null, null, excludeFields: ["description"]);
+
+        ISearchResult result = IndexAndRetrieve(validator);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Values, Contains.Key("title"));
+            Assert.That(result.Values, Does.Not.ContainKey("description"));
+        });
+    }
+
+    private ISearchResult IndexAndRetrieve(IContentValueSetValidator validator)
+    {
+        using var luceneDir = new RandomIdRAMDirectory();
+        using UmbracoContentIndex index = IndexInitializer.GetUmbracoIndexer(HostingEnvironment, RunningRuntimeState, luceneDir, validator: validator);
+        using IDisposable synchronous = index.WithThreadingMode(IndexThreadingMode.Synchronous);
+
+        // Index through IIndex, as populators and indexing handlers do.
+        ((IIndex)index).IndexItems(
+        [
+            new ValueSet(
+                "1234",
+                IndexTypes.Content,
+                "page",
+                new Dictionary<string, object>
+                {
+                    ["path"] = "-1,1234",
+                    ["nodeName"] = "My page",
+                    ["title"] = "My title",
+                    ["description"] = "My description",
+                }),
+        ]);
+
+        ISearchResults results = index.Searcher.CreateQuery().Id("1234").Execute();
+        Assert.That(results.TotalItemCount, Is.EqualTo(1));
+        return results.First();
     }
 
     [Test]

@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Sync;
@@ -34,8 +35,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// a rebuild, and we have future-proofing in case the alias parsing logic changes in future versions.
     /// Bumped to "2" so that installs which persisted draft alias values (before aliases were restricted to the
     /// published property value, see #23206) rebuild once on startup and flush the stale entries.
+    /// Bumped to "3" so that installs which persisted aliases of unpublished documents (before aliases were
+    /// restricted to published documents, see #23948) rebuild once on startup and flush the stale entries.
     /// </remarks>
-    private const string CurrentRebuildValue = "2";
+    private const string CurrentRebuildValue = "3";
 
     private readonly ILogger<DocumentUrlAliasService> _logger;
     private readonly IDocumentUrlAliasRepository _documentUrlAliasRepository;
@@ -45,6 +48,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     private readonly IContentService _contentService;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private readonly IServerRoleAccessor _serverRoleAccessor;
+    private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
     // Lookup: alias -> list of matching document keys (multiple docs can have same alias).
     private readonly ConcurrentDictionary<AliasCacheKey, List<Guid>> _aliasCache = new();
@@ -123,6 +127,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentUrlAliasService"/> class.
     /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 20.")]
     public DocumentUrlAliasService(
         ILogger<DocumentUrlAliasService> logger,
         IDocumentUrlAliasRepository documentUrlAliasRepository,
@@ -132,6 +137,32 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         IContentService contentService,
         IDocumentNavigationQueryService documentNavigationQueryService,
         IServerRoleAccessor serverRoleAccessor)
+        : this(
+            logger,
+            documentUrlAliasRepository,
+            coreScopeProvider,
+            languageService,
+            keyValueService,
+            contentService,
+            documentNavigationQueryService,
+            serverRoleAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IDefaultCultureAccessor>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentUrlAliasService"/> class.
+    /// </summary>
+    public DocumentUrlAliasService(
+        ILogger<DocumentUrlAliasService> logger,
+        IDocumentUrlAliasRepository documentUrlAliasRepository,
+        ICoreScopeProvider coreScopeProvider,
+        ILanguageService languageService,
+        IKeyValueService keyValueService,
+        IContentService contentService,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IServerRoleAccessor serverRoleAccessor,
+        IDefaultCultureAccessor defaultCultureAccessor)
     {
         _logger = logger;
         _documentUrlAliasRepository = documentUrlAliasRepository;
@@ -141,6 +172,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         _contentService = contentService;
         _documentNavigationQueryService = documentNavigationQueryService;
         _serverRoleAccessor = serverRoleAccessor;
+        _defaultCultureAccessor = defaultCultureAccessor;
     }
 
     /// <inheritdoc/>
@@ -233,7 +265,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         }
 
         // Default to the default language when culture is not specified (like DocumentUrlService)
-        culture ??= await _languageService.GetDefaultIsoCodeAsync();
+        culture ??= _defaultCultureAccessor.DefaultCulture;
 
         var languageId = await TryGetLanguageIdAsync(culture);
         if (languageId is null)
@@ -264,7 +296,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         ThrowIfNotInitialized();
 
         // Default to the default language when culture is not specified (like DocumentUrlService)
-        culture ??= await _languageService.GetDefaultIsoCodeAsync();
+        culture ??= _defaultCultureAccessor.DefaultCulture;
 
         var languageId = await TryGetLanguageIdAsync(culture);
         if (languageId is null)
@@ -362,7 +394,9 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         List<PublishedDocumentUrlAlias> aliases = document.Trashed || document.PublishedState == PublishedState.Unpublishing
             ? []
-            : await ExtractAliasesFromDocumentAsync(document);
+            : document.PublishedState == PublishedState.Publishing
+                ? await ExtractPublishedAliasesAsync(document)
+                : await ExtractAliasesFromDocumentAsync(document);
 
         if (aliases.Count > 0)
         {
@@ -467,7 +501,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     public bool HasAny()
     {
         ThrowIfNotInitialized();
-        return _aliasCache.Count > 0;
+        return _aliasCache.IsEmpty is false;
     }
 
     /// <inheritdoc/>
@@ -548,6 +582,26 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     }
 
     private async Task<List<PublishedDocumentUrlAlias>> ExtractAliasesFromDocumentAsync(IContent document)
+    {
+        // An unpublished document keeps the property values of its last published version,
+        // so GetValue(published: true) alone would still return its former alias.
+        if (document.Published is false)
+        {
+            return [];
+        }
+
+        return await ExtractPublishedAliasesAsync(document);
+    }
+
+    /// <summary>
+    /// Extracts the aliases from the published property values of a document, without checking whether the document
+    /// is published.
+    /// </summary>
+    /// <remarks>
+    /// Used directly for a document that is being published, whose published flag is only set once it has been
+    /// persisted, after the aliases are written.
+    /// </remarks>
+    private async Task<List<PublishedDocumentUrlAlias>> ExtractPublishedAliasesAsync(IContent document)
     {
         var aliases = new List<PublishedDocumentUrlAlias>();
 

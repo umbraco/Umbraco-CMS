@@ -2,7 +2,7 @@ import type { UmbStaticFileItemModel } from '../../repository/item/types.js';
 import { UmbStaticFilePickerInputContext } from './input-static-file.context.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { isAboveZeroAndBelowMinimum, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
@@ -30,13 +30,13 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 	}
 
 	/**
-	 * Min validation message.
+	 * Min validation message. When not set, a localized message stating the minimum and how many more items are needed is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field needs more files';
+	minMessage?: string;
 
 	/**
 	 * This is a maximum amount of selected files in this input.
@@ -53,13 +53,13 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 	}
 
 	/**
-	 * Max validation message.
+	 * Max validation message. When not set, a localized message stating the maximum and how many items are over it is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'max-message' })
-	maxMessage = 'This field exceeds the allowed amount of files';
+	maxMessage?: string;
 
 	public set selection(paths: Array<string>) {
 		this.#pickerContext.setSelection(paths);
@@ -92,13 +92,25 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 
 		this.addValidator(
 			'rangeUnderflow',
-			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() =>
+				this.minMessage ||
+				this.localize.term(
+					'validation_entriesShort',
+					this.min,
+					(this.min ?? 0) - this.#pickerContext.getSelection().length,
+				),
+			() => isAboveZeroAndBelowMinimum(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(
 			'rangeOverflow',
-			() => this.maxMessage,
+			() =>
+				this.maxMessage ||
+				this.localize.term(
+					'validation_entriesExceed',
+					this.max,
+					this.#pickerContext.getSelection().length - (this.max ?? 0),
+				),
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 

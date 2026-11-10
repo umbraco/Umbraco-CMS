@@ -36,13 +36,13 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	min = 0;
 
 	/**
-	 * Min validation message.
+	 * Min validation message. When not set, a localized message stating the minimum and how many more items are needed is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field needs more items';
+	minMessage?: string;
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -54,16 +54,22 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	max = 0;
 
 	/**
-	 * Max validation message.
+	 * Max validation message. When not set, a localized message stating the maximum and how many items are over it is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'max-message' })
-	maxMessage = 'This field exceeds the allowed amount of items';
+	maxMessage?: string;
 
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
+
+	/**
+	 * Multiple nodes to start the picker tree from. Takes precedence over `startNode`.
+	 */
+	@property({ type: Array, attribute: false })
+	startNodes?: Array<UmbTreeStartNode>;
 
 	@property()
 	public set allowedContentTypeIds(value: string | undefined) {
@@ -110,7 +116,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 		this.addValidator(
 			'valueMissing',
 			() => this.requiredMessage,
-			() => !this.readonly && (this.required || this.min > 0) && this.selection.length === 0,
+			() => !this.readonly && this.required && this.selection.length === 0,
 		);
 	}
 
@@ -165,6 +171,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 			<umb-input-document
 				.selection=${this.#selection}
 				.startNode=${this.startNode}
+				.startNodes=${this.startNodes}
 				.allowedContentTypeIds=${this.#allowedContentTypeIds}
 				.min=${this.min}
 				.minMessage=${this.minMessage}

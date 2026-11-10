@@ -7,6 +7,7 @@ import type {
 	DictionaryItemItemResponseModel,
 	DictionaryItemResponseModel,
 	DictionaryOverviewResponseModel,
+	DomainsResponseModel,
 	NamedEntityTreeItemResponseModel,
 	// Document
 	DocumentItemResponseModel,
@@ -104,7 +105,9 @@ import type {
 // Model Type Definitions
 // ============================================================================
 
-export type UmbMockDataTypeModel = DataTypeResponseModel & DataTypeTreeItemResponseModel & DataTypeItemResponseModel;
+export type UmbMockDataTypeModel = DataTypeResponseModel &
+	Omit<DataTypeTreeItemResponseModel, 'parentIsFolder'> &
+	DataTypeItemResponseModel;
 
 export type UmbMockDictionaryModel = DictionaryItemResponseModel &
 	NamedEntityTreeItemResponseModel &
@@ -116,14 +119,16 @@ export type UmbMockDocumentModel = DocumentResponseModel &
 	DocumentItemResponseModel & {
 		/** Mock-only: the parent before trashing, used to restore it. Not a real response field. */
 		originalParent?: { id: string } | null;
+		/** Mock-only: the culture and hostnames of the document. Not a real response field. */
+		domains?: DomainsResponseModel;
 	};
 
 export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
 	DocumentBlueprintItemResponseModel &
-	DocumentBlueprintTreeItemResponseModel;
+	Omit<DocumentBlueprintTreeItemResponseModel, 'parentIsFolder'>;
 
 export type UmbMockDocumentTypeModel = DocumentTypeResponseModel &
-	DocumentTypeTreeItemResponseModel &
+	Omit<DocumentTypeTreeItemResponseModel, 'parentIsFolder'> &
 	DocumentTypeItemResponseModel;
 
 export type UmbMockLanguageModel = LanguageResponseModel & LanguageItemResponseModel;
@@ -136,7 +141,7 @@ export type UmbMockMediaModel = MediaResponseModel &
 	};
 
 export type UmbMockMediaTypeModel = MediaTypeResponseModel &
-	MediaTypeTreeItemResponseModel &
+	Omit<MediaTypeTreeItemResponseModel, 'parentIsFolder'> &
 	MediaTypeItemResponseModel;
 
 export type UmbMockMemberModel = MemberResponseModel & MemberItemResponseModel;
@@ -144,7 +149,7 @@ export type UmbMockMemberModel = MemberResponseModel & MemberItemResponseModel;
 export type UmbMockMemberGroupModel = MemberGroupItemResponseModel;
 
 export type UmbMockMemberTypeModel = MemberTypeResponseModel &
-	MemberTypeTreeItemResponseModel &
+	Omit<MemberTypeTreeItemResponseModel, 'parentIsFolder'> &
 	MemberTypeItemResponseModel & {
 		hasListView: boolean;
 	};
@@ -257,6 +262,8 @@ export interface UmbMockDataSet {
 
 	// Tracked references
 	trackedReferenceItems?: Array<UmbMockTrackedReferenceItemModel>;
+	/** The items referencing each target, keyed by the target's id. When set, the reference endpoints use it instead of `trackedReferenceItems`. */
+	referencedBy?: Record<string, Array<UmbMockTrackedReferenceItemModel>>;
 
 	// News
 	news?: Array<NewsDashboardItemResponseModel>;

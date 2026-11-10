@@ -1,13 +1,28 @@
 import type { UmbMemberGroupItemModel } from '../../types.js';
+import { UMB_EDIT_MEMBER_GROUP_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UmbMemberGroupPickerInputContext } from './input-member-group.context.js';
-import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	repeat,
+	state,
+	when,
+} from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_WORKSPACE_MODAL, umbGenerateWorkspaceLink } from '@umbraco-cms/backoffice/workspace';
+import {
+	isAboveZeroAndBelowMinimum,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	UmbFormControlMixin,
+} from '@umbraco-cms/backoffice/validation';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 import '@umbraco-cms/backoffice/entity-item';
 
@@ -47,13 +62,13 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 	}
 
 	/**
-	 * Min validation message.
+	 * Min validation message. When not set, a localized message stating the minimum and how many more items are needed is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field needs more items';
+	minMessage?: string;
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -64,19 +79,20 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 	@property({ type: Number })
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+		this.#updateSorterEnabled();
 	}
 	public get max(): number {
 		return this.#pickerContext.max;
 	}
 
 	/**
-	 * Max validation message.
+	 * Max validation message. When not set, a localized message stating the maximum and how many items are over it is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'max-message' })
-	maxMessage = 'This field exceeds the allowed amount of items';
+	maxMessage?: string;
 
 	public set selection(ids: Array<string>) {
 		this.#pickerContext.setSelection(ids);
@@ -111,13 +127,17 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 	public set readonly(value) {
 		this.#readonly = value;
 
-		if (this.#readonly) {
+		this.#updateSorterEnabled();
+	}
+	#readonly = false;
+
+	#updateSorterEnabled() {
+		if (this.readonly || this.max === 1) {
 			this.#sorter.disable();
 		} else {
 			this.#sorter.enable();
 		}
 	}
-	#readonly = false;
 
 	/**
 	 * Sets the input to required, meaning validation will fail if the value is empty.
@@ -159,13 +179,25 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 
 		this.addValidator(
 			'rangeUnderflow',
-			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() =>
+				this.minMessage ||
+				this.localize.term(
+					'validation_entriesShort',
+					this.min,
+					(this.min ?? 0) - this.#pickerContext.getSelection().length,
+				),
+			() => isAboveZeroAndBelowMinimum(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(
 			'rangeOverflow',
-			() => this.maxMessage,
+			() =>
+				this.maxMessage ||
+				this.localize.term(
+					'validation_entriesExceed',
+					this.max,
+					this.#pickerContext.getSelection().length - (this.max ?? 0),
+				),
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
@@ -230,11 +262,17 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 
 						// For successful items, use uui-ref-node
 						if (!item) return nothing;
+						const link = umbGenerateWorkspaceLink({
+							pattern: UMB_EDIT_MEMBER_GROUP_WORKSPACE_PATH_PATTERN,
+							params: { unique },
+							routePath: this._editMemberGroupPath,
+						});
 						return html`
 							<uui-ref-node
 								name=${item.name}
 								id=${unique}
-								href="${this._editMemberGroupPath}edit/${unique}"
+								href=${link.href}
+								target=${ifDefined(link.target)}
 								?readonly=${this.readonly}>
 								<uui-action-bar slot="actions">
 									${when(

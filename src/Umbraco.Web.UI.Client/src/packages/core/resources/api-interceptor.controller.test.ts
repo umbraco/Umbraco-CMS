@@ -1,5 +1,7 @@
 import { UmbApiInterceptorController } from './api-interceptor.controller.js';
-import { expect, waitUntil } from '@open-wc/testing';
+import { tryExecute } from './try-execute/tryExecute.function.js';
+import { createClient, createConfig } from '../backend-api/client/index.js';
+import { aTimeout, expect, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import type { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
@@ -25,6 +27,9 @@ describe('UmbApiInterceptorController', () => {
 			interceptors: {
 				response: {
 					use: (fn: ResponseInterceptor) => responseInterceptors.push(fn),
+				},
+				error: {
+					use: () => {},
 				},
 			},
 		} as unknown as typeof umbHttpClient;
@@ -183,6 +188,72 @@ describe('UmbApiInterceptorController', () => {
 			expect(response.headers.get('Umb-Notifications')).to.equal(notificationsHeader);
 
 			subscription.unsubscribe();
+		});
+	});
+
+	describe('operations cancelled by a notification handler', () => {
+		let client: typeof umbHttpClient;
+		let notifications: Array<{ element: Element }>;
+		let originalConsoleError: typeof console.error;
+
+		function cancelledResponse(headers: Record<string, string> = {}) {
+			return new Response(
+				JSON.stringify({
+					type: 'Error',
+					title: 'Cancelled by notification',
+					detail: 'A notification handler prevented the content operation.',
+					status: 400,
+					operationStatus: 'CancelledByNotification',
+				}),
+				{ status: 400, headers: { 'Content-Type': 'application/json', ...headers } },
+			);
+		}
+
+		function messagesShown() {
+			return notifications.map(
+				(notification) =>
+					(notification.element.firstElementChild as Element & { data?: { message?: string } })?.data?.message,
+			);
+		}
+
+		beforeEach(async () => {
+			const { UmbNotificationContext } = await import('@umbraco-cms/backoffice/notification');
+			notifications = [];
+			new UmbNotificationContext(hostElement).notifications.subscribe((value) => (notifications = value));
+
+			client = createClient(createConfig({ throwOnError: true })) as unknown as typeof umbHttpClient;
+			controller.addUmbNotificationsInterceptor(client);
+			controller.addErrorInterceptor(client);
+
+			// tryExecute logs the failed request, which is expected noise here.
+			originalConsoleError = console.error;
+			console.error = () => {};
+		});
+
+		afterEach(() => {
+			console.error = originalConsoleError;
+		});
+
+		it('shows an error when the handler cancels the operation without a message', async () => {
+			await tryExecute(hostElement, client.post({ url: '/cancelled', fetch: async () => cancelledResponse() }));
+			await aTimeout(50);
+
+			expect(messagesShown()).to.deep.equal(['Cancelled by notification']);
+		});
+
+		it('shows only the message of the handler when it cancels the operation with one', async () => {
+			const umbNotifications = JSON.stringify([{ category: 'Cancelled', message: 'Not on a Friday', type: 'Error' }]);
+
+			await tryExecute(
+				hostElement,
+				client.post({
+					url: '/cancelled',
+					fetch: async () => cancelledResponse({ 'Umb-Notifications': umbNotifications }),
+				}),
+			);
+			await aTimeout(50);
+
+			expect(messagesShown()).to.deep.equal(['Not on a Friday']);
 		});
 	});
 });

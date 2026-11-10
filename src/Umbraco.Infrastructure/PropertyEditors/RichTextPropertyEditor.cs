@@ -171,6 +171,13 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
         return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue, defaultCulture);
     }
 
+    /// <inheritdoc />
+    public override bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue)
+    {
+        var valueEditor = (RichTextPropertyValueEditor)GetValueEditor();
+        return valueEditor.ArePropertyValuesEquivalent(editedValue, publishedValue);
+    }
+
     /// <summary>
     ///     Create a custom value editor
     /// </summary>
@@ -556,6 +563,28 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
                 targetRichTextEditorValue?.Blocks is not null ? ConvertAndClean(targetRichTextEditorValue.Blocks) : null;
 
             return GetChangedCulturesForBlockValue(sourceBlockEditorData?.BlockValue, targetBlockEditorData?.BlockValue, defaultCulture);
+        }
+
+        internal override bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue)
+        {
+            if (Equals(editedValue, publishedValue))
+            {
+                return true;
+            }
+
+            if (TryParseEditorValue(editedValue, out RichTextEditorValue? editedRichTextEditorValue) is false
+                || TryParseEditorValue(publishedValue, out RichTextEditorValue? publishedRichTextEditorValue) is false
+                || editedRichTextEditorValue.Markup != publishedRichTextEditorValue.Markup)
+            {
+                return false;
+            }
+
+            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? editedBlockEditorData =
+                editedRichTextEditorValue.Blocks is not null ? ConvertAndClean(editedRichTextEditorValue.Blocks) : null;
+            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? publishedBlockEditorData =
+                publishedRichTextEditorValue.Blocks is not null ? ConvertAndClean(publishedRichTextEditorValue.Blocks) : null;
+
+            return BlockValuesAreEquivalent(editedBlockEditorData?.BlockValue, publishedBlockEditorData?.BlockValue);
         }
 
         private bool TryParseEditorValue(object? value, [NotNullWhen(true)] out RichTextEditorValue? richTextEditorValue)

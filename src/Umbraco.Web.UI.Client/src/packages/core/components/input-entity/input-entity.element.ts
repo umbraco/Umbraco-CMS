@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { isAboveZeroAndBelowMinimum, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { getItemFallbackName, type UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-input-entity')
@@ -54,13 +54,13 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 	#min: number = 0;
 
 	/**
-	 * Min validation message.
+	 * Min validation message. When not set, a localized message stating the minimum and how many more items are needed is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field needs more items';
+	minMessage?: string;
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -74,6 +74,11 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 		if (this.#pickerContext) {
 			this.#pickerContext.max = value;
 		}
+		if (value === 1) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
 	}
 	public get max(): number {
 		return this.#max;
@@ -81,13 +86,13 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 	#max: number = Infinity;
 
 	/**
-	 * Max validation message.
+	 * Max validation message. When not set, a localized message stating the maximum and how many items are over it is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'max-message' })
-	maxMessage = 'This field exceeds the allowed amount of items';
+	maxMessage?: string;
 
 	@property({ type: Array })
 	public set selection(uniques: Array<string>) {
@@ -126,13 +131,25 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 
 		this.addValidator(
 			'rangeUnderflow',
-			() => this.minMessage,
-			() => !!this.min && (this.#pickerContext?.getSelection().length ?? 0) < this.min,
+			() =>
+				this.minMessage ||
+				this.localize.term(
+					'validation_entriesShort',
+					this.min,
+					(this.min ?? 0) - (this.#pickerContext?.getSelection().length ?? 0),
+				),
+			() => isAboveZeroAndBelowMinimum(this.#pickerContext?.getSelection().length ?? 0, this.min),
 		);
 
 		this.addValidator(
 			'rangeOverflow',
-			() => this.maxMessage,
+			() =>
+				this.maxMessage ||
+				this.localize.term(
+					'validation_entriesExceed',
+					this.max,
+					(this.#pickerContext?.getSelection().length ?? 0) - (this.max ?? 0),
+				),
 			() => !!this.max && (this.#pickerContext?.getSelection().length ?? 0) > this.max,
 		);
 	}

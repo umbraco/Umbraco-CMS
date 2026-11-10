@@ -64,6 +64,14 @@ describe('UmbResourceController', () => {
 			expect(UmbCancelError.isUmbCancelError(result)).to.equal(true);
 		});
 
+		it('maps a TimeoutError from a fetch aborted by a timeout signal to an UmbCancelError', () => {
+			const timeoutError = new DOMException('signal timed out', 'TimeoutError');
+
+			const result = controller.mapToUmbError(timeoutError);
+
+			expect(UmbCancelError.isUmbCancelError(result)).to.equal(true);
+		});
+
 		it('falls back to a generic Unknown error for unrecognizable non-Error values', () => {
 			const result = controller.mapToUmbError('some random string') as UmbApiError;
 

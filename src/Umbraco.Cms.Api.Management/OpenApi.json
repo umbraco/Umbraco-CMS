@@ -13847,6 +13847,14 @@
             }
           },
           {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
             "name": "height",
             "in": "query",
             "schema": {
@@ -20381,6 +20389,14 @@
                 "type": "string",
                 "format": "uuid"
               }
+            }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -39595,6 +39611,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -42941,7 +42960,8 @@
           "id",
           "isDeletable",
           "isFolder",
-          "name"
+          "name",
+          "parentIsFolder"
         ],
         "type": "object",
         "properties": {
@@ -42974,6 +42994,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "editorUiAlias": {
@@ -43421,6 +43444,7 @@
           "id",
           "isFolder",
           "name",
+          "parentIsFolder",
           "variants"
         ],
         "type": "object",
@@ -43454,6 +43478,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "documentType": {
@@ -44566,7 +44593,8 @@
           "id",
           "isElement",
           "isFolder",
-          "name"
+          "name",
+          "parentIsFolder"
         ],
         "type": "object",
         "properties": {
@@ -44599,6 +44627,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "isElement": {
@@ -47028,7 +47059,8 @@
           "id",
           "isDeletable",
           "isFolder",
-          "name"
+          "name",
+          "parentIsFolder"
         ],
         "type": "object",
         "properties": {
@@ -47061,6 +47093,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "icon": {
@@ -47880,7 +47915,8 @@
           "icon",
           "id",
           "isFolder",
-          "name"
+          "name",
+          "parentIsFolder"
         ],
         "type": "object",
         "properties": {
@@ -47913,6 +47949,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "icon": {
@@ -51132,6 +51171,7 @@
         "required": [
           "assemblyVersion",
           "baseUtcOffset",
+          "isDebugMode",
           "runtimeMode",
           "version"
         ],
@@ -51148,6 +51188,9 @@
           },
           "runtimeMode": {
             "$ref": "#/components/schemas/RuntimeModeModel"
+          },
+          "isDebugMode": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -54504,13 +54547,16 @@
             "type": "string"
           },
           "events": {
-            "type": "string"
+            "type": "string",
+            "deprecated": true
           },
           "url": {
-            "type": "string"
+            "type": "string",
+            "deprecated": true
           },
           "types": {
-            "type": "string"
+            "type": "string",
+            "deprecated": true
           }
         },
         "additionalProperties": false

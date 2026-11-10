@@ -146,7 +146,7 @@ public class IndexInitializer
 
 
         return Mock.Of<IContentService>(
-            x => x.GetPagedDescendants(It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<IQuery<IContent>>(), It.IsAny<Ordering>())
+            x => x.GetPagedDescendants(It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<string[]>(), It.IsAny<IQuery<IContent>>(), It.IsAny<Ordering>())
                  == allRecs);
     }
 

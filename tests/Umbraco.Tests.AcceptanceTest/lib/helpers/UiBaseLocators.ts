@@ -1052,6 +1052,10 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
+  async clickCaretButtonForModalMenuItemWithName(name: string) {
+    await this.click(this.sidebarModal.locator(`uui-menu-item[label="${name}"] #caret-button`).last());
+  }
+
   async doesModalHaveText(text: string) {
     await this.containsText(this.openedModal, text);
   }
@@ -1108,6 +1112,10 @@ export class UiBaseLocators extends BasePage {
       this.page.getByRole("tab", { name: sectionName }),
       isVisible,
     );
+  }
+
+  async isSectionActive(sectionName: string) {
+    await expect(this.activeSectionLink.getByText(sectionName)).toBeVisible();
   }
 
   async isBackOfficeMainVisible(isVisible: boolean = true) {
@@ -2028,6 +2036,18 @@ export class UiBaseLocators extends BasePage {
 
   async isTextWithMessageVisible(message: string, isVisible: boolean = true) {
     return await this.isVisible(this.page.getByText(message), isVisible);
+  }
+
+  async isDiscardChangesModalVisible(isVisible: boolean = true) {
+    return await this.isVisible(this.page.getByTestId('discard-changes-modal'), isVisible);
+  }
+
+  async clickDiscardChangesButton() {
+    await this.click(this.page.getByTestId('discard-changes-modal').getByTestId('action:discard-changes'));
+  }
+
+  async clickStayOnPageButton() {
+    await this.click(this.page.getByTestId('discard-changes-modal').getByTestId('action:stay'));
   }
 
   /**

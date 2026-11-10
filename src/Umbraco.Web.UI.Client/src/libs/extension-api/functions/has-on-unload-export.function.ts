@@ -5,6 +5,6 @@ import type { UmbEntryPointModule } from '../models/entry-point.interface.js';
  * @param {unknown} obj The object to check.
  * @returns {boolean} True if the object has an 'onUnload' function.
  */
-export function hasOnUnloadExport(obj: unknown): obj is Pick<UmbEntryPointModule, 'onUnload'> {
-	return obj !== null && typeof obj === 'object' && 'onUnload' in obj;
+export function hasOnUnloadExport(obj: unknown): obj is Required<Pick<UmbEntryPointModule, 'onUnload'>> {
+	return obj !== null && typeof obj === 'object' && typeof (obj as { onUnload?: unknown }).onUnload === 'function';
 }

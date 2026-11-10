@@ -4,7 +4,7 @@ export class UmbError extends Error {
 	public override name = 'UmbError';
 
 	public static isUmbError(error: unknown): error is UmbError {
-		return error instanceof UmbError || (error as UmbError).name === 'UmbError';
+		return error instanceof UmbError || (error as UmbError | null | undefined)?.name === 'UmbError';
 	}
 }
 
@@ -12,7 +12,7 @@ export class UmbCancelError extends UmbError {
 	public override name = 'UmbCancelError';
 
 	public static isUmbCancelError(error: unknown): error is UmbCancelError {
-		return error instanceof UmbCancelError || (error as UmbCancelError).name === 'UmbCancelError';
+		return error instanceof UmbCancelError || (error as UmbCancelError | null | undefined)?.name === 'UmbCancelError';
 	}
 
 	/**
@@ -43,7 +43,7 @@ export class UmbApiError extends UmbError {
 	}
 
 	public static isUmbApiError(error: unknown): error is UmbApiError {
-		return error instanceof UmbApiError || (error as UmbApiError).name === 'UmbApiError';
+		return error instanceof UmbApiError || (error as UmbApiError | null | undefined)?.name === 'UmbApiError';
 	}
 
 	/**

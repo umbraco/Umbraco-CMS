@@ -1,6 +1,7 @@
 import { UmbMoveDocumentServerDataSource } from '../../../entity-actions/move-to/repository/document-move.server.data-source.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { apiErrorWasNotified } from '@umbraco-cms/backoffice/resources';
 import type { UmbBulkMoveToRepository, UmbBulkMoveToRequestArgs } from '@umbraco-cms/backoffice/entity-bulk-action';
 import type { UmbRepositoryErrorResponse } from '@umbraco-cms/backoffice/repository';
 
@@ -16,8 +17,10 @@ export class UmbBulkMoveToDocumentRepository extends UmbRepositoryBase implement
 			const { error } = await this.#moveSource.moveTo({ unique, destination });
 
 			if (error) {
-				const notification = { data: { message: error.message } };
-				notificationContext?.peek('danger', notification);
+				if (!apiErrorWasNotified(error)) {
+					const notification = { data: { message: error.message } };
+					notificationContext?.peek('danger', notification);
+				}
 			} else {
 				count++;
 			}
