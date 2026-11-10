@@ -7,8 +7,15 @@ namespace Umbraco.Cms.Core.Services;
 /// Performs entity search against search indexes.
 /// </summary>
 /// <remarks>
+/// <para>
 /// Note that this service only supports entity types that are included in search indexes.
 /// By default this means documents, media and members.
+/// </para>
+/// <para>
+/// Searches run on behalf of the current backoffice user. Member searches match the full indexed member data only for
+/// a user with access to the Members section; otherwise the query matches the member name alone, so that identifying
+/// data such as email addresses can't be used to confirm membership.
+/// </para>
 /// </remarks>
 public interface IIndexedEntitySearchService
 {

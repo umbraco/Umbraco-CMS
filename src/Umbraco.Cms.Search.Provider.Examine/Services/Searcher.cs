@@ -132,15 +132,7 @@ public class Searcher : IExamineSearcher
                 //    documents with "whatever" because the wildcard is applied at the end of the query.
                 // to counter for these cases, we split the query into multiple terms and apply wildcard search to each
                 // term with AND grouping.
-                // the clauses built below append a wildcard to each term, so a term that already begins with a
-                // wildcard character would yield a leading-wildcard query, which Lucene rejects outright. such a
-                // term carries no text to match on, so drop it rather than fail the whole search.
-                var terms = query
-                    .Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(term => term.TrimStart('*', '?'))
-                    .Where(term => term.Length > 0)
-                    .ToArray();
-                foreach (var term in terms)
+                foreach (var term in WithoutLeadingWildcards(query.Split(' ', StringSplitOptions.RemoveEmptyEntries)))
                 {
                     searchQuery.And().Group(nestedQuery => CreateAggregatedTextQuery(nestedQuery, term, segment));
                 }
@@ -342,7 +334,13 @@ public class Searcher : IExamineSearcher
                         textFields.Add(FieldNameHelper.FieldName(filter.FieldName, Constants.FieldValues.TextsR3, segment));
                     }
 
-                    IExamineValue[] query = textFilter.Values
+                    var values = WithoutLeadingWildcards(textFilter.Values);
+                    if (values.Length == 0)
+                    {
+                        break;
+                    }
+
+                    IExamineValue[] query = values
                         .SelectMany(value => new IExamineValue[]
                         {
                             new ExamineValue(Examineness.Explicit, value),
@@ -708,6 +706,15 @@ public class Searcher : IExamineSearcher
 
     private static int GetFacetCount(string fieldName, string key, ISearchResults results)
         => (int?)results.GetFacet(fieldName)?.Facet(key)?.Value ?? 0;
+
+    // Free text terms and text filter values are both queried with a wildcard appended, so a value that already
+    // begins with a wildcard character would yield a leading-wildcard query, which Lucene rejects outright. Rather
+    // than fail the search, strip the leading wildcard characters and drop any value left with no text to match on.
+    private static string[] WithoutLeadingWildcards(IEnumerable<string> values)
+        => values
+            .Select(value => value.TrimStart('*', '?'))
+            .Where(value => value.Length > 0)
+            .ToArray();
 
     private INestedBooleanOperation CreateAggregatedTextQuery(INestedQuery nestedQuery, string term, string? searchSegment)
     {
