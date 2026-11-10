@@ -312,12 +312,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     // database-read node is promoted into L1 — an L1/L2 hit is already there.
     private async Task ReadFromDatabaseAsync(List<Guid> keys, long generation, Dictionary<Guid, IPublishedContent> resolved, MediaSourcesReader readMediaSources)
     {
-        IReadOnlyCollection<ContentCacheNode> coldNodes;
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
-        {
-            coldNodes = (await readMediaSources(keys)).ToArray();
-            scope.Complete();
-        }
+        IReadOnlyCollection<ContentCacheNode> coldNodes = (await readMediaSources(keys)).ToArray();
 
         // Mirrors GetNodeAsync, which warms the id/key map for every node the database returns.
         if (coldNodes.Count > 0)
@@ -431,10 +426,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
         async Task<ContentCacheNode?> GetContentCacheNodeFromRepo()
         {
-            using ICoreScope scope = _scopeProvider.CreateCoreScope();
-            ContentCacheNode? mediaCacheNode = await readMediaSource(key);
-            scope.Complete();
-            return mediaCacheNode;
+            return await readMediaSource(key);
         }
     }
 

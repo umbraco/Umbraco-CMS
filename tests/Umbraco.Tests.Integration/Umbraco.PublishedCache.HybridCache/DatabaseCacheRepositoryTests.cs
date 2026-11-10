@@ -189,6 +189,137 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
         => node is null ? null : (node.Id, node.Key, node.IsDraft, node.Data?.Name);
 
     [Test]
+    public async Task GetDocumentSourceAsync_Without_An_Ambient_Scope_Returns_The_Published_Source()
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
+
+        ContentCacheNode? source = await DatabaseCacheRepository.GetDocumentSourceAsync(Textpage.Key);
+
+        Assert.IsNotNull(source);
+        Assert.AreEqual(Textpage.Key, source!.Key);
+    }
+
+    [Test]
+    public async Task GetDocumentSource_Without_An_Ambient_Scope_Returns_The_Published_Source()
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
+
+        ContentCacheNode? source = DatabaseCacheRepository.GetDocumentSource(Textpage.Key);
+
+        Assert.IsNotNull(source);
+        Assert.AreEqual(Textpage.Key, source!.Key);
+    }
+
+    [Test]
+    public async Task GetDocumentSourcesAsync_Without_An_Ambient_Scope_Returns_Matching_Sources()
+    {
+        var requestedKeys = new[] { Textpage.Key, Subpage.Key };
+
+        var sources = (await DatabaseCacheRepository.GetDocumentSourcesAsync(requestedKeys, preview: true)).ToList();
+
+        Assert.That(sources.Select(s => s.Key), Is.EquivalentTo(requestedKeys));
+    }
+
+    [Test]
+    public async Task GetMediaSourceAsync_Without_An_Ambient_Scope_Returns_The_Source()
+    {
+        ContentCacheNode? source = await DatabaseCacheRepository.GetMediaSourceAsync(MediaItem1.Key);
+
+        Assert.IsNotNull(source);
+        Assert.AreEqual(MediaItem1.Key, source!.Key);
+    }
+
+    [Test]
+    public void GetMediaSources_Without_An_Ambient_Scope_Returns_Matching_Sources()
+    {
+        var requestedKeys = new[] { MediaItem1.Key, MediaItem2.Key };
+
+        var sources = DatabaseCacheRepository.GetMediaSources(requestedKeys).ToList();
+
+        Assert.That(sources.Select(s => s.Key), Is.EquivalentTo(requestedKeys));
+    }
+
+    [Test]
+    public async Task GetMediaSourcesAsync_Without_An_Ambient_Scope_Returns_Matching_Sources()
+    {
+        var requestedKeys = new[] { MediaItem1.Key, MediaItem2.Key };
+
+        var sources = (await DatabaseCacheRepository.GetMediaSourcesAsync(requestedKeys)).ToList();
+
+        Assert.That(sources.Select(s => s.Key), Is.EquivalentTo(requestedKeys));
+    }
+
+    [Test]
+    public async Task GetDocumentSources_Without_An_Ambient_Scope_Returns_Matching_Sources()
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
+        var requestedKeys = new[] { Textpage.Key, Subpage.Key };
+
+        var sources = DatabaseCacheRepository.GetDocumentSources(requestedKeys, preview: true).ToList();
+
+        Assert.That(sources.Select(s => s.Key), Is.EquivalentTo(requestedKeys));
+    }
+
+    [Test]
+    public void GetMediaSource_Without_An_Ambient_Scope_Returns_The_Source()
+    {
+        ContentCacheNode? source = DatabaseCacheRepository.GetMediaSource(MediaItem1.Key);
+
+        Assert.IsNotNull(source);
+        Assert.AreEqual(MediaItem1.Key, source!.Key);
+    }
+
+    [Test]
+    public async Task GetDocumentSourceForPublishStatesAsync_Without_An_Ambient_Scope_Returns_Both_States()
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
+
+        (ContentCacheNode? draft, ContentCacheNode? published) = await DatabaseCacheRepository.GetDocumentSourceForPublishStatesAsync(Textpage.Key);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(draft?.Key, Is.EqualTo(Textpage.Key));
+            Assert.That(draft?.IsDraft, Is.True);
+            Assert.That(published?.Key, Is.EqualTo(Textpage.Key));
+            Assert.That(published?.IsDraft, Is.False);
+        });
+    }
+
+    [Test]
+    public async Task GetDocumentSourceForPublishStates_Without_An_Ambient_Scope_Returns_Both_States()
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
+
+        (ContentCacheNode? draft, ContentCacheNode? published) = DatabaseCacheRepository.GetDocumentSourceForPublishStates(Textpage.Key);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(draft?.Key, Is.EqualTo(Textpage.Key));
+            Assert.That(draft?.IsDraft, Is.True);
+            Assert.That(published?.Key, Is.EqualTo(Textpage.Key));
+            Assert.That(published?.IsDraft, Is.False);
+        });
+    }
+
+    [Test]
+    public async Task GetDocumentSourceAsync_In_A_Scope_Sees_The_Uncommitted_Changes_Of_The_Scope()
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
+
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            scope.Database.Execute(SqlContext.Sql()
+                .Delete<ContentNuDto>()
+                .Where<ContentNuDto>(x => x.NodeId == Textpage.Id && x.Published));
+
+            Assert.IsNull(await DatabaseCacheRepository.GetDocumentSourceAsync(Textpage.Key));
+        }
+
+        // The scope was not completed, so the published source is back.
+        Assert.IsNotNull(await DatabaseCacheRepository.GetDocumentSourceAsync(Textpage.Key));
+    }
+
+    [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureSmallDeleteBatchSize))]
     public void Rebuild_Deletes_Stale_Rows_In_Batches_And_Repopulates()
     {
