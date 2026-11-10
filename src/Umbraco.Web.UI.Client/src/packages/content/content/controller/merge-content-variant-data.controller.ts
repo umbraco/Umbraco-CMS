@@ -1,7 +1,8 @@
 import type { UmbContentLikeDetailModel, UmbPotentialContentValueModel } from '../types.js';
 import { _sortContentValuesByVariant } from '../utils/sort-content-values-by-variant.function.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbExtensionApiCacheIndex } from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestCacheIndex } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbPropertyValueIndex, type ManifestPropertyValueResolver } from '@umbraco-cms/backoffice/property';
 import {
 	umbVariantObjectSortCompare,
@@ -20,7 +21,7 @@ function defaultCompareVariantMethod(a: UmbVariantDataModel, b: UmbVariantDataMo
 }
 
 export class UmbMergeContentVariantDataController extends UmbControllerBase {
-	#resolvers = new UmbExtensionApiCacheIndex<ManifestPropertyValueResolver>(
+	#resolvers = new UmbExtensionsManifestCacheIndex<ManifestPropertyValueResolver>(
 		this,
 		'propertyValueResolver',
 		(manifest, editorAlias) => manifest.forEditorAlias === editorAlias,
@@ -159,11 +160,20 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 			return undefined;
 		}
 
-		const api = await this.#resolvers.createApi(editorAlias);
-		if (!api) {
-			// No resolver found, or its api could not be created, then we can continue using the draftValue as is.
+		const manifest = this.#resolvers.getManifests(editorAlias)[0];
+		if (!manifest) {
+			// No resolver found, then we can continue using the draftValue as is.
 			return draftValue;
 		}
+
+		const api = await createExtensionApi(this, manifest);
+		if (!api) {
+			// If api is not to be found, then we can continue using the draftValue as is.
+			return draftValue;
+		}
+
+		// TODO: Setting the manifest on the api is legacy, the implementation should not have to do this. [NL]
+		api.manifest = manifest;
 
 		let newValue = draftValue;
 

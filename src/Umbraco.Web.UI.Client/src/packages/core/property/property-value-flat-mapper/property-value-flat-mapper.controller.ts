@@ -1,10 +1,11 @@
 import type { UmbPropertyValueDataPotentiallyWithEditorAlias } from '../index.js';
 import type { ManifestPropertyValueResolver } from '../property-value-resolver/property-value-resolver.extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbExtensionApiCacheIndex } from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestCacheIndex } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
-	#resolvers = new UmbExtensionApiCacheIndex<ManifestPropertyValueResolver>(
+	#resolvers = new UmbExtensionsManifestCacheIndex<ManifestPropertyValueResolver>(
 		this,
 		'propertyValueResolver',
 		(manifest, editorAlias) => manifest.forEditorAlias === editorAlias,
@@ -43,10 +44,18 @@ export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 		if (!editorAlias) {
 			return [mapOfThisProperty];
 		}
-		const api = await this.#resolvers.createApi(editorAlias);
+		const manifest = this.#resolvers.getManifests(editorAlias)[0];
+		if (!manifest) {
+			return [mapOfThisProperty];
+		}
+
+		const api = await createExtensionApi(this, manifest);
 		if (!api) {
 			return [mapOfThisProperty];
 		}
+
+		// TODO: Setting the manifest on the api is legacy, the implementation should not have to do this. [NL]
+		api.manifest = manifest;
 
 		if (api.processValues) {
 			let mappedValues: Array<ReturnType> = [];

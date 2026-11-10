@@ -9,7 +9,8 @@ import type {
 	UmbPropertyValuePresetApiCallArgsEntityBase,
 } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbExtensionApisCacheIndex } from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionApis } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestCacheIndex } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 type UmbPropertyValuePresetLookupKey = { schemaAlias?: string; uiAlias: string };
@@ -17,7 +18,7 @@ type UmbPropertyValuePresetLookupKey = { schemaAlias?: string; uiAlias: string }
 export class UmbPropertyValuePresetBuilderController<
 	ReturnType extends UmbPropertyValueData = UmbPropertyValueData | UmbPropertyValueDataPotentiallyWithEditorAlias,
 > extends UmbControllerBase {
-	#presets = new UmbExtensionApisCacheIndex<ManifestPropertyValuePreset, UmbPropertyValuePresetLookupKey>(
+	#presets = new UmbExtensionsManifestCacheIndex<ManifestPropertyValuePreset, UmbPropertyValuePresetLookupKey>(
 		this,
 		'propertyValuePreset',
 		// A preset applies when registered for the UI alias, or, if the property type has a schema alias, for the schema alias.
@@ -107,9 +108,15 @@ export class UmbPropertyValuePresetBuilderController<
 			throw new Error(`propertyEditorUiAlias was not defined in ${propertyType}`);
 		}
 
-		const apis: Array<UmbPropertyValuePreset> = await this.#presets.createApis({
-			schemaAlias: editorAlias,
-			uiAlias: editorUiAlias,
+		const manifests = this.#presets.getManifests({ schemaAlias: editorAlias, uiAlias: editorUiAlias });
+		const apis: Array<UmbPropertyValuePreset> = [];
+		(await createExtensionApis(this, manifests)).forEach((api, index) => {
+			if (!api) {
+				return;
+			}
+			// TODO: Setting the manifest on the api is legacy, the implementation should not have to do this. [NL]
+			(api as { manifest?: ManifestPropertyValuePreset }).manifest = manifests[index];
+			apis.push(api);
 		});
 
 		const result = await this._generatePropertyValues(apis, propertyType);

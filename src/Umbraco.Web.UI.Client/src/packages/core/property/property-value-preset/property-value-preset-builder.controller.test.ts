@@ -412,5 +412,34 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 			expect(result.map((x) => x.alias)).to.deep.equal(['a', 'b']);
 			expect(searches).to.equal(2);
 		});
+
+		it('skips and logs a preset whose API can not be created, and still applies the others', async () => {
+			umbExtensionsRegistry.register({
+				type: 'propertyValuePreset',
+				name: 'test-preset-broken',
+				alias: 'Umb.Test.Preset.Broken',
+				forPropertyEditorUiAlias: 'test-editor-ui',
+			} as ManifestPropertyValuePreset);
+			const originalError = console.error;
+			let logged = 0;
+			console.error = () => {
+				logged++;
+			};
+
+			let result;
+			try {
+				result = await new UmbPropertyValuePresetBuilderController(new UmbTestControllerHostElement()).create(
+					[{ alias: 'test', propertyEditorUiAlias: 'test-editor-ui', config: [], typeArgs: {} }],
+					createArgs,
+				);
+			} finally {
+				console.error = originalError;
+				umbExtensionsRegistry.unregister('Umb.Test.Preset.Broken');
+			}
+
+			expect(result).to.have.lengthOf(1);
+			expect(result[0].value).to.equal('first');
+			expect(logged).to.equal(1);
+		});
 	});
 });
