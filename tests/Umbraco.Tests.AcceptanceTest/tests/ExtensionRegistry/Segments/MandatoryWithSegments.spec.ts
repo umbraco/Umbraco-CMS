@@ -64,5 +64,6 @@ test('cannot publish segment-only content when the mandatory VIP segment value i
 
   // Assert
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   expect(await umbracoApi.document.isDocumentPublished(documentId)).toBeFalsy();
 });

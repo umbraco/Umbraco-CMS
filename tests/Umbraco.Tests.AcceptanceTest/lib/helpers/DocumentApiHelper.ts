@@ -2006,9 +2006,11 @@ export class DocumentApiHelper {
 
   async getPublishedValuesByCultureAndSegmentForDocument(documentId: string, culturesAndSegments: {culture: string | null, segment: string | null}[]) {
     const publishedData = await this.getPublished(documentId);
-    const values = Array.isArray(publishedData.values) ? publishedData.values : [];
+    if (!Array.isArray(publishedData?.values)) {
+      throw new Error(`Published document '${documentId}' was not found`);
+    }
     return culturesAndSegments.map(cs =>
-      values.find(v => v.culture === cs.culture && v.segment === cs.segment)
+      publishedData.values.find(v => v.culture === cs.culture && v.segment === cs.segment)
     );
   }
 
