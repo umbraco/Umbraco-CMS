@@ -92,4 +92,8 @@ export class WebhookUiHelper extends UiBaseLocators {
   async clickSaveButtonAndWaitForWebhookToBeUpdated() {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.webhook, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
   }
+
+  async isWebhookNameVisible(name: string, isVisible: boolean = true) {
+    await this.isVisible(this.page.locator('umb-webhook-table-collection-view').getByText(name, {exact: true}), isVisible);
+  }
 }

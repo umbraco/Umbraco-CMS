@@ -144,6 +144,50 @@ export default defineConfig({
         ignoreHTTPSErrors: true,
         storageState: STORAGE_STATE
       }
+    },
+    {
+      name: 'schemaLockdownCreateBlocked',
+      testMatch: 'SchemaLockdownConfig/CreateBlocked/*.spec.ts',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
+    },
+    {
+      name: 'schemaLockdownUpdateBlocked',
+      testMatch: 'SchemaLockdownConfig/UpdateBlocked/*.spec.ts',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
+    },
+    {
+      name: 'schemaLockdownDeleteBlocked',
+      testMatch: 'SchemaLockdownConfig/DeleteBlocked/*.spec.ts',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
+    },
+    {
+      name: 'schemaLockdownAllBlocked',
+      testMatch: 'SchemaLockdownConfig/AllBlocked/*.spec.ts',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
     }
   ],
 });

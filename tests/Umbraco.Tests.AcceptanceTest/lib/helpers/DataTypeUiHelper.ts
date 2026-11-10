@@ -391,6 +391,11 @@ export class DataTypeUiHelper extends UiBaseLocators {
     await this.click(this.duplicateToBtn);
   }
 
+  async isChangePropertyEditorButtonVisible(isVisible: boolean = true) {
+    await this.isVisible(this.propertyEditor);
+    await this.isVisible(this.propertyEditor.getByLabel('Change', {exact: true}), isVisible);
+  }
+
   async isDataTypeTreeItemVisible(name: string, isVisible: boolean = true) {
     await this.expandTreeRoot(this.dataTypeTreeRoot);
     await this.isTreeItemVisible(name, isVisible);
