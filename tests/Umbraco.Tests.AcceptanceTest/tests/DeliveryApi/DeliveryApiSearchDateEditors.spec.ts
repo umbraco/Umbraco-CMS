@@ -43,7 +43,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.template.ensureNameNotExists(templateName);
 });
 
-test('can index and fetch a document with a DateOnly property', async ({umbracoApi}) => {
+test('can index and fetch a document that has a DateOnly property', async ({umbracoApi}) => {
   // Arrange
   const dataTypeId = await umbracoApi.dataType.createDefaultDateOnlyPickerDataType(dateOnlyDataTypeName) ?? '';
   const value = {date: '2026-01-01T00:00:00.000Z', timeZone: null};
@@ -61,7 +61,7 @@ test('can index and fetch a document with a DateOnly property', async ({umbracoA
   expect((await contentItem.json()).properties[AliasHelper.toAlias(dateOnlyDataTypeName)]).toBe('2026-01-01');
 });
 
-test('can index and fetch a document with a TimeOnly property', async ({umbracoApi}) => {
+test('can index and fetch a document that has a TimeOnly property', async ({umbracoApi}) => {
   // Arrange
   const dataTypeId = await umbracoApi.dataType.createDefaultTimeOnlyPickerDataType(timeOnlyDataTypeName) ?? '';
   const value = {date: '1970-01-01T12:30:00.000Z', timeZone: null};
@@ -79,7 +79,7 @@ test('can index and fetch a document with a TimeOnly property', async ({umbracoA
   expect((await contentItem.json()).properties[AliasHelper.toAlias(timeOnlyDataTypeName)]).toBe('12:30:00');
 });
 
-test('can index and fetch a document with a DateTimeUnspecified property', async ({umbracoApi}) => {
+test('can index and fetch a document that has a DateTimeUnspecified property', async ({umbracoApi}) => {
   // Arrange
   const dataTypeId = await umbracoApi.dataType.createDefaultDateTimePickerDataType(dateTimeUnspecifiedDataTypeName) ?? '';
   const value = {date: '2026-01-01T12:30:00.000Z', timeZone: null};
@@ -97,7 +97,7 @@ test('can index and fetch a document with a DateTimeUnspecified property', async
   expect((await contentItem.json()).properties[AliasHelper.toAlias(dateTimeUnspecifiedDataTypeName)]).toBe('2026-01-01T12:30:00');
 });
 
-test('can index and fetch a document with a DateTimeWithTimeZone property', async ({umbracoApi}) => {
+test('can index and fetch a document that has a DateTimeWithTimeZone property', async ({umbracoApi}) => {
   // Arrange
   const dataTypeId = await umbracoApi.dataType.createDefaultDateTimeWithTimeZonePickerDataType(dateTimeWithTimeZoneDataTypeName) ?? '';
   const value = {date: '2026-01-01T12:30:00.000Z', timeZone: 'Europe/Copenhagen'};

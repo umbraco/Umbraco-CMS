@@ -218,7 +218,8 @@ export class DocumentApiHelper {
 
   async createPublishedDefaultDocument(documentName: string, documentTypeId: string) {
     const documentId = await this.createDefaultDocument(documentName, documentTypeId) ?? '';
-    await this.publish(documentId);
+    expect(documentId).toBeTruthy();
+    expect(await this.publish(documentId)).toBe(ConstantHelper.statusCodes.ok);
     return documentId;
   }
 

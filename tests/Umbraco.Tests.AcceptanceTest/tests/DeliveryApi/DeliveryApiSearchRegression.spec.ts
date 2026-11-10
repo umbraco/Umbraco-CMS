@@ -11,8 +11,8 @@ const unprotectedContentName = 'DeliveryApiSearchRegressionUnprotectedContent';
 const excludedContentNamePrefix = 'DeliveryApiSearchRegressionExcluded';
 const includedContentNamePrefix = 'DeliveryApiSearchRegressionIncluded';
 const sortSecondTypeContentName = includedContentNamePrefix + 'SecondType';
-const sortContentNameA = includedContentNamePrefix + 'B';
-const sortContentNameB = includedContentNamePrefix + 'A';
+const sortCreatedFirstContentName = includedContentNamePrefix + 'B';
+const sortCreatedSecondContentName = includedContentNamePrefix + 'A';
 const isNotIncludedContentName = includedContentNamePrefix + 'ForIsNot';
 const isNotExcludedContentName = excludedContentNamePrefix + 'ForIsNot';
 const doesNotContainExcludedContentName = excludedContentNamePrefix + 'DoesNotContain';
@@ -42,18 +42,18 @@ test.afterEach(async ({umbracoApi}) => {
 test('can combine a contentType filter with a sort', async ({umbracoApi}) => {
   // Arrange
   await umbracoApi.document.createPublishedDefaultDocument(sortSecondTypeContentName, secondDocumentTypeId);
-  await umbracoApi.document.createPublishedDefaultDocument(sortContentNameA, documentTypeId);
-  await umbracoApi.document.createPublishedDefaultDocument(sortContentNameB, documentTypeId);
+  await umbracoApi.document.createPublishedDefaultDocument(sortCreatedFirstContentName, documentTypeId);
+  await umbracoApi.document.createPublishedDefaultDocument(sortCreatedSecondContentName, documentTypeId);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   const filter = 'contentType:' + documentTypeData.alias;
   const sort = 'name:asc';
 
   // Act
-  const contentItemsJson = await umbracoApi.contentDeliveryApi.waitUntilContentQueryReturnsNames(filter, sort, [sortContentNameA, sortContentNameB], 2);
+  const contentItemsJson = await umbracoApi.contentDeliveryApi.waitUntilContentQueryReturnsNames(filter, sort, [sortCreatedFirstContentName, sortCreatedSecondContentName], 2);
 
   // Assert
-  expect(contentItemsJson.items[0].name).toBe(sortContentNameB);
-  expect(contentItemsJson.items[1].name).toBe(sortContentNameA);
+  expect(contentItemsJson.items[0].name).toBe(sortCreatedSecondContentName);
+  expect(contentItemsJson.items[1].name).toBe(sortCreatedFirstContentName);
 });
 
 test('can exclude content items using the contentType IsNot filter operator', async ({umbracoApi}) => {
