@@ -6,11 +6,10 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 /// Defines a repository for persisting content cache data.
 /// </summary>
 /// <remarks>
-/// The source reads (<see cref="GetDocumentSource"/>, <see cref="GetDocumentSources"/>,
-/// <see cref="GetDocumentSourceForPublishStates"/>, <see cref="GetMediaSource"/>, <see cref="GetMediaSources"/>,
-/// <see cref="GetElementSourceAsync"/>, <see cref="GetElementSource"/>, <see cref="GetElementSourcesAsync"/>)
-/// may be called without an ambient scope, as they are on a cache miss. Inside a scope they read within its
-/// transaction, so they see what the scope has written. The other members read and write through the ambient scope.
+/// The source reads (the <c>Get*Source</c>, <c>Get*Sources</c> and <c>Get*SourceForPublishStates</c> members, in their
+/// synchronous and asynchronous forms, for documents, media and elements) may be called without an ambient scope, as
+/// they are on a cache miss. Inside a scope they read within its transaction, so they see what the scope has written.
+/// The other members read and write through the ambient scope.
 /// </remarks>
 internal interface IDatabaseCacheRepository
 {
