@@ -299,7 +299,11 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
                 continue;
             }
 
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
             List<ContentCacheNode> cacheNodes = (await _databaseCacheRepository.GetElementSourcesAsync(uncachedKeys)).ToList();
+
+            scope.Complete();
 
             _logger.LogDebug("Element nodes to cache {NodeCount}", cacheNodes.Count);
 
