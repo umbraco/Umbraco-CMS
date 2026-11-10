@@ -11,12 +11,19 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const elementTypeName = 'TestElementType';
 // Element
 const elementName = 'TestElement';
+const secondElementTypeName = 'TestSecondElementType';
+const secondElementName = 'TestSecondElement';
+const elementFolderName = 'TestElementFolder';
+const elementInFolderName = 'TestElementInFolder';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
   await umbracoApi.element.ensureNameNotExists(elementName);
+  await umbracoApi.element.ensureNameNotExists(secondElementName);
+  await umbracoApi.element.ensureNameNotExists(elementFolderName);
+  await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
   await umbracoUi.goToBackOffice();
 });
 
@@ -24,7 +31,10 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.element.ensureNameNotExists(elementName);
+  await umbracoApi.element.ensureNameNotExists(secondElementName);
+  await umbracoApi.element.ensureNameNotExists(elementFolderName);
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
   await umbracoApi.dataType.ensureNameNotExists(elementPickerDataTypeName);
 });
 
@@ -236,4 +246,76 @@ test('can remove a not-found element from the element picker in the content', as
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
+});
+
+test('can only pick elements of an accepted type in the element picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
+  const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName, true);
+  const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
+  const secondElementId = await umbracoApi.element.createDefaultElement(secondElementName, secondElementTypeId);
+  await umbracoApi.element.publish(elementId);
+  await umbracoApi.element.publish(secondElementId);
+  const elementPickerDataTypeId = await umbracoApi.dataType.createElementPickerDataTypeWithAllowedContentTypes(elementPickerDataTypeName, [elementTypeId]);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, elementPickerDataTypeName, elementPickerDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickChooseElementPickerButton();
+  await umbracoUi.content.isModalMenuItemWithNameDisabled(secondElementName);
+  await umbracoUi.content.clickModalMenuItemWithName(elementName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(elementPickerDataTypeName));
+  expect(contentData.values[0].value).toEqual([elementId]);
+});
+
+test('can not publish content with an element of a type that is not accepted', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const wrongTypeMessage = 'The selected item is of the wrong type.';
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
+  const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName, true);
+  const secondElementId = await umbracoApi.element.createDefaultElement(secondElementName, secondElementTypeId);
+  await umbracoApi.element.publish(secondElementId);
+  const elementPickerDataTypeId = await umbracoApi.dataType.createElementPickerDataTypeWithAllowedContentTypes(elementPickerDataTypeName, [elementTypeId]);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, elementPickerDataTypeName, elementPickerDataTypeId);
+  const documentId = await umbracoApi.document.createDocumentWithElementPickers(contentName, documentTypeId, elementPickerDataTypeName, [secondElementId]);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isValidationMessageVisible(wrongTypeMessage);
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  expect(await umbracoApi.document.isDocumentPublished(documentId)).toBeFalsy();
+});
+
+test('can only pick elements inside the start node in the element picker', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
+  const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
+  const elementInFolderId = await umbracoApi.element.createDefaultElementWithParent(elementInFolderName, elementTypeId, elementFolderId);
+  await umbracoApi.element.publish(elementId);
+  await umbracoApi.element.publish(elementInFolderId);
+  const elementPickerDataTypeId = await umbracoApi.dataType.createElementPickerDataTypeWithStartNode(elementPickerDataTypeName, elementFolderId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, elementPickerDataTypeName, elementPickerDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickChooseElementPickerButton();
+
+  // Assert
+  await umbracoUi.content.isModalMenuItemWithNameVisible(elementInFolderName);
+  await umbracoUi.content.isModalMenuItemWithNameVisible(elementName, false);
+  await umbracoUi.content.isModalMenuItemWithNameVisible(elementFolderName, false);
 });

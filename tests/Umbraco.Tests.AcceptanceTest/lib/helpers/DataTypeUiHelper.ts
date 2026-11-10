@@ -70,6 +70,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly selectAPropertyEditorBtn: Locator;
   private readonly typeToFilterTxt: Locator;
   private readonly chooseStartNodeBtn: Locator;
+  private readonly chooseElementPickerAcceptedTypesBtn: Locator;
+  private readonly chooseElementPickerStartNodeBtn: Locator;
   private readonly addBlockBtn: Locator;
   private readonly minAmountTxt: Locator;
   private readonly maxAmountTxt: Locator;
@@ -225,6 +227,9 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.chooseAllowedMediaTypesBtn = page.getByTestId('property:allowedMediaTypes').locator('#btn-add');
     this.chooseWithPlusBtn = page.getByTestId('property:mediaParentId').locator('#btn-add');
     this.chooseStartNodeBtn = page.getByTestId('property:startNodeId').locator('#btn-add');
+    // Element Picker
+    this.chooseElementPickerAcceptedTypesBtn = page.getByTestId('property:allowedContentTypes').getByLabel('Choose');
+    this.chooseElementPickerStartNodeBtn = page.getByTestId('property:startNodeId').getByLabel('Choose');
 
     // Rich Editor
     this.toolbarCheckboxes = page.getByTestId('property:toolbar').locator('uui-checkbox');
@@ -703,6 +708,18 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   async clickChooseStartNodeButton() {
     await this.click(this.chooseStartNodeBtn);
+  }
+
+  async addElementPickerAcceptedType(elementTypeName: string) {
+    await this.click(this.chooseElementPickerAcceptedTypesBtn);
+    await this.clickModalMenuItemWithName(elementTypeName);
+    await this.clickChooseModalButton();
+  }
+
+  async addElementPickerStartNode(folderName: string) {
+    await this.click(this.chooseElementPickerStartNodeBtn);
+    await this.clickModalMenuItemWithName(folderName);
+    await this.clickChooseModalButton();
   }
 
   // Richtext Editor

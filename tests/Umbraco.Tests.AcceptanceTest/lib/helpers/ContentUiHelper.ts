@@ -2427,6 +2427,10 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.hasValue(this.textAreaTxt, expectedValue);
   }
 
+  async clickChooseElementPickerButton() {
+    await this.click(this.chooseModalLink);
+  }
+
   async addElementPicker(elementName: string) {
     await this.click(this.chooseModalLink);
     await this.click(this.sidebarModal.getByText(elementName, {exact: true}));
