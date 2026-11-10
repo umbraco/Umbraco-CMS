@@ -31293,40 +31293,6 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/server/schema-lockdown": {
-      "get": {
-        "tags": [
-          "Server"
-        ],
-        "summary": "Gets the schema lockdown state.",
-        "description": "Gets the permission verbs schema lockdown denies.",
-        "operationId": "GetServerSchemaLockdown",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ServerSchemaLockdownResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
     "/umbraco/management/api/v1/server/status": {
       "get": {
         "tags": [
@@ -51646,21 +51612,6 @@
           },
           "isDebugMode": {
             "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ServerSchemaLockdownResponseModel": {
-        "required": [
-          "deniedPermissions"
-        ],
-        "type": "object",
-        "properties": {
-          "deniedPermissions": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
           }
         },
         "additionalProperties": false
