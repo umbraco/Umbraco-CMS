@@ -1,3 +1,8 @@
+import {
+	EXAMPLE_PRODUCT_CATEGORY_ENTITY_TYPE,
+	EXAMPLE_PRODUCT_COLOR_ENTITY_TYPE,
+	EXAMPLE_PRODUCT_SIZE_ENTITY_TYPE,
+} from '../../entity.js';
 import { filterProducts } from '../../data/products.js';
 import type { ExampleProductFilterArgs } from '../../data/types.js';
 import type { ExampleRangeValueModel } from '../../range-kind/types.js';
@@ -52,9 +57,12 @@ export class ExampleDynamicFacetCollectionDataSource
 				count: f.count,
 			}));
 
-		facets[this.#fieldAliasMap['categories']] = toOptions(result.facets.categories, 'example-product-cateory');
-		facets[this.#fieldAliasMap['sizes']] = toOptions(result.facets.sizes, 'example-product-size');
-		facets[this.#fieldAliasMap['colors']] = toOptions(result.facets.colors, 'example-product-color');
+		facets[this.#fieldAliasMap['categories']] = toOptions(
+			result.facets.categories,
+			EXAMPLE_PRODUCT_CATEGORY_ENTITY_TYPE,
+		);
+		facets[this.#fieldAliasMap['sizes']] = toOptions(result.facets.sizes, EXAMPLE_PRODUCT_SIZE_ENTITY_TYPE);
+		facets[this.#fieldAliasMap['colors']] = toOptions(result.facets.colors, EXAMPLE_PRODUCT_COLOR_ENTITY_TYPE);
 		facets[this.#fieldAliasMap['priceRange']] = result.facets.priceRange;
 
 		return {

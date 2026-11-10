@@ -12,6 +12,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 @customElement('test-facet-filter-value-coordinator-host')
 class TestHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
+const TEST_ENTITY_TYPE = 'test-facet-filter-value';
+
 const createdResolvers: Array<UmbFacetFilterValueResolver> = [];
 
 class TestNameResolver implements UmbFacetFilterValueResolver {
@@ -20,7 +22,13 @@ class TestNameResolver implements UmbFacetFilterValueResolver {
 		createdResolvers.push(this);
 	}
 	async resolveValues(values: ReadonlyArray<unknown>) {
-		return { data: values.map((v) => ({ name: `${this.manifest?.meta.label}: ${v}` })) };
+		return {
+			data: values.map((v) => ({
+				entityType: TEST_ENTITY_TYPE,
+				unique: String(v),
+				name: `${this.manifest?.meta.label}: ${v}`,
+			})),
+		};
 	}
 	destroy() {}
 }
@@ -35,7 +43,12 @@ function registerFilter(alias: string, extra: Partial<ManifestFacetFilter> = {})
 	} as unknown as ManifestFacetFilter);
 }
 
-function waitForValue(coordinator: UmbFacetFilterValueCoordinatorContext, alias: string, raw: unknown, expected: unknown) {
+function waitForValue(
+	coordinator: UmbFacetFilterValueCoordinatorContext,
+	alias: string,
+	raw: unknown,
+	expected: unknown,
+) {
 	return new Promise<void>((resolve) => {
 		coordinator.observeResolvedValue(alias, raw).subscribe((v) => {
 			if (JSON.stringify(v) === JSON.stringify(expected)) resolve();
@@ -68,7 +81,11 @@ describe('UmbFacetFilterValueCoordinatorContext', () => {
 
 		coordinator.register('Umb.Test.FacetFilter.Own', 'x');
 
-		await waitForValue(coordinator, 'Umb.Test.FacetFilter.Own', 'x', { name: 'Umb.Test.FacetFilter.Own: x' });
+		await waitForValue(coordinator, 'Umb.Test.FacetFilter.Own', 'x', {
+			entityType: TEST_ENTITY_TYPE,
+			unique: 'x',
+			name: 'Umb.Test.FacetFilter.Own: x',
+		});
 	});
 
 	it('resolves values with a valueResolver inherited from the filter kind', async () => {
@@ -83,7 +100,11 @@ describe('UmbFacetFilterValueCoordinatorContext', () => {
 
 		coordinator.register('Umb.Test.FacetFilter.FromKind', 'y');
 
-		await waitForValue(coordinator, 'Umb.Test.FacetFilter.FromKind', 'y', { name: 'Umb.Test.FacetFilter.FromKind: y' });
+		await waitForValue(coordinator, 'Umb.Test.FacetFilter.FromKind', 'y', {
+			entityType: TEST_ENTITY_TYPE,
+			unique: 'y',
+			name: 'Umb.Test.FacetFilter.FromKind: y',
+		});
 	});
 
 	it('gives each resolver the manifest of the filter it resolves for', async () => {
@@ -94,8 +115,16 @@ describe('UmbFacetFilterValueCoordinatorContext', () => {
 		coordinator.register('Umb.Test.FacetFilter.Second', 'a');
 
 		await Promise.all([
-			waitForValue(coordinator, 'Umb.Test.FacetFilter.First', 'a', { name: 'Umb.Test.FacetFilter.First: a' }),
-			waitForValue(coordinator, 'Umb.Test.FacetFilter.Second', 'a', { name: 'Umb.Test.FacetFilter.Second: a' }),
+			waitForValue(coordinator, 'Umb.Test.FacetFilter.First', 'a', {
+				entityType: TEST_ENTITY_TYPE,
+				unique: 'a',
+				name: 'Umb.Test.FacetFilter.First: a',
+			}),
+			waitForValue(coordinator, 'Umb.Test.FacetFilter.Second', 'a', {
+				entityType: TEST_ENTITY_TYPE,
+				unique: 'a',
+				name: 'Umb.Test.FacetFilter.Second: a',
+			}),
 		]);
 
 		expect(createdResolvers.map((r) => r.manifest?.alias)).to.have.members([

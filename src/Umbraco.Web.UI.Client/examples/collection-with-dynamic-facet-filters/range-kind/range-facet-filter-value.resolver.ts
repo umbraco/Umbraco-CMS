@@ -1,13 +1,12 @@
+import { EXAMPLE_RANGE_LIMIT_ENTITY_TYPE } from './entity.js';
 import type { ExampleRangeValueModel } from './types.js';
-import type {
-	UmbFacetFilterValueDisplayModel,
-	UmbFacetFilterValueResolver,
-} from '@umbraco-cms/backoffice/facet-filter';
+import type { UmbFacetFilterValueResolver } from '@umbraco-cms/backoffice/facet-filter';
+import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
- * Resolves the active values of every range filter: `{ key: 'min', amount: 50 }` is displayed as "Min 50".
- * Registered on the range kind, so every filter using the kind gets it.
+ * Resolves the active values of every range filter into range limit items: `{ key: 'min', amount: 50 }` gets the
+ * name "Min 50". Registered on the range kind, so every filter using the kind gets it.
  */
 export class ExampleRangeFacetFilterValueResolver
 	extends UmbControllerBase
@@ -16,7 +15,9 @@ export class ExampleRangeFacetFilterValueResolver
 	async resolveValues(values: ReadonlyArray<ExampleRangeValueModel>) {
 		return {
 			data: values.map(
-				(value): UmbFacetFilterValueDisplayModel => ({
+				(value): UmbItemModel => ({
+					entityType: EXAMPLE_RANGE_LIMIT_ENTITY_TYPE,
+					unique: value.key,
 					name: `${value.key === 'min' ? 'Min' : 'Max'} ${value.amount}`,
 				}),
 			),

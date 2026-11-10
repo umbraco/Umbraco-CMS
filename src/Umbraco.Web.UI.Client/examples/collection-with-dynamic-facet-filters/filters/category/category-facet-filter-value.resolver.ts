@@ -1,4 +1,6 @@
+import { EXAMPLE_PRODUCT_CATEGORY_ENTITY_TYPE } from '../../entity.js';
 import type { UmbFacetFilterValueResolver } from '@umbraco-cms/backoffice/facet-filter';
+import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 const categoryNames: Record<string, string> = {
@@ -10,7 +12,7 @@ const categoryNames: Record<string, string> = {
 };
 
 /**
- * Resolves the active values of the category filter: `cat-tshirt` is displayed as "T-shirts".
+ * Resolves the active values of the category filter into category items: `cat-tshirt` gets the name "T-shirts".
  * Registered on the category filter only.
  */
 export class ExampleCategoryFacetFilterValueResolver
@@ -18,7 +20,15 @@ export class ExampleCategoryFacetFilterValueResolver
 	implements UmbFacetFilterValueResolver<string>
 {
 	async resolveValues(values: ReadonlyArray<string>) {
-		return { data: values.map((value) => ({ name: categoryNames[value] ?? value })) };
+		return {
+			data: values.map(
+				(unique): UmbItemModel => ({
+					entityType: EXAMPLE_PRODUCT_CATEGORY_ENTITY_TYPE,
+					unique,
+					name: categoryNames[unique] ?? unique,
+				}),
+			),
+		};
 	}
 }
 
