@@ -291,7 +291,8 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
                 continue;
             }
 
-            if (node is not null)
+            // An entry of another entity type means the key identifies no media item; it is accounted for, as a null is.
+            if (node is not null && node.IsOtherEntityType(ContentCacheDataSerializerEntityType.Media) is false)
             {
                 idKeyPairs.Add((node.Id, node.Key));
                 ResolveNode(key, node, generation, resolved);
@@ -377,6 +378,12 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
         string cacheKey = GetCacheKey(key);
         (bool exists, ContentCacheNode? contentCacheNode) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
+
+        // The entry is another entity type's, so the key identifies no media item.
+        if (contentCacheNode?.IsOtherEntityType(ContentCacheDataSerializerEntityType.Media) is true)
+        {
+            return null;
+        }
 
         // A value found in the backing store is already current, so it can always populate the caches
         // below; only a value built from the read-through DB fetch needs the generation guard.

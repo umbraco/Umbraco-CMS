@@ -171,7 +171,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     {
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Element);
-        return CreateContentNodeKit(dto, serializer, preview);
+        return CreateContentNodeKit(dto, serializer, preview, ContentCacheDataSerializerEntityType.Element);
     }
 
     /// <inheritdoc/>
@@ -192,7 +192,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Element);
         return dtos
-            .Select(x => CreateContentNodeKit(x, serializer, preview))
+            .Select(x => CreateContentNodeKit(x, serializer, preview, ContentCacheDataSerializerEntityType.Element))
             .OfType<ContentCacheNode>();
     }
 
@@ -330,7 +330,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     {
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
-        return CreateContentNodeKit(dto, serializer, preview);
+        return CreateContentNodeKit(dto, serializer, preview, ContentCacheDataSerializerEntityType.Document);
     }
 
     /// <inheritdoc/>
@@ -372,7 +372,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
         return filtered
-            .Select(x => CreateContentNodeKit(x, serializer, preview))
+            .Select(x => CreateContentNodeKit(x, serializer, preview, ContentCacheDataSerializerEntityType.Document))
             .OfType<ContentCacheNode>();
     }
 
@@ -404,15 +404,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// <inheritdoc/>
     public IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType)
     {
-        Guid objectType = entityType switch
-        {
-            ContentCacheDataSerializerEntityType.Document => Constants.ObjectTypes.Document,
-            ContentCacheDataSerializerEntityType.Media => Constants.ObjectTypes.Media,
-            ContentCacheDataSerializerEntityType.Element => Constants.ObjectTypes.Element,
-            _ => throw new ArgumentOutOfRangeException(nameof(entityType), entityType, null),
-        };
-
-        IEnumerable<ContentSourceDto> dtos = GetContentSourceByDocumentTypeKey(keys, objectType);
+        IEnumerable<ContentSourceDto> dtos = GetContentSourceByDocumentTypeKey(keys, GetObjectType(entityType));
 
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(entityType);
@@ -426,7 +418,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             }
             else
             {
-                ContentCacheNode? node = CreateContentNodeKit(row, serializer, row.Published is false);
+                ContentCacheNode? node = CreateContentNodeKit(row, serializer, row.Published is false, entityType);
                 if (node is not null)
                 {
                     yield return node;
@@ -434,6 +426,38 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             }
         }
     }
+
+    /// <inheritdoc />
+    public ISet<Guid> GetKeysOfOtherEntityTypes(IReadOnlyCollection<Guid> keys, ContentCacheDataSerializerEntityType entityType)
+    {
+        var otherKeys = new HashSet<Guid>();
+        if (keys.Count == 0)
+        {
+            return otherKeys;
+        }
+
+        Guid objectType = GetObjectType(entityType);
+        foreach (IEnumerable<Guid> group in keys.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Sql<ISqlContext> sql = Sql()
+                .Select<NodeDto>(x => x.UniqueId)
+                .From<NodeDto>()
+                .WhereIn<NodeDto>(x => x.UniqueId, group)
+                .Where<NodeDto>(x => x.NodeObjectType != objectType);
+            otherKeys.UnionWith(Database.Fetch<Guid>(sql));
+        }
+
+        return otherKeys;
+    }
+
+    private static Guid GetObjectType(ContentCacheDataSerializerEntityType entityType)
+        => entityType switch
+        {
+            ContentCacheDataSerializerEntityType.Document => Constants.ObjectTypes.Document,
+            ContentCacheDataSerializerEntityType.Media => Constants.ObjectTypes.Media,
+            ContentCacheDataSerializerEntityType.Element => Constants.ObjectTypes.Element,
+            _ => throw new ArgumentOutOfRangeException(nameof(entityType), entityType, null),
+        };
 
     /// <inheritdoc />
     public IEnumerable<Guid> GetDocumentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false)
@@ -2096,7 +2120,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return sql;
     }
 
-    private ContentCacheNode? CreateContentNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer, bool preview)
+    private ContentCacheNode? CreateContentNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer, bool preview, ContentCacheDataSerializerEntityType entityType)
     {
         if (preview)
         {
@@ -2148,6 +2172,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 ContentTypeId = dto.ContentTypeId,
                 Data = draftContentData,
                 IsDraft = true,
+                EntityType = entityType,
             };
         }
 
@@ -2197,6 +2222,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             ContentTypeId = dto.ContentTypeId,
             Data = publishedContentData,
             IsDraft = false,
+            EntityType = entityType,
         };
     }
 
@@ -2230,6 +2256,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             ContentTypeId = dto.ContentTypeId,
             Data = publishedContentData,
             IsDraft = false,
+            EntityType = ContentCacheDataSerializerEntityType.Media,
         };
     }
 

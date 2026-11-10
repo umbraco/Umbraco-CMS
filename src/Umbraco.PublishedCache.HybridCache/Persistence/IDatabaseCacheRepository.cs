@@ -216,6 +216,14 @@ internal interface IDatabaseCacheRepository
     IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType);
 
     /// <summary>
+    /// Gets the keys, from those given, that identify a node of an object type other than the one cached for an entity type.
+    /// </summary>
+    /// <param name="keys">The keys to check.</param>
+    /// <param name="entityType">The entity type whose object type the keys are compared with.</param>
+    /// <returns>The keys that identify a node of another object type. Keys that identify no node are not included.</returns>
+    ISet<Guid> GetKeysOfOtherEntityTypes(IReadOnlyCollection<Guid> keys, ContentCacheDataSerializerEntityType entityType);
+
+    /// <summary>
     /// Rebuilds the caches for content, media and/or elements based on the content type ids specified.
     /// </summary>
     /// <param name="contentTypeIds">

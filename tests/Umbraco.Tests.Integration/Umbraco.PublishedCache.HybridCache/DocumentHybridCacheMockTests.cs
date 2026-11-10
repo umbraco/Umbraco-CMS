@@ -41,6 +41,9 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     public void SetUp()
     {
         _mockDatabaseCacheRepository = new Mock<IDatabaseCacheRepository>();
+        _mockDatabaseCacheRepository
+            .Setup(r => r.GetKeysOfOtherEntityTypes(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<ContentCacheDataSerializerEntityType>()))
+            .Returns(new HashSet<Guid>());
 
         var contentData = new ContentData(
             Textpage.Name,

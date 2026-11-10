@@ -178,6 +178,12 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
         (bool exists, ContentCacheNode? contentCacheNode) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
 
+        // The entry is another entity type's, so the key identifies no element.
+        if (contentCacheNode?.IsOtherEntityType(ContentCacheDataSerializerEntityType.Element) is true)
+        {
+            return null;
+        }
+
         // A value found in the backing store is already current, so it can always populate the caches
         // below; only a value built from the read-through DB fetch needs the generation guard.
         bool snapshotIsCurrent = true;
@@ -189,12 +195,13 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
             // memory permanently stale until a full clear).
             long generation = Interlocked.Read(ref _cacheGeneration);
 
-            contentCacheNode = await GetContentCacheNodeFromRepo();
+            bool cacheable;
+            (contentCacheNode, cacheable) = await GetContentCacheNodeFromRepo();
             snapshotIsCurrent = IsCacheGenerationCurrent(generation);
 
             // Skip the write when the generation moved — a refresh has superseded this snapshot. A null
             // node is still written when current (negative caching, tagged so it can be cleared).
-            if (snapshotIsCurrent)
+            if (cacheable && snapshotIsCurrent)
             {
                 await _hybridCache.SetAsync(
                     cacheKey,
@@ -229,10 +236,16 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
         return result;
 
-        async Task<ContentCacheNode?> GetContentCacheNodeFromRepo()
+        async Task<(ContentCacheNode? Node, bool Cacheable)> GetContentCacheNodeFromRepo()
         {
             using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-            return await readElementSource(key, preview);
+            ContentCacheNode? node = await readElementSource(key, preview);
+
+            // A null cached under the key of a document or media item would hide that item from its own cache,
+            // which reads the same cache key.
+            return node is null
+                ? (null, _databaseCacheRepository.GetKeysOfOtherEntityTypes([key], ContentCacheDataSerializerEntityType.Element).Count == 0)
+                : (node, true);
         }
     }
 
