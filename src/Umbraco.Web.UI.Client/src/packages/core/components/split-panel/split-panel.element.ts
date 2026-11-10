@@ -107,9 +107,8 @@ export class UmbSplitPanelElement extends UmbLitElement {
 		return getComputedStyle(this.mainElement).direction === 'rtl';
 	}
 
-	#distanceFromInlineStart(clientX: number) {
-		const { left, right } = this.mainElement.getBoundingClientRect();
-		return this.#isRightToLeft() ? right - clientX : clientX - left;
+	#distanceFromInlineStart(clientX: number, mainRect: DOMRect, isRightToLeft: boolean) {
+		return isRightToLeft ? mainRect.right - clientX : clientX - mainRect.left;
 	}
 
 	#updateSplit() {
@@ -136,9 +135,12 @@ export class UmbSplitPanelElement extends UmbLitElement {
 	#onDragStart = (event: PointerEvent | TouchEvent) => {
 		event.preventDefault();
 
+		const isRightToLeft = this.#isRightToLeft();
+
 		const move = (event: PointerEvent) => {
-			const { width } = this.mainElement.getBoundingClientRect();
-			const localPos = clamp(this.#distanceFromInlineStart(event.clientX), 0, width);
+			const mainRect = this.mainElement.getBoundingClientRect();
+			const { width } = mainRect;
+			const localPos = clamp(this.#distanceFromInlineStart(event.clientX, mainRect, isRightToLeft), 0, width);
 			const mappedPos = mapXAxisToSnap(localPos, width);
 
 			this.#lockedPanelWidth = this.lock === 'start' ? mappedPos : width - mappedPos;
@@ -207,8 +209,9 @@ export class UmbSplitPanelElement extends UmbLitElement {
 		await new Promise((resolve) => requestAnimationFrame(resolve));
 
 		const { left: dividerLeft } = this.shadowRoot!.querySelector('#divider')!.getBoundingClientRect();
-		const { width: mainWidth } = this.mainElement.getBoundingClientRect();
-		const percentagePos = (this.#distanceFromInlineStart(dividerLeft) / mainWidth) * 100;
+		const mainRect = this.mainElement.getBoundingClientRect();
+		const percentagePos =
+			(this.#distanceFromInlineStart(dividerLeft, mainRect, this.#isRightToLeft()) / mainRect.width) * 100;
 		this.position = `${percentagePos}%`;
 	}
 
@@ -235,14 +238,16 @@ export class UmbSplitPanelElement extends UmbLitElement {
 
 	#onKeydown(event: KeyboardEvent) {
 		if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-			const { width } = this.mainElement.getBoundingClientRect();
+			const mainRect = this.mainElement.getBoundingClientRect();
+			const { width } = mainRect;
 			const divider = this.dividerElement.getBoundingClientRect();
+			const isRightToLeft = this.#isRightToLeft();
 
-			const dividerPos = this.#distanceFromInlineStart(divider.left);
+			const dividerPos = this.#distanceFromInlineStart(divider.left, mainRect, isRightToLeft);
 			const percentageFromWidth = (dividerPos / width) * 100;
 
 			const multiplier = event.shiftKey ? 10 : 1;
-			const towardsStart = event.key === (this.#isRightToLeft() ? 'ArrowRight' : 'ArrowLeft');
+			const towardsStart = event.key === (isRightToLeft ? 'ArrowRight' : 'ArrowLeft');
 			const step = 1 * multiplier * (towardsStart ? -1 : 1);
 
 			const newPercent = percentageFromWidth + step;

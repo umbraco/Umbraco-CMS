@@ -50,6 +50,30 @@ describe('UmbSplitPanelElement', () => {
 				expect(startPanelWidth()).to.be.closeTo(400, 1);
 			});
 
+			it('reads no computed styles while the pointer moves', () => {
+				const touchArea = element.shadowRoot!.querySelector('#divider-touch-area')!;
+				touchArea.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
+
+				const getComputedStyle = window.getComputedStyle;
+				let reads = 0;
+				window.getComputedStyle = (...args) => {
+					reads++;
+					return getComputedStyle(...args);
+				};
+				try {
+					for (let i = 1; i <= 5; i++) {
+						document.dispatchEvent(
+							new PointerEvent('pointermove', { clientX: inlineStartEdge() + 100 * i * towardsInlineEnd }),
+						);
+					}
+				} finally {
+					window.getComputedStyle = getComputedStyle;
+					document.dispatchEvent(new PointerEvent('pointerup'));
+				}
+
+				expect(reads).to.equal(0);
+			});
+
 			it('moves the divider in the direction of the arrow key', async () => {
 				const divider = element.shadowRoot!.querySelector('#divider')!;
 				const before = divider.getBoundingClientRect().left;
