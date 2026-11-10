@@ -238,7 +238,6 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
         async Task<(ContentCacheNode? Node, bool Cacheable)> GetContentCacheNodeFromRepo()
         {
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
             ContentCacheNode? node = await readElementSource(key, preview);
 
             // A null cached under a key that another cache also reads would hide that cache's item. Documents read

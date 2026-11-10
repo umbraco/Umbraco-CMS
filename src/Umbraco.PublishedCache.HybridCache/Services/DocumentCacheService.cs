@@ -417,11 +417,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     // every request.
     private async Task ReadFromDatabaseAsync(List<Guid> keys, bool preview, long generation, Dictionary<Guid, IPublishedContent> resolved, ContentSourcesReader readContentSources)
     {
-        IReadOnlyCollection<ContentCacheNode> coldNodes;
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            coldNodes = (await readContentSources(keys, preview)).ToArray();
-        }
+        IReadOnlyCollection<ContentCacheNode> coldNodes = (await readContentSources(keys, preview)).ToArray();
 
         // Mirrors GetNodeAsync, which warms the id/key map for every node the database returns,
         // regardless of the ancestor guard below.
@@ -583,7 +579,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
         async Task<(ContentCacheNode? Node, bool Cacheable)> GetContentCacheNodeFromRepo()
         {
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
             ContentCacheNode? contentCacheNode = await readContentSource(key, preview);
 
             if (contentCacheNode is null)
@@ -617,7 +612,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             ? ContentCacheDataSerializerEntityType.Element
             : ContentCacheDataSerializerEntityType.Media | ContentCacheDataSerializerEntityType.Element;
 
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
         return _databaseCacheRepository.GetKeysOfEntityTypes(keys, entityTypes);
     }
 

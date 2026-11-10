@@ -312,12 +312,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     // database-read node is promoted into L1 — an L1/L2 hit is already there.
     private async Task ReadFromDatabaseAsync(List<Guid> keys, long generation, Dictionary<Guid, IPublishedContent> resolved, MediaSourcesReader readMediaSources)
     {
-        IReadOnlyCollection<ContentCacheNode> coldNodes;
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
-        {
-            coldNodes = (await readMediaSources(keys)).ToArray();
-            scope.Complete();
-        }
+        IReadOnlyCollection<ContentCacheNode> coldNodes = (await readMediaSources(keys)).ToArray();
 
         // Mirrors GetNodeAsync, which warms the id/key map for every node the database returns.
         if (coldNodes.Count > 0)
@@ -362,12 +357,9 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     // A null cached under a key that another cache also reads would hide that cache's item. Documents and
     // elements both read the published key that media uses.
     private ISet<Guid> GetKeysSharingCacheKeysWithOtherEntityTypes(IReadOnlyCollection<Guid> keys)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        return _databaseCacheRepository.GetKeysOfEntityTypes(
+        => _databaseCacheRepository.GetKeysOfEntityTypes(
             keys,
             ContentCacheDataSerializerEntityType.Document | ContentCacheDataSerializerEntityType.Element);
-    }
 
     // Converts a resolved cache node to IPublishedContent, writes it into the resolved set and — when
     // our snapshot is still current — populates L0. Returns whether conversion succeeded, so a caller
@@ -472,7 +464,6 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
         async Task<(ContentCacheNode? Node, bool Cacheable)> GetContentCacheNodeFromRepo()
         {
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
             ContentCacheNode? mediaCacheNode = await readMediaSource(key);
             return mediaCacheNode is null
                 ? (null, GetKeysSharingCacheKeysWithOtherEntityTypes([key]).Count == 0)
