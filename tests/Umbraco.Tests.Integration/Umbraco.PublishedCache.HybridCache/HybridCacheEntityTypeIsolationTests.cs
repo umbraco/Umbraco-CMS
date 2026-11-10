@@ -193,6 +193,55 @@ internal sealed class HybridCacheEntityTypeIsolationTests : UmbracoIntegrationTe
         });
     }
 
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Media_Cache_Caches_A_Miss_For_A_Key_No_Other_Cache_Reads(bool batched)
+    {
+        Guid contentTypeKey = await CreateContentType();
+
+        await LookUpInMediaCache(contentTypeKey, batched);
+
+        Assert.That(await IsCached(contentTypeKey, false), Is.True);
+    }
+
+    [Test]
+    public async Task Clearing_The_Media_Cache_Removes_A_Cached_Miss()
+    {
+        Guid contentTypeKey = await CreateContentType();
+        await LookUpInMediaCache(contentTypeKey, false);
+        Assert.That(await IsCached(contentTypeKey, false), Is.True);
+
+        await MediaCacheService.ClearMemoryCacheAsync(CancellationToken.None);
+
+        Assert.That(await IsCached(contentTypeKey, false), Is.False);
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Document_Remains_Resolvable_After_The_Media_Cache_Is_Asked_For_Its_Key(bool batched)
+    {
+        Guid documentKey = await CreateAndPublishDocument();
+        await DocumentCacheService.ClearMemoryCacheAsync(CancellationToken.None);
+
+        await LookUpInMediaCache(documentKey, batched);
+        IPublishedContent? result = await DocumentCacheService.GetByKeyAsync(documentKey, false);
+
+        Assert.That(result?.Key, Is.EqualTo(documentKey));
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Element_Remains_Resolvable_After_The_Media_Cache_Is_Asked_For_Its_Key(bool batched)
+    {
+        Guid elementKey = await CreateAndPublishElement();
+        await ElementCacheService.ClearMemoryCacheAsync(CancellationToken.None);
+
+        await LookUpInMediaCache(elementKey, batched);
+        IPublishedElement? result = await ElementCacheService.GetByKeyAsync(elementKey, false);
+
+        Assert.That(result?.Key, Is.EqualTo(elementKey));
+    }
+
     [TestCase(true)]
     [TestCase(false)]
     public async Task Missing_Key_Stays_Unresolved_In_Every_Cache(bool preview)
@@ -216,6 +265,18 @@ internal sealed class HybridCacheEntityTypeIsolationTests : UmbracoIntegrationTe
         else
         {
             Assert.That(await DocumentCacheService.GetByKeyAsync(key, preview), Is.Null);
+        }
+    }
+
+    private async Task LookUpInMediaCache(Guid key, bool batched)
+    {
+        if (batched)
+        {
+            Assert.That(await MediaCacheService.GetByKeysAsync([key]), Is.Empty);
+        }
+        else
+        {
+            Assert.That(await MediaCacheService.GetByKeyAsync(key), Is.Null);
         }
     }
 
