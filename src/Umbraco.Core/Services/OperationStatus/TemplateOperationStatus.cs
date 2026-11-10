@@ -44,6 +44,16 @@ public enum TemplateOperationStatus
     ///     The operation failed because the master template cannot be deleted while it has child templates.
     /// </summary>
     MasterTemplateCannotBeDeleted,
+
+    /// <summary>
+    ///     The operation is not allowed when running in production mode.
+    /// </summary>
+    [Obsolete("No longer returned, as schema lockdown denies template changes in production mode. Scheduled for removal in Umbraco 19.")]
     NotAllowedInProductionMode,
+
+    /// <summary>
+    ///     The template content cannot be changed when running in production mode.
+    /// </summary>
+    [Obsolete("No longer returned, as schema lockdown denies template changes in production mode. Scheduled for removal in Umbraco 19.")]
     ContentChangeNotAllowedInProductionMode,
 }
