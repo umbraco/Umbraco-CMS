@@ -104,7 +104,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public ContentCacheNode? GetElementSource(Guid key, bool preview = false)
-        => CreateElementSourceNode(Database.FirstOrDefault<ContentSourceDto>(GetElementSourceSql(key)), preview);
+        => CreateElementSourceNode(Read(database => database.FirstOrDefault<ContentSourceDto>(GetElementSourceSql(key))), preview);
 
     private ContentCacheNode? CreateElementSourceNode(ContentSourceDto? dto, bool preview)
     {
@@ -162,13 +162,13 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     private async Task<ContentSourceDto?> GetElementSourceDto(Guid key)
-        => await Database.FirstOrDefaultAsync<ContentSourceDto>(GetElementSourceSql(key));
+        => await ReadAsync(database => database.FirstOrDefaultAsync<ContentSourceDto>(GetElementSourceSql(key)));
 
     private Sql<ISqlContext> GetElementSourceSql(Guid key)
         => SqlElementSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Element))
-            .Append(SqlWhereNodeKey(SqlContext, key))
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+            .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Element))
+            .Append(SqlWhereNodeKey(ScopelessSqlContext, key))
+            .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
 
     private ContentCacheNode? CreateElementNodeKit(bool preview, ContentSourceDto dto)
     {
@@ -181,11 +181,11 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     public async Task<IEnumerable<ContentCacheNode>> GetElementSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
     {
         Sql<ISqlContext>? sql = SqlElementSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Element))
+            .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Element))
             .WhereIn<NodeDto>(x => x.UniqueId, keys)
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+            .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
 
-        List<ContentSourceDto> dtos = await Database.FetchAsync<ContentSourceDto>(sql);
+        List<ContentSourceDto> dtos = await ReadAsync(database => database.FetchAsync<ContentSourceDto>(sql));
 
         dtos = dtos
             .Where(x => x is not null)
@@ -2069,7 +2069,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     private Sql<ISqlContext> SqlElementSourcesSelect(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
     {
-        SqlTemplate sqlTemplate = SqlContext.Templates.Get(
+        SqlTemplate sqlTemplate = ScopelessSqlContext.Templates.Get(
             Constants.SqlTemplates.NuCacheDatabaseDataSource.ElementSourcesSelect,
             tsql =>
                 tsql.Select<NodeDto>(

@@ -7,10 +7,10 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 /// </summary>
 /// <remarks>
 /// The source reads (<see cref="GetDocumentSource"/>, <see cref="GetDocumentSources"/>,
-/// <see cref="GetDocumentSourceForPublishStates"/>, <see cref="GetMediaSource"/>, <see cref="GetMediaSources"/> and
-/// their asynchronous counterparts) may be called without an ambient scope, as they are on a cache miss. Inside a
-/// scope they read within its transaction, so they see what the scope has written. The other members read and write
-/// through the ambient scope.
+/// <see cref="GetDocumentSourceForPublishStates"/>, <see cref="GetMediaSource"/>, <see cref="GetMediaSources"/>,
+/// <see cref="GetElementSourceAsync"/>, <see cref="GetElementSource"/>, <see cref="GetElementSourcesAsync"/>)
+/// may be called without an ambient scope, as they are on a cache miss. Inside a scope they read within its
+/// transaction, so they see what the scope has written. The other members read and write through the ambient scope.
 /// </remarks>
 internal interface IDatabaseCacheRepository
 {

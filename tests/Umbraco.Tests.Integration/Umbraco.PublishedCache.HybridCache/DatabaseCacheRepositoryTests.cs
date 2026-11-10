@@ -5,6 +5,8 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
@@ -31,6 +33,7 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
     {
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.AddNotificationHandler<MediaTreeChangeNotification, MediaTreeChangeDistributedCacheNotificationHandler>();
+        builder.AddNotificationHandler<ElementTreeChangeNotification, ElementTreeChangeDistributedCacheNotificationHandler>();
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
     }
 
@@ -49,6 +52,12 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
     private ISqlContext SqlContext => GetRequiredService<ISqlContext>();
 
     private IContentPublishingService ContentPublishingService => GetRequiredService<IContentPublishingService>();
+
+    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
+    private IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
+
+    private IElementPublishingService ElementPublishingService => GetRequiredService<IElementPublishingService>();
 
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
@@ -317,6 +326,94 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
 
         // The scope was not completed, so the published source is back.
         Assert.IsNotNull(await DatabaseCacheRepository.GetDocumentSourceAsync(Textpage.Key));
+    }
+
+    [Test]
+    public async Task GetElementSourceAsync_Without_An_Ambient_Scope_Returns_The_Published_Source()
+    {
+        Guid elementKey = await CreateAndPublishElement();
+
+        ContentCacheNode? source = await DatabaseCacheRepository.GetElementSourceAsync(elementKey);
+
+        Assert.IsNotNull(source);
+        Assert.AreEqual(elementKey, source!.Key);
+    }
+
+    [Test]
+    public async Task GetElementSource_Without_An_Ambient_Scope_Returns_The_Published_Source()
+    {
+        Guid elementKey = await CreateAndPublishElement();
+
+        ContentCacheNode? source = DatabaseCacheRepository.GetElementSource(elementKey);
+
+        Assert.IsNotNull(source);
+        Assert.AreEqual(elementKey, source!.Key);
+    }
+
+    [Test]
+    public async Task GetElementSourcesAsync_Without_An_Ambient_Scope_Returns_Matching_Sources()
+    {
+        Guid elementKey1 = await CreateAndPublishElement();
+        Guid elementKey2 = await CreateAndPublishElement();
+
+        var sources = (await DatabaseCacheRepository.GetElementSourcesAsync([elementKey1, elementKey2])).ToList();
+
+        CollectionAssert.AreEquivalent(new[] { elementKey1, elementKey2 }, sources.Select(x => x.Key));
+    }
+
+    [Test]
+    public async Task GetElementSourceForPublishStatesAsync_Without_An_Ambient_Scope_Returns_Both_States()
+    {
+        Guid elementKey = await CreateAndPublishElement();
+
+        (ContentCacheNode? draft, ContentCacheNode? published) = await DatabaseCacheRepository.GetElementSourceForPublishStatesAsync(elementKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(draft?.IsDraft, Is.True);
+            Assert.That(published?.IsDraft, Is.False);
+        });
+    }
+
+    [Test]
+    public async Task GetElementSourceAsync_In_A_Scope_Sees_The_Uncommitted_Changes_Of_The_Scope()
+    {
+        Guid elementKey = await CreateAndPublishElement();
+        ContentCacheNode? source = await DatabaseCacheRepository.GetElementSourceAsync(elementKey);
+        int elementId = source!.Id;
+
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            scope.Database.Execute(SqlContext.Sql()
+                .Delete<ContentNuDto>()
+                .Where<ContentNuDto>(x => x.NodeId == elementId && x.Published));
+
+            Assert.IsNull(await DatabaseCacheRepository.GetElementSourceAsync(elementKey));
+        }
+
+        // The scope was not completed, so the published source is back.
+        Assert.IsNotNull(await DatabaseCacheRepository.GetElementSourceAsync(elementKey));
+    }
+
+    private async Task<Guid> CreateAndPublishElement()
+    {
+        IContentType elementType = ContentTypeBuilder.CreateBasicElementType(Guid.NewGuid().ToString("N"));
+        elementType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+
+        var createResult = await ElementEditingService.CreateAsync(
+            new ElementCreateModel { ContentTypeKey = elementType.Key, Variants = [new() { Name = "Element" }] },
+            Constants.Security.SuperUserKey);
+        Assert.That(createResult.Success, Is.True);
+        Guid elementKey = createResult.Result.Content!.Key;
+
+        var publishResult = await ElementPublishingService.PublishAsync(
+            elementKey,
+            [new CulturePublishScheduleModel { Culture = "*", Schedule = null }],
+            Constants.Security.SuperUserKey);
+        Assert.That(publishResult.Success, Is.True);
+
+        return elementKey;
     }
 
     [Test]

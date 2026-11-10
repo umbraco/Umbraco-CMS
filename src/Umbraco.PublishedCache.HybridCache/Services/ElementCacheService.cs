@@ -231,7 +231,6 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
         async Task<ContentCacheNode?> GetContentCacheNodeFromRepo()
         {
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
             return await readElementSource(key, preview);
         }
     }
@@ -300,11 +299,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
                 continue;
             }
 
-            using ICoreScope scope = _scopeProvider.CreateCoreScope();
-
             List<ContentCacheNode> cacheNodes = (await _databaseCacheRepository.GetElementSourcesAsync(uncachedKeys)).ToList();
-
-            scope.Complete();
 
             _logger.LogDebug("Element nodes to cache {NodeCount}", cacheNodes.Count);
 
