@@ -30,13 +30,13 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 	}
 
 	/**
-	 * Min validation message.
+	 * Min validation message. When not set, a localized message stating the minimum and how many more items are needed is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field needs more files';
+	minMessage?: string;
 
 	/**
 	 * This is a maximum amount of selected files in this input.
@@ -53,13 +53,13 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 	}
 
 	/**
-	 * Max validation message.
+	 * Max validation message. When not set, a localized message stating the maximum and how many items are over it is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'max-message' })
-	maxMessage = 'This field exceeds the allowed amount of files';
+	maxMessage?: string;
 
 	public set selection(paths: Array<string>) {
 		this.#pickerContext.setSelection(paths);
@@ -92,13 +92,25 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 
 		this.addValidator(
 			'rangeUnderflow',
-			() => this.minMessage,
+			() =>
+				this.minMessage ||
+				this.localize.term(
+					'validation_entriesShort',
+					this.min,
+					(this.min ?? 0) - this.#pickerContext.getSelection().length,
+				),
 			() => isAboveZeroAndBelowMinimum(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(
 			'rangeOverflow',
-			() => this.maxMessage,
+			() =>
+				this.maxMessage ||
+				this.localize.term(
+					'validation_entriesExceed',
+					this.max,
+					this.#pickerContext.getSelection().length - (this.max ?? 0),
+				),
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
