@@ -11,9 +11,4 @@ export interface UmbSegmentCollectionItemModel {
 	unique: string;
 	alias: string;
 	name: string;
-	/**
-	 * An optional list of culture codes that the segment applies to.
-	 * If null or undefined, the segment applies to all cultures.
-	 */
-	cultures?: Array<string> | null;
 }

@@ -125,9 +125,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 
 	protected override async _loadSegmentsFor(): Promise<void> {
 		const { data } = await this.#segmentCollectionRepository.requestCollection({ skip: 0, take: 9999 });
-		this._segments.setValue(
-			data?.items.map((item) => ({ alias: item.alias, name: item.name, cultures: item.cultures })) ?? [],
-		);
+		this._segments.setValue(data?.items.map((item) => ({ alias: item.alias, name: item.name })) ?? []);
 	}
 
 	/**
