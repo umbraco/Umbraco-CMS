@@ -76,7 +76,7 @@ internal sealed class ElementHybridCacheL0DraftTests : UmbracoIntegrationTest
 
         _databaseCacheRepository = new Mock<IDatabaseCacheRepository>();
         _databaseCacheRepository
-            .Setup(r => r.GetKeysOfOtherEntityTypes(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<ContentCacheDataSerializerEntityType>()))
+            .Setup(r => r.GetKeysOfEntityTypes(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<ContentCacheDataSerializerEntityType>()))
             .Returns(new HashSet<Guid>());
 
         _elementCacheService = new ElementCacheService(

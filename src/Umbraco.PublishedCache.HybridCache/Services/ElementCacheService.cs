@@ -241,11 +241,17 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
             using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
             ContentCacheNode? node = await readElementSource(key, preview);
 
-            // A null cached under the key of a document or media item would hide that item from its own cache,
-            // which reads the same cache key.
-            return node is null
-                ? (null, _databaseCacheRepository.GetKeysOfOtherEntityTypes([key], ContentCacheDataSerializerEntityType.Element).Count == 0)
-                : (node, true);
+            // A null cached under a key that another cache also reads would hide that cache's item. Documents read
+            // the same published and draft keys as elements; media reads only the published one.
+            if (node is null)
+            {
+                ContentCacheDataSerializerEntityType entityTypes = preview
+                    ? ContentCacheDataSerializerEntityType.Document
+                    : ContentCacheDataSerializerEntityType.Document | ContentCacheDataSerializerEntityType.Media;
+                return (null, _databaseCacheRepository.GetKeysOfEntityTypes([key], entityTypes).Count == 0);
+            }
+
+            return (node, true);
         }
     }
 

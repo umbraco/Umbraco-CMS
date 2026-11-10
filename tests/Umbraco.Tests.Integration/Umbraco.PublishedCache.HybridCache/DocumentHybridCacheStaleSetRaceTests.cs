@@ -74,7 +74,7 @@ internal sealed class DocumentHybridCacheStaleSetRaceTests : UmbracoIntegrationT
     {
         _databaseCacheRepository = new Mock<IDatabaseCacheRepository>();
         _databaseCacheRepository
-            .Setup(r => r.GetKeysOfOtherEntityTypes(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<ContentCacheDataSerializerEntityType>()))
+            .Setup(r => r.GetKeysOfEntityTypes(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<ContentCacheDataSerializerEntityType>()))
             .Returns(new HashSet<Guid>());
         _hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
 

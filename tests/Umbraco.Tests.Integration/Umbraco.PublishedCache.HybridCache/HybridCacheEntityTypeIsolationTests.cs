@@ -10,6 +10,8 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.HybridCache;
+using Umbraco.Cms.Infrastructure.HybridCache.Extensions;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -48,6 +50,8 @@ internal sealed class HybridCacheEntityTypeIsolationTests : UmbracoIntegrationTe
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 
     private IElementService ElementService => GetRequiredService<IElementService>();
+
+    private Microsoft.Extensions.Caching.Hybrid.HybridCache HybridCache => GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
 
     [TestCase(true)]
     [TestCase(false)]
@@ -138,6 +142,57 @@ internal sealed class HybridCacheEntityTypeIsolationTests : UmbracoIntegrationTe
         Assert.That(result?.Key, Is.EqualTo(documentKey));
     }
 
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Document_Cache_Caches_A_Miss_For_A_Key_No_Other_Cache_Reads(bool batched)
+    {
+        Guid contentTypeKey = await CreateContentType();
+
+        await LookUpInDocumentCache(contentTypeKey, false, batched);
+
+        Assert.That(await IsCached(contentTypeKey, false), Is.True);
+    }
+
+    [Test]
+    public async Task Document_Cache_Caches_A_Preview_Miss_For_The_Key_Of_A_Media_Item()
+    {
+        Guid mediaKey = await CreateMedia();
+        await MediaCacheService.ClearMemoryCacheAsync(CancellationToken.None);
+
+        await LookUpInDocumentCache(mediaKey, true, false);
+
+        Assert.Multiple(async () =>
+        {
+            Assert.That(await IsCached(mediaKey, true), Is.True);
+            Assert.That((await MediaCacheService.GetByKeyAsync(mediaKey))?.Key, Is.EqualTo(mediaKey));
+        });
+    }
+
+    [Test]
+    public async Task Element_Cache_Caches_A_Miss_For_A_Key_No_Other_Cache_Reads()
+    {
+        Guid contentTypeKey = await CreateContentType();
+
+        Assert.That(await ElementCacheService.GetByKeyAsync(contentTypeKey, false), Is.Null);
+
+        Assert.That(await IsCached(contentTypeKey, false), Is.True);
+    }
+
+    [Test]
+    public async Task Element_Cache_Caches_A_Preview_Miss_For_The_Key_Of_A_Media_Item()
+    {
+        Guid mediaKey = await CreateMedia();
+        await MediaCacheService.ClearMemoryCacheAsync(CancellationToken.None);
+
+        Assert.That(await ElementCacheService.GetByKeyAsync(mediaKey, true), Is.Null);
+
+        Assert.Multiple(async () =>
+        {
+            Assert.That(await IsCached(mediaKey, true), Is.True);
+            Assert.That((await MediaCacheService.GetByKeyAsync(mediaKey))?.Key, Is.EqualTo(mediaKey));
+        });
+    }
+
     [TestCase(true)]
     [TestCase(false)]
     public async Task Missing_Key_Stays_Unresolved_In_Every_Cache(bool preview)
@@ -162,6 +217,16 @@ internal sealed class HybridCacheEntityTypeIsolationTests : UmbracoIntegrationTe
         {
             Assert.That(await DocumentCacheService.GetByKeyAsync(key, preview), Is.Null);
         }
+    }
+
+    private async Task<bool> IsCached(Guid key, bool preview)
+        => await HybridCache.ExistsAsync<ContentCacheNode?>(preview ? $"{key}+draft" : $"{key}", CancellationToken.None);
+
+    private async Task<Guid> CreateContentType()
+    {
+        IContentType contentType = ContentTypeBuilder.CreateBasicContentType();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        return contentType.Key;
     }
 
     private async Task<Guid> CreateAndPublishDocument()

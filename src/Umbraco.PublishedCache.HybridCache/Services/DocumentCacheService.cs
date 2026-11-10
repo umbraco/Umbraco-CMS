@@ -465,8 +465,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             return;
         }
 
-        ISet<Guid> keysOfOtherEntityTypes = GetKeysOfOtherEntityTypes(keysNotReturned);
-        foreach (Guid key in keysNotReturned.Where(key => keysOfOtherEntityTypes.Contains(key) is false))
+        ISet<Guid> keysSharedWithOtherEntityTypes = GetKeysSharingCacheKeysWithOtherEntityTypes(keysNotReturned, preview);
+        foreach (Guid key in keysNotReturned.Where(key => keysSharedWithOtherEntityTypes.Contains(key) is false))
         {
             await _hybridCache.SetAsync(GetCacheKey(key, preview), (ContentCacheNode?)null, GetEntryOptions(key, preview), GenerateTags(null));
         }
@@ -586,11 +586,9 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
             ContentCacheNode? contentCacheNode = await readContentSource(key, preview);
 
-            // A null cached under the key of a media item or element would hide that item from its own cache,
-            // which reads the same cache key.
             if (contentCacheNode is null)
             {
-                return (null, IsKeyOfOtherEntityType(key) is false);
+                return (null, GetKeysSharingCacheKeysWithOtherEntityTypes([key], preview).Count == 0);
             }
 
             // If we can resolve the content cache node, we still need to check if the ancestor path is published.
@@ -611,12 +609,16 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         }
     }
 
-    private bool IsKeyOfOtherEntityType(Guid key) => GetKeysOfOtherEntityTypes([key]).Count > 0;
-
-    private ISet<Guid> GetKeysOfOtherEntityTypes(IReadOnlyCollection<Guid> keys)
+    // A null cached under a key that another cache also reads would hide that cache's item. Elements read the
+    // same published and draft keys as documents; media reads only the published one.
+    private ISet<Guid> GetKeysSharingCacheKeysWithOtherEntityTypes(IReadOnlyCollection<Guid> keys, bool preview)
     {
+        ContentCacheDataSerializerEntityType entityTypes = preview
+            ? ContentCacheDataSerializerEntityType.Element
+            : ContentCacheDataSerializerEntityType.Media | ContentCacheDataSerializerEntityType.Element;
+
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        return _databaseCacheRepository.GetKeysOfOtherEntityTypes(keys, ContentCacheDataSerializerEntityType.Document);
+        return _databaseCacheRepository.GetKeysOfEntityTypes(keys, entityTypes);
     }
 
     private bool GetPreview() => _previewService.IsInPreview();

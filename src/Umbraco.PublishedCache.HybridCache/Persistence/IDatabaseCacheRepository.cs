@@ -216,12 +216,16 @@ internal interface IDatabaseCacheRepository
     IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType);
 
     /// <summary>
-    /// Gets the keys, from those given, that identify a node of an object type other than the one cached for an entity type.
+    /// Gets the keys, from those given, that identify a document, media item or element of one of the given entity types.
     /// </summary>
+    /// <remarks>
+    /// Documents, media and elements are cached under their keys in one HybridCache, so a cache checks this before
+    /// caching <c>null</c> for a key, to avoid hiding an item of another entity type that reads the same cache key.
+    /// </remarks>
     /// <param name="keys">The keys to check.</param>
-    /// <param name="entityType">The entity type whose object type the keys are compared with.</param>
-    /// <returns>The keys that identify a node of another object type. Keys that identify no node are not included.</returns>
-    ISet<Guid> GetKeysOfOtherEntityTypes(IReadOnlyCollection<Guid> keys, ContentCacheDataSerializerEntityType entityType);
+    /// <param name="entityTypes">The entity types to match, combined as flags.</param>
+    /// <returns>The keys that identify a node of one of the entity types.</returns>
+    ISet<Guid> GetKeysOfEntityTypes(IReadOnlyCollection<Guid> keys, ContentCacheDataSerializerEntityType entityTypes);
 
     /// <summary>
     /// Rebuilds the caches for content, media and/or elements based on the content type ids specified.

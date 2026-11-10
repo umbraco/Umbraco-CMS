@@ -122,7 +122,7 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
         // vs batched read count is what distinguishes the cold per-key path from the batched one.
         var repoMock = new Mock<IDatabaseCacheRepository>();
         repoMock
-            .Setup(r => r.GetKeysOfOtherEntityTypes(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<ContentCacheDataSerializerEntityType>()))
+            .Setup(r => r.GetKeysOfEntityTypes(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<ContentCacheDataSerializerEntityType>()))
             .Returns(new HashSet<Guid>());
         repoMock.Setup(r => r.GetDocumentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .Returns(async (Guid key, bool _) =>

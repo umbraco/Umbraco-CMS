@@ -428,26 +428,34 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc />
-    public ISet<Guid> GetKeysOfOtherEntityTypes(IReadOnlyCollection<Guid> keys, ContentCacheDataSerializerEntityType entityType)
+    public ISet<Guid> GetKeysOfEntityTypes(IReadOnlyCollection<Guid> keys, ContentCacheDataSerializerEntityType entityTypes)
     {
-        var otherKeys = new HashSet<Guid>();
-        if (keys.Count == 0)
+        var matchingKeys = new HashSet<Guid>();
+        Guid[] objectTypes = new[]
+            {
+                ContentCacheDataSerializerEntityType.Document,
+                ContentCacheDataSerializerEntityType.Media,
+                ContentCacheDataSerializerEntityType.Element,
+            }
+            .Where(entityType => entityTypes.HasFlag(entityType))
+            .Select(GetObjectType)
+            .ToArray();
+        if (keys.Count == 0 || objectTypes.Length == 0)
         {
-            return otherKeys;
+            return matchingKeys;
         }
 
-        Guid objectType = GetObjectType(entityType);
         foreach (IEnumerable<Guid> group in keys.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
             Sql<ISqlContext> sql = Sql()
                 .Select<NodeDto>(x => x.UniqueId)
                 .From<NodeDto>()
                 .WhereIn<NodeDto>(x => x.UniqueId, group)
-                .Where<NodeDto>(x => x.NodeObjectType != objectType);
-            otherKeys.UnionWith(Database.Fetch<Guid>(sql));
+                .WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
+            matchingKeys.UnionWith(Database.Fetch<Guid>(sql));
         }
 
-        return otherKeys;
+        return matchingKeys;
     }
 
     private static Guid GetObjectType(ContentCacheDataSerializerEntityType entityType)

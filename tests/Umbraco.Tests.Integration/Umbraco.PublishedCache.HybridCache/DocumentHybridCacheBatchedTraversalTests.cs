@@ -329,8 +329,8 @@ internal sealed class DocumentHybridCacheBatchedTraversalTests : UmbracoIntegrat
         public IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType)
             => _inner.GetContentByContentTypeKey(keys, entityType);
 
-        public ISet<Guid> GetKeysOfOtherEntityTypes(IReadOnlyCollection<Guid> keys, ContentCacheDataSerializerEntityType entityType)
-            => _inner.GetKeysOfOtherEntityTypes(keys, entityType);
+        public ISet<Guid> GetKeysOfEntityTypes(IReadOnlyCollection<Guid> keys, ContentCacheDataSerializerEntityType entityTypes)
+            => _inner.GetKeysOfEntityTypes(keys, entityTypes);
 
         public IEnumerable<Guid> GetDocumentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false)
             => _inner.GetDocumentKeysByContentTypeKeys(keys, published);
