@@ -10,6 +10,7 @@ let documentTypeId = '';
 const dataTypeName = 'Textstring';
 const editorAlias = 'Umbraco.TextBox';
 // Segments
+const vipMemberSegment = 'VIP members';
 const vipMemberSegmentAlias = 'vip-members';
 // Test Values
 const defaultSegmentValue = 'Default segment value';
@@ -21,7 +22,6 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'TestGroup', false, false, true, true, true);
   await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -34,9 +34,11 @@ test('cannot publish segment-only content when the mandatory default segment val
   const documentId = await umbracoApi.document.createDocumentWithMultipleSegmentValues(contentName, documentTypeId, dataTypeName, editorAlias, [
     {value: vipSegmentValue, segment: vipMemberSegmentAlias},
   ]);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
+  await umbracoUi.content.enterTextstring('');
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
@@ -45,21 +47,22 @@ test('cannot publish segment-only content when the mandatory default segment val
   expect(await umbracoApi.document.isDocumentPublished(documentId)).toBeFalsy();
 });
 
-test('can publish segment-only content with a mandatory property without a VIP segment value', async ({umbracoApi, umbracoUi}) => {
+test('cannot publish segment-only content when the mandatory VIP segment value is empty', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const documentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, defaultSegmentValue, dataTypeName);
+  const documentId = await umbracoApi.document.createDocumentWithMultipleSegmentValues(contentName, documentTypeId, dataTypeName, editorAlias, [
+    {value: defaultSegmentValue, segment: null},
+    {value: vipSegmentValue, segment: vipMemberSegmentAlias},
+  ]);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickSelectVariantButton();
+  await umbracoUi.content.clickSegmentVariantButton(vipMemberSegment);
 
   // Act
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+  await umbracoUi.content.enterTextstring('');
+  await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  expect(await umbracoApi.document.isDocumentPublished(documentId)).toBeTruthy();
-  const [publishedDefault, publishedVip] = await umbracoApi.document.getPublishedValuesByCultureAndSegmentForDocument(documentId, [
-    {culture: null, segment: null},
-    {culture: null, segment: vipMemberSegmentAlias},
-  ]);
-  expect(publishedDefault).toBeTruthy();
-  expect(publishedDefault.value).toBe(defaultSegmentValue);
-  expect(publishedVip).toBeFalsy();
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
+  expect(await umbracoApi.document.isDocumentPublished(documentId)).toBeFalsy();
 });

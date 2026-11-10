@@ -28,7 +28,6 @@ test.describe('publish content with segment-only variations', () => {
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'TestGroup', false, false, false, true, true);
     await umbracoUi.goToBackOffice();
-    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   });
 
   test.afterEach(async ({umbracoApi}) => {
@@ -44,6 +43,7 @@ test.describe('publish content with segment-only variations', () => {
     ]);
     await umbracoApi.document.publish(documentId);
     expect(await umbracoApi.document.isDocumentPublished(documentId)).toBeTruthy();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.content.goToContentWithName(contentName);
     await umbracoUi.content.clickSelectVariantButton();
     await umbracoUi.content.clickSegmentVariantButton(vipMemberSegment);
@@ -70,6 +70,7 @@ test.describe('publish content with segment-only variations', () => {
       {value: defaultSegmentValue, segment: null},
       {value: vipSegmentValue, segment: vipMemberSegmentAlias},
     ]);
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.content.goToContentWithName(contentName);
 
     // Act
@@ -95,6 +96,7 @@ test.describe('publish content with segment-only variations', () => {
       {value: vipSegmentValue, segment: vipMemberSegmentAlias},
     ]);
     await umbracoApi.document.publish(documentId);
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.content.goToContentWithName(contentName);
     await umbracoUi.content.clickSelectVariantButton();
     await umbracoUi.content.clickSegmentVariantButton(vipMemberSegment);
@@ -122,6 +124,7 @@ test.describe('publish content with segment-only variations', () => {
       {value: vipSegmentValue, segment: vipMemberSegmentAlias},
     ]);
     await umbracoApi.document.publish(documentId);
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
     // Act
     await umbracoUi.content.clickActionsMenuForContent(contentName);
@@ -150,7 +153,6 @@ test.describe('publish content with culture and segment variations', () => {
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'TestGroup', true, true, false, true, true);
     await umbracoUi.goToBackOffice();
-    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   });
 
   test.afterEach(async ({umbracoApi}) => {
@@ -166,6 +168,7 @@ test.describe('publish content with culture and segment variations', () => {
       {value: englishVipValue, culture: 'en-US', segment: vipMemberSegmentAlias},
       {value: danishDefaultValue, culture: 'da', segment: null},
     ]);
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.content.goToContentWithName(contentName);
     await umbracoUi.content.clickSelectVariantButton();
     await umbracoUi.content.clickExpandSegmentButton('English');

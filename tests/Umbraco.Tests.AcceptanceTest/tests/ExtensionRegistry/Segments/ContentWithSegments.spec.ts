@@ -240,6 +240,7 @@ test.describe('content with segment-only variations', () => {
         {value: vipSegmentValue, segment: vipMemberSegmentAlias},
       ]
     );
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.content.goToContentWithName(contentName);
     await umbracoUi.content.clickSelectVariantButton();
     await umbracoUi.content.clickSegmentVariantButton(vipMemberSegment);

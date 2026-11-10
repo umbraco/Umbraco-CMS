@@ -79,6 +79,7 @@ test('can only create a block in the VIP segment of a block list that varies by 
   // Act
   await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickBlockElementWithName(blockElementTypeName);
+  await umbracoUi.content.enterTextstring('');
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
   await umbracoUi.content.enterTextstring(vipBlockValue);
