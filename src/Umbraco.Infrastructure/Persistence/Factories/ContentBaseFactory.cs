@@ -64,6 +64,43 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
+    ///     Creates an <see cref="IElement" /> entity from the EF Core rows a read query returns for one version of an
+    ///     element (mirrors the NPoco <see cref="BuildEntity(ElementDto, IContentType?)" /> overload).
+    /// </summary>
+    /// <param name="dto">The element row, read for its node id and its published and edited flags.</param>
+    /// <param name="node">The node row.</param>
+    /// <param name="contentVersion">The content version row of the version being built.</param>
+    /// <param name="publishedContentVersion">
+    ///     The content version row of the published version, or <c>null</c> if the element has never been published.
+    /// </param>
+    /// <param name="contentType">The element type; required, an element cannot exist without one.</param>
+    /// <returns>An <see cref="IElement" /> instance populated from the rows.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="contentType" /> is <c>null</c>.</exception>
+    public static IElement BuildEntity(
+        EFCoreDtos.ElementDto dto,
+        EFCoreDtos.NodeDto node,
+        EFCoreDtos.ContentVersionDto contentVersion,
+        EFCoreDtos.ContentVersionDto? publishedContentVersion,
+        IContentType? contentType)
+    {
+        ArgumentNullException.ThrowIfNull(contentType);
+
+        var entity = new Element(node.Text ?? throw new ArgumentException("The element did not have a name", nameof(node)), contentType);
+
+        try
+        {
+            entity.DisableChangeTracking();
+            PopulatePublishableEntity(entity, dto, node, contentVersion, publishedContentVersion);
+            entity.ResetDirtyProperties(false);
+            return entity;
+        }
+        finally
+        {
+            entity.EnableChangeTracking();
+        }
+    }
+
+    /// <summary>
     ///     Constructs an Element item entity from the provided data transfer object (DTO) and content type.
     /// </summary>
     /// <param name="dto">The <see cref="ElementDto"/> containing the data for the element.</param>
@@ -397,6 +434,36 @@ internal sealed class ContentBaseFactory
         {
             Id = entity.VersionId,
             TemplateId = entity.TemplateId,
+            Published = publishing,
+        };
+
+    /// <summary>
+    ///     Builds the EF Core <see cref="EFCoreDtos.ElementDto"/> row inserted for a new <see cref="IElement"/> entity
+    ///     (mirrors the entity part of <see cref="BuildDto(IElement, Guid)"/>). The node, content and version rows
+    ///     persisted alongside it are built separately.
+    /// </summary>
+    /// <param name="entity">The element entity, with its id assigned.</param>
+    /// <param name="published">The published flag to persist.</param>
+    /// <param name="edited">The edited flag to persist.</param>
+    /// <returns>An EF Core <see cref="EFCoreDtos.ElementDto"/> for the specified element entity.</returns>
+    internal static EFCoreDtos.ElementDto BuildEFCoreElementDto(IElement entity, bool published, bool edited) =>
+        new()
+        {
+            NodeId = entity.Id,
+            Published = published,
+            Edited = edited,
+        };
+
+    /// <summary>
+    ///     Builds the EF Core <see cref="EFCoreDtos.ElementVersionDto"/> row for the entity's current version.
+    /// </summary>
+    /// <param name="entity">The element entity whose current version is being persisted.</param>
+    /// <param name="publishing">Whether that version is being published as part of the same save.</param>
+    /// <returns>An EF Core <see cref="EFCoreDtos.ElementVersionDto"/> for the entity's current version.</returns>
+    internal static EFCoreDtos.ElementVersionDto BuildEFCoreElementVersionDto(IElement entity, bool publishing) =>
+        new()
+        {
+            Id = entity.VersionId,
             Published = publishing,
         };
 
