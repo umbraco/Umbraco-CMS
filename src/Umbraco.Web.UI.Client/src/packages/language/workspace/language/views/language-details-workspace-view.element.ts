@@ -123,6 +123,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 						${this._isNew
 							? html` <umb-input-culture-select
 									value=${ifDefined(this._language?.unique)}
+									?readonly=${this._isReadOnly}
 									@change=${this.#handleCultureChange}></umb-input-culture-select>`
 							: this._language?.name}
 					</div>
