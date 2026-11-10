@@ -136,9 +136,9 @@ Detects transient Azure SQL errors for retry:
 SQL Server version detection and syntax generation:
 
 - **Engine editions**: Desktop, Standard, Enterprise, Express, Azure (lines 23-31)
-- **SQL Server versions**: V7 through V2025, plus Azure (lines 33-47)
-- **Default isolation**: `ReadCommitted` (line 69)
-- **Azure detection**: `ServerVersion?.IsAzure` determines `DbProvider` (line 67)
+- **SQL Server versions**: V7 through V2025, plus Azure (lines 33-49)
+- **Default isolation**: `ReadCommitted` (line 86)
+- **Azure detection**: `ServerVersion?.IsAzure` determines `DbProvider` (line 84)
 - **Version detection**: Populated via `GetDbProviderManifest()` by querying SQL Server metadata
 
 ---
@@ -153,8 +153,8 @@ SQL Server version detection and syntax generation:
 - Connection string generation
 
 **Known issues** (from TODO comments):
-- Line 358: Stale database handling not implemented
-- Line 359: File name assumptions may not always be correct
+- Line 359: Stale database handling not implemented
+- Line 360: File name assumptions may not always be correct
 
 ---
 
@@ -189,7 +189,7 @@ Test projects have access to internal types:
 
 2. **BulkInsert TODO** (`SqlServerBulkSqlInsertProvider.cs:44-46`): Custom `SqlBulkCopy` implementation used because NPoco's `InsertBulk` doesn't return record count. Performance comparison vs NPoco's DataTable approach pending.
 
-3. **LocalDB TODOs** (`LocalDb.cs:358-359`): Stale database cleanup and file name assumption handling incomplete.
+3. **LocalDB TODOs** (`LocalDb.cs:359-360`): Stale database cleanup and file name assumption handling incomplete.
 
 ### NPoco Bulk Extensions
 
