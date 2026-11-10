@@ -1,5 +1,5 @@
 import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
-import { CULTURES, CULTURE_EN, mbcsElementUdi, mbcsId } from './ids.js';
+import { CULTURES, mbcsElementUdi, mbcsId } from './ids.js';
 
 export type UmbMbcsValue = UmbMockDocumentModel['values'][number];
 
@@ -49,7 +49,7 @@ export const richTextValue = (
 				: {},
 			contentData: instances.map(toContentData),
 			settingsData: [],
-			expose: instances.flatMap(toExposeEntries),
+			expose: instances.flatMap((block) => toExposeEntries(block)),
 		},
 	});
 };
@@ -136,7 +136,7 @@ const flatten = (block: UmbMbcsBlockInstance): Array<UmbMbcsBlockInstance> => [
 
 /**
  * The Block Grid itself is invariant; text inside the blocks varies through the element types (block-level variation),
- * so blocks are only exposed in the default culture. The other cultures show the "create" placeholder for each block.
+ * so every block is exposed in each culture, unless a block grid limits it with `exposedCultures`.
  */
 const toContentData = (block: UmbMbcsBlockInstance) => ({
 	contentTypeKey: block.elementTypeId,
@@ -163,16 +163,21 @@ const toContentData = (block: UmbMbcsBlockInstance) => ({
 	),
 });
 
-const toExposeEntries = (block: UmbMbcsBlockInstance) => [{ contentKey: block.key, culture: CULTURE_EN, segment: null }];
+const toExposeEntries = (block: UmbMbcsBlockInstance, cultures: ReadonlyArray<string> = CULTURES) =>
+	cultures.map((culture) => ({ contentKey: block.key, culture, segment: null }));
 
-export const blockGridValue = (alias: string, blocks: Array<UmbMbcsBlock>): Array<UmbMbcsValue> => {
+export const blockGridValue = (
+	alias: string,
+	blocks: Array<UmbMbcsBlock>,
+	exposedCultures?: ReadonlyArray<string>,
+): Array<UmbMbcsValue> => {
 	const instances = blocks.map(withKeys);
 	const all = instances.flatMap(flatten);
 
 	return invariant('Umbraco.BlockGrid', alias, {
 		contentData: all.map(toContentData),
 		settingsData: [],
-		expose: all.flatMap(toExposeEntries),
+		expose: all.flatMap((block) => toExposeEntries(block, exposedCultures)),
 		layout: { 'Umbraco.BlockGrid': instances.map(toLayoutItem) },
 	});
 };
@@ -183,7 +188,7 @@ const toBlockListValue = (blocks: Array<UmbMbcsBlock>) => {
 	return {
 		contentData: instances.map(toContentData),
 		settingsData: [],
-		expose: instances.flatMap(toExposeEntries),
+		expose: instances.flatMap((block) => toExposeEntries(block)),
 		layout: {
 			'Umbraco.BlockList': instances.map((block) => ({
 				contentUdi: mbcsElementUdi(block.key),
