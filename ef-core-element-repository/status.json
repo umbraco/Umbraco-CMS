@@ -2,7 +2,7 @@
   "campaign": "Element repository and service from NPoco to EF Core",
   "targetBranch": "v18/feature/ef-core-repositories",
   "planFile": ".claude/campaign/ef-core-element-repository/CAMPAIGN.md",
-  "updated": "09-11-2026",
+  "updated": "10-11-2026",
   "artifact": {
     "url": "https://claude.ai/artifact/Q5Bttu57VfLyS1ajt7nKtU",
     "title": "Element Repository Campaign"
@@ -210,8 +210,8 @@
       "id": 4,
       "slug": "async-element-repository",
       "title": "AsyncElementRepository (additive)",
-      "status": "planned",
-      "branch": "",
+      "status": "in-progress",
+      "branch": "v20/feature/ef-core-element-repository-4-async-element-repository",
       "pr": "",
       "prUrl": "",
       "dependsOn": [
@@ -222,35 +222,43 @@
       "tasks": [
         {
           "text": "IAsyncElementRepository marker interface",
-          "done": false
+          "done": true
         },
         {
           "text": "AsyncElementRepository: BuildBaseQuery, factories, delete clauses, keys, IsPathPublishedAsync, refresh notification",
-          "done": false
+          "done": true
         },
         {
           "text": "ContentBaseFactory EF Core element builders",
-          "done": false
+          "done": true
         },
         {
           "text": "DI registration; resolvable through the container",
-          "done": false
+          "done": true
         },
         {
           "text": "28 NPoco ElementRepositoryTest tests ported (red first)",
-          "done": false
+          "done": true
         },
         {
           "text": "Element-specific tests: startElementId cleared, three-table delete, refresh notification, culture variations, recycle bin depth, paged-of-types, cache isolation",
-          "done": false
+          "done": true
         },
         {
           "text": "Contract check: no int ids, IQuery, out params or missing CancellationToken on the new repository surface",
-          "done": false
+          "done": true
+        },
+        {
+          "text": "Independent review: approve-after-fixes; the three test strengthenings applied (warm-cache clear, culture-variation rows in the delete test, recycle-bin depth + paging)",
+          "done": true
+        },
+        {
+          "text": "Fixture green on SQLite (30 tests); SQL Server run deferred to the pipeline",
+          "done": true
         }
       ],
       "acceptance": "New fixture green on both providers; Document fixtures unchanged.",
-      "notes": "Merge-up note 09-11-2026: the write hooks on EntityTypeContainerService are now GetContainedEntityAsync(IEntitySlim)/SaveContainedEntityAsync (element container service wraps the NPoco repository); IPublishableContentService gained GetPagedOfTypesAsync(Guid[] keys, skip, take, ordering, ct) with a bridge on the sync PublishableContentServiceBase that PR 5 removes; ContentSchedule carries IncludeInvariantForVariant and the EF Core schedule DTO/mapping already handle it; upstream's library-element search indexing (DraftContentChangeStrategy, ContentTypeIndexingService) calls IElementService async members, so PR 5 must keep GetByIdsAsync/GetPagedOfTypesAsync/GetContentSchedulesByKeysAsync."
+      "notes": "Merge-up note 09-11-2026: the write hooks on EntityTypeContainerService are now GetContainedEntityAsync(IEntitySlim)/SaveContainedEntityAsync (element container service wraps the NPoco repository); IPublishableContentService gained GetPagedOfTypesAsync(Guid[] keys, skip, take, ordering, ct) with a bridge on the sync PublishableContentServiceBase that PR 5 removes; ContentSchedule carries IncludeInvariantForVariant and the EF Core schedule DTO/mapping already handle it; upstream's library-element search indexing (DraftContentChangeStrategy, ContentTypeIndexingService) calls IElementService async members, so PR 5 must keep GetByIdsAsync/GetPagedOfTypesAsync/GetContentSchedulesByKeysAsync. Review 10-11-2026: production code approved as written; factory keeps the NPoco element builder's name source (node row, required) while the document builder reads the version row, matching each NPoco original. The local SQL Server run was skipped (no local server on this machine); the pipeline covers it. Awaiting the go-ahead to commit and open the PR."
     },
     {
       "id": 5,
@@ -302,7 +310,8 @@
           "done": false
         }
       ],
-      "acceptance": "No reference to the NPoco IElementRepository remains; every Element fixture green; unit tests green."
+      "acceptance": "No reference to the NPoco IElementRepository remains; every Element fixture green; unit tests green.",
+      "notes": "Reviewer note 10-11-2026: CheckDataIntegrityAsync's root-id list lacks Constants.System.RecycleBinElement; add it when ElementService moves onto the async engine."
     },
     {
       "id": 6,
@@ -346,6 +355,14 @@
     }
   ],
   "log": [
+    {
+      "date": "10-11-2026",
+      "text": "PR 4 implemented: IAsyncElementRepository, AsyncElementRepository (~180 lines over the hoisted base), element factory builders, DI registration, AsyncElementRepositoryTest (30 tests). Red proof on the user-group clause and the refresh notification. Independent review approve-after-fixes; three test strengthenings applied. Fixture green on SQLite (30 tests); full build clean; the SQL Server run is left to the pipeline. Not yet committed."
+    },
+    {
+      "date": "09-11-2026",
+      "text": "PR 4 started on v20/feature/ef-core-element-repository-4-async-element-repository, cut from the integration branch after the merge-up."
+    },
     {
       "date": "09-11-2026",
       "text": "v19/dev (fb17c75d01a, 300 commits) merged into v18/feature/ef-core-repositories: 36 conflicts resolved keeping the async form; ported by hand the includeInvariantForVariant schedule column (EF Core DTO + no-op snapshot migration AddIncludeInvariantForVariantToContentScheduleModel, enum 26), the scheduled-release flag in the async publish engine, the container-move hooks (now async, key-aware), the PropertyFactory equivalence check and the property-loader parameter guard; ~200 upstream test call sites ported to the async API. Audits clean; full rebuild clean; unit 7881 green; integration 868 + 588 targeted green; frontend build green. Merged as c6b0ec18aa5 and pushed."
