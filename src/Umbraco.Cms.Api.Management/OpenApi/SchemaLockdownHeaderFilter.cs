@@ -5,7 +5,6 @@ using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Management.SchemaLockdown;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.SchemaLockdown;
 
 namespace Umbraco.Cms.Api.Management.OpenApi;
 
@@ -21,10 +20,7 @@ internal sealed class SchemaLockdownHeaderFilter : IOperationFilter
     /// <inheritdoc />
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        // Reads are never denied.
-        (string EntityType, SchemaOperation Operation)[] deniable = Array.FindAll(
-            GovernedOperations(context),
-            x => x.Operation != SchemaOperation.Read);
+        string[] deniable = GovernedPermissions(context);
         if (deniable.Length == 0)
         {
             return;
@@ -51,15 +47,13 @@ internal sealed class SchemaLockdownHeaderFilter : IOperationFilter
             new OpenApiHeader
             {
                 Description =
-                    "Present when schema lockdown denied the request, naming the entity type and the operation it "
-                    + $"was denied for, for example \"{deniable[0].EntityType.ToLowerInvariant()}:"
-                    + $"{deniable[0].Operation.ToString().ToLowerInvariant()}\". Absent when the response has "
-                    + "another cause.",
+                    "Present when schema lockdown denied the request, naming the permission verb it was denied, for "
+                    + $"example \"{deniable[0]}\". Absent when the response has another cause.",
                 Schema = new OpenApiSchema { Type = JsonSchemaType.String },
             });
     }
 
-    private static (string EntityType, SchemaOperation Operation)[] GovernedOperations(OperationFilterContext context)
+    private static string[] GovernedPermissions(OperationFilterContext context)
     {
         if ((context.ApiDescription.ActionDescriptor as ControllerActionDescriptor)?
                 .ControllerTypeInfo
@@ -68,10 +62,8 @@ internal sealed class SchemaLockdownHeaderFilter : IOperationFilter
             return [];
         }
 
-        SchemaOperationAttribute[] declared = context.MethodInfo?
-            .GetCustomAttributes<SchemaOperationAttribute>()
-            .ToArray() ?? [];
+        SchemaOperationAttribute? declared = context.MethodInfo?.GetCustomAttribute<SchemaOperationAttribute>();
 
-        return SchemaOperationResolver.Resolve(governed.EntityTypes, declared, context.ApiDescription.HttpMethod);
+        return SchemaOperationResolver.ResolvePermissions(governed.EntityTypes, declared, context.ApiDescription.HttpMethod);
     }
 }

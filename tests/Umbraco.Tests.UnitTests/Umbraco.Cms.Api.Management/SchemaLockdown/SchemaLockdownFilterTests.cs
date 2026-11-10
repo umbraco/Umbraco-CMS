@@ -21,16 +21,16 @@ public class SchemaLockdownFilterTests
         {
         }
 
-        [SchemaOperation(SchemaOperation.Read)]
+        [SchemaOperation([])]
         public void PostButReadOnly()
         {
         }
     }
 
-    // A POST that updates the document type, while the template's operation comes from the verb.
+    // A POST that creates a template and updates the document type.
     private class TemplateForDocumentTypeController
     {
-        [SchemaOperation(Constants.UdiEntityType.DocumentType, SchemaOperation.Update)]
+        [SchemaOperation([Constants.Permissions.Template.Create, Constants.Permissions.DocumentType.Update])]
         public void Post()
         {
         }
@@ -39,13 +39,13 @@ public class SchemaLockdownFilterTests
     private sealed class LockDocumentTypes : ISchemaLockdownConfigurator
     {
         public void Configure(ISchemaRestrictionsBuilder builder)
-            => builder.BlockMutations(Constants.UdiEntityType.DocumentType);
+            => builder.Deny(Constants.Permissions.DocumentType.Create, Constants.Permissions.DocumentType.Update, Constants.Permissions.DocumentType.Delete);
     }
 
     private sealed class LockDocumentTypeCreationOnly : ISchemaLockdownConfigurator
     {
         public void Configure(ISchemaRestrictionsBuilder builder)
-            => builder.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Create);
+            => builder.Deny(Constants.Permissions.DocumentType.Create);
     }
 
     [Test]
@@ -99,7 +99,7 @@ public class SchemaLockdownFilterTests
     }
 
     [Test]
-    public async Task Declared_Read_Operation_Overrides_The_Post_Verb()
+    public async Task Declaring_No_Permissions_Overrides_The_Post_Verb()
     {
         AuthorizationFilterContext context = CreateContext(
             HttpMethods.Post,
@@ -112,7 +112,7 @@ public class SchemaLockdownFilterTests
     }
 
     [Test]
-    public async Task Denial_Names_The_Entity_Type_And_Operation()
+    public async Task Denial_Names_The_Denied_Permission()
     {
         AuthorizationFilterContext context = CreateContext(HttpMethods.Put, lockDocumentTypes: true);
 
@@ -120,11 +120,27 @@ public class SchemaLockdownFilterTests
 
         Assert.That(
             context.HttpContext.Response.Headers[Constants.Headers.SchemaLockdown].ToString(),
-            Is.EqualTo($"{Constants.UdiEntityType.DocumentType}:update"));
+            Is.EqualTo(Constants.Permissions.DocumentType.Update));
     }
 
     [Test]
-    public async Task Denial_Names_The_Entity_Type_In_Lower_Case_Whatever_Was_Declared()
+    public async Task An_Unrecognised_Verb_Is_Denied_As_An_Update()
+    {
+        AuthorizationFilterContext context = CreateContext(HttpMethods.Trace, lockDocumentTypes: true);
+
+        await CreateFilter().OnAuthorizationAsync(context);
+
+        Assert.Multiple(() =>
+        {
+            AssertForbidden(context);
+            Assert.That(
+                context.HttpContext.Response.Headers[Constants.Headers.SchemaLockdown].ToString(),
+                Is.EqualTo(Constants.Permissions.DocumentType.Update));
+        });
+    }
+
+    [Test]
+    public async Task Denial_Names_The_Permission_Whatever_Case_The_Entity_Type_Was_Declared_In()
     {
         AuthorizationFilterContext context = CreateContext(HttpMethods.Post, lockDocumentTypes: true);
 
@@ -132,7 +148,7 @@ public class SchemaLockdownFilterTests
 
         Assert.That(
             context.HttpContext.Response.Headers[Constants.Headers.SchemaLockdown].ToString(),
-            Is.EqualTo("document-type:create"));
+            Is.EqualTo(Constants.Permissions.DocumentType.Create));
     }
 
     [Test]
@@ -147,7 +163,7 @@ public class SchemaLockdownFilterTests
     }
 
     [Test]
-    public async Task Denial_Names_The_Entity_Type_That_Denied_It()
+    public async Task Denial_Names_The_Permission_Of_The_Entity_Type_That_Denied_It()
     {
         AuthorizationFilterContext context = CreateContext(HttpMethods.Post, lockDocumentTypes: true);
 
@@ -156,7 +172,7 @@ public class SchemaLockdownFilterTests
 
         Assert.That(
             context.HttpContext.Response.Headers[Constants.Headers.SchemaLockdown].ToString(),
-            Is.EqualTo($"{Constants.UdiEntityType.DocumentType}:create"));
+            Is.EqualTo(Constants.Permissions.DocumentType.Create));
     }
 
     [Test]
@@ -186,7 +202,7 @@ public class SchemaLockdownFilterTests
     }
 
     [Test]
-    public async Task An_Entity_Type_Without_A_Declaration_Falls_Back_To_The_Verb()
+    public async Task Every_Declared_Permission_Has_To_Be_Permitted()
     {
         AuthorizationFilterContext context = CreateContext(
             HttpMethods.Post,
@@ -201,14 +217,14 @@ public class SchemaLockdownFilterTests
             AssertForbidden(context);
             Assert.That(
                 context.HttpContext.Response.Headers[Constants.Headers.SchemaLockdown].ToString(),
-                Is.EqualTo($"{Constants.UdiEntityType.Template}:create"));
+                Is.EqualTo(Constants.Permissions.Template.Create));
         });
     }
 
     private sealed class LockTemplateCreation : ISchemaLockdownConfigurator
     {
         public void Configure(ISchemaRestrictionsBuilder builder)
-            => builder.Block(Constants.UdiEntityType.Template, SchemaOperation.Create);
+            => builder.Deny(Constants.Permissions.Template.Create);
     }
 
     private static AuthorizationFilterContext CreateContext(

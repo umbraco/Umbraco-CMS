@@ -5,15 +5,14 @@ using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Server;
 using Umbraco.Cms.Api.Management.ViewModels.Server;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.SchemaLockdown;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
 /// <summary>
-/// The endpoint reports each operation of a restricted entity type, so a partial lock reaches the backoffice.
+/// The endpoint reports only the permission verbs that were denied, so a partial lock reaches the backoffice.
 /// </summary>
-public class ReportedOperationsFollowWhatWasBlockedTests : SchemaLockdownApiTest<SchemaLockdownServerController>
+public class ReportedPermissionsFollowWhatWasBlockedTests : SchemaLockdownApiTest<SchemaLockdownServerController>
 {
     protected override Expression<Func<SchemaLockdownServerController, object>> MethodSelector { get; set; }
         = x => x.SchemaLockdown(CancellationToken.None);
@@ -22,7 +21,7 @@ public class ReportedOperationsFollowWhatWasBlockedTests : SchemaLockdownApiTest
         => builder.SchemaLockdownConfigurators().Add<LockDataTypeCreateAndUpdateConfigurator>();
 
     [Test]
-    public async Task Only_The_Blocked_Operations_Are_Reported_As_Denied()
+    public async Task Only_The_Denied_Permissions_Are_Reported()
     {
         HttpResponseMessage response = await Client.GetAsync(Url);
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -30,16 +29,10 @@ public class ReportedOperationsFollowWhatWasBlockedTests : SchemaLockdownApiTest
         ServerSchemaLockdownResponseModel? model =
             await response.Content.ReadFromJsonAsync<ServerSchemaLockdownResponseModel>();
 
-        ServerSchemaLockdownEntityTypeResponseModel? dataType = model?.RestrictedEntityTypes
-            .FirstOrDefault(x => x.EntityType == Constants.UdiEntityType.DataType);
-
-        Assert.That(dataType, Is.Not.Null);
-        Assert.Multiple(() =>
-        {
-            Assert.That(dataType!.Create, Is.False);
-            Assert.That(dataType.Update, Is.False);
-            Assert.That(dataType.Delete, Is.True);
-        });
+        Assert.That(model, Is.Not.Null);
+        Assert.That(
+            model!.DeniedPermissions,
+            Is.EquivalentTo(new[] { Constants.Permissions.DataType.Create, Constants.Permissions.DataType.Update }));
     }
 
     /// <summary>
@@ -49,6 +42,6 @@ public class ReportedOperationsFollowWhatWasBlockedTests : SchemaLockdownApiTest
     {
         /// <inheritdoc />
         public void Configure(ISchemaRestrictionsBuilder builder)
-            => builder.Block(Constants.UdiEntityType.DataType, SchemaOperation.Create, SchemaOperation.Update);
+            => builder.Deny(Constants.Permissions.DataType.Create, Constants.Permissions.DataType.Update);
     }
 }

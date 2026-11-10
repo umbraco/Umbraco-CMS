@@ -5062,7 +5062,7 @@ export class ServerService {
     /**
      * Gets the schema lockdown state.
      *
-     * Gets which schema operations are permitted for each entity type.
+     * Gets the permission verbs schema lockdown denies.
      */
     public static getServerSchemaLockdown<ThrowOnError extends boolean = true>(options?: Options<GetServerSchemaLockdownData, ThrowOnError>): RequestResult<GetServerSchemaLockdownResponses, GetServerSchemaLockdownErrors, ThrowOnError> {
         return (options?.client ?? client).get<GetServerSchemaLockdownResponses, GetServerSchemaLockdownErrors, ThrowOnError>({

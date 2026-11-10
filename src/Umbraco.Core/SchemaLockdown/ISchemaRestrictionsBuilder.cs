@@ -10,19 +10,13 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 public interface ISchemaRestrictionsBuilder : ISchemaRestrictions
 {
     /// <summary>
-    /// Denies the supplied operations on the supplied entity type.
+    /// Denies the supplied permission verbs.
     /// </summary>
     /// <remarks>
-    /// Only <see cref="SchemaOperation.Create"/>, <see cref="SchemaOperation.Update"/> and
-    /// <see cref="SchemaOperation.Delete"/> can be denied; any other operation is ignored.
+    /// A denial is enforced on the Management API endpoints that change the entity types they declare. Schema lockdown
+    /// governs only changes; reads are always permitted.
     /// </remarks>
-    /// <param name="entityType">The entity type, for example one of <see cref="Constants.UdiEntityType"/>.</param>
-    /// <param name="operations">The operations to deny.</param>
-    void Block(string entityType, params SchemaOperation[] operations);
-
-    /// <summary>
-    /// Denies creating, updating and deleting the supplied entity type.
-    /// </summary>
-    /// <param name="entityType">The entity type, for example one of <see cref="Constants.UdiEntityType"/>.</param>
-    void BlockMutations(string entityType);
+    /// <param name="permissions">The permission verbs, for example one of <see cref="Constants.Permissions"/>. Matched case-sensitively.</param>
+    /// <exception cref="ArgumentException">A permission verb is empty.</exception>
+    void Deny(params string[] permissions);
 }

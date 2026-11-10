@@ -1,13 +1,13 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.Server;
 
 /// <summary>
-/// Describes which schema operations are permitted.
+/// Describes which permissions schema lockdown denies.
 /// </summary>
 public class ServerSchemaLockdownResponseModel
 {
     /// <summary>
-    /// Gets or sets the permitted operations per restricted entity type, named in lower case. Entity types not listed
-    /// are permitted every operation.
+    /// Gets or sets the denied permission verbs, for example <c>Umb.DocumentType.Create</c>. Any verb not listed is
+    /// permitted.
     /// </summary>
-    public IEnumerable<ServerSchemaLockdownEntityTypeResponseModel> RestrictedEntityTypes { get; set; } = [];
+    public IEnumerable<string> DeniedPermissions { get; set; } = [];
 }

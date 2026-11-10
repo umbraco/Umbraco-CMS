@@ -6,7 +6,6 @@ using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.SchemaLockdown;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.SchemaLockdown;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Web.Common.Authorization;
 
@@ -41,7 +40,7 @@ public class AvailableCompositionMemberTypeController : MemberTypeControllerBase
     /// <returns>An <see cref="IActionResult"/> containing a collection of <see cref="AvailableMemberTypeCompositionResponseModel"/> representing the available member type compositions.</returns>
     [HttpPost("available-compositions")]
     [MapToApiVersion("1.0")]
-    [SchemaOperation(SchemaOperation.Read)]
+    [SchemaOperation([])]
     [ProducesResponseType(typeof(IEnumerable<AvailableMemberTypeCompositionResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets available compositions.")]
     [EndpointDescription("Gets a collection of member types that are available to use as compositions for the specified member type.")]

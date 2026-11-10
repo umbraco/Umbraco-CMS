@@ -6,7 +6,6 @@ using Umbraco.Cms.Api.Management.Controllers.Dictionary;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.SchemaLockdown;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
@@ -32,7 +31,7 @@ public class ImportingADictionaryItemIsForbiddenWhenUpdatesAreLockedTests : Sche
         Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.That(
             response.Headers.GetValues(Constants.Headers.SchemaLockdown),
-            Is.EqualTo(new[] { $"{Constants.UdiEntityType.DictionaryItem}:update" }));
+            Is.EqualTo(new[] { Constants.Permissions.DictionaryItem.Update }));
     }
 
     /// <summary>
@@ -42,6 +41,6 @@ public class ImportingADictionaryItemIsForbiddenWhenUpdatesAreLockedTests : Sche
     {
         /// <inheritdoc />
         public void Configure(ISchemaRestrictionsBuilder builder)
-            => builder.Block(Constants.UdiEntityType.DictionaryItem, SchemaOperation.Update);
+            => builder.Deny(Constants.Permissions.DictionaryItem.Update);
     }
 }

@@ -1,85 +1,62 @@
 using Microsoft.AspNetCore.Http;
-using Umbraco.Cms.Core.SchemaLockdown;
 
 namespace Umbraco.Cms.Api.Management.SchemaLockdown;
 
 /// <summary>
-/// Infers the <see cref="SchemaOperation"/> implied by an HTTP verb.
+/// Resolves the permission verbs a governed action needs.
 /// </summary>
 internal static class SchemaOperationResolver
 {
     /// <summary>
-    /// Resolves the operation inferred from an HTTP verb.
-    /// </summary>
-    /// <param name="httpMethod">The HTTP method the action responds to.</param>
-    /// <returns>The resolved operation, or <see cref="SchemaOperation.Unknown"/> for an unrecognised verb.</returns>
-    public static SchemaOperation Resolve(string? httpMethod)
-        => httpMethod is null ? SchemaOperation.Unknown : FromVerb(httpMethod);
-
-    /// <summary>
-    /// Resolves the operations each of an action's entity types is subject to.
+    /// Resolves the permission verbs an action needs.
     /// </summary>
     /// <param name="entityTypes">The entity types the action's controller manages.</param>
-    /// <param name="declared">The operations the action declares.</param>
+    /// <param name="declared">What the action declares, if anything.</param>
     /// <param name="httpMethod">The HTTP method the action responds to.</param>
-    /// <returns>Each entity type the controller declared, paired with each of its operations.</returns>
-    /// <remarks>
-    /// Declarations naming the entity type win, then declarations naming none, then the HTTP verb. An entity type's
-    /// operations are ordered by value, so which denial is reported doesn't depend on the order attributes are read in.
-    /// Both enforcement and the OpenAPI document use this, so they can't disagree.
-    /// </remarks>
-    public static (string EntityType, SchemaOperation Operation)[] Resolve(
+    /// <returns>The declared verbs, or else the HTTP verb's change on each entity type, in order.</returns>
+    /// <remarks>Both enforcement and the OpenAPI document use this, so they can't disagree.</remarks>
+    public static string[] ResolvePermissions(
         IReadOnlyList<string> entityTypes,
-        IReadOnlyList<SchemaOperationAttribute> declared,
-        string? httpMethod)
-        => entityTypes
-            .SelectMany(entityType => For(entityType, declared, httpMethod)
-                .Select(operation => (EntityType: entityType, Operation: operation)))
-            .ToArray();
-
-    private static SchemaOperation[] For(
-        string entityType,
-        IReadOnlyList<SchemaOperationAttribute> declared,
+        SchemaOperationAttribute? declared,
         string? httpMethod)
     {
-        SchemaOperation[] named =
-            Operations(declared, x => string.Equals(x.EntityType, entityType, StringComparison.OrdinalIgnoreCase));
-        if (named.Length > 0)
+        if (declared is not null)
         {
-            return named;
+            return declared.Permissions.Distinct(StringComparer.Ordinal).ToArray();
         }
 
-        SchemaOperation[] general = Operations(declared, x => x.EntityType is null);
-        return general.Length > 0 ? general : [Resolve(httpMethod)];
+        return ResolveFromHttpMethod(httpMethod) is SchemaOperation operation
+            ? entityTypes.Select(entityType => SchemaPermissions.For(entityType, operation)).ToArray()
+            : [];
     }
 
-    private static SchemaOperation[] Operations(
-        IReadOnlyList<SchemaOperationAttribute> declared,
-        Func<SchemaOperationAttribute, bool> applies)
-        => declared.Where(applies).Select(x => x.Operation).Distinct().Order().ToArray();
-
-    private static SchemaOperation FromVerb(string httpMethod)
+    /// <summary>
+    /// Resolves the change an HTTP verb makes.
+    /// </summary>
+    /// <param name="httpMethod">The HTTP method the action responds to.</param>
+    /// <returns>
+    /// <c>null</c> for GET, HEAD and OPTIONS, which change nothing. Otherwise the change: PUT, PATCH and any unrecognised
+    /// verb are treated as <see cref="SchemaOperation.Update"/>.
+    /// </returns>
+    private static SchemaOperation? ResolveFromHttpMethod(string? httpMethod)
     {
-        if (HttpMethods.IsGet(httpMethod) || HttpMethods.IsHead(httpMethod) || HttpMethods.IsOptions(httpMethod))
+        var method = httpMethod ?? string.Empty;
+
+        if (HttpMethods.IsGet(method) || HttpMethods.IsHead(method) || HttpMethods.IsOptions(method))
         {
-            return SchemaOperation.Read;
+            return null;
         }
 
-        if (HttpMethods.IsPost(httpMethod))
+        if (HttpMethods.IsPost(method))
         {
             return SchemaOperation.Create;
         }
 
-        if (HttpMethods.IsPut(httpMethod) || HttpMethods.IsPatch(httpMethod))
-        {
-            return SchemaOperation.Update;
-        }
-
-        if (HttpMethods.IsDelete(httpMethod))
+        if (HttpMethods.IsDelete(method))
         {
             return SchemaOperation.Delete;
         }
 
-        return SchemaOperation.Unknown;
+        return SchemaOperation.Update;
     }
 }

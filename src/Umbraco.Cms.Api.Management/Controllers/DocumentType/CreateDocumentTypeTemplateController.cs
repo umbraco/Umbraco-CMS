@@ -6,7 +6,6 @@ using Umbraco.Cms.Api.Management.Controllers.Template;
 using Umbraco.Cms.Api.Management.SchemaLockdown;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.SchemaLockdown;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -47,8 +46,7 @@ public class CreateDocumentTypeTemplateController : DocumentTypeControllerBase
     /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
     [HttpPost("{id:guid}/template")]
     [MapToApiVersion("1.0")]
-    [SchemaOperation(Constants.UdiEntityType.Template, SchemaOperation.Create)]
-    [SchemaOperation(Constants.UdiEntityType.DocumentType, SchemaOperation.Update)]
+    [SchemaOperation([Constants.Permissions.Template.Create, Constants.Permissions.DocumentType.Update])]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [EndpointSummary("Creates a template for a document type.")]

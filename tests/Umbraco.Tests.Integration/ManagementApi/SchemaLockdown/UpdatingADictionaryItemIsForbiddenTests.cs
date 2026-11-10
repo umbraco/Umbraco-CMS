@@ -5,7 +5,6 @@ using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Dictionary;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.SchemaLockdown;
 using Umbraco.Cms.Core.Services;
@@ -64,6 +63,6 @@ public class UpdatingADictionaryItemIsForbiddenTests : SchemaLockdownApiTest<Upd
     {
         /// <inheritdoc />
         public void Configure(ISchemaRestrictionsBuilder builder)
-            => builder.BlockMutations(Constants.UdiEntityType.DictionaryItem);
+            => builder.Deny(Constants.Permissions.DictionaryItem.Create, Constants.Permissions.DictionaryItem.Update, Constants.Permissions.DictionaryItem.Delete);
     }
 }

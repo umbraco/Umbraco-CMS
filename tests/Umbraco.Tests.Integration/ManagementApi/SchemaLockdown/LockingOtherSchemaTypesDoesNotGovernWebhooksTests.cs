@@ -5,7 +5,6 @@ using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Webhook;
 using Umbraco.Cms.Api.Management.ViewModels.Webhook;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.SchemaLockdown;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
@@ -40,23 +39,26 @@ public class LockingOtherSchemaTypesDoesNotGovernWebhooksTests : SchemaLockdownA
     /// </summary>
     private sealed class LockOtherSchemaTypesConfigurator : ISchemaLockdownConfigurator
     {
-        private static readonly string[] EntityTypes =
-        [
-            Constants.UdiEntityType.DocumentType,
-            Constants.UdiEntityType.MediaType,
-            Constants.UdiEntityType.MemberType,
-            Constants.UdiEntityType.DataType,
-            Constants.UdiEntityType.DictionaryItem,
-            Constants.UdiEntityType.Language,
-        ];
-
         /// <inheritdoc />
         public void Configure(ISchemaRestrictionsBuilder builder)
-        {
-            foreach (var entityType in EntityTypes)
-            {
-                builder.BlockMutations(entityType);
-            }
-        }
+            => builder.Deny(
+                Constants.Permissions.DocumentType.Create,
+                Constants.Permissions.DocumentType.Update,
+                Constants.Permissions.DocumentType.Delete,
+                Constants.Permissions.MediaType.Create,
+                Constants.Permissions.MediaType.Update,
+                Constants.Permissions.MediaType.Delete,
+                Constants.Permissions.MemberType.Create,
+                Constants.Permissions.MemberType.Update,
+                Constants.Permissions.MemberType.Delete,
+                Constants.Permissions.DataType.Create,
+                Constants.Permissions.DataType.Update,
+                Constants.Permissions.DataType.Delete,
+                Constants.Permissions.DictionaryItem.Create,
+                Constants.Permissions.DictionaryItem.Update,
+                Constants.Permissions.DictionaryItem.Delete,
+                Constants.Permissions.Language.Create,
+                Constants.Permissions.Language.Update,
+                Constants.Permissions.Language.Delete);
     }
 }

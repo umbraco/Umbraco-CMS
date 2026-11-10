@@ -7,13 +7,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.SchemaLockdown;
 [TestFixture]
 public class SchemaRestrictionsTests
 {
-    private static readonly string[] EntityTypes =
-    [
-        Constants.UdiEntityType.DocumentType,
-        Constants.UdiEntityType.DataType,
-        Constants.UdiEntityType.DictionaryItem,
-    ];
-
     private sealed class DelegateConfigurator : ISchemaLockdownConfigurator
     {
         private readonly Action<ISchemaRestrictionsBuilder> _configure;
@@ -28,31 +21,28 @@ public class SchemaRestrictionsTests
             () => configure.Select(ISchemaLockdownConfigurator (x) => new DelegateConfigurator(x))));
 
     [Test]
-    public void Nothing_Is_Locked_When_No_Configurator_Is_Registered()
+    public void Nothing_Is_Denied_When_No_Configurator_Is_Registered()
     {
         SchemaRestrictions restrictions = CreateRestrictions();
 
         Assert.Multiple(() =>
         {
-            foreach (var entityType in EntityTypes)
-            {
-                Assert.That(restrictions.IsAllowed(entityType, SchemaOperation.Create), Is.True);
-                Assert.That(restrictions.IsAllowed(entityType, SchemaOperation.Update), Is.True);
-                Assert.That(restrictions.IsAllowed(entityType, SchemaOperation.Delete), Is.True);
-            }
+            Assert.That(restrictions.DeniedPermissions, Is.Empty);
+            Assert.That(restrictions.IsDenied(Constants.Permissions.DocumentType.Create), Is.False);
         });
     }
 
     [Test]
-    public void Only_The_Entity_Types_A_Configurator_Names_Are_Locked()
+    public void Only_The_Permissions_A_Configurator_Names_Are_Denied()
     {
-        SchemaRestrictions restrictions = CreateRestrictions(x => x.BlockMutations(Constants.UdiEntityType.DocumentType));
+        SchemaRestrictions restrictions = CreateRestrictions(x => x.Deny(Constants.Permissions.DocumentType.Create));
 
         Assert.Multiple(() =>
         {
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Create), Is.False);
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Read), Is.True);
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DataType, SchemaOperation.Create), Is.True);
+            Assert.That(restrictions.IsDenied(Constants.Permissions.DocumentType.Create), Is.True);
+            Assert.That(restrictions.IsDenied(Constants.Permissions.DocumentType.Update), Is.False);
+            Assert.That(restrictions.IsDenied(Constants.Permissions.DataType.Create), Is.False);
+            Assert.That(restrictions.DeniedPermissions, Is.EquivalentTo(new[] { Constants.Permissions.DocumentType.Create }));
         });
     }
 
@@ -60,178 +50,70 @@ public class SchemaRestrictionsTests
     public void Every_Configurators_Denials_Are_Kept_Whatever_The_Order()
     {
         SchemaRestrictions restrictions = CreateRestrictions(
-            x => x.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete),
-            x => x.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Create),
-            x => x.Block(Constants.UdiEntityType.DataType, SchemaOperation.Update));
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete), Is.False);
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Create), Is.False);
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Update), Is.True);
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DataType, SchemaOperation.Update), Is.False);
-        });
-    }
-
-    [Test]
-    public void Several_Operations_Can_Be_Denied_In_One_Call()
-    {
-        SchemaRestrictions restrictions = CreateRestrictions(
-            x => x.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Create, SchemaOperation.Delete));
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Create), Is.False);
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete), Is.False);
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Update), Is.True);
-        });
-    }
-
-    [Test]
-    public void Blocking_The_Same_Operation_Twice_Is_Harmless()
-    {
-        SchemaRestrictions restrictions = CreateRestrictions(
-            x => x.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete),
-            x => x.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete));
-
-        Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete), Is.False);
-    }
-
-    [Test]
-    public void Cells_Are_Independent()
-    {
-        SchemaRestrictions restrictions = CreateRestrictions(x => x.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Create));
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Create), Is.False);
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete), Is.True);
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DataType, SchemaOperation.Create), Is.True);
-        });
-    }
-
-    [Test]
-    public void BlockMutations_Blocks_Every_Operation_Except_Read()
-    {
-        SchemaRestrictions restrictions = CreateRestrictions(x => x.BlockMutations(Constants.UdiEntityType.DocumentType));
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Create), Is.False);
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Update), Is.False);
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete), Is.False);
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Unknown), Is.False);
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Read), Is.True);
-        });
-    }
-
-    [Test]
-    public void Cell_Lookup_Is_Case_Insensitive_On_Entity_Type()
-    {
-        SchemaRestrictions restrictions = CreateRestrictions(x => x.Block("Dictionary-Item", SchemaOperation.Update));
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(restrictions.IsAllowed("dictionary-item", SchemaOperation.Update), Is.False);
-            Assert.That(restrictions.IsAllowed("Dictionary-Item", SchemaOperation.Update), Is.False);
-            Assert.That(restrictions.IsAllowed("DICTIONARY-ITEM", SchemaOperation.Unknown), Is.False);
-            Assert.That(restrictions.RestrictedEntityTypes, Is.EquivalentTo(new[] { "Dictionary-Item" }));
-        });
-    }
-
-    [Test]
-    public void Unknown_Is_Blocked_Wherever_Any_Operation_Is_Blocked()
-    {
-        SchemaRestrictions single = CreateRestrictions(x => x.Block(Constants.UdiEntityType.DataType, SchemaOperation.Create));
-        SchemaRestrictions all = CreateRestrictions(x => x.BlockMutations(Constants.UdiEntityType.DataType));
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(single.IsAllowed(Constants.UdiEntityType.DataType, SchemaOperation.Unknown), Is.False);
-            Assert.That(all.IsAllowed(Constants.UdiEntityType.DataType, SchemaOperation.Unknown), Is.False);
-        });
-    }
-
-    [Test]
-    public void Unknown_Stays_Permitted_On_An_Entity_Type_Nothing_Is_Blocked_On()
-    {
-        SchemaRestrictions restrictions = CreateRestrictions(x => x.BlockMutations(Constants.UdiEntityType.DocumentType));
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DataType, SchemaOperation.Unknown), Is.True);
-            Assert.That(CreateRestrictions().IsAllowed(Constants.UdiEntityType.DataType, SchemaOperation.Unknown), Is.True);
-        });
-    }
-
-    [Test]
-    public void Reads_Stay_Permitted_Whatever_A_Configurator_Writes()
-    {
-        SchemaRestrictions restrictions = CreateRestrictions(
-            x => x.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Read),
-            x => x.BlockMutations(Constants.UdiEntityType.DocumentType),
-            x => x.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Read));
-
-        Assert.Multiple(() =>
-        {
-            foreach (var entityType in EntityTypes)
-            {
-                Assert.That(restrictions.IsAllowed(entityType, SchemaOperation.Read), Is.True);
-            }
-        });
-    }
-
-    [Test]
-    public void Restricted_Entity_Types_Are_Empty_When_No_Configurator_Is_Registered()
-        => Assert.That(CreateRestrictions().RestrictedEntityTypes, Is.Empty);
-
-    [Test]
-    public void Restricted_Entity_Types_Are_Only_Those_A_Configurator_Blocked_Something_On()
-    {
-        SchemaRestrictions restrictions = CreateRestrictions(
-            x => x.BlockMutations(Constants.UdiEntityType.DocumentType),
-            x => x.Block(Constants.UdiEntityType.DataType, SchemaOperation.Delete),
-            x => x.Block(Constants.UdiEntityType.MediaType, SchemaOperation.Read));
+            x => x.Deny(Constants.Permissions.DocumentType.Delete),
+            x => x.Deny(Constants.Permissions.DocumentType.Create),
+            x => x.Deny(Constants.Permissions.DataType.Update));
 
         Assert.That(
-            restrictions.RestrictedEntityTypes,
-            Is.EquivalentTo(new[] { Constants.UdiEntityType.DocumentType, Constants.UdiEntityType.DataType }));
+            restrictions.DeniedPermissions,
+            Is.EquivalentTo(new[]
+            {
+                Constants.Permissions.DocumentType.Delete,
+                Constants.Permissions.DocumentType.Create,
+                Constants.Permissions.DataType.Update,
+            }));
     }
 
     [Test]
-    public void An_Entity_Type_Is_Restricted_Only_When_A_Configurator_Blocked_Something_On_It()
+    public void Denying_The_Same_Permission_Twice_Lists_It_Once()
     {
         SchemaRestrictions restrictions = CreateRestrictions(
-            x => x.Block(Constants.UdiEntityType.DataType, SchemaOperation.Delete),
-            x => x.Block(Constants.UdiEntityType.MediaType, SchemaOperation.Read));
+            x => x.Deny(Constants.Permissions.DataType.Create, Constants.Permissions.DataType.Delete),
+            x => x.Deny(Constants.Permissions.DataType.Delete));
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(restrictions.IsRestricted(Constants.UdiEntityType.DataType), Is.True);
-            Assert.That(restrictions.IsRestricted(Constants.UdiEntityType.DataType.ToUpperInvariant()), Is.True);
-            Assert.That(restrictions.IsRestricted(Constants.UdiEntityType.MediaType), Is.False);
-            Assert.That(restrictions.IsRestricted(Constants.UdiEntityType.DocumentType), Is.False);
-        });
+        Assert.That(
+            restrictions.DeniedPermissions,
+            Is.EquivalentTo(new[] { Constants.Permissions.DataType.Create, Constants.Permissions.DataType.Delete }));
     }
 
     [Test]
-    public void Restricted_Entity_Types_Are_Visible_To_A_Configurator_Still_Running()
+    public void A_Permission_For_An_Entity_Type_Umbraco_Does_Not_Define_Can_Be_Denied()
+    {
+        SchemaRestrictions restrictions = CreateRestrictions(x => x.Deny("Umb.MyWidget.Delete"));
+
+        Assert.That(restrictions.IsDenied("Umb.MyWidget.Delete"), Is.True);
+    }
+
+    [Test]
+    public void Permissions_Are_Matched_Case_Sensitively()
+    {
+        SchemaRestrictions restrictions = CreateRestrictions(x => x.Deny(Constants.Permissions.DocumentType.Create));
+
+        Assert.That(restrictions.IsDenied(Constants.Permissions.DocumentType.Create.ToLowerInvariant()), Is.False);
+    }
+
+    [TestCase("")]
+    [TestCase(" ")]
+    public void Denying_An_Empty_Permission_Throws(string permission)
+        => Assert.Throws<ArgumentException>(() => CreateRestrictions(x => x.Deny(permission)));
+
+    [Test]
+    public void Denied_Permissions_Are_Visible_To_A_Configurator_Still_Running()
     {
         string[]? seen = null;
 
         CreateRestrictions(
-            x => x.BlockMutations(Constants.UdiEntityType.DocumentType),
-            x => seen = x.RestrictedEntityTypes.ToArray());
+            x => x.Deny(Constants.Permissions.DocumentType.Create),
+            x => seen = x.DeniedPermissions.ToArray());
 
-        Assert.That(seen, Is.EquivalentTo(new[] { Constants.UdiEntityType.DocumentType }));
+        Assert.That(seen, Is.EquivalentTo(new[] { Constants.Permissions.DocumentType.Create }));
     }
 
     [Test]
-    public void Mutating_After_Construction_Throws()
+    public void Denying_After_Construction_Throws()
     {
-        SchemaRestrictions restrictions = CreateRestrictions(x => x.BlockMutations(Constants.UdiEntityType.DocumentType));
+        SchemaRestrictions restrictions = CreateRestrictions(x => x.Deny(Constants.Permissions.DocumentType.Create));
 
-        Assert.Throws<InvalidOperationException>(
-            () => restrictions.Block(Constants.UdiEntityType.DataType, SchemaOperation.Create));
+        Assert.Throws<InvalidOperationException>(() => restrictions.Deny(Constants.Permissions.DataType.Create));
     }
 }
