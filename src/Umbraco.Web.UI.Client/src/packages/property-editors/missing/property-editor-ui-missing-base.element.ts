@@ -76,7 +76,7 @@ export class UmbPropertyEditorUIMissingBaseElement extends UmbLitElement impleme
 			</p>
 			<p>
 				<strong><umb-localize key="missingEditor_detailsDataType"></umb-localize></strong>:
-				<code>${this._dataTypeDetailModel?.name}</code><br />
+				<code dir="auto">${this._dataTypeDetailModel?.name}</code><br />
 				<strong><umb-localize key="missingEditor_detailsPropertyEditor"></umb-localize></strong>:
 				<code>${this._dataTypeDetailModel?.editorAlias}</code>
 				${this._displayPropertyEditorUi

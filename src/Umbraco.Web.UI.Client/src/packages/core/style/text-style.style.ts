@@ -17,7 +17,7 @@ export const UmbTextStyles = css`
 		border-top: 1px solid var(--uui-color-border);
 	}
 
-	code {
+	code:not([dir]) {
 		direction: ltr;
 		unicode-bidi: isolate;
 	}

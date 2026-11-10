@@ -103,4 +103,16 @@ describe('UmbSortableListElement', () => {
 		expect(style.direction).to.equal('ltr');
 		expect(style.unicodeBidi).to.equal('isolate');
 	});
+
+	it('leaves the direction of inline code with a dir attribute to that attribute', async () => {
+		const container = await fixture<HTMLDivElement>(html`<div dir="rtl"><umb-sortable-list></umb-sortable-list></div>`);
+		const list = container.querySelector<UmbSortableListElement<string>>('umb-sortable-list')!;
+		list.getUnique = getUnique;
+		list.renderMethod = (item) =>
+			html`<umb-sortable-list-item .unique=${item}><code dir="auto">${item}</code></umb-sortable-list-item>`;
+		list.items = ['اسم'];
+		await list.updateComplete;
+
+		expect(getComputedStyle(list.shadowRoot!.querySelector('code')!).direction).to.equal('rtl');
+	});
 });

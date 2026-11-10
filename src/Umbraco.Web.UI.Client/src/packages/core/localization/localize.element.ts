@@ -66,7 +66,7 @@ export class UmbLocalizeElement extends UmbLitElement {
 				display: contents;
 			}
 
-			code {
+			code:not([dir]) {
 				direction: ltr;
 				unicode-bidi: isolate;
 			}

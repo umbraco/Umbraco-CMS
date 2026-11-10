@@ -156,7 +156,7 @@ export class UmbSortableListElement<T = unknown> extends UmbLitElement {
 				border: 2px solid var(--uui-color-interactive-emphasis);
 			}
 
-			code {
+			code:not([dir]) {
 				direction: ltr;
 				unicode-bidi: isolate;
 			}
