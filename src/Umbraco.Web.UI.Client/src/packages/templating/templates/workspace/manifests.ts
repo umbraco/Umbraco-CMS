@@ -1,8 +1,4 @@
-import {
-	UMB_WORKSPACE_CONDITION_ALIAS,
-	UmbSubmitWorkspaceAction,
-	UMB_WORKSPACE_ENTITY_IS_READ_ONLY_CONDITION_ALIAS,
-} from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction, UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
 
 export const UMB_TEMPLATE_WORKSPACE_ALIAS = 'Umb.Workspace.Template';
@@ -49,10 +45,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: '#buttons_save',
 		},
 		conditions: [
-			{
-				alias: UMB_WORKSPACE_ENTITY_IS_READ_ONLY_CONDITION_ALIAS,
-				match: false,
-			},
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_TEMPLATE_WORKSPACE_ALIAS,

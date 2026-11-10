@@ -5,11 +5,7 @@ import type {
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/workspace';
-import {
-	UmbSubmitWorkspaceAction,
-	UMB_WORKSPACE_CONDITION_ALIAS,
-	UMB_WORKSPACE_ENTITY_IS_READ_ONLY_CONDITION_ALIAS,
-} from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction, UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 const workspace: ManifestWorkspaces = {
 	type: 'workspace',
@@ -35,10 +31,6 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 			color: 'positive',
 		},
 		conditions: [
-			{
-				alias: UMB_WORKSPACE_ENTITY_IS_READ_ONLY_CONDITION_ALIAS,
-				match: false,
-			},
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_MEMBER_GROUP_WORKSPACE_ALIAS,
