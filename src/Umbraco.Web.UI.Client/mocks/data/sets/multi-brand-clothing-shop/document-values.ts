@@ -1,5 +1,5 @@
 import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
-import { CULTURES, mbcsElementUdi, mbcsId } from './ids.js';
+import { CULTURES, CULTURE_EN, mbcsElementUdi, mbcsId } from './ids.js';
 
 export type UmbMbcsValue = UmbMockDocumentModel['values'][number];
 
@@ -136,7 +136,7 @@ const flatten = (block: UmbMbcsBlockInstance): Array<UmbMbcsBlockInstance> => [
 
 /**
  * The Block Grid itself is invariant; text inside the blocks varies through the element types (block-level variation),
- * so every block is exposed in each culture.
+ * so blocks are only exposed in the default culture. The other cultures show the "create" placeholder for each block.
  */
 const toContentData = (block: UmbMbcsBlockInstance) => ({
 	contentTypeKey: block.elementTypeId,
@@ -163,8 +163,7 @@ const toContentData = (block: UmbMbcsBlockInstance) => ({
 	),
 });
 
-const toExposeEntries = (block: UmbMbcsBlockInstance) =>
-	CULTURES.map((culture) => ({ contentKey: block.key, culture, segment: null }));
+const toExposeEntries = (block: UmbMbcsBlockInstance) => [{ contentKey: block.key, culture: CULTURE_EN, segment: null }];
 
 export const blockGridValue = (alias: string, blocks: Array<UmbMbcsBlock>): Array<UmbMbcsValue> => {
 	const instances = blocks.map(withKeys);
