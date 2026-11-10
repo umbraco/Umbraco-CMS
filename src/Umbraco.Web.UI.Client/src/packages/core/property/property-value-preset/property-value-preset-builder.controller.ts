@@ -9,13 +9,23 @@ import type {
 	UmbPropertyValuePresetApiCallArgsEntityBase,
 } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionApisCacheIndex } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+
+type UmbPropertyValuePresetLookupKey = { schemaAlias?: string; uiAlias: string };
 
 export class UmbPropertyValuePresetBuilderController<
 	ReturnType extends UmbPropertyValueData = UmbPropertyValueData | UmbPropertyValueDataPotentiallyWithEditorAlias,
 > extends UmbControllerBase {
+	#presets = new UmbExtensionApisCacheIndex<ManifestPropertyValuePreset, UmbPropertyValuePresetLookupKey>(
+		this,
+		'propertyValuePreset',
+		// A preset applies when registered for the UI alias, or, if the property type has a schema alias, for the schema alias.
+		(manifest, key) =>
+			manifest.forPropertyEditorUiAlias === key.uiAlias ||
+			(!!key.schemaAlias && manifest.forPropertyEditorSchemaAlias === key.schemaAlias),
+		(key) => JSON.stringify([key.schemaAlias ?? null, key.uiAlias]),
+	);
 	#baseCreateArgs?: UmbPropertyValuePresetApiCallArgsEntityBase;
 	#hasCreated = false;
 	#existingValuesIndex?: UmbPropertyValueIndex<ReturnType>;
@@ -97,28 +107,10 @@ export class UmbPropertyValuePresetBuilderController<
 			throw new Error(`propertyEditorUiAlias was not defined in ${propertyType}`);
 		}
 
-		let filter: (x: ManifestPropertyValuePreset) => boolean;
-		if (editorAlias && editorUiAlias) {
-			filter = (x) => x.forPropertyEditorSchemaAlias === editorAlias || x.forPropertyEditorUiAlias === editorUiAlias;
-		} else {
-			filter = (x) => x.forPropertyEditorUiAlias === editorUiAlias;
-		}
-
-		// Find a preset for this editor alias:
-		const manifests = umbExtensionsRegistry.getByTypeAndFilter('propertyValuePreset', filter);
-
-		const apis = (
-			await Promise.all(
-				manifests.map((m) =>
-					createExtensionApi(this, m).then((api) => {
-						if (api) {
-							(api as any).manifest = m;
-						}
-						return api;
-					}),
-				),
-			)
-		).filter((x) => x !== undefined) as Array<UmbPropertyValuePreset>;
+		const apis: Array<UmbPropertyValuePreset> = await this.#presets.createApis({
+			schemaAlias: editorAlias,
+			uiAlias: editorUiAlias,
+		});
 
 		const result = await this._generatePropertyValues(apis, propertyType);
 

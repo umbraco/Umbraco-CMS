@@ -1,4 +1,4 @@
-import { UmbExtensionApiCacheIndex } from './extension-api-cache-index.class.js';
+import { UmbExtensionApiCacheIndex } from './extension-api-cache-index.controller.js';
 import { expect, fixture } from '@open-wc/testing';
 import type { ManifestApi, UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
@@ -94,6 +94,31 @@ describe('UmbExtensionApiCacheIndex', () => {
 
 			expect(index.getManifest(20)?.alias).to.equal(aliases[1]);
 			expect(index.getManifest(30)).to.be.undefined;
+		});
+
+		it('caches by the value of the cache key function, not by the key itself', () => {
+			const index = new UmbExtensionApiCacheIndex<TestManifest, { group: string }>(
+				host,
+				'test-extension-api-cache-index',
+				(manifest, key) => manifest.forGroup === key.group,
+				(key) => key.group,
+			);
+			const original = umbExtensionsRegistry.getByTypeAndFilter;
+			let searches = 0;
+			umbExtensionsRegistry.getByTypeAndFilter = function (this: unknown, ...args: Array<never>) {
+				searches++;
+				return (original as (...a: Array<never>) => unknown).apply(umbExtensionsRegistry, args);
+			} as typeof original;
+
+			try {
+				expect(index.getManifest({ group: 'group-a' })?.alias).to.equal(aliases[0]);
+				expect(index.getManifest({ group: 'group-a' })?.alias).to.equal(aliases[0]);
+				expect(index.getManifest({ group: 'group-b' })?.alias).to.equal(aliases[1]);
+			} finally {
+				umbExtensionsRegistry.getByTypeAndFilter = original;
+			}
+
+			expect(searches).to.equal(2);
 		});
 
 		it('searches the registry once per key, also when nothing is found', () => {
