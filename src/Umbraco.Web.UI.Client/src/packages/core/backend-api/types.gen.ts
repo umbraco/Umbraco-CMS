@@ -2496,10 +2496,6 @@ export type ServerInformationResponseModel = {
     isDebugMode: boolean;
 };
 
-export type ServerSchemaLockdownResponseModel = {
-    deniedPermissions: Array<string>;
-};
-
 export type ServerStatusResponseModel = {
     serverStatus: RuntimeLevelModel;
 };
@@ -15200,29 +15196,6 @@ export type GetServerInformationResponses = {
 };
 
 export type GetServerInformationResponse = GetServerInformationResponses[keyof GetServerInformationResponses];
-
-export type GetServerSchemaLockdownData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/management/api/v1/server/schema-lockdown';
-};
-
-export type GetServerSchemaLockdownErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetServerSchemaLockdownResponses = {
-    /**
-     * OK
-     */
-    200: ServerSchemaLockdownResponseModel;
-};
-
-export type GetServerSchemaLockdownResponse = GetServerSchemaLockdownResponses[keyof GetServerSchemaLockdownResponses];
 
 export type GetServerStatusData = {
     body?: never;
