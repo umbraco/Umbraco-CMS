@@ -2,12 +2,12 @@ import { umbQueryMapperForJsonPaths } from '../../utils/query-mapper-json-paths.
 import type { ManifestPropertyValidationPathTranslator } from './property-validation-path-translator.extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { UmbExtensionsManifestCacheIndex } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionsManifestCache } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbPropertyValueDataPotentiallyWithEditorAlias } from '@umbraco-cms/backoffice/property';
 
 // Write interface that can be handed to the API for the Host, so each path Translator can communicate back to the host here. For translating inner values.
 export class UmbValidationPropertyPathTranslationController extends UmbControllerBase {
-	#translators = new UmbExtensionsManifestCacheIndex<ManifestPropertyValidationPathTranslator<unknown>>(
+	#translators = new UmbExtensionsManifestCache<ManifestPropertyValidationPathTranslator<unknown>>(
 		this,
 		'propertyValidationPathTranslator',
 		(manifest, editorAlias) => manifest.forEditorAlias === editorAlias,

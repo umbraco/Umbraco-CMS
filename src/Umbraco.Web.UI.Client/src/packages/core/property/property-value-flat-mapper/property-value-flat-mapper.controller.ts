@@ -2,10 +2,10 @@ import type { UmbPropertyValueDataPotentiallyWithEditorAlias } from '../index.js
 import type { ManifestPropertyValueResolver } from '../property-value-resolver/property-value-resolver.extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { UmbExtensionsManifestCacheIndex } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionsManifestCache } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
-	#resolvers = new UmbExtensionsManifestCacheIndex<ManifestPropertyValueResolver>(
+	#resolvers = new UmbExtensionsManifestCache<ManifestPropertyValueResolver>(
 		this,
 		'propertyValueResolver',
 		(manifest, editorAlias) => manifest.forEditorAlias === editorAlias,

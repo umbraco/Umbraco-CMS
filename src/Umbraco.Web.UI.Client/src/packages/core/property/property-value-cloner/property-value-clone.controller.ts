@@ -3,15 +3,15 @@ import type { ManifestPropertyValueResolver } from '../property-value-resolver/p
 import type { ManifestPropertyValueCloner } from './property-value-cloner.extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { UmbExtensionsManifestCacheIndex } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionsManifestCache } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbPropertyValueCloneController extends UmbControllerBase {
-	#cloners = new UmbExtensionsManifestCacheIndex<ManifestPropertyValueCloner>(
+	#cloners = new UmbExtensionsManifestCache<ManifestPropertyValueCloner>(
 		this,
 		'propertyValueCloner',
 		(manifest, editorAlias) => manifest.forEditorAlias === editorAlias,
 	);
-	#resolvers = new UmbExtensionsManifestCacheIndex<ManifestPropertyValueResolver>(
+	#resolvers = new UmbExtensionsManifestCache<ManifestPropertyValueResolver>(
 		this,
 		'propertyValueResolver',
 		(manifest, editorAlias) => manifest.forEditorAlias === editorAlias,

@@ -1,49 +1,47 @@
-import { UmbExtensionsManifestCacheIndex } from './extensions-manifest-cache-index.controller.js';
+import { UmbExtensionsManifestCache } from './extensions-manifest-cache.controller.js';
 import { expect, fixture } from '@open-wc/testing';
 import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-@customElement('umb-test-extensions-manifest-cache-index-host')
-class UmbTestExtensionsManifestCacheIndexHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+@customElement('umb-test-extensions-manifest-cache-host')
+class UmbTestExtensionsManifestCacheHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 interface TestManifest extends ManifestBase {
-	type: 'test-extensions-manifest-cache-index';
+	type: 'test-extensions-manifest-cache';
 	forGroup: string;
 }
 
 interface OtherTestManifest extends ManifestBase {
-	type: 'test-extensions-manifest-cache-index-other';
+	type: 'test-extensions-manifest-cache-other';
 	forGroup: string;
 }
 
 const testManifest = (alias: string, forGroup: string, weight?: number): TestManifest => ({
-	type: 'test-extensions-manifest-cache-index',
+	type: 'test-extensions-manifest-cache',
 	name: alias,
 	alias,
 	forGroup,
 	weight,
 });
 
-describe('UmbExtensionsManifestCacheIndex', () => {
+describe('UmbExtensionsManifestCache', () => {
 	const aliases = [
-		'Umb.Test.ManifestCacheIndex.A1',
-		'Umb.Test.ManifestCacheIndex.A2',
-		'Umb.Test.ManifestCacheIndex.B',
-		'Umb.Test.ManifestCacheIndex.Other',
+		'Umb.Test.ManifestCache.A1',
+		'Umb.Test.ManifestCache.A2',
+		'Umb.Test.ManifestCache.B',
+		'Umb.Test.ManifestCache.Other',
 	];
-	let host: UmbTestExtensionsManifestCacheIndexHostElement;
+	let host: UmbTestExtensionsManifestCacheHostElement;
 
 	beforeEach(async () => {
-		host = await fixture(
-			html`<umb-test-extensions-manifest-cache-index-host></umb-test-extensions-manifest-cache-index-host>`,
-		);
+		host = await fixture(html`<umb-test-extensions-manifest-cache-host></umb-test-extensions-manifest-cache-host>`);
 		umbExtensionsRegistry.register(testManifest(aliases[0], 'group-a', 10));
 		umbExtensionsRegistry.register(testManifest(aliases[1], 'group-a', 20));
 		umbExtensionsRegistry.register(testManifest(aliases[2], 'group-b'));
 		umbExtensionsRegistry.register({
-			type: 'test-extensions-manifest-cache-index-other',
+			type: 'test-extensions-manifest-cache-other',
 			name: aliases[3],
 			alias: aliases[3],
 			forGroup: 'group-a',
@@ -55,15 +53,15 @@ describe('UmbExtensionsManifestCacheIndex', () => {
 	});
 
 	const createIndex = () =>
-		new UmbExtensionsManifestCacheIndex<TestManifest>(
+		new UmbExtensionsManifestCache<TestManifest>(
 			host,
-			'test-extensions-manifest-cache-index',
+			'test-extensions-manifest-cache',
 			(manifest, group) => manifest.forGroup === group,
 		);
 
 	const registryOrder = (group: string) =>
 		umbExtensionsRegistry
-			.getByTypeAndFilter<string, TestManifest>('test-extensions-manifest-cache-index', (x) => x.forGroup === group)
+			.getByTypeAndFilter<string, TestManifest>('test-extensions-manifest-cache', (x) => x.forGroup === group)
 			.map((x) => x.alias);
 
 	describe('getManifests', () => {
@@ -110,9 +108,9 @@ describe('UmbExtensionsManifestCacheIndex', () => {
 		});
 
 		it('caches by the value of the cache key function, not by the key itself', () => {
-			const index = new UmbExtensionsManifestCacheIndex<TestManifest, { group: string }>(
+			const index = new UmbExtensionsManifestCache<TestManifest, { group: string }>(
 				host,
-				'test-extensions-manifest-cache-index',
+				'test-extensions-manifest-cache',
 				(manifest, key) => manifest.forGroup === key.group,
 				(key) => key.group,
 			);

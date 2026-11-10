@@ -2,7 +2,7 @@ import type { UmbContentLikeDetailModel, UmbPotentialContentValueModel } from '.
 import { _sortContentValuesByVariant } from '../utils/sort-content-values-by-variant.function.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { UmbExtensionsManifestCacheIndex } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionsManifestCache } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbPropertyValueIndex, type ManifestPropertyValueResolver } from '@umbraco-cms/backoffice/property';
 import {
 	umbVariantObjectSortCompare,
@@ -21,7 +21,7 @@ function defaultCompareVariantMethod(a: UmbVariantDataModel, b: UmbVariantDataMo
 }
 
 export class UmbMergeContentVariantDataController extends UmbControllerBase {
-	#resolvers = new UmbExtensionsManifestCacheIndex<ManifestPropertyValueResolver>(
+	#resolvers = new UmbExtensionsManifestCache<ManifestPropertyValueResolver>(
 		this,
 		'propertyValueResolver',
 		(manifest, editorAlias) => manifest.forEditorAlias === editorAlias,

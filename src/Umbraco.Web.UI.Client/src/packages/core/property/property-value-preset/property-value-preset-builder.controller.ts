@@ -10,7 +10,7 @@ import type {
 } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApis } from '@umbraco-cms/backoffice/extension-api';
-import { UmbExtensionsManifestCacheIndex } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionsManifestCache } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 type UmbPropertyValuePresetLookupKey = { schemaAlias?: string; uiAlias: string };
@@ -18,7 +18,7 @@ type UmbPropertyValuePresetLookupKey = { schemaAlias?: string; uiAlias: string }
 export class UmbPropertyValuePresetBuilderController<
 	ReturnType extends UmbPropertyValueData = UmbPropertyValueData | UmbPropertyValueDataPotentiallyWithEditorAlias,
 > extends UmbControllerBase {
-	#presets = new UmbExtensionsManifestCacheIndex<ManifestPropertyValuePreset, UmbPropertyValuePresetLookupKey>(
+	#presets = new UmbExtensionsManifestCache<ManifestPropertyValuePreset, UmbPropertyValuePresetLookupKey>(
 		this,
 		'propertyValuePreset',
 		// A preset applies when registered for the UI alias, or, if the property type has a schema alias, for the schema alias.

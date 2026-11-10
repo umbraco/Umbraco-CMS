@@ -14,10 +14,7 @@ import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
  * @template {ManifestBase} ManifestType The manifest type of the extensions to look up.
  * @template KeyType The type of the key the extensions are looked up by.
  */
-export class UmbExtensionsManifestCacheIndex<
-	ManifestType extends ManifestBase,
-	KeyType = string,
-> extends UmbControllerBase {
+export class UmbExtensionsManifestCache<ManifestType extends ManifestBase, KeyType = string> extends UmbControllerBase {
 	readonly #extensionType: ManifestType['type'];
 	readonly #filter: (manifest: ManifestType, key: KeyType) => boolean;
 	readonly #getCacheKey?: (key: KeyType) => string | number;

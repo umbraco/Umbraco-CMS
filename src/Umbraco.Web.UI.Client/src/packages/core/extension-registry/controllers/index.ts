@@ -1,1 +1,1 @@
-export * from './extensions-manifest-cache-index.controller.js';
+export * from './extensions-manifest-cache.controller.js';
