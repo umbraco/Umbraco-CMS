@@ -2,6 +2,8 @@
 import {ApiHelpers} from "../ApiHelpers";
 import {ConstantHelper} from '../ConstantHelper';
 
+export type ContentQueryResult = {total: number; items: {name: string}[]};
+
 export class ContentDeliveryApiHelper {
   api: ApiHelpers
 
@@ -65,10 +67,10 @@ export class ContentDeliveryApiHelper {
     return await this.api.get(this.api.baseUrl + '/umbraco/delivery/api/v2/content' + query, undefined, extraHeaders);
   }
 
-  async waitUntilContentQueryReturnsNames(filter: string | undefined, sort: string | undefined, expectedNames: string[], expectedTotal?: number, extraHeaders?: { [key: string]: string; }) {
+  async waitUntilContentQueryReturnsNames(filter: string | undefined, sort: string | undefined, expectedNames: string[], expectedTotal?: number, extraHeaders?: { [key: string]: string; }): Promise<ContentQueryResult> {
     const take = 100;
     expect(expectedNames.length).toBeGreaterThan(0);
-    let contentItemsJson;
+    let contentItemsJson: ContentQueryResult | undefined;
     await expect
       .poll(
         async () => {
@@ -92,13 +94,13 @@ export class ContentDeliveryApiHelper {
         {timeout: ConstantHelper.timeout.pageLoad},
       )
       .toEqual([]);
-    return contentItemsJson;
+    return contentItemsJson!;
   }
 
-  async waitUntilContentQueryExcludesNames(filter: string | undefined, sort: string | undefined, unexpectedNames: string[], extraHeaders?: { [key: string]: string; }) {
+  async waitUntilContentQueryExcludesNames(filter: string | undefined, sort: string | undefined, unexpectedNames: string[], extraHeaders?: { [key: string]: string; }): Promise<ContentQueryResult> {
     const take = 100;
     expect(unexpectedNames.length).toBeGreaterThan(0);
-    let contentItemsJson;
+    let contentItemsJson: ContentQueryResult | undefined;
     await expect
       .poll(
         async () => {
@@ -116,7 +118,7 @@ export class ContentDeliveryApiHelper {
         {timeout: ConstantHelper.timeout.pageLoad},
       )
       .toEqual([]);
-    return contentItemsJson;
+    return contentItemsJson!;
   }
 
   async waitUntilContentQueryTotalIs(filter: string | undefined, expectedTotal: number, extraHeaders?: { [key: string]: string; }) {
