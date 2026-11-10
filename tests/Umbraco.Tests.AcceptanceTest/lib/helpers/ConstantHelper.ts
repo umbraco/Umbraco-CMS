@@ -324,6 +324,21 @@
       "eventName": "Media Saved",
       "eventType": "Media",
       "alias": "Umbraco.MediaSave"
+    },
+    {
+      "eventName": "Element Published",
+      "eventType": "Element",
+      "alias": "Umbraco.ElementPublish"
+    },
+    {
+      "eventName": "Element Unpublished",
+      "eventType": "Element",
+      "alias": "Umbraco.ElementUnpublish"
+    },
+    {
+      "eventName": "Element Deleted",
+      "eventType": "Element",
+      "alias": "Umbraco.ElementDelete"
     }
   ]
 

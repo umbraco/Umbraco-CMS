@@ -77,14 +77,29 @@ export class WebhookApiHelper {
     return null;
   }
 
-  async generateWebhookSiteToken() {
-    const createWebhookResponse = await this.page.request.post(this.webhookSiteUrl + 'token', {
-      headers: {
-        'Accept': 'application/json'
+  async generateWebhookSiteToken(timeoutMs: number = ConstantHelper.timeout.navigation) {
+    const start = Date.now();
+    let lastStatus = 0;
+
+    while (Date.now() - start < timeoutMs) {
+      const createWebhookResponse = await this.page.request.post(this.webhookSiteUrl + 'token', {
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      lastStatus = createWebhookResponse.status();
+      if (createWebhookResponse.ok()) {
+        const webhookData = await createWebhookResponse.json();
+        return webhookData.uuid;
       }
-    });
-    const webhookData = await createWebhookResponse.json();
-    return webhookData.uuid;
+
+      // webhook.site rate-limits token creation (429); back off and retry rather than returning an undefined token.
+      const retryAfterMs = Number(createWebhookResponse.headers()['retry-after']) * 1000;
+      const delayMs = retryAfterMs > 0 ? retryAfterMs : ConstantHelper.timeout.long;
+      const remainingMs = timeoutMs - (Date.now() - start);
+      await new Promise((resolve) => setTimeout(resolve, Math.min(delayMs, Math.max(remainingMs, 0))));
+    }
+    throw new Error(`Could not create a webhook.site token within ${timeoutMs}ms (last status: ${lastStatus})`);
   }
 
   async getWebhookSiteRequestResponse(webhookSiteToken: string, timeoutMs: number = ConstantHelper.timeout.veryLong, pollInterval: number = ConstantHelper.timeout.short, expectedContentFragment?: string) {
@@ -96,7 +111,11 @@ export class WebhookApiHelper {
         headers: {
           'Accept': 'application/json'
         }
-      });
+      }).catch(() => null);
+      if (!requestResponse?.ok()) {
+        await new Promise((resolve) => setTimeout(resolve, pollInterval));
+        continue;
+      }
       const requestJson = await requestResponse.json();
       const requests = requestJson.data ?? [];
       // Delivery to webhook.site is async and an unrelated request can arrive first, so when an
@@ -174,7 +193,7 @@ export class WebhookApiHelper {
     const eventAlias = await this.getEventAliasValue(eventName);
     const eventType = await this.getEventTypeValue(eventName);
     let contentTypeData;
-    if (eventType == 'Content') {
+    if (eventType == 'Content' || eventType == 'Element') {
       contentTypeData = await this.api.documentType.getByName(contentTypeName);
     } else {
       contentTypeData = await this.api.mediaType.getByName(contentTypeName);

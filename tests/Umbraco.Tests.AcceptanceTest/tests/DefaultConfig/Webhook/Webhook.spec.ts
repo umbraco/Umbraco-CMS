@@ -179,3 +179,37 @@ test('cannot add both content event and media event for a webhook', async ({umbr
   await umbracoUi.webhook.isModalMenuItemWithNameDisabled('Media Saved');
   await umbracoUi.webhook.isModalMenuItemWithNameDisabled('Media Deleted');
 });
+
+test('can create a webhook with an element event', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const event = 'Element Published';
+  const webhookSiteUrl = umbracoApi.webhook.webhookSiteUrl + webhookSiteToken;
+  await umbracoUi.webhook.goToWebhooks();
+
+  // Act
+  await umbracoUi.webhook.clickWebhookCreateButton();
+  await umbracoUi.webhook.enterWebhookName(webhookName);
+  await umbracoUi.webhook.enterUrl(webhookSiteUrl);
+  await umbracoUi.webhook.clickChooseEventButton();
+  await umbracoUi.webhook.clickTextButtonWithName(event);
+  await umbracoUi.webhook.clickSubmitButton();
+  await umbracoUi.webhook.clickSaveButtonAndWaitForWebhookToBeCreated();
+
+  // Assert
+  expect(await umbracoApi.webhook.doesNameExist(webhookName)).toBeTruthy();
+  expect(await umbracoApi.webhook.doesWebhookHaveEvent(webhookName, event)).toBeTruthy();
+});
+
+test('cannot add both element event and content event for a webhook', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const event = 'Element Published';
+  await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken, event);
+  await umbracoUi.webhook.goToWebhookWithName(webhookName);
+
+  // Act
+  await umbracoUi.webhook.clickChooseEventButton();
+
+  // Assert
+  await umbracoUi.webhook.isModalMenuItemWithNameDisabled('Content Published');
+  await umbracoUi.webhook.isModalMenuItemWithNameDisabled('Media Saved');
+});
