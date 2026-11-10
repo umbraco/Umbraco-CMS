@@ -4,6 +4,7 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 export interface UmbState {
 	unique: string;
+	title?: string;
 	message?: string;
 }
 

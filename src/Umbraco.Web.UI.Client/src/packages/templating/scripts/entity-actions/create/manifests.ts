@@ -1,6 +1,7 @@
-import { UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { manifests as defaultManifests } from './default/manifests.js';
 import { manifests as folderManifests } from './folder/manifests.js';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -10,6 +11,13 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		alias: 'Umb.EntityAction.Script.Create',
 		name: 'Create Script Entity Action',
 		forEntityTypes: [UMB_SCRIPT_ROOT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE],
+		conditions: [
+			{
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_SCRIPT_ENTITY_TYPE,
+				operation: 'create',
+			},
+		],
 	},
 	...defaultManifests,
 	...folderManifests,

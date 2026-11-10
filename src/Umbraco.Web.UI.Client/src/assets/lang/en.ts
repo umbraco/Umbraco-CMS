@@ -680,6 +680,7 @@ export default {
 		linkedToService: 'Your account is linked to this service',
 		selectEditor: 'Select editor',
 		selectEditorConfiguration: 'Select configuration',
+		selectEditorConfigurationEmptyMessage: 'No configurations available',
 		selectSnippet: 'Select snippet',
 		variantdeletewarning:
 			'This will delete the node and all its languages. If you only want to delete one language, you should unpublish the node in that language instead.',
@@ -3139,5 +3140,13 @@ export default {
 		'zh-cn': '中文（简体，中国）',
 		'zh-tw': '中文（正體，台灣）',
 		vi: 'Tiếng Việt',
+	},
+	schemaLockdown: {
+		locked: 'Locked',
+		updateLockedDescription:
+			'Changes to this item are locked in this environment.<br />Make the change where this item is managed, or contact your developer or administrator.',
+		createLockedTitle: (entityType: string) => `Creating a new ${entityType ?? 'item'} is locked`,
+		createLockedDescription:
+			"New items of this type can't be created in this environment.<br />Create it where this item is managed, or contact your developer or administrator.",
 	},
 } as UmbLocalizationDictionary;

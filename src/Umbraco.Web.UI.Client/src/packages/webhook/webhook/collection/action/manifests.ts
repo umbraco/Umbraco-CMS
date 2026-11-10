@@ -1,4 +1,6 @@
+import { UMB_WEBHOOK_ENTITY_TYPE } from '../../../entity.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -15,6 +17,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
 				match: 'Umb.Collection.Webhook',
+			},
+			{
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_WEBHOOK_ENTITY_TYPE,
+				operation: 'create',
 			},
 		],
 	},

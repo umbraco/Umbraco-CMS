@@ -8,6 +8,7 @@ import { manifests as moveManifests } from './move-to/manifests.js';
 import { manifests as duplicateManifests } from './duplicate/manifests.js';
 import { manifests as exportManifests } from './export/manifests.js';
 import { manifests as importManifests } from './import/manifests.js';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -21,6 +22,13 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			detailRepositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS,
 		},
+		conditions: [
+			{
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
+				operation: 'delete',
+			},
+		],
 	},
 	...createManifests,
 	...moveManifests,

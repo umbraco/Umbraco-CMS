@@ -4,6 +4,7 @@ import { css, customElement, html, ifDefined, nothing, property, state } from '@
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityDeletedEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import type { UmbState } from '@umbraco-cms/backoffice/utils';
 
 let umbBackPathDeprecation: UmbDeprecation | undefined;
 
@@ -53,6 +54,9 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 	private _isForbidden = false;
 
 	@state()
+	private _forbiddenState?: UmbState;
+
+	@state()
 	private _exists = false;
 
 	@state()
@@ -73,6 +77,10 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 			this.observe(this.#context?.entityType, (entityType) => (this._entityType = entityType));
 			this.observe(this.#context?.loading.isOn, (isLoading) => (this._isLoading = isLoading ?? false));
 			this.observe(this.#context?.forbidden.isOn, (isForbidden) => (this._isForbidden = isForbidden ?? false));
+			this.observe(
+				this.#context?.forbidden.states,
+				(states) => (this._forbiddenState = states?.find((forbiddenState) => forbiddenState.title)),
+			);
 			this.observe(this.#context?.data, (data) => (this._exists = !!data));
 			this.observe(this.#context?.isNew, (isNew) => (this._isNew = isNew));
 			this.observe(this.#context?.unique, (unique) => (this.#unique = unique));
@@ -117,7 +125,9 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 	#renderForbidden() {
 		if (!this._isLoading && this._isForbidden) {
 			return html`<umb-entity-detail-forbidden
-				entity-type=${ifDefined(this._entityType)}></umb-entity-detail-forbidden>`;
+				entity-type=${ifDefined(this._entityType)}
+				headline=${ifDefined(this._forbiddenState?.title)}
+				message=${ifDefined(this._forbiddenState?.message)}></umb-entity-detail-forbidden>`;
 		}
 		return nothing;
 	}
