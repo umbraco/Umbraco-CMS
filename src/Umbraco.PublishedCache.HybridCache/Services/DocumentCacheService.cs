@@ -416,11 +416,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     // every request.
     private async Task ReadFromDatabaseAsync(List<Guid> keys, bool preview, long generation, Dictionary<Guid, IPublishedContent> resolved, ContentSourcesReader readContentSources)
     {
-        IReadOnlyCollection<ContentCacheNode> coldNodes;
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            coldNodes = (await readContentSources(keys, preview)).ToArray();
-        }
+        IReadOnlyCollection<ContentCacheNode> coldNodes = (await readContentSources(keys, preview)).ToArray();
 
         // Mirrors GetNodeAsync, which warms the id/key map for every node the database returns,
         // regardless of the ancestor guard below.
@@ -572,7 +568,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
         async Task<(ContentCacheNode? Node, bool AncestorCheckFailed)> GetContentCacheNodeFromRepo()
         {
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
             ContentCacheNode? contentCacheNode = await readContentSource(key, preview);
 
             // If we can resolve the content cache node, we still need to check if the ancestor path is published.
