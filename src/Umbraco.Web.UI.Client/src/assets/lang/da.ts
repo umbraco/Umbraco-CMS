@@ -81,6 +81,17 @@ export default {
 		loadMore: 'Indlæs flere',
 		showMore: 'Vis flere',
 	},
+	actionGroups: {
+		clipboard: 'Udklipsholder',
+		create: 'Opret',
+		edit: 'Rediger',
+		importExport: 'Import og eksport',
+		notifications: 'Notificeringer',
+		other: 'Andet',
+		publishing: 'Udgivelse',
+		routing: 'Routing',
+		structure: 'Struktur',
+	},
 	actionCategories: {
 		content: 'Indhold',
 		administration: 'Administration',
@@ -3104,5 +3115,6 @@ export default {
 		cultureSelectLabel: 'Kultur',
 		searchDisabled: 'Søgning utilgængelig. Indeksstatus:',
 		searchError: 'Søgningen fejlede. Prøv igen.',
+		searchNotAllowed: 'Du har ikke adgang til at søge i dette indeks.',
 	},
 } as UmbLocalizationDictionary;

@@ -26,11 +26,13 @@ class UmbMockManager {
 			label: 'Default',
 			loader: () => import('./data/sets/default/index.js') as Promise<UmbMockDataSet>,
 			visible: true,
+			userSwitcher: true,
 		},
 		kitchenSink: {
 			label: 'Kitchen Sink',
 			loader: () => import('./data/sets/kitchen-sink/index.js') as Promise<UmbMockDataSet>,
 			visible: true,
+			userSwitcher: true,
 		},
 		userPermissions: {
 			label: 'User Permissions',

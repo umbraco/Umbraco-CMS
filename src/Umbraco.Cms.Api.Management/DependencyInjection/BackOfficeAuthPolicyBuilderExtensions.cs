@@ -61,6 +61,12 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
             policy.RequireRole(Constants.Security.AdminGroupAlias);
         });
 
+        options.AddPolicy(AuthorizationPolicies.SearcherQueryAccess, policy =>
+        {
+            AddAuthenticationSchemes(policy);
+            policy.RequireRole(Constants.Security.AdminGroupAlias);
+        });
+
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessContent, Constants.Applications.Content);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessContentOrMedia, Constants.Applications.Content, Constants.Applications.Media);
         AddAllowedApplicationsPolicy(

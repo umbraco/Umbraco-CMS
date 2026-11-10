@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Services;
@@ -11,6 +12,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Search.Querying;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 using SearchDocument = Umbraco.Cms.Core.Search.Querying.Document;
 
@@ -19,7 +21,13 @@ namespace Umbraco.Cms.Api.Management.Controllers.Search;
 /// <summary>
 /// Executes an ad-hoc search against a registered index, for use by the backoffice Search section.
 /// </summary>
+/// <remarks>
+/// Searching bypasses content protection and can match any data an implementor puts in an index, so on top of the
+/// settings section access required by <see cref="SearchControllerBase"/>, it requires the
+/// <see cref="AuthorizationPolicies.SearcherQueryAccess"/> policy.
+/// </remarks>
 [ApiVersion("1.0")]
+[Authorize(Policy = AuthorizationPolicies.SearcherQueryAccess)]
 public class SearchApiController : SearchControllerBase
 {
     private readonly ISearcherResolver _searcherResolver;

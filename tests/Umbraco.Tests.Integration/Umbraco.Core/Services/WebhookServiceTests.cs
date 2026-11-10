@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -12,6 +13,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 internal sealed class WebhookServiceTests : UmbracoIntegrationTest
 {
     private IWebhookService WebhookService => GetRequiredService<IWebhookService>();
+
+    private IWebhookRequestService WebhookRequestService => GetRequiredService<IWebhookRequestService>();
 
     [TestCase("https://example.com", Constants.WebhookEvents.Aliases.ContentPublish, "00000000-0000-0000-0000-010000000000")]
     [TestCase("https://example.com", Constants.WebhookEvents.Aliases.ContentDelete, "00000000-0000-0000-0000-000200000000")]
@@ -114,6 +117,21 @@ internal sealed class WebhookServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Delete_With_Queued_Requests()
+    {
+        var webhookToDelete = await WebhookService.CreateAsync(new Webhook("https://example.com", true, [Guid.NewGuid()], [Constants.WebhookEvents.Aliases.ContentPublish]));
+        var webhookToKeep = await WebhookService.CreateAsync(new Webhook("https://example.org", true, [Guid.NewGuid()], [Constants.WebhookEvents.Aliases.ContentPublish]));
+        await WebhookRequestService.CreateAsync(webhookToDelete.Result.Key, Constants.WebhookEvents.Aliases.ContentPublish, null);
+        await WebhookRequestService.CreateAsync(webhookToDelete.Result.Key, Constants.WebhookEvents.Aliases.ContentPublish, null);
+        var keptRequest = await WebhookRequestService.CreateAsync(webhookToKeep.Result.Key, Constants.WebhookEvents.Aliases.ContentPublish, null);
+
+        await WebhookService.DeleteAsync(webhookToDelete.Result.Key);
+
+        var remaining = await WebhookRequestService.GetAllAsync();
+        Assert.That(remaining.Select(x => x.Id), Is.EqualTo(new[] { keptRequest.Id }));
+    }
+
+    [Test]
     public async Task Can_Create_With_No_EntityKeys()
     {
         var createdWebhook = await WebhookService.CreateAsync(new Webhook("https://example.com", events: [Constants.WebhookEvents.Aliases.ContentPublish]));
@@ -148,4 +166,16 @@ internal sealed class WebhookServiceTests : UmbracoIntegrationTest
         Assert.IsNotEmpty(result);
         Assert.AreEqual(2, result.Count());
     }
+
+    [Test]
+    public async Task Can_Create_With_Valid_Header()
+    {
+        var result = await WebhookService.CreateAsync(CreateWebhookWithHeader("Content-Type", "application/vnd.custom+json"));
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(WebhookOperationStatus.Success, result.Status);
+    }
+
+    private static Webhook CreateWebhookWithHeader(string name, string value)
+        => new("https://example.com", true, events: [Constants.WebhookEvents.Aliases.ContentPublish], headers: new Dictionary<string, string> { [name] = value });
 }

@@ -440,10 +440,12 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
+		clearTimeout(this.#renderTimeout);
 		this.#layoutContainerResizeObserver.disconnect();
 	}
 
 	override destroy(): void {
+		clearTimeout(this.#renderTimeout);
 		this.#layoutContainerResizeObserver.disconnect();
 		super.destroy();
 	}
@@ -490,6 +492,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	readonly #updateInlineCreateButtons = () => {
+		// A detached subtree keeps its parent element, which always measures zero width.
+		if (!this.isConnected) return;
 		// TODO: Could we optimize this, so it wont break?, cause currently we trust blindly that parentElement is '.umb-block-grid__layout-container' [NL]
 		const layoutContainer = this.parentElement;
 		if (!layoutContainer) return;
@@ -821,6 +825,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				--umb-block-scale-handler-opacity: 0;
 				--umb-entity-frame-opacity: 0;
 				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
+				--umb-entity-frame-contrast-color: var(--uui-color-interactive-contrast);
 
 				height: 100%;
 

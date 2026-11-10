@@ -495,6 +495,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			.umb-block-rte__block {
 				--umb-entity-frame-opacity: 0;
 				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
+				--umb-entity-frame-contrast-color: var(--uui-color-interactive-contrast);
 
 				&:hover,
 				&:focus-within {

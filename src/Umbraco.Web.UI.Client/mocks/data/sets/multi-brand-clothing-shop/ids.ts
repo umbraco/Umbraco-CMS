@@ -12,6 +12,7 @@ const NAMESPACE = {
 	block: 9,
 	area: 10,
 	pickerItem: 11,
+	layout: 12,
 } as const;
 
 type UmbMbcsNamespace = keyof typeof NAMESPACE;
@@ -57,6 +58,8 @@ export const DATA_TYPE_IDS = {
 	productDocumentCategory: mbcsId('dataType', 27),
 	integer: mbcsId('dataType', 28),
 	productDocumentLanguages: mbcsId('dataType', 29),
+	/** The Collection Data Type that the media root collection view is hardcoded to use. */
+	mediaCollection: '3a0156c4-3b8c-4803-bdc1-6871faa83fff',
 } as const;
 
 export const DOCUMENT_TYPE_IDS = {

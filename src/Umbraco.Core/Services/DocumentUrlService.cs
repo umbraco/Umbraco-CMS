@@ -551,7 +551,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return;
         }
 
-        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
+        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _, propertyAliases: null, filter: null, ordering: null);
 
         await CreateOrUpdateUrlSegmentsAsync(new List<IContent>(descendants)
         {
@@ -584,7 +584,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return;
         }
 
-        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
+        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _, propertyAliases: null, filter: null, ordering: null);
         await CreateOrUpdateUrlSegmentsInternalAsync(new List<IContent>(descendants) { item }, skipDatabaseWrite: true);
     }
 
@@ -918,7 +918,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
         Guid? runnerKey = GetStartNodeKey(documentStartNodeId);
         var hideTopLevelNodeFromPath = _globalSettings.HideTopLevelNodeFromPath;
 
-        culture ??= _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+        culture ??= _defaultCultureAccessor.DefaultCulture;
 
         if (!_globalSettings.ForceCombineUrlPathLeftToRight
             && CultureInfo.GetCultureInfo(culture).TextInfo.IsRightToLeft)
@@ -1213,7 +1213,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     private string GetCultureOrDefault(string? culture)
         => string.IsNullOrWhiteSpace(culture) is false
             ? culture
-            : _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+            : _defaultCultureAccessor.DefaultCulture;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool ArePathsLeftToRight(string cultureOrDefault)
@@ -1268,7 +1268,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     public bool HasAny()
     {
         ThrowIfNotInitialized();
-        return _documentUrlCache.Any();
+        return _documentUrlCache.IsEmpty is false;
     }
 
     private bool TryGetPrimaryUrlSegment(Guid documentKey, string culture, bool isDraft, [NotNullWhen(true)] out string? segment)

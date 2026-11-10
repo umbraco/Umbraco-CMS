@@ -13,6 +13,7 @@ import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import { UmbApiError } from '@umbraco-cms/backoffice/resources';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UUIInputElement, UUIPaginationElement, UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
 
@@ -77,6 +78,9 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 
 	@state()
 	private _error?: string;
+
+	@state()
+	private _searchNotAllowed = false;
 
 	@state()
 	private _searchStatusMessage = ''; // For screen reader announcements
@@ -280,7 +284,7 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 							.value=${this.#inputValue}
 							@input=${this.#handleInputChange}
 							@keydown=${this.#handleKeyDown}
-							?disabled=${this.#isSearchDisabled}
+							?disabled=${this.#isSearchDisabled || this._searchNotAllowed}
 							placeholder=${this.localize.term('searchManagement_searchPlaceholder')}
 							label=${this.localize.term('searchManagement_searchInputLabel')}
 							aria-label=${this.localize.term('searchManagement_searchInputAriaLabel', this._indexAlias ?? '')}
@@ -292,6 +296,7 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 							() => html`
 								<uui-select
 									label=${this.localize.term('searchManagement_cultureSelectLabel')}
+									?disabled=${this._searchNotAllowed}
 									.options=${this._languages.map((lang) => ({
 										name: lang.name,
 										value: lang.unique,
@@ -304,7 +309,7 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 							look="primary"
 							color="positive"
 							@click=${this.#handleButtonClick}
-							?disabled=${this.#isSearchDisabled || this._isSearching}
+							?disabled=${this.#isSearchDisabled || this._searchNotAllowed || this._isSearching}
 							label=${this.localize.term('searchManagement_searchButtonAriaLabel')}>
 							<umb-localize key="searchManagement_searchButton">Search</umb-localize>
 						</uui-button>
@@ -325,6 +330,16 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 						this._error,
 						() => html` <div class="error-message" role="alert" aria-live="assertive">${this._error}</div> `,
 					)}
+					${when(
+						this._searchNotAllowed,
+						() => html`
+							<div class="search-not-allowed">
+								<umb-localize key="searchManagement_searchNotAllowed">
+									You do not have permission to search this index.
+								</umb-localize>
+							</div>
+						`,
+					)}
 					${this.#renderResults()}
 				</div>
 			</uui-box>
@@ -335,7 +350,7 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 		// Sync state with current input value
 		this._searchQuery = this.#inputValue;
 
-		if (!this._indexAlias) {
+		if (!this._indexAlias || this._searchNotAllowed) {
 			return;
 		}
 
@@ -366,7 +381,13 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 			return;
 		}
 
-		if (error || !data) {
+		if (UmbApiError.isUmbApiError(error) && error.status === 403) {
+			// Not being allowed to search is a permission state rather than a failure, so it is shown as information.
+			this._searchNotAllowed = true;
+			this._searchResults = undefined;
+			this._tableItems = [];
+			this._searchStatusMessage = this.localize.term('searchManagement_searchNotAllowed');
+		} else if (error || !data) {
 			this._error = this.localize.term('searchManagement_searchError');
 			this._searchResults = undefined;
 			this._tableItems = [];
@@ -550,7 +571,8 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
 				font-size: 0.875rem;
 			}
 
-			.no-results {
+			.no-results,
+			.search-not-allowed {
 				padding: var(--uui-size-space-4);
 				text-align: center;
 				color: var(--uui-color-text-alt);

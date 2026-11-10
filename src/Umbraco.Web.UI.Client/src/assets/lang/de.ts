@@ -69,6 +69,17 @@ export default {
 		resendInvite: 'Einladung erneut versenden',
 		viewActionsFor: (name: string) => (name ? `Aktionen anzeigen für ${name}` : 'Aktionen anzeigen'),
 	},
+	actionGroups: {
+		clipboard: 'Zwischenablage',
+		create: 'Erstellen',
+		edit: 'Bearbeiten',
+		importExport: 'Import und Export',
+		notifications: 'Benachrichtigungen',
+		other: 'Sonstiges',
+		publishing: 'Veröffentlichung',
+		routing: 'Routing',
+		structure: 'Struktur',
+	},
 	actionCategories: {
 		content: 'Inhalt',
 		administration: 'Administration',

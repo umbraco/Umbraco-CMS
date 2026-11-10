@@ -14,7 +14,7 @@ export const UMB_ENTITY_BULK_ACTION_TRASH_KIND_MANIFEST: UmbExtensionManifestKin
 		type: 'entityBulkAction',
 		kind: UMB_ENTITY_BULK_ACTION_TRASH_KIND,
 		api: UmbTrashEntityBulkAction,
-		weight: 1150,
+		weight: 799,
 		meta: {
 			icon: 'icon-trash',
 			label: '#actions_trash',

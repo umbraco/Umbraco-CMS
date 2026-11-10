@@ -60,4 +60,19 @@ public class DatabaseServerMessengerNotificationHandlerTests
 
         _cacheVersionService.Verify(x => x.FlushCacheUpdatesAsync(), Times.Once);
     }
+
+    [Test]
+    public void Handle_RequestEnd_WritesInstructionsBeforePublishingCacheVersions_WithoutAwaiting()
+    {
+        _cacheVersionService
+            .Setup(x => x.FlushCacheUpdates())
+            .Callback(() => _calls.Add(nameof(IRepositoryCacheVersionService.FlushCacheUpdates)));
+
+        _sut.Handle(new UmbracoRequestEndNotification(Mock.Of<IUmbracoContext>()));
+
+        Assert.That(
+            _calls,
+            Is.EqualTo(new[] { nameof(IServerMessenger.SendMessages), nameof(IRepositoryCacheVersionService.FlushCacheUpdates) }));
+        _cacheVersionService.Verify(x => x.FlushCacheUpdatesAsync(), Times.Never);
+    }
 }

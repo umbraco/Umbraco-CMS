@@ -42,7 +42,7 @@ public class NewDefaultUrlProviderTests
 
         public Mock<IPublishedContentStatusFilteringService> StatusFilteringService { get; } = new();
 
-        public Mock<ILanguageService> LanguageService { get; } = new();
+        public Mock<IDefaultCultureAccessor> DefaultCultureAccessor { get; } = new();
 
         public Mock<ILogger<DefaultUrlProvider>> Logger { get; } = new();
 
@@ -62,8 +62,8 @@ public class NewDefaultUrlProviderTests
             DomainCache.Setup(x => x.GetAssigned(It.IsAny<int>(), It.IsAny<bool>()))
                 .Returns(Enumerable.Empty<Domain>());
 
-            LanguageService.Setup(x => x.GetDefaultIsoCodeAsync())
-                .ReturnsAsync(() => DefaultCulture);
+            DefaultCultureAccessor.SetupGet(x => x.DefaultCulture)
+                .Returns(() => DefaultCulture);
         }
 
         public DefaultUrlProvider CreateProvider()
@@ -87,7 +87,7 @@ public class NewDefaultUrlProviderTests
                 DocumentUrlService.Object,
                 NavigationQueryService.Object,
                 StatusFilteringService.Object,
-                LanguageService.Object);
+                DefaultCultureAccessor.Object);
         }
 
         public void SetupDomainForNode(int nodeId, DomainAndUri domainAndUri)

@@ -16,6 +16,7 @@ export class LogViewerUiHelper extends UiBaseLocators {
   private readonly firstLogSearchResult: Locator;
   private readonly savedSearchesBtn: Locator;
   private readonly loadingSpinner: Locator;
+  private readonly startDateInput: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -32,6 +33,7 @@ export class LogViewerUiHelper extends UiBaseLocators {
     this.firstLogSearchResult = page.getByRole('group').locator('#message').first();
     this.savedSearchesBtn = page.getByLabel('Saved searches');
     this.loadingSpinner = page.locator('#empty uui-loader-circle');
+    this.startDateInput = page.locator('umb-log-viewer-date-range-selector #start-date input');
   }
 
   async clickSearchButton() {
@@ -41,6 +43,12 @@ export class LogViewerUiHelper extends UiBaseLocators {
 
   async clickOverviewButton() {
     await this.click(this.overviewBtn);
+  }
+
+  // The default range starts yesterday, so widen it when searching for a message that is only logged at startup.
+  async setStartDate(date: string) {
+    await this.startDateInput.fill(date);
+    await this.waitUntilLoadingSpinnerInvisible();
   }
 
   async enterSearchKeyword(keyword: string) {
