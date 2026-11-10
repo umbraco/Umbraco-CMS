@@ -231,7 +231,6 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
         async Task<ContentCacheNode?> GetContentCacheNodeFromRepo()
         {
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
             return await readElementSource(key, preview);
         }
     }
