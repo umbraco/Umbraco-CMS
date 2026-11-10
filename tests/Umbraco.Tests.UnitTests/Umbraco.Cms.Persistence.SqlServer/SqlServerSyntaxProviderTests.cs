@@ -27,7 +27,7 @@ public class SqlServerSyntaxProviderTests
     [TestCase("15.0.4430.1", SqlServerSyntaxProvider.VersionName.V2019)]
     [TestCase("16.0.4195.2", SqlServerSyntaxProvider.VersionName.V2022)]
     [TestCase("17.0.1000.7", SqlServerSyntaxProvider.VersionName.V2025)]
-    [TestCase("18.0.100.1", SqlServerSyntaxProvider.VersionName.Other)]
+    [TestCase("99.0.0.0", SqlServerSyntaxProvider.VersionName.Other)]
     public void Can_Map_Product_Version_To_Version_Name(string productVersion, SqlServerSyntaxProvider.VersionName expected)
     {
         var result = new SqlServerSyntaxProvider.ServerVersionInfo(
