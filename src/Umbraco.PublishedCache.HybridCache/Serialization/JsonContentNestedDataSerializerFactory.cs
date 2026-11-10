@@ -5,4 +5,8 @@ internal sealed class JsonContentNestedDataSerializerFactory : IContentCacheData
     private readonly Lazy<JsonContentNestedDataSerializer> _serializer = new();
 
     public IContentCacheDataSerializer Create(ContentCacheDataSerializerEntityType types) => _serializer.Value;
+
+    public void ClearTypeCache()
+    {
+    }
 }
