@@ -1,13 +1,12 @@
 import { extractUmbNotificationColor } from './extractUmbNotificationColor.function.js';
 import { isUmbNotifications, UMB_NOTIFICATION_HEADER } from './isUmbNotifications.function.js';
+import type { UmbNotificationsEventModel } from './isUmbNotifications.function.js';
 import { isProblemDetailsLike } from './apiTypeValidators.function.js';
 import { UmbAuthSignalerContext } from './auth-signaler.context.js';
 import type { UmbProblemDetails } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
 import type { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
-
-const MAX_RETRIES = 3;
 
 /**
  * HTTP statuses used by proxies/gateways (nginx, ALB, IIS ARR, Cloudflare's 524/598, etc.) to report that
@@ -25,18 +24,31 @@ const GATEWAY_TIMEOUT_STATUSES = new Set([504, 524, 598]);
  */
 const GATEWAY_UNREACHABLE_STATUSES = new Set([521, 522, 523, 525, 526, 530, 599]);
 
+/** The backoffice login page, which the server's auth challenge redirects to. */
+const LOGIN_PATH = '/umbraco/login';
+
+/**
+ * Whether a request was redirected to the login page by an auth challenge. The client follows
+ * redirects and the login page answers 200, so where the request ended up is the only sign of it.
+ * @param {Response} response The response to check.
+ * @returns {boolean} True if the response is the login page reached through a redirect.
+ */
+function isRedirectToLogin(response: Response): boolean {
+	if (!response.redirected) return false;
+	// Matched as a suffix, so a server hosted under a path base is recognised too.
+	return new URL(response.url).pathname.replace(/\/$/, '').endsWith(LOGIN_PATH);
+}
+
 export class UmbApiInterceptorController extends UmbControllerBase {
 	/**
 	 * Store pending requests that received a 401 response and are waiting for re-authentication.
 	 * This is used to retry the requests after re-authentication.
 	 */
 	#pending401Requests: Array<{
-		request: Request;
 		requestConfig: unknown;
 		retry: () => Promise<Response>;
 		resolve: (value: Response) => void;
 		reject: (reason?: unknown) => void;
-		retries: number;
 	}> = [];
 
 	/**
@@ -83,7 +95,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			// the session lives in a cookie it cannot read. The proxy is optimistic in one direction —
 			// a request to an endpoint that does not require a session succeeds without renewing one —
 			// so it can report activity the server did not act on, never miss activity it did.
-			if (response.ok) {
+			if (response.ok && !isRedirectToLogin(response)) {
 				this.#signaler.signalActivity();
 			}
 
@@ -92,25 +104,25 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
-	 * Interceptor which checks responses for 401 errors and signals the auth layer to show the login UI.
+	 * Interceptor which checks responses for 401 errors, or a redirect to the login page, and signals the auth layer to show the login UI.
+	 * A GET request is retried once after re-authentication; what the retry gets is final.
 	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
 	 * @internal
 	 */
 	addAuthResponseInterceptor(client: typeof umbHttpClient) {
 		client.interceptors.response.use(async (response, request, requestConfig): Promise<Response> => {
-			if (response.status !== 401) return response;
+			const redirectedToLogin = isRedirectToLogin(response);
+			if (response.status !== 401 && !redirectedToLogin) return response;
 
-			// Build a plain ProblemDetails object for the response body
-			const problemDetails: UmbProblemDetails = {
-				status: response.status,
-				title: response.statusText || 'Unauthorized request, waiting for re-authentication.',
-				detail: undefined,
-				errors: undefined,
-				type: 'Unauthorized',
-				stack: undefined,
-			};
+			// The server's access-denied path is the login page too, so a redirect there only means the
+			// session ended once the server confirms it. The forbidden interceptor next in the chain gives
+			// the 403 its problem details.
+			if (redirectedToLogin && (await this.#signaler.isSessionAlive())) {
+				return new Response(null, { status: 403 });
+			}
 
-			const newResponse = this.#createResponse(problemDetails, response);
+			// The login page's 200 is not the API's answer, so nothing of it is carried over.
+			const newResponse = this.#createUnauthorizedResponse(redirectedToLogin ? undefined : response);
 
 			const signaler = this.#signaler;
 
@@ -124,47 +136,42 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				return newResponse;
 			}
 
-			// Find if this request is already in the queue and increment retries
-			let retries = 1;
-			const existing = this.#pending401Requests.find(
-				(req) => req.request === request && req.requestConfig === requestConfig,
-			);
-			if (existing) {
-				retries = existing.retries + 1;
-				if (retries > MAX_RETRIES) {
-					return newResponse;
-				}
-				existing.retries = retries;
-			}
-
 			// Return a promise that will resolve when re-auth completes
 			return new Promise<Response>((resolve, reject) => {
 				this.#pending401Requests.push({
-					request,
 					requestConfig,
 					retry: async () => {
-						const { data, response: retryResponse } = await client.request(requestConfig as never);
+						// Re-issued below the client, as the request it already sent: the original call then reads
+						// the answer with its own options (a download stays a download, headers and all), and the
+						// retry cannot come back through this interceptor. Called unbound, as the client calls it:
+						// as a method of the options, the browser's fetch throws "Illegal invocation".
+						const clientFetch = requestConfig.fetch ?? fetch;
+						const retryResponse = await clientFetch(request.clone());
 
-						if (!retryResponse) {
-							throw new Error('The retried request did not produce a response.');
+						// The retry carries the re-established session, so its answer is final: asking for
+						// re-authentication again would only loop.
+						if (isRedirectToLogin(retryResponse)) {
+							// Signed in, yet sent to the login page: the server's access-denied path. The forbidden
+							// interceptor next in the chain gives it its problem details.
+							return new Response(null, { status: 403 });
 						}
-
-						return this.#createResponse(data, retryResponse);
+						if (retryResponse.status === 401) {
+							return this.#createUnauthorizedResponse(retryResponse);
+						}
+						// The activity interceptor has already run, on the answer that was retried.
+						if (retryResponse.ok) {
+							this.#signaler.signalActivity();
+						}
+						return retryResponse;
 					},
 					resolve,
 					reject,
-					retries,
 				});
 
 				// Signal the auth layer to show the login UI
 				signaler.requestTimeout();
 
-				console.log(
-					'[Interceptor] 401 Unauthorized - queuing request for re-authentication and have tried',
-					retries - 1,
-					'times before',
-					requestConfig,
-				);
+				console.log('[Interceptor] 401 Unauthorized - queuing request for re-authentication', requestConfig);
 			});
 		});
 	}
@@ -299,41 +306,49 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
-	 * Interceptor which checks responses for the umb-notifications header and displays them as a notification if any. Removes the umb-notifications from the headers.
-	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
+	 * Interceptor which checks responses for the umb-notifications header and displays them as a notification if any.
+	 * The error of a failed response that carried notifications is marked with `notifiedByServer`.
+	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response, Request and Error interceptors.
 	 * @internal
 	 */
 	addUmbNotificationsInterceptor(client: typeof umbHttpClient) {
 		client.interceptors.response.use((response) => {
-			// Check if the response has the umb-notifications header
-			// If not, we just return the response
-			const umbNotifications = response.headers.get(UMB_NOTIFICATION_HEADER);
-			if (!umbNotifications) return response;
-
-			// Parse the notifications from the header
-			// If the header is not a valid JSON, we just return the response
-			try {
-				const notifications = JSON.parse(umbNotifications);
-				if (!isUmbNotifications(notifications)) return response;
-
-				for (const notification of notifications) {
-					// Backend event messages may contain HTML (e.g. links) and are rendered sanitized by the
-					// notification layout via htmlMessage. The plain message must stay markup-free because it is
-					// read by screen readers (see umb-backoffice-notification-container).
-					this.#peekError(
-						notification.category,
-						this.#extractText(notification.message),
-						undefined,
-						extractUmbNotificationColor(notification.type),
-						notification.message,
-					);
-				}
-			} catch {
-				// Ignore JSON parse errors
+			for (const notification of this.#getUmbNotifications(response)) {
+				// Backend event messages may contain HTML (e.g. links) and are rendered sanitized by the
+				// notification layout via htmlMessage. The plain message must stay markup-free because it is
+				// read by screen readers (see umb-backoffice-notification-container).
+				this.#peekError(
+					notification.category,
+					this.#extractText(notification.message),
+					undefined,
+					extractUmbNotificationColor(notification.type),
+					notification.message,
+				);
 			}
 
 			return response;
 		});
+
+		client.interceptors.error?.use((error, response) => {
+			if (!response || !isProblemDetailsLike(error) || this.#getUmbNotifications(response).length === 0) {
+				return error;
+			}
+
+			return { ...error, notifiedByServer: true };
+		});
+	}
+
+	#getUmbNotifications(response: Response): Array<UmbNotificationsEventModel> {
+		const umbNotifications = response.headers.get(UMB_NOTIFICATION_HEADER);
+		if (!umbNotifications) return [];
+
+		try {
+			const notifications = JSON.parse(umbNotifications);
+			return isUmbNotifications(notifications) ? notifications : [];
+		} catch {
+			// Ignore JSON parse errors
+			return [];
+		}
 	}
 
 	/**
@@ -380,27 +395,52 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
+	 * Helper to create the ProblemDetails response for a request that was not authorized.
+	 * @param {Response} [unauthorizedResponse] The server's 401 response to take the status text and headers from, if any.
+	 * @returns {Response} A 401 response with a ProblemDetails body.
+	 */
+	#createUnauthorizedResponse(unauthorizedResponse?: Response): Response {
+		const problemDetails: UmbProblemDetails = {
+			status: 401,
+			title: unauthorizedResponse?.statusText || 'Unauthorized request, waiting for re-authentication.',
+			detail: undefined,
+			errors: undefined,
+			type: 'Unauthorized',
+			stack: undefined,
+		};
+
+		return this.#createResponse(problemDetails, unauthorizedResponse, 401);
+	}
+
+	/**
 	 * Helper to create a new Response with correct Content-Type.
 	 * @param {unknown} body The body of the response, can be a string or an object.
 	 * @param {Response} [originalResponse] The original response to copy status and headers from, if any.
-	 * @param {number} [fallbackStatus] Status to use when no upstream response is available. Defaults to 500.
+	 * @param {number} [fallbackStatus] Status to use when no upstream response is available, or its status is not a valid HTTP status. Defaults to 500.
 	 * @returns {Response} The new Response object with the correct Content-Type and body.
 	 */
 	#createResponse(body: unknown, originalResponse?: Response, fallbackStatus: number = 500): Response {
+		// `new Response()` throws outside 200-599; an opaque redirect or a network error reports 0.
+		const originalStatus = originalResponse?.status ?? 0;
+		const status = originalStatus >= 200 && originalStatus <= 599 ? originalStatus : fallbackStatus;
+
 		const isString = typeof body === 'string';
 		const contentType = isString ? 'text/plain' : 'application/json';
 		const responseBody = isString ? body : JSON.stringify(body);
 
-		// Construct new headers but preserve "X-" headers from the original response
+		// Construct new headers but preserve "X-" headers and Umbraco's own "Umb-" headers from the original
+		// response, so interceptors running after the one that rebuilt it can still read them.
+		// @see https://github.com/umbraco/Umbraco-CMS/issues/23589
 		const headersOverride: Record<string, string> = {};
 		originalResponse?.headers.forEach((value, key) => {
-			if (key.toLowerCase().startsWith('x-')) {
+			const name = key.toLowerCase();
+			if (name.startsWith('x-') || name.startsWith('umb-')) {
 				headersOverride[key] = value;
 			}
 		});
 
 		return new Response(responseBody, {
-			status: originalResponse?.status ?? fallbackStatus,
+			status,
 			statusText: originalResponse?.statusText ?? '',
 			headers: {
 				...headersOverride,

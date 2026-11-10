@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HybridCache;
@@ -92,7 +93,8 @@ internal sealed class ElementHybridCacheStaleSetRaceTests : UmbracoIntegrationTe
             GetRequiredService<IPreviewSessionService>(),
             GetRequiredService<IOptions<CacheSettings>>(),
             new NullLogger<ElementCacheService>(),
-            GetRequiredService<IConvertedPublishedContentCacheFactory>());
+            GetRequiredService<IConvertedPublishedContentCacheFactory>(),
+            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewElement(It.IsAny<IPublishedElement>())));
     }
 
     [Test]
@@ -169,5 +171,63 @@ internal sealed class ElementHybridCacheStaleSetRaceTests : UmbracoIntegrationTe
             Assert.AreEqual(newNode.Key, cachedNode!.Key, "Cached node should be the refreshed node.");
             Assert.AreEqual(NewName, cachedNode!.Data?.Name, "Cached node should hold the refreshed name.");
         });
+    }
+
+    [Test]
+    public async Task Synchronous_Read_Through_Does_Not_Clobber_A_Concurrent_Refresh()
+    {
+        ContentCacheNode oldNode = BuildPublishedNode(OldName, OldTitle);
+        ContentCacheNode newNode = BuildPublishedNode(NewName, NewTitle);
+
+        // The synchronous read-through reads the pre-publish (old) snapshot, then blocks before writing back.
+        using var readReachedDatabase = new ManualResetEventSlim();
+        using var releaseRead = new ManualResetEventSlim();
+        _databaseCacheRepository
+            .Setup(x => x.GetElementSource(_element.Key, false))
+            .Returns(() =>
+            {
+                readReachedDatabase.Set();
+                releaseRead.Wait(TimeSpan.FromSeconds(10));
+                return oldNode;
+            });
+
+        // The refresh after a commit reads the new snapshot.
+        _databaseCacheRepository
+            .Setup(x => x.GetElementSourceForPublishStatesAsync(_element.Key))
+            .ReturnsAsync((null, newNode));
+
+        await _hybridCache.RemoveAsync($"{_element.Key}");
+
+        // 1. Start the synchronous request; it reads the old snapshot and blocks before the cache write-back.
+        Task<IPublishedElement?> staleRead = Task.Run(() => _elementCacheService.GetByKey(_element.Key, false));
+        Assert.That(readReachedDatabase.Wait(TimeSpan.FromSeconds(10)), Is.True, "The read never reached the database.");
+
+        // 2. The refresh stores the new snapshot (and bumps the generation).
+        await _elementCacheService.RefreshMemoryCacheAsync(_element.Key);
+
+        // 3. Let the blocked request resume and perform its (now stale) write-back.
+        releaseRead.Set();
+        IPublishedElement? staleResult = await staleRead;
+
+        Assert.IsNotNull(staleResult);
+        Assert.AreEqual(OldName, staleResult!.Name, "Name should be served from the stale snapshot.");
+
+        // 4. A fresh synchronous lookup must observe the refreshed content, not the stale snapshot.
+        IPublishedElement? result = _elementCacheService.GetByKey(_element.Key, false);
+
+        Assert.IsNotNull(result);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(NewName, result!.Name, "Name was served from the clobbered stale snapshot.");
+            Assert.AreEqual(
+                NewTitle,
+                result.GetProperty("title")?.GetSourceValue(),
+                "Property value was served from the clobbered stale snapshot.");
+        });
+
+        _databaseCacheRepository.Verify(
+            x => x.GetElementSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()),
+            Times.Never,
+            "The synchronous read must not use the asynchronous repository read.");
     }
 }

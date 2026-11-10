@@ -20,4 +20,14 @@ public class DataTypeMovedNotification : MovedNotification<IDataType>
         : base(target, messages)
     {
     }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DataTypeMovedNotification"/> class.
+    /// </summary>
+    /// <param name="target">The move event information for the data types that were moved.</param>
+    /// <param name="messages">The event messages collection.</param>
+    public DataTypeMovedNotification(IEnumerable<MoveEventInfo<IDataType>> target, EventMessages messages)
+        : base(target, messages)
+    {
+    }
 }

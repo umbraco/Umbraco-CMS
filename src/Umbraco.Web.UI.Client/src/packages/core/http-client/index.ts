@@ -5,17 +5,15 @@ import { client } from '@umbraco-cms/backoffice/external/backend-api';
  *
  * - `credentials: 'include'` sends the httpOnly authentication cookie with every request — the cookie
  *   is the sole credential, so no `Authorization` header is needed.
- * - `redirect: 'manual'` stops the client from following redirects. The Management API is JSON-only,
- *   so any 3xx is an auth-challenge bounce to the HTML login page; following it would return login
- *   HTML that breaks JSON parsing in early loaders (e.g. the extension manifests). Manual mode turns
- *   a stray 3xx into an opaque, non-ok response instead. Defence in depth — the server also answers
- *   API requests with 401/403 directly rather than redirecting.
+ * - Redirects are followed (the client's default), so an endpoint may legitimately answer with a 3xx.
+ *   An auth-challenge bounce to the login page is recognised by the auth response interceptor and
+ *   handled like a 401. Defence in depth — the server also answers API requests with 401/403 directly
+ *   rather than redirecting.
  *
  * Configured at module level so it applies regardless of UmbAuthContext initialisation timing.
  */
 client.setConfig({
 	credentials: 'include',
-	redirect: 'manual',
 });
 
 /**

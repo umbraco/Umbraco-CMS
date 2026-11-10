@@ -3,6 +3,7 @@ import { manifests as bulkTrashManifests } from './entity-actions/bulk-trash/man
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as deleteManifests } from './entity-actions/delete/manifests.js';
 import { manifests as trashManifests } from './entity-actions/trash/manifests.js';
+import { manifests as referencesModalManifests } from './reference/modal/manifests.js';
 import { manifests as workspaceInfoAppManifests } from './reference/workspace-info-app/manifests.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -12,5 +13,6 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...collectionManifests,
 	...deleteManifests,
 	...trashManifests,
+	...referencesModalManifests,
 	...workspaceInfoAppManifests,
 ];

@@ -70,9 +70,9 @@ internal abstract class BlockEditorElementVariationTestBase : UmbracoIntegration
     public async Task SetUp() => await LanguageService.CreateAsync(
         new Language("da-DK", "Danish"), Constants.Security.SuperUserKey);
 
-    protected void PublishContent(IContent content, string[] culturesToPublish)
+    protected void PublishContent(IContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId)
     {
-        var publishResult = ContentService.Publish(content, culturesToPublish);
+        var publishResult = ContentService.Publish(content, culturesToPublish, userId);
         Assert.IsTrue(publishResult.Success);
         DocumentCacheService.RefreshContentAsync(content).GetAwaiter().GetResult();
     }

@@ -6,7 +6,7 @@ import type { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 	UmbMediaCollectionItemModel,
 	UmbMediaCollectionFilterModel
@@ -49,43 +49,12 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 		this.#placeholders.updateOne(unique, { progress });
 	}
 
-	/**
-	 * Requests the collection from the repository.
-	 * @returns {Promise<void>}
-	 * @deprecated Deprecated since v.17.0.0. Use `loadCollection` instead.
-	 * @memberof UmbMediaCollectionContext
-	 */
-	public override async requestCollection(): Promise<void> {
-		new UmbDeprecation({
-			removeInVersion: '19.0.0',
-			deprecated: 'requestCollection',
-			solution: 'Use .loadCollection method instead',
-		}).warn();
+	protected override _setCollectionData(data: UmbPagedModel<UmbMediaCollectionItemModel>) {
+		this.#cleanupPlaceholdersFromCollection(data.items);
+		const placeholders = this.#placeholders.getValue();
 
-		return this._requestCollection();
-	}
-
-	protected override async _requestCollection() {
-		await this._init;
-
-		if (!this._configured) this._configure();
-
-		if (!this._repository) throw new Error(`Missing repository for ${this._manifest}`);
-
-		this._loading.setValue(true);
-
-		const filter = this._filter.getValue();
-		const { data } = await this._repository.requestCollection(filter);
-
-		if (data) {
-			this.#cleanupPlaceholdersFromCollection(data.items);
-			const placeholders = this.#placeholders.getValue();
-
-			this._items.setValue([...placeholders, ...data.items]);
-			this._setTotalItems(placeholders.length + data.total);
-		}
-
-		this._loading.setValue(false);
+		this._items.setValue([...placeholders, ...data.items]);
+		this._setTotalItems(placeholders.length + data.total);
 	}
 
 	#cleanupPlaceholdersFromCollection(collection: Array<UmbMediaCollectionItemModel>) {

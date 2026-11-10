@@ -249,12 +249,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: false,
 			},
 			{
-				alias: 'maxNumber',
-				value: 2,
-			},
-			{
-				alias: 'minNumber',
-				value: 0,
+				alias: 'validationLimit',
+				value: { max: 2 },
 			},
 		],
 		noAccess: false,
@@ -288,12 +284,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				},
 			},
 			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 3,
+				alias: 'validationLimit',
+				value: { max: 3 },
 			},
 			{
 				alias: 'ignoreUserStartNodes',
@@ -411,12 +403,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'minNumber',
-				value: 2,
-			},
-			{
-				alias: 'maxNumber',
-				value: 4,
+				alias: 'validationLimit',
+				value: { min: 2, max: 4 },
 			},
 		],
 		noAccess: false,
@@ -515,12 +503,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 40,
 			},
 			{
-				alias: 'maxVal',
-				value: 50,
-			},
-			{
-				alias: 'minVal',
-				value: 0,
+				alias: 'validationRange',
+				value: { min: 0, max: 50 },
 			},
 			{
 				alias: 'step',
@@ -913,8 +897,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 								alias: 'area1_alias',
 								columnSpan: 6,
 								rowSpan: 1,
-								minAllowed: 1,
-								maxAllowed: 2,
+								validationLimit: { min: 1, max: 2 },
 								specifiedAllowance: [
 									{
 										elementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
@@ -928,8 +911,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 								alias: 'area2_alias',
 								columnSpan: 6,
 								rowSpan: 1,
-								minAllowed: 1,
-								maxAllowed: 2,
+								validationLimit: { min: 1, max: 2 },
 								specifiedAllowance: [],
 							},
 						],

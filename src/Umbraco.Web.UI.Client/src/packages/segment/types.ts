@@ -11,13 +11,6 @@ export interface UmbSegmentModel {
 	 * The name of the segment used for display purposes.
 	 */
 	name: string;
-
-	/**
-	 * An optional list of culture codes that the segment applies to.
-	 * If null, the segment applies to the invariant culture.
-	 * If undefined, the segment is considered generic and applies to all cultures.
-	 */
-	cultures?: Array<string> | null;
 }
 
 export interface UmbSegmentResponseModel {

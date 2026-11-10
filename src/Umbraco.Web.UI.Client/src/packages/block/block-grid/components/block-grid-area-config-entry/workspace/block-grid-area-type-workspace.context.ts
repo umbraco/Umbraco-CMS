@@ -18,6 +18,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/property-editor';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 export class UmbBlockGridAreaTypeWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<UmbBlockGridTypeAreaType>
@@ -44,9 +45,12 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias);
 	readonly properties = this.#properties.asObservable();
 
+	readonly validationContext = new UmbValidationContext(this);
+
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		super(host, workspaceArgs.manifest.alias);
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
+		this.addValidationContext(this.validationContext);
 	}
 
 	set manifest(manifest: ManifestWorkspace) {
@@ -106,8 +110,7 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 			alias: '',
 			columnSpan: 12,
 			rowSpan: 1,
-			minAllowed: 0,
-			maxAllowed: undefined,
+			validationLimit: undefined,
 			specifiedAllowance: [],
 		};
 

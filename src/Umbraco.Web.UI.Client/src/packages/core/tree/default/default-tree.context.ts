@@ -13,7 +13,7 @@ import type { UmbTreeRepository } from '../data/index.js';
 import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbDeprecation, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
+import { UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
@@ -75,6 +75,7 @@ export class UmbDefaultTreeContext<
 	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
 	public readonly targetPagination = this.#treeItemChildrenManager.targetPagination;
 	public readonly startNode = this.#treeItemChildrenManager.startNode;
+	public readonly startNodes = this.#treeItemChildrenManager.startNodes;
 	public readonly foldersOnly = this.#treeItemChildrenManager.foldersOnly;
 	public readonly additionalRequestArgs = this.#treeItemChildrenManager.additionalRequestArgs;
 	public readonly isLoading = this.#treeItemChildrenManager.isLoading;
@@ -143,21 +144,6 @@ export class UmbDefaultTreeContext<
 		return this.#manifest;
 	}
 
-	/**
-	 * Returns the manifest.
-	 * @returns {ManifestTree} The tree manifest
-	 * @memberof UmbDefaultTreeContext
-	 * @deprecated Use the `.manifest` property instead.
-	 */
-	public getManifest() {
-		new UmbDeprecation({
-			removeInVersion: '18.0.0',
-			deprecated: 'getManifest',
-			solution: 'Use .manifest property instead',
-		}).warn();
-		return this.#manifest;
-	}
-
 	public getRepository() {
 		return this.#repository;
 	}
@@ -212,7 +198,7 @@ export class UmbDefaultTreeContext<
 	async #debouncedLoadTree(reload = false) {
 		await this.#init;
 
-		const hasStartNode = this.getStartNode();
+		const hasStartNode = this.getStartNode() !== undefined || this.getStartNodes().length > 0;
 		const hideTreeRoot = this.getHideTreeRoot();
 
 		// Always load the tree root entity, even when the root node is hidden or we are drilled
@@ -347,6 +333,37 @@ export class UmbDefaultTreeContext<
 	 */
 	getStartNode(): UmbTreeStartNode | undefined {
 		return this.#treeItemChildrenManager.getStartNode();
+	}
+
+	/**
+	 * Sets the startNodes config. Only two or more nodes make the tree present the nodes themselves as its top
+	 * level. The single start node is configured separately, through `setStartNode`.
+	 * @param {Array<UmbTreeStartNode> | undefined} startNodes - The start nodes
+	 * @memberof UmbDefaultTreeContext
+	 */
+	setStartNodes(startNodes: Array<UmbTreeStartNode> | undefined) {
+		const current = this.getStartNodes();
+		const next = startNodes ?? [];
+		const isUnchanged =
+			current.length === next.length &&
+			current.every(
+				(startNode, index) =>
+					startNode.unique === next[index].unique && startNode.entityType === next[index].entityType,
+			);
+		if (isUnchanged) return;
+
+		this.#treeItemChildrenManager.setStartNodes(next);
+		this.#clearTree();
+		this.loadTree();
+	}
+
+	/**
+	 * Gets the startNodes config
+	 * @returns {Array<UmbTreeStartNode>} - The start nodes
+	 * @memberof UmbDefaultTreeContext
+	 */
+	getStartNodes(): Array<UmbTreeStartNode> {
+		return this.#treeItemChildrenManager.getStartNodes();
 	}
 
 	/**

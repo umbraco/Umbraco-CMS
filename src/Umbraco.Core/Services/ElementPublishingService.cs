@@ -17,6 +17,7 @@ internal sealed class ElementPublishingService : ContentPublishingServiceBase<IE
         ILanguageService languageService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
+        IUserService userService,
         ILogger<ContentPublishingServiceBase<IElement, IElementService>> logger)
         : base(
             coreScopeProvider,
@@ -27,6 +28,7 @@ internal sealed class ElementPublishingService : ContentPublishingServiceBase<IE
             languageService,
             optionsMonitor,
             relationService,
+            userService,
             logger)
     {
     }

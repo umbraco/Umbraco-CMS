@@ -64,6 +64,17 @@ export default {
 		createblueprint: 'Inhoudssjabloon aanmaken',
 		resendInvite: 'Uitnodiging opnieuw versturen',
 	},
+	actionGroups: {
+		clipboard: 'Klembord',
+		create: 'Aanmaken',
+		edit: 'Bewerken',
+		importExport: 'Importeren en exporteren',
+		notifications: 'Meldingen',
+		other: 'Overig',
+		publishing: 'Publicatie',
+		routing: 'Routering',
+		structure: 'Structuur',
+	},
 	actionCategories: {
 		content: 'Inhoud',
 		administration: 'Administratie',
@@ -959,6 +970,7 @@ export default {
 		userFailedLogin: 'Oeps! We konden je niet inloggen. Controleer je inloggegevens en probeer het opnieuw.',
 		userLockedOut: 'Je account is geblokkeerd. Probeer het later opnieuw.',
 		receivedErrorFromServer: 'Een error ontvangen van de server',
+		passwordResetUnavailable: 'Het opnieuw instellen van het wachtwoord is momenteel helaas niet beschikbaar. Probeer het later opnieuw of neem contact op met je beheerder.',
 		userInviteWelcomeMessage:
 			'Hallo en welkom in Umbraco! Binnen ongeveer één minuut kan je aan de slag. Je moet enkel je wachtwoord instellen.',
 		userInviteExpiredMessage:
@@ -1805,6 +1817,7 @@ export default {
 		stateLockedOut: 'Vergrendeld',
 		stateInvited: 'Uitgenodigd',
 		stateInactive: 'Inactief',
+		type: 'Type',
 		sortNameAscending: 'Naam (A-Z)',
 		sortNameDescending: 'Naam (Z-A)',
 		sortCreateDateAscending: 'Oudste',

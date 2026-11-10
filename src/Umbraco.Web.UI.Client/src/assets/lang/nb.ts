@@ -74,6 +74,17 @@ export default {
 		wasDeleted: 'ble slettet',
 		wasMovedTo: 'ble flyttet til',
 	},
+	actionGroups: {
+		clipboard: 'Utklippstavle',
+		create: 'Opprett',
+		edit: 'Rediger',
+		importExport: 'Import og eksport',
+		notifications: 'Varslinger',
+		other: 'Annet',
+		publishing: 'Publisering',
+		routing: 'Ruting',
+		structure: 'Struktur',
+	},
 	assignDomain: {
 		permissionDenied: 'Ingen tilgang.',
 		addNew: 'Legg til domene',
@@ -246,6 +257,7 @@ export default {
 		type: 'Type',
 		unpublish: 'Avpubliser',
 		unpublishDate: 'Dato for avpublisering',
+		scheduleForAllLanguages: 'Planlegg for alle valgte språk',
 		unpublished: 'Avpublisert',
 		updatedBy: 'Oppdatert av',
 		updateDate: 'Sist endret',
@@ -751,6 +763,7 @@ export default {
 		userFailedLogin: 'Oops! Vi kunne ikke logge deg inn. Vennligst sjekk legitimasjonen din og prøv igjen.',
 		userLockedOut: 'Kontoen din er låst. Vennligst prøv igjen senere.',
 		receivedErrorFromServer: 'Mottok en feil fra serveren',
+		passwordResetUnavailable: 'Beklager, tilbakestilling av passord er ikke tilgjengelig for øyeblikket. Prøv igjen senere, eller kontakt administratoren din.',
 		resetCodeExpired: 'Lenken du har klikket på er ugyldig eller har utløpt',
 		userInviteWelcomeMessage:
 			'Hei og velkommen til Umbraco! Om bare 1 minutt er du klar til å starte, vi trenger bare at du setter et passord.',

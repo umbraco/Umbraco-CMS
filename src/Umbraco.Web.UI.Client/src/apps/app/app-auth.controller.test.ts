@@ -1,11 +1,13 @@
 import { UmbAppAuthController } from './app-auth.controller.js';
-import { aTimeout, expect } from '@open-wc/testing';
+import { aTimeout, expect, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
 import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('test-app-auth-controller-host')
 class UmbTestAppAuthControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -95,5 +97,56 @@ describe('UmbAppAuthController', () => {
 
 		expect(openedLoginStates).to.eql(['timedOut']);
 		expect(replaceStateCalls).to.equal(0);
+	});
+
+	it('binds the page to the user it loads', async () => {
+		const boundUsers: Array<string> = [];
+		context.bindUser = (unique: string) => {
+			boundUsers.push(unique);
+		};
+		const loadedUser = new BehaviorSubject<string | undefined>(undefined);
+		const currentUserProvider = new UmbContextProvider(hostElement, UMB_CURRENT_USER_CONTEXT, {
+			getHostElement: () => hostElement,
+			unique: loadedUser.asObservable(),
+		} as never);
+		currentUserProvider.hostConnected();
+
+		loadedUser.next('admin');
+
+		await waitUntil(() => boundUsers.length > 0);
+		expect(boundUsers).to.deep.equal(['admin']);
+	});
+
+	it('starts the backoffice over when the session has passed to another user', async () => {
+		let restarts = 0;
+		controller.restartForNewUser = () => {
+			restarts++;
+		};
+		await aTimeout(50);
+
+		context.bindUser('admin');
+		context.bindUser('editor');
+
+		expect(restarts).to.equal(1);
+	});
+
+	it('lets no unsaved-changes guard hold the page when it starts over for another user', () => {
+		// A guard registered once the app has started, as an editor with unsaved changes does
+		const guard = (event: Event) => event.preventDefault();
+		window.addEventListener('beforeunload', guard);
+		// Cancels the navigation before it unloads the page, so the test page stays open
+		const { navigation } = window as unknown as { navigation: EventTarget };
+		const stay = (event: Event) => event.preventDefault();
+		navigation.addEventListener('navigate', stay);
+		try {
+			controller.restartForNewUser();
+
+			const unload = new Event('beforeunload', { cancelable: true });
+			window.dispatchEvent(unload);
+			expect(unload.defaultPrevented).to.be.false;
+		} finally {
+			window.removeEventListener('beforeunload', guard);
+			navigation.removeEventListener('navigate', stay);
+		}
 	});
 });

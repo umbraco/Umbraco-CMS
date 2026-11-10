@@ -14,9 +14,4 @@ public class SearchResultResponseModel
     /// Gets or sets the matched documents for the requested page.
     /// </summary>
     public required IEnumerable<SearchDocumentResponseModel> Documents { get; set; }
-
-    /// <summary>
-    /// Gets or sets the facet results for the requested facets, if any.
-    /// </summary>
-    public required IEnumerable<FacetResultResponseModel> Facets { get; set; }
 }

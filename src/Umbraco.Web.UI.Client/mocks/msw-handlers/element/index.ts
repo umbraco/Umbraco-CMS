@@ -1,3 +1,4 @@
+import { auditLogHandlers } from './audit-log.handlers.js';
 import { recycleBinHandlers } from './recycle-bin.handlers.js';
 import { treeHandlers } from './tree.handlers.js';
 import { itemHandlers } from './item.handlers.js';
@@ -5,9 +6,9 @@ import { publishingHandlers } from './publishing.handlers.js';
 import { detailHandlers } from './detail.handlers.js';
 import { folderHandlers } from './folder.handlers.js';
 import { moveCopyHandlers } from './move-copy.handlers.js';
-import { blockReferenceHandlers } from './block-reference.handlers.js';
 
 export const handlers = [
+	...auditLogHandlers,
 	...recycleBinHandlers,
 	...treeHandlers,
 	...itemHandlers,
@@ -15,5 +16,4 @@ export const handlers = [
 	...detailHandlers,
 	...folderHandlers,
 	...moveCopyHandlers,
-	...blockReferenceHandlers,
 ];

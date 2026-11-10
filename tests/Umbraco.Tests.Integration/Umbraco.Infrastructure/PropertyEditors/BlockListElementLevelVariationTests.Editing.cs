@@ -3,12 +3,9 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
@@ -20,13 +17,12 @@ internal partial class BlockListElementLevelVariationTests
     /// <param name="updateWithLimitedUserAccess">true => danish only which is not the default. false => admin which is all languages</param>
     [TestCase(true)]
     [TestCase(false)]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Handle_Limited_User_Access_To_Languages_With_AllowEditInvariantFromNonDefault(bool updateWithLimitedUserAccess)
     {
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -178,13 +174,12 @@ internal partial class BlockListElementLevelVariationTests
     /// <param name="updateWithLimitedUserAccess">true => danish only which is not the default. false => admin which is all languages</param>
     [TestCase(true)]
     [TestCase(false)]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Handle_Limited_User_Access_To_Languages_With_AllowEditInvariantFromNonDefault_WithoutInitialValues(bool updateWithLimitedUserAccess)
     {
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -316,7 +311,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -477,7 +472,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -600,7 +595,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -758,14 +753,13 @@ internal partial class BlockListElementLevelVariationTests
     /// <param name="updateWithLimitedUserAccess">true => danish only which is not the default. false => admin which is all languages</param>
     [TestCase(true)]
     [TestCase(false)]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Handle_BlockStructureManipulation_For_Limited_Users_With_AllowEditInvariantFromNonDefault(
             bool updateWithLimitedUserAccess)
     {
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -890,7 +884,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -993,7 +987,7 @@ internal partial class BlockListElementLevelVariationTests
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -1133,13 +1127,12 @@ internal partial class BlockListElementLevelVariationTests
 
     [TestCase(true)]
     [TestCase(false)]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Handle_Limited_User_Access_To_Languages_In_Nested_Blocks_Without_Access_With_AllowEditInvariantFromNonDefault(bool updateWithLimitedUserAccess)
     {
         await LanguageService.CreateAsync(
             new Language("de-DE", "German"), Constants.Security.SuperUserKey);
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
             : Constants.Security.SuperUserKey;
         var nestedElementType = await CreateElementType(ContentVariation.Culture);
         var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
@@ -1570,13 +1563,12 @@ internal partial class BlockListElementLevelVariationTests
     /// <param name="updateWithLimitedUserAccess">true => danish only which is not the default. false => admin which is all languages</param>
     [TestCase(true)]
     [TestCase(false)]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Handle_Limited_User_Access_To_Languages_With_Segment_Variant_Elements(bool updateWithLimitedUserAccess)
     {
         // Arrange: prepare an invariant block property whose element type varies by culture AND segment,
         // holding a value per culture and segment, and an editor restricted to Danish.
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.CultureAndSegment);
@@ -1662,13 +1654,12 @@ internal partial class BlockListElementLevelVariationTests
     /// <param name="updateWithLimitedUserAccess">true => danish only which is not the default. false => admin which is all languages</param>
     [TestCase(true)]
     [TestCase(false)]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Handle_Limited_User_Access_To_Languages_With_Segment_Variant_Block_Property(bool updateWithLimitedUserAccess)
     {
         // Arrange: prepare a culture invariant, segment variant block property holding a separate block
         // value per segment, each with a value per culture, and an editor restricted to Danish.
         var userKey = updateWithLimitedUserAccess
-            ? (await CreateLimitedUser()).Key
+            ? (await CreateLimitedUser(hasAccessToInvariantForVariant: true)).Key
             : Constants.Security.SuperUserKey;
 
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -1755,27 +1746,6 @@ internal partial class BlockListElementLevelVariationTests
             return JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue)!.ContentData[0].Values
                 .Single(value => value.Alias == "variantText" && value.Culture == culture).Value as string;
         }
-    }
-
-    private async Task<IUser> CreateLimitedUser()
-    {
-        var userGroupService = GetRequiredService<IUserGroupService>();
-        var userService = GetRequiredService<IUserService>();
-
-        var danish = await LanguageService.GetAsync("da-DK");
-        Assert.IsNotNull(danish);
-
-        var user = UserBuilder.CreateUser();
-        userService.Save(user);
-
-        var group = UserGroupBuilder.CreateUserGroup();
-        group.ClearAllowedLanguages();
-        group.AddAllowedLanguage(danish.Id);
-
-        var userGroupResult = await userGroupService.CreateAsync(group, Constants.Security.SuperUserKey, [user.Key]);
-        Assert.IsTrue(userGroupResult.Success);
-
-        return user;
     }
 
     private void AddBlock(BlockListValue listValue, BlockItemData contentData, BlockItemData? settingsData, IContentType elementType)

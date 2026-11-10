@@ -75,7 +75,7 @@ describe('UmbIsRoutableContextCondition', () => {
 				condition?.hostDisconnected();
 			});
 
-			it('should not permit the condition when route context is blocked by boundary', (done) => {
+			it('should not permit the condition when route context is blocked by boundary', async () => {
 				let callbackCount = 0;
 
 				condition = new UmbIsRoutableContextCondition(hostElement, {
@@ -88,13 +88,14 @@ describe('UmbIsRoutableContextCondition', () => {
 					},
 				});
 
-				// The onChange callback is not called when the condition remains false,
-				// so we need to wait and check manually
-				setTimeout(() => {
-					expect(callbackCount).to.equal(0);
-					expect(condition.permitted).to.be.false;
-					done();
-				}, 50);
+				// The absence of the context is only known once the condition is rejected,
+				// so we wait two frames (the lookup is rejected in the first) and check manually
+				await new Promise((resolve) => {
+					requestAnimationFrame(() => requestAnimationFrame(resolve));
+				});
+
+				expect(callbackCount).to.equal(1);
+				expect(condition.permitted).to.be.false;
 			});
 		});
 
@@ -116,7 +117,7 @@ describe('UmbIsRoutableContextCondition', () => {
 				condition?.hostDisconnected();
 			});
 
-			it('should not permit the condition when no route context exists', (done) => {
+			it('should not permit the condition when no route context exists', async () => {
 				let callbackCount = 0;
 
 				condition = new UmbIsRoutableContextCondition(hostElement, {
@@ -129,13 +130,14 @@ describe('UmbIsRoutableContextCondition', () => {
 					},
 				});
 
-				// The onChange callback is not called when the condition remains false,
-				// so we need to wait and check manually
-				setTimeout(() => {
-					expect(callbackCount).to.equal(0);
-					expect(condition.permitted).to.be.false;
-					done();
-				}, 50);
+				// The absence of the context is only known once the condition is rejected,
+				// so we wait two frames (the lookup is rejected in the first) and check manually
+				await new Promise((resolve) => {
+					requestAnimationFrame(() => requestAnimationFrame(resolve));
+				});
+
+				expect(callbackCount).to.equal(1);
+				expect(condition.permitted).to.be.false;
 			});
 		});
 	});
@@ -170,9 +172,8 @@ describe('UmbIsRoutableContextCondition', () => {
 					},
 					onChange: () => {
 						callbackCount++;
-						// First callback: permitted = true (from constructor, since match is false)
-						// Second callback: permitted = false (when context is found)
-						if (callbackCount === 2) {
+						// Only callback: permitted = false (when context is found)
+						if (callbackCount === 1) {
 							expect(condition.permitted).to.be.false;
 							done();
 						}
@@ -206,7 +207,7 @@ describe('UmbIsRoutableContextCondition', () => {
 				condition?.hostDisconnected();
 			});
 
-			it('should permit the condition when route context is blocked by boundary', (done) => {
+			it('should permit the condition when route context is blocked by boundary', async () => {
 				let callbackCount = 0;
 
 				condition = new UmbIsRoutableContextCondition(hostElement, {
@@ -221,11 +222,12 @@ describe('UmbIsRoutableContextCondition', () => {
 				});
 
 				// Wait and verify it remains permitted (only initial callback, no second callback to set false)
-				setTimeout(() => {
-					expect(callbackCount).to.equal(1);
-					expect(condition.permitted).to.be.true;
-					done();
-				}, 50);
+				await new Promise((resolve) => {
+					requestAnimationFrame(() => requestAnimationFrame(resolve));
+				});
+
+				expect(callbackCount).to.equal(1);
+				expect(condition.permitted).to.be.true;
 			});
 		});
 
@@ -247,7 +249,7 @@ describe('UmbIsRoutableContextCondition', () => {
 				condition?.hostDisconnected();
 			});
 
-			it('should permit the condition when no route context exists', (done) => {
+			it('should permit the condition when no route context exists', async () => {
 				let callbackCount = 0;
 
 				condition = new UmbIsRoutableContextCondition(hostElement, {
@@ -262,11 +264,12 @@ describe('UmbIsRoutableContextCondition', () => {
 				});
 
 				// Wait and verify it remains permitted (only initial callback, no second callback to set false)
-				setTimeout(() => {
-					expect(callbackCount).to.equal(1);
-					expect(condition.permitted).to.be.true;
-					done();
-				}, 50);
+				await new Promise((resolve) => {
+					requestAnimationFrame(() => requestAnimationFrame(resolve));
+				});
+
+				expect(callbackCount).to.equal(1);
+				expect(condition.permitted).to.be.true;
 			});
 		});
 	});

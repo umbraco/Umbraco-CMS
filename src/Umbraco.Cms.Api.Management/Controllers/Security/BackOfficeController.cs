@@ -261,6 +261,7 @@ public class BackOfficeController : SecurityControllerBase
     /// A task representing the asynchronous operation. The result contains an <see cref="IActionResult"/> indicating the outcome of the authorization request, including possible error responses for invalid contexts or unauthorized clients.
     /// </returns>
     [AllowAnonymous]
+    [AllowCookieRedirect]
     [HttpGet("authorize")]
     [EndpointSummary("Authorizes the current request.")]
     [EndpointDescription("Validates and authorizes the OAuth authorization request.")]
@@ -374,6 +375,10 @@ public class BackOfficeController : SecurityControllerBase
         AuthenticateResult cookieAuthResult = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
         var userName = cookieAuthResult.Principal?.Identity?.Name;
         var userId = cookieAuthResult.Principal?.Identity?.GetUserId();
+
+        // This endpoint allows anonymous access, so the request principal is not populated. Sign-out needs it to
+        // update the user's security stamp and end their login session.
+        HttpContext.SetPrincipalForRequest(cookieAuthResult.Principal);
 
         await _backOfficeSignInManager.SignOutAsync();
         SignOutSuccessResult signOutResult = _backOfficeUserManager.NotifyLogoutSuccess(cookieAuthResult.Principal ?? User, userId);
@@ -683,11 +688,11 @@ public class BackOfficeController : SecurityControllerBase
     /// <summary>
     ///     Retrieve the user principal stored in the authentication cookie.
     /// </summary>
-    private async Task<string?> GetUserNameFromAuthCookie()
+    private async Task<ClaimsPrincipal?> GetPrincipalFromAuthCookie()
     {
         AuthenticateResult cookieAuthResult = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
         return cookieAuthResult.Succeeded
-            ? cookieAuthResult.Principal?.Identity?.Name
+            ? cookieAuthResult.Principal
             : null;
     }
 
@@ -700,13 +705,38 @@ public class BackOfficeController : SecurityControllerBase
         // for future reference, notifications are already handled for the external login flow by
         // by calling BackOfficeSignInManager.ExternalLoginSignInAsync
 
-        var userName = await GetUserNameFromAuthCookie();
+        ClaimsPrincipal? cookiePrincipal = await GetPrincipalFromAuthCookie();
+        var userName = cookiePrincipal?.Identity?.Name;
 
         if (userName != null)
         {
             BackOfficeIdentityUser? backOfficeUser = await _backOfficeUserManager.FindByNameAsync(userName);
             if (backOfficeUser != null)
             {
+                // The auth cookie outlives a user being disabled or locked out, so sign it out
+                // and fall through to the login screen rather than issuing new tokens.
+                if (backOfficeUser.IsApproved is false || await _backOfficeUserManager.IsLockedOutAsync(backOfficeUser))
+                {
+                    await _backOfficeSignInManager.SignOutAsync();
+                    _logger.LogInformation(
+                        "User {UserName} from IP address {RemoteIpAddress} was signed out because the account is disabled or locked out",
+                        userName,
+                        HttpContext.Connection.RemoteIpAddress);
+                    return DefaultChallengeResult();
+                }
+
+                // The cookie's security stamp might only be validated periodically, so a cookie issued before the stamp
+                // changed (for example by signing out) can still authenticate. Tokens must not be issued from it.
+                if (string.Equals(cookiePrincipal?.FindFirstValue(Constants.Security.SecurityStampClaimType), backOfficeUser.SecurityStamp, StringComparison.Ordinal) is false)
+                {
+                    await HttpContext.SignOutAsync(Constants.Security.BackOfficeAuthenticationType);
+                    _logger.LogInformation(
+                        "User {UserName} from IP address {RemoteIpAddress} was signed out because the authentication cookie has an outdated security stamp",
+                        userName,
+                        HttpContext.Connection.RemoteIpAddress);
+                    return DefaultChallengeResult();
+                }
+
                 return await SignInBackOfficeUser(backOfficeUser, request);
             }
         }

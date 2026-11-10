@@ -1,6 +1,8 @@
 import type { UmbMockElementModel } from '../../mock-data-set.types.js';
 import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 
+import { data as elementStates } from './element-states.data.js';
+
 const elementOneLibraryElement: UmbMockElementModel = {
 	ancestors: [],
 	id: 'library-element-one-id',
@@ -71,6 +73,82 @@ const elementTwoLibraryElement: UmbMockElementModel = {
 			culture: null,
 			segment: null,
 			value: '17cd53f2-93b3-4e34-ade2-916e7a6639ed',
+		},
+	],
+	flags: [],
+	noAccess: false,
+};
+
+const elementThreeLibraryElement: UmbMockElementModel = {
+	ancestors: [],
+	id: 'library-element-three-id',
+	createDate: '2024-01-15T10:00:00.000Z',
+	parent: null,
+	documentType: {
+		id: 'b818bb55-31e1-4537-9c42-17471a176089',
+		icon: 'icon-attachment color-deep-purple',
+	},
+	hasChildren: false,
+	isTrashed: false,
+	isFolder: false,
+	name: 'Element Three (Library)',
+	variants: [
+		{
+			state: UmbElementVariantState.PUBLISHED,
+			culture: null,
+			name: 'Element Three (Library)',
+			createDate: '2024-01-15T10:00:00.000Z',
+			updateDate: '2024-01-15T10:00:00.000Z',
+			publishDate: '2024-01-15T10:00:00.000Z',
+			id: 'library-element-three',
+			flags: [],
+		},
+	],
+	values: [
+		{
+			editorAlias: 'Umbraco.TextBox',
+			alias: 'title',
+			culture: null,
+			segment: null,
+			value: 'Reusable Element Three',
+		},
+	],
+	flags: [],
+	noAccess: false,
+};
+
+const elementFourLibraryElement: UmbMockElementModel = {
+	ancestors: [],
+	id: 'library-element-four-id',
+	createDate: '2024-01-15T10:00:00.000Z',
+	parent: null,
+	documentType: {
+		id: 'b818bb55-31e1-4537-9c42-17471a176089',
+		icon: 'icon-attachment color-deep-purple',
+	},
+	hasChildren: false,
+	isTrashed: false,
+	isFolder: false,
+	name: 'Element Four (Library)',
+	variants: [
+		{
+			state: UmbElementVariantState.PUBLISHED,
+			culture: null,
+			name: 'Element Four (Library)',
+			createDate: '2024-01-15T10:00:00.000Z',
+			updateDate: '2024-01-15T10:00:00.000Z',
+			publishDate: '2024-01-15T10:00:00.000Z',
+			id: 'library-element-four',
+			flags: [],
+		},
+	],
+	values: [
+		{
+			editorAlias: 'Umbraco.TextBox',
+			alias: 'title',
+			culture: null,
+			segment: null,
+			value: 'Reusable Element Four',
 		},
 	],
 	flags: [],
@@ -348,13 +426,79 @@ const emptyVariantsLibraryElement: UmbMockElementModel = {
 	noAccess: false,
 };
 
+const createFolder = (id: string, name: string): UmbMockElementModel => ({
+	ancestors: [],
+	id,
+	createDate: '2024-01-15T10:00:00.000Z',
+	parent: null,
+	documentType: null,
+	hasChildren: true,
+	isTrashed: false,
+	isFolder: true,
+	name,
+	variants: [],
+	values: [],
+	flags: [],
+	noAccess: false,
+});
+
+const createElementInFolder = (id: string, name: string, folderId: string): UmbMockElementModel => ({
+	ancestors: [{ id: folderId }],
+	id,
+	createDate: '2024-01-15T10:00:00.000Z',
+	parent: { id: folderId },
+	documentType: {
+		id: 'b818bb55-31e1-4537-9c42-17471a176089',
+		icon: 'icon-attachment color-deep-purple',
+	},
+	hasChildren: false,
+	isTrashed: false,
+	isFolder: false,
+	name,
+	variants: [
+		{
+			state: UmbElementVariantState.PUBLISHED,
+			culture: null,
+			name,
+			createDate: '2024-01-15T10:00:00.000Z',
+			updateDate: '2024-01-15T10:00:00.000Z',
+			publishDate: '2024-01-15T10:00:00.000Z',
+			id: `${id}-variant`,
+			flags: [],
+		},
+	],
+	values: [
+		{
+			editorAlias: 'Umbraco.TextBox',
+			alias: 'title',
+			culture: null,
+			segment: null,
+			value: name,
+		},
+	],
+	flags: [],
+	noAccess: false,
+});
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const OPEN_FOLDER_ID = 'library-folder-open-id';
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const RESTRICTED_FOLDER_ID = 'library-folder-restricted-id';
+
 export const data: Array<UmbMockElementModel> = [
+	createFolder(OPEN_FOLDER_ID, 'Open Folder'),
+	createElementInFolder('library-folder-open-element-id', 'Element In Open Folder', OPEN_FOLDER_ID),
+	createFolder(RESTRICTED_FOLDER_ID, 'Restricted Folder'),
+	createElementInFolder('library-folder-restricted-element-id', 'Element In Restricted Folder', RESTRICTED_FOLDER_ID),
 	elementOneLibraryElement,
 	elementTwoLibraryElement,
+	elementThreeLibraryElement,
+	elementFourLibraryElement,
 	variantLibraryElement,
 	draftLibraryElement,
 	pendingChangesLibraryElement,
 	publishedBothLibraryElement,
 	missingDaLibraryElement,
 	emptyVariantsLibraryElement,
+	...elementStates,
 ];

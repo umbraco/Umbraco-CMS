@@ -87,26 +87,36 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Creating ${this.getEntityType()} scaffold` });
 		this._internal_setCreateUnderParent(args.parent);
 
-		const request = this.structure.createScaffold(args.preset);
-		this._getDataPromise = request;
-		let { data } = await request;
+		try {
+			await this._initialized;
+			// Set before the init hook runs, as extensions with an is-new condition cannot answer before this is known.
+			this.setIsNew(true);
 
-		if (data) {
-			data = await this._processIncomingData(data);
+			const loading = this.initHook.execute({
+				entityType: this.getEntityType(),
+				unique: undefined,
+				isNew: true,
+			});
+			const request = this.structure.createScaffold(args.preset);
+			this._getDataPromise = request;
+			let [{ data }] = await Promise.all([request, loading]);
 
-			if (this.modalContext) {
-				// Notice if the preset comes with values, they will overwrite the scaffolded values... [NL]
-				data = { ...data, ...this.modalContext.data.preset };
+			if (data) {
+				data = await this._processIncomingData(data);
+
+				if (this.modalContext) {
+					// Notice if the preset comes with values, they will overwrite the scaffolded values... [NL]
+					data = { ...data, ...this.modalContext.data.preset };
+				}
+
+				this.setUnique(data.unique);
+				this._data.setPersisted(data);
 			}
 
-			this.setUnique(data.unique);
-			this.setIsNew(true);
-			this._data.setPersisted(data);
+			return data;
+		} finally {
+			this.loading.removeState(LOADING_STATE_UNIQUE);
 		}
-
-		this.loading.removeState(LOADING_STATE_UNIQUE);
-
-		return data;
 	}
 
 	/**
@@ -124,22 +134,32 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		this.resetState();
 		this.setUnique(unique);
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Loading ${this.getEntityType()} Details` });
-		this._getDataPromise = this.structure.loadType(unique);
-		const response = await this._getDataPromise;
-		const data = response.data;
-		if (data) {
-			this._data.setPersisted(data);
-			this.setIsNew(false);
+		try {
+			await this._initialized;
+			const loading = this.initHook.execute({
+				entityType: this.getEntityType(),
+				unique,
+				isNew: false,
+			});
+			this._getDataPromise = this.structure.loadType(unique);
+			const [response] = await Promise.all([this._getDataPromise, loading]);
+			const data = response.data;
+			if (data) {
+				const processedData = await this._processIncomingData(data);
+				this._data.setPersisted(processedData);
+				this.setIsNew(false);
 
-			this.observe(
-				this.structure.ownerContentType,
-				(entity: any) => this.#onDetailStoreChange(entity),
-				'umbContentTypeDetailStoreObserver',
-			);
+				this.observe(
+					this.structure.ownerContentType,
+					(entity: any) => this.#onDetailStoreChange(entity),
+					'umbContentTypeDetailStoreObserver',
+				);
+			}
+
+			return response;
+		} finally {
+			this.loading.removeState(LOADING_STATE_UNIQUE);
 		}
-
-		this.loading.removeState(LOADING_STATE_UNIQUE);
-		return response;
 	}
 
 	/**
@@ -152,8 +172,9 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 
 		const data = await this.structure.reload();
 		if (data) {
-			this._data.setPersisted(data);
-			this._data.setCurrent(data);
+			const processedData = await this._processIncomingData(data);
+			this._data.setPersisted(processedData);
+			this._data.setCurrent(processedData);
 		}
 	}
 

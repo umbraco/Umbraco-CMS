@@ -8,6 +8,18 @@ export interface ManifestPropertyAction<MetaType extends MetaPropertyAction = Me
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'propertyAction';
 	forPropertyEditorUis: string[];
+	/**
+	 * The alias of the action group this action belongs to. The actions of a group render together, ordered by their
+	 * own weight, and the group's weight orders the group in the menu. Actions without a registered group render last.
+	 * @examples ["Umb.PropertyActionGroup.Clipboard"]
+	 */
+	group?: string;
+	/**
+	 * Renders a separator above this action inside its group. The first action of a group needs none, as a separator
+	 * already sits between groups.
+	 * The separator belongs to this action, so it is not rendered when the action is not.
+	 */
+	separatorBefore?: boolean;
 	meta: MetaType;
 }
 

@@ -726,6 +726,42 @@ export class DataTypeApiHelper {
     return await this.save(blockGrid);
   }
 
+  async createBlockGridWithAnAreaWithTwoSpecifiedAllowancesWithMinMaxInABlock(blockGridName: string, contentElementTypeId: string, firstSpecifiedAllowanceElementTypeId: string, secondSpecifiedAllowanceElementTypeId: string, secondMinAllowed: number, secondMaxAllowed: number, areaAlias: string = 'area', createLabel: string = 'CreateLabel', columnSpan: number = 6, rowSpan: number = 1) {
+    await this.ensureNameNotExists(blockGridName);
+
+    const blockGrid = new BlockGridDataTypeBuilder()
+      .withName(blockGridName)
+      .addBlock()
+        .withContentElementTypeKey(contentElementTypeId)
+        .withAllowAtRoot(true)
+        .addArea()
+          .withAlias(areaAlias)
+          .withCreateLabel(createLabel)
+          .withColumnSpan(columnSpan)
+          .withRowSpan(rowSpan)
+          .addSpecifiedAllowance()
+            .withElementTypeKey(firstSpecifiedAllowanceElementTypeId)
+            .done()
+          .addSpecifiedAllowance()
+            .withElementTypeKey(secondSpecifiedAllowanceElementTypeId)
+            .withMinAllowed(secondMinAllowed)
+            .withMaxAllowed(secondMaxAllowed)
+            .done()
+          .done()
+        .done()
+      .addBlock()
+        .withContentElementTypeKey(firstSpecifiedAllowanceElementTypeId)
+        .withAllowInAreas(true)
+        .done()
+      .addBlock()
+        .withContentElementTypeKey(secondSpecifiedAllowanceElementTypeId)
+        .withAllowInAreas(true)
+        .done()
+      .build();
+
+    return await this.save(blockGrid);
+  }
+
   async createBlockGridWithAnAreaInABlockWithAllowInAreas(blockGridName: string, contentElementTypeId: string, areaAlias: string = 'area', allowInAreas = false, createButtonLabel :string = 'CreateLabel', columnSpan: number = 6, rowSpan: number = 1, minAllowed: number = 0, maxAllowed: number = 2) {
     await this.ensureNameNotExists(blockGridName);
 
@@ -1054,12 +1090,12 @@ export class DataTypeApiHelper {
 
   async doesBlockEditorBlockContainAreaWithMinAllowed(blockGridName: string, elementTypeKey: string, areaAlias: string = 'area', minAllowed: number) {
     const block = await this.getBlockWithContentElementTypeId(blockGridName, elementTypeKey);
-    return block.areas.find(area => area.minAllowed === minAllowed && area.alias === areaAlias);
+    return block.areas.find(area => area.validationLimit?.min === minAllowed && area.alias === areaAlias);
   }
 
   async doesBlockEditorBlockContainAreaWithMaxAllowed(blockGridName: string, elementTypeKey: string, areaAlias: string = 'area', maxAllowed: number) {
     const block = await this.getBlockWithContentElementTypeId(blockGridName, elementTypeKey);
-    return block.areas.find(area => area.maxAllowed === maxAllowed && area.alias === areaAlias);
+    return block.areas.find(area => area.validationLimit?.max === maxAllowed && area.alias === areaAlias);
   }
 
   async doesBlockEditorBlockContainAreaWithSpecifiedAllowance(blockGridName: string, elementTypeKey: string, areaAlias: string = 'area') {
@@ -1831,6 +1867,24 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
+  async createContentPickerSourceDataTypeWithDynamicRootAndQueryStep(name: string, originAlias: string, queryStepAlias: string, docTypeKeys: string[]) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultiNodeTreePickerDataTypeBuilder()
+      .withName(name)
+      .addStartNode()
+        .withType('content')
+        .withOriginAlias(originAlias)
+        .addQueryStep()
+          .withAlias(queryStepAlias)
+          .withDocTypeKeys(docTypeKeys)
+          .done()
+        .done()
+      .build();
+
+    return await this.save(dataType);
+  }
+
   async doesContentPickerHaveDynamicRoot(dataTypeName: string, originAlias: string) {
     const dataType = await this.getByName(dataTypeName);
     const startNodeValue = dataType.values.find((item: any) => item.alias === 'startNode');
@@ -1994,6 +2048,17 @@ export class DataTypeApiHelper {
     const dataTypeData = await this.getByName(dataTypeName);
     const valueData = dataTypeData.values.find(item => item.alias === 'validationLimit');
     return valueData?.value.max === max && valueData?.value.min === min;
+  }
+
+  // Checks a single range configuration value (e.g. 'validationRange' or 'validationLimit') that stores its
+  // bounds as a {min, max} object. Both bounds are asserted, so a bound that is not passed in must be unset.
+  async doesDataTypeHaveRangeValue(dataTypeName: string, alias: string, min?: number, max?: number, dataTypeData?) {
+    const dataType = dataTypeData || await this.getByName(dataTypeName);
+    const valueData = dataType.values.find(item => item.alias === alias);
+    if (!valueData) {
+      return false;
+    }
+    return (valueData.value?.min ?? undefined) === min && (valueData.value?.max ?? undefined) === max;
   }
 
   async doesDataTypeHaveCrops(dataTypeName: string, cropLabel: string, cropAlias: string, cropWidth: number, cropHeight: number) {
@@ -2360,7 +2425,7 @@ export class DataTypeApiHelper {
     return await this.save(builder);
   }
 
-  async createDefaultElementPickerWithValidationLimit(name: string, minValidation: number = 0, maxValidation: number = 0) {
+  async createDefaultElementPickerWithValidationLimit(name: string, minValidation?: number, maxValidation?: number) {
     await this.ensureNameNotExists(name);
 
     const builder = new ElementPickerDataTypeBuilder()

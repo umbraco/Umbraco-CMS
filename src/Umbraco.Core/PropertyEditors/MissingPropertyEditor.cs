@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.DependencyInjection;
+﻿using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
@@ -58,6 +56,9 @@ public class MissingPropertyEditor : IDataEditor
 
     /// <inheritdoc />
     public IConfigurationEditor GetConfigurationEditor() => new ConfigurationEditor();
+
+    /// <inheritdoc />
+    public bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue) => Equals(editedValue, publishedValue);
 
     /// <summary>
     /// Provides the property value editor for missing property editors.

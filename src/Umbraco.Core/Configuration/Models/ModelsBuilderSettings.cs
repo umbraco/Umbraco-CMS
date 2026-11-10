@@ -15,7 +15,11 @@ public class ModelsBuilderSettings
     /// <summary>
     ///     The default models mode.
     /// </summary>
-    internal const string StaticModelsMode = "InMemoryAuto";
+    /// <remarks>
+    ///     Generating no models is the only default that can be satisfied without an optional package. A package
+    ///     that supplies a model factory capable of more raises the mode when none has been configured.
+    /// </remarks>
+    internal const string StaticModelsMode = Constants.ModelsBuilder.ModelsModes.Nothing;
 
     /// <summary>
     ///     The default models directory path.

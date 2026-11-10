@@ -42,6 +42,7 @@
     <ProjectReference Include="..\..\src\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Cms.DevelopmentMode.Backoffice\Umbraco.Cms.DevelopmentMode.Backoffice.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Cms.Search.Extension.FileToText\Umbraco.Cms.Search.Extension.FileToText.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Cms\Umbraco.Cms.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache.Bounded\Umbraco.PublishedCache.HybridCache.Bounded.csproj" />
@@ -431,6 +432,15 @@
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.UpdateAndPublish.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <None Update="Umbraco.Cms.Search.Extension.FileToText\TestFiles\Lorem ipsum.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Umbraco.Cms.Search.Extension.FileToText\TestFiles\Lorem ipsum.pdf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Umbraco.Cms.Search.Extension.FileToText\TestFiles\Lorem ipsum.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

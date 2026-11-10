@@ -1,4 +1,7 @@
-import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_BLOCK_ENTRY_CONTEXT } from '../../../block/context/block-entry.context-token.js';
+import { getUnsupportedBlockMessageKeys } from '../../../block/utils/get-unsupported-block-message-keys.function.js';
+import type { UmbBlockExternalContentFailureReason } from '../../../block/types.js';
+import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
@@ -6,15 +9,27 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  */
 @customElement('umb-unsupported-rte-block')
 export class UmbUnsupportedRteBlockElement extends UmbLitElement {
+	@state()
+	private _externalContentFailure?: UmbBlockExternalContentFailureReason;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
+			this.observe(
+				context?.externalContentFailure,
+				(failure) => (this._externalContentFailure = failure),
+				'observeExternalContentFailure',
+			);
+		});
+	}
+
 	override render() {
+		const keys = getUnsupportedBlockMessageKeys(this._externalContentFailure);
 		return html`
-			<uui-ref-node
-				standalone
-				.readonly=${true}
-				detail=${this.localize.term('blockEditor_unsupportedBlockDescription')}>
+			<uui-ref-node standalone .readonly=${true} detail=${this.localize.term(keys.descriptionKey)}>
 				<div class="selection-background" aria-hidden="true">&emsp;</div>
 				<umb-icon slot="icon" name="icon-alert"></umb-icon>
-				<span slot="name">${this.localize.term('blockEditor_unsupportedBlockName')}</span>
+				<span slot="name">${this.localize.term(keys.nameKey)}</span>
 			</uui-ref-node>
 		`;
 	}

@@ -6,7 +6,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Value Type Property Editor UI',
 	element: () => import('./property-editor-ui-value-type.element.js'),
 	meta: {
-		supportsVariantChange: true,
 		label: 'Value Type',
 		icon: 'icon-autofill',
 		group: '#propertyEditorUIGroups_common',

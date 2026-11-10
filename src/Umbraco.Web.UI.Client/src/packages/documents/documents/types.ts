@@ -52,6 +52,7 @@ export interface UmbDocumentUrlInfoModel {
 export interface UmbDocumentValueModel<ValueType = unknown> extends UmbEntryValueModel<ValueType> {}
 
 export interface UmbDocumentVariantOptionModel extends UmbEntityVariantOptionModel<UmbDocumentVariantModel> {
+	// TODO: This information does not belong on this model, we should move that responsibility to something else [NL]
 	documentCount?: number;
 }
 

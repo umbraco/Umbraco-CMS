@@ -24,8 +24,6 @@ export abstract class UmbMenuListStructureWorkspaceContextBase
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT);
-		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
-		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 	}
 
 	/**

@@ -8,7 +8,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Checkbox List Property Editor UI',
 		element: () => import('./property-editor-ui-checkbox-list.element.js'),
 		meta: {
-			supportsVariantChange: true,
 			label: 'Checkbox List',
 			propertyEditorSchemaAlias: 'Umbraco.CheckBoxList',
 			icon: 'icon-bulleted-list',

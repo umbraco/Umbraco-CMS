@@ -16,9 +16,11 @@ export class UserUiHelper extends UiBaseLocators {
   private readonly userSectionCard: Locator;
   private readonly statusBtn: Locator;
   private readonly groupBtn: Locator;
+  private readonly typeBtn: Locator;
   private readonly chooseUserGroupsBtn: Locator;
   private readonly allowAccessToAllDocumentsToggle: Locator;
   private readonly allowAccessToAllMediaToggle: Locator;
+  private readonly allowAccessToAllDocumentBlueprintsToggle: Locator;
   private readonly mediaInput: Locator;
   private readonly chooseContainerBtn: Locator;
   private readonly disabledTxt: Locator;
@@ -49,8 +51,10 @@ export class UserUiHelper extends UiBaseLocators {
     this.userSectionCard = page.locator('uui-card-user');
     this.statusBtn = page.locator('uui-button', {hasText: 'Status'});
     this.groupBtn = page.locator('uui-button', {hasText: 'Groups'});
+    this.typeBtn = page.locator('uui-button', {hasText: 'Type'});
     this.allowAccessToAllDocumentsToggle = page.locator('umb-property-layout').filter({hasText: 'Allow access to all documents'}).locator('#toggle');
     this.allowAccessToAllMediaToggle = page.locator('umb-property-layout').filter({hasText: 'Allow access to all media'}).locator('#toggle');
+    this.allowAccessToAllDocumentBlueprintsToggle = page.locator('umb-property-layout').filter({hasText: 'Allow access to all document blueprints'}).locator('#toggle');
     this.mediaInput = page.locator('umb-input-media');
     this.chooseContainerBtn = page.locator('#container').getByLabel('Choose');
     this.disabledTxt = page.getByText('Disabled', {exact: true});
@@ -179,6 +183,11 @@ export class UserUiHelper extends UiBaseLocators {
     await this.click(this.page.locator('label').filter({hasText: groupName}));
   }
 
+  async filterByTypeName(typeName: string) {
+    await this.click(this.typeBtn);
+    await this.click(this.page.locator('label').filter({hasText: typeName}));
+  }
+
   async isPasswordUpdatedForUserWithId(userId: string) {
     await Promise.all([
       this.page.waitForResponse(resp => resp.url().includes(umbracoConfig.environment.baseUrl + '/umbraco/management/api/v1/user/' + userId + '/change-password') && resp.status() === 200),
@@ -205,6 +214,10 @@ export class UserUiHelper extends UiBaseLocators {
 
   async clickAllowAccessToAllMediaToggle() {
     await this.click(this.allowAccessToAllMediaToggle);
+  }
+
+  async clickAllowAccessToAllDocumentBlueprintsToggle() {
+    await this.click(this.allowAccessToAllDocumentBlueprintsToggle);
   }
 
   async isUserDisabledTextVisible() {

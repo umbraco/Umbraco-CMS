@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Changes;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -11,6 +13,8 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 internal sealed class ContentBlueprintContainerService : EntityTypeContainerService<IContent, IDocumentBlueprintContainerRepository>, IContentBlueprintContainerService
 {
+    private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentBlueprintContainerService"/> class.
     /// </summary>
@@ -21,6 +25,8 @@ internal sealed class ContentBlueprintContainerService : EntityTypeContainerServ
     /// <param name="auditService">The audit service.</param>
     /// <param name="entityRepository">The entity repository.</param>
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="documentBlueprintRepository">The document blueprint repository.</param>
     public ContentBlueprintContainerService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -28,9 +34,48 @@ internal sealed class ContentBlueprintContainerService : EntityTypeContainerServ
         IDocumentBlueprintContainerRepository entityContainerRepository,
         IAuditService auditService,
         IEntityRepository entityRepository,
-        IUserIdKeyResolver userIdKeyResolver)
-        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IEntityService entityService,
+        IDocumentBlueprintRepository documentBlueprintRepository)
+        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver, entityService)
+        => _documentBlueprintRepository = documentBlueprintRepository;
+
+    /// <inheritdoc />
+    protected override IContent? GetContainedEntity(int id)
     {
+        IContent? blueprint = _documentBlueprintRepository.Get(id);
+        if (blueprint is not null)
+        {
+            // the repository does not set this, see also ContentService.GetBlueprintById
+            blueprint.Blueprint = true;
+        }
+
+        return blueprint;
+    }
+
+    /// <inheritdoc />
+    protected override void SaveContainedEntity(IContent entity)
+    {
+        entity.Blueprint = true;
+        _documentBlueprintRepository.Save(entity);
+    }
+
+    /// <inheritdoc />
+    protected override void PublishContainedEntitiesMovedNotifications(ICoreScope scope, IReadOnlyCollection<MoveEventInfo<IContent>> movedEntities, EventMessages eventMessages)
+    {
+        if (movedEntities.Count == 0)
+        {
+            return;
+        }
+
+        scope.Notifications.Publish(new ContentMovedBlueprintNotification(movedEntities, eventMessages));
+
+        // Blueprints are content nodes, so the content tree change notification is what keeps the tree and the
+        // caches in step - matching what ContentService.MoveBlueprint publishes for a single blueprint move.
+        scope.Notifications.Publish(new ContentTreeChangeNotification(
+            movedEntities.Select(movedEntity => movedEntity.Entity).ToArray(),
+            TreeChangeTypes.RefreshNode,
+            eventMessages));
     }
 
     /// <inheritdoc />

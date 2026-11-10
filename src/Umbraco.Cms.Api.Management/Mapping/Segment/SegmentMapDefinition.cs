@@ -14,7 +14,7 @@ public class SegmentMapDefinition : IMapDefinition
     /// </summary>
     /// <param name="mapper">The mapper instance used to register the mapping definitions.</param>
     public void DefineMaps(IUmbracoMapper mapper) => mapper.Define<Core.Models.Segment, SegmentResponseModel>(
-        (_, _) => new SegmentResponseModel { Name = string.Empty, Alias = string.Empty, Cultures = null },
+        (_, _) => new SegmentResponseModel { Name = string.Empty, Alias = string.Empty },
         Map);
 
     // Umbraco.Code.MapAll
@@ -22,6 +22,5 @@ public class SegmentMapDefinition : IMapDefinition
     {
         target.Name = source.Name;
         target.Alias = source.Alias;
-        target.Cultures = source.Cultures;
     }
 }

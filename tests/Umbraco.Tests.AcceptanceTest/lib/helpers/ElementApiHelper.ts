@@ -15,8 +15,8 @@ export class ElementApiHelper {
     return await response.json();
   }
 
-  async waitUntilIndexed(query: string, id: string) {
-    await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.elementSearch, query, id);
+  async waitUntilIndexed(query: string, id: string, culture?: string) {
+    await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.elementSearch, query, id, undefined, culture);
   }
 
   async doesExist(id: string) {
@@ -317,6 +317,30 @@ export class ElementApiHelper {
 
     // Create element
     return await this.create(element);
+  }
+
+  async createElementWithMultipleVariantsAndVaryingAndSharedValues(elementName: string, elementTypeId: string, varyingPropertyName: string, sharedPropertyName: string, cultureVariants: {isoCode: string, name: string, value: string}[], sharedValue: string) {
+    await this.ensureNameNotExists(elementName);
+
+    const builder = new ElementBuilder()
+      .withDocumentTypeId(elementTypeId);
+    for (const variant of cultureVariants) {
+      builder.addVariant()
+        .withName(variant.name)
+        .withCulture(variant.isoCode)
+        .done();
+      builder.addValue()
+        .withAlias(AliasHelper.toAlias(varyingPropertyName))
+        .withValue(variant.value)
+        .withCulture(variant.isoCode)
+        .done();
+    }
+    builder.addValue()
+      .withAlias(AliasHelper.toAlias(sharedPropertyName))
+      .withValue(sharedValue)
+      .done();
+
+    return await this.create(builder.build());
   }
 
   async createDefaultElementWithEnglishAndDanishVariants(elementTypeId: string, englishName: string, danishName: string, propertyName: string, englishTextContent: string, danishTextContent: string) {

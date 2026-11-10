@@ -6,14 +6,21 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 export class UmbAppAuthController extends UmbControllerBase {
 	readonly #retrievedContext: Promise<unknown>;
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#authModalOpen = false;
+	#backofficePath?: string;
+	#restarting = false;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
+
+		// Registered as the app starts, so it runs before the unsaved-changes guards that are registered later
+		window.addEventListener('beforeunload', this.#onBeforeUnload, { capture: true });
 
 		this.#retrievedContext = this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
 			this.#authContext = context;
@@ -29,7 +36,44 @@ export class UmbAppAuthController extends UmbControllerBase {
 				},
 				'_authState',
 			);
+
+			this.observe(
+				context?.userChanged,
+				() => {
+					if (context) this.restartForNewUser();
+				},
+				'_userChanged',
+			);
 		}).asPromise({ preventTimeout: true });
+
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (currentUser) => {
+			this.observe(
+				currentUser?.unique,
+				(unique) => {
+					if (unique) this.#authContext?.bindUser(unique);
+				},
+				'_bindUser',
+			);
+		});
+
+		this.consumeContext(UMB_SERVER_CONTEXT, (serverContext) => {
+			this.#backofficePath = serverContext?.getBackofficePath();
+		});
+	}
+
+	#onBeforeUnload = (event: Event) => {
+		if (this.#restarting) event.stopImmediatePropagation();
+	};
+
+	/**
+	 * Starts the backoffice over with a full page load, for the user who is signed in now. Only a new page
+	 * guarantees that none of the previous user's client state, including state held by extensions, is
+	 * shown to them. Unsaved changes on the page belong to the previous user, so no unsaved-changes
+	 * prompt (`beforeunload`) can keep the page.
+	 */
+	restartForNewUser() {
+		this.#restarting = true;
+		location.href = this.#backofficePath ?? '/umbraco';
 	}
 
 	/**
@@ -131,5 +175,10 @@ export class UmbAppAuthController extends UmbControllerBase {
 	#renderRouteIfNoneWasRendered(userLoginState: UmbUserLoginState) {
 		if (userLoginState === 'timedOut') return;
 		history.replaceState(null, '', location.href);
+	}
+
+	override destroy() {
+		window.removeEventListener('beforeunload', this.#onBeforeUnload, { capture: true });
+		super.destroy();
 	}
 }

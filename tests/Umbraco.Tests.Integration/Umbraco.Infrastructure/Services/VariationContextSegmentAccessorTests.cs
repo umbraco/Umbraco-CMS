@@ -66,7 +66,7 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
                 Properties = [new() { Alias = "documentTitle", Value = "Document Title" }],
                 Variants = [new() { Name = "Page" }],
             },
-            [],
+            new HashSet<string>(),
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(createResult.Success);
@@ -149,7 +149,7 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
                 ],
                 Variants = [new() { Name = "Page" }],
             },
-            [],
+            new HashSet<string>(),
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(createResult.Success);
@@ -259,7 +259,7 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
                 ],
                 Variants = [new() { Name = "Page" }],
             },
-            [],
+            new HashSet<string>(),
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(createResult.Success);
@@ -351,7 +351,7 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
                 ],
                 Variants = [new() { Name = "Page" }],
             },
-            [],
+            new HashSet<string>(),
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(contentCreateResult.Success);
@@ -427,7 +427,7 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
                 ],
                 Variants = [new() { Name = "Page" }],
             },
-            [],
+            new HashSet<string>(),
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(contentCreateResult.Success);
@@ -487,7 +487,7 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
                 ],
                 Variants = [new() { Name = "Page" }],
             },
-            [],
+            new HashSet<string>(),
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(contentCreateResult.Success);
@@ -567,7 +567,7 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
                 ],
                 Variants = [new() { Name = "Page" }],
             },
-            [],
+            new HashSet<string>(),
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(createResult.Success);

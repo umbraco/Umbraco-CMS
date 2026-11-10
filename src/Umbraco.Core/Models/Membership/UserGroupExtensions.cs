@@ -31,12 +31,14 @@ public static class UserGroupExtensions
             group.StartContentId,
             group.StartMediaId,
             group.StartElementId,
+            group.StartDocumentBlueprintId,
             group.Alias,
             group.AllowedLanguages,
             group.AllowedSections,
             group.Permissions,
             group.GranularPermissions,
-            group.HasAccessToAllLanguages);
+            group.HasAccessToAllLanguages,
+            group.HasAccessToInvariantForVariant);
     }
 
     /// <summary>

@@ -34,6 +34,16 @@ export interface MetaEntityActionContentPublishKind extends MetaEntityActionDefa
 	 * Alias of the publishing repository used to perform the publish operation.
 	 */
 	publishingRepositoryAlias: string;
+	/**
+	 * Alias of the item repository used by the modal to present the affected items. Omit to skip publish-awareness
+	 * of inbound references entirely.
+	 */
+	itemRepositoryAlias?: string;
+	/**
+	 * Alias of the reference repository used by the modal to show how many items reference this entity. Omit to skip
+	 * publish-awareness of inbound references entirely.
+	 */
+	referenceRepositoryAlias?: string;
 }
 
 /**

@@ -46,6 +46,7 @@ export const serverInformationHandlers = [
 			assemblyVersion: version,
 			baseUtcOffset: '01:00:00',
 			runtimeMode: RuntimeModeModel.BACKOFFICE_DEVELOPMENT,
+			isDebugMode: true,
 		});
 	}),
 	http.get(umbracoPath('/server/troubleshooting'), () => {

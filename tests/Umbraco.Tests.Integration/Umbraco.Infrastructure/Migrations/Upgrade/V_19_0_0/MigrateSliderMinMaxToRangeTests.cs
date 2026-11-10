@@ -1,0 +1,106 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Text.Json.Nodes;
+using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_0_0;
+using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Tests.Common.Testing;
+
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Upgrade.V19_0_0;
+
+[TestFixture]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+internal sealed class MigrateSliderMinMaxToRangeTests : MigrateMinMaxToRangeTestBase
+{
+    [Test]
+    public async Task Combines_Into_ValidationRange_And_Preserves_Other_Config()
+    {
+        var id = await CreateDataTypeWithRawConfig(
+            Constants.PropertyEditors.Aliases.Slider,
+            """{ "minVal": 0, "maxVal": 100, "step": 1, "enableRange": true, "minimumRange": 0 }""");
+
+        await RunMigration<MigrateSliderMinMaxToRange>();
+
+        JsonObject config = await GetRawConfig(id);
+        Assert.Multiple(() =>
+        {
+            Assert.That(config.ContainsKey("minVal"), Is.False);
+            Assert.That(config.ContainsKey("maxVal"), Is.False);
+
+            // Slider minimum of zero is a real lower bound and must be preserved.
+            Assert.That(Min(config, "validationRange"), Is.EqualTo(0));
+            Assert.That(Max(config, "validationRange"), Is.EqualTo(100));
+            Assert.That(config["enableRange"]?.GetValue<bool>(), Is.True);
+        });
+    }
+
+    [Test]
+    public async Task Zero_Maximum_Becomes_Unbounded()
+    {
+        var id = await CreateDataTypeWithRawConfig(
+            Constants.PropertyEditors.Aliases.Slider,
+            """{ "minVal": 5, "maxVal": 0 }""");
+
+        await RunMigration<MigrateSliderMinMaxToRange>();
+
+        JsonObject config = await GetRawConfig(id);
+        Assert.Multiple(() =>
+        {
+            Assert.That(Min(config, "validationRange"), Is.EqualTo(5));
+            Assert.That(Max(config, "validationRange"), Is.Null);
+        });
+    }
+
+    [Test]
+    public async Task Combines_Range_Slider_Into_ValidationRange()
+    {
+        var id = await CreateDataTypeWithRawConfig(
+            Constants.PropertyEditors.Aliases.RangeSlider,
+            """{ "minVal": 10, "maxVal": 90, "step": 1, "minimumRange": 5 }""");
+
+        await RunMigration<MigrateSliderMinMaxToRange>();
+
+        JsonObject config = await GetRawConfig(id);
+        Assert.Multiple(() =>
+        {
+            Assert.That(config.ContainsKey("minVal"), Is.False);
+            Assert.That(config.ContainsKey("maxVal"), Is.False);
+            Assert.That(Min(config, "validationRange"), Is.EqualTo(10));
+            Assert.That(Max(config, "validationRange"), Is.EqualTo(90));
+            Assert.That(config["minimumRange"]?.GetValue<decimal>(), Is.EqualTo(5));
+        });
+    }
+
+    [Test]
+    public async Task Bounds_Survive_The_Earlier_Range_Slider_Data_Type_Migration()
+    {
+        var id = await CreateDataTypeWithRawConfig(
+            Constants.PropertyEditors.Aliases.Slider,
+            """{ "minVal": 10, "maxVal": 90, "step": 1, "enableRange": true, "minimumRange": 5 }""");
+
+        // Matches the order in the upgrade plan, where the range slider data types are moved first.
+        await RunMigration<MigrateRangeSliderDataTypes>();
+        await RunMigration<MigrateSliderMinMaxToRange>();
+
+        JsonObject config = await GetRawConfig(id);
+        string editorAlias;
+        using (IScope scope = ScopeProvider.CreateScope())
+        {
+            editorAlias = scope.Database.ExecuteScalar<string>(
+                "SELECT propertyEditorAlias FROM umbracoDataType WHERE nodeId = @0",
+                id);
+            scope.Complete();
+        }
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(editorAlias, Is.EqualTo(Constants.PropertyEditors.Aliases.RangeSlider));
+            Assert.That(config.ContainsKey("minVal"), Is.False);
+            Assert.That(config.ContainsKey("maxVal"), Is.False);
+            Assert.That(Min(config, "validationRange"), Is.EqualTo(10));
+            Assert.That(Max(config, "validationRange"), Is.EqualTo(90));
+        });
+    }
+}

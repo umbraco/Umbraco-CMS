@@ -33,8 +33,6 @@ export class UmbMemberMenuStructureWorkspaceContext
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT);
-		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
-		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 
 		this.#parentContext.setParent({ unique: null, entityType: UMB_MEMBER_ROOT_ENTITY_TYPE });
 

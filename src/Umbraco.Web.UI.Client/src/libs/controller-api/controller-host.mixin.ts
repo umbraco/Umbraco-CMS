@@ -75,6 +75,13 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 						ctrl.hostConnected();
 					}
 				});
+			} else if (this._attached === false) {
+				// Match the state of controllers that were present when this host disconnected, so nothing keeps running until a reconnect that may never come.
+				Promise.resolve().then(() => {
+					if (this._attached === false && this._controllers?.includes(ctrl)) {
+						ctrl.hostDisconnected();
+					}
+				});
 			}
 		}
 

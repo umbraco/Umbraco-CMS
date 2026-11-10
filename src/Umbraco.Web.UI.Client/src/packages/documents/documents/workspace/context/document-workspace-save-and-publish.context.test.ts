@@ -153,12 +153,12 @@ describe('UmbDocumentWorkspaceContext (save & publish data state, segment varian
 	});
 
 	it('transfers every segment of the saved culture, not just the explicitly selected variant', async () => {
-		const s1 = UmbVariantId.Create({ culture: null, segment: 's1' });
+		const s1 = new UmbVariantId(null, 's1');
 		await context.setPropertyValue('segmentText', 'Updated segment 1 text', s1);
 
 		// Only the default (culture-invariant, segment-invariant) variant is ever offered for selection when a
 		// document does not vary by culture; segments of that culture are carried along transparently.
-		await saveAndPublish(context, publishingDataSource, [UmbVariantId.CreateInvariant()]);
+		await saveAndPublish(context, publishingDataSource, [UmbVariantId.INVARIANT]);
 
 		expect(context.getPropertyValue('segmentText', s1)).to.equal('Updated segment 1 text');
 		expect(context.getHasUnpersistedChanges(), 'no unpersisted changes remain after the save').to.be.false;

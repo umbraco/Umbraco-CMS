@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Search.Querying;
 using Umbraco.Cms.Core.Search.Querying.Filtering;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -38,20 +39,35 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
         _idKeyMap = idKeyMap;
     }
 
-    /// <summary>
-    /// Synchronously searches for entities. See <see cref="SearchAsync"/>.
-    /// </summary>
-    /// <param name="objectType">The type of entities to search for.</param>
-    /// <param name="query">The search query string.</param>
-    /// <param name="skip">The number of results to skip for pagination.</param>
-    /// <param name="take">The maximum number of results to return.</param>
-    /// <param name="ignoreUserStartNodes">If true, ignores user start node restrictions when searching.</param>
-    /// <returns>A paged model containing the matching entities.</returns>
-    public PagedModel<IEntitySlim> Search(UmbracoObjectTypes objectType, string query, int skip = 0, int take = 100, bool ignoreUserStartNodes = false)
-        => SearchAsync(objectType, query, null, null, null, null, skip, take, ignoreUserStartNodes).GetAwaiter().GetResult();
-
     /// <inheritdoc />
     public async Task<PagedModel<IEntitySlim>> SearchAsync(
+        UmbracoObjectTypes objectType,
+        string query,
+        Guid? parentId,
+        IEnumerable<Guid>? contentTypeIds,
+        bool? trashed,
+        string? culture = null,
+        int skip = 0,
+        int take = 100,
+        bool ignoreUserStartNodes = false)
+    {
+        PagedModel<Guid> result = await SearchKeysAsync(objectType, query, parentId, contentTypeIds, trashed, culture, skip, take, ignoreUserStartNodes);
+
+        Guid[] resultKeys = result.Items.ToArray();
+        IEntitySlim[] resultEntities = resultKeys.Length > 0
+            ? _entityService
+                .GetAll(objectType, resultKeys)
+                // unfortunately we can't explicitly rely on the underlying services ordering the requested
+                // items correctly, so we need to enforce correct ordering here.
+                .OrderBy(entity => resultKeys.IndexOf(entity.Key))
+                .ToArray()
+            : [];
+
+        return new PagedModel<IEntitySlim> { Items = resultEntities, Total = result.Total };
+    }
+
+    /// <inheritdoc />
+    public async Task<PagedModel<Guid>> SearchKeysAsync(
         UmbracoObjectTypes objectType,
         string query,
         Guid? parentId,
@@ -67,7 +83,7 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
         // cannot combine trashed and start node filtering - this should always yield zero results
         if (startNodeKeys.Length > 0 && trashed is true)
         {
-            return new PagedModel<IEntitySlim>();
+            return new PagedModel<Guid>();
         }
 
         var indexAlias = objectType switch
@@ -75,10 +91,20 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
             UmbracoObjectTypes.Document => Constants.Search.IndexAliases.DraftContent,
             UmbracoObjectTypes.Media => Constants.Search.IndexAliases.DraftMedia,
             UmbracoObjectTypes.Member => Constants.Search.IndexAliases.DraftMembers,
+            UmbracoObjectTypes.Element => Constants.Search.IndexAliases.DraftElements,
             _ => throw new ArgumentOutOfRangeException(nameof(objectType), objectType, null)
         };
 
         List<Filter> filters = ParseFilters(query, parentId, out var effectiveQuery);
+
+        // Free text matches every textual field of a member, including identifying data such as email, username and
+        // property values. Without access to members, the query only matches the member name, so that a search can't
+        // be used to confirm who is a member.
+        if (objectType is UmbracoObjectTypes.Member && effectiveQuery is not null && CurrentUserHasMembersAccess() is false)
+        {
+            filters.AddRange(NameFilters(effectiveQuery));
+            effectiveQuery = null;
+        }
 
         Guid[]? contentTypeIdsAsArray = contentTypeIds as Guid[] ?? contentTypeIds?.ToArray();
         if (contentTypeIdsAsArray?.Length > 0)
@@ -104,6 +130,7 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
             {
                 UmbracoObjectTypes.Document => Cms.Core.Constants.System.RecycleBinContentKey,
                 UmbracoObjectTypes.Media => Cms.Core.Constants.System.RecycleBinMediaKey,
+                UmbracoObjectTypes.Element => Cms.Core.Constants.System.RecycleBinElementKey,
                 _ => null
             };
 
@@ -130,18 +157,18 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
             skip,
             take);
 
-        Guid[] resultKeys = result.Documents.Select(d => d.Id).ToArray();
-        IEntitySlim[] resultEntities = resultKeys.Length > 0
-            ? _entityService
-                .GetAll(objectType, resultKeys)
-                // unfortunately we can't explicitly rely on the underlying services ordering the requested
-                // items correctly, so we need to enforce correct ordering here.
-                .OrderBy(entity => resultKeys.IndexOf(entity.Key))
-                .ToArray()
-            : [];
-
-        return new PagedModel<IEntitySlim> { Items = resultEntities, Total = result.Total };
+        return new PagedModel<Guid> { Items = result.Documents.Select(d => d.Id).ToArray(), Total = result.Total };
     }
+
+    private bool CurrentUserHasMembersAccess()
+        => _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasSectionAccess(Constants.Applications.Members) is true;
+
+    // Filters combine with AND, so one filter per term requires every term to match the name, just as free text
+    // requires every term to match some field.
+    private static IEnumerable<Filter> NameFilters(string query)
+        => query
+            .Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries)
+            .Select(term => new TextFilter(Constants.Search.FieldNames.Name, [term], Negate: false));
 
     /// <summary>
     /// Resolves the current backoffice user's start node keys for the given entity type, if any are configured.
@@ -155,13 +182,19 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
         {
             UmbracoObjectTypes.Document => currentUser?.CalculateContentStartNodeIds(_entityService, _appCaches),
             UmbracoObjectTypes.Media => currentUser?.CalculateMediaStartNodeIds(_entityService, _appCaches),
+            UmbracoObjectTypes.Element => currentUser?.CalculateElementStartNodeIds(_entityService, _appCaches),
             _ => null
         };
+
+        // element start nodes are element containers
+        UmbracoObjectTypes startNodeObjectType = objectType is UmbracoObjectTypes.Element
+            ? UmbracoObjectTypes.ElementContainer
+            : objectType;
 
         return startNodeIds is not null
             ? startNodeIds.Select(id =>
                 {
-                    Attempt<Guid> attempt = _idKeyMap.GetKeyForId(id, objectType);
+                    Attempt<Guid> attempt = _idKeyMap.GetKeyForId(id, startNodeObjectType);
                     return attempt.Success ? attempt.Result : (Guid?)null;
                 })
                 .Where(key => key.HasValue)

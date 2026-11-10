@@ -204,6 +204,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Search.Provider
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.PublishedCache.HybridCache.Bounded", "src\Umbraco.PublishedCache.HybridCache.Bounded\Umbraco.PublishedCache.HybridCache.Bounded.csproj", "{0A00AC20-8CB8-4E93-AB84-B1851095AEC2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Search.Extension.FileToText", "src\Umbraco.Cms.Search.Extension.FileToText\Umbraco.Cms.Search.Extension.FileToText.csproj", "{02173D97-0519-474E-9511-A74FB245A19F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -786,6 +788,24 @@ Global
 		{0A00AC20-8CB8-4E93-AB84-B1851095AEC2}.SkipTests|x64.Build.0 = SkipTests|Any CPU
 		{0A00AC20-8CB8-4E93-AB84-B1851095AEC2}.SkipTests|x86.ActiveCfg = SkipTests|Any CPU
 		{0A00AC20-8CB8-4E93-AB84-B1851095AEC2}.SkipTests|x86.Build.0 = SkipTests|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.Debug|x64.Build.0 = Debug|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.Debug|x86.Build.0 = Debug|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.Release|x64.ActiveCfg = Release|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.Release|x64.Build.0 = Release|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.Release|x86.ActiveCfg = Release|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.Release|x86.Build.0 = Release|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.SkipTests|x64.ActiveCfg = Debug|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.SkipTests|x64.Build.0 = Debug|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.SkipTests|x86.ActiveCfg = Debug|Any CPU
+		{02173D97-0519-474E-9511-A74FB245A19F}.SkipTests|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

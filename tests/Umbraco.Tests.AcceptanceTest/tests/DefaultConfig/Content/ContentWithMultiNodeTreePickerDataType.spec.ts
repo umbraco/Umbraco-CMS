@@ -1,4 +1,4 @@
-import {ApiHelpers, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {AliasHelper, ApiHelpers, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {BrowserContext, expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -1055,4 +1055,62 @@ test('can only select allowed types in the tree table view within the picker', a
   await umbracoApi.document.ensureNameNotExists(notAllowedItemName);
   await umbracoApi.documentType.ensureNameNotExists(allowedItemDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(notAllowedItemDocumentTypeName);
+});
+
+test('can navigate away from content with a multi node tree picker value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const firstPickerItemName = 'First Picker Item';
+  const secondPickerItemName = 'Second Picker Item';
+  const pickerItemDocumentTypeName = 'MultiPickerItemDocumentType';
+  const pickerItemDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(pickerItemDocumentTypeName);
+  const firstPickerItemId = await umbracoApi.document.createDefaultDocument(firstPickerItemName, pickerItemDocumentTypeId);
+  await umbracoApi.document.createDefaultDocument(secondPickerItemName, pickerItemDocumentTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDocumentWithPropertyValue(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), [{type: 'document', unique: firstPickerItemId}]);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(firstPickerItemName);
+  await umbracoApi.document.ensureNameNotExists(secondPickerItemName);
+  await umbracoApi.documentType.ensureNameNotExists(pickerItemDocumentTypeName);
+});
+
+test('can see discard changes when navigating away from content with a changed multi node tree picker value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const firstPickerItemName = 'First Picker Item';
+  const secondPickerItemName = 'Second Picker Item';
+  const pickerItemDocumentTypeName = 'MultiPickerItemDocumentType';
+  const pickerItemDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(pickerItemDocumentTypeName);
+  const firstPickerItemId = await umbracoApi.document.createDefaultDocument(firstPickerItemName, pickerItemDocumentTypeId);
+  await umbracoApi.document.createDefaultDocument(secondPickerItemName, pickerItemDocumentTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDocumentWithPropertyValue(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), [{type: 'document', unique: firstPickerItemId}]);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.selectLinkByName(secondPickerItemName);
+  await umbracoUi.content.clickChooseModalButton();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(firstPickerItemName);
+  await umbracoApi.document.ensureNameNotExists(secondPickerItemName);
+  await umbracoApi.documentType.ensureNameNotExists(pickerItemDocumentTypeName);
 });

@@ -18,10 +18,10 @@ using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 /// <summary>
-/// Integration tests that verify the end-to-end behavior of
-/// <see cref="DocumentUrlServiceContentTreeChangeNotificationHandler"/>:
-/// the handler writes URL segments and aliases to the database on publish,
-/// while the cache-only variants (<c>UpdateUrlSegmentCacheAsync</c> /
+/// Integration tests that verify the end-to-end behavior of the URL persistence on publish:
+/// <see cref="DocumentUrlServiceContentTreeChangeNotificationHandler"/> writes URL segments to the database after
+/// the commit and <see cref="DocumentUrlAliasContentRefreshNotificationHandler"/> writes URL aliases inside the
+/// content transaction, while the cache-only variants (<c>UpdateUrlSegmentCacheAsync</c> /
 /// <c>UpdateAliasCacheAsync</c> etc.) leave the database unchanged.
 /// </summary>
 [TestFixture]
@@ -364,7 +364,7 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
     /// the alias to the database without any manual call to <c>CreateOrUpdateAliasesAsync</c>.
     /// </summary>
     [Test]
-    public void Publish_WithUrlAlias_WritesAliasesToDatabase_ViaNotificationHandler()
+    public void Publish_WithUrlAlias_WritesAliasesToDatabase_InsideTheContentTransaction()
     {
         var page = ContentBuilder.CreateSimpleContent(ContentType, "Alias Page", RootPage.Id);
         page.SetValue(Constants.Conventions.Content.UrlAlias, "my-integration-alias");
@@ -372,11 +372,22 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         ContentService.Publish(page, []);
 
         var aliases = GetDbAliases(page.Key);
+        int publishedCacheRows;
+        using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+        {
+            publishedCacheRows = scope.Database.ExecuteScalar<int>(
+                $"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.NodeData} WHERE nodeId = @0",
+                page.Id);
+        }
 
         Assert.That(
             aliases,
             Is.Not.Empty,
-            "The ContentTreeChangeNotification handler must write URL aliases to the database on publish.");
+            "The URL aliases must be written to the database as part of the publish.");
+        Assert.That(
+            publishedCacheRows,
+            Is.GreaterThan(0),
+            "The published content cache row is written from the same ContentRefreshNotification and must be there too.");
         Assert.That(
             aliases.Any(a => a.Alias == "my-integration-alias"),
             Is.True,

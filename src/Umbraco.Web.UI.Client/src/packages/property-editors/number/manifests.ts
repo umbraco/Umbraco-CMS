@@ -15,7 +15,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Decimal Property Editor UI',
 		element: () => import('./property-editor-ui-decimal.element.js'),
 		meta: {
-			supportsVariantChange: true,
 			label: 'Decimal',
 			propertyEditorSchemaAlias: 'Umbraco.Decimal',
 			icon: 'icon-autofill',
@@ -66,7 +65,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Numeric Property Editor UI',
 		element: () => import('./property-editor-ui-number.element.js'),
 		meta: {
-			supportsVariantChange: true,
 			label: 'Numeric',
 			icon: 'icon-autofill',
 			group: '#propertyEditorUIGroups_common',

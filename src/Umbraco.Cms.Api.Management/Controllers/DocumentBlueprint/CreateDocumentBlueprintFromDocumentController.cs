@@ -48,6 +48,7 @@ public class CreateDocumentBlueprintFromDocumentController : DocumentBlueprintCo
     [HttpPost("from-document")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Creates a document blueprint from an existing document.")]
     [EndpointDescription("Creates a new document blueprint based on an existing document identified by the provided Id.")]
@@ -63,11 +64,22 @@ public class CreateDocumentBlueprintFromDocumentController : DocumentBlueprintCo
             return Forbidden();
         }
 
+        AuthorizationResult documentBlueprintAuthorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            DocumentBlueprintPermissionResource.WithKeys(fromDocumentRequestModel.Parent?.Id),
+            AuthorizationPolicies.DocumentBlueprintPermissionByResource);
+
+        if (documentBlueprintAuthorizationResult.Succeeded is false)
+        {
+            return Forbidden();
+        }
+
         Attempt<ContentCreateResult, ContentEditingOperationStatus> result =
             await _contentBlueprintEditingService.CreateFromContentAsync(
                 fromDocumentRequestModel.Document.Id,
                 fromDocumentRequestModel.Name,
                 fromDocumentRequestModel.Id,
+                fromDocumentRequestModel.Parent?.Id,
                 CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success

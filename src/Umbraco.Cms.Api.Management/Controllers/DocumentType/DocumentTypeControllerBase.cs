@@ -108,7 +108,7 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .Build()),
                 ContentTypeOperationStatus.NameTooLong => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Name was too long")
-                    .WithDetail("Name cannot be more than 255 characters in length.")
+                    .WithDetail($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.")
                     .Build()),
                 ContentTypeOperationStatus.InvalidElementFlagDocumentHasContent => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid IsElement flag")
@@ -125,10 +125,6 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                 ContentTypeOperationStatus.InvalidElementFlagComparedToParent => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid IsElement flag")
                     .WithDetail("Can not create a documentType with inheritance composition where the parent and the new type's IsElement flag are different.")
-                    .Build()),
-                ContentTypeOperationStatus.InvalidSegmentVariationForElementType => new BadRequestObjectResult(problemDetailsBuilder
-                    .WithTitle("Invalid segment variation")
-                    .WithDetail("Element types cannot vary by segment.")
                     .Build()),
                 ContentTypeOperationStatus.InvalidPropertyTypeVariation => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid property variation")

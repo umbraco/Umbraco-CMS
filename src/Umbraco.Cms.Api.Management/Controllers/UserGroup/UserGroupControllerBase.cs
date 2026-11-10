@@ -61,6 +61,10 @@ public class UserGroupControllerBase : ManagementApiControllerBase
                 .WithTitle("Element start node key not found")
                 .WithDetail("The assigned element start node does not exist.")
                 .Build()),
+            UserGroupOperationStatus.DocumentBlueprintStartNodeKeyNotFound => NotFound(problemDetailsBuilder
+                .WithTitle("Document blueprint start node key not found")
+                .WithDetail("The assigned document blueprint start node does not exist.")
+                .Build()),
             UserGroupOperationStatus.DocumentPermissionKeyNotFound => NotFound(new ProblemDetailsBuilder()
                 .WithTitle("Document permission key not found")
                 .WithDetail("An assigned document permission does not reference an existing document.")
@@ -92,8 +96,8 @@ public class UserGroupControllerBase : ManagementApiControllerBase
             UserGroupOperationStatus.UserNotInGroup => BadRequest(problemDetailsBuilder
                 .WithTitle("User not in group")
                 .WithDetail("The user is not in the group.")),
-            UserGroupOperationStatus.Unauthorized => Unauthorized(problemDetailsBuilder
-                .WithTitle("Unauthorized access")
+            UserGroupOperationStatus.Unauthorized => StatusCode(StatusCodes.Status403Forbidden, problemDetailsBuilder
+                .WithTitle("Forbidden")
                 .WithDetail("The performing user does not have the necessary access to perform this operation. Check the log for details.")
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder

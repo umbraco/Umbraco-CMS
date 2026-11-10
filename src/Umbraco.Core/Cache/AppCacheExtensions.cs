@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using Umbraco.Cms.Core.Cache;
 
 namespace Umbraco.Extensions;
@@ -7,6 +9,10 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class AppCacheExtensions
 {
+    private static bool RetrievedNullRepresentationInCache(object result) => result == (object)Cms.Core.Constants.Cache.NullRepresentationInCache;
+
+    private static bool RequestedNullRepresentationInCache<T>() => typeof(T) == typeof(string);
+
     /// <summary>
     ///     Gets a strongly typed cache item with the specified key, creating it if necessary using the provided factory.
     /// </summary>
@@ -139,13 +145,8 @@ public static class AppCacheExtensions
         TimeSpan? timeout,
         bool isSliding = false)
     {
-        var result = provider.Get(cacheKey);
-
-        if (result == null)
-        {
-            result = await getCacheItemAsync();
-            provider.Insert(cacheKey, () => result, timeout, isSliding);
-        }
+        var result = provider.Get(cacheKey)
+            ?? await GetOrAddInFlightAsync(provider, cacheKey, getCacheItemAsync, timeout, isSliding);
 
         if (result == null)
         {
@@ -162,9 +163,77 @@ public static class AppCacheExtensions
         return result.TryConvertTo<T>().Result;
     }
 
-    private static bool RetrievedNullRepresentationInCache(object result) => result == (object)Cms.Core.Constants.Cache.NullRepresentationInCache;
+    /// <summary>
+    ///     The asynchronous factory calls currently running, keyed by cache instance and cache key, so that concurrent
+    ///     misses on the same key await one shared result.
+    /// </summary>
+    /// <remarks>
+    ///     An entry is removed when its factory call completes, whether or not it succeeded.
+    /// </remarks>
+    private static readonly ConcurrentDictionary<(IAppPolicyCache, string), Lazy<Task<object?>>> _inFlight = new();
 
-    private static bool RequestedNullRepresentationInCache<T>() => typeof(T) == typeof(string);
+    /// <summary>
+    ///     The cache instance and cache key pairs whose asynchronous factories are running in the current asynchronous
+    ///     context, used to detect a factory requesting its own key.
+    /// </summary>
+    private static readonly AsyncLocal<ImmutableHashSet<(IAppPolicyCache, string)>?> _factoryKeys = new();
+
+    // Concurrent misses on the same key share one in-flight factory call and its result, matching the stampede
+    // protection the synchronous GetCacheItem gets from IAppPolicyCache.Get(key, factory). Sharing the result rather
+    // than re-reading the cache means callers don't each re-run the factory when nothing was stored, such as for a null
+    // result or a cache that doesn't store. Entries are scoped per cache instance and removed once the factory completes.
+    private static Task<object?> GetOrAddInFlightAsync<T>(
+        IAppPolicyCache provider,
+        string cacheKey,
+        Func<Task<T?>> getCacheItemAsync,
+        TimeSpan? timeout,
+        bool isSliding)
+    {
+        (IAppPolicyCache provider, string cacheKey) inFlightKey = (provider, cacheKey);
+
+        // A factory requesting its own key would await its own result forever. Fail fast instead, as the synchronous
+        // GetCacheItem does (Lazy throws on a recursive Value access).
+        if (_factoryKeys.Value?.Contains(inFlightKey) is true)
+        {
+            throw new InvalidOperationException(
+                $"The factory for cache key '{cacheKey}' attempted to get the same key from the same cache.");
+        }
+
+        Lazy<Task<object?>> inFlight = _inFlight.GetOrAdd(
+            inFlightKey,
+            key => new Lazy<Task<object?>>(() => RunFactoryAsync(key, getCacheItemAsync, timeout, isSliding)));
+
+        return inFlight.Value;
+    }
+
+    private static async Task<object?> RunFactoryAsync<T>(
+        (IAppPolicyCache Provider, string CacheKey) inFlightKey,
+        Func<Task<T?>> getCacheItemAsync,
+        TimeSpan? timeout,
+        bool isSliding)
+    {
+        try
+        {
+            // Another caller may have populated the cache between our miss and this factory call becoming in-flight.
+            var result = inFlightKey.Provider.Get(inFlightKey.CacheKey);
+            if (result != null)
+            {
+                return result;
+            }
+
+            // Flows into the factory's async context only, so it is gone once this method returns.
+            _factoryKeys.Value = (_factoryKeys.Value ?? []).Add(inFlightKey);
+            result = await getCacheItemAsync();
+            inFlightKey.Provider.Insert(inFlightKey.CacheKey, () => result, timeout, isSliding);
+
+            return result;
+        }
+        finally
+        {
+            // Only this call removes its entry and nothing replaces it while present, so the key is still ours.
+            _inFlight.TryRemove(inFlightKey, out _);
+        }
+    }
 
     /// <summary>
     ///     Asynchronously inserts a strongly typed cache item with the specified key.

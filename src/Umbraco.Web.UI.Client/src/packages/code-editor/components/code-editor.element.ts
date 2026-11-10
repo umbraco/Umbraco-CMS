@@ -264,7 +264,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		return html`
 			${this.#renderStyles()}
 			${when(this._loading, () => html`<div id="loader-container"><uui-loader></uui-loader></div>`)}
-			<div id="editor-container" ${ref(this.#containerRef)}></div>
+			<div id="editor-container" dir="ltr" ${ref(this.#containerRef)}></div>
 		`;
 	}
 

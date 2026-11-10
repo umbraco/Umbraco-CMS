@@ -7,6 +7,7 @@ import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboar
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+
 export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT.TYPE,
@@ -34,12 +35,6 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_LIST_MANAGER_CONTEXT, UMB_BLOCK_LIST_ENTRIES_CONTEXT);
-	}
-
-	protected override _needsLegacyLabelRenderer(): boolean {
-		// Block List entry element owns the canonical `<umb-ufm-render>` and pushes
-		// resolved text via `setName()`. No hidden virtual renderer is needed here.
-		return false;
 	}
 
 	protected override _gotManager() {
@@ -79,6 +74,7 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 
 		clipboardContext.write({
 			icon: this.getContentElementTypeIcon(),
+			thumbnail: this.getThumbnailUrl(),
 			name: entryName,
 			propertyValue: this.#buildPropertyValue(),
 			propertyEditorUiAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,

@@ -14,15 +14,14 @@ export class UmbIsRoutableContextCondition
 		// Default match value is true (checking if we are in a routable context)
 		const matchValue = this.config.match ?? true;
 
-		// Default state: we assume we are NOT in a routable context.
-		// So if match is false (looking for "not in routable context"), we start as permitted.
-		// If match is true (looking for "in routable context"), we start as not permitted.
-		this.permitted = !matchValue;
-
-		this.consumeContext(UMB_ROUTE_CONTEXT, () => {
-			// Route context found, so we ARE in a routable context.
-			// Permitted if match is true, not permitted if match is false.
-			this.permitted = matchValue;
-		});
+		this.consumeContext(UMB_ROUTE_CONTEXT, (context) => {
+			// Route context found, so we ARE in a routable context, if that matches the expected match value, then we are permitted.
+			this.permitted = !!context === matchValue;
+		})
+			.asPromise()
+			.catch(() => {
+				// The context could not be found, so it is absent: permitted if that matches the expected match value.
+				this.permitted = !matchValue;
+			});
 	}
 }

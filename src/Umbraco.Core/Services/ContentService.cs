@@ -62,6 +62,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// <param name="idKeyMap">The ID key map.</param>
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
+    /// <param name="userService">The user service, resolved lazily to avoid a circular dependency.</param>
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -79,7 +80,8 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         PropertyEditorCollection propertyEditorCollection,
         IIdKeyMap idKeyMap,
         IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
+        IRelationService relationService,
+        Lazy<IUserService> userService)
         : base(
             provider,
             loggerFactory,
@@ -92,7 +94,8 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             cultureImpactFactory,
             userIdKeyResolver,
             propertyEditorCollection,
-            idKeyMap)
+            idKeyMap,
+            userService)
     {
         _documentRepository = documentRepository;
         _entityRepository = entityRepository;
@@ -459,7 +462,12 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 20.")]
     public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter = null, Ordering? ordering = null)
+        => GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter: filter, ordering: ordering);
+
+    /// <inheritdoc />
+    public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering)
     {
         ordering ??= Ordering.By("Path");
 
@@ -474,14 +482,14 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                     _entityRepository.GetAllPaths(Constants.ObjectTypes.Document, id).ToArray();
                 if (contentPath.Length == 0)
                 {
-                    totalChildren = 0;
+                    totalRecords = 0;
                     return Enumerable.Empty<IContent>();
                 }
 
-                return GetPagedLocked(GetPagedDescendantQuery(contentPath[0].Path), pageIndex, pageSize, out totalChildren, filter, ordering);
+                return GetPagedLocked(GetPagedDescendantQuery(contentPath[0].Path), pageIndex, pageSize, out totalRecords, filter, ordering, propertyAliases);
             }
 
-            return GetPagedLocked(null, pageIndex, pageSize, out totalChildren, filter, ordering);
+            return GetPagedLocked(null, pageIndex, pageSize, out totalRecords, filter, ordering, propertyAliases);
         }
     }
 
@@ -496,7 +504,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         return query;
     }
 
-    private IEnumerable<IContent> GetPagedLocked(IQuery<IContent>? query, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter, Ordering? ordering)
+    private IEnumerable<IContent> GetPagedLocked(IQuery<IContent>? query, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter, Ordering? ordering, string[]? propertyAliases = null)
     {
         if (pageIndex < 0)
         {
@@ -513,7 +521,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             throw new ArgumentNullException(nameof(ordering));
         }
 
-        return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter, ordering);
+        return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases, filter, ordering);
     }
 
     /// <summary>
@@ -653,7 +661,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     }
 
     // utility 'PublishCultures' func used by SaveAndPublishBranch
-    private bool PublishBranch_PublishCultures(IContent content, HashSet<string> culturesToPublish, IReadOnlyCollection<ILanguage> allLangs)
+    private bool PublishBranch_PublishCultures(IContent content, HashSet<string> culturesToPublish, IUser user)
     {
         // variant content type - publish specified cultures
         // invariant content type - publish only the invariant culture
@@ -663,7 +671,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         {
             return culturesToPublish.All(culture =>
             {
-                CultureImpact? impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
+                CultureImpact? impact = _cultureImpactFactory.Create(culture, content, includeInvariantForVariant: user.HasAccessToInvariantForVariant());
                 return content.PublishCulture(impact, publishTime, _propertyEditorCollection) &&
                        _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
             });
@@ -779,7 +787,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     internal IEnumerable<PublishResult> PublishBranch(
         IContent document,
         Func<IContent, HashSet<string>?> shouldPublish,
-        Func<IContent, HashSet<string>, IReadOnlyCollection<ILanguage>, bool> publishCultures,
+        Func<IContent, HashSet<string>, IUser, bool> publishCultures,
         int userId = Constants.Security.SuperUserId)
     {
         if (shouldPublish == null)
@@ -798,6 +806,8 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            IUser user = GetRequiredUser(userId);
+
             scope.WriteLock(Constants.Locks.ContentTree);
 
             var allLangs = _languageRepository.GetMany().ToList();
@@ -832,7 +842,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
             // deal with the branch root - if it fails, abort
             HashSet<string>? culturesToPublish = shouldPublish(document);
-            PublishResult? result = PublishBranchItem(scope, document, culturesToPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, out IDictionary<string, object?>? notificationState);
+            PublishResult? result = PublishBranchItem(scope, document, culturesToPublish, publishCultures, true, publishedDocuments, eventMessages, user, allLangs, out IDictionary<string, object?>? notificationState);
             if (result != null)
             {
                 results.Add(result);
@@ -859,7 +869,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
                 // important to order by Path ASC so make it explicit in case defaults change
                 // ReSharper disable once RedundantArgumentDefaultValue
-                foreach (IContent d in GetPagedDescendants(document.Id, page, pageSize, out _, ordering: Ordering.By("Path", Direction.Ascending)))
+                foreach (IContent d in GetPagedDescendants(document.Id, page, pageSize, out _, propertyAliases: null, filter: null, ordering: Ordering.By("Path", Direction.Ascending)))
                 {
                     count++;
 
@@ -872,7 +882,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
                     // no need to check path here, parent has to be published here
                     culturesToPublish = shouldPublish(d);
-                    result = PublishBranchItem(scope, d, culturesToPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs, out _);
+                    result = PublishBranchItem(scope, d, culturesToPublish, publishCultures, false, publishedDocuments, eventMessages, user, allLangs, out _);
                     if (result != null)
                     {
                         results.Add(result);
@@ -925,12 +935,11 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         ICoreScope scope,
         IContent document,
         HashSet<string>? culturesToPublish,
-        Func<IContent, HashSet<string>, IReadOnlyCollection<ILanguage>,
-            bool> publishCultures,
+        Func<IContent, HashSet<string>, IUser, bool> publishCultures,
         bool isRoot,
         ICollection<IContent> publishedDocuments,
         EventMessages evtMsgs,
-        int userId,
+        IUser user,
         IReadOnlyCollection<ILanguage> allLangs,
         out IDictionary<string, object?>? initialNotificationState)
     {
@@ -961,13 +970,13 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         }
 
         // publish & check if values are valid
-        if (!publishCultures(document, culturesToPublish, allLangs))
+        if (!publishCultures(document, culturesToPublish, user))
         {
             // TODO: Based on this callback behavior there is no way to know which properties may have been invalid if this failed, see other results of FailedPublishContentInvalid
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
         }
 
-        PublishResult result = CommitContentChangesInternal(scope, document, evtMsgs, allLangs, savingNotification.State, userId, true, isRoot);
+        PublishResult result = CommitContentChangesInternal(scope, document, evtMsgs, allLangs, savingNotification.State, user.Id, true, isRoot);
         if (result.Success)
         {
             publishedDocuments.Add(document);
@@ -1442,7 +1451,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 while (page * pageSize < total)
                 {
                     IEnumerable<IContent> descendants =
-                        GetPagedDescendants(content.Id, page++, pageSize, out total);
+                        GetPagedDescendants(content.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
                     foreach (IContent descendant in descendants)
                     {
                         // when copying a branch into itself, the copy of a root would be seen as a descendant
@@ -2192,7 +2201,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         while (total > 0)
         {
             // get descendants - ordered from deepest to shallowest
-            IEnumerable<IContent> descendants = GetPagedDescendants(content.Id, 0, pageSize, out total, ordering: Ordering.By("Path", Direction.Descending));
+            IEnumerable<IContent> descendants = GetPagedDescendants(content.Id, 0, pageSize, out total, propertyAliases: null, filter: null, ordering: Ordering.By("Path", Direction.Descending));
             foreach (IContent c in descendants)
             {
                 DoDelete(c);

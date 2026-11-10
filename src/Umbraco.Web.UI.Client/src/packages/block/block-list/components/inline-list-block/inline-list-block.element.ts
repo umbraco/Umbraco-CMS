@@ -1,14 +1,14 @@
 import { UMB_BLOCK_LIST_ENTRY_CONTEXT } from '../../context/index.js';
 import type { UmbBlockListLayoutModel, UmbBlockListWorkspaceOriginData } from '../../index.js';
-import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbBlockInsertedEvent,
+	UmbBlockRefNameSlotMixin,
 	UMB_BLOCK_MANAGER_CONTEXT,
 	UMB_BLOCK_WORKSPACE_ALIAS,
 } from '@umbraco-cms/backoffice/block';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionApiInitializer, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -21,46 +21,22 @@ import type {
 	UmbBlockLabelUfmValueType,
 } from '@umbraco-cms/backoffice/block';
 
+import '../../../block/components/block-state-tag/block-state-tag.element.js';
 import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
 };
 
-let hasWarnedLabelDeprecation = false;
-
 /**
  * @element umb-inline-list-block
  * @slot name - Content rendered as the block's primary label. The expected projection is a `<umb-ufm-render>` element owned by the parent block-list entry.
  */
 @customElement('umb-inline-list-block')
-export class UmbInlineListBlockElement extends UmbLitElement {
+export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitElement) {
 	#manager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
 	#blockContext?: typeof UMB_BLOCK_LIST_ENTRY_CONTEXT.TYPE;
 	#contentKey?: string;
-
-	/**
-	 * @deprecated Use the `name` slot to project a `<umb-ufm-render>` instead. Will be removed in Umbraco 19.
-	 */
-	@property({ type: String, reflect: false })
-	public set label(value: string | undefined) {
-		if (value !== undefined && value !== this._label) {
-			if (!hasWarnedLabelDeprecation) {
-				hasWarnedLabelDeprecation = true;
-				new UmbDeprecation({
-					deprecated: 'umb-inline-list-block.label property',
-					solution: 'Project a `<umb-ufm-render>` into the `name` slot instead.',
-					removeInVersion: '19.0.0',
-				}).warn();
-			}
-		}
-		this._label = value;
-	}
-	public get label(): string | undefined {
-		return this._label;
-	}
-	@state()
-	private _label?: string;
 
 	@property({ type: String, reflect: false })
 	icon?: string;
@@ -70,13 +46,6 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
-
-	/**
-	 * Whether the Block is backed by external (library element) content, so the unpublished tooltip
-	 * reflects the library element's own publish state rather than the local expose entry.
-	 */
-	@property({ type: Boolean, attribute: false })
-	isExternalContent?: boolean;
 
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
@@ -98,14 +67,6 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 
 	@state()
 	private _variantName?: string;
-
-	@state()
-	private _hasNameSlotContent = false;
-
-	#onNameSlotChange = (event: Event) => {
-		const slot = event.target as HTMLSlotElement;
-		this._hasNameSlotContent = slot.assignedNodes({ flatten: true }).length > 0;
-	};
 
 	constructor() {
 		super();
@@ -194,38 +155,42 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 		this._workspaceContext.load(this.#contentKey);
 	}
 
-	#onBlockInserted = (event: Event) => {
+	readonly #onClick = () => {
+		this.#toggleOpen();
+	};
+
+	readonly #onKeydown = (event: KeyboardEvent) => {
+		if (event.key !== ' ' && event.key !== 'Enter') return;
+		event.preventDefault();
+		event.stopPropagation();
+		this.#toggleOpen();
+	};
+
+	#toggleOpen() {
+		this._isOpen = !this._isOpen;
+	}
+
+	readonly #onBlockInserted = (event: Event) => {
 		const blockEvent = event as UmbBlockInsertedEvent<UmbBlockListLayoutModel, UmbBlockListWorkspaceOriginData>;
 		if (blockEvent.detail.layout.contentKey === this.#contentKey) {
 			this._isOpen = true;
 		}
 	};
 
-	#expose = () => {
+	readonly #expose = () => {
 		this._workspaceContext?.expose();
 	};
 
 	override render() {
 		return html`
 			<div id="host">
-				<button
-					id="open-part"
-					tabindex="0"
-					@keydown=${(e: KeyboardEvent) => {
-						if (e.key !== ' ' && e.key !== 'Enter') return;
-						e.preventDefault();
-						e.stopPropagation();
-						this._isOpen = !this._isOpen;
-					}}
-					@click=${() => {
-						this._isOpen = !this._isOpen;
-					}}>
+				<button id="open-part" tabindex="0" @click=${this.#onClick} @keydown=${this.#onKeydown}>
 					<uui-symbol-expand .open=${this._isOpen}></uui-symbol-expand>
 					${this.#renderBlockInfo()}
 					<slot></slot>
 					<slot name="tag"></slot>
 				</button>
-				${this._isOpen === true ? this.#renderInside() : nothing}
+				${when(this._isOpen === true, () => html`${this.#renderInside()}`)}
 			</div>
 		`;
 	}
@@ -237,27 +202,9 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				<span id="icon">
 					<umb-icon .name=${this.icon}></umb-icon>
 				</span>
-				<div id="info">
-					<slot name="name" @slotchange=${this.#onNameSlotChange}></slot>
-					${when(
-						!this._hasNameSlotContent && this._label !== undefined,
-						() =>
-							html`<umb-ufm-render id="name" inline .markdown=${this._label} .value=${blockValue}></umb-ufm-render>`,
-					)}
-				</div>
+				<div id="info">${this.renderNameSlot(blockValue)}</div>
 			</span>
-			${when(this.unpublished, () => this.#renderDraftTag())}
-		`;
-	}
-
-	#renderDraftTag() {
-		const titleKey = this.isExternalContent
-			? 'blockEditor_notPublishedLibraryElementDescription'
-			: 'blockEditor_notExposedDescription';
-		return html`
-			<uui-tag slot="name" look="secondary" title=${this.localize.term(titleKey)}>
-				<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
-			</uui-tag>
+			<umb-block-state-tag slot="name"></umb-block-state-tag>
 		`;
 	}
 
@@ -266,19 +213,23 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 			return html`<umb-view-loader></umb-view-loader>`;
 		}
 		if (this._exposed === false) {
-			return html`<uui-button id="exposeButton" draggable="false" @click=${this.#expose}
-				><uui-icon name="icon-add"></uui-icon>
-				<umb-localize
-					key="blockEditor_createThisFor"
-					.args=${[this._ownerContentTypeName, this._variantName]}></umb-localize
-			></uui-button>`;
+			return html`
+				<uui-button id="exposeButton" draggable="false" @click=${this.#expose}>
+					<uui-icon name="icon-add"></uui-icon>
+					<umb-localize
+						key="blockEditor_createThisFor"
+						.args=${[this._ownerContentTypeName, this._variantName]}></umb-localize>
+				</uui-button>
+			`;
 		} else {
-			return html`<umb-block-workspace-view-edit-content-no-router
-				draggable="false"></umb-block-workspace-view-edit-content-no-router>`;
+			return html`
+				<umb-block-workspace-view-edit-content-no-router draggable="false">
+				</umb-block-workspace-view-edit-content-no-router>
+			`;
 		}
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			#host {
@@ -379,13 +330,6 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				justify-content: center;
 				height: 100%;
 				padding-left: var(--uui-size-2, 6px);
-			}
-
-			uui-tag {
-				margin-left: 0.5em;
-				margin-bottom: -0.3em;
-				margin-top: -0.3em;
-				vertical-align: text-top;
 			}
 
 			:host(:not([disabled])) #open-part:hover #icon {

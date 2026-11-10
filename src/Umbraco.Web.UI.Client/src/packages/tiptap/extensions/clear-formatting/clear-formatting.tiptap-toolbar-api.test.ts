@@ -67,7 +67,7 @@ describe('UmbTiptapToolbarClearFormattingExtensionApi', () => {
 
 	it('preserves link attributes when clearing formatting', () => {
 		editor.commands.setContent(
-			'<p><strong><a href="https://example.com" target="_blank" title="Example" type="external">link</a></strong></p>',
+			'<p><strong><a href="https://example.com" target="_blank" title="Example">link</a></strong></p>',
 		);
 		editor.commands.selectAll();
 
@@ -77,7 +77,6 @@ describe('UmbTiptapToolbarClearFormattingExtensionApi', () => {
 		expect(html).to.include('href="https://example.com"');
 		expect(html).to.include('target="_blank"');
 		expect(html).to.include('title="Example"');
-		expect(html).to.include('type="external"');
 	});
 
 	it('preserves any mark declaring clearable: false, not just links', () => {

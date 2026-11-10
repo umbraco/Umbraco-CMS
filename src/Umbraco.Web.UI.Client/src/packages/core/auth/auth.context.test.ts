@@ -1,5 +1,5 @@
 import { UmbAuthContext, type UmbAuthSession } from './auth.context.js';
-import { aTimeout, expect } from '@open-wc/testing';
+import { aTimeout, expect, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
@@ -24,24 +24,6 @@ describe('UmbAuthContext', () => {
 			expect(context).to.have.property('isAuthorized');
 		});
 
-		it('has an isInitialized property', () => {
-			expect(context).to.have.property('isInitialized');
-		});
-
-		// setInitialized() used to be driven from the core entry point. It now runs in the constructor,
-		// so guard the property that makes that safe: #isInitialized is a ReplaySubject(1), meaning a
-		// subscriber attaching after construction still receives the emission rather than hanging.
-		// Reading the deprecated getter logs a deprecation warning here — expected, since the test
-		// runner's origin resolves to 'unknown' rather than 'core' so the warning isn't suppressed.
-		it('emits isInitialized to a subscriber that attaches after construction', async () => {
-			let emitted = false;
-			context.isInitialized.subscribe(() => {
-				emitted = true;
-			});
-			await aTimeout(0);
-			expect(emitted).to.be.true;
-		});
-
 		it('has a getIsAuthorized method', () => {
 			expect(context).to.have.property('getIsAuthorized').that.is.a('function');
 		});
@@ -54,23 +36,12 @@ describe('UmbAuthContext', () => {
 			expect(context).to.have.property('signOut').that.is.a('function');
 		});
 
-		it('has a getServerUrl method', () => {
-			expect(context).to.have.property('getServerUrl').that.is.a('function');
-		});
-
 		it('has a configureClient method', () => {
 			expect(context).to.have.property('configureClient').that.is.a('function');
 		});
 
 		it('has a session$ observable', () => {
 			expect(context).to.have.property('session$');
-		});
-	});
-
-	describe('getServerUrl', () => {
-		it('returns the configured server URL', () => {
-			const serverUrl = context.getServerUrl();
-			expect(serverUrl).to.equal('http://localhost');
 		});
 	});
 
@@ -109,7 +80,7 @@ describe('UmbAuthContext', () => {
 				buildUrl: () => '',
 				getConfig: () => ({}),
 				request: () => Promise.resolve({}) as never,
-				interceptors: { request: { use: () => {} }, response: { use: () => {} } },
+				interceptors: { request: { use: () => {} }, response: { use: () => {} }, error: { use: () => {} } },
 				setConfig: (config: Record<string, unknown>) => {
 					receivedConfig = config;
 					return config;
@@ -122,8 +93,9 @@ describe('UmbAuthContext', () => {
 			expect(receivedConfig).to.have.property('credentials', 'include');
 			// Cookie auth carries no bearer token, so the auth callback is deliberately not set.
 			expect(receivedConfig.auth).to.be.undefined;
-			// The server's 302 to /login must not be followed; the interceptor handles the 401 instead.
-			expect(receivedConfig).to.have.property('redirect', 'manual');
+			// Redirects are followed, so endpoints can answer with a 3xx; the auth interceptor recognises a
+			// redirect to the login page instead.
+			expect(receivedConfig.redirect ?? 'follow').to.equal('follow');
 		});
 	});
 
@@ -454,6 +426,70 @@ describe('UmbAuthContext', () => {
 				expect(context.getIsAuthorized()).to.be.false;
 			});
 		});
+
+		// The server sends both an ended session and a signed-in user it denies access to the login page.
+		describe('a request redirected to the login page', () => {
+			let sessionAlive: boolean;
+
+			beforeEach(async () => {
+				// The interceptor provides its signaler on the host, and context requests only resolve for an attached host.
+				document.body.appendChild(hostElement);
+				sessionAlive = true;
+				const timeoutUtc = new Date(Date.now() + 20 * 60 * 1000).toISOString();
+				stubFetch(() =>
+					sessionAlive
+						? new Response(JSON.stringify({ timeoutUtc }), { status: 200 })
+						: new Response(null, { status: 401 }),
+				);
+				await context.setInitialState();
+				fetchCalls = [];
+			});
+
+			afterEach(() => {
+				hostElement.remove();
+			});
+
+			async function receiveLoginRedirect(): Promise<Response> {
+				const interceptors: Array<(response: Response, request: Request, options: unknown) => Promise<Response>> = [];
+				context.configureClient({
+					getConfig: () => ({}),
+					interceptors: {
+						request: { use: () => {} },
+						response: { use: (fn: never) => interceptors.push(fn) },
+					},
+					setConfig: () => ({}),
+				} as never);
+				await aTimeout(0);
+
+				let response = new Response('<!doctype html><title>Log in</title>', { status: 200 });
+				Object.defineProperties(response, {
+					redirected: { value: true },
+					url: { value: 'http://localhost/umbraco/login?ReturnUrl=%2F' },
+				});
+				const request = new Request('http://localhost/umbraco/my-extension/settings', { method: 'POST' });
+				for (const interceptor of interceptors) {
+					response = await interceptor(response, request, {});
+				}
+				return response;
+			}
+
+			it('answers with a 403 and keeps the session while the server still accepts it', async () => {
+				const response = await receiveLoginRedirect();
+
+				expect(response.status).to.equal(403);
+				expect(context.getIsAuthorized()).to.be.true;
+				expect(String(fetchCalls[0].input)).to.contain('keep-alive');
+			});
+
+			it('ends the session once the server no longer accepts it', async () => {
+				sessionAlive = false;
+
+				const response = await receiveLoginRedirect();
+
+				expect(response.status).to.equal(401);
+				expect(context.getIsAuthorized()).to.be.false;
+			});
+		});
 	});
 
 	describe('Login URL construction', () => {
@@ -503,6 +539,195 @@ describe('UmbAuthContext', () => {
 			expect(url.origin + url.pathname).to.equal('http://localhost/umbraco/login');
 			expect(url.searchParams.get('ReturnUrl')).to.equal(new URL('auth-callback', document.baseURI).pathname);
 			expect(openedWindows[0].target).to.equal('umbracoAuthPopup');
+		});
+	});
+
+	describe('Sign-in by another user', () => {
+		const realFetch = window.fetch;
+		let channel: BroadcastChannel;
+		let userCalls: number;
+		// Answers GET /user/current with the user behind the session cookie, or with the given failure
+		let respondToUserCall: () => Promise<Response>;
+		let userChanges: number;
+
+		const userResponse = (id: string) =>
+			Promise.resolve(
+				new Response(JSON.stringify({ id }), { status: 200, headers: { 'Content-Type': 'application/json' } }),
+			);
+		const signedInAs = (id: string) => () => userResponse(id);
+		const signInElsewhere = () =>
+			channel.postMessage({ type: 'authorized', expiresIn: 300, issuedAt: Math.floor(Date.now() / 1000) });
+
+		beforeEach(async () => {
+			document.body.appendChild(hostElement);
+			userCalls = 0;
+			respondToUserCall = signedInAs('admin');
+			window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
+				const url = input instanceof Request ? input.url : input.toString();
+				// The test runner's own requests have to reach the real fetch
+				if (!url.includes('/umbraco/management/api/')) return realFetch.call(window, input, init);
+				if (url.endsWith('/user/current')) {
+					userCalls++;
+					return respondToUserCall();
+				}
+				// The keep-alive, and the configuration it reads the renewed expiry from
+				const timeoutUtc = new Date(Date.now() + 300_000).toISOString();
+				return Promise.resolve(new Response(JSON.stringify({ timeoutUtc }), { status: 200 }));
+			}) as typeof window.fetch;
+			userChanges = 0;
+			context.userChanged.subscribe(() => userChanges++);
+
+			// The page has loaded the backoffice for the admin
+			channel = new BroadcastChannel('umb:auth');
+			signInElsewhere();
+			await waitUntil(() => context.getIsAuthorized());
+			context.bindUser('admin');
+		});
+
+		afterEach(() => {
+			window.fetch = realFetch;
+			channel.close();
+			hostElement.remove();
+		});
+
+		it('holds a sign-in until the signed-in user is known', async () => {
+			let answer: (response: Response) => void = () => {};
+			respondToUserCall = () => new Promise<Response>((resolve) => (answer = resolve));
+			context.timeOut();
+
+			signInElsewhere();
+			await waitUntil(() => userCalls === 1);
+			await aTimeout(50);
+			expect(context.getIsAuthorized(), 'nothing may resume before the user is known').to.be.false;
+
+			answer(await userResponse('admin'));
+			await waitUntil(() => context.getIsAuthorized());
+			expect(userChanges).to.equal(0);
+		});
+
+		it('resumes the page when the same user signs in again', async () => {
+			context.timeOut();
+
+			signInElsewhere();
+
+			await waitUntil(() => context.getIsAuthorized());
+			expect(userChanges).to.equal(0);
+		});
+
+		it('does not resume the page for a different user, and reports the change', async () => {
+			respondToUserCall = signedInAs('editor');
+			context.timeOut();
+
+			signInElsewhere();
+
+			await waitUntil(() => userChanges === 1);
+			await aTimeout(50);
+			expect(context.getIsAuthorized()).to.be.false;
+		});
+
+		it('reports the change again for each later sign-in, while the page has not started over', async () => {
+			respondToUserCall = signedInAs('editor');
+			context.timeOut();
+			signInElsewhere();
+			await waitUntil(() => userChanges === 1);
+
+			signInElsewhere();
+
+			await waitUntil(() => userChanges === 2);
+			expect(context.getIsAuthorized()).to.be.false;
+		});
+
+		it('reports the change when a different user signs in while this page still holds a session', async () => {
+			respondToUserCall = signedInAs('editor');
+
+			signInElsewhere();
+
+			await waitUntil(() => userChanges === 1);
+		});
+
+		it('holds a session another tab re-establishes after this one ended, until the user is known', async () => {
+			respondToUserCall = signedInAs('editor');
+			context.timeOut();
+
+			channel.postMessage({
+				type: 'sessionUpdate',
+				expiresAt: Math.floor(Date.now() / 1000) + 240,
+				sessionWindowInMs: 240_000,
+			});
+
+			await waitUntil(() => userChanges === 1);
+			expect(context.getIsAuthorized()).to.be.false;
+		});
+
+		it('holds a session the server still has after this page ended its own, until the user is known', async () => {
+			respondToUserCall = signedInAs('editor');
+			context.timeOut();
+
+			const renewed = await context.keepAlive();
+
+			expect(renewed).to.be.false;
+			expect(userChanges).to.equal(1);
+			expect(context.getIsAuthorized()).to.be.false;
+		});
+
+		it('resumes the page from a session the server still has for the same user', async () => {
+			context.timeOut();
+
+			const renewed = await context.keepAlive();
+
+			expect(renewed).to.be.true;
+			expect(userChanges).to.equal(0);
+			expect(context.getIsAuthorized()).to.be.true;
+		});
+
+		it('renews the session in hand without looking up the user', async () => {
+			expect(await context.keepAlive()).to.be.true;
+			expect(userCalls).to.equal(0);
+		});
+
+		it('retries a failed lookup of the signed-in user before deciding', async () => {
+			let failures = 1;
+			respondToUserCall = () =>
+				failures-- > 0 ? Promise.resolve(new Response(null, { status: 500 })) : userResponse('admin');
+			context.timeOut();
+
+			signInElsewhere();
+
+			await waitUntil(() => context.getIsAuthorized(), undefined, { timeout: 5000 });
+			expect(userCalls).to.equal(2);
+			expect(userChanges).to.equal(0);
+		});
+
+		it('treats a signed-in user that cannot be determined as a different user', async function () {
+			// Every lookup attempt fails, so this waits for all retries
+			this.timeout(6000);
+			respondToUserCall = () => Promise.reject(new TypeError('Failed to fetch'));
+			context.timeOut();
+
+			signInElsewhere();
+
+			await waitUntil(() => userChanges === 1, undefined, { timeout: 5000 });
+			expect(context.getIsAuthorized()).to.be.false;
+		});
+
+		it('reports the change when the page is bound to a different user', () => {
+			context.bindUser('admin');
+			expect(userChanges).to.equal(0);
+
+			context.bindUser('editor');
+			expect(userChanges).to.equal(1);
+		});
+
+		it('applies a sign-in straight away while the page has not loaded a user', async () => {
+			// The lookup never answers, so only a context that does not wait for it can resume
+			respondToUserCall = () => new Promise<Response>(() => {});
+			const unboundContext = new UmbAuthContext(hostElement, 'http://localhost', '/umbraco', false);
+			unboundContext.timeOut();
+
+			signInElsewhere();
+
+			await waitUntil(() => unboundContext.getIsAuthorized());
+			unboundContext.destroy();
 		});
 	});
 });

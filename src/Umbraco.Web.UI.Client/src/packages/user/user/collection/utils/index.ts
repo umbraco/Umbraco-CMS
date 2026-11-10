@@ -15,3 +15,10 @@ export const UmbUserStateFilter = Object.freeze({
 	INVITED: 'Invited',
 	INACTIVE: 'Inactive',
 });
+
+export type UmbUserKindFilterType = 'Default' | 'Api';
+
+export const UmbUserKindFilter = Object.freeze({
+	DEFAULT: 'Default',
+	API: 'Api',
+});

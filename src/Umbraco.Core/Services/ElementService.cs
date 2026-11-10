@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -18,6 +20,7 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     private readonly ILogger<ElementService> _logger;
     private readonly IShortStringHelper _shortStringHelper;
 
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
     public ElementService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -32,6 +35,39 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
         PropertyEditorCollection propertyEditorCollection,
         IIdKeyMap idKeyMap,
         IShortStringHelper shortStringHelper)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            auditService,
+            contentTypeRepository,
+            elementRepository,
+            languageRepository,
+            propertyValidationService,
+            cultureImpactFactory,
+            userIdKeyResolver,
+            propertyEditorCollection,
+            idKeyMap,
+            shortStringHelper,
+            StaticServiceProvider.Instance.GetRequiredService<Lazy<IUserService>>())
+    {
+    }
+
+    public ElementService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IAuditService auditService,
+        IContentTypeRepository contentTypeRepository,
+        IElementRepository elementRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver,
+        PropertyEditorCollection propertyEditorCollection,
+        IIdKeyMap idKeyMap,
+        IShortStringHelper shortStringHelper,
+        Lazy<IUserService> userService)
         : base(
             provider,
             loggerFactory,
@@ -44,7 +80,8 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
             cultureImpactFactory,
             userIdKeyResolver,
             propertyEditorCollection,
-            idKeyMap)
+            idKeyMap,
+            userService)
     {
         _elementRepository = elementRepository;
         _shortStringHelper = shortStringHelper;

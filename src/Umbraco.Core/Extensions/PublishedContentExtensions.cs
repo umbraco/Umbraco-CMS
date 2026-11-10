@@ -432,7 +432,7 @@ public static class PublishedContentExtensions
     /// <param name="other">The potential ancestor content item.</param>
     /// <returns><c>true</c> if this content is a descendant of the other; otherwise, <c>false</c>.</returns>
     public static bool IsDescendant(this IPublishedContent content, IPublishedContent other) =>
-        other.Level < content.Level && content.Path.InvariantStartsWith(other.Path.EnsureEndsWith(','));
+        other.Level < content.Level && content.Path.IsDescendantOfPath(other.Path);
 
     /// <summary>
     /// Determines whether this content item is a descendant of or the same as another content item.
@@ -450,7 +450,7 @@ public static class PublishedContentExtensions
     /// <param name="other">The potential descendant content item.</param>
     /// <returns><c>true</c> if this content is an ancestor of the other; otherwise, <c>false</c>.</returns>
     public static bool IsAncestor(this IPublishedContent content, IPublishedContent other) =>
-        content.Level < other.Level && other.Path.InvariantStartsWith(content.Path.EnsureEndsWith(','));
+        content.Level < other.Level && other.Path.IsDescendantOfPath(content.Path);
 
     /// <summary>
     /// Determines whether this content item is an ancestor of or the same as another content item.

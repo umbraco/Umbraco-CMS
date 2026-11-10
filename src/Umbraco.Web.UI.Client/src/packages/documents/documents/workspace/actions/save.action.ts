@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../context/document-workspace.context-token.js';
 import type UmbDocumentWorkspaceContext from '../context/document-workspace.context.js';
-import type { UmbDocumentVariantModel } from '../../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { combineLatest, map, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
 	UmbSaveWorkspaceAction,
@@ -14,8 +14,6 @@ export class UmbDocumentSaveWorkspaceAction
 	extends UmbSaveWorkspaceAction<MetaWorkspaceAction, UmbDocumentWorkspaceContext>
 	implements UmbWorkspaceActionDefaultKind<MetaWorkspaceAction>
 {
-	#variants: Array<UmbDocumentVariantModel> | undefined;
-
 	constructor(
 		host: UmbControllerHost,
 		args: UmbSaveWorkspaceActionArgs<MetaWorkspaceAction, UmbDocumentWorkspaceContext>,
@@ -35,39 +33,30 @@ export class UmbDocumentSaveWorkspaceAction
 
 	protected override _gotWorkspaceContext() {
 		super._gotWorkspaceContext();
-		this.#observeVariants();
-		this.#observeReadOnlyGuardRules();
-	}
+		const workspaceContext = this._workspaceContext;
+		if (!workspaceContext) return;
 
-	#observeVariants() {
 		this.observe(
-			this._workspaceContext?.variants,
-			(variants) => {
-				this.#variants = variants;
-				this.#checkReadOnlyGuardRules();
+			combineLatest([workspaceContext.variants, workspaceContext.variesByCulture, workspaceContext.isNew]).pipe(
+				switchMap(([variants, variesByCulture, isNew]) => {
+					const variantIds = variants.map((variant) => UmbVariantId.CreateFromPartial(variant));
+					// The shared data of culture-varying content can be saved on its own, but cannot create the content.
+					if (variesByCulture && isNew === false) {
+						variantIds.push(UmbVariantId.CreateInvariant());
+					}
+					return combineLatest(variantIds.map((variantId) => workspaceContext.isWritableVariant(variantId)));
+				}),
+				map((writable) => writable.some(Boolean)),
+			),
+			(canSave) => {
+				if (canSave) {
+					this.enable();
+				} else {
+					this.disable();
+				}
 			},
-			'saveWorkspaceActionVariantsObserver',
+			'saveWorkspaceActionWritableVariantsObserver',
 		);
-	}
-
-	#observeReadOnlyGuardRules() {
-		this.observe(
-			this._workspaceContext?.readOnlyGuard.rules,
-			() => this.#checkReadOnlyGuardRules(),
-			'umbObserveReadOnlyGuardRules',
-		);
-	}
-
-	#checkReadOnlyGuardRules() {
-		const allVariantsAreReadOnly =
-			this.#variants?.filter((variant) =>
-				this._workspaceContext!.readOnlyGuard.getIsPermittedForVariant(UmbVariantId.CreateFromPartial(variant)),
-			).length === this.#variants?.length;
-		if (allVariantsAreReadOnly) {
-			this.disable();
-		} else {
-			this.enable();
-		}
 	}
 }
 

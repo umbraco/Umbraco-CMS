@@ -38,6 +38,7 @@ import {ContentDeliveryApiHelper} from "./differentAppSettingsHelpers/ContentDel
 import {SmtpApiHelper} from './SmtpApiHelper';
 import {ElementApiHelper} from "./ElementApiHelper";
 import {SearchManagementApiHelper} from './SearchManagementApiHelper';
+import {ServerApiHelper} from './ServerApiHelper';
 
 export class ApiHelpers {
   baseUrl: string = umbracoConfig.environment.baseUrl;
@@ -78,6 +79,7 @@ export class ApiHelpers {
   smtp: SmtpApiHelper;
   element: ElementApiHelper;
   searchManagement: SearchManagementApiHelper;
+  server: ServerApiHelper;
 
   constructor(page: Page) {
     this.page = page;
@@ -117,6 +119,7 @@ export class ApiHelpers {
     this.smtp = new SmtpApiHelper(this);
     this.element = new ElementApiHelper(this);
     this.searchManagement = new SearchManagementApiHelper(this);
+    this.server = new ServerApiHelper(this);
   }
 
   // Back-office auth is cookie-only: Playwright auto-sends the authentication cookie from the
@@ -179,11 +182,17 @@ export class ApiHelpers {
 
   // Examine indexes asynchronously after create; await this before a UI search so the item is findable.
   // Indexing can just take a long time sometimes, so this default leans on the longest timeout tier.
-  async waitUntilItemIsIndexed(searchEndpoint: string, query: string, id: string, timeout: number = ConstantHelper.timeout.pageLoad) {
+  async waitUntilItemIsIndexed(searchEndpoint: string, query: string, id: string, timeout: number = ConstantHelper.timeout.pageLoad, culture?: string) {
     await expect.poll(async () => {
       // take: 100 — the search is filtered by `query`, so the target is expected within the first page for
       // test-sized data. If a suite ever creates >100 items matching `query`, raise this or paginate.
-      const response = await this.get(this.baseUrl + searchEndpoint, {query: query, take: 100});
+      // Without a culture the search covers invariant items only, so a culture-variant item is found only when
+      // one of its cultures is passed.
+      const params: { [key: string]: string | number } = {query: query, take: 100};
+      if (culture) {
+        params.culture = culture;
+      }
+      const response = await this.get(this.baseUrl + searchEndpoint, params);
       if (!response.ok()) {
         return false;
       }

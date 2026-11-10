@@ -7,11 +7,12 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbApiInterceptorController, UMB_AUTH_SIGNALER_CONTEXT } from '@umbraco-cms/backoffice/resources';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { ReplaySubject, Subject, distinctUntilChanged, auditTime, map } from '@umbraco-cms/backoffice/external/rxjs';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { Subject, distinctUntilChanged, auditTime, map } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+
+/** Delays (in ms) before each attempt to look up the user behind a new sign-in. */
+const SIGNED_IN_USER_LOOKUP_DELAYS_MS = [0, 500, 1500];
 
 export interface UmbAuthSession {
 	/**
@@ -30,7 +31,6 @@ export interface UmbAuthSession {
 export class UmbAuthContext extends UmbContextBase {
 	// Timeout is different from `isAuthorized` because it can occur repeatedly
 	#isTimeout = new Subject<void>();
-	#isInitialized = new ReplaySubject<void>(1);
 	#isBypassed;
 	#serverUrl;
 	#backofficePath;
@@ -45,6 +45,16 @@ export class UmbAuthContext extends UmbContextBase {
 
 	// Cross-tab coordination
 	#channel: BroadcastChannel;
+
+	// The user the client state of this page belongs to, see bindUser().
+	#boundUser?: string;
+	// Set once the session has passed to another user. The page holds the previous user's state, so no
+	// session is applied to it from then on.
+	#hasUserChanged = false;
+	// Applies the newest session that waits for the user behind it to be confirmed.
+	#heldSession?: () => void;
+	#confirmingUser?: Promise<boolean>;
+	#userChanged = new Subject<void>();
 
 	// Track clients that have been configured to prevent duplicate interceptor binding
 	#configuredClients = new WeakSet();
@@ -62,28 +72,6 @@ export class UmbAuthContext extends UmbContextBase {
 	#keepAliveEndpoint;
 	#externalLoginEndpoint;
 	#postLogoutRedirectUri;
-
-	/**
-	 * Observable that emits once, without a value, when the auth context is initialized.
-	 * For consumers: the boot sequence already awaits app entry points before the router evaluates
-	 * its guards, so by the time any extension code runs this has long since completed.
-	 * @internal
-	 * @deprecated Internal boot signal, never intended for public use. Scheduled for removal in Umbraco 19.
-	 * @remarks It will only emit once and then complete itself.
-	 * @returns {Observable<void>} An observable that emits once when the auth context is initialized.
-	 */
-	get isInitialized(): Observable<void> {
-		new UmbDeprecation({
-			deprecated: 'UmbAuthContext.isInitialized',
-			solution:
-				'Remove the dependency on this signal. It is an internal boot detail — the app awaits app entry points before routing, so extension code always runs after initialization. Scheduled for removal in Umbraco 19.',
-			removeInVersion: '19.0.0',
-		}).warn();
-		return this.#isInitializedObservable;
-	}
-
-	/** Internal, non-warning view of {@link UmbAuthContext#isInitialized} for use inside this class. */
-	readonly #isInitializedObservable = this.#isInitialized.asObservable();
 
 	/**
 	 * Observable that emits true if the user is authorized, otherwise false.
@@ -104,6 +92,19 @@ export class UmbAuthContext extends UmbContextBase {
 		// This is useful to prevent the UI from being flooded with timeout events.
 		auditTime(1000),
 	);
+
+	/**
+	 * Emits when the session has passed to a different user than the one the page is bound to
+	 * (see `bindUser()`), or to a user who could not be determined. The new session is not applied:
+	 * the page holds client state that belongs to the previous user, so it has to start over rather than
+	 * show that state to the user who is signed in now. From then on no session is applied to the page, so
+	 * the host has to start it over, or the page stays unauthorized. The app shell handles this by reloading
+	 * the backoffice. A sign-in while the page is still open emits again, so the host can try once more.
+	 * A user who cannot be determined (every lookup failed) is treated as a different user on purpose, so the
+	 * page also starts over, and discards unsaved work, when it is in fact the same user.
+	 * @internal
+	 */
+	readonly userChanged = this.#userChanged.asObservable();
 
 	/**
 	 * Whether the server is configured to keep users logged in by auto-refreshing before session expiry.
@@ -137,13 +138,16 @@ export class UmbAuthContext extends UmbContextBase {
 			switch (evt.data?.type) {
 				case 'authorized': {
 					// Apply locally — the sender already broadcast to all tabs.
-					this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt);
+					void this.#applySession(true, () => this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt));
 					break;
 				}
 				case 'sessionUpdate': {
 					// Another tab learned a fresher expiry, typically by sliding it on activity. The auth
-					// cookie is shared between tabs, so the renewal applies here too.
-					this.#applySessionExpiry(evt.data.expiresAt, evt.data.sessionWindowInMs);
+					// cookie is shared between tabs, so the renewal applies here too. A session this tab no
+					// longer holds is re-established, possibly by a sign-in it missed.
+					void this.#applySession(!this.#session.getValue(), () =>
+						this.#applySessionExpiry(evt.data.expiresAt, evt.data.sessionWindowInMs),
+					);
 					break;
 				}
 				case 'sessionCleared':
@@ -160,10 +164,6 @@ export class UmbAuthContext extends UmbContextBase {
 		if (!isTestEnvironment()) {
 			new UmbAuthSessionTimeoutController(this);
 		}
-
-		// The auth context is ready once constructed — provider discovery no longer waits on a signal.
-		this.#isInitialized.next();
-		this.#isInitialized.complete();
 
 		// When an HTTP interceptor is active it registers an UmbAuthSignalerContext on the host.
 		// Consume it to keep authorization state in sync and to react to timeout requests.
@@ -183,6 +183,7 @@ export class UmbAuthContext extends UmbContextBase {
 					this.#slideSessionExpiry(activityDetectedAt);
 				}
 			});
+			signaler?.setSessionCheck(() => this.keepAlive());
 		});
 	}
 
@@ -337,11 +338,12 @@ export class UmbAuthContext extends UmbContextBase {
 				? Math.max(0, Math.floor(new Date(data.timeoutUtc).getTime() / 1000) - issuedAt)
 				: undefined;
 
-			this.#setSessionLocally(expiresIn, issuedAt);
+			// A session this page does not hold may come from a sign-in, possibly by another user
+			const applied = this.#applySession(!this.#session.getValue(), () => this.#setSessionLocally(expiresIn, issuedAt));
 
 			// Tell other tabs a session is (re)established, so they can update their local state too.
 			this.#channel.postMessage({ type: 'authorized', expiresIn, issuedAt });
-			return true;
+			return await applied;
 		} catch {
 			this.#session.setValue(undefined);
 			return false;
@@ -349,29 +351,21 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
-	 * Checks if the current session is still valid.
-	 * @deprecated Use {@link getIsAuthorized} or observe {@link session$} instead. Scheduled for removal in Umbraco 19.
-	 * @returns {boolean} True if the session has not expired.
+	 * Binds the page to the user it has loaded client state for. A sign-in that happens after this, in this
+	 * tab or another one, is held until the user behind it is known: the same user resumes the page as it
+	 * is, so unsaved work survives; any other user is reported through {@link userChanged} instead.
+	 * Binding a different user later is reported the same way. The app shell calls this with the user it has loaded.
+	 * @internal
+	 * @param {string} unique The unique of the user the page has loaded.
 	 */
-	isSessionValid(): boolean {
-		new UmbDeprecation({
-			deprecated: 'UmbAuthContext.isSessionValid()',
-			solution:
-				'Use getIsAuthorized() for a synchronous check, or observe session$ to react to session changes. Scheduled for removal in Umbraco 19.',
-			removeInVersion: '19.0.0',
-		}).warn();
-		return this.#isSessionValid();
-	}
-
-	/**
-	 * Internal, non-warning implementation of {@link isSessionValid}.
-	 * @returns {boolean} True if the session has not expired.
-	 */
-	#isSessionValid(): boolean {
-		const session = this.#session.getValue();
-		if (!session) return false;
-		// An unknown expiry cannot be checked, so do not treat it as expired.
-		return session.expiresAt === undefined || session.expiresAt > Math.floor(Date.now() / 1000);
+	bindUser(unique: string): void {
+		if (!this.#boundUser) {
+			this.#boundUser = unique;
+			return;
+		}
+		if (unique !== this.#boundUser) {
+			this.#onUserChanged();
+		}
 	}
 
 	/**
@@ -397,36 +391,6 @@ export class UmbAuthContext extends UmbContextBase {
 		// The server sign-out endpoint clears the auth cookie, then redirects to the client logout landing
 		// (derived server-side from BackOfficeHost).
 		location.href = `${this.#serverUrl}/umbraco/management/api/v1/security/back-office/signout`;
-	}
-
-	/**
-	 * Get the server url to the Management API.
-	 * @deprecated Consume UMB_SERVER_CONTEXT and use its `getServerUrl()` — the canonical source for the server URL. Scheduled for removal in Umbraco 21.
-	 * @memberof UmbAuthContext
-	 * @example <caption>Using the server url</caption>
-	 * ```js
-	 * 	const serverUrl = authContext.getServerUrl();
-	 * 	OpenAPI.BASE = serverUrl;
-	 * ```
-	 * @example <caption></caption>
-	 * ```js
-	 * 	const config = authContext.getOpenApiConfiguration();
-	 * 	const result = await fetch(`${config.base}/umbraco/management/api/v1/my-resource`, {
-	 * 		credentials: config.credentials,
-	 * 		headers: { Authorization: `Bearer ${await config.token()}` },
-	 * 	});
-	 * ```
-	 * @deprecated Consume UMB_SERVER_CONTEXT and use its `getServerUrl()` — the canonical source for the server URL. Scheduled for removal in Umbraco 19.
-	 * @returns {string} The server url to the Management API
-	 */
-	getServerUrl() {
-		new UmbDeprecation({
-			deprecated: 'UmbAuthContext.getServerUrl()',
-			solution:
-				'Consume UMB_SERVER_CONTEXT from @umbraco-cms/backoffice/server and use its getServerUrl(), which is the canonical source. Scheduled for removal in Umbraco 19.',
-			removeInVersion: '19.0.0',
-		}).warn();
-		return this.#serverUrl;
 	}
 
 	/**
@@ -490,8 +454,6 @@ export class UmbAuthContext extends UmbContextBase {
 			// Cookie auth: the httpOnly auth cookie (sent via credentials: 'include') is the sole
 			// credential, so no bearer-token auth callback is needed.
 			auth: undefined,
-			// Don't follow 302 redirects to /login — the auth interceptor handles 401s and replays requests after re-authentication.
-			redirect: 'manual',
 		});
 
 		// Lazy single instance — see #interceptorController field comment. Controller
@@ -502,60 +464,6 @@ export class UmbAuthContext extends UmbContextBase {
 		// distinct generic instantiations. Cast at the boundary; the controller's own
 		// signature stays strictly typed against `umbHttpClient`.
 		this.#interceptorController.bindDefaultInterceptors(client as unknown as typeof umbHttpClient);
-	}
-
-	/**
-	 * Sets the auth context as initialized, which means that the auth context is ready to be used.
-	 * No code outside Umbraco core should ever call this — doing so opens the provider-discovery gate early.
-	 * @internal
-	 * @deprecated Internal boot hook, never intended for public use. Scheduled for removal in Umbraco 19.
-	 * @remarks The constructor already does this, so calling it again is a no-op on an
-	 * already-completed subject. It emits once, without a value.
-	 */
-	setInitialized() {
-		new UmbDeprecation({
-			deprecated: 'UmbAuthContext.setInitialized()',
-			solution:
-				'Do not call this. It is an internal boot hook owned by the core entry point. Scheduled for removal in Umbraco 19.',
-			removeInVersion: '19.0.0',
-		}).warn();
-		this.#setInitialized();
-	}
-
-	/** Internal, non-warning implementation of {@link setInitialized}. */
-	#setInitialized() {
-		this.#isInitialized.next();
-		this.#isInitialized.complete();
-	}
-
-	/**
-	 * Gets all registered auth providers.
-	 * @deprecated Query the extension registry directly: `umbExtensionsRegistry.byType('authProvider')`. Scheduled for removal in Umbraco 19.
-	 * @remarks The initialization gate this used to add is redundant — the app awaits app entry points
-	 * before the router evaluates its guards, so the provider list has already settled by then.
-	 * @param {UmbBackofficeExtensionRegistry} extensionsRegistry The extension registry to query.
-	 * @returns {Observable<Array<ManifestAuthProvider>>} An observable of the registered auth providers.
-	 */
-	getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
-		new UmbDeprecation({
-			deprecated: 'UmbAuthContext.getAuthProviders()',
-			solution:
-				"Query the extension registry directly with byType('authProvider'). The boot sequence already awaits app entry points before routing, so the provider list has settled. Scheduled for removal in Umbraco 19.",
-			removeInVersion: '19.0.0',
-		}).warn();
-		return this.#getAuthProviders(extensionsRegistry);
-	}
-
-	/**
-	 * Internal, non-warning implementation of {@link getAuthProviders}.
-	 * No initialization gate: the constructor completes #isInitialized, so piping through it only
-	 * added a micro-task delay. Ordering is guaranteed by the boot sequence awaiting app entry
-	 * points before the router evaluates its guards.
-	 * @param {UmbBackofficeExtensionRegistry} extensionsRegistry The extension registry to query.
-	 * @returns {Observable<Array<ManifestAuthProvider>>} An observable of the registered auth providers.
-	 */
-	#getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
-		return extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider');
 	}
 
 	/**
@@ -663,6 +571,69 @@ export class UmbAuthContext extends UmbContextBase {
 		// timestamps are the same — the historical access-vs-refresh token split (and its ×4
 		// multiplier) no longer applies. TODO (V21): drop the deprecated accessTokenExpiresAt.
 		this.#session.setValue({ accessTokenExpiresAt: expiresAt, expiresAt });
+	}
+
+	/**
+	 * Applies a session established after the page loaded. A session that may come from a sign-in can belong
+	 * to another user than the one the page is bound to, so it is held until that user is known. Sessions
+	 * arriving while a sign-in is held wait behind it, so the newest one is applied once the user is confirmed.
+	 * @param {boolean} fromSignIn Whether the session may come from a sign-in rather than a renewal of the session in hand.
+	 * @param {() => void} apply Applies the session.
+	 * @returns {Promise<boolean>} True once the session is applied, false when it belongs to another user.
+	 */
+	#applySession(fromSignIn: boolean, apply: () => void): Promise<boolean> {
+		if (this.#hasUserChanged) {
+			// The page is still open, so it has not started over yet: a further sign-in reports the change again
+			if (fromSignIn) this.#userChanged.next();
+			return Promise.resolve(false);
+		}
+		if (this.#isBypassed || !this.#boundUser || (!fromSignIn && !this.#confirmingUser)) {
+			apply();
+			return Promise.resolve(true);
+		}
+
+		this.#heldSession = apply;
+		this.#confirmingUser ??= this.#confirmSignedInUser();
+		return this.#confirmingUser;
+	}
+
+	async #confirmSignedInUser(): Promise<boolean> {
+		const signedInUser = await this.#lookUpSignedInUser();
+		const apply = this.#heldSession;
+		this.#heldSession = undefined;
+		this.#confirmingUser = undefined;
+
+		if (apply && signedInUser === this.#boundUser) {
+			apply();
+			return true;
+		}
+
+		this.#onUserChanged();
+		return false;
+	}
+
+	/**
+	 * Looks up the user behind the session cookie, retrying failed attempts.
+	 * Deliberately not through the configured API clients: their interceptors hold a request that is
+	 * rejected for authorization until the user is signed in, which is what is being decided here.
+	 * @returns {Promise<string | undefined>} The unique of the signed-in user, or undefined if it could not be determined.
+	 */
+	async #lookUpSignedInUser(): Promise<string | undefined> {
+		for (const delay of SIGNED_IN_USER_LOOKUP_DELAYS_MS) {
+			if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
+			const response = await this.#fetchWithCookie(`${this.#serverUrl}/umbraco/management/api/v1/user/current`, 'GET');
+			if (!response?.ok) continue;
+			const user = await response.json().catch(() => undefined);
+			if (typeof user?.id === 'string') return user.id;
+		}
+		return undefined;
+	}
+
+	#onUserChanged() {
+		if (this.#hasUserChanged) return;
+		this.#hasUserChanged = true;
+		this.#heldSession = undefined;
+		this.#userChanged.next();
 	}
 
 	/**

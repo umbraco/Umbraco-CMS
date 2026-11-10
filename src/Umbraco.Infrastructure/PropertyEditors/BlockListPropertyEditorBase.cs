@@ -146,7 +146,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor, IValueSchemaProv
         }
 
         /// <inheritdoc />
-        public override IValueRequiredValidator RequiredValidator => new BlockListValueRequiredValidator(JsonSerializer);
+        public override IValueRequiredValidator RequiredValidator => new BlockEditorValueRequiredValidator<BlockListValue>(JsonSerializer);
 
         /// <inheritdoc/>
         protected override BlockListValue CreateWithLayout(IEnumerable<BlockListLayoutItem> layout) => new(layout);
@@ -180,7 +180,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor, IValueSchemaProv
             {
                 var blockConfig = (BlockListConfiguration?)dataTypeConfiguration;
 
-                BlockListConfiguration.NumberRange? validationLimit = blockConfig?.ValidationLimit;
+                NumberRange? validationLimit = blockConfig?.ValidationLimit;
                 if (validationLimit == null)
                 {
                     return Array.Empty<ValidationResult>();

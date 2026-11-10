@@ -53,12 +53,29 @@ public interface IReadOnlyUserGroup
     int? StartElementId { get; }
 
     /// <summary>
+    ///     Gets the container that members of this user group start at in the document blueprint tree.
+    ///     A null value gives the group no access to document blueprints.
+    /// </summary>
+    int? StartDocumentBlueprintId { get; }
+
+    /// <summary>
     ///     Gets a value indicating whether this user group has access to all languages.
     /// </summary>
     /// <remarks>
     ///     This is set to return true as default to avoid breaking changes.
     /// </remarks>
+    // TODO (V20): Remove default implementation.
     bool HasAccessToAllLanguages => true;
+
+    /// <summary>
+    ///     Gets a value indicating whether this user group can edit invariant (shared) property data
+    ///     on variant content. The permission is not consulted when editing invariant content types.
+    /// </summary>
+    /// <remarks>
+    ///     This is set to return true as default to avoid breaking changes.
+    /// </remarks>
+    // TODO (V20): Remove default implementation.
+    bool HasAccessToInvariantForVariant => true;
 
     /// <summary>
     ///     Gets the set of permissions assigned to this user group.

@@ -114,9 +114,9 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
     /// This is more efficient than loading all IContent objects.
     /// Aliases are routing data for the published site, so this reads the published version's property
     /// data (joined via <see cref="DocumentVersionDto"/>) rather than the current/draft version - a draft
-    /// edit to an alias must not affect routing until the document is actually published.
-    /// The document itself must also be published (<see cref="DocumentDto"/>): unpublishing leaves the last
-    /// published version flagged as published, so the version flag alone would still return its former aliases.
+    /// edit to an alias must not affect routing until the document is actually published. Unpublishing a document
+    /// clears the document's published flag but leaves its last published version flagged, so the document's own
+    /// flag is checked as well.
     /// </remarks>
     public IEnumerable<DocumentUrlAliasRaw> GetAllDocumentUrlAliases()
     {

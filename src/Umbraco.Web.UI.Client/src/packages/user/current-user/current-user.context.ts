@@ -19,12 +19,21 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	readonly allowedSections = this.#currentUser.asObservablePart((user) => user?.allowedSections);
 	readonly avatarUrls = this.#currentUser.asObservablePart((user) => user?.avatarUrls);
 	readonly documentStartNodeUniques = this.#currentUser.asObservablePart((user) => user?.documentStartNodeUniques);
+	readonly documentBlueprintStartNodeUniques = this.#currentUser.asObservablePart(
+		(user) => user?.documentBlueprintStartNodeUniques,
+	);
 	readonly elementStartNodeUniques = this.#currentUser.asObservablePart((user) => user?.elementStartNodeUniques);
 	readonly email = this.#currentUser.asObservablePart((user) => user?.email);
 	readonly fallbackPermissions = this.#currentUser.asObservablePart((user) => user?.fallbackPermissions);
 	readonly hasAccessToAllLanguages = this.#currentUser.asObservablePart((user) => user?.hasAccessToAllLanguages);
+	readonly hasAccessToInvariantForVariant = this.#currentUser.asObservablePart(
+		(user) => user?.hasAccessToInvariantForVariant,
+	);
 	readonly hasAccessToSensitiveData = this.#currentUser.asObservablePart((user) => user?.hasAccessToSensitiveData);
 	readonly hasDocumentRootAccess = this.#currentUser.asObservablePart((user) => user?.hasDocumentRootAccess);
+	readonly hasDocumentBlueprintRootAccess = this.#currentUser.asObservablePart(
+		(user) => user?.hasDocumentBlueprintRootAccess,
+	);
 	readonly hasElementRootAccess = this.#currentUser.asObservablePart((user) => user?.hasElementRootAccess);
 	readonly hasMediaRootAccess = this.#currentUser.asObservablePart((user) => user?.hasMediaRootAccess);
 	readonly isAdmin = this.#currentUser.asObservablePart((user) => user?.isAdmin);
@@ -63,10 +72,15 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	 * Loads the current user. Concurrent callers share the same in-flight promise,
 	 * so awaiting `load()` always waits for `#currentUser` to be populated.
 	 * @returns {Promise<void>} Resolves once the current user observable has emitted.
+	 * @throws {Error} Rejects if the current user could not be fetched, after which the next call fetches again.
 	 */
 	public async load(): Promise<void> {
 		if (!this.#loadPromise) {
-			this.#loadPromise = this.#doLoad();
+			const loading = this.#doLoad().catch((error) => {
+				if (this.#loadPromise === loading) this.#loadPromise = undefined;
+				throw error;
+			});
+			this.#loadPromise = loading;
 		}
 		return this.#loadPromise;
 	}
@@ -87,7 +101,13 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	}
 
 	async #doLoad(): Promise<void> {
-		const { asObservable } = await this.#currentUserRepository.requestCurrentUser();
+		const { data, error, asObservable } = await this.#currentUserRepository.requestCurrentUser();
+
+		// Without fresh data the store still holds whichever user was loaded before, who may not be the user
+		// signed in now, so do not settle on it.
+		if (!data) {
+			throw error ?? new Error('The current user could not be loaded.');
+		}
 
 		// TODO: Fail early? if no asObservable method is available on the server response, we should probably throw an error or handle it differently. [NL]
 		if (asObservable) {
@@ -106,7 +126,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 
 	#loadDebounced = debounce(() => {
 		this.invalidate();
-		this.load();
+		this.load().catch((error) => console.error('[UmbCurrentUserContext] Failed to reload the current user', error));
 	}, 100);
 
 	/**

@@ -5,7 +5,8 @@
 /// </summary>
 /// <remarks>
 /// Umbraco Search ships two strategies: <see cref="IPublishedContentChangeStrategy"/> (for the published content
-/// index) and <see cref="IDraftContentChangeStrategy"/> (for the draft content, media and member indexes).
+/// index) and <see cref="IDraftContentChangeStrategy"/> (for the draft content, media, member and library element
+/// indexes).
 /// </remarks>
 public interface IContentChangeStrategy
 {

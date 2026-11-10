@@ -134,14 +134,14 @@ export class UmbBlockGridEntriesContext
 
 	getMinAllowed() {
 		if (this.#areaKey) {
-			return this.#areaType.getValue()?.minAllowed ?? 0;
+			return this.#areaType.getValue()?.validationLimit?.min ?? 0;
 		}
 		return this._manager?.getMinAllowed() ?? 0;
 	}
 
 	getMaxAllowed() {
 		if (this.#areaKey) {
-			return this.#areaType.getValue()?.maxAllowed ?? Infinity;
+			return this.#areaType.getValue()?.validationLimit?.max ?? Infinity;
 		}
 		return this._manager?.getMaxAllowed() ?? Infinity;
 	}
@@ -257,7 +257,7 @@ export class UmbBlockGridEntriesContext
 						throw new Error('Failed to create block');
 					}
 				} else if (value && 'library' in value) {
-					this._manager?.insertExternalContent(value.library.elementKey);
+					this._insertExternalContent(value.library.elementKey, data?.originData);
 				} else if (value && 'clipboard' in value && value.clipboard.selection?.length && data) {
 					const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
 					if (!clipboardContext) {
@@ -430,8 +430,8 @@ export class UmbBlockGridEntriesContext
 			if (!areaType) return undefined;
 			// No need to observe as this method is called every time the area is changed.
 			this.#rangeLimits.setValue({
-				min: areaType.minAllowed ?? 0,
-				max: areaType.maxAllowed ?? Infinity,
+				min: areaType.validationLimit?.min ?? 0,
+				max: areaType.validationLimit?.max ?? Infinity,
 			});
 		} else if (this.#areaKey === null) {
 			if (!this._manager) return undefined;

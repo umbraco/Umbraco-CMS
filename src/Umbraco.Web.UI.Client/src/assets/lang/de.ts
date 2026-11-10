@@ -69,6 +69,17 @@ export default {
 		resendInvite: 'Einladung erneut versenden',
 		viewActionsFor: (name: string) => (name ? `Aktionen anzeigen für ${name}` : 'Aktionen anzeigen'),
 	},
+	actionGroups: {
+		clipboard: 'Zwischenablage',
+		create: 'Erstellen',
+		edit: 'Bearbeiten',
+		importExport: 'Import und Export',
+		notifications: 'Benachrichtigungen',
+		other: 'Sonstiges',
+		publishing: 'Veröffentlichung',
+		routing: 'Routing',
+		structure: 'Struktur',
+	},
 	actionCategories: {
 		content: 'Inhalt',
 		administration: 'Administration',
@@ -1075,6 +1086,7 @@ export default {
 			'Hoppla! Wir konnten Sie nicht anmelden. Bitte überprüfen Sie Ihre Anmeldeinformationen und versuchen Sie es erneut.',
 		userLockedOut: 'Ihr Konto wurde gesperrt. Bitte versuchen Sie es später erneut.',
 		receivedErrorFromServer: 'Der Server hat einen Fehler gemeldet',
+		passwordResetUnavailable: 'Das Zurücksetzen des Kennworts ist derzeit leider nicht verfügbar. Bitte versuchen Sie es später erneut oder wenden Sie sich an Ihren Administrator.',
 		userInviteWelcomeMessage:
 			'Hallo und Willkommen bei Umbraco! In nur einer Minute sind Sie bereit loszulegen, Sie müssen nur ein Kennwort festlegen.',
 		userInviteExpiredMessage:
@@ -1885,11 +1897,12 @@ export default {
 		stateLockedOut: 'Ausgeschlossen',
 		stateInvited: 'Eingeladen',
 		stateInactive: 'Nicht aktiv',
+		type: 'Typ',
 		sortNameAscending: 'Name (A-Z)',
 		sortNameDescending: 'Name (Z-A)',
-		sortCreateDateAscending: 'Oldest',
-		sortCreateDateDescending: 'Newest',
-		sortLastLoginDateDescending: 'Last login',
+		sortCreateDateAscending: 'Älteste',
+		sortCreateDateDescending: 'Neueste',
+		sortLastLoginDateDescending: 'Letzte Anmeldung',
 	},
 	validation: {
 		validation: 'Validierung',

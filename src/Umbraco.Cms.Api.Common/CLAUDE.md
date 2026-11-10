@@ -246,6 +246,9 @@ With Microsoft.AspNetCore.OpenApi, transformers are configured per OpenAPI docum
    - Requires shared Data Protection key ring
    - All servers must have synchronized clocks (NTP)
    - Reference tokens require database storage
+   - Signing/encryption credentials come from `ISecurityTokenCredentialsProvider` (default: ephemeral per server).
+     Identity tokens are JWTs signed with them even with Data Protection enabled, so load balanced sites whose
+     external clients validate identity tokens must register a provider returning shared credentials (e.g. certificates)
 
 ### External Dependencies
 

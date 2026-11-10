@@ -59,6 +59,17 @@ export default {
 		unpublish: 'Avpublicera',
 		update: 'Uppdatera',
 	},
+	actionGroups: {
+		clipboard: 'Urklipp',
+		create: 'Skapa',
+		edit: 'Redigera',
+		importExport: 'Import och export',
+		notifications: 'Meddelanden',
+		other: 'Övrigt',
+		publishing: 'Publicering',
+		routing: 'Routning',
+		structure: 'Struktur',
+	},
 	actionCategories: {
 		administration: 'Administration',
 		structure: 'Struktur',
@@ -161,6 +172,8 @@ export default {
 	validation: {
 		entriesShort: 'Minsta %0% poster, kräver <strong>%1%</strong> mer.',
 		entriesExceed: 'Max %0% poster, <strong>%1%</strong> för många.',
+		itemMissingValueMessage: 'Objekt %0% saknar ett värde',
+		invalidEmpty: 'Värdet kan inte vara tomt',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Skapa en ny innehållsmall för <em>%0%</em>',
@@ -426,7 +439,7 @@ export default {
 		addLink: 'Lägg till länk',
 		assignDomain: 'Hantera domännamn',
 		closeThisWindow: 'Stäng fönstret',
-		confirmdelete: 'Är du säker på att du vill ta bort',
+		confirmdelete: (name: string) => `Är du säker på att du vill ta bort${name ? ` <strong>${name}</strong>` : ''}?`,
 		confirmdeleteNumberOfItems:
 			'Är du säker på att du vill ta bort <strong>%0%</strong> av <strong>%1%</strong> objekt',
 		confirmdisable: 'Är du säker på att du vill avaktivera',
@@ -798,6 +811,7 @@ export default {
 		userFailedLogin: 'Hoppsan! Vi kunde inte logga in dig. Vänligen kontrollera dina uppgifter och försök igen.',
 		userLockedOut: 'Ditt konto har låsts. Vänligen försök igen senare.',
 		receivedErrorFromServer: 'Ett fel uppstod på servern',
+		passwordResetUnavailable: 'Tyvärr är återställning av lösenord inte tillgänglig just nu. Försök igen senare eller kontakta din administratör.',
 		resetCodeExpired: 'Länken du har klickat på är ogiltig eller har gått ut',
 		userInviteWelcomeMessage:
 			'Hej och välkommen till Umbraco! Inom bara 1 minut är du redo att börja, vi behöver bara att du ställer in ett lösenord.',
@@ -1329,6 +1343,7 @@ export default {
 		stateLockedOut: 'Utlåst',
 		stateInvited: 'Inbjuden',
 		stateInactive: 'Inaktiv',
+		type: 'Typ',
 		sortNameAscending: 'Namn (A-Z)',
 		sortNameDescending: 'Namn (Z-A)',
 		startnode: 'Startnod för innehåll',

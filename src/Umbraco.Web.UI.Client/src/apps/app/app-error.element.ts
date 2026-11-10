@@ -141,13 +141,13 @@ export class UmbAppErrorElement extends UmbLitElement {
 	#renderProblemDetails = (problemDetails: UmbProblemDetails) => html`
 		<p><strong>${problemDetails.title}</strong></p>
 		<p>${problemDetails.detail}</p>
-		<pre>${problemDetails.stack}</pre>
+		<pre dir="ltr">${problemDetails.stack}</pre>
 	`;
 
 	#renderErrorObj = (error: Error) => html`
 		<p><strong>${error.name}</strong></p>
 		<p>${error.message}</p>
-		<pre>${error.stack}</pre>
+		<pre dir="ltr">${error.stack}</pre>
 	`;
 
 	#isProblemDetails(error: unknown): error is UmbProblemDetails {

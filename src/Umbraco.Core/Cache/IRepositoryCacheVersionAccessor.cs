@@ -23,6 +23,19 @@ public interface IRepositoryCacheVersionAccessor
     Task<RepositoryCacheVersion?> GetAsync(string cacheKey);
 
     /// <summary>
+    /// Retrieves the cache version for the specified cache key without leaving the calling thread.
+    /// </summary>
+    /// <param name="cacheKey">The unique identifier for the cache entry.</param>
+    /// <returns>The cache version if found, or <see langword="null"/> if the version doesn't exist or the request is a client-side request.</returns>
+    /// <remarks>
+    /// Used on paths that run while a distributed lock is held, where awaiting the database read would hand the
+    /// continuation to another thread-pool thread and lengthen the time the lock is held.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    RepositoryCacheVersion? Get(string cacheKey)
+        => GetAsync(cacheKey).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Notifies of a version change on a given cache key, providing the new version so internal caches
     /// can be updated in-place without a database round-trip.
     /// </summary>
@@ -31,11 +44,16 @@ public interface IRepositoryCacheVersionAccessor
     void VersionChanged(string cacheKey, Guid newVersion);
 
     /// <summary>
-    /// Notifies the accessor that caches have been synchronized.
+    /// Notifies the accessor that caches have been synchronized and which versions were adopted.
     /// </summary>
+    /// <param name="adoptedVersions">The versions the local caches now hold.</param>
     /// <remarks>
-    /// This method is called after cache synchronization to temporarily bypass version checking,
-    /// preventing recursive sync attempts while repositories reload data from the database.
+    /// The scope-level cache is moved to the adopted versions instead of being cleared: a scope holds its
+    /// distributed locks for the rest of its transaction, so the data it reads cannot change under it and
+    /// checking the database version again would only trigger another sync for a version published after
+    /// its locks were taken. The request-level cache is cleared, so a later root scope in the same request
+    /// reads the current versions again. Clearing the scope-level cache instead would let a version published
+    /// mid-scope change that scope's view.
     /// </remarks>
-    void CachesSynced();
+    void CachesSynced(IEnumerable<RepositoryCacheVersion> adoptedVersions);
 }

@@ -101,6 +101,14 @@ public class TestIndexerAndSearcher : IIndexer, ISearcher
                             && field.Value.Keywords?.ContainsAny(keywordFilter.Values) != keywordFilter.Negate))
                         .ToArray();
                     break;
+                case TextFilter textFilter:
+                    result = result.Where(predicate: document =>
+                        document.Fields.Any(field =>
+                            IsVarianceMatch(field)
+                            && field.FieldName == textFilter.FieldName
+                            && field.Value.AllTexts().Any(text => textFilter.Values.Any(text.InvariantContains)) != textFilter.Negate))
+                        .ToArray();
+                    break;
                 case IntegerExactFilter integerExactFilter:
                     result = result.Where(document =>
                         document.Fields.Any(field =>

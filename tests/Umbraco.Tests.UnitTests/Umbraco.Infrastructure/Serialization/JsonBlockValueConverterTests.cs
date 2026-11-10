@@ -442,6 +442,78 @@ public class JsonBlockValueConverterTests
         });
     }
 
+    [TestCase(typeof(SingleBlockValue), Constants.PropertyEditors.Aliases.BlockList, true)]
+    [TestCase(typeof(SingleBlockValue), Constants.PropertyEditors.Aliases.BlockList, false)]
+    [TestCase(typeof(BlockListValue), Constants.PropertyEditors.Aliases.SingleBlock, true)]
+    [TestCase(typeof(BlockListValue), Constants.PropertyEditors.Aliases.SingleBlock, false)]
+    public void Own_Layout_Takes_Precedence_Over_Other_Supported_Layout(Type blockValueType, string otherAlias, bool ownLayoutFirst)
+    {
+        var ownAlias = ((BlockValue)Activator.CreateInstance(blockValueType)!).PropertyEditorAlias;
+        var ownContentKey = Guid.NewGuid();
+        var otherContentKey = Guid.NewGuid();
+
+        var ownLayout = $$"""
+            "{{ownAlias}}": [{ "contentKey": "{{ownContentKey}}" }]
+            """;
+        var otherLayout = $$"""
+            "{{otherAlias}}": [{ "contentKey": "{{otherContentKey}}" }]
+            """;
+        var json = $$"""
+            {
+                "layout": {
+                    {{(ownLayoutFirst ? ownLayout : otherLayout)}},
+                    {{(ownLayoutFirst ? otherLayout : ownLayout)}}
+                }
+            }
+            """;
+
+        AssertOwnLayoutHoldsContentKeys(DeserializeBlockValue(blockValueType, json), ownContentKey);
+    }
+
+    [TestCase(typeof(SingleBlockValue), Constants.PropertyEditors.Aliases.BlockList)]
+    [TestCase(typeof(BlockListValue), Constants.PropertyEditors.Aliases.SingleBlock)]
+    public void Can_Deserialize_Other_Supported_Layout_As_Own_Layout(Type blockValueType, string otherAlias)
+    {
+        var contentKey = Guid.NewGuid();
+        var json = $$"""
+            {
+                "layout": {
+                    "{{otherAlias}}": [{ "contentKey": "{{contentKey}}" }]
+                }
+            }
+            """;
+
+        BlockValue? deserialized = DeserializeBlockValue(blockValueType, json);
+        AssertOwnLayoutHoldsContentKeys(deserialized, contentKey);
+
+        // the layout is written back under the own alias only
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var serialized = serializer.Serialize(deserialized!);
+        Assert.Multiple(() =>
+        {
+            Assert.That(serialized, Does.Contain($"\"{deserialized!.PropertyEditorAlias}\""));
+            Assert.That(serialized, Does.Not.Contain($"\"{otherAlias}\""));
+        });
+    }
+
+    private static BlockValue? DeserializeBlockValue(Type blockValueType, string json)
+    {
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        return blockValueType == typeof(SingleBlockValue)
+            ? serializer.Deserialize<SingleBlockValue>(json)
+            : blockValueType == typeof(BlockListValue)
+                ? serializer.Deserialize<BlockListValue>(json)
+                : throw new ArgumentOutOfRangeException(nameof(blockValueType));
+    }
+
+    private static void AssertOwnLayoutHoldsContentKeys(BlockValue? blockValue, params Guid[] expectedContentKeys)
+    {
+        Assert.IsNotNull(blockValue);
+        Assert.AreEqual(1, blockValue!.Layout.Count);
+        Assert.IsTrue(blockValue.Layout.ContainsKey(blockValue.PropertyEditorAlias));
+        CollectionAssert.AreEqual(expectedContentKeys, blockValue.Layout[blockValue.PropertyEditorAlias].Select(layoutItem => layoutItem.ContentKey));
+    }
+
     [Test]
     public void Try_Deserialize_Unknown_Block_Layout_With_Nested_Array()
     {

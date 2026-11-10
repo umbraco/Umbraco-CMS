@@ -14,9 +14,4 @@ public class ElementConfigurationResponseModel
     /// Gets or sets a value indicating whether unpublishing is disabled when the element is referenced.
     /// </summary>
     public required bool DisableUnpublishWhenReferenced { get; set; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether editing the invariant language is allowed from a non-default language.
-    /// </summary>
-    public required bool AllowEditInvariantFromNonDefault { get; set; }
 }

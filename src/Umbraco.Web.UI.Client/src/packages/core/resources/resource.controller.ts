@@ -32,6 +32,8 @@ export class UmbResourceController<T = unknown> extends UmbControllerBase {
 			return UmbCancelError.fromLegacyCancelError(error);
 		} else if (UmbCancelError.isUmbCancelError(error)) {
 			return error;
+		} else if (error instanceof DOMException && (error.name === 'AbortError' || error.name === 'TimeoutError')) {
+			return new UmbCancelError(error.message);
 		} else if (UmbApiError.isUmbApiError(error)) {
 			return error;
 		} else if (error instanceof TypeError) {
@@ -94,19 +96,7 @@ export class UmbResourceController<T = unknown> extends UmbControllerBase {
 	 * Show an error peek notification to the user.
 	 * @param args - The error notification details.
 	 */
-	protected async _peekError(args: UmbPeekErrorArgs): Promise<void>;
-	/**
-	 * @deprecated Use the overload accepting {@link UmbPeekErrorArgs} instead. Scheduled for removal in Umbraco 19.
-	 */
-	protected async _peekError(headline: string, message: string, errors?: Record<string, string[]>): Promise<void>;
-	protected async _peekError(
-		headlineOrArgs: string | UmbPeekErrorArgs,
-		message?: string,
-		errors?: Record<string, string[]>,
-	): Promise<void> {
-		const args: UmbPeekErrorArgs =
-			typeof headlineOrArgs === 'object' ? headlineOrArgs : { headline: headlineOrArgs, message: message!, errors };
-
+	protected async _peekError(args: UmbPeekErrorArgs): Promise<void> {
 		// Store the host for usage in the following async context
 		const host = this._host;
 

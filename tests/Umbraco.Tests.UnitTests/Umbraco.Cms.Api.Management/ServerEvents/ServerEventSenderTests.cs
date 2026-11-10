@@ -1034,6 +1034,201 @@ internal sealed class ServerEventSenderTests
     }
 
     [Test]
+    public async Task HandleAsync_ElementSavedNotification_RoutesCreatedEvent()
+    {
+        // Arrange
+        var entityKey = Guid.NewGuid();
+        var now = DateTime.UtcNow;
+        var entity = Mock.Of<IElement>(e => e.Key == entityKey && e.CreateDate == now && e.UpdateDate == now);
+
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(new ElementSavedNotification(entity, new EventMessages()), CancellationToken.None);
+
+        // Assert
+        AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.Element);
+    }
+
+    [Test]
+    public async Task HandleAsync_ElementSavedNotification_RoutesUpdatedEventWithEntityPath()
+    {
+        // Arrange
+        var entityKey = Guid.NewGuid();
+        var entity = Mock.Of<IElement>(e =>
+            e.Key == entityKey &&
+            e.CreateDate == DateTime.UtcNow.AddDays(-1) &&
+            e.UpdateDate == DateTime.UtcNow &&
+            e.Path == "-1,2,3");
+
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(new ElementSavedNotification(entity, new EventMessages()), CancellationToken.None);
+
+        // Assert
+        AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.Element);
+        Assert.That(recordingRouter.RoutedContexts[0].EntityPath, Is.EqualTo("-1,2,3"));
+    }
+
+    [Test]
+    public async Task HandleAsync_ElementDeletedNotification_RoutesDeletedEvent()
+    {
+        // Arrange
+        var entityKey = Guid.NewGuid();
+        var entity = Mock.Of<IElement>(e => e.Key == entityKey);
+
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(new ElementDeletedNotification(entity, new EventMessages()), CancellationToken.None);
+
+        // Assert
+        AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.Element);
+    }
+
+    [Test]
+    public async Task HandleAsync_ElementMovedToRecycleBinNotification_RoutesTrashedEventWithOriginalPath()
+    {
+        // Arrange
+        var entityKey = Guid.NewGuid();
+        var entity = Mock.Of<IElement>(e => e.Key == entityKey);
+        var notification = new ElementMovedToRecycleBinNotification(
+            new MoveToRecycleBinEventInfo<IElement>(entity, "-1,2,3"),
+            new EventMessages());
+
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notification, CancellationToken.None);
+
+        // Assert
+        AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Trashed, Constants.ServerEvents.EventSource.Element);
+        Assert.That(recordingRouter.RoutedContexts[0].EntityPath, Is.EqualTo("-1,2,3"));
+    }
+
+    [Test]
+    public async Task HandleAsync_EntityContainerSavedNotification_ForNewElementContainer_RoutesCreatedEvent()
+    {
+        // Arrange - as persisted on insert: the identity is assigned and only the create date is set.
+        var container = new EntityContainer(Constants.ObjectTypes.Element) { Key = Guid.NewGuid() };
+        container.Id = 123;
+        container.CreateDate = DateTime.UtcNow;
+        container.ResetDirtyProperties();
+
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(new EntityContainerSavedNotification(container, new EventMessages()), CancellationToken.None);
+
+        // Assert
+        AssertPrimaryRoutedEvent(recordingRouter, container.Key, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.ElementContainer);
+        Assert.That(recordingRouter.RoutedContexts[0].EntityPath, Is.EqualTo("-1"));
+    }
+
+    [Test]
+    public async Task HandleAsync_EntityContainerSavedNotification_ForExistingElementContainer_RoutesUpdatedEvent()
+    {
+        // Arrange - as loaded and renamed: containers do not track create or update dates, so both are unset.
+        var container = new EntityContainer(123, Guid.NewGuid(), Constants.System.Root, "-1,123", 1, 0, Constants.ObjectTypes.Element, "Folder", Constants.Security.SuperUserId);
+        container.ResetDirtyProperties(false);
+        container.Name = "Renamed folder";
+        container.ResetDirtyProperties();
+
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(new EntityContainerSavedNotification(container, new EventMessages()), CancellationToken.None);
+
+        // Assert
+        AssertPrimaryRoutedEvent(recordingRouter, container.Key, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.ElementContainer);
+    }
+
+    [Test]
+    public async Task HandleAsync_EntityContainerDeletedNotification_ForElementContainer_RoutesDeletedEvent()
+    {
+        // Arrange
+        var container = new EntityContainer(Constants.ObjectTypes.Element) { Key = Guid.NewGuid() };
+
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(new EntityContainerDeletedNotification(container, new EventMessages()), CancellationToken.None);
+
+        // Assert
+        AssertPrimaryRoutedEvent(recordingRouter, container.Key, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.ElementContainer);
+    }
+
+    [Test]
+    public async Task HandleAsync_EntityContainerMovedToRecycleBinNotification_ForElementContainer_RoutesTrashedEventWithOriginalPath()
+    {
+        // Arrange
+        var container = new EntityContainer(Constants.ObjectTypes.Element) { Key = Guid.NewGuid() };
+        var notification = new EntityContainerMovedToRecycleBinNotification(
+            new MoveToRecycleBinEventInfo<EntityContainer>(container, "-1,5"),
+            new EventMessages());
+
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notification, CancellationToken.None);
+
+        // Assert
+        AssertPrimaryRoutedEvent(recordingRouter, container.Key, Constants.ServerEvents.EventType.Trashed, Constants.ServerEvents.EventSource.ElementContainer);
+        Assert.That(recordingRouter.RoutedContexts[0].EntityPath, Is.EqualTo("-1,5"));
+    }
+
+    [Test]
+    public async Task HandleAsync_EntityContainerNotifications_ForOtherContainerTypes_RoutesNothing()
+    {
+        // Arrange - container notifications are shared by every container type; only element containers are announced.
+        var container = new EntityContainer(Constants.ObjectTypes.DocumentType) { Key = Guid.NewGuid() };
+        var messages = new EventMessages();
+
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(new EntityContainerSavedNotification(container, messages), CancellationToken.None);
+        await serverEventSender.HandleAsync(new EntityContainerDeletedNotification(container, messages), CancellationToken.None);
+        await serverEventSender.HandleAsync(new EntityContainerMovedToRecycleBinNotification(new MoveToRecycleBinEventInfo<EntityContainer>(container, "-1,5"), messages), CancellationToken.None);
+
+        // Assert
+        Assert.That(recordingRouter.RoutedEvents, Is.Empty);
+    }
+
+    [Test]
+    public async Task HandleAsync_EntityContainerNotifications_ForMixedContainerTypes_RoutesOnlyContainersWithAnEventSource()
+    {
+        // Arrange - a batch can hold notifications for several container types; each container is routed by its own type.
+        var elementContainer = new EntityContainer(Constants.ObjectTypes.Element) { Key = Guid.NewGuid() };
+        var documentTypeContainer = new EntityContainer(Constants.ObjectTypes.DocumentType) { Key = Guid.NewGuid() };
+        var messages = new EventMessages();
+
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(
+            [
+                new EntityContainerDeletedNotification(documentTypeContainer, messages),
+                new EntityContainerDeletedNotification(elementContainer, messages),
+            ],
+            CancellationToken.None);
+
+        // Assert
+        AssertPrimaryRoutedEvent(recordingRouter, elementContainer.Key, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.ElementContainer);
+    }
+
+    [Test]
     public async Task HandleAsync_DataTypeDeletedNotification_RoutesDeletedEvent()
     {
         // Arrange

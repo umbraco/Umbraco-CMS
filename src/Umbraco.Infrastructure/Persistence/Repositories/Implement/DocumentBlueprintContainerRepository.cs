@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Scoping;
 
@@ -30,5 +31,29 @@ internal sealed class DocumentBlueprintContainerRepository : EntityContainerRepo
             repositoryCacheVersionService,
             cacheSyncService)
     {
+    }
+
+    protected override void PersistDeletedItem(EntityContainer entity)
+    {
+        if (entity == null)
+        {
+            throw new ArgumentNullException(nameof(entity));
+        }
+
+        // Document blueprint containers can be referenced as start nodes on individual users
+        // (umbracoUserStartNode) and on user groups (umbracoUserGroup.startDocumentBlueprintId). Both
+        // reference umbracoNode.id via FK, so we must clear those references before deleting the
+        // underlying node.
+        var args = new { id = entity.Id };
+        Database.Execute(
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.UserStartNode)} WHERE {QuoteColumnName("startNode")} = @id",
+            args);
+        Database.Execute(
+            $@"UPDATE {QuoteTableName(Constants.DatabaseSchema.Tables.UserGroup)}
+               SET {QuoteColumnName("startDocumentBlueprintId")} = NULL
+               WHERE {QuoteColumnName("startDocumentBlueprintId")} = @id",
+            args);
+
+        base.PersistDeletedItem(entity);
     }
 }

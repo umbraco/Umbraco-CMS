@@ -8,6 +8,7 @@ export class UserGroupBuilder {
   sections: string[];
   languages: string[];
   hasAccessToAllLanguages: boolean;
+  hasAccessToInvariantForVariant: boolean;
   documentStartNodeId: string;
   documentRootAccess: boolean;
   mediaStartNodeId: string;
@@ -17,6 +18,8 @@ export class UserGroupBuilder {
   description: string;
   elementRootAccess: boolean;
   elementStartNodeId: string;
+  documentBlueprintRootAccess: boolean;
+  documentBlueprintStartNodeId: string;
 
   constructor() {
     this.sections = [];
@@ -45,6 +48,11 @@ export class UserGroupBuilder {
 
   withHasAccessToAllLanguages(hasAccessToAllLanguages: boolean) {
     this.hasAccessToAllLanguages = hasAccessToAllLanguages;
+    return this;
+  }
+
+  withHasAccessToInvariantForVariant(hasAccessToInvariantForVariant: boolean) {
+    this.hasAccessToInvariantForVariant = hasAccessToInvariantForVariant;
     return this;
   }
 
@@ -95,6 +103,16 @@ export class UserGroupBuilder {
     return this;
   }
 
+  withDocumentBlueprintStartNodeId(documentBlueprintStartNodeId: string) {
+    this.documentBlueprintStartNodeId = documentBlueprintStartNodeId;
+    return this;
+  }
+
+  withDocumentBlueprintRootAccess(documentBlueprintRootAccess: boolean) {
+    this.documentBlueprintRootAccess = documentBlueprintRootAccess;
+    return this;
+  }
+
   build() {
     return {
       name: this.name || '',
@@ -103,6 +121,7 @@ export class UserGroupBuilder {
       sections: this.sections || [],
       languages: this.languages || [],
       hasAccessToAllLanguages: this.hasAccessToAllLanguages || false,
+      hasAccessToInvariantForVariant: this.hasAccessToInvariantForVariant || false,
       documentStartNode: this.documentStartNodeId ? {id: this.documentStartNodeId} : null,
       documentRootAccess: this.documentRootAccess || false,
       mediaStartNode: this.mediaStartNodeId ? {id: this.mediaStartNodeId} : null,
@@ -112,6 +131,8 @@ export class UserGroupBuilder {
       description: this.description || '',
       elementStartNode: this.elementStartNodeId ? {id: this.elementStartNodeId} : null,
       elementRootAccess: this.elementRootAccess || false,
+      documentBlueprintStartNode: this.documentBlueprintStartNodeId ? {id: this.documentBlueprintStartNodeId} : null,
+      documentBlueprintRootAccess: this.documentBlueprintRootAccess || false,
     };
   }
 }

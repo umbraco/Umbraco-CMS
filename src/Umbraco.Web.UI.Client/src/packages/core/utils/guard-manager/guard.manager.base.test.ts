@@ -56,6 +56,19 @@ describe('UmbPermissionGuardManager', () => {
 		});
 	});
 
+	describe('fallbackPermitted', () => {
+		it('emits when the fallback changes, also when no rule changes', () => {
+			const emitted: boolean[] = [];
+			const subscription = manager.fallbackPermitted.subscribe((value) => emitted.push(value));
+
+			manager.fallbackToPermitted();
+			manager.fallbackToNotPermitted();
+			subscription.unsubscribe();
+
+			expect(emitted).to.deep.equal([false, true, false]);
+		});
+	});
+
 	describe('Add Rule', () => {
 		it('adds a single state to the states array', () => {
 			manager.addRule(rule1);

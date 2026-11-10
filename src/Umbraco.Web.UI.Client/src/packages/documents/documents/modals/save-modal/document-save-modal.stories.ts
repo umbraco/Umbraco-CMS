@@ -102,11 +102,12 @@ const meta: Meta<UmbDocumentSaveModalElement> = {
 			source: {
 				language: 'ts',
 				code: `
-import { UMB_DOCUMENT_PUBLISH_MODAL, UmbDocumentVariantState } from '@umbraco-cms/backoffice/document';
+import { UMB_CONTENT_PUBLISH_MODAL } from '@umbraco-cms/backoffice/content';
+import { UmbDocumentVariantState } from '@umbraco-cms/backoffice/document';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
-	const result = modalManager.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
+	const result = modalManager.open(this, UMB_CONTENT_PUBLISH_MODAL, {
 		data: {
 			options: [
 				{

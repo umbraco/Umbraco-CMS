@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -197,7 +198,7 @@ internal sealed class MemberEditingService : IMemberEditingService
             updateModel.IsTwoFactorEnabled = await _twoFactorLoginService.IsTwoFactorEnabledAsync(member.Key);
         }
 
-        MemberIdentityUser? identityMember = await _memberManager.FindByIdAsync(member.Id.ToString());
+        MemberIdentityUser? identityMember = await _memberManager.FindByIdAsync(member.Id.ToString(CultureInfo.InvariantCulture));
         if (identityMember is null)
         {
             status.MemberEditingOperationStatus = MemberEditingOperationStatus.MemberNotFound;

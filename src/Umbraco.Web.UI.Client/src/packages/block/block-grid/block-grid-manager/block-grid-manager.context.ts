@@ -221,6 +221,14 @@ export class UmbBlockGridManagerContext<
 		return true;
 	}
 
+	protected override _collectExternalContentKeys(layouts: Array<UmbBlockGridLayoutModel>): Array<string> {
+		const nested = layouts.flatMap((layout) => layout.areas?.flatMap((area) => area.items) ?? []);
+		return [
+			...super._collectExternalContentKeys(layouts),
+			...(nested.length ? this._collectExternalContentKeys(nested) : []),
+		];
+	}
+
 	override setOneLayout(layoutEntry: BlockLayoutType, originData?: UmbBlockGridWorkspaceOriginData) {
 		const index = originData?.index ?? -1;
 

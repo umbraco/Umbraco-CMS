@@ -6,8 +6,6 @@ import type {
 } from '@umbraco-cms/backoffice/content';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { PagedDocumentVersionItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 
 export class UmbDocumentRollbackRepository extends UmbControllerBase implements UmbContentRollbackRepository {
 	#dataSource: UmbRollbackServerDataSource;
@@ -56,6 +54,7 @@ export class UmbDocumentRollbackRepository extends UmbControllerBase implements 
 					})),
 					values: data.values.map((v) => ({
 						culture: v.culture ?? null,
+						segment: v.segment ?? null,
 						alias: v.alias,
 						value: v.value,
 					})),
@@ -73,24 +72,6 @@ export class UmbDocumentRollbackRepository extends UmbControllerBase implements 
 	async rollback(versionId: string, culture?: string) {
 		return await this.#dataSource.rollback(versionId, culture);
 	}
-
-	/**
-	 * @param {string} id - The document unique identifier.
-	 * @param {string} [culture] - The culture to get versions for.
-	 * @returns {UmbRepositoryResponse<PagedDocumentVersionItemResponseModel>} The versions for the document.
-	 * @deprecated Use {@link requestVersionsByEntityId} instead. Scheduled for removal in Umbraco 19.
-	 */
-	async requestVersionsByDocumentId(
-		id: string,
-		culture?: string,
-	): Promise<UmbRepositoryResponse<PagedDocumentVersionItemResponseModel>> {
-		return await this.#dataSource.getVersionsByDocumentId(id, culture);
-	}
 }
-
-/**
- * @deprecated Use {@link UmbDocumentRollbackRepository} instead. Scheduled for removal in Umbraco 19.
- */
-export { UmbDocumentRollbackRepository as UmbRollbackRepository };
 
 export default UmbDocumentRollbackRepository;

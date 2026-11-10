@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Locking;
@@ -12,6 +13,8 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 internal sealed class ContentTypeContainerService : EntityTypeContainerService<IContentType, IDocumentTypeContainerRepository>, IContentTypeContainerService
 {
+    private readonly IContentTypeRepository _contentTypeRepository;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentTypeContainerService"/> class.
     /// </summary>
@@ -22,6 +25,8 @@ internal sealed class ContentTypeContainerService : EntityTypeContainerService<I
     /// <param name="auditService">The audit service.</param>
     /// <param name="entityRepository">The entity repository.</param>
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="contentTypeRepository">The content type repository.</param>
     public ContentTypeContainerService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -29,9 +34,25 @@ internal sealed class ContentTypeContainerService : EntityTypeContainerService<I
         IDocumentTypeContainerRepository entityContainerRepository,
         IAuditService auditService,
         IEntityRepository entityRepository,
-        IUserIdKeyResolver userIdKeyResolver)
-        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IEntityService entityService,
+        IContentTypeRepository contentTypeRepository)
+        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver, entityService)
+        => _contentTypeRepository = contentTypeRepository;
+
+    /// <inheritdoc />
+    protected override IContentType? GetContainedEntity(int id) => _contentTypeRepository.Get(id);
+
+    /// <inheritdoc />
+    protected override void SaveContainedEntity(IContentType entity) => _contentTypeRepository.Save(entity);
+
+    /// <inheritdoc />
+    protected override void PublishContainedEntitiesMovedNotifications(ICoreScope scope, IReadOnlyCollection<MoveEventInfo<IContentType>> movedEntities, EventMessages eventMessages)
     {
+        if (movedEntities.Count > 0)
+        {
+            scope.Notifications.Publish(new ContentTypeMovedNotification(movedEntities, eventMessages));
+        }
     }
 
     /// <inheritdoc />

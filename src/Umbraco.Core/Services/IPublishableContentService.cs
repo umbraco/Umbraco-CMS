@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -23,6 +24,18 @@ public interface IPublishableContentService<TContent> : IContentServiceBase<TCon
     /// <param name="loadTemplates">Whether to load templates. Ignored for content that has no templates.</param>
     /// <returns>The content, in the order of <paramref name="ids" />.</returns>
     IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids, string[]? propertyAliases, bool loadTemplates = true);
+
+    /// <summary>
+    ///     Gets paged content for specified content types.
+    /// </summary>
+    /// <param name="contentTypeIds">The content type identifiers.</param>
+    /// <param name="pageIndex">The page number.</param>
+    /// <param name="pageSize">The page size.</param>
+    /// <param name="totalRecords">Total number of content items.</param>
+    /// <param name="filter">Query filter.</param>
+    /// <param name="ordering">Ordering infos.</param>
+    /// <returns>The paged content.</returns>
+    IEnumerable<TContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords, IQuery<TContent>? filter, Ordering? ordering = null);
 
     /// <summary>
     ///     Saves content.
@@ -113,8 +126,14 @@ public interface IPublishableContentService<TContent> : IContentServiceBase<TCon
     ///     <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
     ///     <para>
     ///         The save and publish run in the same scope. If publishing fails for a business reason (for example,
-    ///         invalid content or an expired schedule) the save still takes effect; both are skipped only when a
-    ///         saving notification handler cancels the operation.
+    ///         invalid content or an expired schedule) the save still takes effect. Both are skipped when a handler of
+    ///         either the saving or the publishing notification cancels the operation, as the publishing notification is
+    ///         raised before the content is persisted.
+    ///     </para>
+    ///     <para>
+    ///         The default implementation of this method saves and publishes as two separate operations, so it retains
+    ///         the save when a publishing notification handler cancels. Implementations that combine the two should
+    ///         follow the contract described above.
     ///     </para>
     /// </remarks>
     /// <param name="content">The content to publish.</param>

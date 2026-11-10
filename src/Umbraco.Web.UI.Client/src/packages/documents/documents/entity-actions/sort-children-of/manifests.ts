@@ -17,6 +17,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.EntityAction.Document.SortChildrenOf',
 		name: 'Sort Children Of Document Entity Action',
 		api: () => import('./sort-children-of-document.action.js'),
+		weight: 700,
 		forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,

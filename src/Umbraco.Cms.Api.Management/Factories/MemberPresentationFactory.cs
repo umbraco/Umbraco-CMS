@@ -151,7 +151,7 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         {
             Id = member.Key,
             MemberType = new MemberTypeReferenceResponseModel(),
-            Variants = [new VariantItemResponseModel { Name = member.Name ?? string.Empty, Culture = null }],
+            Variants = [new VariantItemResponseModel { Name = member.Name.IsNullOrWhiteSpace() ? member.UserName : member.Name!, Culture = null }],
             Kind = MemberKind.ExternalOnly,
         };
 

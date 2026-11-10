@@ -93,21 +93,19 @@
 
   public static readonly mediaPickerSettings = {
     0: ['Accepted types', 'Limit to specific types'],
-    1: ['Amount', 'Set a required range of medias'],
+    1: ['Amount', 'The minimum applies once items have been added. To require a value, mark the property as mandatory.'],
     2: ['Start node', ''],
-    3: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
-    4: ['Enable Focal Point', ''],
-    5: ['Image Crops', 'Local crops, stored on document'],
-    6: ['Ignore User Start Nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
+    3: ['Enable Focal Point', ''],
+    4: ['Image Crops', 'Local crops, stored on document'],
+    5: ['Ignore User Start Nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
   }
 
   public static readonly singleMediaPickerSettings = {
     0: ['Accepted types', 'Limit to specific types'],
     1: ['Start node', ''],
-    2: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
-    3: ['Enable Focal Point', ''],
-    4: ['Image Crops', 'Local crops, stored on document'],
-    5: ['Ignore User Start Nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."],
+    2: ['Enable Focal Point', ''],
+    3: ['Image Crops', 'Local crops, stored on document'],
+    4: ['Ignore User Start Nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."],
   }
 
   public static readonly labelSettings = {
@@ -126,24 +124,22 @@
   }
 
   public static readonly sliderSettings = {
-    0: ['Minimum value', ''],
-    1: ['Maximum value', ''],
-    2: ['Initial value', ''],
-    3: ['Step increments', '']
+    0: ['Value range', 'Set the minimum and maximum value of the slider.'],
+    1: ['Initial value', ''],
+    2: ['Step increments', '']
   }
 
   public static readonly rangeSliderSettings = {
-    0: ['Minimum value', ''],
-    1: ['Maximum value', ''],
-    2: ['Minimum range', ''],
-    3: ['Initial low value', ''],
-    4: ['Initial high value', ''],
-    5: ['Step increments', '']
+    0: ['Value range', 'Set the minimum and maximum value of the slider.'],
+    1: ['Minimum range', ''],
+    2: ['Initial low value', ''],
+    3: ['Initial high value', ''],
+    4: ['Step increments', '']
   }
 
   public static readonly multipleDocumentPickerSettings = {
     0: ['Accepted types', 'Limit to specific types'],
-    1: ['Amount', 'Set a required range of documents'],
+    1: ['Amount', 'The minimum applies once items have been added. To require a value, mark the property as mandatory.'],
     2: ['Start node', ''],
     3: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
     4: ['Ignore user start nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."]
@@ -155,7 +151,7 @@
 
   public static readonly multipleMemberPickerSettings = {
     0: ['Accepted types', 'Limit to specific member types'],
-    1: ['Amount', 'Set a required range of members']
+    1: ['Amount', 'The minimum applies once items have been added. To require a value, mark the property as mandatory.']
   }
 
   public static readonly singleUrlPickerSettings = {
@@ -166,18 +162,16 @@
   }
 
   public static readonly multiURLPickerSettings = {
-    0: ['Minimum number of items', ''],
-    1: ['Maximum number of items', ''],
-    2: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
-    3: ['Overlay Size', 'Select the width of the overlay.'],
-    4: ['Hide anchor/query string input', 'Selecting this hides the anchor/query string input field in the link picker overlay.'],
-    5: ['Culture-specific document links', 'Enable specifying a culture when linking to documents.']
+    0: ['Amount', 'The minimum applies once items have been added. To require a value, mark the property as mandatory.'],
+    1: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
+    2: ['Overlay Size', 'Select the width of the overlay.'],
+    3: ['Hide anchor/query string input', 'Selecting this hides the anchor/query string input field in the link picker overlay.'],
+    4: ['Culture-specific document links', 'Enable specifying a culture when linking to documents.']
   }
 
   public static readonly numericSettings = {
-    0: ['Minimum', 'Enter the minimum amount of number to be entered'],
-    1: ['Maximum', 'Enter the maximum amount of number to be entered'],
-    2: ['Step size', 'Enter the intervals amount between each step of number to be entered']
+    0: ['Value range', 'Set the minimum and maximum value that can be entered'],
+    1: ['Step size', 'Enter the intervals amount between each step of number to be entered']
   }
 
   public static readonly radioboxSettings = {
@@ -242,8 +236,9 @@
   public static readonly userGroupAssignAccessSettings = {
     0: ['Sections', 'Add sections to give users access'],
     1: ['Languages', 'Limit the languages users have access to edit'],
-    2: ['Select content start node', 'Limit the content tree to a specific start node'],
-    3: ['Select media start node', 'Limit the media library to a specific start node']
+    2: ['Allow editing shared content', 'Allows editing of content shared across languages. Does not apply to culture-invariant content.'],
+    3: ['Select content start node', 'Limit the content tree to a specific start node'],
+    4: ['Select media start node', 'Limit the media library to a specific start node']
   }
 
   public static readonly userGroupDefaultPermissionsSettings = {
@@ -358,6 +353,7 @@
     documentType: '/umbraco/management/api/v1/document-type',
     documentTypeFolder: '/umbraco/management/api/v1/document-type/folder',
     documentBlueprint: '/umbraco/management/api/v1/document-blueprint',
+    documentBlueprintFolder: '/umbraco/management/api/v1/document-blueprint/folder',
     dataType: '/umbraco/management/api/v1/data-type',
     dataTypeFolder: '/umbraco/management/api/v1/data-type/folder',
     dictionary: '/umbraco/management/api/v1/dictionary',

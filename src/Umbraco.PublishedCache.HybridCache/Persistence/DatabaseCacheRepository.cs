@@ -48,12 +48,11 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task DeleteContentItemAsync(int id)
-    {
-        Sql<ISqlContext> sql = Sql()
-            .Delete<ContentNuDto>()
-            .Where<ContentNuDto>(x => x.NodeId == id);
-        await Database.ExecuteAsync(sql);
-    }
+        => await Database.ExecuteAsync(DeleteContentItemSql(id));
+
+    /// <inheritdoc/>
+    public void DeleteContentItem(int id)
+        => Database.Execute(DeleteContentItemSql(id));
 
     /// <inheritdoc/>
     public async Task RefreshDocumentAsync(ContentCacheNode contentCacheNode)
@@ -64,6 +63,14 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc/>
+    public void RefreshDocument(ContentCacheNode contentCacheNode)
+    {
+        IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+
+        OnRepositoryRefreshedSync(serializer, contentCacheNode, contentCacheNode.IsDraft);
+    }
+
+    /// <inheritdoc/>
     public async Task RefreshMediaAsync(ContentCacheNode contentCacheNode)
     {
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
@@ -71,22 +78,33 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc/>
-    public Task RemovePublishedDocumentAsync(int id)
-        => RemovePublishedAsync(id);
-
-    private Task RemovePublishedAsync(int id)
+    public void RefreshMedia(ContentCacheNode contentCacheNode)
     {
-        Sql<ISqlContext> sql = Sql()
-            .Delete<ContentNuDto>()
-            .Where<ContentNuDto>(x => x.NodeId == id && x.Published);
-        return Database.ExecuteAsync(sql);
+        IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
+        OnRepositoryRefreshedSync(serializer, contentCacheNode, true);
     }
 
     /// <inheritdoc/>
-    public async Task<ContentCacheNode?> GetElementSourceAsync(Guid key, bool preview = false)
-    {
-        ContentSourceDto? dto = await GetElementSourceDto(key);
+    public Task RemovePublishedDocumentAsync(int id)
+        => RemovePublishedAsync(id);
 
+    /// <inheritdoc/>
+    public void RemovePublishedDocument(int id)
+        => Database.Execute(RemovePublishedSql(id));
+
+    private Task RemovePublishedAsync(int id)
+        => Database.ExecuteAsync(RemovePublishedSql(id));
+
+    /// <inheritdoc/>
+    public async Task<ContentCacheNode?> GetElementSourceAsync(Guid key, bool preview = false)
+        => CreateElementSourceNode(await GetElementSourceDto(key), preview);
+
+    /// <inheritdoc/>
+    public ContentCacheNode? GetElementSource(Guid key, bool preview = false)
+        => CreateElementSourceNode(Database.FirstOrDefault<ContentSourceDto>(GetElementSourceSql(key)), preview);
+
+    private ContentCacheNode? CreateElementSourceNode(ContentSourceDto? dto, bool preview)
+    {
         if (dto is null)
         {
             return null;
@@ -101,7 +119,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         {
             _logger.LogWarning(
                 "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
-                key);
+                dto.Key);
             return null;
         }
 
@@ -141,14 +159,13 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     private async Task<ContentSourceDto?> GetElementSourceDto(Guid key)
-    {
-        Sql<ISqlContext>? sql = SqlElementSourcesSelect()
+        => await Database.FirstOrDefaultAsync<ContentSourceDto>(GetElementSourceSql(key));
+
+    private Sql<ISqlContext> GetElementSourceSql(Guid key)
+        => SqlElementSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Element))
             .Append(SqlWhereNodeKey(SqlContext, key))
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
-
-        return await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
-    }
 
     private ContentCacheNode? CreateElementNodeKit(bool preview, ContentSourceDto dto)
     {
@@ -228,9 +245,14 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetDocumentSourceAsync(Guid key, bool preview = false)
-    {
-        ContentSourceDto? dto = await GetDocumentSourceDto(key);
+        => CreateDocumentSourceNode(await GetDocumentSourceDto(key), preview);
 
+    /// <inheritdoc/>
+    public ContentCacheNode? GetDocumentSource(Guid key, bool preview = false)
+        => CreateDocumentSourceNode(Database.FirstOrDefault<ContentSourceDto>(GetDocumentSourceSql(key)), preview);
+
+    private ContentCacheNode? CreateDocumentSourceNode(ContentSourceDto? dto, bool preview)
+    {
         if (dto is null)
         {
             return null;
@@ -245,19 +267,23 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         {
             _logger.LogWarning(
                 "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
-                key);
+                dto.Key);
             return null;
         }
 
         return CreateDocumentNodeKit(preview, dto);
-
     }
 
     /// <inheritdoc/>
     public async Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetDocumentSourceForPublishStatesAsync(Guid key)
-    {
-        ContentSourceDto? dto = await GetDocumentSourceDto(key);
+        => ToPublishStateNodes(key, await GetDocumentSourceDto(key));
 
+    /// <inheritdoc/>
+    public (ContentCacheNode? Draft, ContentCacheNode? Published) GetDocumentSourceForPublishStates(Guid key)
+        => ToPublishStateNodes(key, Database.FirstOrDefault<ContentSourceDto>(GetDocumentSourceSql(key)));
+
+    private (ContentCacheNode? Draft, ContentCacheNode? Published) ToPublishStateNodes(Guid key, ContentSourceDto? dto)
+    {
         if (dto is null)
         {
             return (null, null);
@@ -285,15 +311,20 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return (draftNode, publishedNode);
     }
 
-    private async Task<ContentSourceDto?> GetDocumentSourceDto(Guid key)
-    {
-        Sql<ISqlContext>? sql = SqlContentSourcesSelect()
+    private Task<ContentSourceDto?> GetDocumentSourceDto(Guid key)
+        => Database.FirstOrDefaultAsync<ContentSourceDto>(GetDocumentSourceSql(key));
+
+    private Sql<ISqlContext> GetDocumentSourceSql(Guid key)
+        => SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
             .Append(SqlWhereNodeKey(SqlContext, key))
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
-        return await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
-    }
+    private Sql<ISqlContext> GetDocumentSourcesSql(IEnumerable<Guid> keys)
+        => SqlContentSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
     private ContentCacheNode? CreateDocumentNodeKit(bool preview, ContentSourceDto dto)
     {
@@ -311,14 +342,28 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         var dtos = new List<ContentSourceDto>(keysArray.Length);
         foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
-            Sql<ISqlContext>? sql = SqlContentSourcesSelect()
-                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
-                .WhereIn<NodeDto>(x => x.UniqueId, group)
-                .Append(SqlOrderByLevelIdSortOrder(SqlContext));
-
-            dtos.AddRange(await Database.FetchAsync<ContentSourceDto>(sql));
+            dtos.AddRange(await Database.FetchAsync<ContentSourceDto>(GetDocumentSourcesSql(group)));
         }
 
+        return CreateDocumentSourceNodes(dtos, preview);
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<ContentCacheNode> GetDocumentSources(IEnumerable<Guid> keys, bool preview = false)
+    {
+        // Batch the WHERE IN to stay within SQL Server's parameter limit, as GetDocumentSourcesAsync does.
+        Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
+        var dtos = new List<ContentSourceDto>(keysArray.Length);
+        foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            dtos.AddRange(Database.Fetch<ContentSourceDto>(GetDocumentSourcesSql(group)));
+        }
+
+        return CreateDocumentSourceNodes(dtos, preview);
+    }
+
+    private IEnumerable<ContentCacheNode> CreateDocumentSourceNodes(List<ContentSourceDto> dtos, bool preview)
+    {
         var filtered = dtos
             .Where(x => x is not null)
             .Where(x => preview || ((x.PubDataRaw is not null || x.PubData is not null) && (!x.Published || x.PubName is not null)))
@@ -470,14 +515,26 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetMediaSourceAsync(Guid key)
-    {
-        Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
+        => CreateMediaSourceNode(await Database.FirstOrDefaultAsync<ContentSourceDto>(GetMediaSourceSql(key)));
+
+    /// <inheritdoc/>
+    public ContentCacheNode? GetMediaSource(Guid key)
+        => CreateMediaSourceNode(Database.FirstOrDefault<ContentSourceDto>(GetMediaSourceSql(key)));
+
+    private Sql<ISqlContext> GetMediaSourceSql(Guid key)
+        => SqlMediaSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
             .Append(SqlWhereNodeKey(SqlContext, key))
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
-        ContentSourceDto? dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
+    private Sql<ISqlContext> GetMediaSourcesSql(IEnumerable<Guid> keys)
+        => SqlMediaSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
+    private ContentCacheNode? CreateMediaSourceNode(ContentSourceDto? dto)
+    {
         if (dto is null)
         {
             return null;
@@ -497,14 +554,28 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         var dtos = new List<ContentSourceDto>(keysArray.Length);
         foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
-            Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
-                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
-                .WhereIn<NodeDto>(x => x.UniqueId, group)
-                .Append(SqlOrderByLevelIdSortOrder(SqlContext));
-
-            dtos.AddRange(await Database.FetchAsync<ContentSourceDto>(sql));
+            dtos.AddRange(await Database.FetchAsync<ContentSourceDto>(GetMediaSourcesSql(group)));
         }
 
+        return CreateMediaSourceNodes(dtos);
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<ContentCacheNode> GetMediaSources(IEnumerable<Guid> keys)
+    {
+        // Batch the WHERE IN to stay within SQL Server's parameter limit, as GetMediaSourcesAsync does.
+        Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
+        var dtos = new List<ContentSourceDto>(keysArray.Length);
+        foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            dtos.AddRange(Database.Fetch<ContentSourceDto>(GetMediaSourcesSql(group)));
+        }
+
+        return CreateMediaSourceNodes(dtos);
+    }
+
+    private IEnumerable<ContentCacheNode> CreateMediaSourceNodes(List<ContentSourceDto> dtos)
+    {
         var filtered = dtos
             .Where(x => x is not null)
             .ToList();
@@ -515,13 +586,35 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             .Select(x => CreateMediaNodeKit(x, serializer));
     }
 
+    private Sql<ISqlContext> DeleteContentItemSql(int id)
+        => Sql()
+            .Delete<ContentNuDto>()
+            .Where<ContentNuDto>(x => x.NodeId == id);
+
+    private Sql<ISqlContext> RemovePublishedSql(int id)
+        => Sql()
+            .Delete<ContentNuDto>()
+            .Where<ContentNuDto>(x => x.NodeId == id && x.Published);
+
     private async Task OnRepositoryRefreshed(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
+    {
+        (ContentNuDto dto, string updateCommand, object updateArgs) = GetRefreshStatement(serializer, content, preview);
+        await Database.InsertOrUpdateAsync(dto, updateCommand, updateArgs);
+    }
+
+    private void OnRepositoryRefreshedSync(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
+    {
+        (ContentNuDto dto, string updateCommand, object updateArgs) = GetRefreshStatement(serializer, content, preview);
+        Database.InsertOrUpdate(dto, updateCommand, updateArgs);
+    }
+
+    private (ContentNuDto Dto, string UpdateCommand, object UpdateArgs) GetRefreshStatement(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
     {
         ContentNuDto dto = GetDtoFromCacheNode(content, !preview, serializer);
 
         string C(string s) => SqlSyntax.GetQuotedColumnName(s);
 
-        await Database.InsertOrUpdateAsync(
+        return (
             dto,
             $"SET data = @data, {C("dataRaw")} = @dataRaw, rv = rv + 1 WHERE {C("nodeId")} = @id AND published = @published",
             new
@@ -1668,7 +1761,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         try
         {
-            Database.BulkInsertRecords(items);
+            Database.ExecuteInSavepoint(() => Database.BulkInsertRecords(items));
         }
         catch (Exception ex) when (IsPrimaryKeyViolation(ex))
         {
@@ -1684,24 +1777,37 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     private void InsertNewRows(List<ContentNuDto> items)
     {
         string C(string s) => SqlSyntax.GetQuotedColumnName(s);
-        var tableName = ContentNuDto.TableName;
+        var tableName = QuoteTableName(ContentNuDto.TableName);
         var nodeId = C(ContentNuDto.NodeIdColumnName);
         var published = C("published");
 
         foreach (ContentNuDto dto in items)
         {
+            // Null values are left out rather than passed as untyped NULL parameters, which some providers
+            // cannot convert to the binary column type.
+            var columns = new List<string> { nodeId, published, C("rv") };
+            var values = new List<object> { dto.NodeId, dto.Published, dto.Rv };
+            if (dto.Data is not null)
+            {
+                columns.Add(C("data"));
+                values.Add(dto.Data);
+            }
+
+            if (dto.RawData is not null)
+            {
+                columns.Add(C("dataRaw"));
+                values.Add(dto.RawData);
+            }
+
+            var parameters = string.Join(", ", values.Select((_, i) => $"@{i}"));
             Database.Execute(
-                $@"INSERT INTO [{tableName}] ({nodeId}, {published}, {C("data")}, {C("dataRaw")}, {C("rv")})
-                SELECT @0, @1, @2, @3, @4
+                $@"INSERT INTO {tableName} ({string.Join(", ", columns)})
+                SELECT {parameters}
                 WHERE NOT EXISTS (
-                    SELECT 1 FROM [{tableName}]
+                    SELECT 1 FROM {tableName}
                     WHERE {nodeId} = @0 AND {published} = @1
                 )",
-                dto.NodeId,
-                dto.Published,
-                (object?)dto.Data ?? DBNull.Value,
-                (object?)dto.RawData ?? DBNull.Value,
-                dto.Rv);
+                values.ToArray());
         }
     }
 

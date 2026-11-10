@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -64,49 +62,6 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         _mediaCacheService = mediaCacheService;
         _contentTypeCommonRepository = contentTypeCommonRepository;
         _dataTypeConfigurationCache = dataTypeConfigurationCache;
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="DataTypeCacheRefresher" /> class.
-    /// </summary>
-    /// <param name="appCaches">The application caches.</param>
-    /// <param name="serializer">The JSON serializer.</param>
-    /// <param name="idKeyMap">The ID-key mapping service.</param>
-    /// <param name="eventAggregator">The event aggregator.</param>
-    /// <param name="factory">The cache refresher notification factory.</param>
-    /// <param name="publishedModelFactory">The published model factory.</param>
-    /// <param name="publishedContentTypeFactory">The published content type factory.</param>
-    /// <param name="publishedContentTypeCache">The published content type cache.</param>
-    /// <param name="documentCacheService">The document cache service.</param>
-    /// <param name="mediaCacheService">The media cache service.</param>
-    /// <param name="contentTypeCommonRepository">The content type common repository.</param>
-    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public DataTypeCacheRefresher(
-        AppCaches appCaches,
-        IJsonSerializer serializer,
-        IIdKeyMap idKeyMap,
-        IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory,
-        IPublishedModelFactory publishedModelFactory,
-        IPublishedContentTypeFactory publishedContentTypeFactory,
-        IPublishedContentTypeCache publishedContentTypeCache,
-        IDocumentCacheService documentCacheService,
-        IMediaCacheService mediaCacheService,
-        IContentTypeCommonRepository contentTypeCommonRepository)
-        : this(
-            appCaches,
-            serializer,
-            idKeyMap,
-            eventAggregator,
-            factory,
-            publishedModelFactory,
-            publishedContentTypeFactory,
-            publishedContentTypeCache,
-            documentCacheService,
-            mediaCacheService,
-            contentTypeCommonRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IDataTypeConfigurationCache>())
-    {
     }
 
     #region Json

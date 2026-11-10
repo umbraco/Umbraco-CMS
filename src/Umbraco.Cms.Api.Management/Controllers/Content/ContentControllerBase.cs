@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.Models.ContentPublishing;
@@ -77,6 +78,14 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid sorting options")
                 .WithDetail("The supplied sorting operations were invalid. Additional details can be found in the log.")
                 .Build()),
+            ContentEditingOperationStatus.ConcurrencyViolation => Conflict(problemDetailsBuilder
+                .WithTitle("Concurrency violation detected")
+                .WithDetail("The content was modified by another operation, so the attempted operation was abandoned. Please reload and try again.")
+                .Build()),
+            ContentEditingOperationStatus.InvalidName => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid name")
+                .WithDetail($"One or more of the supplied names was too long. Names cannot exceed {Constants.Validation.MaxNameLength} characters.")
+                .Build()),
             ContentEditingOperationStatus.InvalidCulture => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid culture")
                 .WithDetail("One or more of the supplied culture codes did not match the configured languages.")
@@ -134,8 +143,8 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                     .WithDetail("The publish operation was cancelled by an event.")
                     .Build()),
                 ContentPublishingOperationStatus.ContentInvalid => BadRequest(problemDetailsBuilder
-                    .WithTitle($"Invalid {EntityName}")
-                    .WithDetail($"The specified {EntityName} had an invalid configuration.")
+                    .WithTitle("Validation failed")
+                    .WithDetail($"One or more property values of the {EntityName} failed validation.")
                     .WithExtension("invalidProperties", invalidPropertyAliases ?? Enumerable.Empty<string>())
                     .Build()),
                 ContentPublishingOperationStatus.NothingToPublish => BadRequest(problemDetailsBuilder

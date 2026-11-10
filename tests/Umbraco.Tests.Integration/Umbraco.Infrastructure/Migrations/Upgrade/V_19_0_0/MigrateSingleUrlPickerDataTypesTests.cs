@@ -64,12 +64,13 @@ internal sealed class MigrateSingleUrlPickerDataTypesTests : UmbracoIntegrationT
 
         await ExecuteMigration();
 
+        // The separate minNumber/maxNumber keys are left for the later conversion to a validationLimit range.
         IDataType migrated = (await DataTypeService.GetAsync(dataType.Key))!;
-        var configuration = migrated.ConfigurationAs<MultiUrlPickerConfiguration>()!;
         Assert.Multiple(() =>
         {
-            Assert.That(configuration.MinNumber, Is.EqualTo(2));
-            Assert.That(configuration.MaxNumber, Is.EqualTo(5));
+            Assert.That(migrated.EditorAlias, Is.EqualTo(Constants.PropertyEditors.Aliases.MultiUrlPicker));
+            Assert.That(Convert.ToInt32(migrated.ConfigurationData["minNumber"]), Is.EqualTo(2));
+            Assert.That(Convert.ToInt32(migrated.ConfigurationData["maxNumber"]), Is.EqualTo(5));
         });
     }
 
