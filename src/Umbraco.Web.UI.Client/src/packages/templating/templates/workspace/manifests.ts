@@ -58,7 +58,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('../../local-components/production-mode-workspace-action/production-mode-workspace-action.js'),
 		element: () =>
 			import('../../local-components/production-mode-workspace-action/production-mode-workspace-action.js'),
-		weight: 60,
+		weight: 1100,
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
