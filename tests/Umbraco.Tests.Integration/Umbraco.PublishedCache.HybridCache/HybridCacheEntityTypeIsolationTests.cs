@@ -224,7 +224,7 @@ internal sealed class HybridCacheEntityTypeIsolationTests : UmbracoIntegrationTe
 
     private async Task<Guid> CreateContentType()
     {
-        IContentType contentType = ContentTypeBuilder.CreateBasicContentType();
+        ContentType contentType = ContentTypeBuilder.CreateBasicContentType();
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         return contentType.Key;
     }

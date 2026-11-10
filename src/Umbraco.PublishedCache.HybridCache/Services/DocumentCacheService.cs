@@ -597,7 +597,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             // Similarly, when a branch is published, next time the content is requested, the parent will be published.
             // Null values are cached here are tagged and cleared by ClearMemoryCacheAsync, so the next request after a
             // cache clear will re-query the database.
-            if (preview is false && contentCacheNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(contentCacheNode.Key) is false)
+            if (preview is false && _publishStatusQueryService.HasPublishedAncestorPath(contentCacheNode.Key) is false)
             {
                 // Content exists in the DB but the ancestor path is not published. Return null but
                 // signal to the caller that this should NOT be cached — the ancestor check may be
