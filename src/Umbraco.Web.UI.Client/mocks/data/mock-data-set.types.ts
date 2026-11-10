@@ -74,6 +74,8 @@ import type {
 	UserGroupResponseModel,
 	// Object Type
 	ObjectTypeResponseModel,
+	// Segment
+	SegmentResponseModel,
 	// Log Viewer
 	LogTemplateResponseModel,
 	SavedLogSearchResponseModel,
@@ -230,6 +232,7 @@ export interface UmbMockDataSet {
 	relation?: Array<UmbMockRelationModel>;
 	relationType?: Array<UmbMockRelationTypeModel>;
 	script?: Array<UmbMockScriptModel>;
+	segment?: Array<SegmentResponseModel>;
 	staticFile?: Array<UmbMockStaticFileModel>;
 	stylesheet?: Array<UmbMockStylesheetModel>;
 	template?: Array<UmbMockTemplateModel>;

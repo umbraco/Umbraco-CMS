@@ -101,6 +101,100 @@ public partial class ContentBlueprintEditingServiceTests
         Assert.AreEqual(result.Result.Content.Id, blueprint.Id);
     }
 
+    [Test]
+    public async Task Can_Create_From_Segment_Variant_Content_With_All_Segment_Values()
+    {
+        var content = await CreateSegmentVariantContent();
+
+        var result = await ContentBlueprintEditingService.CreateFromContentAsync(
+            content.Key,
+            "Test Create From Content Blueprint",
+            null,
+            Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        VerifyValues(result.Result.Content);
+        VerifyValues(await ContentBlueprintEditingService.GetAsync(result.Result.Content!.Key));
+
+        void VerifyValues(IContent? blueprint)
+        {
+            Assert.IsNotNull(blueprint);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual("The initial invariant title", blueprint.GetValue<string>("invariantTitle"));
+                Assert.AreEqual("The initial default title", blueprint.GetValue<string>("variantTitle"));
+                Assert.AreEqual("The initial seg-1 title", blueprint.GetValue<string>("variantTitle", segment: "seg-1"));
+                Assert.AreEqual("The initial seg-2 title", blueprint.GetValue<string>("variantTitle", segment: "seg-2"));
+            });
+        }
+    }
+
+    [TestCase(ContentVariation.Culture)]
+    [TestCase(ContentVariation.Segment)]
+    public async Task Can_Create_From_Culture_And_Segment_Variant_Content_With_All_Variant_Values(ContentVariation otherTitleVariation)
+    {
+        var content = await CreateCultureAndSegmentVariantContent(otherTitleVariation);
+
+        var result = await ContentBlueprintEditingService.CreateFromContentAsync(
+            content.Key,
+            "Test Create From Content Blueprint",
+            null,
+            Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        VerifyValues(result.Result.Content);
+        VerifyValues(await ContentBlueprintEditingService.GetAsync(result.Result.Content!.Key));
+
+        void VerifyValues(IContent? blueprint)
+        {
+            Assert.IsNotNull(blueprint);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual("The initial title in English", blueprint.GetValue<string>("variantTitle", "en-US"));
+                Assert.AreEqual("The initial seg-1 title in English", blueprint.GetValue<string>("variantTitle", "en-US", "seg-1"));
+                Assert.AreEqual("The initial seg-2 title in English", blueprint.GetValue<string>("variantTitle", "en-US", "seg-2"));
+                Assert.AreEqual("The initial title in Danish", blueprint.GetValue<string>("variantTitle", "da-DK"));
+                Assert.AreEqual("The initial seg-1 title in Danish", blueprint.GetValue<string>("variantTitle", "da-DK", "seg-1"));
+                Assert.AreEqual("The initial seg-2 title in Danish", blueprint.GetValue<string>("variantTitle", "da-DK", "seg-2"));
+
+                if (otherTitleVariation is ContentVariation.Culture)
+                {
+                    Assert.AreEqual("The initial other English title", blueprint.GetValue<string>("otherTitle", "en-US"));
+                    Assert.AreEqual("The initial other Danish title", blueprint.GetValue<string>("otherTitle", "da-DK"));
+                }
+                else
+                {
+                    Assert.AreEqual("The initial other default title", blueprint.GetValue<string>("otherTitle"));
+                    Assert.AreEqual("The initial other seg-1 title", blueprint.GetValue<string>("otherTitle", segment: "seg-1"));
+                    Assert.AreEqual("The initial other seg-2 title", blueprint.GetValue<string>("otherTitle", segment: "seg-2"));
+                }
+            });
+        }
+    }
+
+    [Test]
+    public async Task Can_Scaffold_Content_With_All_Segment_Values_From_Blueprint_Created_From_Content()
+    {
+        var content = await CreateSegmentVariantContent();
+
+        var result = await ContentBlueprintEditingService.CreateFromContentAsync(
+            content.Key,
+            "Test Create From Content Blueprint",
+            null,
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        var scaffold = await ContentBlueprintEditingService.GetScaffoldedAsync(result.Result.Content!.Key);
+
+        Assert.IsNotNull(scaffold);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("The initial default title", scaffold.GetValue<string>("variantTitle"));
+            Assert.AreEqual("The initial seg-1 title", scaffold.GetValue<string>("variantTitle", segment: "seg-1"));
+            Assert.AreEqual("The initial seg-2 title", scaffold.GetValue<string>("variantTitle", segment: "seg-2"));
+        });
+    }
+
     [TestCase(true)]
     [TestCase(false)]
     public async Task Cannot_Create_From_Content_With_Duplicate_Name(bool variant)

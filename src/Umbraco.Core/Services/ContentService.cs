@@ -4390,15 +4390,24 @@ public class ContentService : RepositoryService, IContentService
             scope.Complete();
         }
 
+        var culturesToCopy = new HashSet<string?>(cultures, StringComparer.InvariantCultureIgnoreCase);
+        foreach (IProperty property in blueprint.Properties)
+        {
+            foreach (IPropertyValue propertyValue in property.Values)
+            {
+                if (property.PropertyType.SupportsVariation(propertyValue.Culture, propertyValue.Segment) is false
+                    || (propertyValue.Culture is not null && culturesToCopy.Contains(propertyValue.Culture) is false))
+                {
+                    continue;
+                }
+
+                content.SetValue(property.Alias, propertyValue.EditedValue, propertyValue.Culture, propertyValue.Segment);
+            }
+        }
+
         DateTime now = DateTime.UtcNow;
         foreach (var culture in cultures)
         {
-            foreach (IProperty property in blueprint.Properties)
-            {
-                var propertyCulture = property.PropertyType.VariesByCulture() ? culture : null;
-                content.SetValue(property.Alias, property.GetValue(propertyCulture), propertyCulture);
-            }
-
             if (!string.IsNullOrEmpty(culture))
             {
                 content.SetCultureInfo(culture, blueprint.GetCultureName(culture), now);
