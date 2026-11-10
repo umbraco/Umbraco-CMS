@@ -21,7 +21,6 @@ export interface MetaEntityActionDefaultKind extends MetaEntityAction {
 	/**
 	 * The action requires additional input from the user.
 	 * A dialog will prompt the user for more information or to make a choice.
-	 * @type {boolean}
 	 * @memberof MetaEntityActionDefaultKind
 	 */
 	additionalOptions?: boolean;

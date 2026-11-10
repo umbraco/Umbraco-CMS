@@ -63,10 +63,10 @@
     <PackageVersion Include="MiniProfiler.Shared" Version="4.5.4" />
     <PackageVersion Include="ncrontab" Version="3.4.0" />
     <PackageVersion Include="NPoco" Version="6.4.0" />
-    <PackageVersion Include="NPoco.SqlServer" Version="6.4.0" />
-    <PackageVersion Include="OpenIddict.Abstractions" Version="7.7.2" />
-    <PackageVersion Include="OpenIddict.AspNetCore" Version="7.7.2" />
-    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.7.2" />
+    <PackageVersion Include="NPoco.SqlServer" Version="6.4.1" />
+    <PackageVersion Include="OpenIddict.Abstractions" Version="7.8.0" />
+    <PackageVersion Include="OpenIddict.AspNetCore" Version="7.8.0" />
+    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.8.0" />
     <PackageVersion Include="Serilog" Version="4.4.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Process" Version="3.0.0" />

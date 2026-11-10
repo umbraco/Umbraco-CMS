@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Examine;
 using Examine.Lucene.Search;
 using Lucene.Net.QueryParsers.Classic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +10,7 @@ using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Searcher;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Searcher;
@@ -16,7 +18,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Searcher;
 /// <summary>
 /// Controller responsible for handling search queries within the management API.
 /// </summary>
+/// <remarks>
+/// Querying returns the raw field values held in an index, so on top of the settings section access required by
+/// <see cref="SearcherControllerBase"/>, it requires the <see cref="AuthorizationPolicies.SearcherQueryAccess"/> policy.
+/// </remarks>
 [ApiVersion("1.0")]
+[Authorize(Policy = AuthorizationPolicies.SearcherQueryAccess)]
 public class QuerySearcherController : SearcherControllerBase
 {
     private readonly IExamineManagerService _examineManagerService;

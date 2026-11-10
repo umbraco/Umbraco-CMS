@@ -30,6 +30,8 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
     private readonly IPreviewAccessEvaluator _previewAccessEvaluator;
     private readonly CacheSettings _cacheSettings;
     private readonly ILogger<ElementCacheService> _logger;
+    private readonly ElementSourceReader _readElementSourceAsync;
+    private readonly ElementSourceReader _readElementSource;
     private HashSet<Guid>? _seedKeys;
 
     private readonly IConvertedPublishedContentCache<string, IPublishedElement> _publishedElementCache;
@@ -94,7 +96,14 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
         _publishedElementCache = cacheFactory.Create<string, IPublishedElement>(_cacheSettings.Entry.Element.MaximumLocalCacheItems, CacheName);
+
+        _readElementSourceAsync = _databaseCacheRepository.GetElementSourceAsync;
+        _readElementSource = (key, preview) => Task.FromResult(_databaseCacheRepository.GetElementSource(key, preview));
     }
+
+    // Reads element sources from the database. The synchronous members pass a reader that reads synchronously and
+    // returns a completed task, so the shared read logic only awaits what HybridCache itself has to wait for.
+    private delegate Task<ContentCacheNode?> ElementSourceReader(Guid key, bool preview);
 
     /// <inheritdoc />
     public string CacheName => "Published elements (converted, L0)";
@@ -105,15 +114,44 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
     /// <inheritdoc />
     public long? GetApproximateBytes() => _publishedElementCache.ApproximateSizeInBytes;
 
-    public async Task<IPublishedElement?> GetByKeyAsync(Guid key, bool? preview = null)
+    // The synchronous member returns an L0 hit directly, and otherwise runs the same read logic as the asynchronous
+    // one with a synchronous database reader. The returned task has then already completed, unless HybridCache
+    // itself had to wait (an L2 round trip, or a concurrent read of the same key), so synchronous callers do not
+    // block on asynchronous I/O.
+
+    /// <inheritdoc />
+    public Task<IPublishedElement?> GetByKeyAsync(Guid key, bool? preview = null)
+        => GetAccessibleNodeAsync(key, preview ?? _previewService.IsInPreview(), _readElementSourceAsync);
+
+    /// <inheritdoc />
+    public IPublishedElement? GetByKey(Guid key, bool? preview = null)
     {
         bool calculatedPreview = preview ?? _previewService.IsInPreview();
-        IPublishedElement? element = await GetNodeAsync(key, calculatedPreview);
+        return TryGetCached(key, calculatedPreview, out IPublishedElement? cached)
+            ? cached
+            : GetByKeyWithSynchronousReadsAsync(key, calculatedPreview).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Runs the read logic behind <see cref="GetByKey"/>, reading the database synchronously on a cache miss.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="GetByKey"/> blocks on the returned task, which only avoids sync-over-async if the task has already
+    /// completed when it is returned. That holds only while every await in the shared read logic completes
+    /// synchronously, so it is kept as a separate method for tests to assert on directly; the public member can't
+    /// show whether it blocked. It is internal because it exists only to verify that guarantee, not as an API.
+    /// </remarks>
+    internal Task<IPublishedElement?> GetByKeyWithSynchronousReadsAsync(Guid key, bool preview)
+        => GetAccessibleNodeAsync(key, preview, _readElementSource);
+
+    private async Task<IPublishedElement?> GetAccessibleNodeAsync(Guid key, bool preview, ElementSourceReader readElementSource)
+    {
+        IPublishedElement? element = await GetNodeAsync(key, preview, readElementSource);
 
         // As for documents (see DocumentCacheService), a draft is only handed out when the preview user may browse
         // the element; otherwise it resolves as it would outside preview: its published version, or nothing.
-        return calculatedPreview && element is not null && _previewAccessEvaluator.CanPreviewElement(element) is false
-            ? await GetNodeAsync(key, false)
+        return preview && element is not null && _previewAccessEvaluator.CanPreviewElement(element) is false
+            ? await GetNodeAsync(key, false, readElementSource)
             : element;
     }
 
@@ -129,7 +167,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         return false;
     }
 
-    private async Task<IPublishedElement?> GetNodeAsync(Guid key, bool preview)
+    private async Task<IPublishedElement?> GetNodeAsync(Guid key, bool preview, ElementSourceReader readElementSource)
     {
         var cacheKey = GetCacheKey(key, preview);
 
@@ -193,8 +231,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
         async Task<ContentCacheNode?> GetContentCacheNodeFromRepo()
         {
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-            return await _databaseCacheRepository.GetElementSourceAsync(key, preview);
+            return await readElementSource(key, preview);
         }
     }
 

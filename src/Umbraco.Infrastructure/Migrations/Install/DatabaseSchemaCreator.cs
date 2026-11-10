@@ -425,7 +425,9 @@ public class DatabaseSchemaCreator
         //These are just column indexes NOT constraints or Keys
         //var colIndexesInDatabase = result.DbIndexDefinitions.Where(x => x.IndexName.InvariantStartsWith("IX_")).Select(x => x.IndexName).ToList();
         var colIndexesInDatabase = result.IndexDefinitions.Select(x => x.IndexName).ToList();
-        var indexesInSchema = result.TableDefinitions.SelectMany(x => x.Indexes.Select(y => y.Name)).ToList();
+        var indexesInSchema = result.TableDefinitions
+            .SelectMany(x => x.Indexes.Select(y => y.Name is null ? null : SqlSyntax.TruncateConstraintName<IndexDefinition>(y.Name)))
+            .ToList();
 
         //Add valid and invalid index differences to the result object
         IEnumerable<string?> validColIndexDifferences =

@@ -12,6 +12,7 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 class UmbTestControllerImplementation extends UmbControllerHostMixin(class {}) {
 	testIsConnected = false;
 	testIsDestroyed = false;
+	testHostDisconnectedCalls = 0;
 
 	private _host: UmbControllerHost;
 	readonly controllerAlias: UmbControllerAlias;
@@ -35,6 +36,7 @@ class UmbTestControllerImplementation extends UmbControllerHostMixin(class {}) {
 	override hostDisconnected(): void {
 		super.hostDisconnected();
 		this.testIsConnected = false;
+		this.testHostDisconnectedCalls++;
 	}
 
 	public override destroy(): void {
@@ -250,6 +252,50 @@ describe('UmbController', () => {
 
 			expect(ctrl.testIsConnected).to.be.false;
 			expect(subCtrl.testIsConnected).to.be.false;
+		});
+
+		it('hostDisconnected is triggered if controller host has been disconnected at time of adding controller.', async () => {
+			document.body.appendChild(hostElement);
+			document.body.removeChild(hostElement);
+
+			const ctrl = new UmbTestControllerImplementation(hostElement);
+			const subCtrl = new UmbTestControllerImplementation(ctrl);
+
+			// Wait one JS cycle, to ensure that the hostDisconnected is triggered.
+			await Promise.resolve();
+
+			expect(ctrl.testHostDisconnectedCalls).to.equal(1);
+			expect(subCtrl.testHostDisconnectedCalls).to.equal(1);
+
+			document.body.appendChild(hostElement);
+
+			expect(ctrl.testIsConnected).to.be.true;
+			expect(subCtrl.testIsConnected).to.be.true;
+
+			document.body.removeChild(hostElement);
+		});
+
+		it('hostDisconnected is not triggered if controller host has never been connected at time of adding controller.', async () => {
+			const ctrl = new UmbTestControllerImplementation(hostElement);
+
+			await Promise.resolve();
+
+			expect(ctrl.testHostDisconnectedCalls).to.equal(0);
+		});
+
+		it('hostDisconnected is not triggered if controller host reconnects before the controller is notified.', async () => {
+			document.body.appendChild(hostElement);
+			document.body.removeChild(hostElement);
+
+			const ctrl = new UmbTestControllerImplementation(hostElement);
+			document.body.appendChild(hostElement);
+
+			await Promise.resolve();
+
+			expect(ctrl.testHostDisconnectedCalls).to.equal(0);
+			expect(ctrl.testIsConnected).to.be.true;
+
+			document.body.removeChild(hostElement);
 		});
 	});
 

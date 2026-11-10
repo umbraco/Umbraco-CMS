@@ -120,7 +120,6 @@ const richTextEditor = (id: string, name: string, blockElementTypeIds: Array<str
 			value: [
 				[
 					[
-						'Umb.Tiptap.Toolbar.StyleSelect',
 						'Umb.Tiptap.Toolbar.Bold',
 						'Umb.Tiptap.Toolbar.Italic',
 						'Umb.Tiptap.Toolbar.BulletList',
