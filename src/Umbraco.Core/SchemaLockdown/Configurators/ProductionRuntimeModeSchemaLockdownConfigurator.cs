@@ -37,7 +37,11 @@ public sealed class ProductionRuntimeModeSchemaLockdownConfigurator : ISchemaLoc
             return;
         }
 
-        builder.Block(Constants.UdiEntityType.Template, SchemaOperation.Create, SchemaOperation.Update);
-        builder.BlockMutations(Constants.UdiEntityType.PartialView);
+        builder.Deny(
+            Constants.Permissions.Template.Create,
+            Constants.Permissions.Template.Update,
+            Constants.Permissions.PartialView.Create,
+            Constants.Permissions.PartialView.Update,
+            Constants.Permissions.PartialView.Delete);
     }
 }

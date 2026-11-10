@@ -1,7 +1,7 @@
 namespace Umbraco.Cms.Core.SchemaLockdown;
 
 /// <summary>
-/// Holds which operations are denied on which entity types.
+/// Holds which permission verbs are denied.
 /// </summary>
 /// <remarks>
 /// Every registered <see cref="ISchemaLockdownConfigurator"/> configures it while it's constructed, after which it is
@@ -9,9 +9,9 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 /// </remarks>
 internal sealed class SchemaRestrictions : ISchemaRestrictionsBuilder
 {
-    private readonly Dictionary<string, HashSet<SchemaOperation>> _blocked = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _denied = new(StringComparer.Ordinal);
     private readonly bool _frozen;
-    private IReadOnlyCollection<string> _restrictedEntityTypes = [];
+    private IReadOnlyCollection<string> _deniedPermissions = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SchemaRestrictions"/> class.
@@ -28,42 +28,14 @@ internal sealed class SchemaRestrictions : ISchemaRestrictionsBuilder
     }
 
     /// <inheritdoc />
-    public IReadOnlyCollection<string> RestrictedEntityTypes => _restrictedEntityTypes;
+    public IReadOnlyCollection<string> DeniedPermissions => _deniedPermissions;
 
     /// <inheritdoc />
-    public void Block(string entityType, params SchemaOperation[] operations)
+    public void Deny(params string[] permissions)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(entityType);
-
-        foreach (SchemaOperation operation in operations)
+        foreach (var permission in permissions)
         {
-            Block(entityType, operation);
-        }
-    }
-
-    /// <inheritdoc />
-    public void BlockMutations(string entityType)
-        => Block(entityType, SchemaOperation.Create, SchemaOperation.Update, SchemaOperation.Delete);
-
-    /// <inheritdoc />
-    public bool IsRestricted(string entityType) => _blocked.ContainsKey(entityType);
-
-    /// <inheritdoc />
-    public bool IsAllowed(string entityType, SchemaOperation operation)
-    {
-        if (_blocked.TryGetValue(entityType, out HashSet<SchemaOperation>? operations) is false)
-        {
-            return true;
-        }
-
-        return operation != SchemaOperation.Unknown && operations.Contains(operation) is false;
-    }
-
-    private void Block(string entityType, SchemaOperation operation)
-    {
-        if (IsBlockable(operation) is false)
-        {
-            return;
+            ArgumentException.ThrowIfNullOrWhiteSpace(permission, nameof(permissions));
         }
 
         if (_frozen)
@@ -71,17 +43,19 @@ internal sealed class SchemaRestrictions : ISchemaRestrictionsBuilder
             throw new InvalidOperationException("The schema lockdown restrictions cannot be modified after they have been built.");
         }
 
-        if (_blocked.TryGetValue(entityType, out HashSet<SchemaOperation>? blocked) is false)
+        var added = false;
+        foreach (var permission in permissions)
         {
-            _blocked[entityType] = blocked = [];
-
-            // Replaced, not updated, so a configurator can keep enumerating the entity types while it blocks more.
-            _restrictedEntityTypes = Array.AsReadOnly(_blocked.Keys.ToArray());
+            added |= _denied.Add(permission);
         }
 
-        blocked.Add(operation);
+        if (added)
+        {
+            // Replaced, not updated, so a configurator can keep enumerating the denied permissions while it denies more.
+            _deniedPermissions = Array.AsReadOnly(_denied.ToArray());
+        }
     }
 
-    private static bool IsBlockable(SchemaOperation operation)
-        => operation is SchemaOperation.Create or SchemaOperation.Update or SchemaOperation.Delete;
+    /// <inheritdoc />
+    public bool IsDenied(string permission) => _denied.Contains(permission);
 }

@@ -5,7 +5,6 @@ using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DocumentType;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.SchemaLockdown;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
@@ -33,7 +32,7 @@ public class CreatingATemplateForADocumentTypeIsForbiddenWhenTemplatesAreLockedT
         Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.That(
             response.Headers.GetValues(Constants.Headers.SchemaLockdown),
-            Is.EqualTo(new[] { $"{Constants.UdiEntityType.Template}:create" }));
+            Is.EqualTo(new[] { Constants.Permissions.Template.Create }));
     }
 
     /// <summary>
@@ -43,6 +42,6 @@ public class CreatingATemplateForADocumentTypeIsForbiddenWhenTemplatesAreLockedT
     {
         /// <inheritdoc />
         public void Configure(ISchemaRestrictionsBuilder builder)
-            => builder.BlockMutations(Constants.UdiEntityType.Template);
+            => builder.Deny(Constants.Permissions.Template.Create, Constants.Permissions.Template.Update, Constants.Permissions.Template.Delete);
     }
 }

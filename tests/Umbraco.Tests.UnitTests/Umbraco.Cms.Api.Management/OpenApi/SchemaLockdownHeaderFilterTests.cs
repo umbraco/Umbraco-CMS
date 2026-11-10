@@ -11,7 +11,6 @@ using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Api.Management.SchemaLockdown;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.SchemaLockdown;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.OpenApi;
 
@@ -36,7 +35,7 @@ internal sealed class SchemaLockdownHeaderFilterTests
             Assert.That(forbidden?.Headers?.Keys, Does.Contain(Constants.Headers.SchemaLockdown));
             Assert.That(
                 forbidden?.Headers?[Constants.Headers.SchemaLockdown].Description,
-                Does.Contain("document-type:create"));
+                Does.Contain(Constants.Permissions.DocumentType.Create));
         });
     }
 
@@ -130,7 +129,7 @@ internal sealed class SchemaLockdownHeaderFilterTests
     [SchemaEntityType(Constants.UdiEntityType.DocumentType)]
     private sealed class GovernedReadController
     {
-        [SchemaOperation(SchemaOperation.Read)]
+        [SchemaOperation([])]
         public void Action()
         {
         }

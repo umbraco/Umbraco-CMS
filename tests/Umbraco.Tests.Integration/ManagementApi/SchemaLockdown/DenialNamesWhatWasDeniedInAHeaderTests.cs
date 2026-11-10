@@ -3,13 +3,12 @@ using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.SchemaLockdown;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
 /// <summary>
-/// A denial names the entity type and operation in a header, so it can be told apart from a permission 403.
+/// A denial names the denied permission verb in a header, so it can be told apart from a permission 403.
 /// </summary>
 public class DenialNamesWhatWasDeniedInAHeaderTests : SchemaLockdownApiTest<DeleteDataTypeController>
 {
@@ -20,14 +19,14 @@ public class DenialNamesWhatWasDeniedInAHeaderTests : SchemaLockdownApiTest<Dele
         => builder.SchemaLockdownConfigurators().Add<LockDataTypeDeletionConfigurator>();
 
     [Test]
-    public async Task Forbidden_Response_Names_The_Entity_Type_And_Operation()
+    public async Task Forbidden_Response_Names_The_Denied_Permission()
     {
         HttpResponseMessage response = await Client.DeleteAsync(Url);
 
         Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.That(
             response.Headers.GetValues(Constants.Headers.SchemaLockdown),
-            Is.EqualTo(new[] { $"{Constants.UdiEntityType.DataType}:delete" }));
+            Is.EqualTo(new[] { Constants.Permissions.DataType.Delete }));
     }
 
     /// <summary>
@@ -37,6 +36,6 @@ public class DenialNamesWhatWasDeniedInAHeaderTests : SchemaLockdownApiTest<Dele
     {
         /// <inheritdoc />
         public void Configure(ISchemaRestrictionsBuilder builder)
-            => builder.Block(Constants.UdiEntityType.DataType, SchemaOperation.Delete);
+            => builder.Deny(Constants.Permissions.DataType.Delete);
     }
 }

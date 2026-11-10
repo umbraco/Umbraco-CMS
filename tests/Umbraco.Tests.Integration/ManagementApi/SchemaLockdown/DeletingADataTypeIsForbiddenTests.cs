@@ -3,7 +3,6 @@ using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.SchemaLockdown;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
@@ -34,6 +33,6 @@ public class DeletingADataTypeIsForbiddenTests : SchemaLockdownApiTest<DeleteDat
     {
         /// <inheritdoc />
         public void Configure(ISchemaRestrictionsBuilder builder)
-            => builder.BlockMutations(Constants.UdiEntityType.DataType);
+            => builder.Deny(Constants.Permissions.DataType.Create, Constants.Permissions.DataType.Update, Constants.Permissions.DataType.Delete);
     }
 }

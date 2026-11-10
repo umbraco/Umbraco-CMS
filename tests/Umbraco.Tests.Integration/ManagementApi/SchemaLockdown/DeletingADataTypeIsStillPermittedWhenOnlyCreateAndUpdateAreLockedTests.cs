@@ -3,7 +3,6 @@ using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.SchemaLockdown;
 using Umbraco.Cms.Core.Services;
@@ -67,8 +66,8 @@ public class DeletingADataTypeIsStillPermittedWhenOnlyCreateAndUpdateAreLockedTe
         /// <inheritdoc />
         public void Configure(ISchemaRestrictionsBuilder builder)
         {
-            builder.Block(Constants.UdiEntityType.DataType, SchemaOperation.Create);
-            builder.Block(Constants.UdiEntityType.DataType, SchemaOperation.Update);
+            builder.Deny(Constants.Permissions.DataType.Create);
+            builder.Deny(Constants.Permissions.DataType.Update);
         }
     }
 }

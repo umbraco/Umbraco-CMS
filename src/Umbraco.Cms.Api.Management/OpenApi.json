@@ -199,7 +199,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"data-type:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -378,7 +378,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"data-type:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -526,7 +526,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"data-type:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -665,7 +665,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"data-type:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -847,7 +847,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"data-type:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -1215,7 +1215,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"data-type:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -1394,7 +1394,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"data-type:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -1542,7 +1542,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"data-type:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -2402,7 +2402,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"dictionary-item:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DictionaryItem.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -2581,7 +2581,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"dictionary-item:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DictionaryItem.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -2729,7 +2729,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"dictionary-item:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DictionaryItem.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -2950,7 +2950,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"dictionary-item:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DictionaryItem.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -3104,7 +3104,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"dictionary-item:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DictionaryItem.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -5100,7 +5100,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"document-type:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -5253,7 +5253,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"document-type:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -5401,7 +5401,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"document-type:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -5875,7 +5875,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"document-type:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -6088,7 +6088,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"document-type:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -6238,7 +6238,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"document-type:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -6440,7 +6440,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"document-type:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Template.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -6834,7 +6834,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"document-type:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -7013,7 +7013,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"document-type:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -7161,7 +7161,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"document-type:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -7315,7 +7315,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"document-type:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -14874,7 +14874,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"language:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Language.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -15048,7 +15048,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"language:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Language.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -15195,7 +15195,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"language:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Language.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -16426,7 +16426,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"media-type:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -16579,7 +16579,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"media-type:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -16727,7 +16727,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"media-type:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -17121,7 +17121,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"media-type:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -17334,7 +17334,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"media-type:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -17484,7 +17484,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"media-type:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -17941,7 +17941,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"media-type:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -18120,7 +18120,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"media-type:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -18268,7 +18268,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"media-type:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -18422,7 +18422,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"media-type:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -21924,7 +21924,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"member-group:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MemberGroup.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -22092,7 +22092,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"member-group:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MemberGroup.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -22240,7 +22240,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"member-group:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MemberGroup.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -22614,7 +22614,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"member-type:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -22767,7 +22767,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"member-type:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -22915,7 +22915,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"member-type:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -23159,7 +23159,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"member-type:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -23372,7 +23372,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"member-type:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -23522,7 +23522,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"member-type:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -23979,7 +23979,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"member-type:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -24158,7 +24158,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"member-type:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -24306,7 +24306,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"member-type:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -24460,7 +24460,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"member-type:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -27261,7 +27261,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"partial-view:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -27438,7 +27438,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"partial-view:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -27585,7 +27585,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"partial-view:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -27749,7 +27749,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"partial-view:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -27903,7 +27903,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"partial-view:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -28080,7 +28080,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"partial-view:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -29560,7 +29560,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"script:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Script.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -29737,7 +29737,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"script:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Script.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -29884,7 +29884,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"script:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Script.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -30048,7 +30048,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"script:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Script.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -30202,7 +30202,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"script:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Script.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -30379,7 +30379,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"script:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Script.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -31299,7 +31299,7 @@
           "Server"
         ],
         "summary": "Gets the schema lockdown state.",
-        "description": "Gets which schema operations are permitted for each entity type.",
+        "description": "Gets the permission verbs schema lockdown denies.",
         "operationId": "GetServerSchemaLockdown",
         "responses": {
           "200": {
@@ -31839,7 +31839,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"stylesheet:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -32016,7 +32016,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"stylesheet:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -32163,7 +32163,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"stylesheet:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -32327,7 +32327,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"stylesheet:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -32481,7 +32481,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"stylesheet:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -32658,7 +32658,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"stylesheet:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -33481,7 +33481,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"template:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Template.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -33660,7 +33660,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"template:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Template.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -33808,7 +33808,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"template:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Template.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -40274,7 +40274,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"webhook:create\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Webhook.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -40453,7 +40453,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"webhook:delete\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Webhook.Delete\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -40601,7 +40601,7 @@
                 }
               },
               "Umb-Schema-Lockdown": {
-                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"webhook:update\". Absent when the response has another cause.",
+                "description": "Present when schema lockdown denied the request, naming the permission verb it was denied, for example \"Umb.Webhook.Update\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -51650,44 +51650,16 @@
         },
         "additionalProperties": false
       },
-      "ServerSchemaLockdownEntityTypeResponseModel": {
-        "required": [
-          "create",
-          "delete",
-          "entityType",
-          "update"
-        ],
-        "type": "object",
-        "properties": {
-          "entityType": {
-            "type": "string"
-          },
-          "create": {
-            "type": "boolean"
-          },
-          "update": {
-            "type": "boolean"
-          },
-          "delete": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
       "ServerSchemaLockdownResponseModel": {
         "required": [
-          "restrictedEntityTypes"
+          "deniedPermissions"
         ],
         "type": "object",
         "properties": {
-          "restrictedEntityTypes": {
+          "deniedPermissions": {
             "type": "array",
             "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ServerSchemaLockdownEntityTypeResponseModel"
-                }
-              ]
+              "type": "string"
             }
           }
         },

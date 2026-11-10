@@ -40,6 +40,6 @@ public class CreateTemplateControllerProductionModeTests : ManagementApiTest<Cre
         Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.That(
             response.Headers.GetValues(Constants.Headers.SchemaLockdown),
-            Is.EqualTo(new[] { $"{Constants.UdiEntityType.Template}:create" }));
+            Is.EqualTo(new[] { Constants.Permissions.Template.Create }));
     }
 }

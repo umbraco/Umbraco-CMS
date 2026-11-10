@@ -1,7 +1,6 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,36 +57,27 @@ public sealed class SchemaEntityTypeAttribute : Attribute, IAsyncAuthorizationFi
         ISchemaRestrictions restrictions =
             httpContext.RequestServices.GetRequiredService<ISchemaRestrictions>();
 
-        if (EntityTypes.Any(restrictions.IsRestricted) is false)
+        if (restrictions.DeniedPermissions.Count == 0)
         {
             return Task.CompletedTask;
         }
 
-        SchemaOperationAttribute[] declared = DeclaredOperations(context.ActionDescriptor);
-        (string EntityType, SchemaOperation Operation)[] governed =
-            SchemaOperationResolver.Resolve(EntityTypes, declared, httpContext.Request.Method);
-
-        var refusal = Array.FindIndex(governed, x => restrictions.IsAllowed(x.EntityType, x.Operation) is false);
-        if (refusal < 0)
+        SchemaOperationAttribute? declared = (context.ActionDescriptor as ControllerActionDescriptor)?.MethodInfo
+            .GetCustomAttribute<SchemaOperationAttribute>();
+        var denied = SchemaOperationResolver.ResolvePermissions(EntityTypes, declared, httpContext.Request.Method)
+            .FirstOrDefault(restrictions.IsDenied);
+        if (denied is null)
         {
             return Task.CompletedTask;
         }
-
-        (var denied, SchemaOperation operation) = governed[refusal];
 
         // A bodyless 403 like every other one in this API, as permissions can return a 403 on the same endpoints. The
-        // header says what was denied. It's returned at every runtime level, including during an upgrade, where the
-        // maintenance mode filter would otherwise answer 503 ("try again later").
-        httpContext.Response.Headers[Constants.Headers.SchemaLockdown] =
-            $"{denied.ToLowerInvariant()}:{operation.ToString().ToLowerInvariant()}";
+        // header names the denied permission verb. It's returned at every runtime level, including during an upgrade,
+        // where the maintenance mode filter would otherwise answer 503 ("try again later").
+        httpContext.Response.Headers[Constants.Headers.SchemaLockdown] = denied;
 
         context.Result = new StatusCodeResult(StatusCodes.Status403Forbidden);
 
         return Task.CompletedTask;
     }
-
-    private static SchemaOperationAttribute[] DeclaredOperations(ActionDescriptor actionDescriptor)
-        => (actionDescriptor as ControllerActionDescriptor)?.MethodInfo
-            .GetCustomAttributes<SchemaOperationAttribute>()
-            .ToArray() ?? [];
 }

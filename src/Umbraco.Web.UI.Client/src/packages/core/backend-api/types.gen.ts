@@ -2496,15 +2496,8 @@ export type ServerInformationResponseModel = {
     isDebugMode: boolean;
 };
 
-export type ServerSchemaLockdownEntityTypeResponseModel = {
-    entityType: string;
-    create: boolean;
-    update: boolean;
-    delete: boolean;
-};
-
 export type ServerSchemaLockdownResponseModel = {
-    restrictedEntityTypes: Array<ServerSchemaLockdownEntityTypeResponseModel>;
+    deniedPermissions: Array<string>;
 };
 
 export type ServerStatusResponseModel = {
