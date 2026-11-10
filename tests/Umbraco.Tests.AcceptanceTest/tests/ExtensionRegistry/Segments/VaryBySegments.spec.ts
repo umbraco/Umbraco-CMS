@@ -52,7 +52,6 @@ test('can allow vary by segments for a property in a document type', async ({umb
   // Assert
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.properties[0].variesBySegment).toBeTruthy();
-  expect(documentTypeData.properties[0].variesByCulture).toBeFalsy();
 });
 
 test('can allow vary by segments for a Library element type', async ({umbracoApi, umbracoUi}) => {

@@ -32,6 +32,7 @@ test.afterEach(async ({umbracoApi}) => {
 test('cannot publish segment-only content when the mandatory default segment value is empty', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentId = await umbracoApi.document.createDocumentWithMultipleSegmentValues(contentName, documentTypeId, dataTypeName, editorAlias, [
+    {value: defaultSegmentValue, segment: null},
     {value: vipSegmentValue, segment: vipMemberSegmentAlias},
   ]);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
