@@ -2041,8 +2041,21 @@ export class DocumentApiHelper {
 
   async getValuesByCultureAndSegmentForDocument(documentName: string, culturesAndSegments: {culture: string | null, segment: string | null}[]) {
     const documentData = await this.getByName(documentName);
+    if (!documentData) {
+      throw new Error(`Document '${documentName}' was not found`);
+    }
     return culturesAndSegments.map(cs =>
       documentData.values.find(v => v.culture === cs.culture && v.segment === cs.segment)
+    );
+  }
+
+  async getPublishedValuesByCultureAndSegmentForDocument(documentId: string, culturesAndSegments: {culture: string | null, segment: string | null}[]) {
+    const publishedData = await this.getPublished(documentId);
+    if (!Array.isArray(publishedData?.values)) {
+      throw new Error(`Published document '${documentId}' was not found`);
+    }
+    return culturesAndSegments.map(cs =>
+      publishedData.values.find(v => v.culture === cs.culture && v.segment === cs.segment)
     );
   }
 
@@ -2128,6 +2141,67 @@ export class DocumentApiHelper {
         blockListBuilder.addExpose().withContentKey(blockKeys[index]).withCulture(culture).done();
       }
 
+      blockListBuilder.addLayout().withContentKey(blockKeys[index]).done();
+    });
+
+    const document = blockListBuilder.done().done().build();
+
+    return await this.create(document);
+  }
+
+  /**
+   * Creates a segment-variant document whose segment-invariant Block List property already holds blocks with
+   * a value per segment, plus an expose entry per block.
+   * @param documentName - name of the document
+   * @param documentTypeId - the document type, expected to vary by segment
+   * @param blockListPropertyAlias - alias of the (segment-invariant) block list property
+   * @param elementTypeId - content element type of every block, expected to vary by segment
+   * @param blockPropertyAlias - alias of the segment-variant property inside the element type
+   * @param blockPropertyEditorAlias - property editor alias of that property
+   * @param blockValuesPerSegment - one entry per block, listing that block's value per segment (null for the default segment)
+   */
+  async createDocumentWithBlockListBlocksInSegments(
+    documentName: string,
+    documentTypeId: string,
+    blockListPropertyAlias: string,
+    elementTypeId: string,
+    blockPropertyAlias: string,
+    blockPropertyEditorAlias: string,
+    blockValuesPerSegment: Array<{value: string, segment: string | null}[]>) {
+    await this.ensureNameNotExists(documentName);
+
+    const crypto = require('crypto');
+    const blockKeys = blockValuesPerSegment.map(() => crypto.randomUUID());
+
+    const documentBuilder = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .addVariant()
+        .withName(documentName)
+        .done();
+
+    const blockListBuilder = documentBuilder.addValue().withAlias(blockListPropertyAlias).addBlockListValue();
+
+    blockValuesPerSegment.forEach((valuesBySegment, index) => {
+      const contentDataBuilder = blockListBuilder
+        .addContentData()
+        .withContentTypeKey(elementTypeId)
+        .withKey(blockKeys[index]);
+
+      for (const segmentValue of valuesBySegment) {
+        const contentDataValueBuilder = contentDataBuilder
+          .addContentDataValue()
+          .withAlias(blockPropertyAlias)
+          .withEditorAlias(blockPropertyEditorAlias)
+          .withValue(segmentValue.value);
+        if (segmentValue.segment !== null) {
+          contentDataValueBuilder.withSegment(segmentValue.segment);
+        }
+        contentDataValueBuilder.done();
+      }
+
+      contentDataBuilder.done();
+
+      blockListBuilder.addExpose().withContentKey(blockKeys[index]).done();
       blockListBuilder.addLayout().withContentKey(blockKeys[index]).done();
     });
 

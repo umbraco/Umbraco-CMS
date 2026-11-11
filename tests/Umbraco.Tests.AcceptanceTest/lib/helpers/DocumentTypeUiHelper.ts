@@ -5,6 +5,7 @@ import {ConstantHelper} from "./ConstantHelper";
 export class DocumentTypeUiHelper extends UiBaseLocators {
   private readonly newDocumentTypeBtn: Locator;
   private readonly sharedAcrossCulturesToggle: Locator;
+  private readonly sharedAcrossSegmentsToggle: Locator;
   private readonly documentTypeSettingsTabBtn: Locator;
   private readonly documentTypeTemplatesTabBtn: Locator;
   private readonly varyBySegmentsBtn: Locator;
@@ -24,6 +25,7 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
     super(page);
     this.newDocumentTypeBtn = page.getByLabel('New Document Type…');
     this.sharedAcrossCulturesToggle = page.locator('label').filter({hasText: 'Shared across cultures'}).locator('#toggle');
+    this.sharedAcrossSegmentsToggle = page.locator('label').filter({hasText: 'Shared across segments'}).locator('#toggle');
     this.tabGroup = page.getByTestId('workspace:view-links');
     this.documentTypeSettingsTabBtn = this.tabGroup.locator('[data-mark*="Settings"]');
     this.documentTypeTemplatesTabBtn = this.tabGroup.locator('[data-mark*="Templates"]');
@@ -58,6 +60,10 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
 
   async clickSharedAcrossCulturesToggle() {
     await this.click(this.sharedAcrossCulturesToggle);
+  }
+
+  async clickSharedAcrossSegmentsToggle() {
+    await this.click(this.sharedAcrossSegmentsToggle);
   }
 
   async clickDocumentTypeSettingsTab() {
