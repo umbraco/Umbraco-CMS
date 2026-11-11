@@ -494,3 +494,58 @@ describe('UmbLocalizationRegistry with a failing extension', () => {
 		expect(registry.localizations.get('da')).to.have.property('general_close', 'Luk');
 	});
 });
+
+describe('UmbLocalizationRegistry document direction', () => {
+	const arabic: ManifestLocalization = {
+		type: 'localization',
+		alias: 'Umb.Test.Localization.Arabic',
+		name: 'Test Arabic',
+		meta: { culture: 'ar', direction: 'rtl', localizations: { general: { color: 'لون' } } },
+	};
+	const arabicPackage: ManifestLocalization = {
+		type: 'localization',
+		alias: 'Umb.Test.Localization.Arabic.Package',
+		name: 'Test Arabic (package)',
+		weight: 50,
+		meta: { culture: 'ar', localizations: { myPackage: { title: 'عنوان' } } },
+	};
+	const arabicEgypt: ManifestLocalization = {
+		type: 'localization',
+		alias: 'Umb.Test.Localization.Arabic.Egypt',
+		name: 'Test Arabic (Egypt)',
+		meta: { culture: 'ar-eg', localizations: { general: { color: 'لون' } } },
+	};
+	let registry: UmbLocalizationRegistry;
+
+	beforeEach(() => {
+		umbExtensionsRegistry.register(arabic);
+		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
+	});
+
+	afterEach(() => {
+		registry.destroy();
+		umbExtensionsRegistry.unregister(arabic.alias);
+		umbExtensionsRegistry.unregister(arabicPackage.alias);
+		umbExtensionsRegistry.unregister(arabicEgypt.alias);
+		umbLocalizationManager.localizations.clear();
+		document.documentElement.dir = 'ltr';
+	});
+
+	it('should keep the direction declared for a language when a lower-weight extension declares none', async () => {
+		umbExtensionsRegistry.register(arabicPackage);
+		registry.loadLanguage('ar');
+		await aTimeout(0);
+
+		expect(registry.localizations.get('ar')).to.have.property('myPackage_title', 'عنوان');
+		expect(document.documentElement.dir).to.equal('rtl');
+	});
+
+	it('should keep the direction declared for a language when its regional extension declares none', async () => {
+		umbExtensionsRegistry.register(arabicEgypt);
+		registry.loadLanguage('ar-eg');
+		await aTimeout(0);
+
+		expect(umbLocalizationManager.documentLanguage).to.equal('ar-eg');
+		expect(document.documentElement.dir).to.equal('rtl');
+	});
+});
