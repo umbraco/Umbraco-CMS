@@ -6,6 +6,7 @@ using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Microsoft.Data.Sqlite;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Tests.Benchmarks;
 
@@ -124,11 +125,11 @@ public class MediaUniqueNameBenchmarks
     [Benchmark]
     public string? FetchPrefixMatched()
     {
-        var prefix = EscapeLikeValue(SimilarNodeName.GetBaseText(ProposedName));
+        var prefix = SqlLikeEscaping.EscapeValue(SimilarNodeName.GetBaseText(ProposedName));
 
         using SqliteCommand command = _connection.CreateCommand();
         command.CommandText =
-            @"SELECT id, text FROM umbracoNode WHERE nodeObjectType = @objectType AND parentId = @parentId AND upper(text) LIKE upper(@prefix) ESCAPE '\'";
+            $"SELECT id, text FROM umbracoNode WHERE nodeObjectType = @objectType AND parentId = @parentId AND upper(text) LIKE upper(@prefix) {SqlLikeEscaping.EscapeClause}";
         command.Parameters.AddWithValue("@objectType", MediaObjectType);
         command.Parameters.AddWithValue("@parentId", ParentId);
         command.Parameters.AddWithValue("@prefix", prefix + "%");
@@ -151,8 +152,4 @@ public class MediaUniqueNameBenchmarks
 
         return siblings;
     }
-
-    // Mirrors SqlSyntaxProviderBase.EscapeLikeValue, which production applies to the StartsWith prefix.
-    private static string EscapeLikeValue(string value)
-        => value.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_");
 }

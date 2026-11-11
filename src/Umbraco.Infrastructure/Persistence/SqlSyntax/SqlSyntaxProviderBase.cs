@@ -269,11 +269,10 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         $"upper({column}) LIKE upper(@{paramIndex})";
 
     /// <inheritdoc />
-    public virtual string EscapeLikeValue(string value)
-        => value.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_");
+    public virtual string EscapeLikeValue(string value) => SqlLikeEscaping.EscapeValue(value);
 
     /// <inheritdoc />
-    public virtual string GetLikeEscapeClause() => @"ESCAPE '\'";
+    public virtual string GetLikeEscapeClause() => SqlLikeEscaping.EscapeClause;
 
     /// <summary>
     /// Generates a SQL expression that concatenates the specified arguments using the SQL CONCAT function.

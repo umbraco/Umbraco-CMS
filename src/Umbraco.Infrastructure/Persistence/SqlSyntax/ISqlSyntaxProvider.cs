@@ -233,15 +233,15 @@ public interface ISqlSyntaxProvider
     /// <remarks>
     ///     A comparison using the escaped value must be followed by <see cref="GetLikeEscapeClause" />.
     /// </remarks>
-    // TODO (V18): Remove the default implementation.
-    string EscapeLikeValue(string value) => value.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_");
+    // TODO (V20): Remove the default implementation.
+    string EscapeLikeValue(string value) => SqlLikeEscaping.EscapeValue(value);
 
     /// <summary>
     ///     Gets the <c>ESCAPE</c> clause that follows a LIKE comparison with a value escaped by <see cref="EscapeLikeValue" />.
     /// </summary>
     /// <returns>The <c>ESCAPE</c> clause.</returns>
-    // TODO (V18): Remove the default implementation.
-    string GetLikeEscapeClause() => @"ESCAPE '\'";
+    // TODO (V20): Remove the default implementation.
+    string GetLikeEscapeClause() => SqlLikeEscaping.EscapeClause;
 
     /// <summary>Concatenates the specified string arguments into a single string using the SQL syntax appropriate for the database.</summary>
     /// <param name="args">The string arguments to concatenate.</param>
