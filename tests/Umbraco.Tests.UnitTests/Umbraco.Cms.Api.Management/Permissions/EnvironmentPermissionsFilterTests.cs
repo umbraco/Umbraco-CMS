@@ -83,13 +83,13 @@ public class EnvironmentPermissionsFilterTests
     }
 
     [Test]
-    public async Task Decision_Follows_The_Declared_Prefix()
+    public async Task Decision_Follows_The_Declared_Resource()
     {
         AuthorizationFilterContext locked = CreateContext(HttpMethods.Post, lockDocumentTypes: true);
         AuthorizationFilterContext unlocked = CreateContext(HttpMethods.Post, lockDocumentTypes: true);
 
         await CreateFilter().OnAuthorizationAsync(locked);
-        await CreateFilter(Constants.Permissions.Entities.Webhook.Prefix).OnAuthorizationAsync(unlocked);
+        await CreateFilter(Constants.Permissions.Entities.Webhook.Resource).OnAuthorizationAsync(unlocked);
 
         Assert.Multiple(() =>
         {
@@ -180,7 +180,7 @@ public class EnvironmentPermissionsFilterTests
             new LockTemplateCreation(),
             typeof(TemplateForDocumentTypeController));
 
-        await CreateFilter(Constants.Permissions.Entities.Template.Prefix).OnAuthorizationAsync(context);
+        await CreateFilter(Constants.Permissions.Entities.Template.Resource).OnAuthorizationAsync(context);
 
         AssertPermitted(context);
     }
@@ -266,8 +266,8 @@ public class EnvironmentPermissionsFilterTests
         return services.BuildServiceProvider();
     }
 
-    private static RequiresPermissionsForAttribute CreateFilter(string permissionPrefix = Constants.Permissions.Entities.DocumentType.Prefix)
-        => new(permissionPrefix);
+    private static RequiresPermissionsForAttribute CreateFilter(string resource = Constants.Permissions.Entities.DocumentType.Resource)
+        => new(resource);
 
     private static RequiresPermissionsAttribute DeclaredFilter(AuthorizationFilterContext context)
         => ((ControllerActionDescriptor)context.ActionDescriptor).MethodInfo

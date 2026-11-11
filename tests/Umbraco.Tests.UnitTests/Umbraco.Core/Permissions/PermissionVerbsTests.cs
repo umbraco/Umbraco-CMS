@@ -8,9 +8,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Permissions;
 [TestFixture]
 public class PermissionVerbsTests
 {
-    private const string PrefixField = "Prefix";
+    private const string ResourceField = "Resource";
 
-    // Every verb constant of each entity type, with the type's prefix and the operation of the same name.
+    // Every verb constant of each entity type, with the type's resource and the operation of the same name.
     private static IEnumerable<TestCaseData> PermissionConstants()
         => typeof(Constants.Permissions.Entities)
             .GetNestedTypes()
@@ -18,7 +18,7 @@ public class PermissionVerbsTests
                 .GetFields(BindingFlags.Public | BindingFlags.Static)
                 .Where(field => field.IsLiteral && OperationNamed(field.Name) is not null)
                 .Select(field => new TestCaseData(
-                        (string)type.GetField(PrefixField)!.GetRawConstantValue()!,
+                        (string)type.GetField(ResourceField)!.GetRawConstantValue()!,
                         OperationNamed(field.Name),
                         (string)field.GetRawConstantValue()!)
                     .SetName($"{type.Name}.{field.Name}")));
@@ -27,31 +27,31 @@ public class PermissionVerbsTests
         => (string?)typeof(Constants.Permissions.Operations).GetField(name)?.GetRawConstantValue();
 
     [TestCaseSource(nameof(PermissionConstants))]
-    public void Every_Permission_Constant_Is_The_Built_Verb(string prefix, string operation, string permission)
-        => Assert.That(PermissionVerbs.For(prefix, operation), Is.EqualTo(permission));
+    public void Every_Permission_Constant_Is_The_Built_Verb(string resource, string operation, string permission)
+        => Assert.That(PermissionVerbs.For(resource, operation), Is.EqualTo(permission));
 
     [TestCase(Constants.Permissions.Operations.Create, "My.Package.Widget.Create")]
     [TestCase(Constants.Permissions.Operations.Delete, "My.Package.Widget.Delete")]
     [TestCase("Publish", "My.Package.Widget.Publish")]
-    public void The_Verb_Is_The_Prefix_And_The_Operation(string operation, string expected)
+    public void The_Verb_Is_The_Resource_And_The_Operation(string operation, string expected)
         => Assert.That(PermissionVerbs.For("My.Package.Widget", operation), Is.EqualTo(expected));
 
     [TestCase("Umb.DocumentType.")]
     [TestCase("Umb.DocumentType..")]
-    public void A_Trailing_Dot_On_The_Prefix_Is_Ignored(string prefix)
+    public void A_Trailing_Dot_On_The_Resource_Is_Ignored(string resource)
         => Assert.That(
-            PermissionVerbs.For(prefix, Constants.Permissions.Operations.Create),
+            PermissionVerbs.For(resource, Constants.Permissions.Operations.Create),
             Is.EqualTo(Constants.Permissions.Entities.DocumentType.Create));
 
     [TestCase("")]
     [TestCase(" ")]
     [TestCase(".")]
-    public void An_Empty_Prefix_Is_Rejected(string prefix)
-        => Assert.Throws<ArgumentException>(() => PermissionVerbs.For(prefix, Constants.Permissions.Operations.Create));
+    public void An_Empty_Resource_Is_Rejected(string resource)
+        => Assert.Throws<ArgumentException>(() => PermissionVerbs.For(resource, Constants.Permissions.Operations.Create));
 
     [TestCase("")]
     [TestCase(" ")]
     public void An_Empty_Operation_Is_Rejected(string operation)
         => Assert.Throws<ArgumentException>(
-            () => PermissionVerbs.For(Constants.Permissions.Entities.DocumentType.Prefix, operation));
+            () => PermissionVerbs.For(Constants.Permissions.Entities.DocumentType.Resource, operation));
 }

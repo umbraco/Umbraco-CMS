@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Template;
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Template)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Template))]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessTemplates)]
-[RequiresPermissionsFor(Constants.Permissions.Entities.Template.Prefix)]
+[RequiresPermissionsFor(Constants.Permissions.Entities.Template.Resource)]
 public class TemplateControllerBase : ManagementApiControllerBase
 {
     protected IActionResult TemplateOperationStatusResult(TemplateOperationStatus status) =>

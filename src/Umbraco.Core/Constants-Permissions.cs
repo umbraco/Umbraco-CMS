@@ -6,7 +6,7 @@ public static partial class Constants
     ///     Contains the permission verbs and the operations they are built from.
     /// </summary>
     /// <remarks>
-    ///     A verb is named <c>{Prefix}.{Operation}</c>, like the document permissions (for example
+    ///     A verb is named <c>{Resource}.{Operation}</c>, like the document permissions (for example
     ///     <c>Umb.Document.Create</c>). <see cref="Umbraco.Cms.Core.Permissions.PermissionVerbs.For"/> builds a verb
     ///     the same way.
     /// </remarks>
@@ -51,24 +51,24 @@ public static partial class Constants
             public static class DataType
             {
                 /// <summary>
-                ///     The prefix of the permission verbs for this entity type.
+                ///     The resource this entity type's permission verbs are named after.
                 /// </summary>
-                public const string Prefix = "Umb.DataType";
+                public const string Resource = "Umb.DataType";
 
                 /// <summary>
                 ///     Creating a data type.
                 /// </summary>
-                public const string Create = Prefix + "." + Operations.Create;
+                public const string Create = Resource + "." + Operations.Create;
 
                 /// <summary>
                 ///     Updating a data type.
                 /// </summary>
-                public const string Update = Prefix + "." + Operations.Update;
+                public const string Update = Resource + "." + Operations.Update;
 
                 /// <summary>
                 ///     Deleting a data type.
                 /// </summary>
-                public const string Delete = Prefix + "." + Operations.Delete;
+                public const string Delete = Resource + "." + Operations.Delete;
             }
 
             /// <summary>
@@ -77,24 +77,24 @@ public static partial class Constants
             public static class DictionaryItem
             {
                 /// <summary>
-                ///     The prefix of the permission verbs for this entity type.
+                ///     The resource this entity type's permission verbs are named after.
                 /// </summary>
-                public const string Prefix = "Umb.DictionaryItem";
+                public const string Resource = "Umb.DictionaryItem";
 
                 /// <summary>
                 ///     Creating a dictionary item.
                 /// </summary>
-                public const string Create = Prefix + "." + Operations.Create;
+                public const string Create = Resource + "." + Operations.Create;
 
                 /// <summary>
                 ///     Updating a dictionary item.
                 /// </summary>
-                public const string Update = Prefix + "." + Operations.Update;
+                public const string Update = Resource + "." + Operations.Update;
 
                 /// <summary>
                 ///     Deleting a dictionary item.
                 /// </summary>
-                public const string Delete = Prefix + "." + Operations.Delete;
+                public const string Delete = Resource + "." + Operations.Delete;
             }
 
             /// <summary>
@@ -103,24 +103,24 @@ public static partial class Constants
             public static class DocumentType
             {
                 /// <summary>
-                ///     The prefix of the permission verbs for this entity type.
+                ///     The resource this entity type's permission verbs are named after.
                 /// </summary>
-                public const string Prefix = "Umb.DocumentType";
+                public const string Resource = "Umb.DocumentType";
 
                 /// <summary>
                 ///     Creating a document type.
                 /// </summary>
-                public const string Create = Prefix + "." + Operations.Create;
+                public const string Create = Resource + "." + Operations.Create;
 
                 /// <summary>
                 ///     Updating a document type.
                 /// </summary>
-                public const string Update = Prefix + "." + Operations.Update;
+                public const string Update = Resource + "." + Operations.Update;
 
                 /// <summary>
                 ///     Deleting a document type.
                 /// </summary>
-                public const string Delete = Prefix + "." + Operations.Delete;
+                public const string Delete = Resource + "." + Operations.Delete;
             }
 
             /// <summary>
@@ -129,24 +129,24 @@ public static partial class Constants
             public static class Language
             {
                 /// <summary>
-                ///     The prefix of the permission verbs for this entity type.
+                ///     The resource this entity type's permission verbs are named after.
                 /// </summary>
-                public const string Prefix = "Umb.Language";
+                public const string Resource = "Umb.Language";
 
                 /// <summary>
                 ///     Creating a language.
                 /// </summary>
-                public const string Create = Prefix + "." + Operations.Create;
+                public const string Create = Resource + "." + Operations.Create;
 
                 /// <summary>
                 ///     Updating a language.
                 /// </summary>
-                public const string Update = Prefix + "." + Operations.Update;
+                public const string Update = Resource + "." + Operations.Update;
 
                 /// <summary>
                 ///     Deleting a language.
                 /// </summary>
-                public const string Delete = Prefix + "." + Operations.Delete;
+                public const string Delete = Resource + "." + Operations.Delete;
             }
 
             /// <summary>
@@ -155,24 +155,24 @@ public static partial class Constants
             public static class MediaType
             {
                 /// <summary>
-                ///     The prefix of the permission verbs for this entity type.
+                ///     The resource this entity type's permission verbs are named after.
                 /// </summary>
-                public const string Prefix = "Umb.MediaType";
+                public const string Resource = "Umb.MediaType";
 
                 /// <summary>
                 ///     Creating a media type.
                 /// </summary>
-                public const string Create = Prefix + "." + Operations.Create;
+                public const string Create = Resource + "." + Operations.Create;
 
                 /// <summary>
                 ///     Updating a media type.
                 /// </summary>
-                public const string Update = Prefix + "." + Operations.Update;
+                public const string Update = Resource + "." + Operations.Update;
 
                 /// <summary>
                 ///     Deleting a media type.
                 /// </summary>
-                public const string Delete = Prefix + "." + Operations.Delete;
+                public const string Delete = Resource + "." + Operations.Delete;
             }
 
             /// <summary>
@@ -181,24 +181,24 @@ public static partial class Constants
             public static class MemberGroup
             {
                 /// <summary>
-                ///     The prefix of the permission verbs for this entity type.
+                ///     The resource this entity type's permission verbs are named after.
                 /// </summary>
-                public const string Prefix = "Umb.MemberGroup";
+                public const string Resource = "Umb.MemberGroup";
 
                 /// <summary>
                 ///     Creating a member group.
                 /// </summary>
-                public const string Create = Prefix + "." + Operations.Create;
+                public const string Create = Resource + "." + Operations.Create;
 
                 /// <summary>
                 ///     Updating a member group.
                 /// </summary>
-                public const string Update = Prefix + "." + Operations.Update;
+                public const string Update = Resource + "." + Operations.Update;
 
                 /// <summary>
                 ///     Deleting a member group.
                 /// </summary>
-                public const string Delete = Prefix + "." + Operations.Delete;
+                public const string Delete = Resource + "." + Operations.Delete;
             }
 
             /// <summary>
@@ -207,24 +207,24 @@ public static partial class Constants
             public static class MemberType
             {
                 /// <summary>
-                ///     The prefix of the permission verbs for this entity type.
+                ///     The resource this entity type's permission verbs are named after.
                 /// </summary>
-                public const string Prefix = "Umb.MemberType";
+                public const string Resource = "Umb.MemberType";
 
                 /// <summary>
                 ///     Creating a member type.
                 /// </summary>
-                public const string Create = Prefix + "." + Operations.Create;
+                public const string Create = Resource + "." + Operations.Create;
 
                 /// <summary>
                 ///     Updating a member type.
                 /// </summary>
-                public const string Update = Prefix + "." + Operations.Update;
+                public const string Update = Resource + "." + Operations.Update;
 
                 /// <summary>
                 ///     Deleting a member type.
                 /// </summary>
-                public const string Delete = Prefix + "." + Operations.Delete;
+                public const string Delete = Resource + "." + Operations.Delete;
             }
 
             /// <summary>
@@ -233,24 +233,24 @@ public static partial class Constants
             public static class PartialView
             {
                 /// <summary>
-                ///     The prefix of the permission verbs for this entity type.
+                ///     The resource this entity type's permission verbs are named after.
                 /// </summary>
-                public const string Prefix = "Umb.PartialView";
+                public const string Resource = "Umb.PartialView";
 
                 /// <summary>
                 ///     Creating a partial view.
                 /// </summary>
-                public const string Create = Prefix + "." + Operations.Create;
+                public const string Create = Resource + "." + Operations.Create;
 
                 /// <summary>
                 ///     Updating a partial view.
                 /// </summary>
-                public const string Update = Prefix + "." + Operations.Update;
+                public const string Update = Resource + "." + Operations.Update;
 
                 /// <summary>
                 ///     Deleting a partial view.
                 /// </summary>
-                public const string Delete = Prefix + "." + Operations.Delete;
+                public const string Delete = Resource + "." + Operations.Delete;
             }
 
             /// <summary>
@@ -259,24 +259,24 @@ public static partial class Constants
             public static class Script
             {
                 /// <summary>
-                ///     The prefix of the permission verbs for this entity type.
+                ///     The resource this entity type's permission verbs are named after.
                 /// </summary>
-                public const string Prefix = "Umb.Script";
+                public const string Resource = "Umb.Script";
 
                 /// <summary>
                 ///     Creating a script.
                 /// </summary>
-                public const string Create = Prefix + "." + Operations.Create;
+                public const string Create = Resource + "." + Operations.Create;
 
                 /// <summary>
                 ///     Updating a script.
                 /// </summary>
-                public const string Update = Prefix + "." + Operations.Update;
+                public const string Update = Resource + "." + Operations.Update;
 
                 /// <summary>
                 ///     Deleting a script.
                 /// </summary>
-                public const string Delete = Prefix + "." + Operations.Delete;
+                public const string Delete = Resource + "." + Operations.Delete;
             }
 
             /// <summary>
@@ -285,24 +285,24 @@ public static partial class Constants
             public static class Stylesheet
             {
                 /// <summary>
-                ///     The prefix of the permission verbs for this entity type.
+                ///     The resource this entity type's permission verbs are named after.
                 /// </summary>
-                public const string Prefix = "Umb.Stylesheet";
+                public const string Resource = "Umb.Stylesheet";
 
                 /// <summary>
                 ///     Creating a stylesheet.
                 /// </summary>
-                public const string Create = Prefix + "." + Operations.Create;
+                public const string Create = Resource + "." + Operations.Create;
 
                 /// <summary>
                 ///     Updating a stylesheet.
                 /// </summary>
-                public const string Update = Prefix + "." + Operations.Update;
+                public const string Update = Resource + "." + Operations.Update;
 
                 /// <summary>
                 ///     Deleting a stylesheet.
                 /// </summary>
-                public const string Delete = Prefix + "." + Operations.Delete;
+                public const string Delete = Resource + "." + Operations.Delete;
             }
 
             /// <summary>
@@ -311,24 +311,24 @@ public static partial class Constants
             public static class Template
             {
                 /// <summary>
-                ///     The prefix of the permission verbs for this entity type.
+                ///     The resource this entity type's permission verbs are named after.
                 /// </summary>
-                public const string Prefix = "Umb.Template";
+                public const string Resource = "Umb.Template";
 
                 /// <summary>
                 ///     Creating a template.
                 /// </summary>
-                public const string Create = Prefix + "." + Operations.Create;
+                public const string Create = Resource + "." + Operations.Create;
 
                 /// <summary>
                 ///     Updating a template.
                 /// </summary>
-                public const string Update = Prefix + "." + Operations.Update;
+                public const string Update = Resource + "." + Operations.Update;
 
                 /// <summary>
                 ///     Deleting a template.
                 /// </summary>
-                public const string Delete = Prefix + "." + Operations.Delete;
+                public const string Delete = Resource + "." + Operations.Delete;
             }
 
             /// <summary>
@@ -337,24 +337,24 @@ public static partial class Constants
             public static class Webhook
             {
                 /// <summary>
-                ///     The prefix of the permission verbs for this entity type.
+                ///     The resource this entity type's permission verbs are named after.
                 /// </summary>
-                public const string Prefix = "Umb.Webhook";
+                public const string Resource = "Umb.Webhook";
 
                 /// <summary>
                 ///     Creating a webhook.
                 /// </summary>
-                public const string Create = Prefix + "." + Operations.Create;
+                public const string Create = Resource + "." + Operations.Create;
 
                 /// <summary>
                 ///     Updating a webhook.
                 /// </summary>
-                public const string Update = Prefix + "." + Operations.Update;
+                public const string Update = Resource + "." + Operations.Update;
 
                 /// <summary>
                 ///     Deleting a webhook.
                 /// </summary>
-                public const string Delete = Prefix + "." + Operations.Delete;
+                public const string Delete = Resource + "." + Operations.Delete;
             }
         }
     }

@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.MediaType)]
 [ApiExplorerSettings(GroupName = "Media Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
-[RequiresPermissionsFor(Constants.Permissions.Entities.MediaType.Prefix)]
+[RequiresPermissionsFor(Constants.Permissions.Entities.MediaType.Resource)]
 public abstract class MediaTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult OperationStatusResult(ContentTypeOperationStatus status)

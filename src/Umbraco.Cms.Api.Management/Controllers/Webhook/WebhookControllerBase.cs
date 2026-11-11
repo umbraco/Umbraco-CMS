@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
 [VersionedApiBackOfficeRoute("webhook")]
 [ApiExplorerSettings(GroupName = "Webhook")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessWebhooks)]
-[RequiresPermissionsFor(Constants.Permissions.Entities.Webhook.Prefix)]
+[RequiresPermissionsFor(Constants.Permissions.Entities.Webhook.Resource)]
 public abstract class WebhookControllerBase : ManagementApiControllerBase
 {
     protected IActionResult WebhookOperationStatusResult(WebhookOperationStatus status) =>

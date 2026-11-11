@@ -15,9 +15,9 @@ namespace Umbraco.Cms.Api.Management.Permissions;
 /// Put it on a controller base class, so every endpoint deriving from it is covered. Which permission verbs are denied
 /// is decided by the registered <see cref="IEnvironmentPermissionsConfigurator"/> instances.
 /// <para>
-/// The permission verb an action needs is the declared prefix followed by the change its HTTP method makes: with
-/// <c>[RequiresPermissionsFor(Constants.Permissions.Entities.DocumentType.Prefix)]</c>, a POST needs
-/// <see cref="Constants.Permissions.Entities.DocumentType.Create"/>. A package names its own prefix, so its verbs
+/// The permission verb an action needs is the declared resource followed by the change its HTTP method makes: with
+/// <c>[RequiresPermissionsFor(Constants.Permissions.Entities.DocumentType.Resource)]</c>, a POST needs
+/// <see cref="Constants.Permissions.Entities.DocumentType.Create"/>. A package names its own resource, so its verbs
 /// don't collide with Umbraco's.
 /// </para>
 /// <para>
@@ -42,23 +42,23 @@ public sealed class RequiresPermissionsForAttribute : Attribute, IAsyncAuthoriza
     /// <summary>
     /// Initializes a new instance of the <see cref="RequiresPermissionsForAttribute"/> class.
     /// </summary>
-    /// <param name="permissionPrefix">
-    /// The prefix of the permission verbs the controller's actions need, for example
-    /// <see cref="Constants.Permissions.Entities.DocumentType.Prefix"/>.
+    /// <param name="resource">
+    /// The resource whose permission verbs the controller's actions need, for example
+    /// <see cref="Constants.Permissions.Entities.DocumentType.Resource"/>.
     /// </param>
-    public RequiresPermissionsForAttribute(string permissionPrefix)
+    public RequiresPermissionsForAttribute(string resource)
     {
-        // The prefix is joined to the operation with a dot, so a trailing one is redundant.
-        var prefix = permissionPrefix?.TrimEnd('.');
-        ArgumentException.ThrowIfNullOrWhiteSpace(prefix, nameof(permissionPrefix));
+        // The resource is joined to the operation with a dot, so a trailing one is redundant.
+        var trimmed = resource?.TrimEnd('.');
+        ArgumentException.ThrowIfNullOrWhiteSpace(trimmed, nameof(resource));
 
-        PermissionPrefix = prefix;
+        Resource = trimmed;
     }
 
     /// <summary>
-    /// Gets the prefix of the permission verbs the controller's actions need.
+    /// Gets the resource whose permission verbs the controller's actions need.
     /// </summary>
-    public string PermissionPrefix { get; }
+    public string Resource { get; }
 
     /// <inheritdoc />
     public Task OnAuthorizationAsync(AuthorizationFilterContext context)
@@ -81,11 +81,11 @@ public sealed class RequiresPermissionsForAttribute : Attribute, IAsyncAuthoriza
     /// Infers the permission verb an action needs from its HTTP method.
     /// </summary>
     /// <param name="httpMethod">The HTTP method the action responds to.</param>
-    /// <returns>The prefix followed by the HTTP method's change, or <c>null</c> for a method that changes nothing.</returns>
+    /// <returns>The resource followed by the HTTP method's change, or <c>null</c> for a method that changes nothing.</returns>
     /// <remarks>Both enforcement and the OpenAPI document use this, so they can't disagree.</remarks>
     internal string? InferPermission(string? httpMethod)
         => InferOperation(httpMethod) is string operation
-            ? PermissionVerbs.For(PermissionPrefix, operation)
+            ? PermissionVerbs.For(Resource, operation)
             : null;
 
     /// <summary>
