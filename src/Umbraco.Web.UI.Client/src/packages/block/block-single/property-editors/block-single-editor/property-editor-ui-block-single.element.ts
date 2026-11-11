@@ -122,8 +122,10 @@ export class UmbPropertyEditorUIBlockSingleElement
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
+	 * @attr
 	 * @default
 	 */
+	@property({ type: Boolean, reflect: true })
 	public set readonly(value) {
 		this.#readonly = value;
 
