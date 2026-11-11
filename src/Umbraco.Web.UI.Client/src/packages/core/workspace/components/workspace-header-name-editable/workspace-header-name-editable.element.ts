@@ -105,7 +105,7 @@ export class UmbWorkspaceHeaderNameEditableElement extends UmbLitElement {
 			@input="${this.#onNameInput}"
 			label=${this.label ?? this.localize.term('placeholders_entername')}
 			placeholder=${this.placeholder ?? this.localize.term('placeholders_entername')}
-			?readonly=${this.readonly || !this._isWritableName}
+			?readonly=${this.readonly || this._isReadOnly || !this._isWritableName}
 			required
 			${umbBindToValidation(this, `$.name`, this._name)}
 			${umbFocus()}>

@@ -30,7 +30,6 @@ describe('UmbSubmitWorkspaceAction', () => {
 		submitted = false;
 
 		const workspaceContext = {
-			IS_ENTITY_DETAIL_WORKSPACE_CONTEXT: true,
 			unique: unique.asObservable(),
 			readOnlyGuard: entityReadOnlyGuard,
 			requestSubmit: () => {

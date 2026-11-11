@@ -1,5 +1,5 @@
 import { UmbEntityNamedDetailWorkspaceContextBase } from './entity-named-detail-workspace-base.js';
-import { expect, waitUntil } from '@open-wc/testing';
+import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -34,18 +34,6 @@ describe('UmbEntityNamedDetailWorkspaceContextBase', () => {
 
 	afterEach(() => {
 		document.body.innerHTML = '';
-	});
-
-	const isNamePermitted = () => context.nameWriteGuard.getRules().every((rule) => rule.permitted !== false);
-
-	it('prevents renaming while the entity is read-only', async () => {
-		context.readOnlyGuard.addRule({ unique: 'test', permitted: true });
-
-		await waitUntil(() => !isNamePermitted(), 'renaming was not prevented');
-
-		context.readOnlyGuard.removeRule('test');
-
-		await waitUntil(isNamePermitted, 'renaming was not allowed again');
 	});
 
 	it('does not submit while the entity is read-only', async () => {
