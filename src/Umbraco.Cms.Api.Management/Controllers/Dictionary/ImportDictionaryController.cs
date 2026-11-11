@@ -51,7 +51,8 @@ public class ImportDictionaryController : DictionaryControllerBase
     [EndpointDescription("Imports a dictionary from the provided file upload.")]
     [RequiresPermissions([
         Constants.Permissions.Entities.DictionaryItem.Create,
-        Constants.Permissions.Entities.DictionaryItem.Update])]
+        Constants.Permissions.Entities.DictionaryItem.Update,
+    ])]
     public async Task<IActionResult> Import(
         CancellationToken cancellationToken,
         ImportDictionaryRequestModel importDictionaryRequestModel)

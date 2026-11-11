@@ -47,7 +47,8 @@ public class CreateDocumentTypeTemplateController : DocumentTypeControllerBase
     [MapToApiVersion("1.0")]
     [RequiresPermissions([
         Constants.Permissions.Entities.Template.Create,
-        Constants.Permissions.Entities.DocumentType.Update])]
+        Constants.Permissions.Entities.DocumentType.Update,
+    ])]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [EndpointSummary("Creates a template for a document type.")]
