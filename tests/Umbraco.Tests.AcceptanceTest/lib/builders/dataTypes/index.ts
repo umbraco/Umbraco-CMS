@@ -35,5 +35,6 @@ export {EntityDataPickerDataTypeBuilder} from './entityDataPickerDataTypeBuilder
 export {ElementPickerDataTypeBuilder} from './elementPickerDataTypeBuilder';
 export {UserPickerDataTypeBuilder} from './userPickerDataTypeBuilder';
 export {MemberGroupPickerDataTypeBuilder} from './memberGroupPickerDataTypeBuilder';
+export {SingleBlockDataTypeBuilder} from './singleBlockDataTypeBuilder';
 export {MultipleDocumentPickerDataTypeBuilder} from './multipleDocumentPickerDataTypeBuilder';
 export {MemberPickerDataTypeBuilder, MultipleMemberPickerDataTypeBuilder} from './memberPickerDataTypeBuilder';
