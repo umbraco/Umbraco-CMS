@@ -14,8 +14,8 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Media.EmbedProviders;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.SchemaLockdown;
-using Umbraco.Cms.Core.SchemaLockdown.Configurators;
+using Umbraco.Cms.Core.Permissions;
+using Umbraco.Cms.Core.Permissions.Configurators;
 using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Snippets;
@@ -116,8 +116,8 @@ public static partial class UmbracoBuilderExtensions
         builder.WebhookEvents().AddCms(true, webhookPayloadType);
 
         builder.ContentTypeFilters();
-        builder.SchemaLockdownConfigurators()
-            .Add<ProductionRuntimeModeSchemaLockdownConfigurator>();
+        builder.EnvironmentPermissionsConfigurators()
+            .Add<ProductionRuntimeModeEnvironmentPermissionsConfigurator>();
     }
 
     /// <summary>
@@ -143,12 +143,12 @@ public static partial class UmbracoBuilderExtensions
         => builder.WithCollectionBuilder<EventSourceAuthorizerCollectionBuilder>();
 
     /// <summary>
-    ///     Gets the schema lockdown configurators collection builder.
+    ///     Gets the environment permissions configurators collection builder.
     /// </summary>
     /// <param name="builder">The builder.</param>
-    /// <returns>The <see cref="SchemaLockdownConfiguratorCollectionBuilder" />.</returns>
-    public static SchemaLockdownConfiguratorCollectionBuilder SchemaLockdownConfigurators(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<SchemaLockdownConfiguratorCollectionBuilder>();
+    /// <returns>The <see cref="EnvironmentPermissionsConfiguratorCollectionBuilder" />.</returns>
+    public static EnvironmentPermissionsConfiguratorCollectionBuilder EnvironmentPermissionsConfigurators(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<EnvironmentPermissionsConfiguratorCollectionBuilder>();
 
     /// <summary>
     ///     Gets the server event access filters collection builder.

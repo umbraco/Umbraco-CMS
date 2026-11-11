@@ -23,8 +23,8 @@ public static partial class Constants
         public const string Notifications = "Umb-Notifications";
 
         /// <summary>
-        ///     Schema lockdown denial header name. Names the permission verb that schema lockdown denied.
+        ///     Denied permission header name. Names the permission verb that environment permissions denied.
         /// </summary>
-        public const string SchemaLockdown = "Umb-Schema-Lockdown";
+        public const string DeniedPermission = "Umb-Denied-Permission";
     }
 }

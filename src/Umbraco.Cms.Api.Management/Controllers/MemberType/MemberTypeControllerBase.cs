@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.DocumentType;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.SchemaLockdown;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType;
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.MemberType)]
 [ApiExplorerSettings(GroupName = "Member Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMembersOrMemberTypes)]
-[SchemaEntityType(Constants.UdiEntityType.MemberType)]
+[RequiresPermissionsFor(Constants.UdiEntityType.MemberType)]
 public abstract class MemberTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult OperationStatusResult(ContentTypeOperationStatus status)

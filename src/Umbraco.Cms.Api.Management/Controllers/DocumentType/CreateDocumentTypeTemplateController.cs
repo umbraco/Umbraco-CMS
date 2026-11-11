@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Template;
-using Umbraco.Cms.Api.Management.SchemaLockdown;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Security;
@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 /// Controller responsible for handling requests to create templates for document types in the Umbraco CMS.
 /// </summary>
 [ApiVersion("1.0")]
-[SchemaEntityType(Constants.UdiEntityType.DocumentType, Constants.UdiEntityType.Template)]
+[RequiresPermissionsFor(Constants.UdiEntityType.DocumentType, Constants.UdiEntityType.Template)]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public class CreateDocumentTypeTemplateController : DocumentTypeControllerBase
 {
@@ -46,7 +46,7 @@ public class CreateDocumentTypeTemplateController : DocumentTypeControllerBase
     /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
     [HttpPost("{id:guid}/template")]
     [MapToApiVersion("1.0")]
-    [SchemaOperation([Constants.Permissions.Template.Create, Constants.Permissions.DocumentType.Update])]
+    [RequiresPermissions([Constants.Permissions.Template.Create, Constants.Permissions.DocumentType.Update])]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [EndpointSummary("Creates a template for a document type.")]

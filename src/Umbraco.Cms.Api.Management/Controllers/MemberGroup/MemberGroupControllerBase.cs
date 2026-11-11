@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.SchemaLockdown;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberGroup;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.MemberGroup}")]
 [ApiExplorerSettings(GroupName = "Member Group")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessMembers)]
-[SchemaEntityType(Constants.UdiEntityType.MemberGroup)]
+[RequiresPermissionsFor(Constants.UdiEntityType.MemberGroup)]
 public class MemberGroupControllerBase : ManagementApiControllerBase
 {
     protected IActionResult MemberGroupOperationStatusResult(MemberGroupOperationStatus status) =>
