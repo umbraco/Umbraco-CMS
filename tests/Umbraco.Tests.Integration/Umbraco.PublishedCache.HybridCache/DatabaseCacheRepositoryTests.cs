@@ -378,6 +378,46 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
+    public async Task GetElementSources_Without_An_Ambient_Scope_Returns_Matching_Sources()
+    {
+        Guid elementKey1 = await CreateAndPublishElement();
+        Guid elementKey2 = await CreateAndPublishElement();
+
+        var sources = DatabaseCacheRepository.GetElementSources([elementKey1, elementKey2, Guid.NewGuid()]).ToList();
+
+        CollectionAssert.AreEquivalent(new[] { elementKey1, elementKey2 }, sources.Select(x => x.Key));
+    }
+
+    [Test]
+    public async Task GetElementSources_With_More_Keys_Than_The_Parameter_Limit_Returns_Matching_Sources()
+    {
+        Guid elementKey1 = await CreateAndPublishElement();
+        Guid elementKey2 = await CreateAndPublishElement();
+
+        var requestedKeys = new List<Guid> { elementKey1 };
+        requestedKeys.AddRange(Enumerable.Range(0, Constants.Sql.MaxParameterCount + 100).Select(_ => Guid.NewGuid()));
+        requestedKeys.Add(elementKey2);
+
+        var sources = DatabaseCacheRepository.GetElementSources(requestedKeys).ToList();
+
+        CollectionAssert.AreEquivalent(new[] { elementKey1, elementKey2 }, sources.Select(x => x.Key));
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task GetElementSources_Returns_The_Same_Sources_As_GetElementSourcesAsync(bool preview)
+    {
+        Guid publishedKey = await CreateAndPublishElement();
+        Guid[] requestedKeys = [publishedKey, Guid.NewGuid()];
+
+        var expected = (await DatabaseCacheRepository.GetElementSourcesAsync(requestedKeys, preview)).Select(Describe).ToList();
+        var actual = DatabaseCacheRepository.GetElementSources(requestedKeys, preview).Select(Describe).ToList();
+
+        Assert.That(actual, Is.EquivalentTo(expected));
+        Assert.That(actual, Has.Count.EqualTo(1));
+    }
+
+    [Test]
     public async Task GetElementSourcesAsync_With_Empty_Keys_Returns_Nothing()
     {
         var sources = await DatabaseCacheRepository.GetElementSourcesAsync(Array.Empty<Guid>());

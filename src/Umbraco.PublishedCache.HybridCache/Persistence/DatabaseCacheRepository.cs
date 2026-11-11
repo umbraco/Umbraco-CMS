@@ -183,14 +183,28 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
         List<ContentSourceDto> dtos = await FetchContentSourcesAsync(keysArray, GetElementSourcesSql);
 
-        dtos = dtos
+        return CreateElementSourceNodes(dtos, preview);
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<ContentCacheNode> GetElementSources(IEnumerable<Guid> keys, bool preview = false)
+    {
+        Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
+        List<ContentSourceDto> dtos = FetchContentSources(keysArray, GetElementSourcesSql);
+
+        return CreateElementSourceNodes(dtos, preview);
+    }
+
+    private IEnumerable<ContentCacheNode> CreateElementSourceNodes(List<ContentSourceDto> dtos, bool preview)
+    {
+        var filtered = dtos
             .Where(x => x is not null)
             .Where(x => preview || ((x.PubDataRaw is not null || x.PubData is not null) && (!x.Published || x.PubName is not null)))
             .ToList();
 
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Element);
-        return dtos
+        return filtered
             .Select(x => CreateContentNodeKit(x, serializer, preview))
             .OfType<ContentCacheNode>();
     }
