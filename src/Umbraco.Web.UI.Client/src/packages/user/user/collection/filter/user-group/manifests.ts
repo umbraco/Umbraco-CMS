@@ -22,4 +22,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
+	{
+		type: 'facetFilterActiveValue',
+		kind: 'default',
+		alias: 'Umb.FacetFilterActiveValue.UserCollection.UserGroup',
+		name: 'User Group Collection Filter Active Value',
+		forFacetFilters: [UMB_USER_COLLECTION_USER_GROUP_FACET_FILTER_ALIAS],
+		valueResolver: () => import('./user-group-facet-filter-value.resolver.js'),
+	},
 ];
