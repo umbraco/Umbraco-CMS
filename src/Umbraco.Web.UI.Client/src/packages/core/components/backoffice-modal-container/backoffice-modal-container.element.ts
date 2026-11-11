@@ -125,6 +125,12 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 			:host([fill-background]) #container::after {
 				background: var(--backdrop-background);
 			}
+			uui-modal-container > * {
+				--umb-modal-index: 0;
+			}
+			uui-modal-container > *:not([index='0']) {
+				--umb-modal-index: 1;
+			}
 		`,
 	];
 }
