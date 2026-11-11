@@ -48,12 +48,12 @@ public enum TemplateOperationStatus
     /// <summary>
     ///     The operation is not allowed when running in production mode.
     /// </summary>
-    [Obsolete("No longer returned, as environment permissions deny template changes in production mode. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("No longer returned, as environment permissions deny template changes in production mode. Scheduled for removal in Umbraco 20.")]
     NotAllowedInProductionMode,
 
     /// <summary>
     ///     The template content cannot be changed when running in production mode.
     /// </summary>
-    [Obsolete("No longer returned, as environment permissions deny template changes in production mode. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("No longer returned, as environment permissions deny template changes in production mode. Scheduled for removal in Umbraco 20.")]
     ContentChangeNotAllowedInProductionMode,
 }

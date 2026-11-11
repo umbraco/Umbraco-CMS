@@ -38,7 +38,7 @@ public class DeleteTemplateController : TemplateControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 20.")]
     public DeleteTemplateController(
         ITemplateService templateService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,

@@ -44,7 +44,7 @@ public class UpdateTemplateController : TemplateControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 20.")]
     public UpdateTemplateController(
         ITemplateService templateService,
         IUmbracoMapper umbracoMapper,
