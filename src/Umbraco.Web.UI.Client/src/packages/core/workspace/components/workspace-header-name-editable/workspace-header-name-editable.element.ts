@@ -1,5 +1,4 @@
 import { UMB_NAMABLE_WORKSPACE_CONTEXT } from '../../namable/index.js';
-import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '../../entity-detail/entity-detail-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, nothing, state, property } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -53,12 +52,8 @@ export class UmbWorkspaceHeaderNameEditableElement extends UmbLitElement {
 	}
 
 	#observeReadOnly() {
-		const context = this.#workspaceContext;
-		const entityDetailContext =
-			context && UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT.getDiscriminator()?.(context) ? context : undefined;
-
 		this.observe(
-			entityDetailContext?.readOnlyGuard.permitted,
+			this.#workspaceContext?.readOnlyGuard?.permitted,
 			(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
 			'umbObserveWorkspaceReadOnly',
 		);
