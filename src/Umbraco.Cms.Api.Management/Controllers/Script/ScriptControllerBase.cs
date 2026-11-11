@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -15,6 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Script;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Script}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Script))]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessScripts)]
+[RequiresPermissionsFor(Constants.Permissions.Entities.Script.Resource)]
 public class ScriptControllerBase : FileSystemManagementControllerBase
 {
     protected IActionResult ScriptOperationStatusResult(ScriptOperationStatus status) =>
