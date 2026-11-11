@@ -439,6 +439,10 @@ export abstract class UmbBlockManagerContext<
 		this.#settings.remove(settingsKeys);
 	}
 
+	removeOneExpose(contentKey: string, variantId: UmbVariantId) {
+		if (!variantId) return;
+		this.#exposes.filter((x) => !(x.contentKey === contentKey && variantId.compare(x)));
+	}
 	removeExposesOf(contentKey: string) {
 		this.#exposes.filter((x) => x.contentKey !== contentKey);
 	}

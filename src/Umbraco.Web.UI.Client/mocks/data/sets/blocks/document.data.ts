@@ -3,6 +3,8 @@ import {
 	NESTED_BLOCK_LIST_DOCUMENT_TYPE_ID,
 	NESTED_BLOCK_LIST_INNER_ELEMENT_TYPE_ID,
 	NESTED_BLOCK_LIST_OUTER_ELEMENT_TYPE_ID,
+	VARIANT_BLOCK_ELEMENT_TYPE_ID,
+	VARIANT_BLOCK_LIST_DOCUMENT_TYPE_ID,
 } from './document-type.data.js';
 import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
@@ -127,6 +129,96 @@ export const data: Array<UmbMockDocumentModel> = [
 								contentKey: 'c0f1a5e0-1d3b-4f2a-9c1e-2a7b8d4e6f01',
 								settingsKey: null,
 							},
+						],
+					},
+				},
+			},
+		],
+		flags: [],
+	},
+	{
+		// Block-level variance. "Shared block" is exposed in both cultures, "English only" only in en-US and
+		// "Danish only" only in da, so un-exposing can be tried from either culture.
+		id: '2bb5536f-deb6-429c-b6d4-dc2975646a4b',
+		createDate: '2024-01-15T10:00:00.000Z',
+		parent: null,
+		ancestors: [],
+		documentType: {
+			id: VARIANT_BLOCK_LIST_DOCUMENT_TYPE_ID,
+			icon: 'icon-document',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		template: null,
+		variants: [
+			{
+				state: 'Published' as UmbDocumentVariantState,
+				publishDate: '2024-01-15T10:05:00.000Z',
+				culture: 'en-US',
+				segment: null,
+				name: 'Variant Block List',
+				createDate: '2024-01-15T10:00:00.000Z',
+				updateDate: '2024-01-15T10:05:00.000Z',
+				id: '5d0f7a1e-3c2b-4e8a-9b6d-1f4a7c9e2b30',
+				flags: [],
+			},
+			{
+				state: 'Published' as UmbDocumentVariantState,
+				publishDate: '2024-01-15T10:05:00.000Z',
+				culture: 'da',
+				segment: null,
+				name: 'Variant blokliste',
+				createDate: '2024-01-15T10:00:00.000Z',
+				updateDate: '2024-01-15T10:05:00.000Z',
+				id: '8e3b1c6d-7a4f-4d2e-b5c9-0a6f2d8e4b71',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.BlockList',
+				alias: 'blocks',
+				culture: null,
+				segment: null,
+				value: {
+					contentData: [
+						{
+							contentTypeKey: VARIANT_BLOCK_ELEMENT_TYPE_ID,
+							key: '06da2eb6-4447-4d2b-9ee3-56bf357eb91c',
+							values: [
+								{ editorAlias: 'Umbraco.TextBox', culture: 'en-US', segment: null, alias: 'headline', value: 'Shared block' },
+								{ editorAlias: 'Umbraco.TextBox', culture: 'da', segment: null, alias: 'headline', value: 'Delt blok' },
+							],
+						},
+						{
+							contentTypeKey: VARIANT_BLOCK_ELEMENT_TYPE_ID,
+							key: '9ea6e58f-1182-41b7-a67a-5fe3846b2225',
+							values: [
+								{ editorAlias: 'Umbraco.TextBox', culture: 'en-US', segment: null, alias: 'headline', value: 'English only' },
+							],
+						},
+						{
+							contentTypeKey: VARIANT_BLOCK_ELEMENT_TYPE_ID,
+							key: '7c1d2e3f-4a5b-4c6d-8e7f-9a0b1c2d3e4f',
+							values: [
+								{ editorAlias: 'Umbraco.TextBox', culture: 'da', segment: null, alias: 'headline', value: 'Kun dansk' },
+							],
+						},
+					],
+					settingsData: [],
+					expose: [
+						{ contentKey: '06da2eb6-4447-4d2b-9ee3-56bf357eb91c', culture: 'en-US', segment: null },
+						{ contentKey: '06da2eb6-4447-4d2b-9ee3-56bf357eb91c', culture: 'da', segment: null },
+						{ contentKey: '9ea6e58f-1182-41b7-a67a-5fe3846b2225', culture: 'en-US', segment: null },
+						{ contentKey: '7c1d2e3f-4a5b-4c6d-8e7f-9a0b1c2d3e4f', culture: 'da', segment: null },
+					],
+					layout: {
+						'Umbraco.BlockList': [
+							{ contentKey: '06da2eb6-4447-4d2b-9ee3-56bf357eb91c', settingsKey: null },
+							{ contentKey: '9ea6e58f-1182-41b7-a67a-5fe3846b2225', settingsKey: null },
+							{ contentKey: '7c1d2e3f-4a5b-4c6d-8e7f-9a0b1c2d3e4f', settingsKey: null },
 						],
 					},
 				},

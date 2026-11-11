@@ -76,6 +76,9 @@ export abstract class UmbBlockEntryContext<
 	#hasExpose = new UmbBooleanState(undefined);
 	readonly hasExpose = this.#hasExpose.asObservable();
 
+	#variesByVariant = new UmbBooleanState(undefined);
+	readonly variesByVariant = this.#variesByVariant.asObservable();
+
 	#actionsVisibility = new UmbBooleanState(true);
 	readonly actionsVisibility = this.#actionsVisibility.asObservable();
 
@@ -672,6 +675,7 @@ export abstract class UmbBlockEntryContext<
 			([variantId, variesByCulture, variesBySegment]) => {
 				if (!variantId || variesByCulture === undefined || variesBySegment === undefined) return;
 				this.#variantId.setValue(variantId.toVariant(variesByCulture, variesBySegment));
+				this.#variesByVariant.setValue(variesByCulture || variesBySegment);
 				this.#gotVariantId();
 			},
 			'observeVariantId',
@@ -841,6 +845,16 @@ export abstract class UmbBlockEntryContext<
 		const variantId = this.#variantId.getValue();
 		if (!variantId || !this.#contentKey) return;
 		this._manager?.setOneExpose(this.#contentKey, variantId);
+	}
+
+	/**
+	 * Reverts the expose of the block for the current variant, returning it to the not-yet-created state.
+	 * The content values of the variant are kept, so exposing again restores them.
+	 */
+	public unexpose() {
+		const variantId = this.#variantId.getValue();
+		if (!variantId || !this.#contentKey) return;
+		this._manager?.removeOneExpose(this.#contentKey, variantId);
 	}
 
 	/**

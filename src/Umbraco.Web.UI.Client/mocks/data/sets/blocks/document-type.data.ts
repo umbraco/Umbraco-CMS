@@ -3,12 +3,15 @@ import {
 	NESTED_INNER_BLOCK_LIST_DATA_TYPE_ID,
 	NESTED_OUTER_BLOCK_LIST_DATA_TYPE_ID,
 	TEXTSTRING_DATA_TYPE_ID,
+	VARIANT_BLOCK_LIST_DATA_TYPE_ID,
 } from './data-type.data.js';
 
 export const NESTED_INLINE_BLOCK_LIST_FOLDER_ID = '6a6f0a9a-4294-4d5e-b0e6-4fa779a80957';
 export const NESTED_BLOCK_LIST_DOCUMENT_TYPE_ID = '9ef9a53e-ed33-4583-b104-3c7f062ea168';
 export const NESTED_BLOCK_LIST_OUTER_ELEMENT_TYPE_ID = '9c86f35b-42d9-480f-bc4a-f8475fde6999';
 export const NESTED_BLOCK_LIST_INNER_ELEMENT_TYPE_ID = '9ad6ab46-3eef-4561-bb1c-98ec3026e18a';
+export const VARIANT_BLOCK_ELEMENT_TYPE_ID = '086f0418-9ab5-4eef-8073-98e57f0a4cd8';
+export const VARIANT_BLOCK_LIST_DOCUMENT_TYPE_ID = '63661a2d-173f-4961-a71c-69338bf50568';
 
 export const data: Array<UmbMockDocumentTypeModel> = [
 	{
@@ -246,6 +249,102 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				name: 'Blocks',
 				description: null,
 				dataType: { id: NESTED_OUTER_BLOCK_LIST_DATA_TYPE_ID },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	},
+	{
+		// Block-level variance: the element type (and its property) vary by culture while the block list
+		// property itself is invariant, so each block is exposed per culture.
+		id: VARIANT_BLOCK_ELEMENT_TYPE_ID,
+		alias: 'variantBlockElement',
+		name: 'Variant Block',
+		description: null,
+		icon: 'icon-item-arrangement',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: false,
+		variesByCulture: true,
+		variesBySegment: false,
+		isElement: true,
+		hasChildren: false,
+		parent: { id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID },
+		isFolder: false,
+		properties: [
+			{
+				id: '51e7a568-1559-4d09-bf96-2b0b94a5f884',
+				container: null,
+				alias: 'headline',
+				name: 'Headline',
+				description: null,
+				dataType: { id: TEXTSTRING_DATA_TYPE_ID },
+				variesByCulture: true,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	},
+	{
+		id: VARIANT_BLOCK_LIST_DOCUMENT_TYPE_ID,
+		alias: 'variantBlockList',
+		name: 'Variant Block List',
+		description: null,
+		icon: 'icon-document',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: true,
+		variesByCulture: true,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: { id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID },
+		isFolder: false,
+		properties: [
+			{
+				id: '94acce87-8728-4493-a967-f0539451b8ff',
+				container: null,
+				alias: 'blocks',
+				name: 'Blocks',
+				description: null,
+				dataType: { id: VARIANT_BLOCK_LIST_DATA_TYPE_ID },
 				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 0,

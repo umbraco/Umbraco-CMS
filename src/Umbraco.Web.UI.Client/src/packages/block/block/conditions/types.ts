@@ -33,6 +33,10 @@ export interface UmbBlockEntryIsExposedConditionConfig extends UmbConditionConfi
 	match?: boolean;
 }
 
+export interface UmbBlockEntryVariesByVariantConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryVariesByVariant'> {
+	match?: boolean;
+}
+
 declare global {
 	interface UmbExtensionConditionConfigMap {
 		umbBlock:
@@ -42,6 +46,7 @@ declare global {
 			| BlockWorkspaceIsReadOnlyConditionConfig
 			| BlockEntryIsReadOnlyConditionConfig
 			| BlockEntryHasSettingsConditionConfig
-			| UmbBlockEntryIsExposedConditionConfig;
+			| UmbBlockEntryIsExposedConditionConfig
+			| UmbBlockEntryVariesByVariantConditionConfig;
 	}
 }
