@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.EnvironmentPermissions;
 /// Creating a template for a document type is denied when only templates are locked, as the endpoint declares both
 /// entity types. The id doesn't exist, so reaching the action would return 404 instead.
 /// </summary>
-public class CreatingATemplateForADocumentTypeIsForbiddenWhenTemplatesAreLockedTests
+internal sealed class CreatingATemplateForADocumentTypeIsForbiddenWhenTemplatesAreLockedTests
     : EnvironmentPermissionsApiTest<CreateDocumentTypeTemplateController>
 {
     protected override Expression<Func<CreateDocumentTypeTemplateController, object>> MethodSelector { get; set; }

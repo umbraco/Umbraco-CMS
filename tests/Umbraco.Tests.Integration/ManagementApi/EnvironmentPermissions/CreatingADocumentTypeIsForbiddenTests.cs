@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Permissions;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.EnvironmentPermissions;
 
-public class CreatingADocumentTypeIsForbiddenTests : EnvironmentPermissionsApiTest<CreateDocumentTypeController>
+internal sealed class CreatingADocumentTypeIsForbiddenTests : EnvironmentPermissionsApiTest<CreateDocumentTypeController>
 {
     protected override Expression<Func<CreateDocumentTypeController, object>> MethodSelector { get; set; }
         = x => x.Create(CancellationToken.None, null);

@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Permissions;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Permissions;
 
 [TestFixture]
-public class PermissionVerbsTests
+internal sealed class PermissionVerbsTests
 {
     private const string ResourceField = "Resource";
 

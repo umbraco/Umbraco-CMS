@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.EnvironmentPermissions;
 /// <summary>
 /// Moving a locked dictionary item is denied, as the move endpoint inherits the declaration from its controller base.
 /// </summary>
-public class MovingADictionaryItemIsForbiddenTests : EnvironmentPermissionsApiTest<MoveDictionaryController>
+internal sealed class MovingADictionaryItemIsForbiddenTests : EnvironmentPermissionsApiTest<MoveDictionaryController>
 {
     private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
 

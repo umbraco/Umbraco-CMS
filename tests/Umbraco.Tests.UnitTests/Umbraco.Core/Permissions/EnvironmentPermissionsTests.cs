@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Permissions;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Permissions;
 
 [TestFixture]
-public class EnvironmentPermissionsTests
+internal sealed class EnvironmentPermissionsTests
 {
     private sealed class DelegateConfigurator : IEnvironmentPermissionsConfigurator
     {

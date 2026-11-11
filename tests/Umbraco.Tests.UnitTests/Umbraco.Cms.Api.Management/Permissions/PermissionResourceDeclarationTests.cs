@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Permissions;
 // [RequiresPermissionsFor] takes a free-form string, so a misspelled resource would compile and never match. Only the
 // Management API assembly is scanned, so test fixtures can't stand in for real controllers.
 [TestFixture]
-public class PermissionResourceDeclarationTests
+internal sealed class PermissionResourceDeclarationTests
 {
     private const string ResourceField = "Resource";
 

@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Permissions;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.EnvironmentPermissions;
 
-public class AvailableCompositionsIsStillPermittedTests : EnvironmentPermissionsApiTest<AvailableCompositionDocumentTypeController>
+internal sealed class AvailableCompositionsIsStillPermittedTests : EnvironmentPermissionsApiTest<AvailableCompositionDocumentTypeController>
 {
     protected override Expression<Func<AvailableCompositionDocumentTypeController, object>> MethodSelector { get; set; }
         = x => x.AvailableCompositions(CancellationToken.None, null);

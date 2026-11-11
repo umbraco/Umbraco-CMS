@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Permissions;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.EnvironmentPermissions;
 
-public class ReadingDocumentTypesIsStillPermittedTests : EnvironmentPermissionsApiTest<AllowedAtRootDocumentTypeController>
+internal sealed class ReadingDocumentTypesIsStillPermittedTests : EnvironmentPermissionsApiTest<AllowedAtRootDocumentTypeController>
 {
     protected override Expression<Func<AllowedAtRootDocumentTypeController, object>> MethodSelector { get; set; }
         = x => x.AllowedAtRoot(CancellationToken.None, 0, 100);

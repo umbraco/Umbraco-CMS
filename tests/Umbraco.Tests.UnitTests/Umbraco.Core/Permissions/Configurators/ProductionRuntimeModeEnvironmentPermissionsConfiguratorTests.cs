@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Permissions.Configurators;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Permissions.Configurators;
 
 [TestFixture]
-public class ProductionRuntimeModeEnvironmentPermissionsConfiguratorTests
+internal sealed class ProductionRuntimeModeEnvironmentPermissionsConfiguratorTests
 {
     private static EnvironmentPermissions CreateEnvironmentPermissions(RuntimeMode mode)
         => new(new EnvironmentPermissionsConfiguratorCollection(

@@ -13,7 +13,7 @@ using Umbraco.Cms.Core.Permissions;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Permissions;
 
 [TestFixture]
-public class EnvironmentPermissionsFilterTests
+internal sealed class EnvironmentPermissionsFilterTests
 {
     private class DocumentTypeController
     {

@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.EnvironmentPermissions;
 /// <summary>
 /// Deleting a locked data type is denied. The id doesn't exist, so reaching the action would return 404 instead.
 /// </summary>
-public class DeletingADataTypeIsForbiddenTests : EnvironmentPermissionsApiTest<DeleteDataTypeController>
+internal sealed class DeletingADataTypeIsForbiddenTests : EnvironmentPermissionsApiTest<DeleteDataTypeController>
 {
     protected override Expression<Func<DeleteDataTypeController, object>> MethodSelector { get; set; }
         = x => x.Delete(CancellationToken.None, Guid.Empty);

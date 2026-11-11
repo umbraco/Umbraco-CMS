@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.EnvironmentPermissions;
 /// <summary>
 /// Importing dictionary items can update existing ones, so it's denied while updates are locked.
 /// </summary>
-public class ImportingADictionaryItemIsForbiddenWhenUpdatesAreLockedTests : EnvironmentPermissionsApiTest<ImportDictionaryController>
+internal sealed class ImportingADictionaryItemIsForbiddenWhenUpdatesAreLockedTests : EnvironmentPermissionsApiTest<ImportDictionaryController>
 {
     protected override Expression<Func<ImportDictionaryController, object>> MethodSelector { get; set; }
         = x => x.Import(CancellationToken.None, null!);

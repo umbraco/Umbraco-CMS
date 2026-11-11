@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.EnvironmentPermissions;
 /// <summary>
 /// Operations a configurator didn't block on an entity type still go through.
 /// </summary>
-public class DeletingADataTypeIsStillPermittedWhenOnlyCreateAndUpdateAreLockedTests : EnvironmentPermissionsApiTest<DeleteDataTypeController>
+internal sealed class DeletingADataTypeIsStillPermittedWhenOnlyCreateAndUpdateAreLockedTests : EnvironmentPermissionsApiTest<DeleteDataTypeController>
 {
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 

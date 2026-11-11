@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.EnvironmentPermissions;
 /// <summary>
 /// A denial names the denied permission verb in a header, so it can be told apart from a permission 403.
 /// </summary>
-public class DenialNamesWhatWasDeniedInAHeaderTests : EnvironmentPermissionsApiTest<DeleteDataTypeController>
+internal sealed class DenialNamesWhatWasDeniedInAHeaderTests : EnvironmentPermissionsApiTest<DeleteDataTypeController>
 {
     protected override Expression<Func<DeleteDataTypeController, object>> MethodSelector { get; set; }
         = x => x.Delete(CancellationToken.None, Guid.Empty);

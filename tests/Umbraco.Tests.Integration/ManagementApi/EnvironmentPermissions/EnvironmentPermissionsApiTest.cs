@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.EnvironmentPermissions;
 /// authorization.
 /// </summary>
 /// <typeparam name="T">The controller under test.</typeparam>
-public abstract class EnvironmentPermissionsApiTest<T> : ManagementApiTest<T>
+internal abstract class EnvironmentPermissionsApiTest<T> : ManagementApiTest<T>
     where T : ManagementApiControllerBase
 {
     /// <inheritdoc />

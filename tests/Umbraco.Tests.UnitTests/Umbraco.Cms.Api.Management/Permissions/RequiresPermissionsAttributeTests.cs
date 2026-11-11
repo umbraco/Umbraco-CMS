@@ -6,7 +6,7 @@ using Umbraco.Cms.Core;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Permissions;
 
 [TestFixture]
-public class RequiresPermissionsAttributeTests
+internal sealed class RequiresPermissionsAttributeTests
 {
     [Test]
     public void A_Permission_Declared_Twice_Is_Needed_Once()

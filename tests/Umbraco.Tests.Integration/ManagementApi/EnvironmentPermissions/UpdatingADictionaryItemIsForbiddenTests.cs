@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.EnvironmentPermissions;
 /// <summary>
 /// Updating a locked dictionary item is denied.
 /// </summary>
-public class UpdatingADictionaryItemIsForbiddenTests : EnvironmentPermissionsApiTest<UpdateDictionaryController>
+internal sealed class UpdatingADictionaryItemIsForbiddenTests : EnvironmentPermissionsApiTest<UpdateDictionaryController>
 {
     private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
 

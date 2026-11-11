@@ -8,7 +8,7 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.PartialView;
 
-public class CreatePartialViewControllerProductionModeTests : ManagementApiTest<CreatePartialViewController>
+internal sealed class CreatePartialViewControllerProductionModeTests : ManagementApiTest<CreatePartialViewController>
 {
     protected override Expression<Func<CreatePartialViewController, object>> MethodSelector { get; set; }
         = x => x.Create(CancellationToken.None, null);

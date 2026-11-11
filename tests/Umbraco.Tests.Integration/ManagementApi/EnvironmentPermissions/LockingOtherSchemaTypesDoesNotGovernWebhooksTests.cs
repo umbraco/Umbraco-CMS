@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.EnvironmentPermissions;
 /// <summary>
 /// Locking other entity types leaves webhooks creatable: only the entity types a configurator names are locked.
 /// </summary>
-public class LockingOtherSchemaTypesDoesNotGovernWebhooksTests : EnvironmentPermissionsApiTest<CreateWebhookController>
+internal sealed class LockingOtherSchemaTypesDoesNotGovernWebhooksTests : EnvironmentPermissionsApiTest<CreateWebhookController>
 {
     protected override Expression<Func<CreateWebhookController, object>> MethodSelector { get; set; }
         = x => x.Create(CancellationToken.None, null);

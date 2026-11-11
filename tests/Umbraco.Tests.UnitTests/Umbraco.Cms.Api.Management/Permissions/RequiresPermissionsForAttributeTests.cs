@@ -8,7 +8,7 @@ using Umbraco.Cms.Core;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Permissions;
 
 [TestFixture]
-public class RequiresPermissionsForAttributeTests
+internal sealed class RequiresPermissionsForAttributeTests
 {
     [RequiresPermissionsFor(Constants.Permissions.Entities.MediaType.Resource)]
     private class ControllerBaseWithDeclaration
