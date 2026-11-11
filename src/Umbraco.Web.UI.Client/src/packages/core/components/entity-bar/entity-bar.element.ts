@@ -5,10 +5,10 @@ import { css, customElement, html, LitElement } from '@umbraco-cms/backoffice/ex
  * with a link icon tab attached to it. The overlay ignores pointer events, so it does not
  * interfere with the content beneath it.
  * The parent must establish a positioning context (e.g. `position: relative`).
- * @element umb-reference-bar
+ * @element umb-entity-bar
  * @augments {LitElement}
  */
-@customElement('umb-reference-bar')
+@customElement('umb-entity-bar')
 export class UmbReferenceBarElement extends LitElement {
 	override render() {
 		return html`
@@ -28,6 +28,8 @@ export class UmbReferenceBarElement extends LitElement {
 				pointer-events: none;
 
 				z-index: 2;
+				opacity: var(--umb-entity-bar-opacity, 1);
+				transition: opacity 120ms ease-out;
 			}
 
 			.border {
@@ -66,6 +68,6 @@ export class UmbReferenceBarElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-reference-bar': UmbReferenceBarElement;
+		'umb-entity-bar': UmbReferenceBarElement;
 	}
 }

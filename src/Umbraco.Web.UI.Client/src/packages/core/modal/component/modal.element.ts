@@ -72,7 +72,7 @@ export class UmbModalElement extends UmbLitElement {
 		);
 
 		if (this.#modalContext.isReference) {
-			const referenceBar = document.createElement('umb-reference-bar');
+			const referenceBar = document.createElement('umb-entity-bar');
 			this.element.appendChild(referenceBar);
 		}
 		/**
