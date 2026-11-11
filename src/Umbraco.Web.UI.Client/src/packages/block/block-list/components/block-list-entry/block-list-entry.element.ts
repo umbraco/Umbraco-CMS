@@ -282,7 +282,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#expose = () => {
-		this.#context.expose();
+		if (this._showContentEdit) {
+			this.#context.edit();
+		} else {
+			this.#context.expose();
+		}
 	};
 
 	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
