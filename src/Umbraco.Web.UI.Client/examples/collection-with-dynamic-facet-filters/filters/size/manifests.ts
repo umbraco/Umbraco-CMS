@@ -19,4 +19,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
+	{
+		type: 'facetFilterActiveValue',
+		kind: 'default',
+		alias: 'Example.FacetFilterActiveValue.Size',
+		name: 'Size Active Filter Value',
+		forFacetFilters: ['Example.DynamicFacetFilter.SizeFilter'],
+		valueResolver: () => import('./size-facet-filter-value.resolver.js'),
+	},
 ];

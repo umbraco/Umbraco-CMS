@@ -1,5 +1,4 @@
 import type { ExampleColorFacetFilterApi, ExampleColorFacetOptionModel } from './color-facet-filter.api.js';
-import { exampleColors } from './colors.js';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -41,18 +40,17 @@ export class ExampleColorFacetFilterElement extends UmbLitElement {
 					this._options,
 					(option) => option.unique,
 					(option) => {
-						const name = exampleColors[option.unique]?.name ?? option.unique;
 						return html`<div class="option" @click=${(event: MouseEvent) => this.#onOptionClick(event, option.unique)}>
 							<uui-color-swatch
-								label="${name} (${option.count})"
+								label="${option.name} (${option.count})"
 								.value=${option.unique}
-								.color=${exampleColors[option.unique]?.hex ?? option.unique}
+								.color=${option.hex}
 								selectable
 								deselectable
 								.selected=${this._value.includes(option.unique)}
 								@selected=${() => this.#onSelected(option.unique)}
 								@deselected=${() => this.#onDeselected(option.unique)}></uui-color-swatch>
-							<span aria-hidden="true">${name} (${option.count})</span>
+							<span aria-hidden="true">${option.name} (${option.count})</span>
 						</div>`;
 					},
 				)}

@@ -5,6 +5,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface ExampleColorFacetOptionModel {
 	unique: string;
+	name: string;
+	hex: string;
 	count: number;
 }
 

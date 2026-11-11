@@ -1,15 +1,8 @@
 import { EXAMPLE_PRODUCT_CATEGORY_ENTITY_TYPE } from '../../entity.js';
+import { categories } from './categories.js';
 import type { UmbFacetFilterValueResolver } from '@umbraco-cms/backoffice/facet-filter';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-
-const categoryNames: Record<string, string> = {
-	'cat-hoodie': 'Hoodies',
-	'cat-jacket': 'Jackets',
-	'cat-shorts': 'Shorts',
-	'cat-trousers': 'Trousers',
-	'cat-tshirt': 'T-shirts',
-};
 
 /**
  * Resolves the active values of the category filter into category items: `cat-tshirt` gets the name "T-shirts".
@@ -21,13 +14,11 @@ export class ExampleCategoryFacetFilterValueResolver
 {
 	async resolveValues(values: ReadonlyArray<string>) {
 		return {
-			data: values.map(
-				(unique): UmbItemModel => ({
-					entityType: EXAMPLE_PRODUCT_CATEGORY_ENTITY_TYPE,
-					unique,
-					name: categoryNames[unique] ?? unique,
-				}),
-			),
+			data: values.map((value): UmbItemModel | undefined => {
+				const category = categories.find((item) => item.id === value);
+				if (!category) return undefined;
+				return { entityType: EXAMPLE_PRODUCT_CATEGORY_ENTITY_TYPE, unique: category.id, name: category.name };
+			}),
 		};
 	}
 }

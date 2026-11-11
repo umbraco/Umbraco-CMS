@@ -1,4 +1,12 @@
-import type { ExampleFilteredResult, ExampleProductFilterArgs, ExampleProductModel } from './types.js';
+import { categories } from '../filters/category/categories.js';
+import { colors } from '../filters/color/colors.js';
+import { sizes } from '../filters/size/sizes.js';
+import type {
+	ExampleAttributeModel,
+	ExampleFilteredResult,
+	ExampleProductFilterArgs,
+	ExampleProductModel,
+} from './types.js';
 
 export const products: Array<ExampleProductModel> = [
 	{
@@ -219,6 +227,24 @@ function countBy(
 }
 
 /**
+ * Adds the attribute's fields, such as its name, to each facet count.
+ * @param {Array<{unique: string, count: number}>} counts - The facet counts.
+ * @param {Array<T>} attributes - The attributes of the facet dimension.
+ * @returns {Array<Omit<T, 'id'> & {unique: string, count: number}>} The facet counts with the attribute's fields.
+ */
+function withAttributes<T extends ExampleAttributeModel>(
+	counts: Array<{ unique: string; count: number }>,
+	attributes: Array<T>,
+): Array<Omit<T, 'id'> & { unique: string; count: number }> {
+	return counts.flatMap(({ unique, count }) => {
+		const attribute = attributes.find((a) => a.id === unique);
+		if (!attribute) return [];
+		const { id, ...fields } = attribute;
+		return [{ ...fields, unique: id, count }];
+	});
+}
+
+/**
  * Filters, paginates and computes cross-facet counts for the product dataset.
  * @param {ExampleProductFilterArgs} args - Filter, pagination and text-search arguments.
  * @returns {ExampleFilteredResult} The filtered items, total count and faceted result data.
@@ -232,9 +258,18 @@ export function filterProducts(args: ExampleProductFilterArgs): ExampleFilteredR
 	}
 
 	// Cross-facet counts: for each dimension, apply all OTHER filters but not the current one
-	const categories = countBy(items, args, 'categories', (p) => [p.category]);
-	const sizes = countBy(items, args, 'sizes', (p) => p.sizes);
-	const colors = countBy(items, args, 'colors', (p) => p.colors);
+	const categoryFacets = withAttributes(
+		countBy(items, args, 'categories', (p) => [p.category]),
+		categories,
+	);
+	const sizeFacets = withAttributes(
+		countBy(items, args, 'sizes', (p) => p.sizes),
+		sizes,
+	);
+	const colorFacets = withAttributes(
+		countBy(items, args, 'colors', (p) => p.colors),
+		colors,
+	);
 
 	// Price range from filtered items
 	const prices = items.map((p) => p.price.amount);
@@ -250,6 +285,6 @@ export function filterProducts(args: ExampleProductFilterArgs): ExampleFilteredR
 	return {
 		items,
 		total,
-		facets: { categories, sizes, colors, priceRange },
+		facets: { categories: categoryFacets, sizes: sizeFacets, colors: colorFacets, priceRange },
 	};
 }

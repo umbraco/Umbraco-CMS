@@ -1,6 +1,6 @@
 import { EXAMPLE_PRODUCT_COLOR_ENTITY_TYPE } from '../../entity.js';
+import { colors } from './colors.js';
 import type { ExampleColorItemModel } from './types.js';
-import { exampleColors } from './colors.js';
 import type { UmbFacetFilterValueResolver } from '@umbraco-cms/backoffice/facet-filter';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
@@ -14,14 +14,11 @@ export class ExampleColorFacetFilterValueResolver
 {
 	async resolveValues(values: ReadonlyArray<string>) {
 		return {
-			data: values.map(
-				(unique): ExampleColorItemModel => ({
-					entityType: EXAMPLE_PRODUCT_COLOR_ENTITY_TYPE,
-					unique,
-					name: exampleColors[unique]?.name ?? unique,
-					hex: exampleColors[unique]?.hex ?? unique,
-				}),
-			),
+			data: values.map((value): ExampleColorItemModel | undefined => {
+				const color = colors.find((item) => item.id === value);
+				if (!color) return undefined;
+				return { entityType: EXAMPLE_PRODUCT_COLOR_ENTITY_TYPE, unique: color.id, name: color.name, hex: color.hex };
+			}),
 		};
 	}
 }

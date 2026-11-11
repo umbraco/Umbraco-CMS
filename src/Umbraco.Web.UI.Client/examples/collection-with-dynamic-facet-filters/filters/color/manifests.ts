@@ -25,6 +25,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Example.FacetFilterActiveValue.Color',
 		name: 'Color Active Filter Value',
 		forFacetFilters: ['Example.DynamicFacetFilter.ColorFilter'],
+		element: () => import('./color-facet-filter-active-value.element.js'),
 		valueResolver: () => import('./color-facet-filter-value.resolver.js'),
 	},
 ];

@@ -1,3 +1,5 @@
+import type { ExampleColorFacetCount } from '../filters/color/types.js';
+
 export interface ExampleProductModel {
 	id: string;
 	name: string;
@@ -17,15 +19,21 @@ export interface ExampleProductFilterArgs {
 	textFilter?: string;
 }
 
+export interface ExampleAttributeModel {
+	id: string;
+	name: string;
+}
+
 export interface ExampleFacetCount {
 	unique: string;
+	name: string;
 	count: number;
 }
 
 export interface ExampleFacetedResultData {
 	categories: Array<ExampleFacetCount>;
 	sizes: Array<ExampleFacetCount>;
-	colors: Array<ExampleFacetCount>;
+	colors: Array<ExampleColorFacetCount>;
 	priceRange: { min: number; max: number };
 }
 

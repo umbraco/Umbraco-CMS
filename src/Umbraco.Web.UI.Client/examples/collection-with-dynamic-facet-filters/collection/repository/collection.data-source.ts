@@ -4,7 +4,7 @@ import {
 	EXAMPLE_PRODUCT_SIZE_ENTITY_TYPE,
 } from '../../entity.js';
 import { filterProducts } from '../../data/products.js';
-import type { ExampleProductFilterArgs } from '../../data/types.js';
+import type { ExampleFacetCount, ExampleProductFilterArgs } from '../../data/types.js';
 import type { ExampleRangeValueModel } from '../../range-kind/types.js';
 import type { ExampleDynamicFacetCollectionFilterModel, ExampleProductCollectionItemModel } from './types.js';
 import type { UmbFacetFilterValueModel } from '@umbraco-cms/backoffice/facet-filter';
@@ -51,12 +51,8 @@ export class ExampleDynamicFacetCollectionDataSource implements UmbCollectionDat
 		// Map faceted results back using the alias mapping
 		const facets: Record<string, unknown> = {};
 
-		const toOptions = (facetItems: Array<{ unique: string; count: number }>, entityType: string) =>
-			facetItems.map((f) => ({
-				unique: f.unique,
-				entityType,
-				count: f.count,
-			}));
+		const toOptions = (facetItems: Array<ExampleFacetCount>, entityType: string) =>
+			facetItems.map((facetItem) => ({ ...facetItem, entityType }));
 
 		facets[this.#fieldAliasMap['categories']] = toOptions(
 			result.facets.categories,
@@ -65,6 +61,8 @@ export class ExampleDynamicFacetCollectionDataSource implements UmbCollectionDat
 		facets[this.#fieldAliasMap['sizes']] = toOptions(result.facets.sizes, EXAMPLE_PRODUCT_SIZE_ENTITY_TYPE);
 		facets[this.#fieldAliasMap['colors']] = toOptions(result.facets.colors, EXAMPLE_PRODUCT_COLOR_ENTITY_TYPE);
 		facets[this.#fieldAliasMap['priceRange']] = result.facets.priceRange;
+
+		debugger;
 
 		return {
 			data: {
