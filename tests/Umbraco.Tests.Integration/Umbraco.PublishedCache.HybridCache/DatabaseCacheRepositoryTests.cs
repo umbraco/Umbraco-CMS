@@ -362,6 +362,30 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
+    public async Task GetElementSourcesAsync_With_More_Keys_Than_The_Parameter_Limit_Returns_Matching_Sources()
+    {
+        Guid elementKey1 = await CreateAndPublishElement();
+        Guid elementKey2 = await CreateAndPublishElement();
+
+        // Unknown keys push the request past SQL Server's 2,100-parameter limit; the matching ones sit in different batches.
+        var requestedKeys = new List<Guid> { elementKey1 };
+        requestedKeys.AddRange(Enumerable.Range(0, Constants.Sql.MaxParameterCount + 100).Select(_ => Guid.NewGuid()));
+        requestedKeys.Add(elementKey2);
+
+        var sources = (await DatabaseCacheRepository.GetElementSourcesAsync(requestedKeys)).ToList();
+
+        CollectionAssert.AreEquivalent(new[] { elementKey1, elementKey2 }, sources.Select(x => x.Key));
+    }
+
+    [Test]
+    public async Task GetElementSourcesAsync_With_Empty_Keys_Returns_Nothing()
+    {
+        var sources = await DatabaseCacheRepository.GetElementSourcesAsync(Array.Empty<Guid>());
+
+        Assert.That(sources, Is.Empty);
+    }
+
+    [Test]
     public async Task GetElementSourceForPublishStatesAsync_Without_An_Ambient_Scope_Returns_Both_States()
     {
         Guid elementKey = await CreateAndPublishElement();

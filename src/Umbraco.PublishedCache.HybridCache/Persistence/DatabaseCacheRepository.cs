@@ -180,12 +180,8 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// <inheritdoc/>
     public async Task<IEnumerable<ContentCacheNode>> GetElementSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
     {
-        Sql<ISqlContext>? sql = SqlElementSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Element))
-            .WhereIn<NodeDto>(x => x.UniqueId, keys)
-            .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
-
-        List<ContentSourceDto> dtos = await ReadAsync(database => database.FetchAsync<ContentSourceDto>(sql));
+        Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
+        List<ContentSourceDto> dtos = await FetchContentSourcesAsync(keysArray, GetElementSourcesSql);
 
         dtos = dtos
             .Where(x => x is not null)
@@ -378,6 +374,12 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     private Sql<ISqlContext> GetDocumentSourcesSql(IEnumerable<Guid> keys)
         => SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Document))
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
+
+    private Sql<ISqlContext> GetElementSourcesSql(IEnumerable<Guid> keys)
+        => SqlElementSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Element))
             .WhereIn<NodeDto>(x => x.UniqueId, keys)
             .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
 
