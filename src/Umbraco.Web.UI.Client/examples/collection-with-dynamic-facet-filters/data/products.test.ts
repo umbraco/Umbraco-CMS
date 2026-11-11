@@ -52,7 +52,9 @@ describe('filterProducts', () => {
 
 		it('filters by multiple colors (OR logic)', () => {
 			const result = filterProducts({ colors: ['color-red', 'color-green'] });
-			expect(result.items.every((p) => p.colors.includes('color-red') || p.colors.includes('color-green'))).to.equal(true);
+			expect(result.items.every((p) => p.colors.includes('color-red') || p.colors.includes('color-green'))).to.equal(
+				true,
+			);
 		});
 	});
 
@@ -89,7 +91,9 @@ describe('filterProducts', () => {
 
 		it('applies category and price range together', () => {
 			const result = filterProducts({ categories: ['cat-jacket'], priceRange: { min: 80, max: 100 } });
-			expect(result.items.every((p) => p.category === 'cat-jacket' && p.price.amount >= 80 && p.price.amount <= 100)).to.equal(true);
+			expect(
+				result.items.every((p) => p.category === 'cat-jacket' && p.price.amount >= 80 && p.price.amount <= 100),
+			).to.equal(true);
 			expect(result.items.length).to.be.greaterThan(0);
 		});
 

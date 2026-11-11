@@ -11,7 +11,6 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			kind: 'range',
 			element: () => import('./range-facet-filter.element.js'),
 			api: () => import('./range-facet-filter.api.js'),
-			valueResolver: () => import('./range-facet-filter-value.resolver.js'),
 		},
 	},
 ];

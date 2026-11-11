@@ -11,9 +11,10 @@ import type { UmbFacetFilterValueModel } from '@umbraco-cms/backoffice/facet-fil
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
-export class ExampleDynamicFacetCollectionDataSource
-	implements UmbCollectionDataSource<ExampleProductCollectionItemModel, ExampleDynamicFacetCollectionFilterModel>
-{
+export class ExampleDynamicFacetCollectionDataSource implements UmbCollectionDataSource<
+	ExampleProductCollectionItemModel,
+	ExampleDynamicFacetCollectionFilterModel
+> {
 	// Alias-to-field mapping: this is the data source's responsibility
 	#aliasFieldMap: Record<string, keyof ExampleProductFilterArgs> = {
 		'Example.DynamicFacetFilter.CategoryFilter': 'categories',

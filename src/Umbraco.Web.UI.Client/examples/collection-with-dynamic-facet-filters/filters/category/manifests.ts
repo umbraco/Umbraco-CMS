@@ -11,12 +11,19 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Category',
 		},
-		valueResolver: () => import('./category-facet-filter-value.resolver.js'),
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
 				match: EXAMPLE_PRODUCT_COLLECTION_ALIAS,
 			},
 		],
+	},
+	{
+		type: 'facetFilterActiveValue',
+		kind: 'default',
+		alias: 'Example.FacetFilterActiveValue.Category',
+		name: 'Category Active Filter Value',
+		forFacetFilters: ['Example.DynamicFacetFilter.CategoryFilter'],
+		valueResolver: () => import('./category-facet-filter-value.resolver.js'),
 	},
 ];

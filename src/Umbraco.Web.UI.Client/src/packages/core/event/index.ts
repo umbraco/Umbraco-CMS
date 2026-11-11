@@ -6,5 +6,6 @@ export * from './deselected.event.js';
 export * from './input.event.js';
 export * from './opened.event.js';
 export * from './progress.event.js';
+export * from './remove.event.js';
 export * from './selected.event.js';
 export * from './selection-change.event.js';

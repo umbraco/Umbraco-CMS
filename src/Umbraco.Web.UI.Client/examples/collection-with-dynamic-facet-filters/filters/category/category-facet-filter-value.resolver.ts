@@ -13,7 +13,7 @@ const categoryNames: Record<string, string> = {
 
 /**
  * Resolves the active values of the category filter into category items: `cat-tshirt` gets the name "T-shirts".
- * Registered on the category filter only.
+ * Registered on the category filter's active value.
  */
 export class ExampleCategoryFacetFilterValueResolver
 	extends UmbControllerBase

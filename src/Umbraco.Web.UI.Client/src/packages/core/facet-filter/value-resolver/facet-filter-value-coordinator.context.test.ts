@@ -1,6 +1,7 @@
 import { UmbFacetFilterValueCoordinatorContext } from './facet-filter-value-coordinator.context.js';
 import { UMB_FACET_FILTER_VALUE_COORDINATOR_CONTEXT } from './facet-filter-value-coordinator.context-token.js';
 import type { UmbFacetFilterValueResolver } from './facet-filter-value-resolver.interface.js';
+import type { ManifestFacetFilterActiveValue } from '../active-value/facet-filter-active-value.extension.js';
 import type { ManifestFacetFilter } from '../facet-filter.extension.js';
 import { UmbFacetFilterManager } from '../facet-filter.manager.js';
 import { expect } from '@open-wc/testing';
@@ -33,14 +34,23 @@ class TestNameResolver implements UmbFacetFilterValueResolver {
 	destroy() {}
 }
 
-function registerFilter(alias: string, extra: Partial<ManifestFacetFilter> = {}) {
+function registerFilter(alias: string) {
 	umbExtensionsRegistry.register({
 		type: 'facetFilter',
 		alias,
 		name: alias,
 		meta: { label: alias },
-		...extra,
 	} as unknown as ManifestFacetFilter);
+}
+
+function registerFacetFilterActiveValue(alias: string, extra: Partial<ManifestFacetFilterActiveValue>) {
+	umbExtensionsRegistry.register({
+		type: 'facetFilterActiveValue',
+		alias,
+		name: alias,
+		forFacetFilters: [],
+		...extra,
+	} as unknown as ManifestFacetFilterActiveValue);
 }
 
 function waitForValue(
@@ -70,14 +80,20 @@ describe('UmbFacetFilterValueCoordinatorContext', () => {
 	afterEach(() => {
 		coordinator.destroy();
 		document.body.innerHTML = '';
-		for (const ext of umbExtensionsRegistry.getByType('facetFilter')) {
-			if (ext.alias.startsWith('Umb.Test.')) umbExtensionsRegistry.unregister(ext.alias);
+		for (const type of ['facetFilter', 'facetFilterActiveValue']) {
+			for (const ext of umbExtensionsRegistry.getByType(type)) {
+				if (ext.alias.startsWith('Umb.Test.')) umbExtensionsRegistry.unregister(ext.alias);
+			}
 		}
-		umbExtensionsRegistry.unregister('Umb.Test.Kind.FacetFilter.Named');
+		umbExtensionsRegistry.unregister('Umb.Test.Kind.FacetFilterActiveValue.Named');
 	});
 
-	it('resolves values with the valueResolver of the filter manifest matching the alias', async () => {
-		registerFilter('Umb.Test.FacetFilter.Own', { valueResolver: TestNameResolver });
+	it('resolves values with the valueResolver of the facet filter active value registered for the filter', async () => {
+		registerFilter('Umb.Test.FacetFilter.Own');
+		registerFacetFilterActiveValue('Umb.Test.FacetFilterActiveValue.Own', {
+			forFacetFilters: ['Umb.Test.FacetFilter.Own'],
+			valueResolver: TestNameResolver,
+		});
 
 		coordinator.register('Umb.Test.FacetFilter.Own', 'x');
 
@@ -88,15 +104,19 @@ describe('UmbFacetFilterValueCoordinatorContext', () => {
 		});
 	});
 
-	it('resolves values with a valueResolver inherited from the filter kind', async () => {
+	it('resolves values with a valueResolver inherited from the facet filter active value kind', async () => {
 		umbExtensionsRegistry.register({
 			type: 'kind',
-			alias: 'Umb.Test.Kind.FacetFilter.Named',
-			matchType: 'facetFilter',
+			alias: 'Umb.Test.Kind.FacetFilterActiveValue.Named',
+			matchType: 'facetFilterActiveValue',
 			matchKind: 'umbTestNamed',
-			manifest: { type: 'facetFilter', kind: 'umbTestNamed', valueResolver: TestNameResolver },
+			manifest: { type: 'facetFilterActiveValue', kind: 'umbTestNamed', valueResolver: TestNameResolver },
 		} as never);
-		registerFilter('Umb.Test.FacetFilter.FromKind', { kind: 'umbTestNamed' } as Partial<ManifestFacetFilter>);
+		registerFilter('Umb.Test.FacetFilter.FromKind');
+		registerFacetFilterActiveValue('Umb.Test.FacetFilterActiveValue.FromKind', {
+			kind: 'umbTestNamed',
+			forFacetFilters: ['Umb.Test.FacetFilter.FromKind'],
+		} as Partial<ManifestFacetFilterActiveValue>);
 
 		coordinator.register('Umb.Test.FacetFilter.FromKind', 'y');
 
@@ -108,8 +128,12 @@ describe('UmbFacetFilterValueCoordinatorContext', () => {
 	});
 
 	it('gives each resolver the manifest of the filter it resolves for', async () => {
-		registerFilter('Umb.Test.FacetFilter.First', { valueResolver: TestNameResolver });
-		registerFilter('Umb.Test.FacetFilter.Second', { valueResolver: TestNameResolver });
+		registerFilter('Umb.Test.FacetFilter.First');
+		registerFilter('Umb.Test.FacetFilter.Second');
+		registerFacetFilterActiveValue('Umb.Test.FacetFilterActiveValue.Shared', {
+			forFacetFilters: ['Umb.Test.FacetFilter.First', 'Umb.Test.FacetFilter.Second'],
+			valueResolver: TestNameResolver,
+		});
 
 		coordinator.register('Umb.Test.FacetFilter.First', 'a');
 		coordinator.register('Umb.Test.FacetFilter.Second', 'a');
@@ -133,8 +157,12 @@ describe('UmbFacetFilterValueCoordinatorContext', () => {
 		]);
 	});
 
-	it('passes values through unchanged when the filter has no valueResolver', async () => {
+	it('passes values through unchanged when no facet filter active value with a valueResolver is registered for the filter', async () => {
 		registerFilter('Umb.Test.FacetFilter.Plain');
+		registerFacetFilterActiveValue('Umb.Test.FacetFilterActiveValue.Other', {
+			forFacetFilters: ['Umb.Test.FacetFilter.Other'],
+			valueResolver: TestNameResolver,
+		});
 
 		coordinator.register('Umb.Test.FacetFilter.Plain', 'raw');
 

@@ -18,4 +18,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
+	{
+		type: 'facetFilterActiveValue',
+		kind: 'default',
+		alias: 'Example.FacetFilterActiveValue.PriceRange',
+		name: 'Price Range Active Filter Value',
+		forFacetFilters: ['Example.DynamicFacetFilter.PriceFilter'],
+		valueResolver: () => import('../../range-kind/range-facet-filter-value.resolver.js'),
+	},
 ];

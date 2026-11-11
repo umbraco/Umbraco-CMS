@@ -5,8 +5,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-collection-active-filters')
 export class UmbCollectionActiveFiltersElement extends UmbLitElement {
-	#filterManager?: typeof UMB_FACET_FILTER_MANAGER_CONTEXT.TYPE;
-
 	@state()
 	private _activeFilters?: Array<UmbActiveFacetFilterModel> = [];
 
@@ -14,8 +12,6 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_FACET_FILTER_MANAGER_CONTEXT, (manager) => {
-			this.#filterManager = manager;
-
 			this.observe(manager?.activeFilters, (activeFilters) => {
 				this._activeFilters = activeFilters;
 			});
@@ -36,29 +32,15 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 					${repeat(
 						this._activeFilters!,
 						(activeFilter) => `${activeFilter.alias}||${activeFilter.unique}`,
-						(activeFilter) => this.#renderActiveFilterItem(activeFilter),
+						(activeFilter) =>
+							html`<umb-facet-filter-active-value-extension
+								.alias=${activeFilter.alias}
+								.unique=${activeFilter.unique}
+								.value=${activeFilter.value}></umb-facet-filter-active-value-extension>`,
 					)}
 				</div>
 			</div>
 		`;
-	}
-
-	#renderActiveFilterItem(activeFilter: UmbActiveFacetFilterModel) {
-		return html`
-			<span class="active-filter-item">
-				${String(activeFilter.value)}
-				<uui-button
-					label="Clear"
-					compact
-					@click=${() => this.#onClearFilterValue(activeFilter.alias, activeFilter.unique)}>
-					<umb-icon name="icon-delete"></umb-icon>
-				</uui-button>
-			</span>
-		`;
-	}
-
-	#onClearFilterValue(alias: string, unique: string) {
-		this.#filterManager?.clearActiveFilter(alias, unique);
 	}
 
 	static override styles = [
@@ -74,13 +56,6 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 
 			#active-filter-items {
 				display: inline;
-			}
-
-			.active-filter-item {
-				display: inline-flex;
-				align-items: center;
-				padding: 0 0 0 var(--uui-size-space-3);
-				font-size: 12px;
 			}
 		`,
 	];

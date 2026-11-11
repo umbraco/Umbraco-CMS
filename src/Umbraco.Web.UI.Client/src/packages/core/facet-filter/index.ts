@@ -1,3 +1,4 @@
+export * from './active-value/index.js';
 export * from './facet-filter.manager.js';
 export * from './facet-filter.manager.context-token.js';
 export * from './facet-filter.context.js';

@@ -69,9 +69,7 @@ export class UmbSelectFacetFilterElement extends UmbLitElement {
 	#onCheckboxChange(event: Event) {
 		const target = event.currentTarget as HTMLInputElement;
 		if (!target.value) return;
-		const newValue = target.checked
-			? [...this._value, target.value]
-			: this._value.filter((v) => v !== target.value);
+		const newValue = target.checked ? [...this._value, target.value] : this._value.filter((v) => v !== target.value);
 		this.#api?.setValue(newValue);
 	}
 

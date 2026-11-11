@@ -1,3 +1,4 @@
+import type { ManifestFacetFilterActiveValue } from '../active-value/facet-filter-active-value.extension.js';
 import type { ManifestFacetFilter } from '../facet-filter.extension.js';
 import type { UmbFacetFilterValueResolver } from './facet-filter-value-resolver.interface.js';
 import { UMB_FACET_FILTER_VALUE_COORDINATOR_CONTEXT } from './facet-filter-value-coordinator.context-token.js';
@@ -11,6 +12,16 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 
 /**
  * @param {string} alias - The facet filter alias.
+ * @returns {ManifestFacetFilterActiveValue | undefined} The highest weighted facet filter active value manifest for the filter, merged with its kind.
+ */
+function getFacetFilterActiveValueManifest(alias: string): ManifestFacetFilterActiveValue | undefined {
+	return umbExtensionsRegistry.getByTypeAndFilter('facetFilterActiveValue', (ext: ManifestFacetFilterActiveValue) =>
+		ext.forFacetFilters.includes(alias),
+	)[0];
+}
+
+/**
+ * @param {string} alias - The facet filter alias.
  * @returns {ManifestFacetFilter | undefined} The facet filter manifest, merged with its kind.
  */
 function getFacetFilterManifest(alias: string): ManifestFacetFilter | undefined {
@@ -19,11 +30,15 @@ function getFacetFilterManifest(alias: string): ManifestFacetFilter | undefined 
 
 /**
  * Display batch resolver coordinator for facet filters. Keys are facet filter aliases, and each filter's resolver is the
- * `valueResolver` of its `facetFilter` manifest, including one inherited from its kind.
+ * `valueResolver` of the `facetFilterActiveValue` manifest registered for it with `forFacetFilters`.
  */
 export class UmbFacetFilterValueCoordinatorContext extends UmbDisplayBatchResolverCoordinatorContext {
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_FACET_FILTER_VALUE_COORDINATOR_CONTEXT, (alias) => getFacetFilterManifest(alias)?.valueResolver);
+		super(
+			host,
+			UMB_FACET_FILTER_VALUE_COORDINATOR_CONTEXT,
+			(alias) => getFacetFilterActiveValueManifest(alias)?.valueResolver,
+		);
 	}
 
 	protected override _createResolver(

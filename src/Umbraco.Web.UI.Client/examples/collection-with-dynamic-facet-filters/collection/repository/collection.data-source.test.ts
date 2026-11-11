@@ -95,7 +95,9 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 			];
 			const { data } = await dataSource.getCollection({ filters });
 			expect(data!.items.length).to.be.greaterThan(0);
-			expect(data!.items.every((p) => p.category === 'cat-jacket' && p.price.amount >= 80 && p.price.amount <= 100)).to.equal(true);
+			expect(
+				data!.items.every((p) => p.category === 'cat-jacket' && p.price.amount >= 80 && p.price.amount <= 100),
+			).to.equal(true);
 		});
 	});
 
@@ -122,9 +124,7 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 
 	describe('unknown alias', () => {
 		it('ignores filters with unknown aliases', async () => {
-			const filters: Array<UmbFacetFilterValueModel> = [
-				{ alias: 'Unknown.Filter', value: 'some-value' },
-			];
+			const filters: Array<UmbFacetFilterValueModel> = [{ alias: 'Unknown.Filter', value: 'some-value' }];
 			const { data } = await dataSource.getCollection({ filters });
 			expect(data!.items.length).to.equal(products.length);
 		});

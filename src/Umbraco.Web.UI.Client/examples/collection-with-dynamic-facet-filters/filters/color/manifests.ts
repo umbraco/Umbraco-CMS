@@ -12,12 +12,19 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Color',
 		},
-		valueResolver: () => import('./color-facet-filter-value.resolver.js'),
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
 				match: EXAMPLE_PRODUCT_COLLECTION_ALIAS,
 			},
 		],
+	},
+	{
+		type: 'facetFilterActiveValue',
+		kind: 'default',
+		alias: 'Example.FacetFilterActiveValue.Color',
+		name: 'Color Active Filter Value',
+		forFacetFilters: ['Example.DynamicFacetFilter.ColorFilter'],
+		valueResolver: () => import('./color-facet-filter-value.resolver.js'),
 	},
 ];

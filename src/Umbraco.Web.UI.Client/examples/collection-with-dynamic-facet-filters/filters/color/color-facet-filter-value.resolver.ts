@@ -6,7 +6,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
  * Resolves the active values of the color filter into color items: `color-white` gets the name "White" and its hex.
- * Registered on the color filter only.
+ * Registered on the color filter's active value.
  */
 export class ExampleColorFacetFilterValueResolver
 	extends UmbControllerBase

@@ -6,7 +6,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
  * Resolves the active values of every range filter into range limit items: `{ key: 'min', amount: 50 }` gets the
- * name "Min 50". Registered on the range kind, so every filter using the kind gets it.
+ * name "Min 50". Registered on the price filter's active value.
  */
 export class ExampleRangeFacetFilterValueResolver
 	extends UmbControllerBase
