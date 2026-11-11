@@ -540,6 +540,14 @@ describe('UmbLocalizationRegistry document direction', () => {
 		expect(document.documentElement.dir).to.equal('rtl');
 	});
 
+	it('should let a lower-weight extension that declares a direction override it', async () => {
+		umbExtensionsRegistry.register({ ...arabicPackage, meta: { ...arabicPackage.meta, direction: 'ltr' } });
+		registry.loadLanguage('ar');
+		await aTimeout(0);
+
+		expect(document.documentElement.dir).to.equal('ltr');
+	});
+
 	it('should keep the direction declared for a language when its regional extension declares none', async () => {
 		umbExtensionsRegistry.register(arabicEgypt);
 		registry.loadLanguage('ar-eg');
