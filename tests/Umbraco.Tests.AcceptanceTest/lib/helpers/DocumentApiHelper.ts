@@ -285,7 +285,7 @@ export class DocumentApiHelper {
     return documentId;
   }
 
-  async createDocumentWithContentPicker(documentName: string, documentTypeId: string, contentPickerId: string) {
+  async createDocumentWithContentPicker(documentName: string, documentTypeId: string, contentPickerId: string, alias: string = 'contentPicker') {
     await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
@@ -294,7 +294,7 @@ export class DocumentApiHelper {
         .withName(documentName)
         .done()
       .addValue()
-        .withAlias('contentPicker')
+        .withAlias(alias)
         .withValue(contentPickerId)
         .done()
       .build();
@@ -302,7 +302,7 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
-  async createDocumentWithOneMediaPicker(documentName: string, documentTypeId: string, mediaPickerId: string) {
+  async createDocumentWithOneMediaPicker(documentName: string, documentTypeId: string, mediaPickerId: string, alias: string = 'mediaPicker') {
     await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
@@ -311,7 +311,7 @@ export class DocumentApiHelper {
         .withName(documentName)
         .done()
       .addValue()
-        .withAlias('mediaPicker')
+        .withAlias(alias)
         .addMediaPickerValue()
           .withMediaKey(mediaPickerId)
           .done()
@@ -343,7 +343,7 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
-  async createDocumentWithMemberPicker(documentName: string, documentTypeId: string, memberId: string) {
+  async createDocumentWithMemberPicker(documentName: string, documentTypeId: string, memberId: string, alias: string = 'memberPicker') {
     await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
@@ -352,7 +352,7 @@ export class DocumentApiHelper {
         .withName(documentName)
         .done()
       .addValue()
-        .withAlias('memberPicker')
+        .withAlias(alias)
         .withValue(memberId)
         .done()
       .build();
@@ -1802,12 +1802,12 @@ export class DocumentApiHelper {
   }
 
   async createDefaultDocumentWithOneDocumentLink(documentName: string, linkedDocumentName: string, linkedDocumentId: string, documentTypeName: string = 'Test Document Type') {
-    const multiURLPickerDataTypeName = 'URL Picker';
     // Get the url of the linked document
     const linkedDocumentData = await this.getByName(linkedDocumentName);
     const linkedDocumentUrl = await this.getDocumentUrl(linkedDocumentData.id);
-    // Get datatype
-    const dataTypeData = await this.api.dataType.getByName(multiURLPickerDataTypeName);
+    // Look the built-in URL picker data type up by key, as its name differs between new installs and upgraded sites
+    const dataTypeData = await this.api.dataType.get('b4e3535a-1753-47e2-8568-602cf8cfee6f');
+    const multiURLPickerDataTypeName = dataTypeData.name;
     // Create document type
     let documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, multiURLPickerDataTypeName, dataTypeData.id);
     documentTypeId = documentTypeId === undefined ? '' : documentTypeId;
@@ -1835,11 +1835,11 @@ export class DocumentApiHelper {
   }
 
   async createDefaultDocumentWithOneMediaLink(documentName: string, linkedMediaName: string, documentTypeName: string = 'Test Document Type') {
-    const multiURLPickerDataTypeName = 'URL Picker';
     // Get the url of the linked document
     const linkedMediaData = await this.api.media.getByName(linkedMediaName);
-    // Get datatype
-    const dataTypeData = await this.api.dataType.getByName(multiURLPickerDataTypeName);
+    // Look the built-in URL picker data type up by key, as its name differs between new installs and upgraded sites
+    const dataTypeData = await this.api.dataType.get('b4e3535a-1753-47e2-8568-602cf8cfee6f');
+    const multiURLPickerDataTypeName = dataTypeData.name;
     // Create document type
     let documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, multiURLPickerDataTypeName, dataTypeData.id);
     documentTypeId = documentTypeId === undefined ? '' : documentTypeId;

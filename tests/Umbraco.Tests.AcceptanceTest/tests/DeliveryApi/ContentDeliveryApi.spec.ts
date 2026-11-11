@@ -1,5 +1,5 @@
 import {expect} from '@playwright/test';
-import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {AliasHelper, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 // Document
 const publishInvariantRootContent = 'Publish Invariant Root';
@@ -233,7 +233,7 @@ test.describe('fetch a content item by id', () => {
     expect(contentItem.status()).toBe(200);
     const contentItemJson = await contentItem.json();
     await umbracoApi.contentDeliveryApi.verifyBasicPropertiesForContentItem(contentName, contentItemJson);
-    await umbracoApi.contentDeliveryApi.verifyEditorialPropertiesForContentItemWithMultiURLPicker(contentName, contentItemJson, 'Content');
+    await umbracoApi.contentDeliveryApi.verifyEditorialPropertiesForContentItemWithMultiURLPicker(contentName, contentItemJson, 'Content', AliasHelper.toAlias(multiUrlPickerDataTypeName));
     await umbracoApi.contentDeliveryApi.verifyCulturePropertyForContentItem(contentName, contentItemJson);
 
     // Clean

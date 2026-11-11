@@ -78,7 +78,7 @@ test('can remove a member picker in the content', async ({umbracoApi, umbracoUi}
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  await umbracoApi.document.createDocumentWithMemberPicker(contentName, documentTypeId, memberId);
+  await umbracoApi.document.createDocumentWithMemberPicker(contentName, documentTypeId, memberId, AliasHelper.toAlias(dataTypeName));
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -96,7 +96,7 @@ test('can remove a not-found member picker in the content', async ({umbracoApi, 
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  await umbracoApi.document.createDocumentWithMemberPicker(contentName, documentTypeId, memberId);
+  await umbracoApi.document.createDocumentWithMemberPicker(contentName, documentTypeId, memberId, AliasHelper.toAlias(dataTypeName));
   await umbracoApi.member.delete(memberId); // Delete the member to simulate not-found member
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -116,7 +116,7 @@ test('can navigate away from content with a member picker value without seeing d
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  await umbracoApi.document.createDocumentWithMemberPicker(contentName, documentTypeId, memberId);
+  await umbracoApi.document.createDocumentWithMemberPicker(contentName, documentTypeId, memberId, AliasHelper.toAlias(dataTypeName));
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
@@ -132,7 +132,7 @@ test('can see discard changes when navigating away from content with a changed m
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  await umbracoApi.document.createDocumentWithMemberPicker(contentName, documentTypeId, memberId);
+  await umbracoApi.document.createDocumentWithMemberPicker(contentName, documentTypeId, memberId, AliasHelper.toAlias(dataTypeName));
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.removeMemberPickerByName(memberName);
