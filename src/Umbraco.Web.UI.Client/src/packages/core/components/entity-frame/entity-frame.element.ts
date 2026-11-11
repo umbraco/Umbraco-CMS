@@ -51,7 +51,7 @@ export class UmbEntityFrameElement extends LitElement {
 			.border {
 				position: absolute;
 				inset: 0;
-				border: var(--umb-entity-frame-border-width, 2px) solid var(--umb-entity-frame-color, var(--uui-color-focus));
+				border: var(--umb-entity-frame-border-width, 1px) solid var(--umb-entity-frame-color, var(--uui-color-focus));
 				border-radius: var(--uui-border-radius);
 				border-top-right-radius: 0;
 				box-sizing: border-box;
@@ -60,14 +60,29 @@ export class UmbEntityFrameElement extends LitElement {
 
 			.tab {
 				position: absolute;
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-1);
 				bottom: 100%;
 				right: 0;
 				background: var(--umb-entity-frame-color, var(--uui-color-focus));
 				color: var(--umb-entity-frame-contrast-color, var(--uui-color-selected-contrast));
-				padding: var(--uui-size-2) var(--uui-size-2) var(--uui-size-1);
+				padding: 0 var(--uui-size-2);
 				border-radius: var(--uui-border-radius) var(--uui-border-radius) 0 0;
 				font-size: var(--uui-type-small-size);
-				line-height: 1;
+			}
+
+			.tab::before {
+				content: '';
+				position: absolute;
+				background-color: transparent;
+				bottom: calc((var(--uui-border-radius) * -2) - var(--umb-entity-frame-border-width, 1px));
+				height: calc(var(--uui-border-radius) * 2);
+				width: var(--uui-border-radius);
+				right: 0;
+				z-index: -1;
+				border-top-right-radius: var(--uui-border-radius);
+				box-shadow: 0 calc(var(--uui-border-radius) * -1) 0 0 var(--umb-entity-frame-color, var(--uui-color-focus));
 			}
 		`,
 	];
