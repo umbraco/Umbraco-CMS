@@ -86,7 +86,7 @@ export class UmbMemberItemRefElement extends UmbEntityItemRefFrameMixin(UmbLitEl
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon(this.item)}
 			</uui-ref-node-member>
-			${this.renderEntityFrame(this.item.name)}
+			${this.renderEntityFrame()}
 		`;
 	}
 
