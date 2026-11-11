@@ -63,6 +63,7 @@ export class UmbEntityFrameElement extends LitElement {
 				display: flex;
 				align-items: center;
 				gap: var(--uui-size-1);
+				min-height: var(--uui-size-7);
 				bottom: 100%;
 				right: 0;
 				background: var(--umb-entity-frame-color, var(--uui-color-focus));
