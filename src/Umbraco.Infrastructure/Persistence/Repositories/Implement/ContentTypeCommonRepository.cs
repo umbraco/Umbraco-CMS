@@ -47,15 +47,22 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
            ?? throw new InvalidOperationException("Cannot run a repository without an ambient scope.");
 
     /// <inheritdoc />
-    public Task<IEnumerable<IContentTypeComposition>?> GetAllTypesAsync()
+    public async Task<IEnumerable<IContentTypeComposition>?> GetAllTypesAsync()
     {
         EnsureAmbientScopeOnCallerContext();
 
-        return _appCaches.RuntimeCache.GetCacheItemAsync<IEnumerable<IContentTypeComposition>>(
-            CacheKey,
-            async () => await FetchAllTypesFromDatabaseAsync(),
-            RepositoryCacheConstants.DefaultCacheDuration,
-            isSliding: true);
+        // Not GetCacheItemAsync: it shares one in-flight factory call between concurrent callers, and this factory
+        // reads through the caller's ambient scope. A caller whose transaction holds locks the shared read waits on
+        // would then await that read itself, so every miss must query on its own scope.
+        if (_appCaches.RuntimeCache.Get(CacheKey) is IEnumerable<IContentTypeComposition> cached)
+        {
+            return cached;
+        }
+
+        IEnumerable<IContentTypeComposition> contentTypes = await FetchAllTypesFromDatabaseAsync();
+        _appCaches.RuntimeCache.Insert(CacheKey, () => contentTypes, RepositoryCacheConstants.DefaultCacheDuration, isSliding: true);
+
+        return contentTypes;
     }
 
     /// <inheritdoc />
