@@ -20,7 +20,7 @@ export class UmbDefaultFacetFilterActiveValueElement extends UmbFacetFilterActiv
 	}
 
 	override render() {
-		return html`<umb-facet-filter-active-value-layout .label=${this._filterLabel} @remove=${this._remove}>
+		return html`<umb-facet-filter-active-value-layout @remove=${this._remove}>
 			${this.#getName()}
 		</umb-facet-filter-active-value-layout>`;
 	}

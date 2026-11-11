@@ -95,12 +95,6 @@ describe('UmbFacetFilterActiveValueExtensionElement', () => {
 		expect(findValueElement(extension)?.tagName.toLowerCase()).to.equal('umb-default-facet-filter-active-value');
 	});
 
-	it('passes the filter label to the layout', async () => {
-		host.appendChild(extension);
-
-		await waitUntil(() => findLayout(extension)?.label === 'Colour', 'filter label not passed to the layout');
-	});
-
 	it('shows the name of the resolved item when the default kind is registered with a valueResolver', async () => {
 		umbExtensionsRegistry.register({
 			type: 'facetFilterActiveValue',

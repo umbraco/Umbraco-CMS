@@ -23,10 +23,6 @@ export interface UmbFacetFilterActiveValueApi<TValue = unknown, TResolvedValue =
 	 */
 	readonly resolvedValue: Observable<TResolvedValue | undefined>;
 	/**
-	 * The label of the facet filter the value belongs to.
-	 */
-	readonly filterLabel: Observable<string | undefined>;
-	/**
 	 * Removes the value from the active filters.
 	 */
 	remove(): void;
