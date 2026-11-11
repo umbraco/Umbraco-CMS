@@ -95,7 +95,7 @@ test('can set accepted types', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesElementPickerHaveAllowedContentTypes(customDataTypeName, [elementTypeId])).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'allowedContentTypes', elementTypeId)).toBeTruthy();
 });
 
 test('can set start node', async ({umbracoApi, umbracoUi}) => {
@@ -109,5 +109,5 @@ test('can set start node', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesElementPickerHaveStartNode(customDataTypeName, elementFolderId)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'startNodeId', [elementFolderId])).toBeTruthy();
 });

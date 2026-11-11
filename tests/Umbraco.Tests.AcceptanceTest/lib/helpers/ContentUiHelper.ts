@@ -2432,7 +2432,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async addElementPicker(elementName: string) {
-    await this.click(this.chooseModalLink);
+    await this.clickChooseElementPickerButton();
     await this.click(this.sidebarModal.getByText(elementName, {exact: true}));
     await this.click(this.chooseModalBtn);
     // Wait for the picked row so a follow-up add doesn't race the closing modal.

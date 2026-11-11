@@ -2434,18 +2434,6 @@ export class DataTypeApiHelper {
     return await this.save(builder);
   }
 
-  async doesElementPickerHaveAllowedContentTypes(dataTypeName: string, allowedContentTypeIds: string[]) {
-    const dataTypeData = await this.getByName(dataTypeName);
-    const valueData = dataTypeData.values.find(item => item.alias === 'allowedContentTypes');
-    return valueData?.value === allowedContentTypeIds.join(',');
-  }
-
-  async doesElementPickerHaveStartNode(dataTypeName: string, startNodeFolderId: string) {
-    const dataTypeData = await this.getByName(dataTypeName);
-    const valueData = dataTypeData.values.find(item => item.alias === 'startNodeId');
-    return Array.isArray(valueData?.value) && valueData.value.length === 1 && valueData.value[0] === startNodeFolderId;
-  }
-
   async doesElementPickerHaveMinAndMaxAmount(dataTypeName: string, min?: number, max?: number) {
     const dataTypeData = await this.getByName(dataTypeName);
     const valueData = dataTypeData.values.find(item => item.alias === 'validationLimit');

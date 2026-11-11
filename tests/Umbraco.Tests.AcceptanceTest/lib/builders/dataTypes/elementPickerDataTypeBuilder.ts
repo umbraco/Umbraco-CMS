@@ -45,14 +45,14 @@ export class ElementPickerDataTypeBuilder extends DataTypeBuilder {
       });
     }
 
-    if (this.allowedContentTypeIds !== undefined) {
+    if (this.allowedContentTypeIds?.length) {
       values.push({
         alias: 'allowedContentTypes',
         value: this.allowedContentTypeIds.join(',')
       });
     }
 
-    if (this.startNodeId !== undefined) {
+    if (this.startNodeId) {
       values.push({
         alias: 'startNodeId',
         value: [this.startNodeId]

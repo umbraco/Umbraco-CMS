@@ -22,6 +22,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
   await umbracoApi.element.ensureNameNotExists(elementName);
   await umbracoApi.element.ensureNameNotExists(secondElementName);
+  await umbracoApi.element.ensureNameNotExists(elementInFolderName);
   await umbracoApi.element.ensureNameNotExists(elementFolderName);
   await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
   await umbracoUi.goToBackOffice();
@@ -32,6 +33,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.element.ensureNameNotExists(elementName);
   await umbracoApi.element.ensureNameNotExists(secondElementName);
+  await umbracoApi.element.ensureNameNotExists(elementInFolderName);
   await umbracoApi.element.ensureNameNotExists(elementFolderName);
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
   await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
@@ -102,7 +104,6 @@ test('can publish content with an element picker selected', {tag: '@smoke'}, asy
 
 test('can select multiple elements in the element picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const secondElementName = 'TestElement2';
   const elementPickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerDataType(elementPickerDataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, elementPickerDataTypeName, elementPickerDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -184,7 +185,6 @@ test.fixme('can validate minimum amount in element picker', async ({umbracoApi, 
 test('can validate maximum amount in element picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const maxAmount = 1;
-  const secondElementName = 'TestElement2';
   const elementPickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerWithValidationLimit(elementPickerDataTypeName, undefined, maxAmount);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, elementPickerDataTypeName, elementPickerDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -265,6 +265,7 @@ test('can only pick elements of an accepted type in the element picker', async (
   // Act
   await umbracoUi.content.clickChooseElementPickerButton();
   await umbracoUi.content.isModalMenuItemWithNameDisabled(secondElementName);
+  await umbracoUi.content.clickModalMenuItemWithName(secondElementName);
   await umbracoUi.content.clickModalMenuItemWithName(elementName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
