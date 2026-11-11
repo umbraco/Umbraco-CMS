@@ -30,9 +30,10 @@ namespace Umbraco.Cms.Api.Management.Permissions;
 /// </para>
 /// <para>
 /// It's a filter, not an authorization requirement, so it runs after the endpoint's authorization policies have
-/// passed. Permission checks an action makes itself through <see cref="IAuthorizationService"/> run later, so when
-/// both would refuse a request, environment permissions answer. A denial carries the
-/// <see cref="Constants.Headers.DeniedPermission"/> header, which tells it apart from any other 403.
+/// passed. Permission checks an action makes itself through
+/// <see cref="Microsoft.AspNetCore.Authorization.IAuthorizationService"/> run later, so when both would refuse a
+/// request, environment permissions answer. A denial carries the <see cref="Constants.Headers.DeniedPermission"/>
+/// header, which tells it apart from any other 403.
 /// </para>
 /// </remarks>
 [AttributeUsage(AttributeTargets.Class, Inherited = true)]

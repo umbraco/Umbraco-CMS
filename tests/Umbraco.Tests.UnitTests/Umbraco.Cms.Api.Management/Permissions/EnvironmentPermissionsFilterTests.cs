@@ -139,7 +139,6 @@ public class EnvironmentPermissionsFilterTests
         });
     }
 
-
     [Test]
     public async Task An_Entity_Type_Named_By_A_Declaration_Uses_That_Operation()
     {
@@ -256,7 +255,7 @@ public class EnvironmentPermissionsFilterTests
         return new AuthorizationFilterContext(new ActionContext(httpContext, new RouteData(), descriptor), []);
     }
 
-    private static IServiceProvider CreateServices(IEnvironmentPermissionsConfigurator? configurator)
+    private static ServiceProvider CreateServices(IEnvironmentPermissionsConfigurator? configurator)
     {
         IEnvironmentPermissionsConfigurator[] configurators = configurator is null ? [] : [configurator];
         var environmentPermissions = new EnvironmentPermissions(new EnvironmentPermissionsConfiguratorCollection(() => configurators));

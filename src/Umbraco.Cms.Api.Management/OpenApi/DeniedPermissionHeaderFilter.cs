@@ -26,8 +26,8 @@ internal sealed class DeniedPermissionHeaderFilter : IOperationFilter
             return;
         }
 
-        // Environment permissions are a reason to refuse an authenticated user in its own right, so the forbidden response is added
-        // when nothing else documented one.
+        // Environment permissions are a reason to refuse an authenticated user in their own right, so the forbidden
+        // response is added when nothing else documented one.
         operation.Responses ??= new OpenApiResponses();
         if (operation.Responses.TryGetValue(StatusCodes.Status403Forbidden.ToString(), out IOpenApiResponse? response)
             is false)
@@ -60,11 +60,11 @@ internal sealed class DeniedPermissionHeaderFilter : IOperationFilter
             return declared.Permissions;
         }
 
-        return (context.ApiDescription.ActionDescriptor as ControllerActionDescriptor)?
+        var permission = (context.ApiDescription.ActionDescriptor as ControllerActionDescriptor)?
             .ControllerTypeInfo
             .GetCustomAttribute<RequiresPermissionsForAttribute>(inherit: true)?
-            .InferPermission(context.ApiDescription.HttpMethod) is string permission
-            ? [permission]
-            : [];
+            .InferPermission(context.ApiDescription.HttpMethod);
+
+        return permission is null ? [] : [permission];
     }
 }
