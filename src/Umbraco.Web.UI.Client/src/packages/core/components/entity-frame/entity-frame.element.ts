@@ -64,26 +64,31 @@ export class UmbEntityFrameElement extends LitElement {
 				align-items: center;
 				gap: var(--uui-size-1);
 				min-height: var(--uui-size-7);
-				bottom: 100%;
+				bottom: calc(100% - var(--umb-entity-frame-border-width, 1px));
 				right: 0;
 				background: var(--umb-entity-frame-color, var(--uui-color-focus));
 				color: var(--umb-entity-frame-contrast-color, var(--uui-color-selected-contrast));
 				padding: 0 var(--uui-size-2);
 				border-radius: var(--uui-border-radius) var(--uui-border-radius) 0 0;
 				font-size: var(--uui-type-small-size);
+				line-height: 2;
 			}
 
 			.tab::before {
 				content: '';
 				position: absolute;
 				background-color: transparent;
-				bottom: calc((var(--uui-border-radius) * -2) - var(--umb-entity-frame-border-width, 1px));
+				bottom: calc(var(--uui-border-radius) * -2);
 				height: calc(var(--uui-border-radius) * 2);
 				width: var(--uui-border-radius);
 				right: 0;
 				z-index: -1;
 				border-top-right-radius: var(--uui-border-radius);
 				box-shadow: 0 calc(var(--uui-border-radius) * -1) 0 0 var(--umb-entity-frame-color, var(--uui-color-focus));
+			}
+
+			::slotted(uui-icon) {
+				margin-top: -0.125em;
 			}
 		`,
 	];
