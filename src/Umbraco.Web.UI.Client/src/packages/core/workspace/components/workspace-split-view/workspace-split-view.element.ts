@@ -142,7 +142,7 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 			}
 
 			:host(:not(:last-child)) {
-				border-right: 1px solid var(--uui-color-border);
+				border-inline-end: 1px solid var(--uui-color-border);
 			}
 
 			#header {
@@ -153,7 +153,7 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 			#icon {
 				display: inline-block;
 				font-size: var(--uui-size-6);
-				margin-right: var(--uui-size-space-4);
+				margin-inline-end: var(--uui-size-space-4);
 			}
 		`,
 	];

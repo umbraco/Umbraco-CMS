@@ -70,7 +70,7 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 		css`
 			:host {
 				height: 100%;
-				margin-left: calc(var(--uui-size-layout-1) * -1);
+				margin-inline-start: calc(var(--uui-size-layout-1) * -1);
 			}
 
 			umb-entity-actions-dropdown {
