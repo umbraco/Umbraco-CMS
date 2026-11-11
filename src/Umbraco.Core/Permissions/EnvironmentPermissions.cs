@@ -11,7 +11,6 @@ internal sealed class EnvironmentPermissions : IEnvironmentPermissionsBuilder
 {
     private readonly HashSet<string> _denied = new(StringComparer.Ordinal);
     private readonly bool _frozen;
-    private IReadOnlyCollection<string> _deniedPermissions = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EnvironmentPermissions"/> class.
@@ -28,7 +27,7 @@ internal sealed class EnvironmentPermissions : IEnvironmentPermissionsBuilder
     }
 
     /// <inheritdoc />
-    public IReadOnlyCollection<string> DeniedPermissions => _deniedPermissions;
+    public IReadOnlyCollection<string> DeniedPermissions { get; private set; } = [];
 
     /// <inheritdoc />
     public void Deny(params string[] permissions)
@@ -52,7 +51,7 @@ internal sealed class EnvironmentPermissions : IEnvironmentPermissionsBuilder
         if (added)
         {
             // Replaced, not updated, so a configurator can keep enumerating the denied permissions while it denies more.
-            _deniedPermissions = Array.AsReadOnly(_denied.ToArray());
+            DeniedPermissions = Array.AsReadOnly(_denied.ToArray());
         }
     }
 
