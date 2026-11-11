@@ -912,10 +912,23 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const variantsWithoutAName = saveData.variants.filter((x) => !x.name);
 		if (variantsWithoutAName.length > 0) {
 			variantsWithoutAName.forEach((variant) => {
+				const variantId = UmbVariantId.Create(variant);
+				const key = 'umbMissingVariantName_' + variantId.toString();
+				// 'client' messages are owned by the form control, so this check owns its message and removes it once a name is set.
 				this.validationContext.messages.addMessage(
-					'client',
+					'custom',
 					`$.variants[${UmbDataPathVariantQuery(variant)}].name`,
 					UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+					key,
+				);
+				this.observe(
+					this.name(variantId),
+					(name) => {
+						if (!name) return;
+						this.validationContext.messages.removeMessageByKey(key);
+						this.removeUmbControllerByAlias(key);
+					},
+					key,
 				);
 			});
 			throw new Error(

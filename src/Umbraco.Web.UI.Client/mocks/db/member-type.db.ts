@@ -14,7 +14,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 class UmbMemberTypeMockDB extends UmbEntityMockDbBase<UmbMockMemberTypeModel> {
-	tree = new UmbMockEntityTreeManager<UmbMockMemberTypeModel>(this, memberTypeTreeItemMapper);
+	tree = new UmbMockEntityTreeManager<UmbMockMemberTypeModel>(this, (item) => memberTypeTreeItemMapper(item, this));
 	item = new UmbMockEntityNamedItemManager<UmbMockMemberTypeModel>(this, itemResponseMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockMemberTypeModel>(this, createDetailMockMapper, detailResponseMapper);
 
@@ -68,12 +68,13 @@ const detailResponseMapper = (item: UmbMockMemberTypeModel): MemberTypeResponseM
 	};
 };
 
-const memberTypeTreeItemMapper = (item: UmbMockMemberTypeModel): any => {
+const memberTypeTreeItemMapper = (item: UmbMockMemberTypeModel, db: UmbMemberTypeMockDB): any => {
 	return {
 		name: item.name,
 		hasChildren: item.hasChildren,
 		id: item.id,
 		parent: item.parent,
+		parentIsFolder: item.parent ? (db.read(item.parent.id)?.isFolder ?? false) : false,
 		isFolder: false,
 		icon: item.icon,
 	};

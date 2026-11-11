@@ -53,19 +53,16 @@ export class UmbPropertyEditorUIContentPickerElement
 	private _min = 0;
 
 	@state()
-	private _minMessage = '';
-
-	@state()
 	private _max = Infinity;
-
-	@state()
-	private _maxMessage = '';
 
 	@state()
 	private _allowedContentTypeUniques?: string;
 
 	@state()
 	private _rootUnique?: string | null;
+
+	@state()
+	private _rootUniques?: Array<string>;
 
 	@state()
 	private _rootEntityType?: string;
@@ -124,9 +121,6 @@ export class UmbPropertyEditorUIContentPickerElement
 		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
 
 		this._allowedContentTypeUniques = config.getValueByAlias('filter');
-
-		this._minMessage = `${this.localize.term('validation_minCount')} ${this._min} ${this.localize.term('validation_items')}`;
-		this._maxMessage = `${this.localize.term('validation_maxCount')} ${this._max} ${this.localize.term('validation_itemsSelected')}`;
 	}
 
 	#parseInt(value: unknown, fallback: number): number {
@@ -177,9 +171,8 @@ export class UmbPropertyEditorUIContentPickerElement
 		const parentUnique = parent?.unique ?? null;
 
 		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique, parentUnique);
-		if (result && result.length > 0) {
-			this._rootUnique = result[0];
-		}
+		this._rootUnique = result?.[0];
+		this._rootUniques = result;
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputContentElement }) {
@@ -212,20 +205,24 @@ export class UmbPropertyEditorUIContentPickerElement
 	}
 
 	override render() {
-		const startNode: UmbTreeStartNode | undefined =
-			this._rootUnique && this._rootEntityType
-				? { unique: this._rootUnique, entityType: this._rootEntityType }
+		const entityType = this._rootEntityType;
+
+		// A dynamic root query can resolve to more than one node, and all of them are made available to the picker.
+		const startNodes: Array<UmbTreeStartNode> | undefined =
+			this._rootUniques && this._rootUniques.length > 1 && entityType
+				? this._rootUniques.map((unique) => ({ unique, entityType }))
 				: undefined;
+		const startNode: UmbTreeStartNode | undefined =
+			!startNodes && this._rootUnique && entityType ? { unique: this._rootUnique, entityType } : undefined;
 
 		return html`
 			<umb-input-content
 				.selection=${this.value ?? []}
 				.type=${this._type}
 				.min=${this._min}
-				.minMessage=${this._minMessage}
 				.max=${this._max}
-				.maxMessage=${this._maxMessage}
 				.startNode=${startNode}
+				.startNodes=${startNodes}
 				.allowedContentTypeIds=${this._allowedContentTypeUniques}
 				?readonly=${this.readonly}
 				?required=${this.mandatory}

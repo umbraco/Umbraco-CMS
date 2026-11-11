@@ -73,7 +73,7 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbPartialViewTreeIt
 		unique: serializer.toUnique(item.path),
 		parent: {
 			unique: item.parent ? serializer.toUnique(item.parent.path) : null,
-			entityType: item.parent ? UMB_PARTIAL_VIEW_ENTITY_TYPE : UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+			entityType: item.parent ? UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE : UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
 		},
 		entityType: item.isFolder ? UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE : UMB_PARTIAL_VIEW_ENTITY_TYPE,
 		name: item.name,

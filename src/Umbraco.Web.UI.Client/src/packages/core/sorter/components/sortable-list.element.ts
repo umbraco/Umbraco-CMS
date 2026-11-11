@@ -155,6 +155,11 @@ export class UmbSortableListElement<T = unknown> extends UmbLitElement {
 				border-radius: var(--uui-border-radius);
 				border: 2px solid var(--uui-color-interactive-emphasis);
 			}
+
+			code:not([dir]) {
+				direction: ltr;
+				unicode-bidi: isolate;
+			}
 		`,
 	];
 }

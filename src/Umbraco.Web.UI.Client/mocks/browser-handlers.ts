@@ -27,6 +27,7 @@ import { handlers as relationTypeHandlers } from './msw-handlers/relation-type/i
 import { handlers as relationHandlers } from './msw-handlers/relation/index.js';
 import { handlers as rteEmbedHandlers } from './msw-handlers/rte-embed.handlers.js';
 import { handlers as scriptHandlers } from './msw-handlers/script/index.js';
+import { handlers as serverEventHubHandlers } from './msw-handlers/server-event-hub.handlers.js';
 import { handlers as staticFileHandlers } from './msw-handlers/static-file/index.js';
 import { handlers as stylesheetHandlers } from './msw-handlers/stylesheet/index.js';
 import { handlers as tagHandlers } from './msw-handlers/tag-handlers.js';
@@ -73,6 +74,7 @@ const handlers = [
 	...relationHandlers,
 	...rteEmbedHandlers,
 	...scriptHandlers,
+	...serverEventHubHandlers,
 	...staticFileHandlers,
 	...stylesheetHandlers,
 	...tagHandlers,

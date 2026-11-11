@@ -155,4 +155,6 @@ test('can find a member type in a sibling nested folder', async ({umbracoApi}) =
   // Assert
   expect(memberTypeData).toBeTruthy();
   expect(memberTypeData.id).toBe(targetMemberTypeId);
+  const secondChildFolderChildren = await umbracoApi.memberType.getChildren(secondChildFolderId);
+  expect(secondChildFolderChildren.map(child => child.id)).toContain(targetMemberTypeId);
 });

@@ -4,9 +4,13 @@
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Migrations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Stubs;
 
@@ -99,6 +103,20 @@ public class AlterMigrationTests
             Is.EqualTo("ALTER TABLE [bar] ALTER COLUMN [foo] UniqueIdentifier NOT NULL"));
     }
 
+    [Test]
+    public async Task AlterColumn_Uses_The_Statement_Of_The_Syntax_Provider()
+    {
+        var database = new TestDatabase(syntaxProvider: new SeparateClausesAlterColumnSyntaxProvider());
+        var migration = new AlterColumnMigration(new MigrationContext(new TestPlan(), database, _logger));
+
+        await migration.RunAsync().ConfigureAwait(false);
+
+        Assert.That(database.Operations.Count, Is.EqualTo(1));
+        Assert.That(
+            database.Operations[0].Sql,
+            Is.EqualTo("ALTER TABLE [bar] ALTER COLUMN [foo] TYPE UniqueIdentifier, ALTER COLUMN [foo] SET NOT NULL"));
+    }
+
     public class AlterColumnMigration : MigrationBase
     {
         public AlterColumnMigration(IMigrationContext context)
@@ -133,6 +151,22 @@ public class AlterMigrationTests
         foreach (var expression in database.Operations)
         {
             Debug.Print(expression.ToString());
+        }
+    }
+
+    // Stands for databases that change a column's type and nullability in separate clauses.
+    private sealed class SeparateClausesAlterColumnSyntaxProvider : SqlServerSyntaxProvider
+    {
+        public SeparateClausesAlterColumnSyntaxProvider()
+            : base(Options.Create(new GlobalSettings()))
+        {
+        }
+
+        public override string FormatAlterColumn(string? tableName, ColumnDefinition column)
+        {
+            var columnName = GetQuotedColumnName(column.Name);
+            var nullability = column.IsNullable ? "DROP NOT NULL" : "SET NOT NULL";
+            return $"ALTER TABLE {GetQuotedTableName(tableName)} ALTER COLUMN {columnName} TYPE {FormatType(column)}, ALTER COLUMN {columnName} {nullability}";
         }
     }
 }

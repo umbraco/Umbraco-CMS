@@ -1,4 +1,4 @@
-import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import './app-error.element.js';
@@ -28,11 +28,24 @@ export class UmbAppOauthElement extends UmbLitElement {
 		// If we don't have a message, we show the loader, this is most likely happening in the main app
 		// for the normal login flow
 		return html`
-			<umb-body-layout id="loader" style="align-items:center;">
-				<uui-loader></uui-loader>
+			<umb-body-layout id="loader">
+				<div id="loader-container">
+					<uui-loader></uui-loader>
+				</div>
 			</umb-body-layout>
 		`;
 	}
+
+	static override styles = [
+		css`
+			#loader-container {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				height: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbAppOauthElement;
