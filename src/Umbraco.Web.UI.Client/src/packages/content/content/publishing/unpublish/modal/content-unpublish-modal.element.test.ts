@@ -92,6 +92,28 @@ describe('UmbContentUnpublishModalElement', () => {
 		expect(await submit()).to.deep.equal(['da-DK']);
 	});
 
+	it('keeps every language selected when an automatically selected mandatory language is deselected', async () => {
+		await render(['en-US'], { options: [option('en-US', true), option('it-IT', true), option('fr-FR')] });
+		await toggle('it-IT', 'deselected');
+
+		expect(await submit()).to.deep.equal(['en-US', 'fr-FR', 'it-IT']);
+	});
+
+	it('deselects every mandatory language when one the editor selected is deselected', async () => {
+		await render(['en-US', 'it-IT', 'da-DK'], {
+			options: [option('en-US', true), option('it-IT', true), option('da-DK'), option('de-DE')],
+		});
+		await toggle('it-IT', 'deselected');
+
+		expect(await submit()).to.deep.equal(['da-DK']);
+	});
+
+	it('explains that unpublishing a mandatory language unpublishes every language', async () => {
+		await render(['da-DK']);
+
+		expect(element.shadowRoot!.querySelector('umb-localize[key="content_languagesToUnpublish"]')).to.exist;
+	});
+
 	it('leaves the selection alone when no mandatory language is selected', async () => {
 		await render(['da-DK']);
 

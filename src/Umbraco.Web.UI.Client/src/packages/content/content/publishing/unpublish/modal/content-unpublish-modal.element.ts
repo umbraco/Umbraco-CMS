@@ -180,6 +180,9 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 				${when(
 					!this._isInvariant,
 					() => html`
+						<p>
+							<umb-localize key="content_languagesToUnpublish"></umb-localize>
+						</p>
 						<umb-content-variant-language-picker
 							.selectionManager=${this._selectionManager}
 							.variantLanguageOptions=${this._options}
