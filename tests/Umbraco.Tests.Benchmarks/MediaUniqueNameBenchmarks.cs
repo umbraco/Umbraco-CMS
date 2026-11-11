@@ -124,11 +124,11 @@ public class MediaUniqueNameBenchmarks
     [Benchmark]
     public string? FetchPrefixMatched()
     {
-        var prefix = GetSafeLikePrefix(SimilarNodeName.GetBaseText(ProposedName));
+        var prefix = EscapeLikeValue(SimilarNodeName.GetBaseText(ProposedName));
 
         using SqliteCommand command = _connection.CreateCommand();
         command.CommandText =
-            "SELECT id, text FROM umbracoNode WHERE nodeObjectType = @objectType AND parentId = @parentId AND upper(text) LIKE upper(@prefix)";
+            @"SELECT id, text FROM umbracoNode WHERE nodeObjectType = @objectType AND parentId = @parentId AND upper(text) LIKE upper(@prefix) ESCAPE '\'";
         command.Parameters.AddWithValue("@objectType", MediaObjectType);
         command.Parameters.AddWithValue("@parentId", ParentId);
         command.Parameters.AddWithValue("@prefix", prefix + "%");
@@ -152,11 +152,7 @@ public class MediaUniqueNameBenchmarks
         return siblings;
     }
 
-    // Mirrors ContentRepositoryBase.GetSafeLikePrefix so this benchmark builds the same prefix as
-    // production; keep the two in sync if the truncation logic changes.
-    private static string GetSafeLikePrefix(string baseText)
-    {
-        var index = baseText.IndexOf('[');
-        return index < 0 ? baseText : baseText[..index];
-    }
+    // Mirrors SqlSyntaxProviderBase.EscapeLikeValue, which production applies to the StartsWith prefix.
+    private static string EscapeLikeValue(string value)
+        => value.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_");
 }
