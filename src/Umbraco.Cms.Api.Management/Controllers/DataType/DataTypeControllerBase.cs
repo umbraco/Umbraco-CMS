@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.DataType)]
 [ApiExplorerSettings(GroupName = "Data Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrMediaOrMembersOrContentTypes)]
-[RequiresPermissionsFor(Constants.Permissions.DataType.Prefix)]
+[RequiresPermissionsFor(Constants.Permissions.Entities.DataType.Prefix)]
 public abstract class DataTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult DataTypeOperationStatusResult(DataTypeOperationStatus status) =>

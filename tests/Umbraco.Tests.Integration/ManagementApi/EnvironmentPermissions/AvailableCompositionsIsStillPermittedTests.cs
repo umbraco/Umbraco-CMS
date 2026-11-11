@@ -34,6 +34,6 @@ public class AvailableCompositionsIsStillPermittedTests : EnvironmentPermissions
     {
         /// <inheritdoc />
         public void Configure(IEnvironmentPermissionsBuilder builder)
-            => builder.Deny(Constants.Permissions.DocumentType.Create, Constants.Permissions.DocumentType.Update, Constants.Permissions.DocumentType.Delete);
+            => builder.Deny(Constants.Permissions.Entities.DocumentType.Create, Constants.Permissions.Entities.DocumentType.Update, Constants.Permissions.Entities.DocumentType.Delete);
     }
 }

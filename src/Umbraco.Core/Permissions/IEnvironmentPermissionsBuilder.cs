@@ -16,7 +16,7 @@ public interface IEnvironmentPermissionsBuilder : IEnvironmentPermissions
     /// A denial is enforced on the Management API endpoints whose changes need the denied verb. Environment permissions
     /// govern only changes; reads are always permitted.
     /// </remarks>
-    /// <param name="permissions">The permission verbs, for example one of <see cref="Constants.Permissions"/>. Matched case-sensitively.</param>
+    /// <param name="permissions">The permission verbs, for example one of <see cref="Constants.Permissions.Entities"/>. Matched case-sensitively.</param>
     /// <exception cref="ArgumentException">A permission verb is empty.</exception>
     void Deny(params string[] permissions);
 }

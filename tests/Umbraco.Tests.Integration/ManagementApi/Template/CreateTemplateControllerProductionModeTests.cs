@@ -40,6 +40,6 @@ public class CreateTemplateControllerProductionModeTests : ManagementApiTest<Cre
         Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.That(
             response.Headers.GetValues(Constants.Headers.DeniedPermission),
-            Is.EqualTo(new[] { Constants.Permissions.Template.Create }));
+            Is.EqualTo(new[] { Constants.Permissions.Entities.Template.Create }));
     }
 }

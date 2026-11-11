@@ -31,7 +31,7 @@ public class ImportingADictionaryItemIsForbiddenWhenUpdatesAreLockedTests : Envi
         Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.That(
             response.Headers.GetValues(Constants.Headers.DeniedPermission),
-            Is.EqualTo(new[] { Constants.Permissions.DictionaryItem.Update }));
+            Is.EqualTo(new[] { Constants.Permissions.Entities.DictionaryItem.Update }));
     }
 
     /// <summary>
@@ -41,6 +41,6 @@ public class ImportingADictionaryItemIsForbiddenWhenUpdatesAreLockedTests : Envi
     {
         /// <inheritdoc />
         public void Configure(IEnvironmentPermissionsBuilder builder)
-            => builder.Deny(Constants.Permissions.DictionaryItem.Update);
+            => builder.Deny(Constants.Permissions.Entities.DictionaryItem.Update);
     }
 }

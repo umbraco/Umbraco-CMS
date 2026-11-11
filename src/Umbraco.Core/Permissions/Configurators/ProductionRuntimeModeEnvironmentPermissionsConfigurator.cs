@@ -38,10 +38,10 @@ public sealed class ProductionRuntimeModeEnvironmentPermissionsConfigurator : IE
         }
 
         builder.Deny(
-            Constants.Permissions.Template.Create,
-            Constants.Permissions.Template.Update,
-            Constants.Permissions.PartialView.Create,
-            Constants.Permissions.PartialView.Update,
-            Constants.Permissions.PartialView.Delete);
+            Constants.Permissions.Entities.Template.Create,
+            Constants.Permissions.Entities.Template.Update,
+            Constants.Permissions.Entities.PartialView.Create,
+            Constants.Permissions.Entities.PartialView.Update,
+            Constants.Permissions.Entities.PartialView.Delete);
     }
 }

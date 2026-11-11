@@ -16,9 +16,9 @@ namespace Umbraco.Cms.Api.Management.Permissions;
 /// is decided by the registered <see cref="IEnvironmentPermissionsConfigurator"/> instances.
 /// <para>
 /// The permission verb an action needs is the declared prefix followed by the change its HTTP method makes: with
-/// <c>[RequiresPermissionsFor(Constants.Permissions.DocumentType.Prefix)]</c>, a POST needs
-/// <see cref="Constants.Permissions.DocumentType.Create"/>. A package names its own prefix, so its verbs don't collide
-/// with Umbraco's.
+/// <c>[RequiresPermissionsFor(Constants.Permissions.Entities.DocumentType.Prefix)]</c>, a POST needs
+/// <see cref="Constants.Permissions.Entities.DocumentType.Create"/>. A package names its own prefix, so its verbs
+/// don't collide with Umbraco's.
 /// </para>
 /// <para>
 /// An action with <see cref="RequiresPermissionsAttribute"/> is checked against its declared verbs instead, and this
@@ -44,7 +44,7 @@ public sealed class RequiresPermissionsForAttribute : Attribute, IAsyncAuthoriza
     /// </summary>
     /// <param name="permissionPrefix">
     /// The prefix of the permission verbs the controller's actions need, for example
-    /// <see cref="Constants.Permissions.DocumentType.Prefix"/>.
+    /// <see cref="Constants.Permissions.Entities.DocumentType.Prefix"/>.
     /// </param>
     public RequiresPermissionsForAttribute(string permissionPrefix)
     {
@@ -84,8 +84,8 @@ public sealed class RequiresPermissionsForAttribute : Attribute, IAsyncAuthoriza
     /// <returns>The prefix followed by the HTTP method's change, or <c>null</c> for a method that changes nothing.</returns>
     /// <remarks>Both enforcement and the OpenAPI document use this, so they can't disagree.</remarks>
     internal string? InferPermission(string? httpMethod)
-        => InferOperation(httpMethod) is PermissionOperation operation
-            ? $"{PermissionPrefix}.{operation}"
+        => InferOperation(httpMethod) is string operation
+            ? PermissionVerbs.For(PermissionPrefix, operation)
             : null;
 
     /// <summary>
@@ -93,10 +93,11 @@ public sealed class RequiresPermissionsForAttribute : Attribute, IAsyncAuthoriza
     /// </summary>
     /// <param name="httpMethod">The HTTP method the action responds to.</param>
     /// <returns>
-    /// <c>null</c> for GET, HEAD and OPTIONS, which change nothing. Otherwise the change: PUT, PATCH and any unrecognised
-    /// method are treated as <see cref="PermissionOperation.Update"/>.
+    /// <c>null</c> for GET, HEAD and OPTIONS, which change nothing. Otherwise one of
+    /// <see cref="Constants.Permissions.Operations"/>: PUT, PATCH and any unrecognised method are treated as
+    /// <see cref="Constants.Permissions.Operations.Update"/>.
     /// </returns>
-    private static PermissionOperation? InferOperation(string? httpMethod)
+    private static string? InferOperation(string? httpMethod)
     {
         var method = httpMethod ?? string.Empty;
 
@@ -107,14 +108,14 @@ public sealed class RequiresPermissionsForAttribute : Attribute, IAsyncAuthoriza
 
         if (HttpMethods.IsPost(method))
         {
-            return PermissionOperation.Create;
+            return Constants.Permissions.Operations.Create;
         }
 
         if (HttpMethods.IsDelete(method))
         {
-            return PermissionOperation.Delete;
+            return Constants.Permissions.Operations.Delete;
         }
 
-        return PermissionOperation.Update;
+        return Constants.Permissions.Operations.Update;
     }
 }

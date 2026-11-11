@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 [VersionedApiBackOfficeRoute("dictionary")]
 [ApiExplorerSettings(GroupName = "Dictionary")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDictionary)]
-[RequiresPermissionsFor(Constants.Permissions.DictionaryItem.Prefix)]
+[RequiresPermissionsFor(Constants.Permissions.Entities.DictionaryItem.Prefix)]
 public abstract class DictionaryControllerBase : ManagementApiControllerBase
 {
     protected IActionResult DictionaryItemOperationStatusResult(DictionaryItemOperationStatus status) =>

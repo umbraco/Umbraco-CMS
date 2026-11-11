@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Folder;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.DocumentType}/folder")]
 [ApiExplorerSettings(GroupName = "Document Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-[RequiresPermissionsFor(Constants.Permissions.DocumentType.Prefix)]
+[RequiresPermissionsFor(Constants.Permissions.Entities.DocumentType.Prefix)]
 public abstract class DocumentTypeFolderControllerBase : FolderManagementControllerBase<IContentType>
 {
     protected DocumentTypeFolderControllerBase(

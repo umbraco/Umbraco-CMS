@@ -26,7 +26,7 @@ public class DenialNamesWhatWasDeniedInAHeaderTests : EnvironmentPermissionsApiT
         Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.That(
             response.Headers.GetValues(Constants.Headers.DeniedPermission),
-            Is.EqualTo(new[] { Constants.Permissions.DataType.Delete }));
+            Is.EqualTo(new[] { Constants.Permissions.Entities.DataType.Delete }));
     }
 
     /// <summary>
@@ -36,6 +36,6 @@ public class DenialNamesWhatWasDeniedInAHeaderTests : EnvironmentPermissionsApiT
     {
         /// <inheritdoc />
         public void Configure(IEnvironmentPermissionsBuilder builder)
-            => builder.Deny(Constants.Permissions.DataType.Delete);
+            => builder.Deny(Constants.Permissions.Entities.DataType.Delete);
     }
 }

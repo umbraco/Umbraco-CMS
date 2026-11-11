@@ -66,8 +66,8 @@ public class DeletingADataTypeIsStillPermittedWhenOnlyCreateAndUpdateAreLockedTe
         /// <inheritdoc />
         public void Configure(IEnvironmentPermissionsBuilder builder)
         {
-            builder.Deny(Constants.Permissions.DataType.Create);
-            builder.Deny(Constants.Permissions.DataType.Update);
+            builder.Deny(Constants.Permissions.Entities.DataType.Create);
+            builder.Deny(Constants.Permissions.Entities.DataType.Update);
         }
     }
 }

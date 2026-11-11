@@ -63,6 +63,6 @@ public class UpdatingADictionaryItemIsForbiddenTests : EnvironmentPermissionsApi
     {
         /// <inheritdoc />
         public void Configure(IEnvironmentPermissionsBuilder builder)
-            => builder.Deny(Constants.Permissions.DictionaryItem.Create, Constants.Permissions.DictionaryItem.Update, Constants.Permissions.DictionaryItem.Delete);
+            => builder.Deny(Constants.Permissions.Entities.DictionaryItem.Create, Constants.Permissions.Entities.DictionaryItem.Update, Constants.Permissions.Entities.DictionaryItem.Delete);
     }
 }

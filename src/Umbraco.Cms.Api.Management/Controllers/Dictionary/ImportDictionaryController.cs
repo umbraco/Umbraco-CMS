@@ -49,7 +49,9 @@ public class ImportDictionaryController : DictionaryControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Imports a dictionary.")]
     [EndpointDescription("Imports a dictionary from the provided file upload.")]
-    [RequiresPermissions([Constants.Permissions.DictionaryItem.Create, Constants.Permissions.DictionaryItem.Update])]
+    [RequiresPermissions([
+        Constants.Permissions.Entities.DictionaryItem.Create,
+        Constants.Permissions.Entities.DictionaryItem.Update])]
     public async Task<IActionResult> Import(
         CancellationToken cancellationToken,
         ImportDictionaryRequestModel importDictionaryRequestModel)

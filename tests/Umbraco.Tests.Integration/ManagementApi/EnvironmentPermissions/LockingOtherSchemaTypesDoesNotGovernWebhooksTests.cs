@@ -42,23 +42,23 @@ public class LockingOtherSchemaTypesDoesNotGovernWebhooksTests : EnvironmentPerm
         /// <inheritdoc />
         public void Configure(IEnvironmentPermissionsBuilder builder)
             => builder.Deny(
-                Constants.Permissions.DocumentType.Create,
-                Constants.Permissions.DocumentType.Update,
-                Constants.Permissions.DocumentType.Delete,
-                Constants.Permissions.MediaType.Create,
-                Constants.Permissions.MediaType.Update,
-                Constants.Permissions.MediaType.Delete,
-                Constants.Permissions.MemberType.Create,
-                Constants.Permissions.MemberType.Update,
-                Constants.Permissions.MemberType.Delete,
-                Constants.Permissions.DataType.Create,
-                Constants.Permissions.DataType.Update,
-                Constants.Permissions.DataType.Delete,
-                Constants.Permissions.DictionaryItem.Create,
-                Constants.Permissions.DictionaryItem.Update,
-                Constants.Permissions.DictionaryItem.Delete,
-                Constants.Permissions.Language.Create,
-                Constants.Permissions.Language.Update,
-                Constants.Permissions.Language.Delete);
+                Constants.Permissions.Entities.DocumentType.Create,
+                Constants.Permissions.Entities.DocumentType.Update,
+                Constants.Permissions.Entities.DocumentType.Delete,
+                Constants.Permissions.Entities.MediaType.Create,
+                Constants.Permissions.Entities.MediaType.Update,
+                Constants.Permissions.Entities.MediaType.Delete,
+                Constants.Permissions.Entities.MemberType.Create,
+                Constants.Permissions.Entities.MemberType.Update,
+                Constants.Permissions.Entities.MemberType.Delete,
+                Constants.Permissions.Entities.DataType.Create,
+                Constants.Permissions.Entities.DataType.Update,
+                Constants.Permissions.Entities.DataType.Delete,
+                Constants.Permissions.Entities.DictionaryItem.Create,
+                Constants.Permissions.Entities.DictionaryItem.Update,
+                Constants.Permissions.Entities.DictionaryItem.Delete,
+                Constants.Permissions.Entities.Language.Create,
+                Constants.Permissions.Entities.Language.Update,
+                Constants.Permissions.Entities.Language.Delete);
     }
 }

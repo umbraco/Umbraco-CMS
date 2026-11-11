@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberGroup;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.MemberGroup}")]
 [ApiExplorerSettings(GroupName = "Member Group")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessMembers)]
-[RequiresPermissionsFor(Constants.Permissions.MemberGroup.Prefix)]
+[RequiresPermissionsFor(Constants.Permissions.Entities.MemberGroup.Prefix)]
 public class MemberGroupControllerBase : ManagementApiControllerBase
 {
     protected IActionResult MemberGroupOperationStatusResult(MemberGroupOperationStatus status) =>

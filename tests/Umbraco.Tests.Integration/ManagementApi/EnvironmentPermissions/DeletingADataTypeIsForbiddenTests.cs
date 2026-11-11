@@ -33,6 +33,6 @@ public class DeletingADataTypeIsForbiddenTests : EnvironmentPermissionsApiTest<D
     {
         /// <inheritdoc />
         public void Configure(IEnvironmentPermissionsBuilder builder)
-            => builder.Deny(Constants.Permissions.DataType.Create, Constants.Permissions.DataType.Update, Constants.Permissions.DataType.Delete);
+            => builder.Deny(Constants.Permissions.Entities.DataType.Create, Constants.Permissions.Entities.DataType.Update, Constants.Permissions.Entities.DataType.Delete);
     }
 }

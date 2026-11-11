@@ -35,7 +35,7 @@ internal sealed class DeniedPermissionHeaderFilterTests
             Assert.That(forbidden?.Headers?.Keys, Does.Contain(Constants.Headers.DeniedPermission));
             Assert.That(
                 forbidden?.Headers?[Constants.Headers.DeniedPermission].Description,
-                Does.Contain(Constants.Permissions.DocumentType.Create));
+                Does.Contain(Constants.Permissions.Entities.DocumentType.Create));
         });
     }
 
@@ -49,7 +49,7 @@ internal sealed class DeniedPermissionHeaderFilterTests
 
         Assert.That(
             operation.Responses?.GetValueOrDefault(Forbidden)?.Headers?[Constants.Headers.DeniedPermission].Description,
-            Does.Contain(Constants.Permissions.Template.Create));
+            Does.Contain(Constants.Permissions.Entities.Template.Create));
     }
 
     [Test]
@@ -131,7 +131,7 @@ internal sealed class DeniedPermissionHeaderFilterTests
         protected override string ApiName => DeniedPermissionHeaderFilterTests.ApiName;
     }
 
-    [RequiresPermissionsFor(Constants.Permissions.DocumentType.Prefix)]
+    [RequiresPermissionsFor(Constants.Permissions.Entities.DocumentType.Prefix)]
     private sealed class GovernedController
     {
         public void Action()
@@ -139,7 +139,7 @@ internal sealed class DeniedPermissionHeaderFilterTests
         }
     }
 
-    [RequiresPermissionsFor(Constants.Permissions.DocumentType.Prefix)]
+    [RequiresPermissionsFor(Constants.Permissions.Entities.DocumentType.Prefix)]
     private sealed class GovernedReadController
     {
         [RequiresPermissions([])]
@@ -150,7 +150,7 @@ internal sealed class DeniedPermissionHeaderFilterTests
 
     private sealed class DeclaringController
     {
-        [RequiresPermissions([Constants.Permissions.Template.Create])]
+        [RequiresPermissions([Constants.Permissions.Entities.Template.Create])]
         public void Action()
         {
         }

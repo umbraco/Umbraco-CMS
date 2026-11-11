@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Language;
 /// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Language)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Language))]
-[RequiresPermissionsFor(Constants.Permissions.Language.Prefix)]
+[RequiresPermissionsFor(Constants.Permissions.Entities.Language.Prefix)]
 public abstract class LanguageControllerBase : ManagementApiControllerBase
 {
     protected IActionResult LanguageOperationStatusResult(LanguageOperationStatus status) =>

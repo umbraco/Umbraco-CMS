@@ -12,12 +12,12 @@ namespace Umbraco.Cms.Core.Permissions;
 /// {
 ///     public void Configure(IEnvironmentPermissionsBuilder builder)
 ///         => builder.Deny(
-///             Constants.Permissions.DocumentType.Create,
-///             Constants.Permissions.DocumentType.Update,
-///             Constants.Permissions.DocumentType.Delete,
-///             Constants.Permissions.DataType.Create,
-///             Constants.Permissions.DataType.Update,
-///             Constants.Permissions.DataType.Delete);
+///             Constants.Permissions.Entities.DocumentType.Create,
+///             Constants.Permissions.Entities.DocumentType.Update,
+///             Constants.Permissions.Entities.DocumentType.Delete,
+///             Constants.Permissions.Entities.DataType.Create,
+///             Constants.Permissions.Entities.DataType.Update,
+///             Constants.Permissions.Entities.DataType.Delete);
 /// }
 ///
 /// public class LockContentModellingComposer : IComposer

@@ -55,7 +55,7 @@ public class UpdateTemplateControllerProductionModeTests : ManagementApiTest<Upd
         Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.That(
             response.Headers.GetValues(Constants.Headers.DeniedPermission),
-            Is.EqualTo(new[] { Constants.Permissions.Template.Update }));
+            Is.EqualTo(new[] { Constants.Permissions.Entities.Template.Update }));
     }
 
     [Test]
@@ -76,6 +76,6 @@ public class UpdateTemplateControllerProductionModeTests : ManagementApiTest<Upd
         Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.That(
             response.Headers.GetValues(Constants.Headers.DeniedPermission),
-            Is.EqualTo(new[] { Constants.Permissions.Template.Update }));
+            Is.EqualTo(new[] { Constants.Permissions.Entities.Template.Update }));
     }
 }

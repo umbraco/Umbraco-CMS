@@ -32,7 +32,7 @@ public class CreatingATemplateForADocumentTypeIsForbiddenWhenTemplatesAreLockedT
         Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.That(
             response.Headers.GetValues(Constants.Headers.DeniedPermission),
-            Is.EqualTo(new[] { Constants.Permissions.Template.Create }));
+            Is.EqualTo(new[] { Constants.Permissions.Entities.Template.Create }));
     }
 
     /// <summary>
@@ -42,6 +42,6 @@ public class CreatingATemplateForADocumentTypeIsForbiddenWhenTemplatesAreLockedT
     {
         /// <inheritdoc />
         public void Configure(IEnvironmentPermissionsBuilder builder)
-            => builder.Deny(Constants.Permissions.Template.Create, Constants.Permissions.Template.Update, Constants.Permissions.Template.Delete);
+            => builder.Deny(Constants.Permissions.Entities.Template.Create, Constants.Permissions.Entities.Template.Update, Constants.Permissions.Entities.Template.Delete);
     }
 }

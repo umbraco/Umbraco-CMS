@@ -30,7 +30,7 @@ public class EnvironmentPermissionsFilterTests
     // A POST that creates a template and updates the document type.
     private class TemplateForDocumentTypeController
     {
-        [RequiresPermissions([Constants.Permissions.Template.Create, Constants.Permissions.DocumentType.Update])]
+        [RequiresPermissions([Constants.Permissions.Entities.Template.Create, Constants.Permissions.Entities.DocumentType.Update])]
         public void Post()
         {
         }
@@ -39,13 +39,13 @@ public class EnvironmentPermissionsFilterTests
     private sealed class LockDocumentTypes : IEnvironmentPermissionsConfigurator
     {
         public void Configure(IEnvironmentPermissionsBuilder builder)
-            => builder.Deny(Constants.Permissions.DocumentType.Create, Constants.Permissions.DocumentType.Update, Constants.Permissions.DocumentType.Delete);
+            => builder.Deny(Constants.Permissions.Entities.DocumentType.Create, Constants.Permissions.Entities.DocumentType.Update, Constants.Permissions.Entities.DocumentType.Delete);
     }
 
     private sealed class LockDocumentTypeCreationOnly : IEnvironmentPermissionsConfigurator
     {
         public void Configure(IEnvironmentPermissionsBuilder builder)
-            => builder.Deny(Constants.Permissions.DocumentType.Create);
+            => builder.Deny(Constants.Permissions.Entities.DocumentType.Create);
     }
 
     [Test]
@@ -89,7 +89,7 @@ public class EnvironmentPermissionsFilterTests
         AuthorizationFilterContext unlocked = CreateContext(HttpMethods.Post, lockDocumentTypes: true);
 
         await CreateFilter().OnAuthorizationAsync(locked);
-        await CreateFilter(Constants.Permissions.Webhook.Prefix).OnAuthorizationAsync(unlocked);
+        await CreateFilter(Constants.Permissions.Entities.Webhook.Prefix).OnAuthorizationAsync(unlocked);
 
         Assert.Multiple(() =>
         {
@@ -120,7 +120,7 @@ public class EnvironmentPermissionsFilterTests
 
         Assert.That(
             context.HttpContext.Response.Headers[Constants.Headers.DeniedPermission].ToString(),
-            Is.EqualTo(Constants.Permissions.DocumentType.Update));
+            Is.EqualTo(Constants.Permissions.Entities.DocumentType.Update));
     }
 
     [Test]
@@ -135,7 +135,7 @@ public class EnvironmentPermissionsFilterTests
             AssertForbidden(context);
             Assert.That(
                 context.HttpContext.Response.Headers[Constants.Headers.DeniedPermission].ToString(),
-                Is.EqualTo(Constants.Permissions.DocumentType.Update));
+                Is.EqualTo(Constants.Permissions.Entities.DocumentType.Update));
         });
     }
 
@@ -168,7 +168,7 @@ public class EnvironmentPermissionsFilterTests
             AssertForbidden(context);
             Assert.That(
                 context.HttpContext.Response.Headers[Constants.Headers.DeniedPermission].ToString(),
-                Is.EqualTo(Constants.Permissions.Template.Create));
+                Is.EqualTo(Constants.Permissions.Entities.Template.Create));
         });
     }
 
@@ -180,7 +180,7 @@ public class EnvironmentPermissionsFilterTests
             new LockTemplateCreation(),
             typeof(TemplateForDocumentTypeController));
 
-        await CreateFilter(Constants.Permissions.Template.Prefix).OnAuthorizationAsync(context);
+        await CreateFilter(Constants.Permissions.Entities.Template.Prefix).OnAuthorizationAsync(context);
 
         AssertPermitted(context);
     }
@@ -200,7 +200,7 @@ public class EnvironmentPermissionsFilterTests
             AssertForbidden(context);
             Assert.That(
                 context.HttpContext.Response.Headers[Constants.Headers.DeniedPermission].ToString(),
-                Is.EqualTo(Constants.Permissions.Template.Create));
+                Is.EqualTo(Constants.Permissions.Entities.Template.Create));
         });
     }
 
@@ -220,7 +220,7 @@ public class EnvironmentPermissionsFilterTests
     private sealed class LockTemplateCreation : IEnvironmentPermissionsConfigurator
     {
         public void Configure(IEnvironmentPermissionsBuilder builder)
-            => builder.Deny(Constants.Permissions.Template.Create);
+            => builder.Deny(Constants.Permissions.Entities.Template.Create);
     }
 
     private static AuthorizationFilterContext CreateContext(
@@ -266,7 +266,7 @@ public class EnvironmentPermissionsFilterTests
         return services.BuildServiceProvider();
     }
 
-    private static RequiresPermissionsForAttribute CreateFilter(string permissionPrefix = Constants.Permissions.DocumentType.Prefix)
+    private static RequiresPermissionsForAttribute CreateFilter(string permissionPrefix = Constants.Permissions.Entities.DocumentType.Prefix)
         => new(permissionPrefix);
 
     private static RequiresPermissionsAttribute DeclaredFilter(AuthorizationFilterContext context)

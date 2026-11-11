@@ -10,6 +10,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Permissions;
 [TestFixture]
 public class PermissionPrefixDeclarationTests
 {
+    private const string PrefixField = "Prefix";
+
     private static readonly (Type Controller, string Prefix)[] Declarations =
         typeof(RequiresPermissionsForAttribute).Assembly
             .GetTypes()
@@ -19,9 +21,9 @@ public class PermissionPrefixDeclarationTests
             .ToArray();
 
     private static readonly string[] KnownPrefixes =
-        typeof(Constants.Permissions)
+        typeof(Constants.Permissions.Entities)
             .GetNestedTypes()
-            .Select(type => type.GetField(nameof(Constants.Permissions.DocumentType.Prefix))?.GetRawConstantValue())
+            .Select(type => type.GetField(PrefixField)?.GetRawConstantValue())
             .OfType<string>()
             .ToArray();
 
@@ -29,10 +31,10 @@ public class PermissionPrefixDeclarationTests
     public void Every_Umbraco_Permission_Prefix_Is_Named_After_Its_Constants_Class()
         => Assert.Multiple(() =>
         {
-            foreach (Type type in typeof(Constants.Permissions).GetNestedTypes())
+            foreach (Type type in typeof(Constants.Permissions.Entities).GetNestedTypes())
             {
                 Assert.That(
-                    type.GetField(nameof(Constants.Permissions.DocumentType.Prefix))?.GetRawConstantValue(),
+                    type.GetField(PrefixField)?.GetRawConstantValue(),
                     Is.EqualTo($"Umb.{type.Name}"),
                     type.Name);
             }
@@ -51,6 +53,6 @@ public class PermissionPrefixDeclarationTests
         Assert.That(
             unknown,
             Is.Empty,
-            $"Prefixes outside {nameof(Constants)}.{nameof(Constants.Permissions)}: {string.Join(", ", unknown)}.");
+            $"Prefixes outside Constants.Permissions.Entities: {string.Join(", ", unknown)}.");
     }
 }

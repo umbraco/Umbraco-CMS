@@ -11,9 +11,9 @@ public class RequiresPermissionsAttributeTests
     [Test]
     public void A_Permission_Declared_Twice_Is_Needed_Once()
         => Assert.That(
-            new RequiresPermissionsAttribute([Constants.Permissions.DocumentType.Update, Constants.Permissions.DocumentType.Update])
+            new RequiresPermissionsAttribute([Constants.Permissions.Entities.DocumentType.Update, Constants.Permissions.Entities.DocumentType.Update])
                 .Permissions,
-            Is.EqualTo(new[] { Constants.Permissions.DocumentType.Update }));
+            Is.EqualTo(new[] { Constants.Permissions.Entities.DocumentType.Update }));
 
     [Test]
     public void Declaring_No_Permissions_Needs_None()

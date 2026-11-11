@@ -28,21 +28,21 @@ public class EnvironmentPermissionsTests
         Assert.Multiple(() =>
         {
             Assert.That(environmentPermissions.DeniedPermissions, Is.Empty);
-            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.DocumentType.Create), Is.False);
+            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.Entities.DocumentType.Create), Is.False);
         });
     }
 
     [Test]
     public void Only_The_Permissions_A_Configurator_Names_Are_Denied()
     {
-        EnvironmentPermissions environmentPermissions = CreateEnvironmentPermissions(x => x.Deny(Constants.Permissions.DocumentType.Create));
+        EnvironmentPermissions environmentPermissions = CreateEnvironmentPermissions(x => x.Deny(Constants.Permissions.Entities.DocumentType.Create));
 
         Assert.Multiple(() =>
         {
-            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.DocumentType.Create), Is.True);
-            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.DocumentType.Update), Is.False);
-            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.DataType.Create), Is.False);
-            Assert.That(environmentPermissions.DeniedPermissions, Is.EquivalentTo(new[] { Constants.Permissions.DocumentType.Create }));
+            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.Entities.DocumentType.Create), Is.True);
+            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.Entities.DocumentType.Update), Is.False);
+            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.Entities.DataType.Create), Is.False);
+            Assert.That(environmentPermissions.DeniedPermissions, Is.EquivalentTo(new[] { Constants.Permissions.Entities.DocumentType.Create }));
         });
     }
 
@@ -50,17 +50,17 @@ public class EnvironmentPermissionsTests
     public void Every_Configurators_Denials_Are_Kept_Whatever_The_Order()
     {
         EnvironmentPermissions environmentPermissions = CreateEnvironmentPermissions(
-            x => x.Deny(Constants.Permissions.DocumentType.Delete),
-            x => x.Deny(Constants.Permissions.DocumentType.Create),
-            x => x.Deny(Constants.Permissions.DataType.Update));
+            x => x.Deny(Constants.Permissions.Entities.DocumentType.Delete),
+            x => x.Deny(Constants.Permissions.Entities.DocumentType.Create),
+            x => x.Deny(Constants.Permissions.Entities.DataType.Update));
 
         Assert.That(
             environmentPermissions.DeniedPermissions,
             Is.EquivalentTo(new[]
             {
-                Constants.Permissions.DocumentType.Delete,
-                Constants.Permissions.DocumentType.Create,
-                Constants.Permissions.DataType.Update,
+                Constants.Permissions.Entities.DocumentType.Delete,
+                Constants.Permissions.Entities.DocumentType.Create,
+                Constants.Permissions.Entities.DataType.Update,
             }));
     }
 
@@ -68,12 +68,12 @@ public class EnvironmentPermissionsTests
     public void Denying_The_Same_Permission_Twice_Lists_It_Once()
     {
         EnvironmentPermissions environmentPermissions = CreateEnvironmentPermissions(
-            x => x.Deny(Constants.Permissions.DataType.Create, Constants.Permissions.DataType.Delete),
-            x => x.Deny(Constants.Permissions.DataType.Delete));
+            x => x.Deny(Constants.Permissions.Entities.DataType.Create, Constants.Permissions.Entities.DataType.Delete),
+            x => x.Deny(Constants.Permissions.Entities.DataType.Delete));
 
         Assert.That(
             environmentPermissions.DeniedPermissions,
-            Is.EquivalentTo(new[] { Constants.Permissions.DataType.Create, Constants.Permissions.DataType.Delete }));
+            Is.EquivalentTo(new[] { Constants.Permissions.Entities.DataType.Create, Constants.Permissions.Entities.DataType.Delete }));
     }
 
     [Test]
@@ -87,9 +87,9 @@ public class EnvironmentPermissionsTests
     [Test]
     public void Permissions_Are_Matched_Case_Sensitively()
     {
-        EnvironmentPermissions environmentPermissions = CreateEnvironmentPermissions(x => x.Deny(Constants.Permissions.DocumentType.Create));
+        EnvironmentPermissions environmentPermissions = CreateEnvironmentPermissions(x => x.Deny(Constants.Permissions.Entities.DocumentType.Create));
 
-        Assert.That(environmentPermissions.IsDenied(Constants.Permissions.DocumentType.Create.ToLowerInvariant()), Is.False);
+        Assert.That(environmentPermissions.IsDenied(Constants.Permissions.Entities.DocumentType.Create.ToLowerInvariant()), Is.False);
     }
 
     [TestCase("")]
@@ -103,17 +103,17 @@ public class EnvironmentPermissionsTests
         string[]? seen = null;
 
         CreateEnvironmentPermissions(
-            x => x.Deny(Constants.Permissions.DocumentType.Create),
+            x => x.Deny(Constants.Permissions.Entities.DocumentType.Create),
             x => seen = x.DeniedPermissions.ToArray());
 
-        Assert.That(seen, Is.EquivalentTo(new[] { Constants.Permissions.DocumentType.Create }));
+        Assert.That(seen, Is.EquivalentTo(new[] { Constants.Permissions.Entities.DocumentType.Create }));
     }
 
     [Test]
     public void Denying_After_Construction_Throws()
     {
-        EnvironmentPermissions environmentPermissions = CreateEnvironmentPermissions(x => x.Deny(Constants.Permissions.DocumentType.Create));
+        EnvironmentPermissions environmentPermissions = CreateEnvironmentPermissions(x => x.Deny(Constants.Permissions.Entities.DocumentType.Create));
 
-        Assert.Throws<InvalidOperationException>(() => environmentPermissions.Deny(Constants.Permissions.DataType.Create));
+        Assert.Throws<InvalidOperationException>(() => environmentPermissions.Deny(Constants.Permissions.Entities.DataType.Create));
     }
 }

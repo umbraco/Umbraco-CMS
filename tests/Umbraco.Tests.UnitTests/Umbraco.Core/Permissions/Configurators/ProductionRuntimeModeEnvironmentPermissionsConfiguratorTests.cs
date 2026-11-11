@@ -21,10 +21,10 @@ public class ProductionRuntimeModeEnvironmentPermissionsConfiguratorTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.Template.Create), Is.True);
-            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.Template.Update), Is.True);
-            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.PartialView.Create), Is.True);
-            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.PartialView.Update), Is.True);
+            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.Entities.Template.Create), Is.True);
+            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.Entities.Template.Update), Is.True);
+            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.Entities.PartialView.Create), Is.True);
+            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.Entities.PartialView.Update), Is.True);
         });
     }
 
@@ -36,8 +36,8 @@ public class ProductionRuntimeModeEnvironmentPermissionsConfiguratorTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.Template.Delete), Is.False);
-            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.PartialView.Delete), Is.True);
+            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.Entities.Template.Delete), Is.False);
+            Assert.That(environmentPermissions.IsDenied(Constants.Permissions.Entities.PartialView.Delete), Is.True);
         });
     }
 
@@ -47,11 +47,11 @@ public class ProductionRuntimeModeEnvironmentPermissionsConfiguratorTests
             CreateEnvironmentPermissions(RuntimeMode.Production).DeniedPermissions,
             Is.EquivalentTo(new[]
             {
-                Constants.Permissions.Template.Create,
-                Constants.Permissions.Template.Update,
-                Constants.Permissions.PartialView.Create,
-                Constants.Permissions.PartialView.Update,
-                Constants.Permissions.PartialView.Delete,
+                Constants.Permissions.Entities.Template.Create,
+                Constants.Permissions.Entities.Template.Update,
+                Constants.Permissions.Entities.PartialView.Create,
+                Constants.Permissions.Entities.PartialView.Update,
+                Constants.Permissions.Entities.PartialView.Delete,
             }));
 
     [TestCase(RuntimeMode.Development)]
