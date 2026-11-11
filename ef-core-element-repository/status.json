@@ -2,7 +2,7 @@
   "campaign": "Element repository and service from NPoco to EF Core",
   "targetBranch": "v18/feature/ef-core-repositories",
   "planFile": ".claude/campaign/ef-core-element-repository/CAMPAIGN.md",
-  "updated": "10-11-2026",
+  "updated": "11-11-2026",
   "artifact": {
     "url": "https://claude.ai/artifact/Q5Bttu57VfLyS1ajt7nKtU",
     "title": "Element Repository Campaign"
@@ -262,7 +262,7 @@
         }
       ],
       "acceptance": "New fixture green on both providers; Document fixtures unchanged.",
-      "notes": "Merge-up note 09-11-2026: the write hooks on EntityTypeContainerService are now GetContainedEntityAsync(IEntitySlim)/SaveContainedEntityAsync (element container service wraps the NPoco repository); IPublishableContentService gained GetPagedOfTypesAsync(Guid[] keys, skip, take, ordering, ct) with a bridge on the sync PublishableContentServiceBase that PR 5 removes; ContentSchedule carries IncludeInvariantForVariant and the EF Core schedule DTO/mapping already handle it; upstream's library-element search indexing (DraftContentChangeStrategy, ContentTypeIndexingService) calls IElementService async members, so PR 5 must keep GetByIdsAsync/GetPagedOfTypesAsync/GetContentSchedulesByKeysAsync. Review 10-11-2026: production code approved as written; factory keeps the NPoco element builder's name source (node row, required) while the document builder reads the version row, matching each NPoco original. The local SQL Server run was skipped (no local server on this machine); the pipeline covers it. Committed as 496e203212c and opened as draft PR #24542 on 10-11-2026."
+      "notes": "Merge-up note 09-11-2026: the write hooks on EntityTypeContainerService are now GetContainedEntityAsync(IEntitySlim)/SaveContainedEntityAsync (element container service wraps the NPoco repository); IPublishableContentService gained GetPagedOfTypesAsync(Guid[] keys, skip, take, ordering, ct) with a bridge on the sync PublishableContentServiceBase that PR 5 removes; ContentSchedule carries IncludeInvariantForVariant and the EF Core schedule DTO/mapping already handle it; upstream's library-element search indexing (DraftContentChangeStrategy, ContentTypeIndexingService) calls IElementService async members, so PR 5 must keep GetByIdsAsync/GetPagedOfTypesAsync/GetContentSchedulesByKeysAsync. Review 10-11-2026: production code approved as written; factory keeps the NPoco element builder's name source (node row, required) while the document builder reads the version row, matching each NPoco original. The local SQL Server run was skipped (no local server on this machine); the pipeline covers it. Committed as 496e203212c and opened as draft PR #24542 on 10-11-2026. Pipeline 11-11-2026: SQLite integration parts 2 and 3 and E2E part 1 red, not yet triaged; search jobs red on the known baseline."
     },
     {
       "id": 5,
@@ -359,6 +359,10 @@
     }
   ],
   "log": [
+    {
+      "date": "11-11-2026",
+      "text": "Home machine synced. Pipeline run on #24542 (11-11): build, unit tests, SQLite integration part 1 and two of three E2E parts green; SQLite integration parts 2 and 3 (Linux and macOS), both search jobs and E2E part 1 red. The search jobs are the known relation-stub baseline; the integration parts 2 and 3 and E2E part 1 are not yet triaged."
+    },
     {
       "date": "10-11-2026",
       "text": "PR 4 committed as 496e203212c and opened as draft #24542 against v18/feature/ef-core-repositories."
