@@ -62,7 +62,7 @@ export class UmbLanguageItemRefElement extends UmbEntityItemRefFrameMixin(UmbLit
 				<slot name="actions" slot="actions"></slot>
 				<umb-icon slot="icon" name="icon-globe"></umb-icon>
 			</uui-ref-node>
-			${this.renderEntityFrame(this.item.name)}
+			${this.renderEntityFrame()}
 		`;
 	}
 }

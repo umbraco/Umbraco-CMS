@@ -150,7 +150,7 @@ export class UmbDocumentItemRefElement extends UmbEntityItemRefFrameMixin(UmbLit
 				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()}
 				${this._ancestorPath ? html`<span slot="detail" class="ancestor-path">${this._ancestorPath}</span>` : nothing}
 			</uui-ref-node>
-			${this.renderEntityFrame(this._name)}
+			${this.renderEntityFrame()}
 		`;
 	}
 
