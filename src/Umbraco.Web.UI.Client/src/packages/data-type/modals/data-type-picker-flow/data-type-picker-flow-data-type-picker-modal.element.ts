@@ -1,11 +1,13 @@
 import { UmbDataTypeCollectionRepository } from '../../collection/index.js';
+import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDataTypeItemModel } from '../../repository/item/types.js';
 import type {
 	UmbDataTypePickerFlowDataTypePickerModalData,
 	UmbDataTypePickerFlowDataTypePickerModalValue,
 } from './data-type-picker-flow-data-type-picker-modal.token.js';
-import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbSchemaOperationAllowedController } from '@umbraco-cms/backoffice/schema-lockdown';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-data-type-picker-flow-data-type-picker-modal')
@@ -16,7 +18,20 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 	@state()
 	private _dataTypes?: Array<UmbDataTypeItemModel>;
 
+	@state()
+	private _isCreateAllowed = true;
+
 	private _propertyEditorUiAlias!: string;
+
+	constructor() {
+		super();
+
+		const createAllowed = new UmbSchemaOperationAllowedController(this, {
+			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
+			operation: 'create',
+		});
+		this.observe(createAllowed.allowed, (allowed) => (this._isCreateAllowed = allowed), null);
+	}
 
 	override connectedCallback(): void {
 		super.connectedCallback();
@@ -63,7 +78,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectEditorConfiguration')}>
-				<uui-box>${this.#renderDataTypes()} ${this.#renderCreate()}</uui-box>
+				<uui-box>${this.#renderDataTypes()} ${this.#renderCreate()} ${this.#renderEmpty()}</uui-box>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				</div>
@@ -94,6 +109,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 	}
 
 	#renderCreate() {
+		if (!this._isCreateAllowed) return nothing;
 		return html`
 			<uui-button
 				id="create-button"
@@ -106,6 +122,11 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 				</div>
 			</uui-button>
 		`;
+	}
+
+	#renderEmpty() {
+		if (!this._dataTypes || this._dataTypes.length > 0 || this._isCreateAllowed) return nothing;
+		return html`<p>${this.localize.term('defaultdialogs_selectEditorConfigurationEmptyMessage')}</p>`;
 	}
 
 	static override styles = [

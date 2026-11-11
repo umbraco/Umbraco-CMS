@@ -1,6 +1,7 @@
-import { UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_MEDIA_TYPE_ENTITY_TYPE, UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as modalManifests } from './modal/manifests.js';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -15,6 +16,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: '#actions_import',
 			additionalOptions: true,
 		},
+		conditions: [
+			{
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
+				operation: 'create',
+			},
+		],
 	},
 	...repositoryManifests,
 	...modalManifests,

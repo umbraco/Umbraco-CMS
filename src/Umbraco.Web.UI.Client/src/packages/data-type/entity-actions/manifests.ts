@@ -9,6 +9,7 @@ import { manifests as moveManifests } from './move-to/manifests.js';
 import { manifests as duplicateManifests } from './duplicate/manifests.js';
 import { UMB_DATA_TYPE_ALLOW_DELETE_CONDITION_ALIAS } from './conditions/allow-delete/index.js';
 import { manifests as conditionManifests } from './conditions/manifests.js';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -26,6 +27,11 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		conditions: [
 			{
 				alias: UMB_DATA_TYPE_ALLOW_DELETE_CONDITION_ALIAS,
+			},
+			{
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_DATA_TYPE_ENTITY_TYPE,
+				operation: 'delete',
 			},
 		],
 	},

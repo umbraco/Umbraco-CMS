@@ -18,6 +18,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 import { UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/property-type';
 import { UmbPropertyEditorUISearchController } from '@umbraco-cms/backoffice/property-editor';
+import { UmbSchemaOperationAllowedController } from '@umbraco-cms/backoffice/schema-lockdown';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -56,6 +57,9 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	@state()
 	private _isFiltering = false;
 
+	@state()
+	private _isCreateAllowed = true;
+
 	pagination = new UmbPaginationManager();
 
 	#collectionRepository;
@@ -81,6 +85,12 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 		this.#collectionRepository = new UmbDataTypeCollectionRepository(this);
 		this.#init();
+
+		const createAllowed = new UmbSchemaOperationAllowedController(this, {
+			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
+			operation: 'create',
+		});
+		this.observe(createAllowed.allowed, (allowed) => (this._isCreateAllowed = allowed), null);
 	}
 
 	#createDataType(propertyEditorUiAlias: string) {
@@ -354,7 +364,9 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		if (!this._groupedDataTypes) return nothing;
 		if (!this._groupedPropertyEditorUIs) return nothing;
 
-		if (this._groupedDataTypes.length === 0 && this._groupedPropertyEditorUIs.length === 0) {
+		const showCreate = this._isCreateAllowed && this._groupedPropertyEditorUIs.length > 0;
+
+		if (this._groupedDataTypes.length === 0 && !showCreate) {
 			return html`<p>Nothing matches your search, try another search term.</p>`;
 		}
 
@@ -369,7 +381,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				`,
 			)}
 			${when(
-				this._groupedPropertyEditorUIs.length > 0,
+				showCreate,
 				() => html`
 					<h5 class="choice-type-headline">
 						<umb-localize key="contentTypeEditor_searchResultEditors">Create a new configuration</umb-localize>

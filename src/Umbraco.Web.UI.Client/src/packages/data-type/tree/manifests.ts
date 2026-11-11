@@ -1,4 +1,5 @@
 import { UMB_DATA_TYPE_ROOT_WORKSPACE_ALIAS } from '../data-type-root/index.js';
+import { UMB_DATA_TYPE_ENTITY_TYPE } from '../entity.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as treeItemChildren } from './tree-item-children/manifests.js';
 import { manifests as viewManifests } from './views/manifests.js';
@@ -11,6 +12,7 @@ import {
 import { UmbDataTypeTreeStore } from './data-type-tree.store.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_TREE_ALIAS_CONDITION } from '@umbraco-cms/backoffice/tree';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -51,6 +53,11 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			{
 				alias: UMB_TREE_ALIAS_CONDITION,
 				match: UMB_DATA_TYPE_TREE_ALIAS,
+			},
+			{
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_DATA_TYPE_ENTITY_TYPE,
+				operation: 'create',
 			},
 		],
 	},

@@ -2,6 +2,7 @@ import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DATA_TYPE_TREE_ALIAS, UMB_DATA_TYPE_TREE_REPOSITORY_ALIAS } from '../../constants.js';
 import { UMB_DUPLICATE_DATA_TYPE_REPOSITORY_ALIAS } from './repository/index.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -16,6 +17,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 			treeRepositoryAlias: UMB_DATA_TYPE_TREE_REPOSITORY_ALIAS,
 			foldersOnly: true,
 		},
+		conditions: [
+			{
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_DATA_TYPE_ENTITY_TYPE,
+				operation: 'create',
+			},
+		],
 	},
 	...repositoryManifests,
 ];

@@ -531,7 +531,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	#onWillNavigate = async (e: CustomEvent) => {
 		const newUrl = e.detail.url;
 
-		if (this.#allowNavigateAway) {
+		if (this.#allowNavigateAway || this.forbidden.getIsOn()) {
 			return true;
 		}
 
@@ -557,6 +557,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	};
 
 	#onBeforeUnload = (e: BeforeUnloadEvent) => {
+		if (this.forbidden.getIsOn()) return;
 		if (this.getHasUnpersistedChanges()) {
 			e.preventDefault();
 			e.returnValue = '';
