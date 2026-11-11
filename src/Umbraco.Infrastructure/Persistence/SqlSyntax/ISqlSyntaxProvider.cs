@@ -240,6 +240,12 @@ public interface ISqlSyntaxProvider
     ///     Gets the <c>ESCAPE</c> clause that follows a LIKE comparison with a value escaped by <see cref="EscapeLikeValue" />.
     /// </summary>
     /// <returns>The <c>ESCAPE</c> clause.</returns>
+    /// <remarks>
+    ///     The default uses a backslash as the escape character, written as the string literal <c>'\'</c>. A provider
+    ///     for a database that treats a backslash inside a string literal as an escape must override this method and
+    ///     <see cref="EscapeLikeValue" /> together, so that the clause is valid and names the character the value is
+    ///     escaped with.
+    /// </remarks>
     // TODO (V20): Remove the default implementation.
     string GetLikeEscapeClause() => SqlLikeEscaping.EscapeClause;
 
