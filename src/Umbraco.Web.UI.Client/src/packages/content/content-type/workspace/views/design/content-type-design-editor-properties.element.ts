@@ -196,6 +196,29 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	@state()
 	private _sortModeActive?: boolean;
 
+	/**
+	 * Sets the properties to readonly mode, meaning they can't be added, changed, sorted or removed.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean })
+	public get readonly(): boolean {
+		return this.#readonly;
+	}
+	public set readonly(value: boolean) {
+		const oldValue = this.#readonly;
+		if (value === oldValue) return;
+		this.#readonly = value;
+		if (value) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+		this.requestUpdate('readonly', oldValue);
+	}
+	#readonly = false;
+
 	constructor() {
 		super();
 
@@ -346,6 +369,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 										.editContentTypePath=${this.editContentTypePath}
 										.editPropertyTypePath=${this._editPropertyTypePath}
 										?sort-mode-active=${this._sortModeActive}
+										.readonly=${this.readonly}
 										.propertyStructureHelper=${this.#propertyStructureHelper}
 										.property=${property}
 										.ownerVariesByCulture=${this._ownerContentTypeVariesByCulture}
@@ -357,7 +381,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 					</div>
 
 					${when(
-						!this._sortModeActive,
+						!this._sortModeActive && !this.readonly,
 						() => html`
 							<uui-button
 								id="btn-add"
