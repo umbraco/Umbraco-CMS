@@ -36,11 +36,8 @@ internal sealed class RedirectTrackerWithoutUmbracoContextTests : UmbracoIntegra
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlServiceInitializerNotificationHandler>();
 
-        // The test host's HTTP context has no host, which makes request URLs invalid.
-        var httpContext = new DefaultHttpContext();
-        httpContext.Request.Scheme = "https";
-        httpContext.Request.Host = new HostString("localhost");
-        builder.Services.AddUnique(Mock.Of<IHttpContextAccessor>(x => x.HttpContext == httpContext));
+        // Background jobs run without an HTTP request.
+        builder.Services.AddUnique(Mock.Of<IHttpContextAccessor>());
     }
 
     public override void Setup()
@@ -55,7 +52,7 @@ internal sealed class RedirectTrackerWithoutUmbracoContextTests : UmbracoIntegra
     [Test]
     public void Can_Store_Old_Route()
     {
-        Assert.IsFalse(GetRequiredService<IUmbracoContextAccessor>().TryGetUmbracoContext(out _), "Precondition: no ambient Umbraco context.");
+        AssertNoAmbientContext();
         Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes = [];
 
         RedirectTracker.StoreOldRoute(Subpage, oldRoutes, isMove: true);
@@ -67,7 +64,7 @@ internal sealed class RedirectTrackerWithoutUmbracoContextTests : UmbracoIntegra
     [Test]
     public void Can_Create_Redirects()
     {
-        Assert.IsFalse(GetRequiredService<IUmbracoContextAccessor>().TryGetUmbracoContext(out _), "Precondition: no ambient Umbraco context.");
+        AssertNoAmbientContext();
         var oldRoutes = new Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>
         {
             [(Subpage.Id, string.Empty)] = (Subpage.Key, "/old-route"),
@@ -77,5 +74,11 @@ internal sealed class RedirectTrackerWithoutUmbracoContextTests : UmbracoIntegra
 
         var redirect = RedirectUrlService.GetContentRedirectUrls(Subpage.Key).Single();
         Assert.AreEqual("/old-route", redirect.Url);
+    }
+
+    private void AssertNoAmbientContext()
+    {
+        Assert.IsNull(GetRequiredService<IHttpContextAccessor>().HttpContext, "Precondition: no HTTP context.");
+        Assert.IsFalse(GetRequiredService<IUmbracoContextAccessor>().TryGetUmbracoContext(out _), "Precondition: no ambient Umbraco context.");
     }
 }
