@@ -25,7 +25,7 @@ const textstringDataTypeName = 'Textstring';
 const trueFalseDataTypeName = 'True/false';
 const numericDataTypeName = 'Numeric';
 const listViewContentTypeName = 'List View - Content';
-const multiUrlPickerDataTypeName = 'Multi URL Picker';
+const multiUrlPickerDataTypeName = 'URL Picker';
 // Property Values
 const textPropertyValue = 'This is an invariant text string value';
 const numericPropertyValue = '1234';

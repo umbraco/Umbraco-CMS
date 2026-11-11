@@ -37,7 +37,7 @@ for (const relationType of relationTypes) {
 test('can see related document in relation type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   // Content Picker
-  const contentPickerName = 'Content Picker';
+  const contentPickerName = 'Single Document Picker';
   const contentPickerData = await umbracoApi.dataType.getByName(contentPickerName);
   // Document Type
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, contentPickerName, contentPickerData.id);
@@ -56,7 +56,7 @@ test('can see related document in relation type', async ({umbracoApi, umbracoUi}
 test('can see related media in relation type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   // Media Picker
-  const mediaPickerName = 'Media Picker';
+  const mediaPickerName = 'Single Media Picker';
   const mediaPickerData = await umbracoApi.dataType.getByName(mediaPickerName);
   // Media
   const mediaName = 'TestMedia';
@@ -79,7 +79,7 @@ test('can see related media in relation type', async ({umbracoApi, umbracoUi}) =
 test('can see related member in relation type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   // MemberPicker
-  const memberPickerName = 'Member Picker';
+  const memberPickerName = 'Single Member Picker';
   const memberPickerData = await umbracoApi.dataType.getByName(memberPickerName);
   // Member
   const memberTypeData = await umbracoApi.memberType.getByName('Member');
@@ -104,7 +104,7 @@ test('can see related member in relation type', async ({umbracoApi, umbracoUi}) 
 test('can not see relation after content with relation is deleted', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   // Content Picker
-  const contentPickerName = 'Content Picker';
+  const contentPickerName = 'Single Document Picker';
   const contentPickerData = await umbracoApi.dataType.getByName(contentPickerName);
   // Document Type
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, contentPickerName, contentPickerData.id);
@@ -128,7 +128,7 @@ test('can not see relation after content with relation is deleted', async ({umbr
 test('can not see relation after media with relation is deleted', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   // Media Picker
-  const mediaPickerName = 'Media Picker';
+  const mediaPickerName = 'Single Media Picker';
   const mediaPickerData = await umbracoApi.dataType.getByName(mediaPickerName);
   // Media
   const mediaName = 'TestMedia';
@@ -153,7 +153,7 @@ test('can not see relation after media with relation is deleted', async ({umbrac
 test('can not see relation after member with relation is deleted', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   // MemberPicker
-  const memberPickerName = 'Member Picker';
+  const memberPickerName = 'Single Member Picker';
   const memberPickerData = await umbracoApi.dataType.getByName(memberPickerName);
   // Member
   const memberTypeData = await umbracoApi.memberType.getByName('Member');

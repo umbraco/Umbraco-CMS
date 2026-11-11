@@ -1802,7 +1802,7 @@ export class DocumentApiHelper {
   }
 
   async createDefaultDocumentWithOneDocumentLink(documentName: string, linkedDocumentName: string, linkedDocumentId: string, documentTypeName: string = 'Test Document Type') {
-    const multiURLPickerDataTypeName = 'Multi URL Picker';
+    const multiURLPickerDataTypeName = 'URL Picker';
     // Get the url of the linked document
     const linkedDocumentData = await this.getByName(linkedDocumentName);
     const linkedDocumentUrl = await this.getDocumentUrl(linkedDocumentData.id);
@@ -1835,7 +1835,7 @@ export class DocumentApiHelper {
   }
 
   async createDefaultDocumentWithOneMediaLink(documentName: string, linkedMediaName: string, documentTypeName: string = 'Test Document Type') {
-    const multiURLPickerDataTypeName = 'Multi URL Picker';
+    const multiURLPickerDataTypeName = 'URL Picker';
     // Get the url of the linked document
     const linkedMediaData = await this.api.media.getByName(linkedMediaName);
     // Get datatype

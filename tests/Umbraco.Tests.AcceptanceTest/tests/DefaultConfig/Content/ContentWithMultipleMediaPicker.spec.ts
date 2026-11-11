@@ -1,7 +1,7 @@
 import {ConstantHelper, test, AliasHelper} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
-const dataTypeName = 'Multiple Media Picker';
+const dataTypeName = 'Media Picker';
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const firstMediaFileName = 'TestFirstMedia';

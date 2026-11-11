@@ -165,7 +165,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		noAccess: false,
 	},
 	{
-		name: 'Content Picker',
+		name: 'Single Document Picker',
 		id: 'dt-contentPicker',
 		parent: null,
 		editorAlias: 'Umbraco.ContentPicker',
@@ -225,7 +225,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		noAccess: false,
 	},
 	{
-		name: 'Multi URL Picker',
+		name: 'URL Picker',
 		id: 'dt-multiUrlPicker',
 		parent: null,
 		editorAlias: 'Umbraco.MultiUrlPicker',
@@ -1230,7 +1230,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		noAccess: false,
 	},
 	{
-		name: 'Member Picker',
+		name: 'Single Member Picker',
 		id: 'dt-memberPicker',
 		parent: null,
 		editorAlias: 'Umbraco.MemberPicker',

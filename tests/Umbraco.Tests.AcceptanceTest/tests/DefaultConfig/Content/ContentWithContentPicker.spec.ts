@@ -3,7 +3,7 @@ import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
-const dataTypeName = 'Content Picker';
+const dataTypeName = 'Single Document Picker';
 const contentPickerDocumentTypeName = 'DocumentTypeForContentPicker';
 const contentPickerName = 'TestContentPicker';
 let contentPickerDocumentTypeId = '';

@@ -1,7 +1,7 @@
 import { ConstantHelper, test, AliasHelper } from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
-const dataTypeName = 'Member Picker';
+const dataTypeName = 'Single Member Picker';
 const contentName = 'TestContent';
 const memberName = 'TestMemberForContent';
 const documentTypeName = 'TestDocumentTypeForContent';
