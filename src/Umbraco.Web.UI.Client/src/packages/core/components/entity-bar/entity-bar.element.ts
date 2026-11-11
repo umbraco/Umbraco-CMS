@@ -24,23 +24,22 @@ export class UmbReferenceBarElement extends LitElement {
 				position: absolute;
 				top: 0;
 				bottom: 0;
-				left: 0;
+				left: -1px;
 				pointer-events: none;
 
-				z-index: 2;
 				opacity: var(--umb-entity-bar-opacity, 1);
 				transition: opacity 120ms ease-out;
 			}
 
 			.border {
 				position: absolute;
-				width: 2px;
+				width: 1px;
 				height: 100%;
 				background-color: var(--umb-color-reference);
 			}
 
 			.tab {
-				position: fixed;
+				position: absolute;
 				top: var(--uui-size-6);
 				background-color: var(--umb-color-reference);
 				color: var(--umb-color-reference-contrast);
@@ -48,19 +47,7 @@ export class UmbReferenceBarElement extends LitElement {
 				border-radius: var(--uui-border-radius) 0 0 var(--uui-border-radius);
 				font-size: var(--uui-type-small-size);
 				line-height: 0;
-				margin-left: -22px;
-			}
-
-			@supports (position-anchor: --my-name) {
-				:host {
-					anchor-name: --umb-tab-anchor;
-				}
-
-				.tab {
-					position-anchor: --umb-tab-anchor;
-					right: anchor(right);
-					margin-left: auto;
-				}
+				right: 0;
 			}
 		`,
 	];
