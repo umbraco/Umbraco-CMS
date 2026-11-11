@@ -47,7 +47,7 @@ export const UmbEntityItemRefFrameMixin = <T extends ClassConstructor<LitElement
 
 		protected renderEntityFrame(name?: string) {
 			if (!this.isEntityFrameNavigable) return nothing;
-			return html`<umb-entity-frame aria-hidden="true"><uui-icon name="link"></uui-icon> ${name}</umb-entity-frame>`;
+			return html`<umb-entity-frame aria-hidden="true"><uui-icon name="link"></uui-icon></umb-entity-frame>`;
 		}
 
 		static readonly styles: Array<CSSResultGroup> = [
