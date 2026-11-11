@@ -87,16 +87,16 @@ export class LoginUiHelper extends UiBaseLocators {
     );
     void revokeResponse.then(() => { isRevoked = true; }, () => {});
     // Any navigation closes the non-routable current-user modal, including the backoffice's own initial routing,
-    // so re-open it and retry until the revoke is seen.
+    // so re-open it and retry until the revoke is seen. A click can also land as the modal closes without starting
+    // the logout, so each attempt waits for the revoke before counting as done.
     await expect(async () => {
       if (isRevoked) {
         return;
       }
-      if (!(await this.currentUserModal.isVisible())) {
-        await this.click(this.currentUserAvatarBtn);
-      }
+      await this.clickCurrentUserAvatarButton();
       // Raw click with its own timeout: this.click() has none after its visibility check, so a detached button hangs.
       await this.logoutBtn.click({timeout: ConstantHelper.timeout.medium});
+      await expect.poll(() => isRevoked, {timeout: ConstantHelper.timeout.medium}).toBe(true);
     }).toPass({timeout: ConstantHelper.timeout.navigation});
     return await revokeResponse;
   }
