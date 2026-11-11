@@ -1,24 +1,26 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Permissions;
 
 namespace Umbraco.Cms.Api.Management.Permissions;
 
 /// <summary>
-/// Requires the environment permissions for the entity types a controller manages, denying any change to them that
-/// they don't permit.
+/// Requires the environment permissions for the entity type a controller manages, denying any change to it that they
+/// don't permit.
 /// </summary>
 /// <remarks>
 /// Put it on a controller base class, so every endpoint deriving from it is covered. Which entity types are restricted
 /// is decided by the registered <see cref="IEnvironmentPermissionsConfigurator"/> instances.
 /// <para>
-/// When several entity types are named, every one of them has to permit the operation. A declaration on a derived
-/// controller replaces the inherited one.
+/// The permission verb an action needs is inferred from its HTTP method. An action with
+/// <see cref="RequiresPermissionsAttribute"/> is checked against its declared verbs instead, and this attribute leaves
+/// it alone. That's also how an action that changes more than the controller's entity type declares what it needs.
+/// </para>
+/// <para>
+/// A declaration on a derived controller replaces the inherited one.
 /// </para>
 /// <para>
 /// It's a filter, not an authorization requirement, so it runs after the endpoint's authorization policies have
@@ -33,51 +35,74 @@ public sealed class RequiresPermissionsForAttribute : Attribute, IAsyncAuthoriza
     /// <summary>
     /// Initializes a new instance of the <see cref="RequiresPermissionsForAttribute"/> class.
     /// </summary>
-    /// <param name="entityTypes">The entity types the controller manages.</param>
-    public RequiresPermissionsForAttribute(params string[] entityTypes)
+    /// <param name="entityType">The entity type the controller manages.</param>
+    public RequiresPermissionsForAttribute(string entityType)
     {
-        ArgumentOutOfRangeException.ThrowIfZero(entityTypes.Length);
-        foreach (var entityType in entityTypes)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(entityType);
-        }
+        ArgumentException.ThrowIfNullOrWhiteSpace(entityType);
 
-        EntityTypes = entityTypes;
+        EntityType = entityType;
     }
 
     /// <summary>
-    /// Gets the entity types the controller manages.
+    /// Gets the entity type the controller manages.
     /// </summary>
-    public IReadOnlyList<string> EntityTypes { get; }
+    public string EntityType { get; }
 
     /// <inheritdoc />
     public Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        HttpContext httpContext = context.HttpContext;
-        IEnvironmentPermissions environmentPermissions =
-            httpContext.RequestServices.GetRequiredService<IEnvironmentPermissions>();
-
-        if (environmentPermissions.DeniedPermissions.Count == 0)
+        // An action that declares its permissions is checked by that declaration instead.
+        if ((context.ActionDescriptor as ControllerActionDescriptor)?.MethodInfo
+            .IsDefined(typeof(RequiresPermissionsAttribute)) is true)
         {
             return Task.CompletedTask;
         }
 
-        RequiresPermissionsAttribute? declared = (context.ActionDescriptor as ControllerActionDescriptor)?.MethodInfo
-            .GetCustomAttribute<RequiresPermissionsAttribute>();
-        var denied = RequiredPermissionsResolver.ResolvePermissions(EntityTypes, declared, httpContext.Request.Method)
-            .FirstOrDefault(environmentPermissions.IsDenied);
-        if (denied is null)
-        {
-            return Task.CompletedTask;
-        }
-
-        // A bodyless 403 like every other one in this API, as permissions can return a 403 on the same endpoints. The
-        // header names the denied permission verb. It's returned at every runtime level, including during an upgrade,
-        // where the maintenance mode filter would otherwise answer 503 ("try again later").
-        httpContext.Response.Headers[Constants.Headers.DeniedPermission] = denied;
-
-        context.Result = new StatusCodeResult(StatusCodes.Status403Forbidden);
+        EnvironmentPermissionsAuthorization.Authorize(
+            context,
+            () => InferPermission(context.HttpContext.Request.Method) is string permission ? [permission] : []);
 
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Infers the permission verb an action needs from its HTTP method.
+    /// </summary>
+    /// <param name="httpMethod">The HTTP method the action responds to.</param>
+    /// <returns>The HTTP method's change on the entity type, or <c>null</c> for a method that changes nothing.</returns>
+    /// <remarks>Both enforcement and the OpenAPI document use this, so they can't disagree.</remarks>
+    internal string? InferPermission(string? httpMethod)
+        => InferOperation(httpMethod) is PermissionOperation operation
+            ? EntityTypePermissions.For(EntityType, operation)
+            : null;
+
+    /// <summary>
+    /// Infers the change an HTTP method makes.
+    /// </summary>
+    /// <param name="httpMethod">The HTTP method the action responds to.</param>
+    /// <returns>
+    /// <c>null</c> for GET, HEAD and OPTIONS, which change nothing. Otherwise the change: PUT, PATCH and any unrecognised
+    /// method are treated as <see cref="PermissionOperation.Update"/>.
+    /// </returns>
+    private static PermissionOperation? InferOperation(string? httpMethod)
+    {
+        var method = httpMethod ?? string.Empty;
+
+        if (HttpMethods.IsGet(method) || HttpMethods.IsHead(method) || HttpMethods.IsOptions(method))
+        {
+            return null;
+        }
+
+        if (HttpMethods.IsPost(method))
+        {
+            return PermissionOperation.Create;
+        }
+
+        if (HttpMethods.IsDelete(method))
+        {
+            return PermissionOperation.Delete;
+        }
+
+        return PermissionOperation.Update;
     }
 }
