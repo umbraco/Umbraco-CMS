@@ -271,8 +271,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     }
 
     // L1/L2 probe without a database hit (same primitive GetNodeAsync uses). An entry holding a null
-    // node accounts for its key and is not passed on to the database read; GetNodeAsync does not write
-    // those for media, but honouring one costs nothing and keeps the two paths in step. Keys are probed
+    // node accounts for its key and is not passed on to the database read. Keys are probed
     // one at a time, and the probe is not free even on a hit: TryGetValueAsync takes a per-key lock and
     // goes through GetOrCreateAsync, which on a miss creates and then removes a local entry. With a
     // distributed L2 (e.g. Redis) configured that is a serial round-trip per key, plus a delete for
@@ -291,7 +290,8 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
                 continue;
             }
 
-            if (node is not null)
+            // An entry of another entity type means the key identifies no media item; it is accounted for, as a null is.
+            if (node is not null && node.IsOtherEntityType(ContentCacheDataSerializerEntityType.Media) is false)
             {
                 idKeyPairs.Add((node.Id, node.Key));
                 ResolveNode(key, node, generation, resolved);
@@ -327,7 +327,39 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
                 await _hybridCache.SetAsync(GetCacheKey(node.Key), node, GetEntryOptions(node.Key), GenerateTags(node));
             }
         }
+
+        await CacheNullsForKeysNotReturnedAsync(keys, coldNodes, generation);
     }
+
+    // Keys the database returned nothing for (e.g. deleted or trashed media) resolve to nothing until a
+    // refresh says otherwise, so a reference to removed media doesn't re-read the database on every request.
+    private async Task CacheNullsForKeysNotReturnedAsync(List<Guid> keys, IReadOnlyCollection<ContentCacheNode> returnedNodes, long generation)
+    {
+        if (IsCacheGenerationCurrent(generation) is false)
+        {
+            return;
+        }
+
+        var returnedKeys = returnedNodes.Select(node => node.Key).ToHashSet();
+        Guid[] keysNotReturned = keys.Where(key => returnedKeys.Contains(key) is false).ToArray();
+        if (keysNotReturned.Length == 0)
+        {
+            return;
+        }
+
+        ISet<Guid> keysSharedWithOtherEntityTypes = GetKeysSharingCacheKeysWithOtherEntityTypes(keysNotReturned);
+        foreach (Guid key in keysNotReturned.Where(key => keysSharedWithOtherEntityTypes.Contains(key) is false))
+        {
+            await _hybridCache.SetAsync(GetCacheKey(key), (ContentCacheNode?)null, GetEntryOptions(key), GenerateTags(null));
+        }
+    }
+
+    // A null cached under a key that another cache also reads would hide that cache's item. Documents and
+    // elements both read the published key that media uses.
+    private ISet<Guid> GetKeysSharingCacheKeysWithOtherEntityTypes(IReadOnlyCollection<Guid> keys)
+        => _databaseCacheRepository.GetKeysOfEntityTypes(
+            keys,
+            ContentCacheDataSerializerEntityType.Document | ContentCacheDataSerializerEntityType.Element);
 
     // Converts a resolved cache node to IPublishedContent, writes it into the resolved set and — when
     // our snapshot is still current — populates L0. Returns whether conversion succeeded, so a caller
@@ -373,6 +405,12 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         string cacheKey = GetCacheKey(key);
         (bool exists, ContentCacheNode? contentCacheNode) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
 
+        // The entry is another entity type's, so the key identifies no media item.
+        if (contentCacheNode?.IsOtherEntityType(ContentCacheDataSerializerEntityType.Media) is true)
+        {
+            return null;
+        }
+
         // A value found in the backing store is already current, so it can always populate the caches
         // below; only a value built from the read-through DB fetch needs the generation guard.
         bool snapshotIsCurrent = true;
@@ -384,12 +422,12 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
             // memory permanently stale until a full clear).
             long generation = Interlocked.Read(ref _cacheGeneration);
 
-            contentCacheNode = await GetContentCacheNodeFromRepo();
+            bool cacheable;
+            (contentCacheNode, cacheable) = await GetContentCacheNodeFromRepo();
             snapshotIsCurrent = IsCacheGenerationCurrent(generation);
 
-            // We don't want to cache removed items, this may cause issues if the L2 serializer changes.
             // Skip the write when the generation moved — a refresh has superseded this snapshot.
-            if (contentCacheNode is not null && snapshotIsCurrent)
+            if (cacheable && snapshotIsCurrent)
             {
                 await _hybridCache.SetAsync(
                     cacheKey,
@@ -424,9 +462,12 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
         return result;
 
-        async Task<ContentCacheNode?> GetContentCacheNodeFromRepo()
+        async Task<(ContentCacheNode? Node, bool Cacheable)> GetContentCacheNodeFromRepo()
         {
-            return await readMediaSource(key);
+            ContentCacheNode? mediaCacheNode = await readMediaSource(key);
+            return mediaCacheNode is null
+                ? (null, GetKeysSharingCacheKeysWithOtherEntityTypes([key]).Count == 0)
+                : (mediaCacheNode, true);
         }
     }
 
@@ -694,9 +735,24 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
     private static string GetCacheKey(Guid key) => $"{key}";
 
-    // Generates the cache tags for a given CacheNode.
-    // We use the tags to be able to clear all cache entries that are related to a given content item.
-    private static HashSet<string> GenerateTags(ContentCacheNode? cacheNode) => cacheNode is null ? [] : [Constants.Cache.Tags.Media, MediaTypeIdTag(cacheNode.ContentTypeId)];
+    /// <summary>
+    /// Generates the cache tags for a given <see cref="ContentCacheNode"/>.
+    /// </summary>
+    /// <param name="cacheNode">The cache node to generate tags for, or <c>null</c> for a negative-cache entry.</param>
+    /// <returns>
+    /// A set of tags that always includes <see cref="Constants.Cache.Tags.Media"/>.
+    /// When <paramref name="cacheNode"/> is non-null, the media type ID tag is also included.
+    /// </returns>
+    /// <remarks>
+    /// Tags are used to clear all cache entries related to a given media item or type.
+    /// The <see cref="Constants.Cache.Tags.Media"/> tag is always included — even for null entries — so
+    /// that <see cref="ClearMemoryCacheAsync"/> (which clears by this tag) can evict negative-cache entries.
+    /// Without this, null entries survive tag-based cache clears and become permanently stale.
+    /// </remarks>
+    private static HashSet<string> GenerateTags(ContentCacheNode? cacheNode) =>
+        cacheNode is null
+            ? [Constants.Cache.Tags.Media]
+            : [Constants.Cache.Tags.Media, MediaTypeIdTag(cacheNode.ContentTypeId)];
 
     private async Task ClearPublishedCacheAsync(Guid key)
     {

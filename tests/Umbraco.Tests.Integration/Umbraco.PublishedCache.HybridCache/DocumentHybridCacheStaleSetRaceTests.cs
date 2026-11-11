@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -72,6 +73,9 @@ internal sealed class DocumentHybridCacheStaleSetRaceTests : UmbracoIntegrationT
     public void SetUpService()
     {
         _databaseCacheRepository = new Mock<IDatabaseCacheRepository>();
+        _databaseCacheRepository
+            .Setup(r => r.GetKeysOfEntityTypes(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<ContentCacheDataSerializerEntityType>()))
+            .Returns(new HashSet<Guid>());
         _hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
 
         var publishStatus = new Mock<IPublishStatusQueryService>();

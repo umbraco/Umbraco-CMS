@@ -395,6 +395,30 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
         Assert.IsNotNull(await DatabaseCacheRepository.GetElementSourceAsync(elementKey));
     }
 
+    [Test]
+    public async Task GetKeysOfEntityTypes_Returns_Only_The_Keys_Of_The_Given_Entity_Types()
+    {
+        Guid elementKey = await CreateAndPublishElement();
+        Guid[] keys = [Textpage.Key, MediaItem1.Key, elementKey, Textpage.ContentType.Key, Guid.NewGuid()];
+
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        ISet<Guid> result = DatabaseCacheRepository.GetKeysOfEntityTypes(
+            keys,
+            ContentCacheDataSerializerEntityType.Media | ContentCacheDataSerializerEntityType.Element);
+
+        Assert.That(result, Is.EquivalentTo(new[] { MediaItem1.Key, elementKey }));
+    }
+
+    [Test]
+    public void GetKeysOfEntityTypes_Without_An_Ambient_Scope_Returns_Matching_Keys()
+    {
+        ISet<Guid> result = DatabaseCacheRepository.GetKeysOfEntityTypes(
+            [MediaItem1.Key, MediaItem2.Key],
+            ContentCacheDataSerializerEntityType.Media);
+
+        Assert.That(result, Is.EquivalentTo(new[] { MediaItem1.Key, MediaItem2.Key }));
+    }
+
     private async Task<Guid> CreateAndPublishElement()
     {
         IContentType elementType = ContentTypeBuilder.CreateBasicElementType(Guid.NewGuid().ToString("N"));

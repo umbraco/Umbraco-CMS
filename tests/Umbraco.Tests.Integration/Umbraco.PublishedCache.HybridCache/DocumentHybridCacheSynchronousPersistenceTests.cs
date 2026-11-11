@@ -272,6 +272,9 @@ internal sealed class DocumentHybridCacheSynchronousPersistenceTests : UmbracoIn
         public IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType)
             => _inner.GetContentByContentTypeKey(keys, entityType);
 
+        public ISet<Guid> GetKeysOfEntityTypes(IReadOnlyCollection<Guid> keys, ContentCacheDataSerializerEntityType entityTypes)
+            => _inner.GetKeysOfEntityTypes(keys, entityTypes);
+
         public void Rebuild(IReadOnlyCollection<int>? contentTypeIds, IReadOnlyCollection<int>? mediaTypeIds, IReadOnlyCollection<int>? elementTypeIds, Action<Action>? executeStep)
             => _inner.Rebuild(contentTypeIds, mediaTypeIds, elementTypeIds, executeStep);
     }

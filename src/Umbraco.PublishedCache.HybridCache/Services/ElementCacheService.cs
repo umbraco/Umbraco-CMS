@@ -178,6 +178,12 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
         (bool exists, ContentCacheNode? contentCacheNode) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
 
+        // The entry is another entity type's, so the key identifies no element.
+        if (contentCacheNode?.IsOtherEntityType(ContentCacheDataSerializerEntityType.Element) is true)
+        {
+            return null;
+        }
+
         // A value found in the backing store is already current, so it can always populate the caches
         // below; only a value built from the read-through DB fetch needs the generation guard.
         bool snapshotIsCurrent = true;
@@ -189,12 +195,13 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
             // memory permanently stale until a full clear).
             long generation = Interlocked.Read(ref _cacheGeneration);
 
-            contentCacheNode = await GetContentCacheNodeFromRepo();
+            bool cacheable;
+            (contentCacheNode, cacheable) = await GetContentCacheNodeFromRepo();
             snapshotIsCurrent = IsCacheGenerationCurrent(generation);
 
             // Skip the write when the generation moved — a refresh has superseded this snapshot. A null
             // node is still written when current (negative caching, tagged so it can be cleared).
-            if (snapshotIsCurrent)
+            if (cacheable && snapshotIsCurrent)
             {
                 await _hybridCache.SetAsync(
                     cacheKey,
@@ -229,9 +236,21 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
         return result;
 
-        async Task<ContentCacheNode?> GetContentCacheNodeFromRepo()
+        async Task<(ContentCacheNode? Node, bool Cacheable)> GetContentCacheNodeFromRepo()
         {
-            return await readElementSource(key, preview);
+            ContentCacheNode? node = await readElementSource(key, preview);
+
+            // A null cached under a key that another cache also reads would hide that cache's item. Documents read
+            // the same published and draft keys as elements; media reads only the published one.
+            if (node is null)
+            {
+                ContentCacheDataSerializerEntityType entityTypes = preview
+                    ? ContentCacheDataSerializerEntityType.Document
+                    : ContentCacheDataSerializerEntityType.Document | ContentCacheDataSerializerEntityType.Media;
+                return (null, _databaseCacheRepository.GetKeysOfEntityTypes([key], entityTypes).Count == 0);
+            }
+
+            return (node, true);
         }
     }
 

@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -66,6 +67,9 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
         };
 
         _mockDatabaseCacheRepository = new Mock<IDatabaseCacheRepository>();
+        _mockDatabaseCacheRepository
+            .Setup(r => r.GetKeysOfEntityTypes(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<ContentCacheDataSerializerEntityType>()))
+            .Returns(new HashSet<Guid>());
         _mockDatabaseCacheRepository
             .Setup(r => r.GetMediaSourceAsync(It.IsAny<Guid>()))
             .ReturnsAsync(mediaCacheNode);

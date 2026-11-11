@@ -7,9 +7,9 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 /// </summary>
 /// <remarks>
 /// The source reads (the <c>Get*Source</c>, <c>Get*Sources</c> and <c>Get*SourceForPublishStates</c> members, in their
-/// synchronous and asynchronous forms, for documents, media and elements) may be called without an ambient scope, as
-/// they are on a cache miss. Inside a scope they read within its transaction, so they see what the scope has written.
-/// The other members read and write through the ambient scope.
+/// synchronous and asynchronous forms, for documents, media and elements) and <see cref="GetKeysOfEntityTypes"/> may be
+/// called without an ambient scope, as they are on a cache miss. Inside a scope they read within its transaction, so they
+/// see what the scope has written. The other members read and write through the ambient scope.
 /// </remarks>
 internal interface IDatabaseCacheRepository
 {
@@ -220,6 +220,18 @@ internal interface IDatabaseCacheRepository
     /// Gets a collection of cache nodes for a collection of content type keys and entity type.
     /// </summary>
     IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType);
+
+    /// <summary>
+    /// Gets the keys, from those given, that identify a document, media item or element of one of the given entity types.
+    /// </summary>
+    /// <remarks>
+    /// Documents, media and elements are cached under their keys in one HybridCache, so a cache checks this before
+    /// caching <c>null</c> for a key, to avoid hiding an item of another entity type that reads the same cache key.
+    /// </remarks>
+    /// <param name="keys">The keys to check.</param>
+    /// <param name="entityTypes">The entity types to match, combined as flags.</param>
+    /// <returns>The keys that identify a node of one of the entity types.</returns>
+    ISet<Guid> GetKeysOfEntityTypes(IReadOnlyCollection<Guid> keys, ContentCacheDataSerializerEntityType entityTypes);
 
     /// <summary>
     /// Rebuilds the caches for content, media and/or elements based on the content type ids specified.
