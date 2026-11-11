@@ -48,11 +48,13 @@ public enum TemplateOperationStatus
     /// <summary>
     ///     The operation failed because it is not allowed in production mode.
     /// </summary>
+    [Obsolete("No longer returned, as environment permissions deny template changes in production mode. Scheduled for removal in Umbraco 20.")]
     NotAllowedInProductionMode,
 
     /// <summary>
     ///     The operation failed because changing template content is not allowed in production mode.
     /// </summary>
+    [Obsolete("No longer returned, as environment permissions deny template changes in production mode. Scheduled for removal in Umbraco 20.")]
     ContentChangeNotAllowedInProductionMode,
 
     /// <inheritdoc cref="LayoutTemplateNotFound" />

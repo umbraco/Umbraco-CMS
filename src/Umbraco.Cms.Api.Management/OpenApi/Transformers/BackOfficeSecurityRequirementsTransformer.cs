@@ -62,7 +62,8 @@ internal class BackOfficeSecurityRequirementsTransformer : IOpenApiOperationTran
         if (numberOfAuthorizeAttributes > BaseAuthorizeAttributeCount ||
             InjectsAuthorizationService(description.MethodInfo.DeclaringType))
         {
-            operation.Responses.Add(
+            // Another transformer may already have documented the forbidden response, for its own reason to refuse.
+            operation.Responses.TryAdd(
                 StatusCodes.Status403Forbidden.ToString(),
                 new OpenApiResponse { Description = "The authenticated user does not have access to this resource" });
         }

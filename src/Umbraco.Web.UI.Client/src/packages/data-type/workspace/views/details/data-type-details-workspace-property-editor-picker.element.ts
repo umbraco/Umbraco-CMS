@@ -32,6 +32,9 @@ export class UmbDataTypeDetailsWorkspacePropertyEditorPickerElement extends UmbF
 	@property({ type: String })
 	propertyEditorSchemaAlias?: string;
 
+	@property({ type: Boolean })
+	readonly = false;
+
 	#workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 	#addButton?: UUIButtonElement;
 	#configurationRepository = new UmbDataTypeConfigurationRepository(this);
@@ -111,17 +114,25 @@ export class UmbDataTypeDetailsWorkspacePropertyEditorPickerElement extends UmbF
 				alias=${alias}
 				property-editor-schema-alias=${this.propertyEditorSchemaAlias}
 				standalone
+				?readonly=${this.readonly}
 				?error=${error}
-				@open=${this.#openPropertyEditorUIPicker}>
+				@open=${this.readonly ? nothing : this.#openPropertyEditorUIPicker}>
 				${this.propertyEditorUiIcon
 					? html`<umb-icon name=${this.propertyEditorUiIcon} slot="icon"></umb-icon>`
 					: nothing}
-				<uui-action-bar slot="actions">
-					<uui-button
-						label=${this.localize.term('general_change')}
-						@click=${this.#openPropertyEditorUIPicker}></uui-button>
-				</uui-action-bar>
+				${this.#renderPropertyEditorUiActions()}
 			</umb-ref-property-editor-ui>
+		`;
+	}
+
+	#renderPropertyEditorUiActions() {
+		if (this.readonly) return nothing;
+		return html`
+			<uui-action-bar slot="actions">
+				<uui-button
+					label=${this.localize.term('general_change')}
+					@click=${this.#openPropertyEditorUIPicker}></uui-button>
+			</uui-action-bar>
 		`;
 	}
 
@@ -133,6 +144,7 @@ export class UmbDataTypeDetailsWorkspacePropertyEditorPickerElement extends UmbF
 				look="placeholder"
 				color="default"
 				required
+				?disabled=${this.readonly}
 				@click=${this.#openPropertyEditorUIPicker}
 				${ref(this.#addButtonRefChanged)}></uui-button>
 		`;

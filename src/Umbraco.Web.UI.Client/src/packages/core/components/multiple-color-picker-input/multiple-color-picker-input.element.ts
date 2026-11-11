@@ -201,14 +201,15 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlWithBasics
 	}
 
 	#renderAddButton() {
-		if (this.disabled || this.readonly) return nothing;
+		if (this.disabled) return nothing;
+		if (this.readonly && this._items.length > 0) return nothing;
 		return html`
 			<uui-button
 				id="action"
 				label=${this.localize.term('general_add')}
 				look="placeholder"
 				color="default"
-				?disabled=${this.disabled}
+				?disabled=${this.readonly}
 				@click=${this.#onAdd}></uui-button>
 		`;
 	}
