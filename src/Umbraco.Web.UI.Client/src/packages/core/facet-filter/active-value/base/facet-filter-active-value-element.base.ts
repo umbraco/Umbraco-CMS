@@ -5,7 +5,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * Base class for facet filter active value elements. Observes the resolved value of the API.
- * Compose `<umb-facet-filter-active-value-layout>` in `render()` and call `_remove()` on its `remove` event.
+ * Compose `<umb-facet-filter-active-value-layout>` in `render()`, set its `label` to the value as displayed text, and
+ * call `_remove()` on its `remove` event.
  */
 export abstract class UmbFacetFilterActiveValueElementBase<TValue = unknown, TResolvedValue = unknown>
 	extends UmbLitElement

@@ -1,23 +1,36 @@
 import { UmbRemoveEvent } from '@umbraco-cms/backoffice/event';
-import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
- * Layout for a facet filter active value: the value and a remove button.
+ * Layout for a facet filter active value: the value's label and a remove button labelled with it.
  * @element umb-facet-filter-active-value-layout
- * @slot - The value.
+ * @slot - Replaces the rendered label, for example to show a colour swatch next to the name. Set `label` anyway: the
+ * remove button's accessible label is built from it.
  * @fires remove - When the remove button is clicked.
  */
 @customElement('umb-facet-filter-active-value-layout')
 export class UmbFacetFilterActiveValueLayoutElement extends UmbLitElement {
+	/**
+	 * The value as text, for example the name of the resolved item. Rendered unless content is slotted, and always used
+	 * for the accessible label of the remove button.
+	 */
+	@property({ type: String })
+	label?: string;
+
 	#onRemove = () => {
 		this.dispatchEvent(new UmbRemoveEvent());
 	};
 
 	override render() {
 		return html`
-			<slot></slot>
-			<uui-button label=${this.localize.term('general_remove')} compact @click=${this.#onRemove}>
+			<slot><span id="label">${this.label}</span></slot>
+			<uui-button
+				label=${this.label
+					? this.localize.term('facetFilter_removeValueLabel', this.label)
+					: this.localize.term('general_remove')}
+				compact
+				@click=${this.#onRemove}>
 				<umb-icon name="icon-delete"></umb-icon>
 			</uui-button>
 		`;

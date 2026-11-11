@@ -245,6 +245,9 @@ export default {
 		listViewLabel: 'List',
 		tableViewLabel: 'Table',
 	},
+	facetFilter: {
+		removeValueLabel: (value: string) => `Remove ${value} filter`,
+	},
 	content: {
 		isPublished: 'Is Published',
 		unpublishedChanges: 'Unpublished changes',

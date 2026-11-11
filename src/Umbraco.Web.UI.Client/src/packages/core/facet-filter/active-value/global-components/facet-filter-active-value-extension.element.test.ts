@@ -12,6 +12,7 @@ import { expect, waitUntil } from '@open-wc/testing';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbLocalizationManager, type UmbLocalizationSet } from '@umbraco-cms/backoffice/localization-api';
 
 @customElement('test-facet-filter-active-value-host')
 class TestHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -19,9 +20,9 @@ class TestHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 @customElement('test-custom-facet-filter-active-value')
 class TestCustomFacetFilterActiveValueElement extends UmbFacetFilterActiveValueElementBase {
 	override render() {
-		return html`<umb-facet-filter-active-value-layout @remove=${this._remove}>
-			custom: ${String(this._resolvedValue)}
-		</umb-facet-filter-active-value-layout>`;
+		return html`<umb-facet-filter-active-value-layout
+			.label=${`custom: ${String(this._resolvedValue)}`}
+			@remove=${this._remove}></umb-facet-filter-active-value-layout>`;
 	}
 }
 
@@ -47,7 +48,7 @@ function findLayout(
 }
 
 function textOf(extension: UmbFacetFilterActiveValueExtensionElement): string {
-	return findLayout(extension)?.textContent?.trim() ?? '';
+	return findLayout(extension)?.shadowRoot?.querySelector('#label')?.textContent?.trim() ?? '';
 }
 
 describe('UmbFacetFilterActiveValueExtensionElement', () => {
@@ -76,6 +77,7 @@ describe('UmbFacetFilterActiveValueExtensionElement', () => {
 	});
 
 	afterEach(() => {
+		umbLocalizationManager.localizations.clear();
 		manager.destroy();
 		document.body.innerHTML = '';
 		for (const type of ['facetFilter', 'facetFilterActiveValue']) {
@@ -93,6 +95,23 @@ describe('UmbFacetFilterActiveValueExtensionElement', () => {
 
 		await waitUntil(() => textOf(extension) === 'red', 'raw value not rendered');
 		expect(findValueElement(extension)?.tagName.toLowerCase()).to.equal('umb-default-facet-filter-active-value');
+	});
+
+	it('labels the remove button with the displayed value', async () => {
+		const english: UmbLocalizationSet = {
+			$code: 'en',
+			$dir: 'ltr',
+			facetFilter_removeValueLabel: (value: string) => `Remove ${value} filter`,
+		};
+		umbLocalizationManager.registerLocalization(english);
+		umbLocalizationManager.documentLanguage = 'en';
+		host.appendChild(extension);
+
+		await waitUntil(
+			() =>
+				findLayout(extension)?.shadowRoot?.querySelector('uui-button')?.getAttribute('label') === 'Remove red filter',
+			'remove button not labelled with the value',
+		);
 	});
 
 	it('shows the name of the resolved item when the default kind is registered with a valueResolver', async () => {
@@ -135,6 +154,25 @@ describe('UmbFacetFilterActiveValueExtensionElement', () => {
 		host.appendChild(extension);
 
 		await waitUntil(() => textOf(extension) === 'red', 'default element not rendered');
+	});
+
+	it('lets slotted content replace the label, and still labels the remove button with the label', async () => {
+		const english: UmbLocalizationSet = {
+			$code: 'en',
+			$dir: 'ltr',
+			facetFilter_removeValueLabel: (value: string) => `Remove ${value} filter`,
+		};
+		umbLocalizationManager.registerLocalization(english);
+		umbLocalizationManager.documentLanguage = 'en';
+		const layout = document.createElement('umb-facet-filter-active-value-layout');
+		layout.label = 'Red';
+		layout.innerHTML = '<span id="swatch"></span>Red';
+		host.appendChild(layout);
+		await layout.updateComplete;
+
+		const slot = layout.shadowRoot!.querySelector('slot')!;
+		expect(slot.assignedNodes()).to.have.length(2);
+		expect(layout.shadowRoot!.querySelector('uui-button')!.getAttribute('label')).to.equal('Remove Red filter');
 	});
 
 	it('removes the value from the active filters when the layout remove button is clicked', async () => {
