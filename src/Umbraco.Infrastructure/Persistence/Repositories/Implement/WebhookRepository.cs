@@ -181,8 +181,11 @@ public class WebhookRepository : IWebhookRepository
         {
             // Queued requests reference the webhook by key without a foreign key, so they don't cascade. The request
             // table is not part of the EF Core model yet, hence the raw statement.
-            Guid webhookKey = webhook.Key;
-            await db.Database.ExecuteSqlAsync($"DELETE FROM {Constants.DatabaseSchema.Tables.WebhookRequest} WHERE webhookKey = {webhookKey}");
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection: the identifier is a constant, the key is a parameter.
+            await db.Database.ExecuteSqlRawAsync(
+                $"DELETE FROM \"{Constants.DatabaseSchema.Tables.WebhookRequest}\" WHERE \"webhookKey\" = {{0}}",
+                webhook.Key);
+#pragma warning restore EF1002
 
             await db.Webhooks.Where(x => x.Key == webhook.Key).ExecuteDeleteAsync();
         });
