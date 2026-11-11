@@ -1,20 +1,15 @@
-import type { ExampleRangeValueModel } from './types.js';
+import type { ExampleRangeFacetModel, ExampleRangeValueModel } from './types.js';
 import { UMB_FACET_FILTER_CONTEXT } from '@umbraco-cms/backoffice/facet-filter';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-interface ExampleRangeResult {
-	min: number;
-	max: number;
-}
-
 export class ExampleRangeFacetFilterApi extends UmbControllerBase {
-	#range = new UmbObjectState<ExampleRangeResult>({ min: 0, max: 0 });
+	#range = new UmbObjectState<ExampleRangeFacetModel>({ min: 0, max: 0 });
 	public readonly min = this.#range.asObservablePart((r) => r.min);
 	public readonly max = this.#range.asObservablePart((r) => r.max);
 
-	#current = new UmbObjectState<ExampleRangeResult>({ min: 0, max: 0 });
+	#current = new UmbObjectState<ExampleRangeFacetModel>({ min: 0, max: 0 });
 	public readonly currentMin = this.#current.asObservablePart((r) => r.min);
 	public readonly currentMax = this.#current.asObservablePart((r) => r.max);
 
@@ -36,7 +31,7 @@ export class ExampleRangeFacetFilterApi extends UmbControllerBase {
 		this.observe(
 			this.#facetFilterContext.facetedResult,
 			(result) => {
-				const range = result as ExampleRangeResult | undefined;
+				const range = result as ExampleRangeFacetModel | undefined;
 				if (range && range.max > 0) {
 					this.#range.setValue(range);
 					if (!this.#initialized) {

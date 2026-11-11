@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'collectionTextFilter',
 		kind: 'default',
-		alias: 'Example.DynamicFacetFilter.TextFilter',
+		alias: 'Example.CollectionTextFilter.Product',
 		name: 'Dynamic Facet Filter Text Filter',
 		conditions: [
 			{

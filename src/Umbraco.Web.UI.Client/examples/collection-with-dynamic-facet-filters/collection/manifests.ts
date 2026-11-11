@@ -1,5 +1,5 @@
 import { EXAMPLE_PRODUCT_COLLECTION_ALIAS } from './constants.js';
-import { EXAMPLE_DYNAMIC_FACET_COLLECTION_REPOSITORY_ALIAS } from './repository/constants.js';
+import { EXAMPLE_PRODUCT_COLLECTION_REPOSITORY_ALIAS } from './repository/constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -8,8 +8,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'default',
 		alias: EXAMPLE_PRODUCT_COLLECTION_ALIAS,
 		name: 'Dynamic Facet Filter Collection',
+		api: () => import('./collection.context.js'),
 		meta: {
-			repositoryAlias: EXAMPLE_DYNAMIC_FACET_COLLECTION_REPOSITORY_ALIAS,
+			repositoryAlias: EXAMPLE_PRODUCT_COLLECTION_REPOSITORY_ALIAS,
 		},
 	},
 	...repositoryManifests,

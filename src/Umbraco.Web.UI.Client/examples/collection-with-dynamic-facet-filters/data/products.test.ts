@@ -175,15 +175,6 @@ describe('filterProducts', () => {
 			expect(blackFacet!.count).to.be.greaterThan(0);
 		});
 
-		it('includes the attribute name in each facet, and the hex in color facets', () => {
-			const result = filterProducts({});
-			expect(result.facets.categories.find((f) => f.unique === 'cat-hoodie')?.name).to.equal('Hoodies');
-			expect(result.facets.sizes.find((f) => f.unique === 'size-xl')?.name).to.equal('XL');
-			const blackFacet = result.facets.colors.find((f) => f.unique === 'color-black');
-			expect(blackFacet?.name).to.equal('Black');
-			expect(blackFacet?.hex).to.equal('#1b1b1b');
-		});
-
 		it('returns price range from filtered items', () => {
 			const result = filterProducts({ categories: ['cat-tshirt'] });
 			const tshirtPrices = products.filter((p) => p.category === 'cat-tshirt').map((p) => p.price.amount);

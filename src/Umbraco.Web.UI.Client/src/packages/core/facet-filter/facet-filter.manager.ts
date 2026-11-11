@@ -94,17 +94,11 @@ export class UmbFacetFilterManager extends UmbContextBase {
 	}
 
 	/**
-	 * Set faceted result data for a given alias.
-	 * @param alias
-	 * @param result
+	 * Replace all faceted results. Filters without a result in `results` no longer have one.
+	 * @param {Array<UmbFacetedResultModel>} results - The faceted result of each filter, keyed by filter alias.
 	 */
-	public setFacetedResult(alias: string, result: unknown): void {
-		const key = alias;
-		if (this.#facetedResults.getHasOne(key)) {
-			this.#facetedResults.updateOne(key, { alias, result });
-		} else {
-			this.#facetedResults.append([{ alias, result }]);
-		}
+	public setFacetedResults(results: Array<UmbFacetedResultModel>): void {
+		this.#facetedResults.setValue(results);
 	}
 
 	/**

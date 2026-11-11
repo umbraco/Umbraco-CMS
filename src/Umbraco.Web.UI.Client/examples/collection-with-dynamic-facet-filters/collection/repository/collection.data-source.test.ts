@@ -1,7 +1,6 @@
 import { products } from '../../data/products.js';
 import { ExampleDynamicFacetCollectionDataSource } from './collection.data-source.js';
 import { expect } from '@open-wc/testing';
-import type { UmbFacetFilterValueModel } from '@umbraco-cms/backoffice/facet-filter';
 
 describe('ExampleDynamicFacetCollectionDataSource', () => {
 	const dataSource = new ExampleDynamicFacetCollectionDataSource();
@@ -32,68 +31,49 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 		});
 	});
 
-	describe('category filter mapping', () => {
-		it('maps category filter alias to category field', async () => {
-			const filters: Array<UmbFacetFilterValueModel> = [
-				{ alias: 'Example.DynamicFacetFilter.CategoryFilter', value: 'cat-tshirt' },
-			];
-			const { data } = await dataSource.getCollection({ filters });
+	describe('category filter', () => {
+		it('returns only products in the given categories', async () => {
+			const { data } = await dataSource.getCollection({ categories: ['cat-tshirt'] });
 			expect(data!.items.every((p) => p.category === 'cat-tshirt')).to.equal(true);
 			expect(data!.items.length).to.be.greaterThan(0);
 		});
 	});
 
-	describe('size filter mapping', () => {
-		it('maps size filter alias to sizes field', async () => {
-			const filters: Array<UmbFacetFilterValueModel> = [
-				{ alias: 'Example.DynamicFacetFilter.SizeFilter', value: 'size-xl' },
-			];
-			const { data } = await dataSource.getCollection({ filters });
+	describe('size filter', () => {
+		it('returns only products in the given sizes', async () => {
+			const { data } = await dataSource.getCollection({ sizes: ['size-xl'] });
 			expect(data!.items.every((p) => p.sizes.includes('size-xl'))).to.equal(true);
 			expect(data!.items.length).to.be.greaterThan(0);
 		});
 	});
 
-	describe('color filter mapping', () => {
-		it('maps color filter alias to colors field', async () => {
-			const filters: Array<UmbFacetFilterValueModel> = [
-				{ alias: 'Example.DynamicFacetFilter.ColorFilter', value: 'color-black' },
-			];
-			const { data } = await dataSource.getCollection({ filters });
+	describe('color filter', () => {
+		it('returns only products in the given colors', async () => {
+			const { data } = await dataSource.getCollection({ colors: ['color-black'] });
 			expect(data!.items.every((p) => p.colors.includes('color-black'))).to.equal(true);
 			expect(data!.items.length).to.be.greaterThan(0);
 		});
 	});
 
-	describe('price range filter mapping', () => {
-		it('maps price range filter entries to priceRange field', async () => {
-			const filters: Array<UmbFacetFilterValueModel> = [
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', value: { key: 'min', amount: 20 } },
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', value: { key: 'max', amount: 50 } },
-			];
-			const { data } = await dataSource.getCollection({ filters });
+	describe('price range filter', () => {
+		it('returns only products within the price range', async () => {
+			const { data } = await dataSource.getCollection({ priceRange: { min: 20, max: 50 } });
 			expect(data!.items.length).to.be.greaterThan(0);
 			expect(data!.items.every((p) => p.price.amount >= 20 && p.price.amount <= 50)).to.equal(true);
 		});
 
 		it('returns items within the full price range', async () => {
-			const filters: Array<UmbFacetFilterValueModel> = [
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', value: { key: 'min', amount: 0 } },
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', value: { key: 'max', amount: 1000 } },
-			];
-			const { data } = await dataSource.getCollection({ filters });
+			const { data } = await dataSource.getCollection({ priceRange: { min: 0, max: 1000 } });
 			expect(data!.items.length).to.equal(products.length);
 		});
 	});
 
 	describe('combined filters', () => {
 		it('applies category and price range together', async () => {
-			const filters: Array<UmbFacetFilterValueModel> = [
-				{ alias: 'Example.DynamicFacetFilter.CategoryFilter', value: 'cat-jacket' },
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', value: { key: 'min', amount: 80 } },
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', value: { key: 'max', amount: 100 } },
-			];
-			const { data } = await dataSource.getCollection({ filters });
+			const { data } = await dataSource.getCollection({
+				categories: ['cat-jacket'],
+				priceRange: { min: 80, max: 100 },
+			});
 			expect(data!.items.length).to.be.greaterThan(0);
 			expect(
 				data!.items.every((p) => p.category === 'cat-jacket' && p.price.amount >= 80 && p.price.amount <= 100),
@@ -101,16 +81,18 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 		});
 	});
 
-	describe('faceted results', () => {
-		it('returns faceted results keyed by alias', async () => {
+	describe('facets', () => {
+		it('returns the facets of each field as facet models', async () => {
 			const { data } = await dataSource.getCollection({});
-			const facets = data!.facets;
-			expect(Array.isArray(facets['Example.DynamicFacetFilter.CategoryFilter'])).to.equal(true);
-			expect(Array.isArray(facets['Example.DynamicFacetFilter.SizeFilter'])).to.equal(true);
-			expect(Array.isArray(facets['Example.DynamicFacetFilter.ColorFilter'])).to.equal(true);
-			const priceRange = facets['Example.DynamicFacetFilter.PriceFilter'] as Record<string, unknown>;
-			expect('min' in priceRange).to.equal(true);
-			expect('max' in priceRange).to.equal(true);
+			const tshirts = data!.facets.categories.find((facet) => facet.unique === 'cat-tshirt');
+			expect(tshirts).to.deep.equal({
+				entityType: 'example-product-category',
+				unique: 'cat-tshirt',
+				count: products.filter((p) => p.category === 'cat-tshirt').length,
+			});
+			expect(data!.facets.sizes.length).to.be.greaterThan(0);
+			expect(data!.facets.colors.length).to.be.greaterThan(0);
+			expect(data!.facets.priceRange.max).to.be.greaterThan(data!.facets.priceRange.min);
 		});
 	});
 
@@ -119,14 +101,6 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 			const { data } = await dataSource.getCollection({ filter: 'hoodie' });
 			expect(data!.items.length).to.be.greaterThan(0);
 			expect(data!.items.every((p) => p.name.toLowerCase().includes('hoodie'))).to.equal(true);
-		});
-	});
-
-	describe('unknown alias', () => {
-		it('ignores filters with unknown aliases', async () => {
-			const filters: Array<UmbFacetFilterValueModel> = [{ alias: 'Unknown.Filter', value: 'some-value' }];
-			const { data } = await dataSource.getCollection({ filters });
-			expect(data!.items.length).to.equal(products.length);
 		});
 	});
 });

@@ -1,13 +1,13 @@
+import { colors } from './colors.js';
 import { UMB_FACET_FILTER_CONTEXT } from '@umbraco-cms/backoffice/facet-filter';
+import type { UmbFacetModel } from '@umbraco-cms/backoffice/facet-filter';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export interface ExampleColorFacetOptionModel {
-	unique: string;
+export interface ExampleColorFacetOptionModel extends UmbFacetModel {
 	name: string;
 	hex: string;
-	count: number;
 }
 
 export class ExampleColorFacetFilterApi extends UmbControllerBase {
@@ -26,7 +26,7 @@ export class ExampleColorFacetFilterApi extends UmbControllerBase {
 			this.#facetFilterContext = context;
 			this.observe(
 				context?.facetedResult,
-				(result) => this.#options.setValue((result as Array<ExampleColorFacetOptionModel> | undefined) ?? []),
+				(result) => this.#options.setValue(((result as Array<UmbFacetModel> | undefined) ?? []).map(this.#toOption)),
 				'exampleColorFacetedResultObserver',
 			);
 			this.observe(
@@ -36,6 +36,11 @@ export class ExampleColorFacetFilterApi extends UmbControllerBase {
 			);
 		});
 	}
+
+	#toOption = (facet: UmbFacetModel): ExampleColorFacetOptionModel => {
+		const color = colors.find((item) => item.id === facet.unique);
+		return { ...facet, name: color?.name ?? facet.unique, hex: color?.hex ?? facet.unique };
+	};
 
 	public setValue(values: Array<string>): void {
 		if (values.length === 0) {

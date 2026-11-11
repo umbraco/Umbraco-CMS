@@ -12,6 +12,14 @@ export interface UmbTargetPagedModel<T> extends UmbPagedModel<T> {
 	totalBefore?: number;
 }
 
+/**
+ * A page of items with the facets of the whole result, for a source that supports faceted search.
+ * The facets are keyed by the source's own fields.
+ */
+export interface UmbFacetedPagedModel<ItemType, FacetsType> extends UmbPagedModel<ItemType> {
+	facets: FacetsType;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbRepositoryResponse<T> extends UmbDataSourceResponse<T> {}
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

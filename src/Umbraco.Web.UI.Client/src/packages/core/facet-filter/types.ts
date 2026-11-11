@@ -1,3 +1,5 @@
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+
 export type * from './active-value/types.js';
 export type * from './facet-filter.extension.js';
 export type * from './facet-filter-api.interface.js';
@@ -14,10 +16,13 @@ export interface UmbActiveFacetFilterModel extends UmbFacetFilterValueModel {
 	unique: string;
 }
 
-export interface UmbWithOptionalFilteringModel {
-	filters?: Array<UmbFacetFilterValueModel>;
-}
-
-export interface UmbWithFilteringModel {
-	filters: Array<UmbFacetFilterValueModel>;
+/**
+ * One value of a facet in a faceted result, for example a category and how many items in the result have it.
+ */
+export interface UmbFacetModel extends UmbEntityModel {
+	unique: string;
+	/**
+	 * The number of items in the result that have this value.
+	 */
+	count?: number;
 }

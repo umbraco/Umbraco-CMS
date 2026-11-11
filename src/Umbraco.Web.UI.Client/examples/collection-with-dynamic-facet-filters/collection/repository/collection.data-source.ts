@@ -4,43 +4,35 @@ import {
 	EXAMPLE_PRODUCT_SIZE_ENTITY_TYPE,
 } from '../../entity.js';
 import { filterProducts } from '../../data/products.js';
-import type { ExampleFacetCount, ExampleProductFilterArgs } from '../../data/types.js';
-import type { ExampleRangeValueModel } from '../../range-kind/types.js';
-import type { ExampleDynamicFacetCollectionFilterModel, ExampleProductCollectionItemModel } from './types.js';
-import type { UmbFacetFilterValueModel } from '@umbraco-cms/backoffice/facet-filter';
+import type { ExampleFacetCount } from '../../data/types.js';
+import type {
+	ExampleDynamicFacetCollectionFilterModel,
+	ExampleProductCollectionFacetsModel,
+	ExampleProductCollectionItemModel,
+} from './types.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
-import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
+import type { UmbFacetModel } from '@umbraco-cms/backoffice/facet-filter';
+import type { UmbDataSourceResponse, UmbFacetedPagedModel } from '@umbraco-cms/backoffice/repository';
 
 export class ExampleDynamicFacetCollectionDataSource implements UmbCollectionDataSource<
 	ExampleProductCollectionItemModel,
 	ExampleDynamicFacetCollectionFilterModel
 > {
-	// Alias-to-field mapping: this is the data source's responsibility
-	#aliasFieldMap: Record<string, keyof ExampleProductFilterArgs> = {
-		'Example.DynamicFacetFilter.CategoryFilter': 'categories',
-		'Example.DynamicFacetFilter.SizeFilter': 'sizes',
-		'Example.DynamicFacetFilter.ColorFilter': 'colors',
-		'Example.DynamicFacetFilter.PriceFilter': 'priceRange',
-	};
-
-	// Reverse mapping: field -> alias
-	#fieldAliasMap: Record<string, string> = Object.fromEntries(
-		Object.entries(this.#aliasFieldMap).map(([alias, field]) => [field, alias]),
-	);
-
 	async getCollection(
 		args: ExampleDynamicFacetCollectionFilterModel,
 	): Promise<
-		UmbDataSourceResponse<UmbPagedModel<ExampleProductCollectionItemModel> & { facets: Record<string, unknown> }>
+		UmbDataSourceResponse<UmbFacetedPagedModel<ExampleProductCollectionItemModel, ExampleProductCollectionFacetsModel>>
 	> {
-		const productFilterArgs = this.#mapFiltersToArgs(args.filters ?? []);
-		productFilterArgs.skip = args.skip;
-		productFilterArgs.take = args.take;
-		productFilterArgs.textFilter = args.filter;
+		const result = filterProducts({
+			skip: args.skip,
+			take: args.take,
+			textFilter: args.filter,
+			categories: args.categories,
+			sizes: args.sizes,
+			colors: args.colors,
+			priceRange: args.priceRange,
+		});
 
-		const result = filterProducts(productFilterArgs);
-
-		// Map server models to client collection items
 		const items: Array<ExampleProductCollectionItemModel> = result.items.map((product) => ({
 			...product,
 			unique: product.id,
@@ -48,61 +40,20 @@ export class ExampleDynamicFacetCollectionDataSource implements UmbCollectionDat
 			icon: 'icon-shirt',
 		}));
 
-		// Map faceted results back using the alias mapping
-		const facets: Record<string, unknown> = {};
-
-		const toOptions = (facetItems: Array<ExampleFacetCount>, entityType: string) =>
-			facetItems.map((facetItem) => ({ ...facetItem, entityType }));
-
-		facets[this.#fieldAliasMap['categories']] = toOptions(
-			result.facets.categories,
-			EXAMPLE_PRODUCT_CATEGORY_ENTITY_TYPE,
-		);
-		facets[this.#fieldAliasMap['sizes']] = toOptions(result.facets.sizes, EXAMPLE_PRODUCT_SIZE_ENTITY_TYPE);
-		facets[this.#fieldAliasMap['colors']] = toOptions(result.facets.colors, EXAMPLE_PRODUCT_COLOR_ENTITY_TYPE);
-		facets[this.#fieldAliasMap['priceRange']] = result.facets.priceRange;
-
-		debugger;
+		const toFacets = (counts: Array<ExampleFacetCount>, entityType: string): Array<UmbFacetModel> =>
+			counts.map((count) => ({ entityType, unique: count.unique, count: count.count }));
 
 		return {
 			data: {
 				items,
 				total: result.total,
-				facets,
+				facets: {
+					categories: toFacets(result.facets.categories, EXAMPLE_PRODUCT_CATEGORY_ENTITY_TYPE),
+					sizes: toFacets(result.facets.sizes, EXAMPLE_PRODUCT_SIZE_ENTITY_TYPE),
+					colors: toFacets(result.facets.colors, EXAMPLE_PRODUCT_COLOR_ENTITY_TYPE),
+					priceRange: result.facets.priceRange,
+				},
 			},
 		};
-	}
-
-	#mapFiltersToArgs(filters: Array<UmbFacetFilterValueModel>): ExampleProductFilterArgs {
-		const args: ExampleProductFilterArgs = {};
-
-		for (const filter of filters) {
-			const field = this.#aliasFieldMap[filter.alias];
-			if (!field) continue;
-
-			switch (field) {
-				case 'categories':
-					args.categories ??= [];
-					args.categories.push(filter.value as string);
-					break;
-				case 'sizes':
-					args.sizes ??= [];
-					args.sizes.push(filter.value as string);
-					break;
-				case 'colors':
-					args.colors ??= [];
-					args.colors.push(filter.value as string);
-					break;
-				case 'priceRange': {
-					args.priceRange ??= { min: 0, max: 0 };
-					const rangeValue = filter.value as ExampleRangeValueModel;
-					if (rangeValue.key === 'min') args.priceRange.min = rangeValue.amount;
-					if (rangeValue.key === 'max') args.priceRange.max = rangeValue.amount;
-					break;
-				}
-			}
-		}
-
-		return args;
 	}
 }

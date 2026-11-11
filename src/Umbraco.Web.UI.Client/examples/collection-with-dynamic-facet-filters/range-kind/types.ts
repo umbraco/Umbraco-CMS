@@ -6,3 +6,8 @@ export interface ExampleRangeValueModel {
 	key: string;
 	amount: number;
 }
+
+export interface ExampleRangeFacetModel {
+	min: number;
+	max: number;
+}

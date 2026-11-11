@@ -1,5 +1,6 @@
 import { UMB_FACET_FILTER_CONTEXT } from '../facet-filter.context-token.js';
 import type { ManifestFacetFilter } from '../facet-filter.extension.js';
+import type { UmbFacetModel } from '../types.js';
 import type { MetaFacetFilterSelect } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -26,6 +27,7 @@ export class UmbSelectFacetFilterApi extends UmbControllerBase {
 	#facetFilterContext?: typeof UMB_FACET_FILTER_CONTEXT.TYPE;
 	#datalistDataSource?: UmbDatalistDataSource;
 	#hasFacetedResults = false;
+	#facetOptionsRequest = 0;
 	public readonly pagination = new UmbPaginationManager();
 
 	#manifest?: ManifestFacetFilter | undefined;
@@ -69,10 +71,10 @@ export class UmbSelectFacetFilterApi extends UmbControllerBase {
 		this.observe(
 			this.#facetFilterContext.facetedResult,
 			(result) => {
-				const options = result as Array<UmbDatalistOptionModel> | undefined;
-				if (options && options.length > 0) {
+				const facets = result as Array<UmbFacetModel> | undefined;
+				if (facets && facets.length > 0) {
 					this.#hasFacetedResults = true;
-					this.#options.setValue(options);
+					this.#setFacetOptions(facets);
 				} else {
 					this.#hasFacetedResults = false;
 				}
@@ -105,28 +107,23 @@ export class UmbSelectFacetFilterApi extends UmbControllerBase {
 		}
 	}
 
+	async #setFacetOptions(facets: Array<UmbFacetModel>) {
+		const request = ++this.#facetOptionsRequest;
+		const uniques = facets.map((facet) => facet.unique);
+		const { data } = (await this.#datalistDataSource?.requestItems(uniques)) ?? {};
+		if (request !== this.#facetOptionsRequest) return;
+
+		this.#options.setValue(
+			facets.map((facet) => {
+				const item = data?.find((item) => item.unique === facet.unique);
+				return { ...facet, name: item?.name, icon: item?.icon };
+			}),
+		);
+	}
+
 	async #requestValueItems(uniques: Array<string>) {
 		if (uniques.length === 0) {
 			this.#valueItems.setValue([]);
-			return;
-		}
-
-		// When faceted results are active, resolve value items from the current options
-		if (this.#hasFacetedResults) {
-			const currentOptions = this.#options.getValue();
-			const items: Array<UmbDatalistItemModel> = [];
-			for (const unique of uniques) {
-				const option = currentOptions.find((o) => o.unique === unique);
-				if (option) {
-					items.push({
-						unique: option.unique,
-						entityType: option.entityType,
-						name: option.name,
-						icon: option.icon,
-					});
-				}
-			}
-			this.#valueItems.setValue(items);
 			return;
 		}
 

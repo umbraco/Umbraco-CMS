@@ -13,6 +13,7 @@ import { UmbCollectionBulkActionManager } from '../bulk-action/collection-bulk-a
 import { UmbCollectionSelectionManager } from '../selection/collection-selection.manager.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
 import { UmbFacetFilterManager } from '@umbraco-cms/backoffice/facet-filter';
+import type { UmbFacetedResultModel } from '@umbraco-cms/backoffice/facet-filter';
 import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbValueSummaryCoordinatorContext } from '@umbraco-cms/backoffice/value-summary';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -344,8 +345,24 @@ export class UmbDefaultCollectionContext<
 		return this._requestCollection();
 	}
 
+	/**
+	 * Maps the active facet filter values to the repository's filter fields. Override it in a collection that has facet
+	 * filters, so the repository receives its own filter model instead of filter aliases.
+	 * @returns {Promise<Record<string, any>>} The filter fields to merge into the repository request.
+	 */
 	protected async _getFilterArgs(): Promise<Record<string, any>> {
 		return {};
+	}
+
+	/**
+	 * Maps the facets of the repository's response to the facet filters that display them. Override it in a collection
+	 * whose repository returns facets, for example an `UmbFacetedPagedModel`.
+	 * @param {UmbPagedModel<CollectionItemType>} data - The response of the repository.
+	 * @returns {Array<UmbFacetedResultModel>} The faceted result of each facet filter, keyed by filter alias.
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected _getFacetedResults(data: UmbPagedModel<CollectionItemType>): Array<UmbFacetedResultModel> {
+		return [];
 	}
 
 	protected async _requestCollection() {
@@ -359,21 +376,14 @@ export class UmbDefaultCollectionContext<
 
 		try {
 			const filterArgs = await this._getFilterArgs();
-			const filters = await this.filtering.getActiveFilterValues();
-			const filter = { ...this._filter.getValue(), ...filterArgs, filters };
+			const filter = { ...this._filter.getValue(), ...filterArgs };
 			const { data } = await this._repository.requestCollection(filter);
 
 			if (requestId !== this.#latestRequestId) return;
 
 			if (data) {
 				this._setCollectionData(data);
-
-				if ('facets' in data && data.facets) {
-					const facets = data.facets as Record<string, unknown>;
-					for (const [alias, result] of Object.entries(facets)) {
-						this.filtering.setFacetedResult(alias, result);
-					}
-				}
+				this.filtering.setFacetedResults(this._getFacetedResults(data));
 			}
 		} finally {
 			if (requestId === this.#latestRequestId) {
