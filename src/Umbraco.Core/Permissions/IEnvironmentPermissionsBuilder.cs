@@ -13,7 +13,7 @@ public interface IEnvironmentPermissionsBuilder : IEnvironmentPermissions
     /// Denies the supplied permission verbs.
     /// </summary>
     /// <remarks>
-    /// A denial is enforced on the Management API endpoints that change the entity types they declare. Environment permissions
+    /// A denial is enforced on the Management API endpoints whose changes need the denied verb. Environment permissions
     /// govern only changes; reads are always permitted.
     /// </remarks>
     /// <param name="permissions">The permission verbs, for example one of <see cref="Constants.Permissions"/>. Matched case-sensitively.</param>

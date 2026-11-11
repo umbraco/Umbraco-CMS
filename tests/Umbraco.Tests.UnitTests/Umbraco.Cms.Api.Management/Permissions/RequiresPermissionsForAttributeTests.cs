@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Permissions;
 [TestFixture]
 public class RequiresPermissionsForAttributeTests
 {
-    [RequiresPermissionsFor(Constants.UdiEntityType.MediaType)]
+    [RequiresPermissionsFor(Constants.Permissions.MediaType.Prefix)]
     private class ControllerBaseWithDeclaration
     {
     }
@@ -19,7 +19,7 @@ public class RequiresPermissionsForAttributeTests
     {
     }
 
-    [RequiresPermissionsFor(Constants.UdiEntityType.DocumentType)]
+    [RequiresPermissionsFor(Constants.Permissions.DocumentType.Prefix)]
     private class ControllerWithItsOwnDeclaration : ControllerBaseWithDeclaration
     {
     }
@@ -27,8 +27,8 @@ public class RequiresPermissionsForAttributeTests
     [Test]
     public void Declaration_On_A_Base_Controller_Is_Inherited()
         => Assert.That(
-            typeof(ControllerWithoutOwnDeclaration).GetCustomAttribute<RequiresPermissionsForAttribute>(inherit: true)?.EntityType,
-            Is.EqualTo(Constants.UdiEntityType.MediaType));
+            typeof(ControllerWithoutOwnDeclaration).GetCustomAttribute<RequiresPermissionsForAttribute>(inherit: true)?.PermissionPrefix,
+            Is.EqualTo(Constants.Permissions.MediaType.Prefix));
 
     // With AllowMultiple, MVC would run both declarations and the base's would still apply.
     [Test]
@@ -41,7 +41,7 @@ public class RequiresPermissionsForAttributeTests
         Assert.Multiple(() =>
         {
             Assert.That(declared, Has.Length.EqualTo(1));
-            Assert.That(declared[0].EntityType, Is.EqualTo(Constants.UdiEntityType.DocumentType));
+            Assert.That(declared[0].PermissionPrefix, Is.EqualTo(Constants.Permissions.DocumentType.Prefix));
         });
     }
 
@@ -49,7 +49,7 @@ public class RequiresPermissionsForAttributeTests
     [Test]
     public void Is_An_Authorization_Filter()
         => Assert.That(
-            new RequiresPermissionsForAttribute(Constants.UdiEntityType.DocumentType),
+            new RequiresPermissionsForAttribute(Constants.Permissions.DocumentType.Prefix),
             Is.InstanceOf<IAsyncAuthorizationFilter>());
 
     [TestCase("POST", Constants.Permissions.DocumentType.Create)]
@@ -72,11 +72,24 @@ public class RequiresPermissionsForAttributeTests
         => Assert.That(InferForDocumentType(httpMethod), Is.Null);
 
     [Test]
-    public void The_Entity_Types_Casing_Does_Not_Change_The_Permission()
+    public void Any_Prefix_Is_Joined_To_The_Operation()
         => Assert.That(
-            new RequiresPermissionsForAttribute("Document-Type").InferPermission(HttpMethods.Post),
+            new RequiresPermissionsForAttribute("My.Package.Widget").InferPermission(HttpMethods.Post),
+            Is.EqualTo("My.Package.Widget.Create"));
+
+    [TestCase("Umb.DocumentType.")]
+    [TestCase("Umb.DocumentType..")]
+    public void A_Trailing_Dot_Is_Ignored(string permissionPrefix)
+        => Assert.That(
+            new RequiresPermissionsForAttribute(permissionPrefix).InferPermission(HttpMethods.Post),
             Is.EqualTo(Constants.Permissions.DocumentType.Create));
 
+    [TestCase("")]
+    [TestCase(" ")]
+    [TestCase(".")]
+    public void An_Empty_Prefix_Is_Rejected(string permissionPrefix)
+        => Assert.Throws<ArgumentException>(() => new RequiresPermissionsForAttribute(permissionPrefix));
+
     private static string? InferForDocumentType(string? httpMethod)
-        => new RequiresPermissionsForAttribute(Constants.UdiEntityType.DocumentType).InferPermission(httpMethod);
+        => new RequiresPermissionsForAttribute(Constants.Permissions.DocumentType.Prefix).InferPermission(httpMethod);
 }

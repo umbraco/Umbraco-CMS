@@ -131,7 +131,7 @@ internal sealed class DeniedPermissionHeaderFilterTests
         protected override string ApiName => DeniedPermissionHeaderFilterTests.ApiName;
     }
 
-    [RequiresPermissionsFor(Constants.UdiEntityType.DocumentType)]
+    [RequiresPermissionsFor(Constants.Permissions.DocumentType.Prefix)]
     private sealed class GovernedController
     {
         public void Action()
@@ -139,7 +139,7 @@ internal sealed class DeniedPermissionHeaderFilterTests
         }
     }
 
-    [RequiresPermissionsFor(Constants.UdiEntityType.DocumentType)]
+    [RequiresPermissionsFor(Constants.Permissions.DocumentType.Prefix)]
     private sealed class GovernedReadController
     {
         [RequiresPermissions([])]

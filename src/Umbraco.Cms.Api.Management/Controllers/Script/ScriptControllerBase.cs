@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Script;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Script}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Script))]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessScripts)]
-[RequiresPermissionsFor(Constants.UdiEntityType.Script)]
+[RequiresPermissionsFor(Constants.Permissions.Script.Prefix)]
 public class ScriptControllerBase : FileSystemManagementControllerBase
 {
     protected IActionResult ScriptOperationStatusResult(ScriptOperationStatus status) =>

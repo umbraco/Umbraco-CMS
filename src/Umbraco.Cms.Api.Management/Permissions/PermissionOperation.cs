@@ -1,7 +1,7 @@
 namespace Umbraco.Cms.Api.Management.Permissions;
 
 /// <summary>
-/// The change an endpoint makes to a schema entity.
+/// The change an endpoint makes, which names the last part of its permission verb.
 /// </summary>
 internal enum PermissionOperation
 {
