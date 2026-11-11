@@ -15,6 +15,7 @@ import { UmbEntityNamedDetailWorkspaceContextBase } from '@umbraco-cms/backoffic
 import { UMB_LIBRARY_SECTION_PATH } from '@umbraco-cms/backoffice/library';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
@@ -64,11 +65,15 @@ export class UmbElementFolderWorkspaceContext
 		return UMB_EDIT_ELEMENT_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
+	#enforcedVerbs = new Map<string, Promise<UmbApi>>();
+
 	#enforceUserPermission(verb: string, message: string) {
+		if (this.#enforcedVerbs.has(verb)) return;
+
 		// We set the initial permission state to false because the condition is false by default and only execute the callback if it changes.
 		this.#handleUserPermissionChange(verb, false, message);
 
-		createExtensionApiByAlias(this, UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS, [
+		const condition = createExtensionApiByAlias(this, UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS, [
 			{
 				config: {
 					allOf: [verb],
@@ -78,6 +83,13 @@ export class UmbElementFolderWorkspaceContext
 				},
 			},
 		]);
+		this.#enforcedVerbs.set(verb, condition);
+	}
+
+	override resetState() {
+		this.#enforcedVerbs.forEach((condition) => condition.then((api) => api.destroy()).catch(() => undefined));
+		this.#enforcedVerbs.clear();
+		super.resetState();
 	}
 
 	#handleUserPermissionChange(identifier: string, permitted: boolean, message: string) {
