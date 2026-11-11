@@ -17,7 +17,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 /// Controller responsible for handling requests to create templates for document types in the Umbraco CMS.
 /// </summary>
 [ApiVersion("1.0")]
-[RequiresPermissionsFor(Constants.UdiEntityType.DocumentType, Constants.UdiEntityType.Template)]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public class CreateDocumentTypeTemplateController : DocumentTypeControllerBase
 {

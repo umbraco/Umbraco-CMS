@@ -12,16 +12,16 @@ namespace Umbraco.Cms.Api.Management.OpenApi;
 /// Documents the 403 response and the denied permission header of every operation environment permissions can deny.
 /// </summary>
 /// <remarks>
-/// It applies to every OpenAPI document, so any controller that declares <see cref="RequiresPermissionsForAttribute"/> gets
-/// them documented in its own document too.
+/// It applies to every OpenAPI document, so any controller with <see cref="RequiresPermissionsForAttribute"/>, or action
+/// with <see cref="RequiresPermissionsAttribute"/>, gets them documented in its own document too.
 /// </remarks>
 internal sealed class DeniedPermissionHeaderFilter : IOperationFilter
 {
     /// <inheritdoc />
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        string[] deniable = GovernedPermissions(context);
-        if (deniable.Length == 0)
+        IReadOnlyList<string> deniable = GovernedPermissions(context);
+        if (deniable.Count == 0)
         {
             return;
         }
@@ -53,17 +53,18 @@ internal sealed class DeniedPermissionHeaderFilter : IOperationFilter
             });
     }
 
-    private static string[] GovernedPermissions(OperationFilterContext context)
+    private static IReadOnlyList<string> GovernedPermissions(OperationFilterContext context)
     {
-        if ((context.ApiDescription.ActionDescriptor as ControllerActionDescriptor)?
-                .ControllerTypeInfo
-                .GetCustomAttribute<RequiresPermissionsForAttribute>(inherit: true) is not RequiresPermissionsForAttribute governed)
+        if (context.MethodInfo?.GetCustomAttribute<RequiresPermissionsAttribute>() is RequiresPermissionsAttribute declared)
         {
-            return [];
+            return declared.Permissions;
         }
 
-        RequiresPermissionsAttribute? declared = context.MethodInfo?.GetCustomAttribute<RequiresPermissionsAttribute>();
-
-        return RequiredPermissionsResolver.ResolvePermissions(governed.EntityTypes, declared, context.ApiDescription.HttpMethod);
+        return (context.ApiDescription.ActionDescriptor as ControllerActionDescriptor)?
+            .ControllerTypeInfo
+            .GetCustomAttribute<RequiresPermissionsForAttribute>(inherit: true)?
+            .InferPermission(context.ApiDescription.HttpMethod) is string permission
+            ? [permission]
+            : [];
     }
 }

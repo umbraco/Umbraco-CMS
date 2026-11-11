@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Permissions;
@@ -26,8 +27,8 @@ public class RequiresPermissionsForAttributeTests
     [Test]
     public void Declaration_On_A_Base_Controller_Is_Inherited()
         => Assert.That(
-            typeof(ControllerWithoutOwnDeclaration).GetCustomAttribute<RequiresPermissionsForAttribute>(inherit: true)?.EntityTypes,
-            Is.EqualTo(new[] { Constants.UdiEntityType.MediaType }));
+            typeof(ControllerWithoutOwnDeclaration).GetCustomAttribute<RequiresPermissionsForAttribute>(inherit: true)?.EntityType,
+            Is.EqualTo(Constants.UdiEntityType.MediaType));
 
     // With AllowMultiple, MVC would run both declarations and the base's would still apply.
     [Test]
@@ -40,7 +41,7 @@ public class RequiresPermissionsForAttributeTests
         Assert.Multiple(() =>
         {
             Assert.That(declared, Has.Length.EqualTo(1));
-            Assert.That(declared[0].EntityTypes, Is.EqualTo(new[] { Constants.UdiEntityType.DocumentType }));
+            Assert.That(declared[0].EntityType, Is.EqualTo(Constants.UdiEntityType.DocumentType));
         });
     }
 
@@ -50,4 +51,32 @@ public class RequiresPermissionsForAttributeTests
         => Assert.That(
             new RequiresPermissionsForAttribute(Constants.UdiEntityType.DocumentType),
             Is.InstanceOf<IAsyncAuthorizationFilter>());
+
+    [TestCase("POST", Constants.Permissions.DocumentType.Create)]
+    [TestCase("PUT", Constants.Permissions.DocumentType.Update)]
+    [TestCase("PATCH", Constants.Permissions.DocumentType.Update)]
+    [TestCase("DELETE", Constants.Permissions.DocumentType.Delete)]
+    public void Infers_The_Permission_From_The_Http_Method(string httpMethod, string expected)
+        => Assert.That(InferForDocumentType(httpMethod), Is.EqualTo(expected));
+
+    [TestCase("TRACE")]
+    [TestCase("LOCK")]
+    [TestCase(null)]
+    public void An_Unrecognised_Or_Missing_Http_Method_Needs_The_Update_Permission(string? httpMethod)
+        => Assert.That(InferForDocumentType(httpMethod), Is.EqualTo(Constants.Permissions.DocumentType.Update));
+
+    [TestCase("GET")]
+    [TestCase("HEAD")]
+    [TestCase("OPTIONS")]
+    public void A_Safe_Http_Method_Needs_No_Permission(string httpMethod)
+        => Assert.That(InferForDocumentType(httpMethod), Is.Null);
+
+    [Test]
+    public void The_Entity_Types_Casing_Does_Not_Change_The_Permission()
+        => Assert.That(
+            new RequiresPermissionsForAttribute("Document-Type").InferPermission(HttpMethods.Post),
+            Is.EqualTo(Constants.Permissions.DocumentType.Create));
+
+    private static string? InferForDocumentType(string? httpMethod)
+        => new RequiresPermissionsForAttribute(Constants.UdiEntityType.DocumentType).InferPermission(httpMethod);
 }

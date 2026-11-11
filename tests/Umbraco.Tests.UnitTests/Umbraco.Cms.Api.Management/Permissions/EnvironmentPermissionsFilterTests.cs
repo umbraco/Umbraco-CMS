@@ -106,7 +106,7 @@ public class EnvironmentPermissionsFilterTests
             lockDocumentTypes: true,
             actionName: nameof(DocumentTypeController.PostButReadOnly));
 
-        await CreateFilter().OnAuthorizationAsync(context);
+        await RunFiltersAsync(CreateFilter(), context);
 
         AssertPermitted(context);
     }
@@ -152,41 +152,6 @@ public class EnvironmentPermissionsFilterTests
     }
 
     [Test]
-    public async Task Every_Declared_Entity_Type_Has_To_Permit_The_Operation()
-    {
-        AuthorizationFilterContext context = CreateContext(HttpMethods.Post, lockDocumentTypes: true);
-
-        await CreateFilter(Constants.UdiEntityType.Webhook, Constants.UdiEntityType.DocumentType)
-            .OnAuthorizationAsync(context);
-
-        AssertForbidden(context);
-    }
-
-    [Test]
-    public async Task Denial_Names_The_Permission_Of_The_Entity_Type_That_Denied_It()
-    {
-        AuthorizationFilterContext context = CreateContext(HttpMethods.Post, lockDocumentTypes: true);
-
-        await CreateFilter(Constants.UdiEntityType.Webhook, Constants.UdiEntityType.DocumentType)
-            .OnAuthorizationAsync(context);
-
-        Assert.That(
-            context.HttpContext.Response.Headers[Constants.Headers.DeniedPermission].ToString(),
-            Is.EqualTo(Constants.Permissions.DocumentType.Create));
-    }
-
-    [Test]
-    public async Task Several_Declared_Entity_Types_Are_Permitted_When_None_Denies()
-    {
-        AuthorizationFilterContext context = CreateContext(HttpMethods.Post, lockDocumentTypes: true);
-
-        await CreateFilter(Constants.UdiEntityType.Webhook, Constants.UdiEntityType.Language)
-            .OnAuthorizationAsync(context);
-
-        AssertPermitted(context);
-    }
-
-    [Test]
     public async Task An_Entity_Type_Named_By_A_Declaration_Uses_That_Operation()
     {
         AuthorizationFilterContext context = CreateContext(
@@ -194,8 +159,7 @@ public class EnvironmentPermissionsFilterTests
             new LockDocumentTypeCreationOnly(),
             typeof(TemplateForDocumentTypeController));
 
-        await CreateFilter(Constants.UdiEntityType.DocumentType, Constants.UdiEntityType.Template)
-            .OnAuthorizationAsync(context);
+        await RunFiltersAsync(CreateFilter(), context);
 
         // The verb says create, but the declaration says this updates the document type, which isn't denied.
         AssertPermitted(context);
@@ -209,8 +173,7 @@ public class EnvironmentPermissionsFilterTests
             new LockTemplateCreation(),
             typeof(TemplateForDocumentTypeController));
 
-        await CreateFilter(Constants.UdiEntityType.DocumentType, Constants.UdiEntityType.Template)
-            .OnAuthorizationAsync(context);
+        await RunFiltersAsync(CreateFilter(), context);
 
         Assert.Multiple(() =>
         {
@@ -219,6 +182,51 @@ public class EnvironmentPermissionsFilterTests
                 context.HttpContext.Response.Headers[Constants.Headers.DeniedPermission].ToString(),
                 Is.EqualTo(Constants.Permissions.Template.Create));
         });
+    }
+
+    [Test]
+    public async Task Requiring_Permissions_For_The_Entity_Type_Skips_An_Action_That_Declares_Its_Permissions()
+    {
+        AuthorizationFilterContext context = CreateContext(
+            HttpMethods.Post,
+            new LockTemplateCreation(),
+            typeof(TemplateForDocumentTypeController));
+
+        await CreateFilter(Constants.UdiEntityType.Template).OnAuthorizationAsync(context);
+
+        AssertPermitted(context);
+    }
+
+    [Test]
+    public async Task Declared_Permissions_Are_Enforced_On_Their_Own()
+    {
+        AuthorizationFilterContext context = CreateContext(
+            HttpMethods.Post,
+            new LockTemplateCreation(),
+            typeof(TemplateForDocumentTypeController));
+
+        await DeclaredFilter(context).OnAuthorizationAsync(context);
+
+        Assert.Multiple(() =>
+        {
+            AssertForbidden(context);
+            Assert.That(
+                context.HttpContext.Response.Headers[Constants.Headers.DeniedPermission].ToString(),
+                Is.EqualTo(Constants.Permissions.Template.Create));
+        });
+    }
+
+    [Test]
+    public async Task Declared_Permissions_Are_Permitted_When_None_Is_Denied()
+    {
+        AuthorizationFilterContext context = CreateContext(
+            HttpMethods.Post,
+            new LockDocumentTypeCreationOnly(),
+            typeof(TemplateForDocumentTypeController));
+
+        await DeclaredFilter(context).OnAuthorizationAsync(context);
+
+        AssertPermitted(context);
     }
 
     private sealed class LockTemplateCreation : IEnvironmentPermissionsConfigurator
@@ -270,8 +278,25 @@ public class EnvironmentPermissionsFilterTests
         return services.BuildServiceProvider();
     }
 
-    private static RequiresPermissionsForAttribute CreateFilter(params string[] entityTypes)
-        => new(entityTypes.Length > 0 ? entityTypes : [Constants.UdiEntityType.DocumentType]);
+    private static RequiresPermissionsForAttribute CreateFilter(string entityType = Constants.UdiEntityType.DocumentType)
+        => new(entityType);
+
+    private static RequiresPermissionsAttribute DeclaredFilter(AuthorizationFilterContext context)
+        => ((ControllerActionDescriptor)context.ActionDescriptor).MethodInfo
+            .GetCustomAttribute<RequiresPermissionsAttribute>()!;
+
+    // Runs the controller's filter, then the action's declaration if it has one, as MVC does.
+    private static async Task RunFiltersAsync(RequiresPermissionsForAttribute filter, AuthorizationFilterContext context)
+    {
+        await filter.OnAuthorizationAsync(context);
+
+        RequiresPermissionsAttribute? declared = ((ControllerActionDescriptor)context.ActionDescriptor).MethodInfo
+            .GetCustomAttribute<RequiresPermissionsAttribute>();
+        if (context.Result is null && declared is not null)
+        {
+            await declared.OnAuthorizationAsync(context);
+        }
+    }
 
     private static void AssertPermitted(AuthorizationFilterContext context)
         => Assert.Multiple(() =>

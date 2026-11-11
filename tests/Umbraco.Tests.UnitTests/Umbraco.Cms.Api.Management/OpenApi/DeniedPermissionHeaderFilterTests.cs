@@ -40,6 +40,19 @@ internal sealed class DeniedPermissionHeaderFilterTests
     }
 
     [Test]
+    public void Documents_The_Header_For_An_Action_That_Declares_Its_Permissions_On_Its_Own()
+    {
+        OperationFilterContext context = CreateContext(typeof(DeclaringController), "POST");
+        var operation = new OpenApiOperation();
+
+        new DeniedPermissionHeaderFilter().Apply(operation, context);
+
+        Assert.That(
+            operation.Responses?.GetValueOrDefault(Forbidden)?.Headers?[Constants.Headers.DeniedPermission].Description,
+            Does.Contain(Constants.Permissions.Template.Create));
+    }
+
+    [Test]
     public void Adds_The_Header_To_An_Already_Documented_Forbidden_Response()
     {
         OperationFilterContext context = CreateContext(typeof(GovernedController), "PUT");
@@ -130,6 +143,14 @@ internal sealed class DeniedPermissionHeaderFilterTests
     private sealed class GovernedReadController
     {
         [RequiresPermissions([])]
+        public void Action()
+        {
+        }
+    }
+
+    private sealed class DeclaringController
+    {
+        [RequiresPermissions([Constants.Permissions.Template.Create])]
         public void Action()
         {
         }
