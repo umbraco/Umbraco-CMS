@@ -779,6 +779,79 @@ public partial class ContentPublishingServiceTests
         VerifyIsPublished(content.Key);
     }
 
+    [TestCase(ContentVariation.Segment)]
+    [TestCase(ContentVariation.CultureAndSegment)]
+    public async Task Cannot_Publish_Branch_Descendant_With_Invalid_Value_In_Non_Default_Segment(ContentVariation variation)
+    {
+        var contentType = await SetupSegmentVariantTest(variation);
+        var culture = variation.VariesByCulture() ? "en-US" : null;
+
+        IContent root = BuildSegmentVariantContent(contentType, culture, "Root");
+        root.SetValue("title", "Valid default value", culture);
+        ContentService.Save(root);
+
+        IContent child = BuildSegmentVariantContent(contentType, culture, "Child", root);
+        child.SetValue("title", "Valid default value", culture);
+        child.SetValue("title", "Invalid seg-1 value", culture, "seg-1");
+        ContentService.Save(child);
+
+        var result = await ContentPublishingService.PublishBranchAsync(
+            root.Key,
+            culture is null ? _allCultures : [culture],
+            PublishBranchFilter.IncludeUnpublished,
+            Constants.Security.SuperUserKey,
+            false);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.FailedBranch, result.Status);
+        AssertBranchResultSuccess(result.Result, root.Key);
+        AssertBranchResultFailed(result.Result, (child.Key, ContentPublishingOperationStatus.ContentInvalid));
+        VerifyIsPublished(root.Key);
+        VerifyIsNotPublished(child.Key);
+    }
+
+    [TestCase(ContentVariation.Segment)]
+    [TestCase(ContentVariation.CultureAndSegment)]
+    public async Task Scheduled_Publish_Does_Not_Publish_Content_With_Invalid_Value_In_Non_Default_Segment(ContentVariation variation)
+    {
+        var contentType = await SetupSegmentVariantTest(variation);
+        var culture = variation.VariesByCulture() ? "en-US" : null;
+
+        IContent content = BuildSegmentVariantContent(contentType, culture, "Segment Test");
+        content.SetValue("title", "Valid default value", culture);
+        content.SetValue("title", "Valid seg-1 value", culture, "seg-1");
+        ContentService.Save(content);
+
+        var scheduleResult = await ContentPublishingService.PublishAsync(
+            content.Key,
+            [
+                new CulturePublishScheduleModel
+                {
+                    Culture = culture,
+                    Schedule = new ContentScheduleModel { PublishDate = DateTimeOffset.UtcNow.AddDays(1) },
+                }
+            ],
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(scheduleResult.Success);
+
+        content = ContentService.GetById(content.Key)!;
+        content.SetValue("title", "Invalid seg-1 value", culture, "seg-1");
+        ContentService.Save(content);
+
+        var results = ContentService.PerformScheduledPublish(DateTime.UtcNow.AddDays(2)).ToArray();
+
+        var contentResult = results.Single(r => r.Content.Key == content.Key);
+        Assert.AreEqual(PublishResultType.FailedPublishContentInvalid, contentResult.Result);
+        VerifyIsNotPublished(content.Key);
+    }
+
+    private static IContent BuildSegmentVariantContent(IContentType contentType, string? culture, string name, IContent? parent = null)
+    {
+        ContentBuilder builder = new ContentBuilder().WithContentType(contentType);
+        builder = culture is null ? builder.WithName(name) : builder.WithCultureName(culture, name);
+        return parent is null ? builder.Build() : builder.WithParent(parent).Build();
+    }
+
     [TestCase(PublishBranchFilter.Default, true)]
     [TestCase(PublishBranchFilter.ForceRepublish, false)]
     public async Task Publish_Branch_Validates_Unchanged_Published_Root_Only_When_Republishing(PublishBranchFilter publishBranchFilter, bool expectSuccess)

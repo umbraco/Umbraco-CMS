@@ -141,6 +141,11 @@ public class PropertyValidationService : IPropertyValidationService
                 return false;
             }
 
+            if (HasInvalidSegmentValue(content, x, impact))
+            {
+                return true;
+            }
+
             // impacts invariant = validate invariant property, invariant culture
             if (impact.ImpactsOnlyInvariantCulture)
             {
@@ -188,6 +193,58 @@ public class PropertyValidationService : IPropertyValidationService
         }).ToArray();
 
         return invalidProperties.Length == 0;
+    }
+
+    /// <summary>
+    ///     Determines whether the property holds an invalid value in a non-default segment of the cultures the impact publishes.
+    /// </summary>
+    private bool HasInvalidSegmentValue(IPublishableContentBase content, IProperty property, CultureImpact impact)
+    {
+        if (property.PropertyType.VariesBySegment() is false)
+        {
+            return false;
+        }
+
+        var variesByCulture = property.PropertyType.VariesByCulture();
+        IEnumerable<string> culturesBeingValidated = [];
+
+        if (impact.ImpactsAllCultures is false)
+        {
+            if (variesByCulture)
+            {
+                if (impact.ImpactsOnlyInvariantCulture)
+                {
+                    return false;
+                }
+            }
+            else if (impact.ImpactsExplicitCulture)
+            {
+                if (GetDataEditor(property.PropertyType)?.CanMergePartialPropertyValues(property.PropertyType) is true)
+                {
+                    culturesBeingValidated = [impact.Culture!];
+                }
+                else if (impact.ImpactsAlsoInvariantProperties is false && content.Published)
+                {
+                    return false;
+                }
+            }
+        }
+
+        var culture = variesByCulture ? impact.Culture : null;
+
+        return property.Values.Any(value =>
+            value.Segment.IsNullOrWhiteSpace() is false
+            && property.PropertyType.SupportsVariation(value.Culture, value.Segment, true)
+            && (impact.ImpactsAllCultures || value.Culture.InvariantEquals(culture))
+            && IsValidPropertyValue(
+                property,
+                value.EditedValue,
+                new PropertyValidationContext
+                {
+                    Culture = value.Culture,
+                    Segment = value.Segment,
+                    CulturesBeingValidated = culturesBeingValidated,
+                }) is false);
     }
 
     /// <inheritdoc />

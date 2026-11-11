@@ -293,6 +293,55 @@ public class PropertyValidationServiceTests
         Assert.AreEqual(4, invalid.Length);
     }
 
+    [TestCase(ContentVariation.Segment, null, "Invalid", false)]
+    [TestCase(ContentVariation.Segment, null, "Valid", true)]
+    [TestCase(ContentVariation.CultureAndSegment, "en-US", "Invalid", false)]
+    [TestCase(ContentVariation.CultureAndSegment, "en-US", "Valid", true)]
+    public void Validate_Values_In_Non_Default_Segments(ContentVariation variation, string? culture, string segmentValue, bool expectedValid)
+    {
+        MockObjects(out var validationService, out var dataType);
+
+        var property = new Property(
+            new PropertyType(ShortStringHelper, dataType, "test1")
+            {
+                ValidationRegExp = "^Valid.*$",
+                Variations = variation,
+            });
+        property.SetValue("Valid", culture);
+        property.SetValue(segmentValue, culture, "segment-1");
+
+        var content = Mock.Of<IContent>(x => x.Properties == new PropertyCollection(new[] { property }));
+        CultureImpact impact = culture is null ? CultureImpact.Invariant : CultureImpact.Explicit(culture, true);
+
+        var result = validationService.IsPropertyDataValid(content, out var invalid, impact);
+
+        Assert.AreEqual(expectedValid, result);
+        Assert.AreEqual(expectedValid ? 0 : 1, invalid.Length);
+    }
+
+    [Test]
+    public void Does_Not_Validate_Segment_Values_Of_Cultures_Not_Impacted()
+    {
+        MockObjects(out var validationService, out var dataType);
+
+        var property = new Property(
+            new PropertyType(ShortStringHelper, dataType, "test1")
+            {
+                ValidationRegExp = "^Valid.*$",
+                Variations = ContentVariation.CultureAndSegment,
+            });
+        property.SetValue("Valid", "en-US");
+        property.SetValue("Valid", "en-US", "segment-1");
+        property.SetValue("Invalid", "da-DK", "segment-1");
+
+        var content = Mock.Of<IContent>(x => x.Properties == new PropertyCollection(new[] { property }));
+
+        var result = validationService.IsPropertyDataValid(content, out var invalid, CultureImpact.Explicit("en-US", true));
+
+        Assert.IsTrue(result);
+        Assert.IsEmpty(invalid);
+    }
+
     [TestCase(null)]
     [TestCase(24)]
     [TestCase("test")]
