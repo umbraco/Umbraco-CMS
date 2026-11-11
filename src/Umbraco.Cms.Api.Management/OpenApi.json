@@ -6088,7 +6088,7 @@
                 }
               },
               "Umb-Denied-Permission": {
-                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Update\". Absent when the response has another cause.",
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -17334,7 +17334,7 @@
                 }
               },
               "Umb-Denied-Permission": {
-                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Update\". Absent when the response has another cause.",
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
@@ -23372,7 +23372,7 @@
                 }
               },
               "Umb-Denied-Permission": {
-                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Update\". Absent when the response has another cause.",
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Create\". Absent when the response has another cause.",
                 "schema": {
                   "type": "string"
                 }
