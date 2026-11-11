@@ -68,11 +68,10 @@ export class UmbEntityFrameElement extends LitElement {
 				right: 0;
 				background: var(--umb-entity-frame-color, var(--uui-color-focus));
 				color: var(--umb-entity-frame-contrast-color, var(--uui-color-selected-contrast));
-				padding: 0 var(--uui-size-2);
+				padding: 1px var(--uui-size-2) 0;
 				border-radius: var(--uui-border-radius) var(--uui-border-radius) 0 0;
 				font-size: var(--uui-type-small-size);
 				line-height: 1.125;
-				padding-top: 1px;
 			}
 
 			.tab::before {
