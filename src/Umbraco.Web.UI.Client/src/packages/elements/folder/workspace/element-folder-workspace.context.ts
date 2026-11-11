@@ -31,7 +31,17 @@ export class UmbElementFolderWorkspaceContext
 			detailRepositoryAlias: UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS,
 		});
 
-		this.#setupNameWritePermissions();
+		this.observe(
+			this.isNew,
+			(isNew) => {
+				if (isNew === undefined) return;
+				this.#enforceUserPermission(
+					UMB_USER_PERMISSION_ELEMENT_FOLDER_UPDATE,
+					'You do not have permission to update element folders.',
+				);
+			},
+			null,
+		);
 
 		this.routes.setRoutes([
 			{
@@ -54,29 +64,34 @@ export class UmbElementFolderWorkspaceContext
 		return UMB_EDIT_ELEMENT_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 
-	#setupNameWritePermissions() {
-		const guardUnique = 'UMB_ALLOW_FOLDER_RENAME_WITH_PERMISSION';
-
-		// Default to not permitted until the condition confirms permission.
-		this.nameWriteGuard.fallbackToNotPermitted();
+	#enforceUserPermission(verb: string, message: string) {
+		// We set the initial permission state to false because the condition is false by default and only execute the callback if it changes.
+		this.#handleUserPermissionChange(verb, false, message);
 
 		createExtensionApiByAlias(this, UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS, [
 			{
 				config: {
-					allOf: [UMB_USER_PERMISSION_ELEMENT_FOLDER_UPDATE],
+					allOf: [verb],
 				},
 				onChange: (permitted: boolean) => {
-					if (permitted) {
-						this.nameWriteGuard.addRule({
-							unique: guardUnique,
-							permitted: true,
-						});
-					} else {
-						this.nameWriteGuard.removeRule(guardUnique);
-					}
+					this.#handleUserPermissionChange(verb, permitted, message);
 				},
 			},
 		]);
+	}
+
+	#handleUserPermissionChange(identifier: string, permitted: boolean, message: string) {
+		if (permitted) {
+			this.readOnlyGuard.removeRule(identifier);
+			return;
+		}
+
+		this.readOnlyGuard.addRule({
+			unique: identifier,
+			message,
+			// A rule permitted to be read-only, so without the permission the folder is read-only.
+			permitted: true,
+		});
 	}
 }
 

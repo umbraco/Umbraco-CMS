@@ -121,6 +121,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 								<uui-toggle
 									label=${this.localize.term('contentTypeEditor_allowInLibraryHeading')}
 									?checked=${this._allowedInLibrary}
+									?readonly=${this._isReadOnly}
 									@change=${(e: CustomEvent) => {
 										this.#workspaceContext?.setAllowedInLibrary((e.target as UUIToggleElement).checked);
 									}}></uui-toggle>
