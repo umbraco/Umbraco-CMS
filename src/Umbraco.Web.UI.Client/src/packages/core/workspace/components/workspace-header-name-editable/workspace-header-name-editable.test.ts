@@ -1,5 +1,24 @@
 import { UmbWorkspaceHeaderNameEditableElement } from './workspace-header-name-editable.element.js';
-import { expect, fixture, html } from '@open-wc/testing';
+import { UMB_NAMABLE_WORKSPACE_CONTEXT } from '../../namable/index.js';
+import { expect, fixture, html, waitUntil } from '@open-wc/testing';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
+import { UmbReadOnlyGuardManager, type UmbGuardRule } from '@umbraco-cms/backoffice/utils';
+
+@customElement('umb-test-workspace-header-name-editable-host')
+class UmbTestWorkspaceHeaderNameEditableHostElement extends UmbElementMixin(HTMLElement) {
+	readOnlyGuard = new UmbReadOnlyGuardManager<UmbGuardRule>(this);
+
+	constructor() {
+		super();
+		this.provideContext(UMB_NAMABLE_WORKSPACE_CONTEXT, {
+			IS_ENTITY_DETAIL_WORKSPACE_CONTEXT: true,
+			getName: () => 'Test',
+			readOnlyGuard: this.readOnlyGuard,
+			getHostElement: () => this,
+		} as never);
+	}
+}
 
 describe('UmbWorkspaceHeaderNameEditableElement', () => {
 	let element: UmbWorkspaceHeaderNameEditableElement;
@@ -32,5 +51,21 @@ describe('UmbWorkspaceHeaderNameEditableElement', () => {
 		);
 
 		expect(isNameInputReadonly(readonlyElement)).to.be.true;
+	});
+
+	it('makes the name input read-only while the workspace entity is read-only', async () => {
+		const host = await fixture<UmbTestWorkspaceHeaderNameEditableHostElement>(
+			html`<umb-test-workspace-header-name-editable-host>
+				<umb-workspace-header-name-editable></umb-workspace-header-name-editable>
+			</umb-test-workspace-header-name-editable-host>`,
+		);
+		const nameElement = host.querySelector('umb-workspace-header-name-editable')!;
+		expect(isNameInputReadonly(nameElement)).to.be.false;
+
+		host.readOnlyGuard.addRule({ unique: 'test', permitted: true });
+		await waitUntil(() => isNameInputReadonly(nameElement), 'the name input did not become read-only');
+
+		host.readOnlyGuard.removeRule('test');
+		await waitUntil(() => !isNameInputReadonly(nameElement), 'the name input did not become editable again');
 	});
 });

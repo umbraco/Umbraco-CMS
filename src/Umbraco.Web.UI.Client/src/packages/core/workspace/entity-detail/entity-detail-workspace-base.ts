@@ -33,7 +33,7 @@ import type {
 	UmbRepositoryResponseWithAsObservable,
 } from '@umbraco-cms/backoffice/repository';
 import { filter, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbReadOnlyGuardManager, UmbStateManager, type UmbGuardRule } from '@umbraco-cms/backoffice/utils';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbApiError } from '@umbraco-cms/backoffice/resources';
@@ -69,6 +69,13 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	public readonly persistedData = this._data.persisted;
 	public readonly loading = new UmbStateManager(this);
 	public readonly forbidden = new UmbStateManager(this);
+
+	/**
+	 * Decides whether the entity is read-only. A rule with `permitted: true` makes the entity read-only, and its
+	 * `message` explains why. A read-only entity can't be submitted. Rules are cleared whenever the workspace loads or
+	 * creates an entity, so they apply to that entity only.
+	 */
+	public readonly readOnlyGuard: UmbReadOnlyGuardManager<UmbGuardRule> = new UmbReadOnlyGuardManager(this);
 
 	protected _getDataPromise?: Promise<
 		UmbRepositoryResponse<DetailModelType> | UmbRepositoryResponseWithAsObservable<DetailModelType>
@@ -405,6 +412,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return data;
 	}
 
+	public override async requestSubmit(): Promise<void> {
+		if (this.readOnlyGuard.getPermitted()) return;
+		return super.requestSubmit();
+	}
+
 	async submit() {
 		await this.#init;
 		const currentData = this.getData();
@@ -560,6 +572,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	override resetState() {
 		super.resetState();
+		this.readOnlyGuard.clearRules();
 		this.loading.clear();
 		this.forbidden.clear();
 		this._data.clear();

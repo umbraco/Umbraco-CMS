@@ -30,6 +30,9 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 	@state()
 	private _supportedDataSourceTypes: Array<string> = [];
 
+	@state()
+	private _isReadOnly = false;
+
 	#workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -66,6 +69,12 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 		this.observe(this.#workspaceContext.propertyEditorDataSourceAlias, (value) => {
 			this._propertyEditorDataSourceAlias = value;
 		});
+
+		this.observe(
+			this.#workspaceContext.readOnlyGuard.permitted,
+			(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+			'_observeIsReadOnly',
+		);
 	}
 
 	#observePropertyEditorUIManifest() {
@@ -96,6 +105,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 						.propertyEditorUiAlias=${this._propertyEditorUiAlias}
 						.propertyEditorUiIcon=${this._propertyEditorUiIcon}
 						.propertyEditorSchemaAlias=${this._propertyEditorSchemaAlias}
+						?readonly=${this._isReadOnly}
 						${umbBindToValidation(this, '$.editorUiAlias', this._propertyEditorUiAlias)}>
 					</umb-data-type-details-workspace-property-editor-picker>
 				</umb-property-layout>
@@ -115,6 +125,8 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 					.dataSourceTypes=${this._supportedDataSourceTypes}
 					slot="editor"
 					max="1"
+					?readonly=${this._isReadOnly}
+					?disabled=${this._isReadOnly}
 					@change=${this.#onDataSourceChange}
 					required
 					${umbBindToValidation(

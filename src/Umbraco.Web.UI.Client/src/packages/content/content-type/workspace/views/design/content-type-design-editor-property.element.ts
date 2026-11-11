@@ -82,6 +82,15 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	@property({ type: String, reflect: false })
 	protected editPropertyTypePath?: string;
 
+	/**
+	 * Sets the property to readonly mode, meaning it can't be changed, sorted or removed.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean })
+	public readonly = false;
+
 	@state()
 	private _dataTypeName?: string;
 
@@ -154,17 +163,17 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 	override render() {
 		// TODO: Only show alias on label if user has access to DocumentType within settings: [NL]
-		return this._inherited ? this.#renderInheritedProperty() : this.#renderEditableProperty();
+		return this._inherited || this.readonly ? this.#renderReadOnlyProperty() : this.#renderEditableProperty();
 	}
 
-	#renderInheritedProperty() {
+	#renderReadOnlyProperty() {
 		if (!this.property) return;
 
 		if (this.sortModeActive) {
 			return this.#renderSortableProperty();
 		} else {
 			return html`
-				<div id="header">
+				<div id="header" class="read-only">
 					<p>${this.localize.string(this.property.name)}<i>${this.property.alias}</i></p>
 					<p>${this.property.description ?? ''}</p>
 				</div>
@@ -417,10 +426,8 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				border-radius: var(--uui-border-radius);
 			}
 
-			:host([_inherited]) {
-				#header {
-					padding: 0 var(--uui-size-3, 9px);
-				}
+			#header.read-only {
+				padding: 0 var(--uui-size-3, 9px);
 			}
 
 			p {
