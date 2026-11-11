@@ -73,6 +73,9 @@ export class UmbModalElement extends UmbLitElement {
 
 		if (this.#modalContext.isReference) {
 			const referenceBar = document.createElement('umb-entity-bar');
+			referenceBar.style = `
+				--umb-entity-bar-opacity: calc(1 - var(--umb-modal-index));
+			`;
 			this.element.appendChild(referenceBar);
 		}
 		/**
