@@ -207,11 +207,12 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	#renderAddButton() {
-		if (this.readonly) return nothing;
+		if (this.readonly && this.#selection.length > 0) return nothing;
 		return html`<uui-button
 			id="btn-add"
 			look="placeholder"
 			label=${this.localize.term('general_choose')}
+			?disabled=${this.readonly}
 			@click=${this.#openPicker}></uui-button>`;
 	}
 

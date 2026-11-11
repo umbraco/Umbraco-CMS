@@ -135,9 +135,14 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 	}
 
 	#renderAddButton() {
-		if (this.readonly) return nothing;
+		if (this.readonly && this._headers.length > 0) return nothing;
 		return html`
-			<uui-button id="add" look="placeholder" label=${this.localize.term('general_add')} @click=${this.#addHeader}>
+			<uui-button
+				id="add"
+				look="placeholder"
+				label=${this.localize.term('general_add')}
+				?disabled=${this.readonly}
+				@click=${this.#addHeader}>
 				<umb-localize key="general_add">Add</umb-localize>
 			</uui-button>
 		`;

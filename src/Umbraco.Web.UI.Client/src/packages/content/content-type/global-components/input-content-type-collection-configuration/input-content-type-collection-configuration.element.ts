@@ -97,14 +97,15 @@ export class UmbInputContentTypeCollectionConfigurationElement extends UmbFormCo
 	}
 
 	#renderCreate() {
-		if (this.readonly || !this._dataTypePickerModalPath) return nothing;
+		if (!this._dataTypePickerModalPath) return nothing;
 		return html`
 			<uui-button
 				id="create-button"
 				color="default"
 				look="placeholder"
 				label=${this.localize.term('collection_addCollectionConfiguration')}
-				href=${this._dataTypePickerModalPath}></uui-button>
+				href=${this._dataTypePickerModalPath}
+				?disabled=${this.readonly}></uui-button>
 		`;
 	}
 

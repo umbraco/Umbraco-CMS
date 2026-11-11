@@ -171,13 +171,15 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 	}
 
 	#renderAddButton() {
+		if (this.readonly && this.selection.length > 0) return nothing;
 		if (this.max > 0 && this.selection.length >= this.max) return nothing;
 		return html`
 			<uui-button
 				id="btn-add"
 				look="placeholder"
 				@click=${this.#openPicker}
-				label="${this.localize.term('general_choose')}"></uui-button>
+				label="${this.localize.term('general_choose')}"
+				?disabled=${this.readonly}></uui-button>
 		`;
 	}
 

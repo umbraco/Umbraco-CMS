@@ -87,11 +87,12 @@ export class UmbInputWebhookEventsElement extends UmbLitElement {
 	}
 
 	#renderAddButton() {
-		if (this.readonly) return nothing;
+		if (this.readonly && this.events.length > 0) return nothing;
 		return html`<uui-button
 			id="btn-add"
 			look="placeholder"
 			label=${this.localize.term('general_choose')}
+			?disabled=${this.readonly}
 			@click=${this.#openModal}></uui-button>`;
 	}
 
