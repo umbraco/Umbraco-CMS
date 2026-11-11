@@ -26,7 +26,7 @@ import type {
 	UmbRepositoryResponse,
 	UmbRepositoryResponseWithAsObservable,
 } from '@umbraco-cms/backoffice/repository';
-import { UmbReadOnlyVariantGuardManager, UmbStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbReadOnlyGuardManager, UmbStateManager, type UmbGuardRule } from '@umbraco-cms/backoffice/utils';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbApiError } from '@umbraco-cms/backoffice/resources';
@@ -63,12 +63,11 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	public readonly forbidden = new UmbStateManager(this);
 
 	/**
-	 * Decides what of the entity is read-only. A rule with `permitted: true` makes the entity read-only, or only the
-	 * variant it names, and its `message` explains why. `permitted` tells whether the entity is read-only, and a
-	 * read-only entity can't be submitted. Rules are cleared whenever the workspace loads or creates an entity, so they
-	 * apply to that entity only.
+	 * Decides whether the entity is read-only. A rule with `permitted: true` makes the entity read-only, and its
+	 * `message` explains why. A read-only entity can't be submitted. Rules are cleared whenever the workspace loads or
+	 * creates an entity, so they apply to that entity only.
 	 */
-	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
+	public readonly readOnlyGuard: UmbReadOnlyGuardManager<UmbGuardRule> = new UmbReadOnlyGuardManager(this);
 
 	protected _getDataPromise?: Promise<
 		UmbRepositoryResponse<DetailModelType> | UmbRepositoryResponseWithAsObservable<DetailModelType>
