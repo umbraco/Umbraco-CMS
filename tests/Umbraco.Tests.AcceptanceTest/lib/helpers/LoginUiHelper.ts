@@ -75,12 +75,29 @@ export class LoginUiHelper extends UiBaseLocators {
     await this.containsText(this.loginErrorMessage, message);
   }
 
+  /**
+   * Clicks Logout in the current-user modal and waits for the token revoke to succeed.
+   * Re-opens the modal if a navigation has closed it, so it can be called with the modal open or closed.
+   */
   async clickLogoutButtonAndWaitForUserLogout() {
     // Register the listener before clicking: the revoke can complete before a post-click waiter attaches.
+    let isRevoked = false;
     const revokeResponse = this.page.waitForResponse(
       resp => resp.url().includes(ConstantHelper.apiEndpoints.revoke) && resp.status() === ConstantHelper.statusCodes.ok,
     );
-    await this.click(this.logoutBtn);
+    void revokeResponse.then(() => { isRevoked = true; }, () => {});
+    // Any navigation closes the non-routable current-user modal, including the backoffice's own initial routing,
+    // so re-open it and retry until the revoke is seen. A click can also land as the modal closes without starting
+    // the logout, so each attempt waits for the revoke before counting as done.
+    await expect(async () => {
+      if (isRevoked) {
+        return;
+      }
+      await this.clickCurrentUserAvatarButton();
+      // Raw click with its own timeout: this.click() has none after its visibility check, so a detached button hangs.
+      await this.logoutBtn.click({timeout: ConstantHelper.timeout.medium});
+      await expect.poll(() => isRevoked, {timeout: ConstantHelper.timeout.medium}).toBe(true);
+    }).toPass({timeout: ConstantHelper.timeout.navigation});
     return await revokeResponse;
   }
 
