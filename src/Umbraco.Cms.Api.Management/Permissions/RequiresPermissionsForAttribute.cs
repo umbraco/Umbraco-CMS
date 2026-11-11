@@ -8,16 +8,22 @@ using Umbraco.Cms.Core.Permissions;
 namespace Umbraco.Cms.Api.Management.Permissions;
 
 /// <summary>
-/// Requires the environment permissions for the entity type a controller manages, denying any change to it that they
-/// don't permit.
+/// Requires the environment permissions for what a controller manages, denying any change to it that they don't
+/// permit.
 /// </summary>
 /// <remarks>
-/// Put it on a controller base class, so every endpoint deriving from it is covered. Which entity types are restricted
+/// Put it on a controller base class, so every endpoint deriving from it is covered. Which permission verbs are denied
 /// is decided by the registered <see cref="IEnvironmentPermissionsConfigurator"/> instances.
 /// <para>
-/// The permission verb an action needs is inferred from its HTTP method. An action with
-/// <see cref="RequiresPermissionsAttribute"/> is checked against its declared verbs instead, and this attribute leaves
-/// it alone. That's also how an action that changes more than the controller's entity type declares what it needs.
+/// The permission verb an action needs is the declared prefix followed by the change its HTTP method makes: with
+/// <c>[RequiresPermissionsFor(Constants.Permissions.DocumentType.Prefix)]</c>, a POST needs
+/// <see cref="Constants.Permissions.DocumentType.Create"/>. A package names its own prefix, so its verbs don't collide
+/// with Umbraco's.
+/// </para>
+/// <para>
+/// An action with <see cref="RequiresPermissionsAttribute"/> is checked against its declared verbs instead, and this
+/// attribute leaves it alone. That's also how an action that changes more than the controller manages declares what
+/// it needs.
 /// </para>
 /// <para>
 /// A declaration on a derived controller replaces the inherited one.
@@ -35,18 +41,23 @@ public sealed class RequiresPermissionsForAttribute : Attribute, IAsyncAuthoriza
     /// <summary>
     /// Initializes a new instance of the <see cref="RequiresPermissionsForAttribute"/> class.
     /// </summary>
-    /// <param name="entityType">The entity type the controller manages.</param>
-    public RequiresPermissionsForAttribute(string entityType)
+    /// <param name="permissionPrefix">
+    /// The prefix of the permission verbs the controller's actions need, for example
+    /// <see cref="Constants.Permissions.DocumentType.Prefix"/>.
+    /// </param>
+    public RequiresPermissionsForAttribute(string permissionPrefix)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(entityType);
+        // The prefix is joined to the operation with a dot, so a trailing one is redundant.
+        var prefix = permissionPrefix?.TrimEnd('.');
+        ArgumentException.ThrowIfNullOrWhiteSpace(prefix, nameof(permissionPrefix));
 
-        EntityType = entityType;
+        PermissionPrefix = prefix;
     }
 
     /// <summary>
-    /// Gets the entity type the controller manages.
+    /// Gets the prefix of the permission verbs the controller's actions need.
     /// </summary>
-    public string EntityType { get; }
+    public string PermissionPrefix { get; }
 
     /// <inheritdoc />
     public Task OnAuthorizationAsync(AuthorizationFilterContext context)
@@ -69,11 +80,11 @@ public sealed class RequiresPermissionsForAttribute : Attribute, IAsyncAuthoriza
     /// Infers the permission verb an action needs from its HTTP method.
     /// </summary>
     /// <param name="httpMethod">The HTTP method the action responds to.</param>
-    /// <returns>The HTTP method's change on the entity type, or <c>null</c> for a method that changes nothing.</returns>
+    /// <returns>The prefix followed by the HTTP method's change, or <c>null</c> for a method that changes nothing.</returns>
     /// <remarks>Both enforcement and the OpenAPI document use this, so they can't disagree.</remarks>
     internal string? InferPermission(string? httpMethod)
         => InferOperation(httpMethod) is PermissionOperation operation
-            ? EntityTypePermissions.For(EntityType, operation)
+            ? $"{PermissionPrefix}.{operation}"
             : null;
 
     /// <summary>

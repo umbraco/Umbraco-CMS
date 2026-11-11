@@ -83,13 +83,13 @@ public class EnvironmentPermissionsFilterTests
     }
 
     [Test]
-    public async Task Decision_Follows_The_Declared_Entity_Type()
+    public async Task Decision_Follows_The_Declared_Prefix()
     {
         AuthorizationFilterContext locked = CreateContext(HttpMethods.Post, lockDocumentTypes: true);
         AuthorizationFilterContext unlocked = CreateContext(HttpMethods.Post, lockDocumentTypes: true);
 
         await CreateFilter().OnAuthorizationAsync(locked);
-        await CreateFilter(Constants.UdiEntityType.Webhook).OnAuthorizationAsync(unlocked);
+        await CreateFilter(Constants.Permissions.Webhook.Prefix).OnAuthorizationAsync(unlocked);
 
         Assert.Multiple(() =>
         {
@@ -139,17 +139,6 @@ public class EnvironmentPermissionsFilterTests
         });
     }
 
-    [Test]
-    public async Task Denial_Names_The_Permission_Whatever_Case_The_Entity_Type_Was_Declared_In()
-    {
-        AuthorizationFilterContext context = CreateContext(HttpMethods.Post, lockDocumentTypes: true);
-
-        await CreateFilter("Document-Type").OnAuthorizationAsync(context);
-
-        Assert.That(
-            context.HttpContext.Response.Headers[Constants.Headers.DeniedPermission].ToString(),
-            Is.EqualTo(Constants.Permissions.DocumentType.Create));
-    }
 
     [Test]
     public async Task An_Entity_Type_Named_By_A_Declaration_Uses_That_Operation()
@@ -192,7 +181,7 @@ public class EnvironmentPermissionsFilterTests
             new LockTemplateCreation(),
             typeof(TemplateForDocumentTypeController));
 
-        await CreateFilter(Constants.UdiEntityType.Template).OnAuthorizationAsync(context);
+        await CreateFilter(Constants.Permissions.Template.Prefix).OnAuthorizationAsync(context);
 
         AssertPermitted(context);
     }
@@ -278,8 +267,8 @@ public class EnvironmentPermissionsFilterTests
         return services.BuildServiceProvider();
     }
 
-    private static RequiresPermissionsForAttribute CreateFilter(string entityType = Constants.UdiEntityType.DocumentType)
-        => new(entityType);
+    private static RequiresPermissionsForAttribute CreateFilter(string permissionPrefix = Constants.Permissions.DocumentType.Prefix)
+        => new(permissionPrefix);
 
     private static RequiresPermissionsAttribute DeclaredFilter(AuthorizationFilterContext context)
         => ((ControllerActionDescriptor)context.ActionDescriptor).MethodInfo
