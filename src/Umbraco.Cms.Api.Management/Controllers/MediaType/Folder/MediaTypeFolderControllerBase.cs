@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.SchemaLockdown;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Folder;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.MediaType}/folder")]
 [ApiExplorerSettings(GroupName = "Media Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
-[SchemaEntityType(Constants.UdiEntityType.MediaType)]
+[RequiresPermissionsFor(Constants.UdiEntityType.MediaType)]
 public abstract class MediaTypeFolderControllerBase : FolderManagementControllerBase<IMediaType>
 {
     protected MediaTypeFolderControllerBase(

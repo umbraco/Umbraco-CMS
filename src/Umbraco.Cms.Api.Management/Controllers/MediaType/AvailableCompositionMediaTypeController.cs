@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.SchemaLockdown;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
@@ -40,7 +40,7 @@ public class AvailableCompositionMediaTypeController : MediaTypeControllerBase
     /// <returns>A <see cref="Task{IActionResult}"/> containing a collection of <see cref="AvailableMediaTypeCompositionResponseModel"/> representing the available media type compositions.</returns>
     [HttpPost("available-compositions")]
     [MapToApiVersion("1.0")]
-    [SchemaOperation([])]
+    [RequiresPermissions([])]
     [ProducesResponseType(typeof(IEnumerable<AvailableMediaTypeCompositionResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets available compositions.")]
     [EndpointDescription("Gets a collection of media types that are available to use as compositions for the specified media type.")]

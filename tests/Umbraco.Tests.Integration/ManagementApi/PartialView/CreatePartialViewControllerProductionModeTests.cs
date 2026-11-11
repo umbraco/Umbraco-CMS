@@ -38,7 +38,7 @@ public class CreatePartialViewControllerProductionModeTests : ManagementApiTest<
 
         Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.That(
-            response.Headers.GetValues(Constants.Headers.SchemaLockdown),
+            response.Headers.GetValues(Constants.Headers.DeniedPermission),
             Is.EqualTo(new[] { Constants.Permissions.PartialView.Create }));
     }
 }
