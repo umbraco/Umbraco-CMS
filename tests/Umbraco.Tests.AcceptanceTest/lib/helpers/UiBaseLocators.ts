@@ -2323,7 +2323,7 @@ export class UiBaseLocators extends BasePage {
   }
 
   async clickSegmentVariantButton(segmentName: string) {
-    const segmentVariant = this.page.locator('.variant.segment-variant').filter({has: this.page.locator('.variant-name').getByText(segmentName, {exact: true})});
+    const segmentVariant = this.page.locator('.variant.segment-variant').filter({has: this.page.locator('.variant-name', {hasText: segmentName})});
     await this.click(segmentVariant.locator('button.switch-button'));
     await expect(segmentVariant).toContainClass('selected');
   }
