@@ -159,7 +159,7 @@ test('new failures sharing an error line are folded into one Slack entry, others
   assert.match(text, /• DefaultConfig\/Media\/Media\.spec\.ts › Area › can upload {2}`Windows`\n {6}↳ Error: can upload broke/);
 });
 
-test('a failed stage outside the E2E stages turns a clean E2E result red', () => {
+test('a failed stage outside the E2E stages is listed without deciding the E2E result', () => {
   const timeline = {
     records: [
       {id: 'b', type: 'Stage', identifier: 'Build', name: 'Build', result: 'succeeded'},
@@ -174,7 +174,7 @@ test('a failed stage outside the E2E stages turns a clean E2E result red', () =>
   assert.deepEqual(findFailedStages(null), []);
 
   const message = renderSlack(summarize([job('E2E Linux', 'Linux', {'can save': 'expected'})], undefined, failedStages));
-  assert.match(slackText(message), /^🔴[\s\S]*Other failed stages \(1\)\*\n• Integration Tests — failed/);
+  assert.match(slackText(message), /^🟢[\s\S]*Other failed stages \(1\)\*\n• Integration Tests — failed/);
   assert.match(renderMarkdown(summarize([job('E2E Linux', 'Linux', {'can save': 'expected'})], undefined, failedStages)), /- Integration Tests: failed/);
 });
 

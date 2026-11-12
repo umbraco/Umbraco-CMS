@@ -195,7 +195,10 @@ export function findMissingJobs(timeline, jobs) {
   return missing.map(record => ({job: record.name, reason: `job ${record.result} before publishing results`}));
 }
 
-/** Finds stages other than the E2E ones that failed, so a clean E2E result is not read as a clean run. */
+/**
+ * Finds stages other than the E2E ones that failed, so a clean E2E result is not read as a clean run.
+ * They are listed, but the result of the message stays that of the E2E tests it reports on.
+ */
 export function findFailedStages(timeline) {
   return (timeline?.records ?? [])
     .filter(record => record.type === 'Stage' && ['failed', 'canceled'].includes(record.result))
@@ -312,7 +315,7 @@ function statusOf(summary) {
   if (total === 0) {
     return {emoji: '🔴', text: 'no E2E results were produced'};
   }
-  if (summary.counts.failed > 0 || summary.infra.length > 0 || summary.failedStages.length > 0) {
+  if (summary.counts.failed > 0 || summary.infra.length > 0) {
     return {emoji: '🔴', text: 'failed'};
   }
   return summary.counts.flaky > 0 ? {emoji: '🟡', text: 'passed with flaky tests'} : {emoji: '🟢', text: 'passed'};
@@ -391,7 +394,6 @@ export function renderSlack(summary) {
     return `• *${item.entries.length} tests with the same error*${where(jobs)}\n${errorLine(item.error)}\n${examples.join('\n')}`;
   };
 
-  list('Other failed stages', summary.failedStages, entry => `• ${escapeSlack(entry.stage)} — ${escapeSlack(entry.result)}`);
   if (summary.hasPrevious) {
     list('New since the previous run', groupByError(summary.newFailures), newFailureLine, summary.newFailures.length);
     list('Still failing', summary.stillFailing, entry => `${failureLine(entry)} · ${plural(entry.runs, 'run')}`);
@@ -402,6 +404,7 @@ export function renderSlack(summary) {
   list('Skipped while failing', summary.skippedWhileFailing, key => `• ${escapeSlack(key)}`);
   list('Flaky (passed on retry)', summary.flaky, entry => `• ${escapeSlack(entry.key)}${where(entry.jobs)}${flakyRuns(entry)}`);
   list('Jobs without results', summary.infra, entry => `• ${escapeSlack(entry.job)} — ${escapeSlack(truncate(entry.reason, 140))}`);
+  list('Other failed stages', summary.failedStages, entry => `• ${escapeSlack(entry.stage)} — ${escapeSlack(entry.result)}`);
 
   const counts = status.text === 'no E2E results were produced' ? 'No E2E results were produced.' : countsLine(summary.counts, true);
   const blocks = [{type: 'section', text: {type: 'mrkdwn', text: `${header}\n${counts}`}}];
@@ -427,7 +430,6 @@ export function renderMarkdown(summary) {
   const where = jobs => (jobs.length > 0 ? ` [${jobs.join(', ')}]` : '');
   const failure = entry => `- ${entry.key}${where(entry.jobs)}${earlierRuns(entry)}${entry.error ? `\n  - ${entry.error}` : ''}`;
 
-  list('Other failed stages', summary.failedStages, entry => `- ${entry.stage}: ${entry.result}`);
   if (summary.hasPrevious) {
     list('New since the previous run', summary.newFailures, failure);
     list('Still failing', summary.stillFailing, entry => `${failure(entry)}\n  - failing for ${plural(entry.runs, 'run')}`);
@@ -438,6 +440,7 @@ export function renderMarkdown(summary) {
   list('Skipped while failing', summary.skippedWhileFailing, key => `- ${key}`);
   list('Flaky (passed on retry)', summary.flaky, entry => `- ${entry.key}${where(entry.jobs)}${flakyRuns(entry)}`);
   list('Jobs without results', summary.infra, entry => `- ${entry.job}: ${entry.reason}`);
+  list('Other failed stages', summary.failedStages, entry => `- ${entry.stage}: ${entry.result}`);
 
   return lines.join('\n');
 }
