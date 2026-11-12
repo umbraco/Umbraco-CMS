@@ -237,17 +237,11 @@ export class UmbSelectFilterElement extends UmbLitElement {
 			:host {
 				display: block;
 				width: 100%;
-				border-top: 1px solid var(--uui-color-border);
-				padding-top: var(--uui-size-space-5);
 			}
 			.filter {
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-space-2);
-			}
-			.label {
-				font-weight: 600;
-				font-size: var(--uui-size-4);
 			}
 			.filter-list {
 				display: flex;

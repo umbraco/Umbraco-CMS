@@ -33,7 +33,10 @@ export class UmbCollectionFilterSidebarElement extends UmbLitElement {
 				${repeat(
 					this._filters,
 					(filter) => filter.alias,
-					(filter) => html` <umb-filter .alias=${filter.alias}> ${filter.component} </umb-filter> `,
+					(filter) =>
+						html`<umb-filter .alias=${filter.alias} .label=${filter.manifest?.meta?.label}
+							>${filter.component}</umb-filter
+						>`,
 				)}
 			</div>
 		`;

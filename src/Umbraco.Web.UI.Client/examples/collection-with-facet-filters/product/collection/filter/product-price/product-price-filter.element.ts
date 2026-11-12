@@ -62,8 +62,6 @@ export class ExampleProductPriceFilterElement extends UmbLitElement {
 			:host {
 				display: block;
 				width: 100%;
-				border-top: 1px solid var(--uui-color-border);
-				padding-top: var(--uui-size-space-5);
 			}
 			.range-filter {
 				display: flex;

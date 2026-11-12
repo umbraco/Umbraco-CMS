@@ -8,16 +8,11 @@ import '../../filter/filter.element.js';
 
 @customElement('umb-collection-filter-bundle')
 export class UmbCollectionFilterBundleElement extends UmbLitElement {
-	#filterManager?: typeof UMB_FILTER_MANAGER_CONTEXT.TYPE;
-
 	@state()
 	private _filters: Array<any> = [];
 
 	@state()
 	private _totalActiveFilters = 0;
-
-	@state()
-	private _activeFilterAliases: Set<string> = new Set();
 
 	constructor() {
 		super();
@@ -35,24 +30,11 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 
 		this.consumeContext(UMB_FILTER_MANAGER_CONTEXT, (manager) => {
 			if (!manager) return;
-			this.#filterManager = manager;
 
 			this.observe(manager.totalActiveFilters, (total) => {
 				this._totalActiveFilters = total ?? 0;
 			});
-
-			this.observe(manager.activeFilters, (filters) => {
-				this._activeFilterAliases = new Set(filters?.map((f) => f.alias) ?? []);
-			});
 		});
-	}
-
-	#isFilterActive(alias: string): boolean {
-		return this._activeFilterAliases.has(alias);
-	}
-
-	#onClearFilter(alias: string) {
-		this.#filterManager?.clearFilter(alias);
 	}
 
 	override render() {
@@ -70,23 +52,9 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 							this._filters,
 							(filter) => filter.alias,
 							(filter) => html`
-								<umb-filter .alias=${filter.alias}>
-									<div class="filter-item">
-										<div class="filter-header">
-											<span class="heading">${filter.manifest?.meta?.label ?? filter.alias}</span>
-											${this.#isFilterActive(filter.alias)
-												? html`<uui-button
-														look="secondary"
-														label="Clear"
-														@click=${() => this.#onClearFilter(filter.alias)}
-														compact>
-														Clear
-													</uui-button>`
-												: nothing}
-										</div>
-										${filter.component}
-									</div>
-								</umb-filter>
+								<umb-filter .alias=${filter.alias} .label=${filter.manifest?.meta?.label}
+									>${filter.component}</umb-filter
+								>
 							`,
 						)}
 					</div>
@@ -107,24 +75,6 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 				gap: var(--uui-size-space-5);
 				padding: var(--uui-size-space-5);
 				min-width: 250px;
-			}
-
-			.filter-item {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-2);
-				padding-top: var(--uui-size-space-2);
-			}
-
-			.filter-header {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-			}
-
-			.heading {
-				font-weight: 700;
-				font-size: var(--uui-type-default-size);
 			}
 		`,
 	];

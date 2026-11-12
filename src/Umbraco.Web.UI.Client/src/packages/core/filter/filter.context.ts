@@ -3,8 +3,7 @@ import { UMB_FILTER_MANAGER_CONTEXT } from './filter-manager.context-token.js';
 import type { UmbActiveFilterModel } from './types.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import type { Observable } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbFilterContext extends UmbContextBase {
 	#manager?: typeof UMB_FILTER_MANAGER_CONTEXT.TYPE;
@@ -12,15 +11,11 @@ export class UmbFilterContext extends UmbContextBase {
 	#alias = new UmbStringState<string | undefined>(undefined);
 	public readonly alias = this.#alias.asObservable();
 
-	#values: Observable<Array<UmbActiveFilterModel>> | undefined;
-	public get values(): Observable<Array<UmbActiveFilterModel>> | undefined {
-		return this.#values;
-	}
+	#values = new UmbArrayState<UmbActiveFilterModel>([], (value) => value.unique);
+	public readonly values = this.#values.asObservable();
 
-	#facetedResult: Observable<unknown> | undefined;
-	public get facetedResult(): Observable<unknown> | undefined {
-		return this.#facetedResult;
-	}
+	#facetedResult = new UmbBasicState<unknown>(undefined);
+	public readonly facetedResult = this.#facetedResult.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_FILTER_CONTEXT);
@@ -46,14 +41,22 @@ export class UmbFilterContext extends UmbContextBase {
 		const alias = this.#alias.getValue();
 		if (!alias || !this.#manager) return;
 
-		this.#values = this.#manager.activeFiltersByAlias(alias);
+		this.observe(
+			this.#manager.activeFiltersByAlias(alias),
+			(values) => this.#values.setValue(values),
+			'umbFilterValuesObserver',
+		);
 	}
 
 	#observeFacetedResult(): void {
 		const alias = this.#alias.getValue();
 		if (!alias || !this.#manager) return;
 
-		this.#facetedResult = this.#manager.facetedResultByAlias(alias);
+		this.observe(
+			this.#manager.facetedResultByAlias(alias),
+			(result) => this.#facetedResult.setValue(result),
+			'umbFilterFacetedResultObserver',
+		);
 	}
 
 	public setValues(entries: Array<{ unique: string; value: unknown }>): void {
