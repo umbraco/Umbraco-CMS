@@ -245,7 +245,7 @@ export default {
 		listViewLabel: 'List',
 		tableViewLabel: 'Table',
 	},
-	facetFilter: {
+	filter: {
 		removeValueLabel: (value: string) => `Remove ${value} filter`,
 	},
 	content: {

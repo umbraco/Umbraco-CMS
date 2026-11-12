@@ -1,12 +1,12 @@
-import { UMB_MEMBER_COLLECTION_MEMBER_GROUP_FACET_FILTER_ALIAS } from './constants.js';
+import { UMB_MEMBER_COLLECTION_MEMBER_GROUP_FILTER_ALIAS } from './constants.js';
 import { UmbMemberGroupDatalistDataSource } from './member-group-datalist-data-source.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		type: 'facetFilter',
+		type: 'filter',
 		kind: 'select',
-		alias: UMB_MEMBER_COLLECTION_MEMBER_GROUP_FACET_FILTER_ALIAS,
+		alias: UMB_MEMBER_COLLECTION_MEMBER_GROUP_FILTER_ALIAS,
 		name: 'Member Group Collection Filter',
 		meta: {
 			label: 'Member Group',
@@ -20,11 +20,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		],
 	},
 	{
-		type: 'facetFilterActiveValue',
+		type: 'filterActiveValue',
 		kind: 'default',
-		alias: 'Umb.FacetFilterActiveValue.MemberCollection.MemberGroup',
+		alias: 'Umb.FilterActiveValue.MemberCollection.MemberGroup',
 		name: 'Member Group Collection Filter Active Value',
-		forFacetFilters: [UMB_MEMBER_COLLECTION_MEMBER_GROUP_FACET_FILTER_ALIAS],
-		valueResolver: () => import('./member-group-facet-filter-value.resolver.js'),
+		forFilters: [UMB_MEMBER_COLLECTION_MEMBER_GROUP_FILTER_ALIAS],
+		valueResolver: () => import('./member-group-filter-value.resolver.js'),
 	},
 ];

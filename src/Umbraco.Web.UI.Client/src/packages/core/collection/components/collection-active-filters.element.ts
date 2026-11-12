@@ -1,4 +1,4 @@
-import { UMB_FACET_FILTER_MANAGER_CONTEXT, type UmbActiveFacetFilterModel } from '@umbraco-cms/backoffice/facet-filter';
+import { UMB_FILTER_MANAGER_CONTEXT, type UmbActiveFilterModel } from '@umbraco-cms/backoffice/filter';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, nothing, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -6,12 +6,12 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-collection-active-filters')
 export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 	@state()
-	private _activeFilters?: Array<UmbActiveFacetFilterModel> = [];
+	private _activeFilters?: Array<UmbActiveFilterModel> = [];
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_FACET_FILTER_MANAGER_CONTEXT, (manager) => {
+		this.consumeContext(UMB_FILTER_MANAGER_CONTEXT, (manager) => {
 			this.observe(manager?.activeFilters, (activeFilters) => {
 				this._activeFilters = activeFilters;
 			});
@@ -33,10 +33,10 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 						this._activeFilters!,
 						(activeFilter) => `${activeFilter.alias}||${activeFilter.unique}`,
 						(activeFilter) =>
-							html`<umb-facet-filter-active-value-extension
+							html`<umb-filter-active-value-extension
 								.alias=${activeFilter.alias}
 								.unique=${activeFilter.unique}
-								.value=${activeFilter.value}></umb-facet-filter-active-value-extension>`,
+								.value=${activeFilter.value}></umb-filter-active-value-extension>`,
 					)}
 				</div>
 			</div>

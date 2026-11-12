@@ -323,11 +323,11 @@ describe('UmbDefaultCollectionContext faceted results', () => {
 	let repository: UmbTestDeferredCollectionRepository;
 
 	/**
-	 * Gives every item of the response a facet filter, with the item as its faceted result.
+	 * Gives every item of the response a filter, with the item as its faceted result.
 	 */
 	class UmbTestFacetedCollectionContext extends UmbTestCollectionContext {
 		protected override _getFacetedResults(data: UmbPagedModel<UmbTestCollectionItem>) {
-			return data.items.map((item) => ({ alias: `Umb.FacetFilter.${item.unique}`, result: item }));
+			return data.items.map((item) => ({ alias: `Umb.Filter.${item.unique}`, result: item }));
 		}
 	}
 
@@ -336,7 +336,7 @@ describe('UmbDefaultCollectionContext faceted results', () => {
 		repository = new UmbTestDeferredCollectionRepository();
 	});
 
-	it('gives each facet filter the faceted result mapped from the response', async () => {
+	it('gives each filter the faceted result mapped from the response', async () => {
 		const context = new UmbTestFacetedCollectionContext(hostElement, DEFAULT_VIEW_ALIAS);
 		context.setConfig({ pageSize: PAGE_SIZE });
 		context.useRepository(repository);
@@ -345,11 +345,11 @@ describe('UmbDefaultCollectionContext faceted results', () => {
 		repository.answer(0, [{ unique: 'a' }, { unique: 'b' }]);
 		await request;
 
-		expect(readOnce(context.filtering.facetedResultByAlias('Umb.FacetFilter.a'))).to.eql({ unique: 'a' });
-		expect(readOnce(context.filtering.facetedResultByAlias('Umb.FacetFilter.b'))).to.eql({ unique: 'b' });
+		expect(readOnce(context.filtering.facetedResultByAlias('Umb.Filter.a'))).to.eql({ unique: 'a' });
+		expect(readOnce(context.filtering.facetedResultByAlias('Umb.Filter.b'))).to.eql({ unique: 'b' });
 	});
 
-	it('removes the faceted result of a facet filter that the latest response has none for', async () => {
+	it('removes the faceted result of a filter that the latest response has none for', async () => {
 		const context = new UmbTestFacetedCollectionContext(hostElement, DEFAULT_VIEW_ALIAS);
 		context.setConfig({ pageSize: PAGE_SIZE });
 		context.useRepository(repository);
@@ -361,6 +361,6 @@ describe('UmbDefaultCollectionContext faceted results', () => {
 		repository.answer(1, [{ unique: 'a' }]);
 		await second;
 
-		expect(readOnce(context.filtering.facetedResultByAlias('Umb.FacetFilter.b'))).to.be.undefined;
+		expect(readOnce(context.filtering.facetedResultByAlias('Umb.Filter.b'))).to.be.undefined;
 	});
 });

@@ -1,14 +1,14 @@
-import { UMB_FACET_FILTER_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/facet-filter';
+import { UMB_FILTER_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/filter';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-import '../../facet-filter/facet-filter.element.js';
+import '../../filter/filter.element.js';
 
 @customElement('umb-collection-filter-bundle')
 export class UmbCollectionFilterBundleElement extends UmbLitElement {
-	#filterManager?: typeof UMB_FACET_FILTER_MANAGER_CONTEXT.TYPE;
+	#filterManager?: typeof UMB_FILTER_MANAGER_CONTEXT.TYPE;
 
 	@state()
 	private _filters: Array<any> = [];
@@ -25,7 +25,7 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 		new UmbExtensionsElementAndApiInitializer(
 			this,
 			umbExtensionsRegistry,
-			'facetFilter',
+			'filter',
 			undefined,
 			undefined,
 			(filters) => {
@@ -33,7 +33,7 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 			},
 		);
 
-		this.consumeContext(UMB_FACET_FILTER_MANAGER_CONTEXT, (manager) => {
+		this.consumeContext(UMB_FILTER_MANAGER_CONTEXT, (manager) => {
 			if (!manager) return;
 			this.#filterManager = manager;
 
@@ -70,7 +70,7 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 							this._filters,
 							(filter) => filter.alias,
 							(filter) => html`
-								<umb-facet-filter .alias=${filter.alias}>
+								<umb-filter .alias=${filter.alias}>
 									<div class="filter-item">
 										<div class="filter-header">
 											<span class="heading">${filter.manifest?.meta?.label ?? filter.alias}</span>
@@ -86,7 +86,7 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 										</div>
 										${filter.component}
 									</div>
-								</umb-facet-filter>
+								</umb-filter>
 							`,
 						)}
 					</div>

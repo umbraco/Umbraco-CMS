@@ -1,13 +1,13 @@
-import { UMB_USER_COLLECTION_USER_GROUP_FACET_FILTER_ALIAS } from './constants.js';
+import { UMB_USER_COLLECTION_USER_GROUP_FILTER_ALIAS } from './constants.js';
 import { UMB_USER_COLLECTION_ALIAS } from '../../constants.js';
 import { UmbUserGroupDatalistDataSource } from './user-group-datalist-data-source.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		type: 'facetFilter',
+		type: 'filter',
 		kind: 'select',
-		alias: UMB_USER_COLLECTION_USER_GROUP_FACET_FILTER_ALIAS,
+		alias: UMB_USER_COLLECTION_USER_GROUP_FILTER_ALIAS,
 		name: 'User Group Collection Filter',
 		weight: 100,
 		meta: {
@@ -23,11 +23,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		],
 	},
 	{
-		type: 'facetFilterActiveValue',
+		type: 'filterActiveValue',
 		kind: 'default',
-		alias: 'Umb.FacetFilterActiveValue.UserCollection.UserGroup',
+		alias: 'Umb.FilterActiveValue.UserCollection.UserGroup',
 		name: 'User Group Collection Filter Active Value',
-		forFacetFilters: [UMB_USER_COLLECTION_USER_GROUP_FACET_FILTER_ALIAS],
-		valueResolver: () => import('./user-group-facet-filter-value.resolver.js'),
+		forFilters: [UMB_USER_COLLECTION_USER_GROUP_FILTER_ALIAS],
+		valueResolver: () => import('./user-group-filter-value.resolver.js'),
 	},
 ];

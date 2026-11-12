@@ -1,1 +1,1 @@
-export const UMB_EXTENSION_COLLECTION_EXTENSION_TYPE_FACET_FILTER_ALIAS = 'Umb.FacetFilter.ExtensionCollection.ExtensionType';
+export const UMB_EXTENSION_COLLECTION_EXTENSION_TYPE_FILTER_ALIAS = 'Umb.Filter.ExtensionCollection.ExtensionType';

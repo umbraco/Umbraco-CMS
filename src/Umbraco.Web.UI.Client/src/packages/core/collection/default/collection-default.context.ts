@@ -12,8 +12,8 @@ import type { ManifestCollection } from '../extensions/types.js';
 import { UmbCollectionBulkActionManager } from '../bulk-action/collection-bulk-action.manager.js';
 import { UmbCollectionSelectionManager } from '../selection/collection-selection.manager.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
-import { UmbFacetFilterManager } from '@umbraco-cms/backoffice/facet-filter';
-import type { UmbFacetedResultModel } from '@umbraco-cms/backoffice/facet-filter';
+import { UmbFilterManagerContext } from '@umbraco-cms/backoffice/filter';
+import type { UmbFacetedResultModel } from '@umbraco-cms/backoffice/filter';
 import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbValueSummaryCoordinatorContext } from '@umbraco-cms/backoffice/value-summary';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -105,7 +105,7 @@ export class UmbDefaultCollectionContext<
 	public readonly interactionMemory = new UmbInteractionMemoryManager(this);
 	public readonly view = new UmbCollectionViewManager(this, { interactionMemoryManager: this.interactionMemory });
 	public readonly bulkAction = new UmbCollectionBulkActionManager(this);
-	public readonly filtering = new UmbFacetFilterManager(this);
+	public readonly filtering = new UmbFilterManagerContext(this);
 	public readonly valueSummaryCoordinator = new UmbValueSummaryCoordinatorContext(this);
 
 	#defaultViewAlias: string;
@@ -346,7 +346,7 @@ export class UmbDefaultCollectionContext<
 	}
 
 	/**
-	 * Maps the active facet filter values to the repository's filter fields. Override it in a collection that has facet
+	 * Maps the active filter values to the repository's filter fields. Override it in a collection that has facet
 	 * filters, so the repository receives its own filter model instead of filter aliases.
 	 * @returns {Promise<Record<string, any>>} The filter fields to merge into the repository request.
 	 */
@@ -355,10 +355,10 @@ export class UmbDefaultCollectionContext<
 	}
 
 	/**
-	 * Maps the facets of the repository's response to the facet filters that display them. Override it in a collection
+	 * Maps the facets of the repository's response to the filters that display them. Override it in a collection
 	 * whose repository returns facets, for example an `UmbFacetedPagedModel`.
 	 * @param {UmbPagedModel<CollectionItemType>} data - The response of the repository.
-	 * @returns {Array<UmbFacetedResultModel>} The faceted result of each facet filter, keyed by filter alias.
+	 * @returns {Array<UmbFacetedResultModel>} The faceted result of each filter, keyed by filter alias.
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected _getFacetedResults(data: UmbPagedModel<CollectionItemType>): Array<UmbFacetedResultModel> {

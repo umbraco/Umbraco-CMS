@@ -30,7 +30,7 @@ Most extension types add further properties on top of `ManifestBase`:
 
 ### Element + API Extensions
 
-When an extension type extends `ManifestElementAndApi` (workspace, collection, tree, tree item, section, entity action, workspace action, value summary, facet filter, …), the element and the API are **one unit**: an instance of the extension *is* the pair.
+When an extension type extends `ManifestElementAndApi` (workspace, collection, tree, tree item, section, entity action, workspace action, value summary, filter, …), the element and the API are **one unit**: an instance of the extension *is* the pair.
 
 How the initializer creates them (`createExtensionElementWithApi`, `UmbExtensionElementAndApiInitializer`):
 
@@ -43,7 +43,7 @@ Because the element hosts the API, the API sits at the element's place in the DO
 
 | Role | The API… | Reached by | Examples |
 |------|----------|------------|----------|
-| **View controller** | extends `UmbControllerBase`; holds the element's state and behaviour | the element, via `this.api` | entity action, workspace action, value summary, facet filter |
+| **View controller** | extends `UmbControllerBase`; holds the element's state and behaviour | the element, via `this.api` | entity action, workspace action, value summary, filter |
 | **Scoped context** | extends `UmbContextBase` with a token; provides itself on the element | the element's descendants, via `consumeContext(TOKEN)` | workspace (`UMB_WORKSPACE_CONTEXT`), collection (`UMB_COLLECTION_CONTEXT`), tree (`UMB_TREE_CONTEXT`), tree item (`UMB_TREE_ITEM_CONTEXT`) |
 
 In both roles the API belongs to **that rendering**. So:

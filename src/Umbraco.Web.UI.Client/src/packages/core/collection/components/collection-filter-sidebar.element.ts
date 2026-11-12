@@ -1,4 +1,4 @@
-import '../../facet-filter/facet-filter.element.js';
+import '../../filter/filter.element.js';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
@@ -15,7 +15,7 @@ export class UmbCollectionFilterSidebarElement extends UmbLitElement {
 		new UmbExtensionsElementAndApiInitializer(
 			this,
 			umbExtensionsRegistry,
-			'facetFilter',
+			'filter',
 			undefined,
 			undefined,
 			(filters) => {
@@ -33,7 +33,7 @@ export class UmbCollectionFilterSidebarElement extends UmbLitElement {
 				${repeat(
 					this._filters,
 					(filter) => filter.alias,
-					(filter) => html` <umb-facet-filter .alias=${filter.alias}> ${filter.component} </umb-facet-filter> `,
+					(filter) => html` <umb-filter .alias=${filter.alias}> ${filter.component} </umb-filter> `,
 				)}
 			</div>
 		`;
