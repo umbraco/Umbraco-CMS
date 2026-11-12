@@ -38,7 +38,8 @@ Umbraco.PublishedCache.HybridCache/
 ├── NotificationHandlers/
 │   ├── CacheRefreshingNotificationHandler.cs   # Content/media change handler (120 lines)
 │   ├── HybridCacheStartupNotificationHandler.cs
-│   └── SeedingNotificationHandler.cs      # Startup seeding (39 lines)
+│   ├── SeedingNotificationHandler.cs      # Startup seeding (39 lines)
+│   └── SerializerTypeCacheRefresherNotificationHandler.cs  # Clears the serializer factory's type snapshot on every server
 ├── Persistence/
 │   ├── ContentSourceDto.cs                # DTO for database queries
 │   ├── DatabaseCacheRepository.cs         # NPoco database access (891 lines)
@@ -213,6 +214,19 @@ Handles 8 notification types:
 | `ContentTypeDeletedNotification` | Clear type cache |
 | `MediaTypeRefreshedNotification` | Clear type cache, `Rebuild()` |
 | `MediaTypeDeletedNotification` | Clear type cache |
+
+### Serializer content type snapshot
+
+`MsgPackContentNestedDataSerializerFactory` reads the content type and media type definitions once and keeps them,
+with the serializers and compression lookups derived from them, in a snapshot that `ClearTypeCache()` replaces.
+It must be cleared whenever a type changes, on every server:
+
+| Notification | Handler | Runs on |
+|--------------|---------|---------|
+| `ContentTypeRefreshedNotification`, `MediaTypeRefreshedNotification`, and the deleted variants | `CacheRefreshingNotificationHandler` (clears before any rebuild) | the server that saved the type |
+| `ContentTypeChangedNotification`, `MediaTypeChangedNotification` | `DeferredCacheRebuildNotificationHandler` (post-commit) | the server that saved the type |
+| `RebuildMemoryCacheByContentTypeAsync` (called by the content type and data type cache refreshers and by the deferred rebuild) | `DocumentCacheService`, `MediaCacheService` (clear before the entries are evicted, so their reload sees the new definitions) | every server |
+| `ContentTypeCacheRefresherNotification`, `DataTypeCacheRefresherNotification` (property types carry their data type's editor alias and storage type) | `SerializerTypeCacheRefresherNotificationHandler` | every server |
 
 ### RefreshContentAsync (DocumentCacheService.cs lines 300-324)
 
