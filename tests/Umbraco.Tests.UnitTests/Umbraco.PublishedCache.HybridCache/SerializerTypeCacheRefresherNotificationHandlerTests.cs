@@ -28,4 +28,20 @@ public class SerializerTypeCacheRefresherNotificationHandlerTests
 
         serializerFactory.Verify(x => x.ClearTypeCache(), Times.Once);
     }
+
+    /// <summary>
+    ///     Verifies that a refresh of a data type clears the serializer factory's type cache, because property types
+    ///     carry state derived from their data type.
+    /// </summary>
+    [TestCase(MessageType.RefreshByPayload)]
+    [TestCase(MessageType.RefreshAll)]
+    public void Refreshing_Data_Types_Clears_The_Serializer_Type_Cache(MessageType messageType)
+    {
+        var serializerFactory = new Mock<IContentCacheDataSerializerFactory>();
+        var handler = new SerializerTypeCacheRefresherNotificationHandler(serializerFactory.Object);
+
+        handler.Handle(new DataTypeCacheRefresherNotification(new object(), messageType));
+
+        serializerFactory.Verify(x => x.ClearTypeCache(), Times.Once);
+    }
 }

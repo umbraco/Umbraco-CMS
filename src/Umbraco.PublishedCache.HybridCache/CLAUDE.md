@@ -226,7 +226,7 @@ It must be cleared whenever a type changes, on every server:
 | `ContentTypeRefreshedNotification`, `MediaTypeRefreshedNotification`, and the deleted variants | `CacheRefreshingNotificationHandler` (clears before any rebuild) | the server that saved the type |
 | `ContentTypeChangedNotification`, `MediaTypeChangedNotification` | `DeferredCacheRebuildNotificationHandler` (post-commit) | the server that saved the type |
 | `RebuildMemoryCacheByContentTypeAsync` (called by the content type and data type cache refreshers and by the deferred rebuild) | `DocumentCacheService`, `MediaCacheService` (clear before the entries are evicted, so their reload sees the new definitions) | every server |
-| `ContentTypeCacheRefresherNotification` | `SerializerTypeCacheRefresherNotificationHandler` | every server |
+| `ContentTypeCacheRefresherNotification`, `DataTypeCacheRefresherNotification` (property types carry their data type's editor alias and storage type) | `SerializerTypeCacheRefresherNotificationHandler` | every server |
 
 ### RefreshContentAsync (DocumentCacheService.cs lines 300-324)
 

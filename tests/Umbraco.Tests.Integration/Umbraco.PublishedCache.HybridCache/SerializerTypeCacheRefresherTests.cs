@@ -16,6 +16,8 @@ internal sealed class SerializerTypeCacheRefresherTests : UmbracoIntegrationTest
 {
     private const int MediaTypeId = 1234;
 
+    private const int UnusedDataTypeId = 98765;
+
     private CountingSerializerFactory SerializerFactory
         => (CountingSerializerFactory)GetRequiredService<IContentCacheDataSerializerFactory>();
 
@@ -74,6 +76,22 @@ internal sealed class SerializerTypeCacheRefresherTests : UmbracoIntegrationTest
         var clearsBefore = SerializerFactory.ClearCount;
 
         await GetRequiredService<IMediaCacheService>().RebuildMemoryCacheByContentTypeAsync([MediaTypeId]);
+
+        Assert.Greater(SerializerFactory.ClearCount, clearsBefore);
+    }
+
+    [Test]
+    public void Refreshing_A_Data_Type_Clears_The_Serializer_Type_Cache_Even_When_No_Content_Type_Is_Rebuilt()
+    {
+        // Property types carry the editor alias and storage type of their data type, and both feed the compression
+        // decision. A data type that no loaded content type uses triggers no rebuild, so only the refresher
+        // notification can clear the snapshot.
+        DataTypeCacheRefresher refresher = GetRequiredService<DataTypeCacheRefresher>();
+        DataTypeCacheRefresher.JsonPayload[] payloads = [new(UnusedDataTypeId, Guid.NewGuid(), false)];
+        var clearsBefore = SerializerFactory.ClearCount;
+
+        refresher.RefreshInternal(payloads);
+        refresher.Refresh(payloads);
 
         Assert.Greater(SerializerFactory.ClearCount, clearsBefore);
     }
