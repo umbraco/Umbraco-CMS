@@ -13,7 +13,7 @@ import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-b
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
+import type { UmbDocumentTypeDetailModel, UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-document-workspace-view-info')
@@ -23,13 +23,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 	// Document Type
 	@state()
-	private _documentTypeUnique?: string = '';
-
-	@state()
-	private _documentTypeName?: string;
-
-	@state()
-	private _documentTypeIcon?: string;
+	private _documentType?: UmbDocumentTypeItemModel;
 
 	@state()
 	private _allowedTemplates?: UmbDocumentTypeDetailModel['allowedTemplates'];
@@ -75,7 +69,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
-			this._documentTypeUnique = this.#workspaceContext?.getContentTypeUnique();
 			this.#observeContent();
 		});
 
@@ -118,8 +111,15 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		this.observe(
 			this.#workspaceContext.structure.ownerContentType,
 			(documentType) => {
-				this._documentTypeName = documentType?.name;
-				this._documentTypeIcon = documentType?.icon;
+				this._documentType = documentType
+					? {
+							entityType: documentType.entityType,
+							unique: documentType.unique,
+							name: documentType.name,
+							isElement: documentType.isElement,
+							icon: documentType.icon,
+						}
+					: undefined;
 				this._allowedTemplates = documentType?.allowedTemplates;
 			},
 			'_documentType',
@@ -209,8 +209,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	}
 
 	#renderGeneralSection() {
-		const editDocumentTypePath = this._routeBuilder?.({ entityType: 'document-type' }) ?? '';
-
 		return html`
 			<div class="general-item"><span>${this.#renderStateTag()}</span></div>
 			${this.#renderCreateDate()} ${this.#renderUpdateDate()} ${this.#renderPublishDate()}
@@ -218,15 +216,10 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 			<div class="general-item">
 				<strong><umb-localize key="content_documentType">Document Type</umb-localize></strong>
-				<uui-ref-node-document-type
+				<umb-entity-item-ref
 					standalone
-					href=${ifDefined(
-						this._hasSettingsAccess ? editDocumentTypePath + 'edit/' + this._documentTypeUnique : undefined,
-					)}
 					?readonly=${!this._hasSettingsAccess || this._isTrashed}
-					name=${ifDefined(this.localize.string(this._documentTypeName ?? ''))}>
-					<umb-icon slot="icon" name=${ifDefined(this._documentTypeIcon)}></umb-icon>
-				</uui-ref-node-document-type>
+					.item=${this._documentType}></umb-entity-item-ref>
 			</div>
 			${this.#renderTemplateInput()}
 			<div class="general-item">
