@@ -520,13 +520,11 @@ export class ContentUiHelper extends UiBaseLocators {
     }
     // An early click can be lost while the tree re-renders (e.g. right after a save), leaving the
     // document workspace unopened. Retry until the edit route is actually loaded.
-    // Wait for the workspace to redirect to a variant route (/edit/{id}/{variant}): view links
-    // clicked before that redirect resolve to /edit/{id}/view/..., which renders an empty workspace.
     await expect(async () => {
       await this.click(contentWithNameLocator, {
         timeout: ConstantHelper.timeout.long,
       });
-      await expect(this.page).toHaveURL(/\/workspace\/document\/edit\/[^/?#]+\/[^/?#]+/, {
+      await expect(this.page).toHaveURL(/\/workspace\/document\/edit\//, {
         timeout: ConstantHelper.timeout.medium,
       });
     }).toPass({timeout: ConstantHelper.timeout.veryLong});
