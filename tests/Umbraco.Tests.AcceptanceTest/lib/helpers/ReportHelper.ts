@@ -21,7 +21,8 @@ export class ReportHelper {
             "TestName": testInfo.title,
             "CommitId": process.env.CommitId,
             "RetryNumber": testInfo.retry,
-            "OS": process.env.AgentOs
+            "OS": process.env.AgentOs,
+            "UmbracoVersion": process.env.UmbracoVersion
           })
         }
       );
