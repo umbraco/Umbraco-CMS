@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -415,6 +417,80 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
 
         Assert.That(actual, Is.EquivalentTo(expected));
         Assert.That(actual, Has.Count.EqualTo(1));
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task GetElementSources_Logs_And_Skips_A_Published_Node_Without_A_Published_Version_Name(bool singleRead)
+    {
+        Guid corruptKey = await CreateAndPublishElement();
+        Guid healthyKey = await CreateAndPublishElement();
+        ClearPublishedVersionFlag(GetRequiredService<IElementService>().GetById(corruptKey)!.Id);
+
+        var logger = new Mock<ILogger<DatabaseCacheRepository>>();
+        logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
+        var repository = ActivatorUtilities.CreateInstance<DatabaseCacheRepository>(Services, logger.Object);
+
+        List<Guid> returnedKeys = singleRead
+            ? [.. new[] { corruptKey, healthyKey }
+                .Select(key => repository.GetElementSource(key))
+                .OfType<ContentCacheNode>()
+                .Select(x => x.Key)]
+            : [.. (await repository.GetElementSourcesAsync([corruptKey, healthyKey])).Select(x => x.Key)];
+
+        CollectionAssert.AreEqual(new[] { healthyKey }, returnedKeys);
+        logger.Verify(
+            l => l.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((state, _) => state.ToString()!.Contains(corruptKey.ToString())),
+                null,
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task GetElementSources_Logs_A_Published_Node_Without_A_Published_Version_Name_On_The_Synchronous_Read()
+    {
+        Guid corruptKey = await CreateAndPublishElement();
+        ClearPublishedVersionFlag(GetRequiredService<IElementService>().GetById(corruptKey)!.Id);
+
+        var logger = new Mock<ILogger<DatabaseCacheRepository>>();
+        logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
+        var repository = ActivatorUtilities.CreateInstance<DatabaseCacheRepository>(Services, logger.Object);
+
+        Assert.IsEmpty(repository.GetElementSources([corruptKey]));
+        logger.Verify(
+            l => l.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((state, _) => state.ToString()!.Contains(corruptKey.ToString())),
+                null,
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
+
+    private void ClearPublishedVersionFlag(int elementId)
+    {
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        var database = ScopeAccessor.AmbientScope!.Database;
+        ISqlContext sqlContext = ScopeAccessor.AmbientScope.SqlContext;
+
+        var publishedVersionIds = database.Fetch<int>(sqlContext.Sql()
+            .Select<ElementVersionDto>(x => x.Id)
+            .From<ElementVersionDto>()
+            .InnerJoin<ContentVersionDto>()
+            .On<ElementVersionDto, ContentVersionDto>((ev, cv) => ev.Id == cv.Id)
+            .Where<ContentVersionDto>(x => x.NodeId == elementId)
+            .Where<ElementVersionDto>(x => x.Published == true));
+        Assert.That(publishedVersionIds, Has.Count.GreaterThan(0), "Expected a published version before corruption");
+
+        foreach (var versionId in publishedVersionIds)
+        {
+            database.Execute(sqlContext.Sql()
+                .Update<ElementVersionDto>(u => u.Set(x => x.Published, false))
+                .Where<ElementVersionDto>(x => x.Id == versionId));
+        }
     }
 
     [Test]
