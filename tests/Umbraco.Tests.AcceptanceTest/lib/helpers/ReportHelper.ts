@@ -10,6 +10,7 @@ export class ReportHelper {
 
   async report(testInfo: TestInfo) {
     const reportUrl = process.env.PlaywrightReportUrl;
+    const umbracoVersion = process.env.UmbracoVersion;
     // An undefined pipeline variable arrives as its unexpanded macro text rather than as an empty value.
     if (testInfo.retry > 0 && process.env.CI && reportUrl && /^https?:\/\//i.test(reportUrl)) {
       await fetch(reportUrl, {
@@ -22,7 +23,7 @@ export class ReportHelper {
             "CommitId": process.env.CommitId,
             "RetryNumber": testInfo.retry,
             "OS": process.env.AgentOs,
-            "UmbracoVersion": process.env.UmbracoVersion
+            "UmbracoVersion": umbracoVersion && !umbracoVersion.startsWith('$(') ? umbracoVersion : undefined
           })
         }
       );
