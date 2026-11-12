@@ -10,14 +10,23 @@ import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 import { umbGenerateWorkspaceLink } from '@umbraco-cms/backoffice/workspace';
 import { UmbEntityItemRefFrameMixin } from '@umbraco-cms/backoffice/entity-item';
 
+/**
+ * Renders a media type item as a reference node, with an optional entity frame.
+ * The reference links to the media type workspace, opened in a modal, when the user has access to the Settings section.
+ * @element umb-media-type-item-ref
+ * @slot actions - Actions rendered alongside the reference.
+ */
 @customElement('umb-media-type-item-ref')
 export class UmbMediaTypeItemRefElement extends UmbEntityItemRefFrameMixin(UmbLitElement) {
+	/** The media type item to render. Nothing is rendered when undefined. */
 	@property({ type: Object })
 	public item?: UmbMediaTypeItemModel;
 
+	/** When true, the reference is not navigable. */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
+	/** Renders the reference as a standalone node. */
 	@property({ type: Boolean })
 	standalone = false;
 

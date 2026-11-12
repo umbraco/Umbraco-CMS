@@ -7,6 +7,12 @@ import type { UmbWorkspaceModalData, UmbWorkspaceModalValue } from '@umbraco-cms
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentTypeWorkspaceData extends UmbWorkspaceModalData {}
 
+/**
+ * Modal token that opens the document type workspace in a sidebar modal.
+ * The modal is marked as a reference (`isReference`), so the workspace is presented as a
+ * reference to the document type rather than as the primary editing context.
+ * Only `preset` and other workspace data are required; the entity type is already set.
+ */
 export const UMB_DOCUMENT_TYPE_WORKSPACE_MODAL = new UmbModalToken<
 	UmbDocumentTypeWorkspaceData,
 	UmbWorkspaceModalValue
