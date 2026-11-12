@@ -1,5 +1,5 @@
-import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN } from '../../paths.js';
+import { UMB_DOCUMENT_TYPE_WORKSPACE_MODAL } from '../../workspace/constants.js';
 import type { UmbDocumentTypeItemModel } from './types.js';
 import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
@@ -7,7 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
-import { UMB_WORKSPACE_MODAL, umbGenerateWorkspaceLink } from '@umbraco-cms/backoffice/workspace';
+import { umbGenerateWorkspaceLink } from '@umbraco-cms/backoffice/workspace';
 import { UmbEntityItemRefFrameMixin } from '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-document-type-item-ref')
@@ -41,11 +41,8 @@ export class UmbDocumentTypeItemRefElement extends UmbEntityItemRefFrameMixin(Um
 			},
 		]);
 
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+		new UmbModalRouteRegistrationController(this, UMB_DOCUMENT_TYPE_WORKSPACE_MODAL)
 			.addUniquePaths(['unique'])
-			.onSetup(() => {
-				return { data: { entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE, preset: {} } };
-			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._editPath = routeBuilder({});
 			});
