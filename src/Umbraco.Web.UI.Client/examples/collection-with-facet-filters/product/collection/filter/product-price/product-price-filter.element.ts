@@ -1,9 +1,9 @@
-import type { ExampleRangeFilterApi } from './range-filter.api.js';
+import type { ExampleProductPriceFilterApi } from './product-price-filter.api.js';
 import { css, customElement, html, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('example-range-filter')
-export class ExampleRangeFilterElement extends UmbLitElement {
+@customElement('example-product-price-filter')
+export class ExampleProductPriceFilterElement extends UmbLitElement {
 	@state()
 	private _min = 0;
 
@@ -16,11 +16,11 @@ export class ExampleRangeFilterElement extends UmbLitElement {
 	@state()
 	private _currentMax = 0;
 
-	#api?: ExampleRangeFilterApi;
-	public get api(): ExampleRangeFilterApi | undefined {
+	#api?: ExampleProductPriceFilterApi;
+	public get api(): ExampleProductPriceFilterApi | undefined {
 		return this.#api;
 	}
-	public set api(api: ExampleRangeFilterApi | undefined) {
+	public set api(api: ExampleProductPriceFilterApi | undefined) {
 		this.#api = api;
 		if (!api) return;
 
@@ -77,10 +77,10 @@ export class ExampleRangeFilterElement extends UmbLitElement {
 	];
 }
 
-export { ExampleRangeFilterElement as element };
+export { ExampleProductPriceFilterElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'example-range-filter': ExampleRangeFilterElement;
+		'example-product-price-filter': ExampleProductPriceFilterElement;
 	}
 }

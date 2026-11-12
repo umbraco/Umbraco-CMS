@@ -1,6 +1,6 @@
 import { EXAMPLE_PRODUCT_COLLECTION_PRODUCT_CATEGORY_FILTER_ALIAS } from './filter/product-category/constants.js';
 import { EXAMPLE_PRODUCT_COLLECTION_PRODUCT_COLOR_FILTER_ALIAS } from './filter/product-color/constants.js';
-import { EXAMPLE_PRODUCT_PRICE_FILTER_ALIAS } from './filter/price/constants.js';
+import { EXAMPLE_PRODUCT_COLLECTION_PRODUCT_PRICE_FILTER_ALIAS } from './filter/product-price/constants.js';
 import { EXAMPLE_PRODUCT_COLLECTION_PRODUCT_SIZE_FILTER_ALIAS } from './filter/product-size/constants.js';
 import { ExampleProductCollectionContext } from './collection.context.js';
 import type { ExampleProductCollectionFacetsModel, ExampleProductCollectionItemModel } from './repository/types.js';
@@ -42,7 +42,7 @@ describe('ExampleProductCollectionContext', () => {
 		context.filtering.setFilterValues(EXAMPLE_PRODUCT_COLLECTION_PRODUCT_COLOR_FILTER_ALIAS, [
 			{ unique: 'color-red', value: 'color-red' },
 		]);
-		context.filtering.setFilterValues(EXAMPLE_PRODUCT_PRICE_FILTER_ALIAS, [
+		context.filtering.setFilterValues(EXAMPLE_PRODUCT_COLLECTION_PRODUCT_PRICE_FILTER_ALIAS, [
 			{ unique: 'min', value: { key: 'min', amount: 20 } },
 			{ unique: 'max', value: { key: 'max', amount: 80 } },
 		]);
@@ -60,7 +60,7 @@ describe('ExampleProductCollectionContext', () => {
 	});
 
 	it('keeps the other end of the price range open when one limit is removed', async () => {
-		context.filtering.setFilterValues(EXAMPLE_PRODUCT_PRICE_FILTER_ALIAS, [
+		context.filtering.setFilterValues(EXAMPLE_PRODUCT_COLLECTION_PRODUCT_PRICE_FILTER_ALIAS, [
 			{ unique: 'min', value: { key: 'min', amount: 20 } },
 		]);
 
@@ -79,7 +79,7 @@ describe('ExampleProductCollectionContext', () => {
 			{ alias: EXAMPLE_PRODUCT_COLLECTION_PRODUCT_CATEGORY_FILTER_ALIAS, result: facets.categories },
 			{ alias: EXAMPLE_PRODUCT_COLLECTION_PRODUCT_SIZE_FILTER_ALIAS, result: facets.sizes },
 			{ alias: EXAMPLE_PRODUCT_COLLECTION_PRODUCT_COLOR_FILTER_ALIAS, result: facets.colors },
-			{ alias: EXAMPLE_PRODUCT_PRICE_FILTER_ALIAS, result: facets.priceRange },
+			{ alias: EXAMPLE_PRODUCT_COLLECTION_PRODUCT_PRICE_FILTER_ALIAS, result: facets.priceRange },
 		]);
 	});
 });

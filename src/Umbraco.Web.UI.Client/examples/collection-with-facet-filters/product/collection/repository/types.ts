@@ -1,6 +1,6 @@
-import type { ExampleRangeFacetModel } from '../../../range-kind/types.js';
-import type { UmbCollectionFilterModel, UmbCollectionItemModel } from '@umbraco-cms/backoffice/collection';
+import type { ExampleProductPriceFacetModel } from '../filter/product-price/types.js';
 import type { UmbFacetModel } from '@umbraco-cms/backoffice/filter';
+import type { UmbCollectionFilterModel, UmbCollectionItemModel } from '@umbraco-cms/backoffice/collection';
 
 export interface ExampleProductCollectionFilterModel extends UmbCollectionFilterModel {
 	categories?: Array<string>;
@@ -21,5 +21,5 @@ export interface ExampleProductCollectionFacetsModel {
 	categories: Array<UmbFacetModel>;
 	sizes: Array<UmbFacetModel>;
 	colors: Array<UmbFacetModel>;
-	priceRange: ExampleRangeFacetModel;
+	priceRange: ExampleProductPriceFacetModel;
 }

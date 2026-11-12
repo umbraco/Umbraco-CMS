@@ -1,5 +1,5 @@
-import { EXAMPLE_RANGE_LIMIT_ENTITY_TYPE } from './entity.js';
-import type { ExampleRangeValueModel } from './types.js';
+import { EXAMPLE_PRODUCT_PRICE_LIMIT_ENTITY_TYPE } from './entity.js';
+import type { ExampleProductPriceFilterValueModel } from './types.js';
 import type { UmbFilterValueResolver } from '@umbraco-cms/backoffice/filter';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -8,15 +8,15 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
  * Resolves the active values of every range filter into range limit items: `{ key: 'min', amount: 50 }` gets the
  * name "Min 50". Registered on the price filter's active value.
  */
-export class ExampleRangeFilterValueResolver
+export class ExampleProductPriceFilterValueResolver
 	extends UmbControllerBase
-	implements UmbFilterValueResolver<ExampleRangeValueModel>
+	implements UmbFilterValueResolver<ExampleProductPriceFilterValueModel>
 {
-	async resolveValues(values: ReadonlyArray<ExampleRangeValueModel>) {
+	async resolveValues(values: ReadonlyArray<ExampleProductPriceFilterValueModel>) {
 		return {
 			data: values.map(
 				(value): UmbItemModel => ({
-					entityType: EXAMPLE_RANGE_LIMIT_ENTITY_TYPE,
+					entityType: EXAMPLE_PRODUCT_PRICE_LIMIT_ENTITY_TYPE,
 					unique: value.key,
 					name: `${value.key === 'min' ? 'Min' : 'Max'} ${value.amount}`,
 				}),
@@ -25,4 +25,4 @@ export class ExampleRangeFilterValueResolver
 	}
 }
 
-export { ExampleRangeFilterValueResolver as valueResolver };
+export { ExampleProductPriceFilterValueResolver as valueResolver };

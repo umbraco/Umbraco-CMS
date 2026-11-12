@@ -1,8 +1,8 @@
 import { EXAMPLE_PRODUCT_COLLECTION_PRODUCT_CATEGORY_FILTER_ALIAS } from './filter/product-category/constants.js';
 import { EXAMPLE_PRODUCT_COLLECTION_PRODUCT_COLOR_FILTER_ALIAS } from './filter/product-color/constants.js';
-import { EXAMPLE_PRODUCT_PRICE_FILTER_ALIAS } from './filter/price/constants.js';
+import { EXAMPLE_PRODUCT_COLLECTION_PRODUCT_PRICE_FILTER_ALIAS } from './filter/product-price/constants.js';
 import { EXAMPLE_PRODUCT_COLLECTION_PRODUCT_SIZE_FILTER_ALIAS } from './filter/product-size/constants.js';
-import type { ExampleRangeValueModel } from '../../range-kind/types.js';
+import type { ExampleProductPriceFilterValueModel } from './filter/product-price/types.js';
 import { EXAMPLE_PRODUCT_TABLE_COLLECTION_VIEW_ALIAS } from './table-view/constants.js';
 import type {
 	ExampleProductCollectionFilterModel,
@@ -40,7 +40,9 @@ export class ExampleProductCollectionContext extends UmbDefaultCollectionContext
 		const colors = valuesOf(EXAMPLE_PRODUCT_COLLECTION_PRODUCT_COLOR_FILTER_ALIAS) as Array<string>;
 		if (colors.length) args.colors = colors;
 
-		const priceLimits = valuesOf(EXAMPLE_PRODUCT_PRICE_FILTER_ALIAS) as Array<ExampleRangeValueModel>;
+		const priceLimits = valuesOf(
+			EXAMPLE_PRODUCT_COLLECTION_PRODUCT_PRICE_FILTER_ALIAS,
+		) as Array<ExampleProductPriceFilterValueModel>;
 		if (priceLimits.length) {
 			args.priceRange = {
 				min: priceLimits.find((limit) => limit.key === 'min')?.amount ?? 0,
@@ -58,7 +60,7 @@ export class ExampleProductCollectionContext extends UmbDefaultCollectionContext
 			{ alias: EXAMPLE_PRODUCT_COLLECTION_PRODUCT_CATEGORY_FILTER_ALIAS, result: data.facets.categories },
 			{ alias: EXAMPLE_PRODUCT_COLLECTION_PRODUCT_SIZE_FILTER_ALIAS, result: data.facets.sizes },
 			{ alias: EXAMPLE_PRODUCT_COLLECTION_PRODUCT_COLOR_FILTER_ALIAS, result: data.facets.colors },
-			{ alias: EXAMPLE_PRODUCT_PRICE_FILTER_ALIAS, result: data.facets.priceRange },
+			{ alias: EXAMPLE_PRODUCT_COLLECTION_PRODUCT_PRICE_FILTER_ALIAS, result: data.facets.priceRange },
 		];
 	}
 }

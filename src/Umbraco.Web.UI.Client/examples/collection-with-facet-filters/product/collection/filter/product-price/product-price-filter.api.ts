@@ -1,15 +1,15 @@
-import type { ExampleRangeFacetModel, ExampleRangeValueModel } from './types.js';
+import type { ExampleProductPriceFacetModel, ExampleProductPriceFilterValueModel } from './types.js';
 import { UMB_FILTER_CONTEXT } from '@umbraco-cms/backoffice/filter';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class ExampleRangeFilterApi extends UmbControllerBase {
-	#range = new UmbObjectState<ExampleRangeFacetModel>({ min: 0, max: 0 });
+export class ExampleProductPriceFilterApi extends UmbControllerBase {
+	#range = new UmbObjectState<ExampleProductPriceFacetModel>({ min: 0, max: 0 });
 	public readonly min = this.#range.asObservablePart((r) => r.min);
 	public readonly max = this.#range.asObservablePart((r) => r.max);
 
-	#current = new UmbObjectState<ExampleRangeFacetModel>({ min: 0, max: 0 });
+	#current = new UmbObjectState<ExampleProductPriceFacetModel>({ min: 0, max: 0 });
 	public readonly currentMin = this.#current.asObservablePart((r) => r.min);
 	public readonly currentMax = this.#current.asObservablePart((r) => r.max);
 
@@ -31,7 +31,7 @@ export class ExampleRangeFilterApi extends UmbControllerBase {
 		this.observe(
 			this.#filterContext.facetedResult,
 			(result) => {
-				const range = result as ExampleRangeFacetModel | undefined;
+				const range = result as ExampleProductPriceFacetModel | undefined;
 				if (range && range.max > 0) {
 					this.#range.setValue(range);
 					if (!this.#initialized) {
@@ -53,8 +53,8 @@ export class ExampleRangeFilterApi extends UmbControllerBase {
 					const minEntry = entries.find((e) => e.unique === 'min');
 					const maxEntry = entries.find((e) => e.unique === 'max');
 					if (minEntry && maxEntry) {
-						const minVal = minEntry.value as ExampleRangeValueModel;
-						const maxVal = maxEntry.value as ExampleRangeValueModel;
+						const minVal = minEntry.value as ExampleProductPriceFilterValueModel;
+						const maxVal = maxEntry.value as ExampleProductPriceFilterValueModel;
 						this.#current.setValue({
 							min: minVal.amount,
 							max: maxVal.amount,
@@ -69,8 +69,8 @@ export class ExampleRangeFilterApi extends UmbControllerBase {
 	public setValue(min: number, max: number): void {
 		this.#current.setValue({ min, max });
 		this.#filterContext?.setValues([
-			{ unique: 'min', value: { key: 'min', amount: min } satisfies ExampleRangeValueModel },
-			{ unique: 'max', value: { key: 'max', amount: max } satisfies ExampleRangeValueModel },
+			{ unique: 'min', value: { key: 'min', amount: min } satisfies ExampleProductPriceFilterValueModel },
+			{ unique: 'max', value: { key: 'max', amount: max } satisfies ExampleProductPriceFilterValueModel },
 		]);
 	}
 
@@ -81,4 +81,4 @@ export class ExampleRangeFilterApi extends UmbControllerBase {
 	}
 }
 
-export { ExampleRangeFilterApi as api };
+export { ExampleProductPriceFilterApi as api };
