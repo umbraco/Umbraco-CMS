@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Dropdown Property Editor UI',
 		element: () => import('./property-editor-ui-dropdown.element.js'),
 		meta: {
-			label: 'Dropdown',
+			label: 'Select List',
 			propertyEditorSchemaAlias: 'Umbraco.DropDown.Flexible',
 			icon: 'icon-list',
 			group: '#propertyEditorUIGroups_lists',
@@ -24,7 +24,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Single Dropdown Property Editor UI',
 		element: () => import('./property-editor-ui-single-dropdown.element.js'),
 		meta: {
-			label: 'Single Dropdown',
+			label: 'Single Select Dropdown',
 			propertyEditorSchemaAlias: 'Umbraco.DropDown.Single',
 			icon: 'icon-list',
 			group: '#propertyEditorUIGroups_lists',

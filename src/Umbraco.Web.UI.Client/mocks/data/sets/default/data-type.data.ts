@@ -410,7 +410,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		noAccess: false,
 	},
 	{
-		name: 'Dropdown',
+		name: 'Select List',
 		id: 'dt-dropdown',
 		parent: null,
 		editorAlias: 'Umbraco.DropDown.Flexible',
