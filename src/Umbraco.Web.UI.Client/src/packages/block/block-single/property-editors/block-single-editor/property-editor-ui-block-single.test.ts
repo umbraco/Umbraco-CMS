@@ -14,30 +14,32 @@ describe('UmbPropertyEditorUIBlockSingleElement', () => {
 	});
 
 	describe('readonly', () => {
-		const getCreateButtonGroupButtons = () =>
-			Array.from(element.shadowRoot!.querySelectorAll<HTMLElement>('uui-button-group uui-button'));
+		const getButtonGroupDisabledStates = () =>
+			Array.from(element.shadowRoot!.querySelectorAll('uui-button-group uui-button'), (button) =>
+				button.hasAttribute('disabled'),
+			);
 
 		it('disables the create button group when readonly changes from false to true after the first render', async () => {
-			expect(getCreateButtonGroupButtons()).to.not.be.empty;
-			expect(getCreateButtonGroupButtons().every((button) => !button.hasAttribute('disabled'))).to.be.true;
+			expect(getButtonGroupDisabledStates()).to.not.be.empty;
+			expect(getButtonGroupDisabledStates()).to.not.include(true);
 
 			element.readonly = true;
 			await element.updateComplete;
 
-			expect(getCreateButtonGroupButtons().every((button) => button.hasAttribute('disabled'))).to.be.true;
+			expect(getButtonGroupDisabledStates()).to.not.include(false);
 		});
 
 		it('enables the create button group when readonly changes from true to false after the first render', async () => {
 			element = await fixture(html`
 				<umb-property-editor-ui-block-single .readonly=${true}></umb-property-editor-ui-block-single>
 			`);
-			expect(getCreateButtonGroupButtons()).to.not.be.empty;
-			expect(getCreateButtonGroupButtons().every((button) => button.hasAttribute('disabled'))).to.be.true;
+			expect(getButtonGroupDisabledStates()).to.not.be.empty;
+			expect(getButtonGroupDisabledStates()).to.not.include(false);
 
 			element.readonly = false;
 			await element.updateComplete;
 
-			expect(getCreateButtonGroupButtons().every((button) => !button.hasAttribute('disabled'))).to.be.true;
+			expect(getButtonGroupDisabledStates()).to.not.include(true);
 		});
 	});
 
