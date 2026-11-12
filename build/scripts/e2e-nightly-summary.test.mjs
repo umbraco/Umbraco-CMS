@@ -76,7 +76,7 @@ test('failures are split into new, still failing and passing again against the p
   assert.deepEqual(summary.newFailures.map(entry => entry.key), [key('can sort')]);
   assert.deepEqual(summary.stillFailing.map(entry => [entry.key, entry.runs]), [[key('can save'), 4]]);
   assert.deepEqual(summary.passingAgain, [key('can publish')]);
-  assert.deepEqual(summary.failing[key('can save')], {runs: 4, since: '19.1.0-test.0'});
+  assert.deepEqual(summary.failing[key('can save')], {runs: 4, since: '19.1.0-test.0', jobs: ['Linux']});
   assert.equal(summary.failing[key('can publish')], undefined);
   assert.equal(summary.failing[key('can copy')], undefined);
 });
@@ -89,11 +89,28 @@ test('a known failure stays open until a complete run shows it passing', () => {
   assert.deepEqual(brokenJob.passingAgain, []);
 
   const passedElsewhere = summarize([job('E2E Linux', 'Linux', {'can save': 'expected'}), job('E2E Windows', 'Windows_NT', null)], previous);
-  assert.deepEqual(passedElsewhere.failing[key('can save')], {runs: 2, since: 'x'});
+  assert.deepEqual(passedElsewhere.failing[key('can save')], {runs: 2, since: 'x', absent: 1});
   assert.deepEqual(passedElsewhere.passingAgain, []);
 
   const otherConfigurationOnly = summarize([{...job('E2E Linux', 'Linux', null), report: report('DeliveryApi/Content.spec.ts', {'returns content': 'expected'})}], previous);
   assert.deepEqual(otherConfigurationOnly.failing[key('can save')], {runs: 2, since: 'x', absent: 1});
+});
+
+test('a failure seen in one configuration stays open until that configuration passes', () => {
+  const sqlite = outcomes => ({...job('E2E SQLite', 'Linux', outcomes), database: 'SQLite'});
+  const sqlServer = outcomes => job('E2E Linux', 'Linux', outcomes);
+
+  let summary = summarize([sqlServer({'can save': 'expected'}), sqlite({'can save': 'unexpected'})]);
+  summary = summarize([sqlServer({'can save': 'expected'}), sqlite({'can save': 'unexpected'})], summary);
+  assert.deepEqual(summary.failing[key('can save')].jobs, ['Linux SQLite']);
+
+  const withoutSqlite = summarize([sqlServer({'can save': 'expected'})], summary);
+  assert.deepEqual(withoutSqlite.passingAgain, []);
+  assert.equal(withoutSqlite.failing[key('can save')].runs, 2);
+
+  const sqlitePasses = summarize([sqlServer({'can save': 'expected'}), sqlite({'can save': 'expected'})], withoutSqlite);
+  assert.deepEqual(sqlitePasses.passingAgain, [key('can save')]);
+  assert.deepEqual(sqlitePasses.failing, {});
 });
 
 test('a known failure is forgotten when it is skipped, removed from its spec file, or absent for too long', () => {

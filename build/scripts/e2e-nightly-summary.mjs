@@ -148,7 +148,7 @@ export function aggregate(jobs) {
     for (const entry of flattenReport(job.report)) {
       let test = tests.get(entry.key);
       if (!test) {
-        test = {key: entry.key, outcome: entry.outcome, failedIn: new Set(), flakyIn: new Set(), error: ''};
+        test = {key: entry.key, outcome: entry.outcome, failedIn: new Set(), flakyIn: new Set(), passedIn: new Set(), error: ''};
         tests.set(entry.key, test);
       }
       if (OUTCOME_RANK[entry.outcome] > OUTCOME_RANK[test.outcome]) {
@@ -159,6 +159,9 @@ export function aggregate(jobs) {
         test.error ||= entry.error;
       } else if (entry.outcome === 'flaky') {
         test.flakyIn.add(label);
+        test.passedIn.add(label);
+      } else if (entry.outcome === 'passed') {
+        test.passedIn.add(label);
       }
     }
   }
@@ -240,7 +243,7 @@ export function buildSummary({tests, infra, previous, build, failedStages = []})
   for (const test of all.filter(test => test.outcome === 'failed').sort((a, b) => a.key.localeCompare(b.key))) {
     const known = previousFailing[test.key];
     const runs = (known?.runs ?? 0) + 1;
-    failing[test.key] = {runs, since: known?.since ?? build.number};
+    failing[test.key] = {runs, since: known?.since ?? build.number, jobs: sortedLabels(test.failedIn)};
     const entry = {key: test.key, jobs: sortedLabels(test.failedIn), error: test.error, runs};
     if (known) {
       stillFailing.push(entry);
@@ -251,9 +254,10 @@ export function buildSummary({tests, infra, previous, build, failedStages = []})
   }
   stillFailing.sort((a, b) => b.runs - a.runs || a.key.localeCompare(b.key));
 
-  // A known failure only leaves the list on evidence: it passed in a run where every job reported,
-  // it is skipped, or it is gone from a spec file that did run. Anything else (a broken job, a run
-  // that left a whole configuration out) says nothing about the test, so the failure stays open.
+  // A known failure only leaves the list on evidence: it passed everywhere it failed before, in a run
+  // where every job reported; it is skipped; or it is gone from a spec file that did run. Anything else
+  // (a broken job, a run that left a configuration out) says nothing about the test, so the failure
+  // stays open until it has gone unconfirmed for too long.
   const filesRun = new Set(all.map(test => fileOf(test.key)));
   const complete = infra.length === 0;
   const passingAgain = [];
@@ -267,20 +271,25 @@ export function buildSummary({tests, infra, previous, build, failedStages = []})
       skippedWhileFailing.push(key);
       continue;
     }
+    const absent = (known.absent ?? 0) + 1;
+    const keepOpen = () => {
+      if (absent <= MAX_ABSENT_RUNS) {
+        failing[key] = {...known, absent};
+      }
+    };
     if (outcome) {
-      if (complete) {
+      const passedIn = tests.get(key).passedIn;
+      if (complete && (known.jobs ?? []).every(label => passedIn.has(label))) {
         if (known.runs >= MIN_RUNS_TO_REPORT_RECOVERY) {
           passingAgain.push(key);
         }
       } else {
-        failing[key] = known;
+        keepOpen();
       }
       continue;
     }
-    const absent = (known.absent ?? 0) + 1;
-    const removed = complete && filesRun.has(fileOf(key));
-    if (!removed && absent <= MAX_ABSENT_RUNS) {
-      failing[key] = {...known, absent};
+    if (!(complete && filesRun.has(fileOf(key)))) {
+      keepOpen();
     }
   }
 
