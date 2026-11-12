@@ -9,6 +9,8 @@ import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backof
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 import { umbGenerateWorkspaceLink } from '@umbraco-cms/backoffice/workspace';
 import { UmbEntityItemRefFrameMixin } from '@umbraco-cms/backoffice/entity-item';
+import type { UUISelectableEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * Renders a document type item as a reference node, with an optional entity frame.
@@ -29,6 +31,19 @@ export class UmbDocumentTypeItemRefElement extends UmbEntityItemRefFrameMixin(Um
 	/** Renders the reference as a standalone node. */
 	@property({ type: Boolean })
 	standalone = false;
+
+	/** When true, the reference can only be selected, not navigated. */
+	@property({ type: Boolean, attribute: 'select-only', reflect: true })
+	selectOnly = false;
+
+	@property({ type: Boolean, reflect: true })
+	selectable = false;
+
+	@property({ type: Boolean, reflect: true })
+	selected = false;
+
+	@property({ type: Boolean, reflect: true })
+	disabled = false;
 
 	@state()
 	private _editPath = '';
@@ -58,7 +73,7 @@ export class UmbDocumentTypeItemRefElement extends UmbEntityItemRefFrameMixin(Um
 	}
 
 	protected override get isEntityFrameNavigable() {
-		return !this.readonly && this._userHasSectionAccess && !!this.item?.unique;
+		return !this.readonly && !this.selectOnly && !this.disabled && this._userHasSectionAccess && !!this.item?.unique;
 	}
 
 	#getLink(item: UmbDocumentTypeItemModel) {
@@ -68,6 +83,16 @@ export class UmbDocumentTypeItemRefElement extends UmbEntityItemRefFrameMixin(Um
 			params: { unique: item.unique },
 			routePath: this._editPath,
 		});
+	}
+
+	#onSelected(event: UUISelectableEvent) {
+		event.stopPropagation();
+		this.dispatchEvent(new UmbSelectedEvent(this.item?.unique ?? ''));
+	}
+
+	#onDeselected(event: UUISelectableEvent) {
+		event.stopPropagation();
+		this.dispatchEvent(new UmbDeselectedEvent(this.item?.unique ?? ''));
 	}
 
 	override render() {
@@ -81,7 +106,13 @@ export class UmbDocumentTypeItemRefElement extends UmbEntityItemRefFrameMixin(Um
 				href=${ifDefined(link?.href)}
 				target=${ifDefined(link?.target)}
 				?readonly=${this.readonly || !this._userHasSectionAccess}
-				?standalone=${this.standalone}>
+				?standalone=${this.standalone}
+				?select-only=${this.selectOnly}
+				?selectable=${this.selectable}
+				?selected=${this.selected}
+				?disabled=${this.disabled}
+				@selected=${this.#onSelected}
+				@deselected=${this.#onDeselected}>
 				<slot name="actions" slot="actions"></slot>
 				${this.item.icon ? html`<umb-icon slot="icon" name=${this.item.icon}></umb-icon>` : nothing}
 			</uui-ref-node-document-type>
