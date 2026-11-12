@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.DocumentType;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -16,6 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.MediaType)]
 [ApiExplorerSettings(GroupName = "Media Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
+[RequiresPermissionsFor(Constants.Permissions.Entities.MediaType.Resource)]
 public abstract class MediaTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult OperationStatusResult(ContentTypeOperationStatus status)
