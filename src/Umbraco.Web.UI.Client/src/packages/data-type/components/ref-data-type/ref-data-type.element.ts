@@ -130,6 +130,9 @@ export class UmbRefDataTypeElement extends UmbEntityItemRefFrameMixin(UmbElement
 	static override styles = [
 		...super.styles,
 		css`
+			:host {
+				--umb-entity-frame-offset: -1px;
+			}
 			#detail {
 				word-break: break-all;
 			}
