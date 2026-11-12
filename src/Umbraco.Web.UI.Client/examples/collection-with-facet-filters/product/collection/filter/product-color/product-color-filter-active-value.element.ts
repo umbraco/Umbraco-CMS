@@ -19,11 +19,13 @@ export class ExampleProductColorFilterActiveValueElement extends UmbFilterActive
 		css`
 			#swatch {
 				display: inline-block;
-				width: 10px;
-				height: 10px;
+				width: 8px;
+				height: 8px;
 				margin-right: var(--uui-size-space-1);
+				padding: 1px;
 				border-radius: 50%;
 				border: 1px solid var(--uui-color-border);
+				background-clip: content-box;
 				vertical-align: middle;
 			}
 		`,
