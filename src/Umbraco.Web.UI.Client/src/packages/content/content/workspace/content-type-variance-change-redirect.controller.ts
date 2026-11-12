@@ -31,6 +31,7 @@ export class UmbContentTypeVarianceChangeRedirectController extends UmbControlle
 	constructor(host: UmbContentTypeVarianceChangeRedirectHost) {
 		super(host);
 		this.#workspace = host;
+		// TODO: Should not consume, but instead get as part of the onChangeState event handler. [NL]
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (context) => {
 			this.#appLanguage = context;
 		});
@@ -44,6 +45,7 @@ export class UmbContentTypeVarianceChangeRedirectController extends UmbControlle
 	 * The URL is checked on navigation rather than on the modal's result: a variance change removes the variant
 	 * the modal was opened from, which closes the modal without resolving it.
 	 */
+	// TODO: Could we instead of starting this when a user navigated to a Document-Type instead, react when a Document Type got changed? — This would be relevant when we implement Signal-R or when an updated Document Type reaches our system [NL]
 	trackVarianceChange(): void {
 		this.#trackedVariance = this.#getVariance();
 		window.addEventListener('changestate', this.#onChangeState);
@@ -51,6 +53,7 @@ export class UmbContentTypeVarianceChangeRedirectController extends UmbControlle
 
 	readonly #onChangeState = async () => {
 		const previous = this.#trackedVariance;
+		// TODO: isInModal is not good enough, you could have documents opened from a modal, that got it's Document-Type changed.
 		if (!previous || this.#isInModal()) return;
 		this.#stopTracking();
 

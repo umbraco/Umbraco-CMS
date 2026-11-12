@@ -105,6 +105,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		]);
 	}
 
+	// TODO: Weak reference, we should instead track the variance change through a more robust mechanism that doesn't rely on the UX relation.
 	#trackVarianceChange() {
 		if (!this._hasSettingsAccess || this._isTrashed) return;
 		this.#workspaceContext?.contentTypeVarianceChangeRedirect.trackVarianceChange();
