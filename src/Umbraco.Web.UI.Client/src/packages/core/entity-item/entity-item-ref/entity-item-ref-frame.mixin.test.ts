@@ -13,7 +13,7 @@ class UmbTestEntityItemRefFrameElement extends UmbEntityItemRefFrameMixin(UmbLit
 	}
 
 	override render() {
-		return this.renderEntityFrame('Test name');
+		return this.renderEntityFrame();
 	}
 }
 
@@ -59,14 +59,15 @@ describe('UmbEntityItemRefFrameMixin', () => {
 		expect(frame).to.be.null;
 	});
 
-	it('renders a hidden entity frame with the name when navigable', async () => {
+	it('renders a hidden, icon-only entity frame when navigable', async () => {
 		element.navigable = true;
 		await element.updateComplete;
 
 		const frame = element.shadowRoot!.querySelector('umb-entity-frame');
 		expect(frame).to.not.be.null;
 		expect(frame!.getAttribute('aria-hidden')).to.equal('true');
-		expect(frame!.textContent?.trim()).to.contain('Test name');
+		expect(frame!.querySelector('uui-icon[name="link"]')).to.not.be.null;
+		expect(frame!.textContent?.trim()).to.equal('');
 	});
 
 	it('applies the frame host styles', () => {

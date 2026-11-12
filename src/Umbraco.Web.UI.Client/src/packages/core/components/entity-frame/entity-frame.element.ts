@@ -9,7 +9,7 @@ import { css, customElement, html, property, LitElement } from '@umbraco-cms/bac
  * clip overflow above its top edge (the tab renders outside the parent's content box).
  * @element umb-entity-frame
  * @slot - Optional rich content for the tab. Falls back to the `label` property.
- * @cssprop --umb-entity-frame-border-width - Thickness of the border. Defaults to `2px`.
+ * @cssprop --umb-entity-frame-border-width - Thickness of the border. Defaults to `1px`.
  * @cssprop --umb-entity-frame-color - Accent colour for the border and tab background. Defaults to `--uui-color-focus`.
  * @cssprop --umb-entity-frame-contrast-color - Text colour for the tab. Defaults to `--uui-color-selected-contrast`. Override when using a custom `--umb-entity-frame-color` that does not pair with the default contrast token.
  * @cssprop --umb-entity-frame-opacity - Opacity of the border and tab. Defaults to `1`. Set to `0` on the parent and toggle to `1` on `:hover` / `:focus-within` to gate visibility.
@@ -51,7 +51,7 @@ export class UmbEntityFrameElement extends LitElement {
 			.border {
 				position: absolute;
 				inset: 0;
-				border: var(--umb-entity-frame-border-width, 2px) solid var(--umb-entity-frame-color, var(--uui-color-focus));
+				border: var(--umb-entity-frame-border-width, 1px) solid var(--umb-entity-frame-color, var(--uui-color-focus));
 				border-radius: var(--uui-border-radius);
 				border-top-right-radius: 0;
 				box-sizing: border-box;
@@ -60,14 +60,35 @@ export class UmbEntityFrameElement extends LitElement {
 
 			.tab {
 				position: absolute;
-				bottom: 100%;
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-1);
+				min-height: var(--uui-size-7);
+				bottom: calc(100% - var(--umb-entity-frame-border-width, 1px));
 				right: 0;
 				background: var(--umb-entity-frame-color, var(--uui-color-focus));
 				color: var(--umb-entity-frame-contrast-color, var(--uui-color-selected-contrast));
-				padding: var(--uui-size-2) var(--uui-size-2) var(--uui-size-1);
+				padding: 1px var(--uui-size-2) 0;
 				border-radius: var(--uui-border-radius) var(--uui-border-radius) 0 0;
 				font-size: var(--uui-type-small-size);
-				line-height: 1;
+				line-height: 1.125;
+			}
+
+			.tab::before {
+				content: '';
+				position: absolute;
+				background-color: transparent;
+				bottom: calc(var(--uui-border-radius) * -2);
+				height: calc(var(--uui-border-radius) * 2);
+				width: var(--uui-border-radius);
+				right: 0;
+				z-index: -1;
+				border-top-right-radius: var(--uui-border-radius);
+				box-shadow: 0 calc(var(--uui-border-radius) * -1) 0 0 var(--umb-entity-frame-color, var(--uui-color-focus));
+			}
+
+			::slotted(uui-icon) {
+				margin-top: -0.125em;
 			}
 		`,
 	];

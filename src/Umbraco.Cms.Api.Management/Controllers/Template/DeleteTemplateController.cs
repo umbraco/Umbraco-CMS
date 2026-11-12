@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -22,22 +23,30 @@ public class DeleteTemplateController : TemplateControllerBase
 {
     private readonly ITemplateService _templateService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IOptions<RuntimeSettings> _runtimeSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeleteTemplateController"/> class, responsible for handling template deletion operations.
     /// </summary>
     /// <param name="templateService">The service used to manage templates.</param>
     /// <param name="backOfficeSecurityAccessor">Provides access to back office security features.</param>
-    /// <param name="runtimeSettings">The runtime configuration settings.</param>
+    [ActivatorUtilitiesConstructor]
+    public DeleteTemplateController(
+        ITemplateService templateService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    {
+        _templateService = templateService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 20.")]
     public DeleteTemplateController(
         ITemplateService templateService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IOptions<RuntimeSettings> runtimeSettings)
+        : this(
+            templateService,
+            backOfficeSecurityAccessor)
     {
-        _templateService = templateService;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _runtimeSettings = runtimeSettings;
     }
 
     /// <summary>
@@ -55,11 +64,6 @@ public class DeleteTemplateController : TemplateControllerBase
     [EndpointDescription("Deletes a template identified by the provided Id.")]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
-        if (_runtimeSettings.Value.Mode == RuntimeMode.Production)
-        {
-            return TemplateOperationStatusResult(TemplateOperationStatus.NotAllowedInProductionMode);
-        }
-
         Attempt<ITemplate?, TemplateOperationStatus> result = await _templateService.DeleteAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
         return result.Success
             ? Ok()

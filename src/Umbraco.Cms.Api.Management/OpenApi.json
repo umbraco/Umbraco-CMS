@@ -161,6 +161,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -326,6 +332,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -447,6 +459,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -561,6 +579,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -714,6 +738,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -1034,6 +1064,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -1199,6 +1235,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -1320,6 +1362,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -1443,6 +1491,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -2229,6 +2283,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DictionaryItem.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -2394,6 +2454,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DictionaryItem.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -2515,6 +2581,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DictionaryItem.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -2701,6 +2773,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DictionaryItem.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -2828,6 +2906,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DictionaryItem.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -9359,6 +9443,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -9500,6 +9590,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -9621,6 +9717,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -10032,6 +10134,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -10210,6 +10318,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -10333,6 +10447,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -10499,6 +10619,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Template.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -10954,6 +11080,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -11119,6 +11251,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -11240,6 +11378,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -11363,6 +11507,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -11490,6 +11640,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -17649,6 +17805,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Language.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -17809,6 +17971,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Language.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -17929,6 +18097,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Language.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -21760,6 +21934,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -21901,6 +22081,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -22022,6 +22208,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -22361,6 +22553,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -22539,6 +22737,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -22662,6 +22866,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -23047,6 +23257,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -23212,6 +23428,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -23333,6 +23555,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -23456,6 +23684,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -23583,6 +23817,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -25157,6 +25397,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberGroup.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -25315,6 +25561,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberGroup.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -25436,6 +25688,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberGroup.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -25765,6 +26023,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -25906,6 +26170,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -26027,6 +26297,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -26238,6 +26514,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -26416,6 +26698,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -26539,6 +26827,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -26924,6 +27218,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -27089,6 +27389,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -27210,6 +27516,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -27333,6 +27645,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -27460,6 +27778,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -28833,6 +29157,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -28996,6 +29326,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -29116,6 +29452,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -29253,6 +29595,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -29380,6 +29728,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -29543,6 +29897,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -30864,6 +31224,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Script.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -31027,6 +31393,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Script.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -31147,6 +31519,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Script.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -31284,6 +31662,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Script.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -31411,6 +31795,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Script.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -31574,6 +31964,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Script.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -32956,6 +33352,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -33119,6 +33521,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -33239,6 +33647,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -33376,6 +33790,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -33503,6 +33923,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -33666,6 +34092,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -34401,6 +34833,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Template.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -34566,6 +35004,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Template.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -34687,6 +35131,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Template.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -40421,6 +40871,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Webhook.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -40586,6 +41042,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Webhook.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
@@ -40707,6 +41169,12 @@
           "403": {
             "description": "The authenticated user does not have access to this resource",
             "headers": {
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Webhook.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
+              },
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {

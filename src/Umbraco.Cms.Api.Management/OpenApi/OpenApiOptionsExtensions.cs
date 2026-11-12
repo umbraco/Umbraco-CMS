@@ -16,5 +16,6 @@ public static class OpenApiOptionsExtensions
     public static OpenApiOptions AddBackofficeSecurityRequirements(this OpenApiOptions options)
         => options
             .AddOperationTransformer<BackOfficeSecurityRequirementsTransformer>()
-            .AddDocumentTransformer<BackOfficeSecurityRequirementsTransformer>();
+            .AddDocumentTransformer<BackOfficeSecurityRequirementsTransformer>()
+            .AddOperationTransformer<DeniedPermissionHeaderTransformer>();
 }
