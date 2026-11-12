@@ -1,8 +1,8 @@
 import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 export interface UmbInputDimensionsValue {
 	width?: number;
@@ -20,6 +20,15 @@ export class UmbInputDimensionsElement extends UmbFormControlMixin<
 	typeof UmbLitElement
 >(UmbLitElement, undefined) {
 	#ratio?: number;
+
+	constructor() {
+		super();
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage,
+			() => this.required && (!this.value?.width || !this.value?.height),
+		);
+	}
 
 	@property({ type: Number })
 	public set width(value: number | undefined) {
@@ -51,6 +60,15 @@ export class UmbInputDimensionsElement extends UmbFormControlMixin<
 	@property({ type: Boolean })
 	disabled = false;
 
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
+	@property({ type: Boolean })
+	required = false;
+
+	@property({ type: String })
+	requiredMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
+
 	@property({ type: Number, attribute: 'natural-width' })
 	naturalWidth?: number;
 
@@ -60,6 +78,14 @@ export class UmbInputDimensionsElement extends UmbFormControlMixin<
 	override connectedCallback() {
 		super.connectedCallback();
 		this.#updateRatio();
+	}
+
+	protected override firstUpdated() {
+		this.shadowRoot?.querySelectorAll<UUIInputElement>('uui-input').forEach((x) => this.addFormControlElement(x));
+	}
+
+	override focus() {
+		return this.shadowRoot?.querySelector<UUIInputElement>('uui-input')?.focus();
 	}
 
 	#updateRatio() {
@@ -135,8 +161,10 @@ export class UmbInputDimensionsElement extends UmbFormControlMixin<
 						label=${this.localize.term('general_width')}
 						placeholder=${this.localize.term('general_width')}
 						min="1"
+						?required=${this.required}
 						.value=${this.value?.width?.toString() ?? ''}
 						?disabled=${this.disabled}
+						?readonly=${this.readonly}
 						@input=${this.#onWidthInput}>
 						<span class="extra" slot="append">px</span>
 					</uui-input>
@@ -145,8 +173,8 @@ export class UmbInputDimensionsElement extends UmbFormControlMixin<
 					compact
 					label=${this.localize.term('general_constrainProportions')}
 					title=${this.localize.term('general_constrainProportions')}
-					look=${this.locked ? 'primary' : 'default'}
-					?disabled=${this.disabled}
+					look=${this.locked ? 'secondary' : 'default'}
+					?disabled=${this.disabled || this.readonly}
 					@click=${this.#onToggleLock}>
 					<uui-icon name=${this.locked ? 'icon-lock' : 'icon-unlocked'}></uui-icon>
 				</uui-button>
@@ -158,8 +186,10 @@ export class UmbInputDimensionsElement extends UmbFormControlMixin<
 						label=${this.localize.term('general_height')}
 						placeholder=${this.localize.term('general_height')}
 						min="1"
+						?required=${this.required}
 						.value=${this.value?.height?.toString() ?? ''}
 						?disabled=${this.disabled}
+						?readonly=${this.readonly}
 						@input=${this.#onHeightInput}>
 						<span class="extra" slot="append">px</span>
 					</uui-input>
@@ -170,7 +200,7 @@ export class UmbInputDimensionsElement extends UmbFormControlMixin<
 						id="reset"
 						compact
 						label=${this.localize.term('general_reset')}
-						?disabled=${this.disabled}
+						?disabled=${this.disabled || this.readonly}
 						@click=${this.#onReset}></uui-button>`
 				: nothing}
 		`;
