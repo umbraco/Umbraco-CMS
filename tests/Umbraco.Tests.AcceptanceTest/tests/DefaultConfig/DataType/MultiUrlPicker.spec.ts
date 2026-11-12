@@ -1,7 +1,7 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
-const dataTypeName = 'Multi URL Picker';
+const dataTypeName = 'URL Picker';
 const editorAlias = 'Umbraco.MultiUrlPicker';
 const editorUiAlias = 'Umb.PropertyEditorUi.MultiUrlPicker';
 const customDataTypeName = 'Custom Multi URL Picker';

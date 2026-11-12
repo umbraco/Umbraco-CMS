@@ -3,7 +3,7 @@ import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
-const dataTypeNames = ['Dropdown', 'Dropdown multiple'];
+const dataTypeNames = ['Single Select Dropdown', 'Select List'];
 const customDataTypeName = 'CustomDropdown';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
@@ -62,8 +62,8 @@ for (const dataTypeName of dataTypeNames) {
   test(`can create content with the custom ${dataTypeName} data type`, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const optionValues = ['testOption1', 'testOption2', 'testOption3'];
-    const selectedOptions = dataTypeName === 'Dropdown' ? [optionValues[0]] : optionValues;
-    const isMultiple = dataTypeName === 'Dropdown' ? false : true;
+    const selectedOptions = dataTypeName === 'Single Select Dropdown' ? [optionValues[0]] : optionValues;
+    const isMultiple = dataTypeName === 'Single Select Dropdown' ? false : true;
     const customDataTypeId = await umbracoApi.dataType.createDropdownDataType(customDataTypeName, isMultiple, optionValues);
     const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
     await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);

@@ -36,7 +36,7 @@ test('can create a member type with a property', {tag: '@smoke'}, async ({umbrac
 test('can update a property in a member type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const newDataTypeName = 'Image Media Picker';
+  const newDataTypeName = 'Single Image Media Picker';
   await umbracoApi.memberType.createMemberTypeWithPropertyEditor(memberTypeName, dataTypeName, dataTypeData.id);
 
   // Act
@@ -177,7 +177,7 @@ test('can delete a group in a member type', async ({umbracoApi, umbracoUi}) => {
 test('can create a member type with multiple groups', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const secondDataTypeName = 'Image Media Picker';
+  const secondDataTypeName = 'Single Image Media Picker';
   await umbracoApi.memberType.createMemberTypeWithPropertyEditor(memberTypeName, dataTypeName, dataTypeData.id, groupName);
   const secondGroupName = 'TesterGroup';
 

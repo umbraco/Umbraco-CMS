@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/prope
 
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
-	name: 'Single Dropdown',
+	name: 'Single Select Dropdown',
 	alias: 'Umbraco.DropDown.Single',
 	meta: {
 		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.Dropdown.Single',

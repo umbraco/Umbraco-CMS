@@ -1,7 +1,7 @@
 import { ConstantHelper, test, AliasHelper } from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
-const dataTypeName = 'Multi URL Picker';
+const dataTypeName = 'URL Picker';
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const link = 'https://docs.umbraco.com';
