@@ -563,7 +563,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 							${repeat(
 								this._tabs,
 								(tab) => tab.ownerId ?? tab.ids[0],
-								(tab) => this.renderTab(tab),
+								(tab, index) => this.renderTab(tab, index),
 							)}
 						</uui-tab-group>`
 					: nothing}
@@ -596,10 +596,10 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		`;
 	}
 
-	renderTab(tab: UmbPropertyTypeContainerMergedModel) {
+	renderTab(tab: UmbPropertyTypeContainerMergedModel, index: number) {
 		const path = this._routerPath + '/tab/' + encodeFolderName(tab.name && tab.name !== '' ? tab.name : '-');
 		let tabActive = path === this._activePath;
-		if (!tabActive && !this._hasRootGroups && !this._hasRootProperties) {
+		if (!tabActive && index === 0 && !this._hasRootGroups && !this._hasRootProperties) {
 			tabActive = this._routerPath + '/' === this._activePath;
 		}
 		const ownedTab = tab.ownerId ? true : false;
