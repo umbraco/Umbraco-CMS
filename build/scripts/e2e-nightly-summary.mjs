@@ -13,8 +13,15 @@ import {parseArgs} from 'node:util';
 const E2E_STAGES = ['DefaultConfigE2E', 'AdditionalConfigE2E'];
 const SLACK_LIST_LIMIT = 10;
 const SLACK_SECTION_LIMIT = 2900;
+// New failures sharing one error line are shown as a single entry from this many tests on.
+const SLACK_GROUP_SIZE = 3;
+const SLACK_GROUP_EXAMPLES = 3;
+const SLACK_COLORS = {'🔴': '#d72b3f', '🟡': '#e8a317', '🟢': '#2eb67d'};
 // A known failure whose spec file stops running altogether (deleted, renamed) is forgotten after this many runs.
 const MAX_ABSENT_RUNS = 7;
+// A failure seen in a single run that passes in the next is more likely unstable than repaired, so only
+// failures that lasted at least this many runs are reported when they pass again.
+const MIN_RUNS_TO_REPORT_RECOVERY = 2;
 const OUTCOME_RANK = {skipped: 0, passed: 1, flaky: 2, failed: 3};
 const OUTCOME_BY_STATUS = {expected: 'passed', unexpected: 'failed', flaky: 'flaky', skipped: 'skipped'};
 
@@ -32,12 +39,13 @@ async function findFiles(dir, name) {
 
 /** Loads every job that published a summary, keeping only the latest attempt of each job. */
 export async function loadJobs(dir) {
-  const latest = new Map();
+  const jobs = [];
   for (const metaFile of await findFiles(dir, 'job.json')) {
-    const meta = await readJson(metaFile);
-    const attempt = Number(meta.attempt) || 1;
-    const id = `${meta.stage}|${meta.job}`;
-    if (latest.has(id) && latest.get(id).attempt >= attempt) {
+    let meta;
+    try {
+      meta = await readJson(metaFile);
+    } catch {
+      console.warn(`Could not read ${metaFile}; ignoring that job summary.`);
       continue;
     }
     const reportFile = path.join(path.dirname(metaFile), 'results.json');
@@ -49,9 +57,25 @@ export async function loadJobs(dir) {
         report = null;
       }
     }
-    latest.set(id, {stage: meta.stage, job: meta.job, jobId: meta.jobId, os: meta.os, attempt, report});
+    jobs.push({
+      stage: meta.stage,
+      job: meta.job,
+      jobId: meta.jobId,
+      os: meta.os,
+      database: meta.database,
+      attempt: Number(meta.attempt) || 1,
+      report,
+    });
   }
-  return [...latest.values()];
+
+  // Two jobs of one stage can share a name (one matrix run against two databases), so a summary is only
+  // superseded by a later attempt under that name, never by a sibling from the same attempt.
+  const name = job => `${job.stage}|${job.job}`;
+  const latestAttempt = new Map();
+  for (const job of jobs) {
+    latestAttempt.set(name(job), Math.max(latestAttempt.get(name(job)) ?? 0, job.attempt));
+  }
+  return jobs.filter(job => job.attempt === latestAttempt.get(name(job)));
 }
 
 function firstLine(text) {
@@ -85,7 +109,7 @@ export function* flattenReport(report) {
 
 function jobLabel(job) {
   const os = {Windows_NT: 'Windows', Darwin: 'macOS'}[job.os] ?? job.os ?? 'unknown';
-  return /sqlite/i.test(job.job) ? `${os} SQLite` : os;
+  return /sqlite/i.test(`${job.database ?? ''} ${job.job}`) ? `${os} SQLite` : os;
 }
 
 /** Merges all jobs into one record per test; a test counts by its worst outcome across jobs. */
@@ -152,6 +176,14 @@ export function findMissingJobs(timeline, jobs) {
   return missing.map(record => ({job: record.name, reason: `job ${record.result} before publishing results`}));
 }
 
+/** Finds stages other than the E2E ones that failed, so a clean E2E result is not read as a clean run. */
+export function findFailedStages(timeline) {
+  return (timeline?.records ?? [])
+    .filter(record => record.type === 'Stage' && ['failed', 'canceled'].includes(record.result))
+    .filter(record => !E2E_STAGES.some(stage => [record.identifier, record.refName, record.name].includes(stage)))
+    .map(record => ({stage: record.name ?? record.identifier, result: record.result}));
+}
+
 function fileOf(key) {
   return key.split(' › ')[0];
 }
@@ -161,7 +193,7 @@ function sortedLabels(set) {
 }
 
 /** Classifies the run against the previous summary and builds the summary document. */
-export function buildSummary({tests, infra, previous, build}) {
+export function buildSummary({tests, infra, previous, build, failedStages = []}) {
   const all = [...tests.values()];
   const count = outcome => all.filter(test => test.outcome === outcome).length;
   const previousFailing = previous?.failing ?? {};
@@ -183,15 +215,22 @@ export function buildSummary({tests, infra, previous, build}) {
   // that left a whole configuration out) says nothing about the test, so the failure stays open.
   const filesRun = new Set(all.map(test => fileOf(test.key)));
   const complete = infra.length === 0;
-  const fixed = [];
+  const passingAgain = [];
+  const skippedWhileFailing = [];
   for (const [key, known] of Object.entries(previousFailing)) {
     const outcome = tests.get(key)?.outcome;
-    if (outcome === 'failed' || outcome === 'skipped') {
+    if (outcome === 'failed') {
+      continue;
+    }
+    if (outcome === 'skipped') {
+      skippedWhileFailing.push(key);
       continue;
     }
     if (outcome) {
       if (complete) {
-        fixed.push(key);
+        if (known.runs >= MIN_RUNS_TO_REPORT_RECOVERY) {
+          passingAgain.push(key);
+        }
       } else {
         failing[key] = known;
       }
@@ -211,7 +250,9 @@ export function buildSummary({tests, infra, previous, build}) {
     counts: {failed: count('failed'), flaky: count('flaky'), passed: count('passed'), skipped: count('skipped')},
     newFailures,
     stillFailing,
-    fixed: fixed.sort(),
+    passingAgain: passingAgain.sort(),
+    skippedWhileFailing: skippedWhileFailing.sort(),
+    failedStages,
     flaky: all
       .filter(test => test.outcome === 'flaky')
       .map(test => ({key: test.key, jobs: sortedLabels(test.flakyIn)}))
@@ -226,7 +267,7 @@ function statusOf(summary) {
   if (total === 0) {
     return {emoji: '🔴', text: 'no E2E results were produced'};
   }
-  if (summary.counts.failed > 0 || summary.infra.length > 0) {
+  if (summary.counts.failed > 0 || summary.infra.length > 0 || summary.failedStages.length > 0) {
     return {emoji: '🔴', text: 'failed'};
   }
   return summary.counts.flaky > 0 ? {emoji: '🟡', text: 'passed with flaky tests'} : {emoji: '🟢', text: 'passed'};
@@ -249,14 +290,26 @@ function truncate(text, limit) {
   return text.length > limit ? `${text.slice(0, limit - 1)}…` : text;
 }
 
+/** Folds failures that share an error line into one entry, so a single cause does not fill the list. */
+function groupByError(entries) {
+  const groups = new Map();
+  for (const entry of entries) {
+    groups.set(entry.error, [...(groups.get(entry.error) ?? []), entry]);
+  }
+  return [...groups].flatMap(([error, group]) => (error && group.length >= SLACK_GROUP_SIZE ? [{error, entries: group}] : group));
+}
+
 export function renderSlack(summary) {
   const {build} = summary;
   const status = statusOf(summary);
   const manual = build.reason && build.reason !== 'Schedule' ? ` · ${build.reason.toLowerCase()} run` : '';
-  const header = `${status.emoji} *Nightly E2E · ${escapeSlack(build.branch)}* · ${escapeSlack(build.number)}${manual}`;
-  const blocks = [];
-  const section = text => blocks.push({type: 'section', text: {type: 'mrkdwn', text: truncate(text, SLACK_SECTION_LIMIT)}});
-  const list = (title, items, format) => {
+  const number = build.url ? `<${build.url}|${escapeSlack(build.number)}>` : escapeSlack(build.number);
+  const rerun = build.attempt > 1 ? ` · attempt ${build.attempt}` : '';
+  const header = `${status.emoji} *Nightly E2E · ${escapeSlack(build.branch)}* · ${number}${manual}${rerun}`;
+  // Each list is an attachment rather than a block: Slack folds a long attachment behind "Show more",
+  // which keeps the message short in the channel while every list stays one click away.
+  const attachments = [];
+  const list = (title, items, format, total = items.length) => {
     if (items.length === 0) {
       return;
     }
@@ -264,24 +317,41 @@ export function renderSlack(summary) {
     if (items.length > SLACK_LIST_LIMIT) {
       lines.push(`_+${items.length - SLACK_LIST_LIMIT} more_`);
     }
-    section(`*${title} (${items.length})*\n${lines.join('\n')}`);
+    attachments.push({
+      color: SLACK_COLORS[status.emoji],
+      mrkdwn_in: ['text'],
+      text: truncate(`*${title} (${total})*\n${lines.join('\n')}`, SLACK_SECTION_LIMIT),
+    });
   };
   const where = jobs => (jobs.length > 0 ? `  \`${jobs.join(', ')}\`` : '');
-
-  section(`${header}\n${status.text === 'no E2E results were produced' ? 'No E2E results were produced.' : countsLine(summary.counts, true)}`);
-
   const failureLine = entry => `• ${escapeSlack(entry.key)}${where(entry.jobs)}`;
+  const errorLine = error => `      ↳ ${escapeSlack(truncate(error, 140))}`;
+  const newFailureLine = item => {
+    if (!item.entries) {
+      return item.error ? `${failureLine(item)}\n${errorLine(item.error)}` : failureLine(item);
+    }
+    const jobs = sortedLabels(new Set(item.entries.flatMap(entry => entry.jobs)));
+    const examples = item.entries.slice(0, SLACK_GROUP_EXAMPLES).map(entry => `      ◦ ${escapeSlack(entry.key)}`);
+    if (item.entries.length > SLACK_GROUP_EXAMPLES) {
+      examples.push(`      ◦ _+${item.entries.length - SLACK_GROUP_EXAMPLES} more_`);
+    }
+    return `• *${item.entries.length} tests with the same error*${where(jobs)}\n${errorLine(item.error)}\n${examples.join('\n')}`;
+  };
+
+  list('Other failed stages', summary.failedStages, entry => `• ${escapeSlack(entry.stage)} — ${escapeSlack(entry.result)}`);
   if (summary.hasPrevious) {
-    list('New since the previous run', summary.newFailures, entry =>
-      entry.error ? `${failureLine(entry)}\n      ↳ ${escapeSlack(truncate(entry.error, 140))}` : failureLine(entry));
+    list('New since the previous run', groupByError(summary.newFailures), newFailureLine, summary.newFailures.length);
     list('Still failing', summary.stillFailing, entry => `${failureLine(entry)} · ${plural(entry.runs, 'run')}`);
   } else {
     list('Failing', summary.newFailures, failureLine);
   }
-  list('Fixed since the previous run', summary.fixed, key => `• ${escapeSlack(key)}`);
+  list('Passing again', summary.passingAgain, key => `• ${escapeSlack(key)}`);
+  list('Skipped while failing', summary.skippedWhileFailing, key => `• ${escapeSlack(key)}`);
   list('Flaky (passed on retry)', summary.flaky, entry => `• ${escapeSlack(entry.key)}${where(entry.jobs)}`);
   list('Jobs without results', summary.infra, entry => `• ${escapeSlack(entry.job)} — ${escapeSlack(truncate(entry.reason, 140))}`);
 
+  const counts = status.text === 'no E2E results were produced' ? 'No E2E results were produced.' : countsLine(summary.counts, true);
+  const blocks = [{type: 'section', text: {type: 'mrkdwn', text: `${header}\n${counts}`}}];
   if (build.url) {
     blocks.push({
       type: 'context',
@@ -289,7 +359,7 @@ export function renderSlack(summary) {
     });
   }
 
-  return {text: `Nightly E2E ${build.branch} (${build.number}): ${status.text}`, blocks};
+  return {text: `Nightly E2E ${build.branch} (${build.number}): ${status.text}`, blocks, attachments};
 }
 
 export function renderMarkdown(summary) {
@@ -304,13 +374,15 @@ export function renderMarkdown(summary) {
   const where = jobs => (jobs.length > 0 ? ` [${jobs.join(', ')}]` : '');
   const failure = entry => `- ${entry.key}${where(entry.jobs)}${entry.error ? `\n  - ${entry.error}` : ''}`;
 
+  list('Other failed stages', summary.failedStages, entry => `- ${entry.stage}: ${entry.result}`);
   if (summary.hasPrevious) {
     list('New since the previous run', summary.newFailures, failure);
     list('Still failing', summary.stillFailing, entry => `${failure(entry)}\n  - failing for ${plural(entry.runs, 'run')}`);
   } else {
     list('Failing', summary.newFailures, failure);
   }
-  list('Fixed since the previous run', summary.fixed, key => `- ${key}`);
+  list('Passing again', summary.passingAgain, key => `- ${key}`);
+  list('Skipped while failing', summary.skippedWhileFailing, key => `- ${key}`);
   list('Flaky (passed on retry)', summary.flaky, entry => `- ${entry.key}${where(entry.jobs)}`);
   list('Jobs without results', summary.infra, entry => `- ${entry.job}: ${entry.reason}`);
 
@@ -327,6 +399,7 @@ function readBuildFromEnvironment(env) {
     branch: (env.BUILD_SOURCEBRANCH ?? 'local').replace(/^refs\/heads\//, ''),
     commit: env.BUILD_SOURCEVERSION ?? '',
     reason: env.BUILD_REASON ?? '',
+    attempt: Number(env.SYSTEM_JOBATTEMPT) || 1,
     url: collection && id ? `${collection}${encodeURIComponent(project)}/_build/results?buildId=${id}` : '',
   };
 }
@@ -403,7 +476,13 @@ async function main() {
   const {tests, infra} = aggregate(jobs);
   infra.push(...findMissingJobs(timeline, jobs));
 
-  const summary = buildSummary({tests, infra, previous: await loadPrevious(values.previous, build), build});
+  const summary = buildSummary({
+    tests,
+    infra,
+    previous: await loadPrevious(values.previous, build),
+    build,
+    failedStages: findFailedStages(timeline),
+  });
   const markdown = renderMarkdown(summary);
   const slack = renderSlack(summary);
 
@@ -420,5 +499,17 @@ async function main() {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  await main();
+  try {
+    await main();
+  } catch (error) {
+    // A silent channel reads as a clean night, so a summary that could not be produced is announced as well.
+    if (!process.argv.includes('--dry-run')) {
+      const build = readBuildFromEnvironment(process.env);
+      const link = build.url ? ` <${build.url}|Build>` : '';
+      await postToSlack(process.env.SLACK_WEBHOOK_URL, {
+        text: `🔴 Nightly E2E ${build.branch} (${build.number}): the summary could not be produced — ${error.message}${link}`,
+      });
+    }
+    throw error;
+  }
 }

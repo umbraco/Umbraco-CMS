@@ -1,11 +1,14 @@
 // Run with: node --test build/scripts/e2e-nightly-summary.test.mjs
 import assert from 'node:assert/strict';
+import {mkdir, mkdtemp, rm, writeFile} from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import {test} from 'node:test';
-import {aggregate, buildSummary, findMissingJobs, flattenReport, renderMarkdown, renderSlack} from './e2e-nightly-summary.mjs';
+import {aggregate, buildSummary, findFailedStages, findMissingJobs, flattenReport, loadJobs, renderMarkdown, renderSlack} from './e2e-nightly-summary.mjs';
 
 const build = {id: '2', number: '19.1.0-test.2', branch: 'v19/dev', commit: 'abc', reason: 'Schedule', url: 'https://example.test/build?buildId=2'};
 
-function report(file, outcomes) {
+function report(file, outcomes, error) {
   return {
     errors: [],
     suites: [{
@@ -20,7 +23,7 @@ function report(file, outcomes) {
           file,
           tests: [{
             status,
-            results: status === 'expected' || status === 'skipped' ? [{status: 'passed'}] : [{status: 'failed', error: {message: `\u001b[31mError: ${title} broke\u001b[39m\n  at somewhere`}}],
+            results: status === 'expected' || status === 'skipped' ? [{status: 'passed'}] : [{status: 'failed', error: {message: `\u001b[31m${error ?? `Error: ${title} broke`}\u001b[39m\n  at somewhere`}}],
           }],
         })),
       }],
@@ -32,9 +35,13 @@ function job(name, os, outcomes, stage = 'DefaultConfigE2E') {
   return {stage, job: name, os, attempt: 1, report: outcomes ? report('DefaultConfig/Content/Content.spec.ts', outcomes) : null};
 }
 
-function summarize(jobs, previous) {
+function summarize(jobs, previous, failedStages) {
   const {tests, infra} = aggregate(jobs);
-  return buildSummary({tests, infra, previous, build});
+  return buildSummary({tests, infra, previous, build, failedStages});
+}
+
+function slackText(message) {
+  return [...message.blocks.map(block => block.text?.text ?? ''), ...message.attachments.map(attachment => attachment.text)].join('\n');
 }
 
 const key = title => `DefaultConfig/Content/Content.spec.ts › Area › ${title}`;
@@ -56,20 +63,22 @@ test('a test counts once, by its worst outcome across jobs, listing where it fai
   assert.deepEqual(summary.flaky.find(entry => entry.key === key('can publish')).jobs, ['Windows']);
 });
 
-test('failures are split into new, still failing and fixed against the previous run', () => {
+test('failures are split into new, still failing and passing again against the previous run', () => {
   const previous = {
     build: {id: '1'},
     failing: {
       [key('can save')]: {runs: 3, since: '19.1.0-test.0'},
-      [key('can publish')]: {runs: 1, since: '19.1.0-test.1'},
+      [key('can publish')]: {runs: 2, since: '19.1.0-test.1'},
+      [key('can copy')]: {runs: 1, since: '19.1.0-test.1'},
     },
   };
-  const summary = summarize([job('E2E Linux', 'Linux', {'can save': 'unexpected', 'can publish': 'expected', 'can sort': 'unexpected'})], previous);
+  const summary = summarize([job('E2E Linux', 'Linux', {'can save': 'unexpected', 'can publish': 'expected', 'can copy': 'expected', 'can sort': 'unexpected'})], previous);
   assert.deepEqual(summary.newFailures.map(entry => entry.key), [key('can sort')]);
   assert.deepEqual(summary.stillFailing.map(entry => [entry.key, entry.runs]), [[key('can save'), 4]]);
-  assert.deepEqual(summary.fixed, [key('can publish')]);
+  assert.deepEqual(summary.passingAgain, [key('can publish')]);
   assert.deepEqual(summary.failing[key('can save')], {runs: 4, since: '19.1.0-test.0'});
   assert.equal(summary.failing[key('can publish')], undefined);
+  assert.equal(summary.failing[key('can copy')], undefined);
 });
 
 test('a known failure stays open until a complete run shows it passing', () => {
@@ -77,11 +86,11 @@ test('a known failure stays open until a complete run shows it passing', () => {
 
   const brokenJob = summarize([job('E2E Linux', 'Linux', null)], previous);
   assert.deepEqual(brokenJob.failing[key('can save')], {runs: 2, since: 'x', absent: 1});
-  assert.deepEqual(brokenJob.fixed, []);
+  assert.deepEqual(brokenJob.passingAgain, []);
 
   const passedElsewhere = summarize([job('E2E Linux', 'Linux', {'can save': 'expected'}), job('E2E Windows', 'Windows_NT', null)], previous);
   assert.deepEqual(passedElsewhere.failing[key('can save')], {runs: 2, since: 'x'});
-  assert.deepEqual(passedElsewhere.fixed, []);
+  assert.deepEqual(passedElsewhere.passingAgain, []);
 
   const otherConfigurationOnly = summarize([{...job('E2E Linux', 'Linux', null), report: report('DeliveryApi/Content.spec.ts', {'returns content': 'expected'})}], previous);
   assert.deepEqual(otherConfigurationOnly.failing[key('can save')], {runs: 2, since: 'x', absent: 1});
@@ -92,13 +101,16 @@ test('a known failure is forgotten when it is skipped, removed from its spec fil
 
   const skipped = summarize([job('E2E Linux', 'Linux', {'can save': 'skipped'})], previous);
   assert.deepEqual(skipped.failing, {});
+  assert.deepEqual(skipped.passingAgain, []);
+  assert.deepEqual(skipped.skippedWhileFailing, [key('can save')]);
+  assert.match(slackText(renderSlack(skipped)), /Skipped while failing \(1\)/);
 
   const absentTooLong = summarize([{...job('E2E Linux', 'Linux', null), report: report('DeliveryApi/Content.spec.ts', {'returns content': 'expected'})}], previous);
   assert.deepEqual(absentTooLong.failing, {});
 
   const removed = summarize([job('E2E Linux', 'Linux', {'can publish': 'expected'})], previous);
   assert.deepEqual(removed.failing, {});
-  assert.deepEqual(removed.fixed, []);
+  assert.deepEqual(removed.passingAgain, []);
 });
 
 test('jobs that ran but published nothing are reported, skipped jobs are not', () => {
@@ -124,13 +136,46 @@ test('jobs that ran but published nothing are reported, skipped jobs are not', (
 test('the Slack message names the branch, caps long lists and escapes markup', () => {
   const outcomes = Object.fromEntries(Array.from({length: 12}, (_, index) => [`case <${index}>`, 'unexpected']));
   const message = renderSlack(summarize([job('E2E Linux', 'Linux', outcomes)], {build: {id: '1'}, failing: {}}));
-  const text = message.blocks.map(block => block.text?.text ?? '').join('\n');
-  assert.match(text, /🔴 \*Nightly E2E · v19\/dev\*/);
+  const text = slackText(message);
+  assert.match(text, /🔴 \*Nightly E2E · v19\/dev\* · <https:\/\/example\.test\/build\?buildId=2\|19\.1\.0-test\.2>/);
   assert.match(text, /\*12 failed\*/);
   assert.match(text, /New since the previous run \(12\)/);
   assert.match(text, /_\+2 more_/);
   assert.match(text, /case &lt;0&gt;/);
-  assert.ok(message.blocks.every(block => !block.text || block.text.text.length <= 3000));
+  assert.ok(message.attachments.every(attachment => attachment.text.length <= 3000));
+});
+
+test('new failures sharing an error line are folded into one Slack entry, others stay separate', () => {
+  const shared = Object.fromEntries(['a', 'b', 'c', 'd'].map(title => [`can ${title}`, 'unexpected']));
+  const jobs = [
+    {...job('E2E Linux', 'Linux', null), report: report('DefaultConfig/Content/Content.spec.ts', shared, 'Error: server did not start')},
+    {...job('E2E Windows', 'Windows_NT', null), report: report('DefaultConfig/Media/Media.spec.ts', {'can upload': 'unexpected'})},
+  ];
+  const text = slackText(renderSlack(summarize(jobs, {build: {id: '1'}, failing: {}})));
+  assert.match(text, /New since the previous run \(5\)/);
+  assert.match(text, /\*4 tests with the same error\* {2}`Linux`\n {6}↳ Error: server did not start/);
+  assert.equal(text.match(/server did not start/g).length, 1);
+  assert.match(text, /◦ _\+1 more_/);
+  assert.match(text, /• DefaultConfig\/Media\/Media\.spec\.ts › Area › can upload {2}`Windows`\n {6}↳ Error: can upload broke/);
+});
+
+test('a failed stage outside the E2E stages turns a clean E2E result red', () => {
+  const timeline = {
+    records: [
+      {id: 'b', type: 'Stage', identifier: 'Build', name: 'Build', result: 'succeeded'},
+      {id: 'i', type: 'Stage', identifier: 'Integration', name: 'Integration Tests', result: 'failed'},
+      {id: 'e', type: 'Stage', identifier: 'DefaultConfigE2E', name: 'Default Config E2E Tests', result: 'failed'},
+      {id: 'r', type: 'Stage', identifier: 'Report', name: 'Report E2E Results', result: null},
+      {id: 'j', type: 'Job', name: 'Integration Tests', result: 'failed'},
+    ],
+  };
+  const failedStages = findFailedStages(timeline);
+  assert.deepEqual(failedStages, [{stage: 'Integration Tests', result: 'failed'}]);
+  assert.deepEqual(findFailedStages(null), []);
+
+  const message = renderSlack(summarize([job('E2E Linux', 'Linux', {'can save': 'expected'})], undefined, failedStages));
+  assert.match(slackText(message), /^🔴[\s\S]*Other failed stages \(1\)\*\n• Integration Tests — failed/);
+  assert.match(renderMarkdown(summarize([job('E2E Linux', 'Linux', {'can save': 'expected'})], undefined, failedStages)), /- Integration Tests: failed/);
 });
 
 test('a clean run is green and a run without any results is red', () => {
@@ -140,4 +185,33 @@ test('a clean run is green and a run without any results is red', () => {
 
   const empty = summarize([]);
   assert.match(renderSlack(empty).blocks[0].text.text, /^🔴[\s\S]*No E2E results were produced/);
+});
+
+test('a job summary is superseded by a later attempt, not by another job with the same name', async () => {
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'e2e-summary-'));
+  try {
+    const publish = async (folder, meta, outcomes) => {
+      await mkdir(path.join(dir, folder));
+      await writeFile(path.join(dir, folder, 'job.json'), JSON.stringify({stage: 'DefaultConfigE2E', job: 'LinuxPart1Of3', os: 'Linux', ...meta}));
+      await writeFile(path.join(dir, folder, 'results.json'), JSON.stringify(report('DefaultConfig/Content/Content.spec.ts', outcomes)));
+    };
+    await publish('sqlite', {jobId: 'a', attempt: '2', database: 'SQLite'}, {'can save': 'unexpected'});
+    await publish('sqlserver-first', {jobId: 'b', attempt: '1', database: 'SQLServer'}, {'can save': 'unexpected'});
+    await publish('sqlserver-rerun', {jobId: 'c', attempt: '2', database: 'SQLServer'}, {'can save': 'expected'});
+    await mkdir(path.join(dir, 'unreadable'));
+    await writeFile(path.join(dir, 'unreadable', 'job.json'), '{');
+
+    const jobs = await loadJobs(dir);
+    assert.deepEqual(jobs.map(entry => entry.jobId).sort(), ['a', 'c']);
+    const summary = buildSummary({...aggregate(jobs), build});
+    assert.deepEqual(summary.newFailures.map(entry => entry.jobs), [['Linux SQLite']]);
+  } finally {
+    await rm(dir, {recursive: true, force: true});
+  }
+});
+
+test('a rerun is marked in the Slack header', () => {
+  const summary = buildSummary({...aggregate([job('E2E Linux', 'Linux', {'can save': 'expected'})]), build: {...build, attempt: 2}});
+  assert.match(renderSlack(summary).blocks[0].text.text, /· attempt 2$/m);
+  assert.doesNotMatch(renderSlack(summarize([job('E2E Linux', 'Linux', {'can save': 'expected'})])).blocks[0].text.text, /attempt/);
 });

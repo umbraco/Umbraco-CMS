@@ -418,6 +418,7 @@ stages:
           # Run tests Template
           - template: nightly-E2E-run-tests-template.yml
             parameters:
+              publishSummary: true
               testCommand: $(testCommand)
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
               DatabaseType: ${{ variables.DatabaseType }}
@@ -497,6 +498,7 @@ stages:
           # Run tests Template
           - template: nightly-E2E-run-tests-template.yml
             parameters:
+              publishSummary: true
               testCommand: $(testCommand)
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
               DatabaseType: ${{ variables.DatabaseType }}
@@ -711,6 +713,7 @@ stages:
           # Run tests Template
           - template: nightly-E2E-run-tests-template.yml
             parameters:
+              publishSummary: true
               testCommand: $(testCommand)
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
               port: $(port)
@@ -769,7 +772,7 @@ stages:
               branchName: $(Build.SourceBranch)
               allowPartiallySucceededBuilds: true
               allowFailedBuilds: true
-              artifact: e2e-nightly-summary
+              patterns: 'e2e-nightly-summary*/**'
               path: $(Pipeline.Workspace)/e2e-previous
 
           - script: node build/scripts/e2e-nightly-summary.mjs --summaries "$(Pipeline.Workspace)/e2e-summaries" --previous "$(Pipeline.Workspace)/e2e-previous" --out "$(Build.ArtifactStagingDirectory)/e2e-nightly-summary"
@@ -781,8 +784,10 @@ stages:
           - bash: echo "##vso[task.uploadsummary]$(Build.ArtifactStagingDirectory)/e2e-nightly-summary/summary.md"
             displayName: Attach summary to the build
 
+          # An artifact name can be published once per run, so each attempt of this stage publishes its own;
+          # the next run compares against the latest attempt.
           - task: PublishPipelineArtifact@1
             displayName: Publish nightly summary
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/e2e-nightly-summary
-              artifact: e2e-nightly-summary
+              artifact: "e2e-nightly-summary - Attempt #$(System.JobAttempt)"
