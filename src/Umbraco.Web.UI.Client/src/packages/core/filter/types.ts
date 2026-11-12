@@ -1,6 +1,7 @@
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export type * from './active-value/types.js';
+export type * from './facet-select/types.js';
 export type * from './filter.extension.js';
 export type * from './filter-api.interface.js';
 export type * from './filter-element.interface.js';

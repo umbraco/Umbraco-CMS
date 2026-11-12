@@ -1,4 +1,4 @@
-import { EXAMPLE_PRODUCT_COLLECTION_ALIAS } from '../collection/constants.js';
+import { EXAMPLE_PRODUCT_COLLECTION_ALIAS } from '../product/collection/constants.js';
 import { html, customElement, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import type { UmbCollectionConfiguration } from '@umbraco-cms/backoffice/collection';

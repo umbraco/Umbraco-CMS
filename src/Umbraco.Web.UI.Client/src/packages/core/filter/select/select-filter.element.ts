@@ -1,10 +1,11 @@
 import type { ManifestFilter } from '../filter.extension.js';
-import type { MetaFilterSelect } from './types.js';
-import type { UmbSelectFilterApi } from './select-filter.api.js';
-import type { UmbDatalistItemModel, UmbDatalistOptionModel } from '@umbraco-cms/backoffice/datalist-data-source';
+import type { MetaFilterFacetSelect } from '../facet-select/types.js';
+import type { MetaFilterSelect, UmbSelectFilterOptionModel } from './types.js';
+import type { UmbSelectFilterApiBase } from './select-filter-api.base.js';
 import { css, customElement, html, ifDefined, repeat, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 
 const INLINE_THRESHOLD = 6;
 
@@ -19,17 +20,17 @@ export class UmbSelectFilterElement extends UmbLitElement {
 	}
 	public set manifest(manifest: ManifestFilter | undefined) {
 		this.#manifest = manifest;
-		this._multiple = !!(manifest?.meta as MetaFilterSelect | undefined)?.multiple;
+		this._multiple = !!(manifest?.meta as MetaFilterSelect | MetaFilterFacetSelect | undefined)?.multiple;
 	}
 
 	@state()
-	private _options: Array<UmbDatalistOptionModel> = [];
+	private _options: Array<UmbSelectFilterOptionModel> = [];
 
 	@state()
 	private _value: Array<string> = [];
 
 	@state()
-	private _valueItems: Array<UmbDatalistItemModel> = [];
+	private _valueItems: Array<UmbItemModel> = [];
 
 	@state()
 	private _hasMore = false;
@@ -37,11 +38,11 @@ export class UmbSelectFilterElement extends UmbLitElement {
 	@state()
 	private _comboboxSearch: string = '';
 
-	#api?: UmbSelectFilterApi | undefined;
-	public get api(): UmbSelectFilterApi | undefined {
+	#api?: UmbSelectFilterApiBase | undefined;
+	public get api(): UmbSelectFilterApiBase | undefined {
 		return this.#api;
 	}
-	public set api(api: UmbSelectFilterApi | undefined) {
+	public set api(api: UmbSelectFilterApiBase | undefined) {
 		this.#api = api;
 		this.observe(api?.options, (options) => (this._options = options ?? []));
 		this.observe(api?.value, (value) => (this._value = value ?? []));
@@ -114,7 +115,7 @@ export class UmbSelectFilterElement extends UmbLitElement {
 		this._comboboxSearch = target.value ?? '';
 	}
 
-	#formatOptionLabel(option: UmbDatalistOptionModel): string {
+	#formatOptionLabel(option: UmbSelectFilterOptionModel): string {
 		const name = option.name ?? option.unique;
 		return option.count !== undefined ? `${name} (${option.count})` : name;
 	}

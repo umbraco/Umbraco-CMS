@@ -21,11 +21,3 @@ export type * from './types.js';
 
 export { UmbCollectionActionElement, UmbCollectionActionBase } from './action/index.js';
 export type { UmbCollectionDataSource, UmbCollectionRepository } from './repository/index.js';
-
-// Deprecated re-exports — use @umbraco-cms/backoffice/filter instead.
-export {
-	UmbFilterManagerContext as UmbCollectionFacetFilterManager,
-	UmbFilterContext as UmbCollectionFacetFilterContext,
-	UMB_FILTER_CONTEXT as UMB_COLLECTION_FACET_FILTER_CONTEXT,
-	type UmbActiveFilterModel as UmbActiveCollectionFacetFilterModel,
-} from '@umbraco-cms/backoffice/filter';

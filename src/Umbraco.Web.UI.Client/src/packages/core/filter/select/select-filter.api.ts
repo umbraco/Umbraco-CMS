@@ -1,95 +1,27 @@
-import { UMB_FILTER_CONTEXT } from '../filter.context-token.js';
 import type { ManifestFilter } from '../filter.extension.js';
-import type { UmbFacetModel } from '../types.js';
 import type { MetaFilterSelect } from './types.js';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbSelectFilterApiBase } from './select-filter-api.base.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type {
-	UmbDatalistDataSource,
-	UmbDatalistItemModel,
-	UmbDatalistOptionModel,
-} from '@umbraco-cms/backoffice/datalist-data-source';
-import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import type { UmbDatalistDataSource } from '@umbraco-cms/backoffice/datalist-data-source';
 
 const ObserveValueItems = Symbol();
 
-export class UmbSelectFilterApi extends UmbControllerBase {
-	#options = new UmbArrayState<UmbDatalistOptionModel>([], (x) => x.unique);
-	public readonly options = this.#options.asObservable();
-
-	#value = new UmbArrayState<string>([], (x) => x);
-	public readonly value = this.#value.asObservable();
-
-	#valueItems = new UmbArrayState<UmbDatalistItemModel>([], (x) => x.unique);
-	public readonly valueItems = this.#valueItems.asObservable();
-
-	#filterContext?: typeof UMB_FILTER_CONTEXT.TYPE;
+/**
+ * API of the `select` filter kind: options and the items of the selected values come from the filter's datalist data source.
+ */
+export class UmbSelectFilterApi extends UmbSelectFilterApiBase {
 	#datalistDataSource?: UmbDatalistDataSource;
-	#hasFacetedResults = false;
-	#facetOptionsRequest = 0;
-	public readonly pagination = new UmbPaginationManager();
-
-	#manifest?: ManifestFilter | undefined;
-	public get manifest(): ManifestFilter | undefined {
-		return this.#manifest;
-	}
-	public set manifest(manifest: ManifestFilter | undefined) {
-		this.#manifest = manifest;
-		const meta = manifest?.meta as MetaFilterSelect | undefined;
-		if (meta?.datalistDataSource) {
-			this.#datalistDataSource = new meta.datalistDataSource(this);
-		}
-	}
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.pagination.setPageSize(100);
-
-		this.consumeContext(UMB_FILTER_CONTEXT, (context) => {
-			this.#filterContext = context;
-			this.#observeFilterValues();
-			this.#observeFacetedResult();
-		});
 	}
 
-	#observeFilterValues() {
-		if (!this.#filterContext) return;
-		this.observe(
-			this.#filterContext.values,
-			(entries) => {
-				const values: Array<string> = entries?.map((e) => e.value as string) ?? [];
-				this.#value.setValue(values);
-				this.#requestValueItems(values);
-			},
-			'umbFilterValuesObserver',
-		);
-	}
-
-	#observeFacetedResult() {
-		if (!this.#filterContext) return;
-		this.observe(
-			this.#filterContext.facetedResult,
-			(result) => {
-				const facets = result as Array<UmbFacetModel> | undefined;
-				if (facets && facets.length > 0) {
-					this.#hasFacetedResults = true;
-					this.#setFacetOptions(facets);
-				} else {
-					this.#hasFacetedResults = false;
-				}
-			},
-			'umbFacetedResultObserver',
-		);
-	}
-
-	public loadOptions() {
-		if (this.#hasFacetedResults) return;
+	public override loadOptions() {
 		this.#requestOptions();
 	}
 
-	public loadMoreOptions() {
-		if (this.#hasFacetedResults) return;
+	public override loadMoreOptions() {
 		const nextPage = this.pagination.getCurrentPageNumber() + 1;
 		if (nextPage <= this.pagination.getTotalPages()) {
 			this.pagination.setCurrentPageNumber(nextPage);
@@ -97,33 +29,16 @@ export class UmbSelectFilterApi extends UmbControllerBase {
 		}
 	}
 
-	public setValue(values: Array<string>) {
-		const filtered = values.filter((v) => v !== '');
-
-		if (filtered.length === 0) {
-			this.#filterContext?.clearAllValues();
-		} else {
-			this.#filterContext?.setValues(filtered.map((v) => ({ unique: v, value: v })));
+	protected override _onManifest(manifest: ManifestFilter | undefined) {
+		const meta = manifest?.meta as MetaFilterSelect | undefined;
+		if (meta?.datalistDataSource) {
+			this.#datalistDataSource = new meta.datalistDataSource(this);
 		}
 	}
 
-	async #setFacetOptions(facets: Array<UmbFacetModel>) {
-		const request = ++this.#facetOptionsRequest;
-		const uniques = facets.map((facet) => facet.unique);
-		const { data } = (await this.#datalistDataSource?.requestItems(uniques)) ?? {};
-		if (request !== this.#facetOptionsRequest) return;
-
-		this.#options.setValue(
-			facets.map((facet) => {
-				const item = data?.find((item) => item.unique === facet.unique);
-				return { ...facet, name: item?.name, icon: item?.icon };
-			}),
-		);
-	}
-
-	async #requestValueItems(uniques: Array<string>) {
+	protected override async _requestValueItems(uniques: Array<string>) {
 		if (uniques.length === 0) {
-			this.#valueItems.setValue([]);
+			this._setValueItems([]);
 			return;
 		}
 
@@ -132,9 +47,9 @@ export class UmbSelectFilterApi extends UmbControllerBase {
 		const { data, asObservable } = await this.#datalistDataSource.requestItems(uniques);
 
 		if (asObservable) {
-			this.observe(asObservable(), (items) => this.#valueItems.setValue(items ?? []), ObserveValueItems);
+			this.observe(asObservable(), (items) => this._setValueItems(items ?? []), ObserveValueItems);
 		} else if (data) {
-			this.#valueItems.setValue(data);
+			this._setValueItems(data);
 		}
 	}
 
@@ -147,13 +62,12 @@ export class UmbSelectFilterApi extends UmbControllerBase {
 		});
 
 		if (data) {
-			const currentOptions = this.#options.getValue();
-			this.#options.setValue([...currentOptions, ...data.items]);
+			this._setOptions([...this._getOptions(), ...data.items]);
 			this.pagination.setTotalItems(data.total);
 		} else {
 			if (this.pagination.getCurrentPageNumber() === 1) {
 				this.pagination.clear();
-				this.#options.setValue([]);
+				this._setOptions([]);
 			}
 		}
 	}
