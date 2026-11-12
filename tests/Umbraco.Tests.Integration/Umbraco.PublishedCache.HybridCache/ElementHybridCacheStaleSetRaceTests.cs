@@ -174,6 +174,46 @@ internal sealed class ElementHybridCacheStaleSetRaceTests : UmbracoIntegrationTe
     }
 
     [Test]
+    public async Task Batched_Read_Through_Does_Not_Clobber_A_Concurrent_Refresh()
+    {
+        ContentCacheNode oldNode = BuildPublishedNode(OldName, OldTitle);
+        ContentCacheNode newNode = BuildPublishedNode(NewName, NewTitle);
+
+        var readReachedDatabase = new TaskCompletionSource();
+        var releaseRead = new TaskCompletionSource();
+        _databaseCacheRepository
+            .Setup(x => x.GetElementSourcesAsync(It.IsAny<IEnumerable<Guid>>(), false))
+            .Returns(async () =>
+            {
+                readReachedDatabase.TrySetResult();
+                await releaseRead.Task;
+                return [oldNode];
+            });
+
+        _databaseCacheRepository
+            .Setup(x => x.GetElementSourceForPublishStatesAsync(_element.Key))
+            .ReturnsAsync((null, newNode));
+
+        await _hybridCache.RemoveAsync($"{_element.Key}");
+
+        Task<IReadOnlyList<IPublishedElement>> staleRead = Task.Run(() => _elementCacheService.GetByKeysAsync([_element.Key], false));
+        await readReachedDatabase.Task;
+
+        await _elementCacheService.RefreshMemoryCacheAsync(_element.Key);
+
+        releaseRead.TrySetResult();
+        IReadOnlyList<IPublishedElement> staleResult = await staleRead;
+
+        Assert.AreEqual(OldName, staleResult.Single().Name, "The set is served from the stale snapshot.");
+
+        // The stale write-back is skipped, so a fresh lookup observes the refreshed content.
+        IReadOnlyList<IPublishedElement> result = await _elementCacheService.GetByKeysAsync([_element.Key], false);
+
+        Assert.AreEqual(NewName, result.Single().Name, "Name was served from the clobbered stale snapshot.");
+        Assert.AreEqual(NewTitle, result.Single().GetProperty("title")?.GetSourceValue());
+    }
+
+    [Test]
     public async Task Synchronous_Read_Through_Does_Not_Clobber_A_Concurrent_Refresh()
     {
         ContentCacheNode oldNode = BuildPublishedNode(OldName, OldTitle);
