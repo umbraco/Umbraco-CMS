@@ -43,7 +43,7 @@ export class UmbBlockGridEntryContext
 	readonly layoutAreas = this._layout.asObservablePart((x) => x?.areas);
 	readonly columnSpanOptions = this._blockType.asObservablePart((x) => x?.columnSpanOptions ?? []);
 	readonly areaTypeGridColumns = this._blockType.asObservablePart((x) => x?.areaGridColumns);
-	readonly areas = this._blockType.asObservablePart((x) => x?.areas ?? []);
+	readonly areas = this._blockType.asObservablePart((x) => (x ? (x.areas ?? []) : undefined));
 	readonly minMaxRowSpan = this._blockType.asObservablePart((x) =>
 		x ? [x.rowMinSpan ?? 1, x.rowMaxSpan ?? 1] : undefined,
 	);
@@ -219,9 +219,8 @@ export class UmbBlockGridEntryContext
 
 		// Secure areas fits options:
 		this.observe(
-			observeMultiple([this._blockType.asObservablePart((x) => (x ? (x.areas ?? []) : undefined)), this.layoutAreas]),
+			observeMultiple([this.areas, this.layoutAreas]),
 			([areas, layoutAreas]) => {
-				// `areas` is only defined once the block type has loaded. Until then, an empty list would wrongly clear every area.
 				if (!areas || !layoutAreas) return;
 				const areasAreIdentical =
 					areas.length === layoutAreas.length && areas.every((area) => layoutAreas.some((y) => y.key === area.key));
