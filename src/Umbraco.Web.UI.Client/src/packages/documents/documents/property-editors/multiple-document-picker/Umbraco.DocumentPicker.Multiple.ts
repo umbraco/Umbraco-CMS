@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/prope
 
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
-	name: 'Multiple Document Picker',
+	name: 'Document Picker',
 	alias: 'Umbraco.DocumentPicker.Multiple',
 	meta: {
 		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.DocumentPicker.Multiple',
