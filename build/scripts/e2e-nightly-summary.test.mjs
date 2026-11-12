@@ -4,7 +4,7 @@ import {mkdir, mkdtemp, rm, writeFile} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {test} from 'node:test';
-import {aggregate, buildSummary, findFailedStages, findMissingJobs, flattenReport, loadJobs, renderMarkdown, renderSlack} from './e2e-nightly-summary.mjs';
+import {aggregate, buildSummary, findFailedStages, findMissingJobs, flattenReport, loadJobs, loadPrevious, renderMarkdown, renderSlack} from './e2e-nightly-summary.mjs';
 
 const build = {id: '2', number: '19.1.0-test.2', branch: 'v19/dev', commit: 'abc', reason: 'Schedule', url: 'https://example.test/build?buildId=2'};
 
@@ -205,6 +205,42 @@ test('a job summary is superseded by a later attempt, not by another job with th
     assert.deepEqual(jobs.map(entry => entry.jobId).sort(), ['a', 'c']);
     const summary = buildSummary({...aggregate(jobs), build});
     assert.deepEqual(summary.newFailures.map(entry => entry.jobs), [['Linux SQLite']]);
+  } finally {
+    await rm(dir, {recursive: true, force: true});
+  }
+});
+
+test('a job that was not rerun keeps its summary when a job with the same name was', async () => {
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'e2e-summary-'));
+  try {
+    const publish = async (folder, meta) => {
+      await mkdir(path.join(dir, folder));
+      await writeFile(path.join(dir, folder, 'job.json'), JSON.stringify({stage: 'DefaultConfigE2E', job: 'LinuxPart1Of3', os: 'Linux', ...meta}));
+    };
+    await publish('sqlite', {jobId: 'a', attempt: '1', database: 'SQLite'});
+    await publish('sqlserver-first', {jobId: 'b', attempt: '1', database: 'SQLServer'});
+    await publish('sqlserver-rerun', {jobId: 'c', attempt: '2', database: 'SQLServer'});
+
+    assert.deepEqual((await loadJobs(dir)).map(entry => entry.jobId).sort(), ['a', 'c']);
+  } finally {
+    await rm(dir, {recursive: true, force: true});
+  }
+});
+
+test('the previous run is read from its latest attempt', async () => {
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'e2e-previous-'));
+  try {
+    for (const attempt of [2, 3, 1]) {
+      const folder = path.join(dir, `e2e-nightly-summary - Attempt #${attempt}`);
+      await mkdir(folder);
+      await writeFile(path.join(folder, 'summary.json'), JSON.stringify({build: {id: '1', attempt}, failing: {}}));
+    }
+    await mkdir(path.join(dir, 'unreadable'));
+    await writeFile(path.join(dir, 'unreadable', 'summary.json'), '{');
+
+    assert.equal((await loadPrevious(dir, build)).build.attempt, 3);
+    assert.equal(await loadPrevious(dir, {...build, id: '1'}), null);
+    assert.equal(await loadPrevious(path.join(dir, 'missing'), build), null);
   } finally {
     await rm(dir, {recursive: true, force: true});
   }

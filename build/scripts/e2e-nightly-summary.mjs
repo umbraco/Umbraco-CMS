@@ -69,8 +69,8 @@ export async function loadJobs(dir) {
   }
 
   // Two jobs of one stage can share a name (one matrix run against two databases), so a summary is only
-  // superseded by a later attempt under that name, never by a sibling from the same attempt.
-  const name = job => `${job.stage}|${job.job}`;
+  // superseded by a later attempt of the same job, never by a sibling.
+  const name = job => `${job.stage}|${job.job}|${job.database ?? ''}`;
   const latestAttempt = new Map();
   for (const job of jobs) {
     latestAttempt.set(name(job), Math.max(latestAttempt.get(name(job)) ?? 0, job.attempt));
@@ -424,17 +424,20 @@ async function fetchTimeline(env) {
   }
 }
 
-async function loadPrevious(dir, build) {
-  const [file] = await findFiles(dir, 'summary.json');
-  if (!file) {
-    return null;
+/** Loads the summary of the previous run; a run that was retried holds one per attempt and the latest counts. */
+export async function loadPrevious(dir, build) {
+  let previous = null;
+  for (const file of await findFiles(dir, 'summary.json')) {
+    try {
+      const candidate = await readJson(file);
+      if (!previous || (candidate.build?.attempt ?? 1) > (previous.build?.attempt ?? 1)) {
+        previous = candidate;
+      }
+    } catch {
+      console.warn(`Could not read ${file}; ignoring that summary.`);
+    }
   }
-  try {
-    const previous = await readJson(file);
-    return String(previous.build?.id ?? '') === String(build.id) && build.id ? null : previous;
-  } catch {
-    return null;
-  }
+  return previous && build.id && String(previous.build?.id ?? '') === String(build.id) ? null : previous;
 }
 
 async function postToSlack(webhook, payload) {
