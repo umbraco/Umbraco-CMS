@@ -219,8 +219,9 @@ export class UmbBlockGridEntryContext
 
 		// Secure areas fits options:
 		this.observe(
-			observeMultiple([this.areas, this.layoutAreas]),
+			observeMultiple([this._blockType.asObservablePart((x) => x?.areas), this.layoutAreas]),
 			([areas, layoutAreas]) => {
+				// `areas` is only defined once the block type has loaded. Until then, an empty list would wrongly clear every area.
 				if (!areas || !layoutAreas) return;
 				const areasAreIdentical =
 					areas.length === layoutAreas.length && areas.every((area) => layoutAreas.some((y) => y.key === area.key));
