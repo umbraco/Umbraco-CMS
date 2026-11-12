@@ -29,7 +29,6 @@ export class UmbCollectionFilterSidebarElement extends UmbLitElement {
 
 		return html`
 			<div id="sidebar">
-				<span class="heading">Filters</span>
 				${repeat(
 					this._filters,
 					(filter) => filter.alias,
@@ -57,11 +56,6 @@ export class UmbCollectionFilterSidebarElement extends UmbLitElement {
 				min-width: 250px;
 				overflow-y: auto;
 				flex-shrink: 0;
-			}
-
-			.heading {
-				font-weight: 700;
-				font-size: var(--uui-type-default-size);
 			}
 		`,
 	];
