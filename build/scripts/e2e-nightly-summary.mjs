@@ -22,6 +22,8 @@ const MAX_ABSENT_RUNS = 7;
 // A failure seen in a single run that passes in the next is more likely unstable than repaired, so only
 // failures that lasted at least this many runs are reported when they pass again.
 const MIN_RUNS_TO_REPORT_RECOVERY = 2;
+// How many runs a test is remembered after it last failed or was flaky, to recognise one that keeps coming back.
+const HISTORY_RUNS = 14;
 const OUTCOME_RANK = {skipped: 0, passed: 1, flaky: 2, failed: 3};
 const OUTCOME_BY_STATUS = {expected: 'passed', unexpected: 'failed', flaky: 'flaky', skipped: 'skipped'};
 
@@ -60,6 +62,7 @@ export async function loadJobs(dir) {
     jobs.push({
       stage: meta.stage,
       job: meta.job,
+      displayName: meta.displayName,
       jobId: meta.jobId,
       os: meta.os,
       database: meta.database,
@@ -78,9 +81,25 @@ export async function loadJobs(dir) {
   return jobs.filter(job => job.attempt === latestAttempt.get(name(job)));
 }
 
+function clean(text) {
+  return String(text ?? '').replace(/\u001b\[[0-9;]*m/g, '');
+}
+
 function firstLine(text) {
-  const clean = String(text ?? '').replace(/\u001b\[[0-9;]*m/g, '');
-  return clean.split('\n').map(line => line.trim()).find(line => line.length > 0) ?? '';
+  return clean(text).split('\n').map(line => line.trim()).find(line => line.length > 0) ?? '';
+}
+
+/**
+ * Describes a failed attempt in one line. The first line of an assertion or timeout error is the same
+ * for every test that fails that way, so the element it was waiting on is added to tell failures apart.
+ */
+function describeFailure(result) {
+  const messages = [result?.error, ...(result?.errors ?? [])].map(error => clean(error?.message));
+  const headline = firstLine(messages[0]);
+  const target = messages
+    .map(message => message.match(/^\s*(?:Locator:|- waiting for)\s*(.+?)\s*$/m)?.[1])
+    .find(Boolean);
+  return target && !headline.includes(target) ? `${headline} · ${target}` : headline;
 }
 
 /** Flattens a Playwright JSON report into one entry per test. */
@@ -93,7 +112,7 @@ export function* flattenReport(report) {
         yield {
           key: [file, ...titles, spec.title].join(' › '),
           outcome: OUTCOME_BY_STATUS[test.status] ?? 'failed',
-          error: firstLine(failure?.error?.message),
+          error: describeFailure(failure),
         };
       }
     }
@@ -119,11 +138,11 @@ export function aggregate(jobs) {
 
   for (const job of jobs) {
     if (!job.report) {
-      infra.push({job: job.job, reason: 'no test results were produced'});
+      infra.push({job: job.displayName || job.job, reason: 'no test results were produced'});
       continue;
     }
     for (const error of job.report.errors ?? []) {
-      infra.push({job: job.job, reason: firstLine(error.message) || 'run error'});
+      infra.push({job: job.displayName || job.job, reason: firstLine(error.message) || 'run error'});
     }
     const label = jobLabel(job);
     for (const entry of flattenReport(job.report)) {
@@ -188,6 +207,20 @@ function fileOf(key) {
   return key.split(' › ')[0];
 }
 
+/** Carries the per-test counters one run forward: tests seen now count once more, the rest age out. */
+function updateHistory(previous = {}, keys) {
+  const history = {};
+  for (const [key, entry] of Object.entries(previous)) {
+    if (entry.age < HISTORY_RUNS) {
+      history[key] = {count: entry.count, age: entry.age + 1};
+    }
+  }
+  for (const key of keys) {
+    history[key] = {count: (previous[key]?.count ?? 0) + 1, age: 0};
+  }
+  return history;
+}
+
 function sortedLabels(set) {
   return [...set].sort();
 }
@@ -206,7 +239,12 @@ export function buildSummary({tests, infra, previous, build, failedStages = []})
     const runs = (known?.runs ?? 0) + 1;
     failing[test.key] = {runs, since: known?.since ?? build.number};
     const entry = {key: test.key, jobs: sortedLabels(test.failedIn), error: test.error, runs};
-    (known ? stillFailing : newFailures).push(entry);
+    if (known) {
+      stillFailing.push(entry);
+    } else {
+      // A failure that is new compared with the previous run may still be one that comes and goes.
+      newFailures.push({...entry, earlierRuns: previous?.history?.failed?.[test.key]?.count ?? 0});
+    }
   }
   stillFailing.sort((a, b) => b.runs - a.runs || a.key.localeCompare(b.key));
 
@@ -243,6 +281,12 @@ export function buildSummary({tests, infra, previous, build, failedStages = []})
     }
   }
 
+  const keysWith = outcome => all.filter(test => test.outcome === outcome).map(test => test.key);
+  const history = {
+    failed: updateHistory(previous?.history?.failed, keysWith('failed')),
+    flaky: updateHistory(previous?.history?.flaky, keysWith('flaky')),
+  };
+
   return {
     schema: 1,
     build,
@@ -255,10 +299,11 @@ export function buildSummary({tests, infra, previous, build, failedStages = []})
     failedStages,
     flaky: all
       .filter(test => test.outcome === 'flaky')
-      .map(test => ({key: test.key, jobs: sortedLabels(test.flakyIn)}))
-      .sort((a, b) => a.key.localeCompare(b.key)),
+      .map(test => ({key: test.key, jobs: sortedLabels(test.flakyIn), runs: history.flaky[test.key].count}))
+      .sort((a, b) => b.runs - a.runs || a.key.localeCompare(b.key)),
     infra,
     failing,
+    history,
   };
 }
 
@@ -284,6 +329,14 @@ function plural(count, word) {
 
 function escapeSlack(text) {
   return String(text).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+}
+
+function earlierRuns(entry) {
+  return entry.earlierRuns > 0 ? ` · also failed in ${plural(entry.earlierRuns, 'earlier run')}` : '';
+}
+
+function flakyRuns(entry) {
+  return entry.runs > 1 ? ` · flaky in ${entry.runs} recent runs` : '';
 }
 
 function truncate(text, limit) {
@@ -324,7 +377,7 @@ export function renderSlack(summary) {
     });
   };
   const where = jobs => (jobs.length > 0 ? `  \`${jobs.join(', ')}\`` : '');
-  const failureLine = entry => `• ${escapeSlack(entry.key)}${where(entry.jobs)}`;
+  const failureLine = entry => `• ${escapeSlack(entry.key)}${where(entry.jobs)}${earlierRuns(entry)}`;
   const errorLine = error => `      ↳ ${escapeSlack(truncate(error, 140))}`;
   const newFailureLine = item => {
     if (!item.entries) {
@@ -347,7 +400,7 @@ export function renderSlack(summary) {
   }
   list('Passing again', summary.passingAgain, key => `• ${escapeSlack(key)}`);
   list('Skipped while failing', summary.skippedWhileFailing, key => `• ${escapeSlack(key)}`);
-  list('Flaky (passed on retry)', summary.flaky, entry => `• ${escapeSlack(entry.key)}${where(entry.jobs)}`);
+  list('Flaky (passed on retry)', summary.flaky, entry => `• ${escapeSlack(entry.key)}${where(entry.jobs)}${flakyRuns(entry)}`);
   list('Jobs without results', summary.infra, entry => `• ${escapeSlack(entry.job)} — ${escapeSlack(truncate(entry.reason, 140))}`);
 
   const counts = status.text === 'no E2E results were produced' ? 'No E2E results were produced.' : countsLine(summary.counts, true);
@@ -372,7 +425,7 @@ export function renderMarkdown(summary) {
     }
   };
   const where = jobs => (jobs.length > 0 ? ` [${jobs.join(', ')}]` : '');
-  const failure = entry => `- ${entry.key}${where(entry.jobs)}${entry.error ? `\n  - ${entry.error}` : ''}`;
+  const failure = entry => `- ${entry.key}${where(entry.jobs)}${earlierRuns(entry)}${entry.error ? `\n  - ${entry.error}` : ''}`;
 
   list('Other failed stages', summary.failedStages, entry => `- ${entry.stage}: ${entry.result}`);
   if (summary.hasPrevious) {
@@ -383,7 +436,7 @@ export function renderMarkdown(summary) {
   }
   list('Passing again', summary.passingAgain, key => `- ${key}`);
   list('Skipped while failing', summary.skippedWhileFailing, key => `- ${key}`);
-  list('Flaky (passed on retry)', summary.flaky, entry => `- ${entry.key}${where(entry.jobs)}`);
+  list('Flaky (passed on retry)', summary.flaky, entry => `- ${entry.key}${where(entry.jobs)}${flakyRuns(entry)}`);
   list('Jobs without results', summary.infra, entry => `- ${entry.job}: ${entry.reason}`);
 
   return lines.join('\n');

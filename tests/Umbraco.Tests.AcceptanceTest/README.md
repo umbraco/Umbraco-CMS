@@ -249,11 +249,11 @@ Each test is listed once, with the operating systems it failed on:
 | Section | Meaning |
 |---------|---------|
 | Other failed stages | A stage outside the E2E stages (build, integration tests) failed or was canceled |
-| New since the previous run | Failed now, did not fail in the previous run on the same branch. Tests failing with the same error are shown as one entry |
+| New since the previous run | Failed now, did not fail in the previous run on the same branch. Tests failing with the same error are shown as one entry. "Also failed in N earlier runs" marks a test that comes and goes |
 | Still failing | Failed in the previous run as well, with the number of consecutive runs |
 | Passing again | Failed for at least two runs in a row and passes now, in a run where every job reported. Nothing says why it passes — check before treating it as fixed |
 | Skipped while failing | Failed in the previous run and is skipped now, so it is no longer tracked |
-| Flaky (passed on retry) | Failed at least once but passed on a retry — these show as passed in the Tests tab |
+| Flaky (passed on retry) | Failed at least once but passed on a retry — these show as passed in the Tests tab. "Flaky in N recent runs" marks a test that keeps being flaky; those are listed first |
 | Jobs without results | A job that ran but produced no test report (timeout, application did not start) |
 
 The comparison is against the latest run of the same branch, so a manual run counts as a "previous run" too. The summary is produced by `build/scripts/e2e-nightly-summary.mjs`; its tests run with `node --test build/scripts/e2e-nightly-summary.test.mjs`.

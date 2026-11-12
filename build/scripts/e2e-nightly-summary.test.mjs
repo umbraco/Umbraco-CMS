@@ -246,6 +246,58 @@ test('the previous run is read from its latest attempt', async () => {
   }
 });
 
+test('the error line names the element a failure was waiting on', () => {
+  const failing = (error, errors) => ({
+    suites: [{title: 'a.spec.ts', file: 'a.spec.ts', specs: [{title: 'case', file: 'a.spec.ts', tests: [{status: 'unexpected', results: [{error, errors}]}]}]}],
+  });
+  const describe = (error, errors) => [...flattenReport(failing(error, errors))][0].error;
+
+  assert.equal(
+    describe({message: "Error: expect(locator).toBeVisible() failed\n\nLocator: locator('umb-tree')\nExpected: visible"}),
+    "Error: expect(locator).toBeVisible() failed · locator('umb-tree')");
+  assert.equal(
+    describe({message: "TimeoutError: locator.click: Timeout 300ms exceeded.\nCall log:\n  - waiting for getByTestId('save')\n"}),
+    "TimeoutError: locator.click: Timeout 300ms exceeded. · getByTestId('save')");
+  assert.equal(
+    describe(
+      {message: 'Test timeout of 60000ms exceeded.'},
+      [{message: 'Test timeout of 60000ms exceeded.'}, {message: "Error: locator.click: Test timeout of 60000ms exceeded.\nCall log:\n  - waiting for locator('umb-modal')"}]),
+    "Test timeout of 60000ms exceeded. · locator('umb-modal')");
+  assert.equal(describe({message: 'Error: expect(received).toBe(expected)\n\nExpected: 1'}), 'Error: expect(received).toBe(expected)');
+});
+
+test('a test that keeps coming back is marked, in new failures and in flaky tests', () => {
+  const runs = [
+    {'can save': 'unexpected', 'can sort': 'flaky'},
+    {'can save': 'expected', 'can sort': 'flaky'},
+    {'can save': 'unexpected', 'can sort': 'expected'},
+    {'can save': 'expected', 'can sort': 'flaky'},
+    {'can save': 'unexpected', 'can sort': 'flaky'},
+  ];
+  let summary;
+  for (const outcomes of runs) {
+    summary = summarize([job('E2E Linux', 'Linux', outcomes)], summary);
+  }
+
+  assert.deepEqual(summary.newFailures.map(entry => [entry.key, entry.earlierRuns]), [[key('can save'), 2]]);
+  assert.deepEqual(summary.flaky.map(entry => [entry.key, entry.runs]), [[key('can sort'), 4]]);
+  const text = renderSlack(summary).attachments.map(attachment => attachment.text).join('\n');
+  assert.match(text, /can save.*also failed in 2 earlier runs/);
+  assert.match(text, /can sort.*flaky in 4 recent runs/);
+  assert.match(renderMarkdown(summary), /also failed in 2 earlier runs/);
+});
+
+test('a test is forgotten once it has neither failed nor been flaky for a while', () => {
+  let summary = summarize([job('E2E Linux', 'Linux', {'can save': 'unexpected'})]);
+  for (let run = 0; run < 14; run++) {
+    summary = summarize([job('E2E Linux', 'Linux', {'can save': 'expected'})], summary);
+  }
+  assert.deepEqual(summary.history.failed[key('can save')], {count: 1, age: 14});
+
+  summary = summarize([job('E2E Linux', 'Linux', {'can save': 'expected'})], summary);
+  assert.deepEqual(summary.history.failed, {});
+});
+
 test('a rerun is marked in the Slack header', () => {
   const summary = buildSummary({...aggregate([job('E2E Linux', 'Linux', {'can save': 'expected'})]), build: {...build, attempt: 2}});
   assert.match(renderSlack(summary).blocks[0].text.text, /· attempt 2$/m);
