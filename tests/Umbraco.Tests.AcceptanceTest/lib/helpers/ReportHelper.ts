@@ -10,7 +10,8 @@ export class ReportHelper {
 
   async report(testInfo: TestInfo) {
     const reportUrl = process.env.PlaywrightReportUrl;
-    if (testInfo.retry > 0 && process.env.CI && reportUrl) {
+    // An undefined pipeline variable arrives as its unexpanded macro text rather than as an empty value.
+    if (testInfo.retry > 0 && process.env.CI && reportUrl && /^https?:\/\//i.test(reportUrl)) {
       await fetch(reportUrl, {
           method: 'POST',
           headers: {
