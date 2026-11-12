@@ -1,4 +1,4 @@
-import { products } from '../../../data/products.js';
+import { products } from '../../../mock-data/products.js';
 import { ExampleProductCollectionDataSource } from './collection.data-source.js';
 import { expect } from '@open-wc/testing';
 

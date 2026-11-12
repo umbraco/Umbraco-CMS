@@ -1,6 +1,9 @@
-import type { ExampleAttributeModel } from '../data/types.js';
+export interface ExampleMockProductCategoryModel {
+	id: string;
+	name: string;
+}
 
-export const productCategories: Array<ExampleAttributeModel> = [
+export const productCategories: Array<ExampleMockProductCategoryModel> = [
 	{ id: 'cat-hoodie', name: 'Hoodies' },
 	{ id: 'cat-jacket', name: 'Jackets' },
 	{ id: 'cat-shorts', name: 'Shorts' },

@@ -1,15 +1,15 @@
 import { EXAMPLE_PRODUCT_CATEGORY_ENTITY_TYPE } from '../../../product-category/entity.js';
 import { EXAMPLE_PRODUCT_COLOR_ENTITY_TYPE } from '../../../product-color/entity.js';
 import { EXAMPLE_PRODUCT_SIZE_ENTITY_TYPE } from '../../../product-size/entity.js';
-import { filterProducts } from '../../../data/products.js';
-import type { ExampleFacetCount } from '../../../data/types.js';
+import { filterProducts } from '../../../mock-data/products.js';
+import type { ExampleMockFacetCount } from '../../../mock-data/products.js';
 import type {
 	ExampleProductCollectionFilterModel,
 	ExampleProductCollectionFacetsModel,
 	ExampleProductCollectionItemModel,
 } from './types.js';
-import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UmbFacetModel } from '@umbraco-cms/backoffice/filter';
+import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UmbDataSourceResponse, UmbFacetedPagedModel } from '@umbraco-cms/backoffice/repository';
 
 export class ExampleProductCollectionDataSource implements UmbCollectionDataSource<
@@ -38,7 +38,7 @@ export class ExampleProductCollectionDataSource implements UmbCollectionDataSour
 			icon: 'icon-shirt',
 		}));
 
-		const toFacets = (counts: Array<ExampleFacetCount>, entityType: string): Array<UmbFacetModel> =>
+		const toFacets = (counts: Array<ExampleMockFacetCount>, entityType: string): Array<UmbFacetModel> =>
 			counts.map((count) => ({ entityType, unique: count.unique, count: count.count }));
 
 		return {

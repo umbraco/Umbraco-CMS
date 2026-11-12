@@ -1,5 +1,5 @@
 import { EXAMPLE_PRODUCT_COLOR_ENTITY_TYPE } from '../../entity.js';
-import { productColors } from '../../product-colors.js';
+import { productColors } from '../../../mock-data/product-colors.js';
 import type { ExampleProductColorItemModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';

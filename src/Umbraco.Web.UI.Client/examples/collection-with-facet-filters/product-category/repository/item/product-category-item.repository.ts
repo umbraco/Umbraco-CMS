@@ -1,5 +1,5 @@
 import { EXAMPLE_PRODUCT_CATEGORY_ENTITY_TYPE } from '../../entity.js';
-import { productCategories } from '../../product-categories.js';
+import { productCategories } from '../../../mock-data/product-categories.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';

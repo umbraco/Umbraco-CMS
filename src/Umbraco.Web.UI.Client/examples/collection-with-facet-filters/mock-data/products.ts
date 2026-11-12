@@ -1,6 +1,41 @@
-import type { ExampleFilteredResult, ExampleProductFilterArgs, ExampleProductModel } from './types.js';
+export interface ExampleMockProductModel {
+	id: string;
+	name: string;
+	category: string;
+	sizes: Array<string>;
+	colors: Array<string>;
+	price: { amount: number; currency: string };
+}
 
-export const products: Array<ExampleProductModel> = [
+export interface ExampleMockProductFilterArgs {
+	skip?: number;
+	take?: number;
+	categories?: Array<string>;
+	sizes?: Array<string>;
+	colors?: Array<string>;
+	priceRange?: { min: number; max: number };
+	textFilter?: string;
+}
+
+export interface ExampleMockFacetCount {
+	unique: string;
+	count: number;
+}
+
+export interface ExampleMockFacetedResultData {
+	categories: Array<ExampleMockFacetCount>;
+	sizes: Array<ExampleMockFacetCount>;
+	colors: Array<ExampleMockFacetCount>;
+	priceRange: { min: number; max: number };
+}
+
+export interface ExampleMockFilteredResult {
+	items: Array<ExampleMockProductModel>;
+	total: number;
+	facets: ExampleMockFacetedResultData;
+}
+
+export const products: Array<ExampleMockProductModel> = [
 	{
 		id: 'p01',
 		name: 'Classic White Tee',
@@ -165,15 +200,15 @@ export const products: Array<ExampleProductModel> = [
 
 /**
  * Checks whether a product matches the given filter args, optionally excluding one dimension.
- * @param {ExampleProductModel} product - The product to test.
- * @param {ExampleProductFilterArgs} args - The active filter arguments.
- * @param {keyof ExampleProductFilterArgs} [excludeField] - A filter dimension to skip (for cross-facet counting).
+ * @param {ExampleMockProductModel} product - The product to test.
+ * @param {ExampleMockProductFilterArgs} args - The active filter arguments.
+ * @param {keyof ExampleMockProductFilterArgs} [excludeField] - A filter dimension to skip (for cross-facet counting).
  * @returns {boolean} True if the product matches all (non-excluded) filters.
  */
 function matchesFilter(
-	product: ExampleProductModel,
-	args: ExampleProductFilterArgs,
-	excludeField?: keyof ExampleProductFilterArgs,
+	product: ExampleMockProductModel,
+	args: ExampleMockProductFilterArgs,
+	excludeField?: keyof ExampleMockProductFilterArgs,
 ): boolean {
 	if (excludeField !== 'categories' && args.categories?.length) {
 		if (!args.categories.includes(product.category)) return false;
@@ -192,17 +227,17 @@ function matchesFilter(
 
 /**
  * Counts unique values for a facet dimension, excluding its own filter to produce cross-facet counts.
- * @param {Array<ExampleProductModel>} items - The pre-filtered product list.
- * @param {ExampleProductFilterArgs} args - The active filter arguments.
- * @param {keyof ExampleProductFilterArgs} excludeField - The dimension to exclude from filtering.
- * @param {(product: ExampleProductModel) => Array<string>} accessor - Extracts the facet values from a product.
+ * @param {Array<ExampleMockProductModel>} items - The pre-filtered product list.
+ * @param {ExampleMockProductFilterArgs} args - The active filter arguments.
+ * @param {keyof ExampleMockProductFilterArgs} excludeField - The dimension to exclude from filtering.
+ * @param {(product: ExampleMockProductModel) => Array<string>} accessor - Extracts the facet values from a product.
  * @returns {Array<{unique: string, count: number}>} Sorted facet counts.
  */
 function countBy(
-	items: Array<ExampleProductModel>,
-	args: ExampleProductFilterArgs,
-	excludeField: keyof ExampleProductFilterArgs,
-	accessor: (product: ExampleProductModel) => Array<string>,
+	items: Array<ExampleMockProductModel>,
+	args: ExampleMockProductFilterArgs,
+	excludeField: keyof ExampleMockProductFilterArgs,
+	accessor: (product: ExampleMockProductModel) => Array<string>,
 ): Array<{ unique: string; count: number }> {
 	const counts = new Map<string, number>();
 
@@ -220,10 +255,10 @@ function countBy(
 
 /**
  * Filters, paginates and computes cross-facet counts for the product dataset.
- * @param {ExampleProductFilterArgs} args - Filter, pagination and text-search arguments.
- * @returns {ExampleFilteredResult} The filtered items, total count and faceted result data.
+ * @param {ExampleMockProductFilterArgs} args - Filter, pagination and text-search arguments.
+ * @returns {ExampleMockFilteredResult} The filtered items, total count and faceted result data.
  */
-export function filterProducts(args: ExampleProductFilterArgs): ExampleFilteredResult {
+export function filterProducts(args: ExampleMockProductFilterArgs): ExampleMockFilteredResult {
 	let items = products.filter((p) => matchesFilter(p, args));
 
 	if (args.textFilter) {

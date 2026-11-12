@@ -1,5 +1,5 @@
 import { EXAMPLE_PRODUCT_SIZE_ENTITY_TYPE } from '../../entity.js';
-import { productSizes } from '../../product-sizes.js';
+import { productSizes } from '../../../mock-data/product-sizes.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
