@@ -9,8 +9,9 @@ export class ReportHelper {
   }
 
   async report(testInfo: TestInfo) {
-    if (testInfo.retry > 0 && process.env.CI) {
-      await fetch("https://functionapp-221110123128.azurewebsites.net/api/PlaywrightTableData", {
+    const reportUrl = process.env.PlaywrightReportUrl;
+    if (testInfo.retry > 0 && process.env.CI && reportUrl) {
+      await fetch(reportUrl, {
           method: 'POST',
           headers: {
             'content-type': 'application/json;charset=UTF-8'
