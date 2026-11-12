@@ -73,9 +73,7 @@ internal sealed class ElementPickerValueConverter : PropertyValueConverterBase, 
             return null;
         }
 
-        IEnumerable<IPublishedElement> elements = keys
-            .Select(key => _publishedElementCache.GetById(preview, key))
-            .WhereNotNull();
+        IEnumerable<IPublishedElement> elements = _publishedElementCache.GetByIds(preview, keys);
 
         if (preview is false && _variationContextAccessor.VariationContext?.Culture is not null)
         {

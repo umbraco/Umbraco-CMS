@@ -57,7 +57,7 @@ public class ExtendedElementPublishedWebhookEvent : WebhookEventContentBase<Elem
     protected override object? ConvertEntityToRequestPayload(IElement entity)
     {
         // Get published version of element
-        IPublishedElement? publishedElement = _elementCacheService.GetByKeyAsync(entity.Key).GetAwaiter().GetResult();
+        IPublishedElement? publishedElement = _elementCacheService.GetByKey(entity.Key);
         if (publishedElement is null)
         {
             return null;

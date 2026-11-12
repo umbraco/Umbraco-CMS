@@ -1014,6 +1014,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'examineManagement_rebuildIndexWarning',
 	'examineManagement_searchDescription',
 	'examineManagement_searchers',
+	'examineManagement_searchNotAllowed',
 	'examineManagement_searchResultsFound',
 	'examineManagement_tools',
 	'examineManagement_toolsDescription',

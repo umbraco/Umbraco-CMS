@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
@@ -60,7 +61,7 @@ internal sealed class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUs
             });
         }
 
-        var userId = changingPasswordModel.Id.ToString();
+        var userId = changingPasswordModel.Id.ToString(CultureInfo.InvariantCulture);
         TUser? identityUser = await userMgr.FindByIdAsync(userId);
         if (identityUser == null)
         {
