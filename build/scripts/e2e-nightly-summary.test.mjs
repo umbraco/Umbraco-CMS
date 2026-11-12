@@ -72,13 +72,29 @@ test('failures are split into new, still failing and fixed against the previous 
   assert.equal(summary.failing[key('can publish')], undefined);
 });
 
-test('a known failure that did not run because a job broke stays open; a removed test does not', () => {
+test('a known failure stays open until a complete run shows it passing', () => {
   const previous = {build: {id: '1'}, failing: {[key('can save')]: {runs: 2, since: 'x'}}};
 
-  const broken = summarize([job('E2E Linux', 'Linux', null)], previous);
-  assert.deepEqual(broken.failing[key('can save')], {runs: 2, since: 'x'});
-  assert.deepEqual(broken.fixed, []);
-  assert.equal(broken.infra.length, 1);
+  const brokenJob = summarize([job('E2E Linux', 'Linux', null)], previous);
+  assert.deepEqual(brokenJob.failing[key('can save')], {runs: 2, since: 'x', absent: 1});
+  assert.deepEqual(brokenJob.fixed, []);
+
+  const passedElsewhere = summarize([job('E2E Linux', 'Linux', {'can save': 'expected'}), job('E2E Windows', 'Windows_NT', null)], previous);
+  assert.deepEqual(passedElsewhere.failing[key('can save')], {runs: 2, since: 'x'});
+  assert.deepEqual(passedElsewhere.fixed, []);
+
+  const otherConfigurationOnly = summarize([{...job('E2E Linux', 'Linux', null), report: report('DeliveryApi/Content.spec.ts', {'returns content': 'expected'})}], previous);
+  assert.deepEqual(otherConfigurationOnly.failing[key('can save')], {runs: 2, since: 'x', absent: 1});
+});
+
+test('a known failure is forgotten when it is skipped, removed from its spec file, or absent for too long', () => {
+  const previous = {build: {id: '1'}, failing: {[key('can save')]: {runs: 2, since: 'x', absent: 7}}};
+
+  const skipped = summarize([job('E2E Linux', 'Linux', {'can save': 'skipped'})], previous);
+  assert.deepEqual(skipped.failing, {});
+
+  const absentTooLong = summarize([{...job('E2E Linux', 'Linux', null), report: report('DeliveryApi/Content.spec.ts', {'returns content': 'expected'})}], previous);
+  assert.deepEqual(absentTooLong.failing, {});
 
   const removed = summarize([job('E2E Linux', 'Linux', {'can publish': 'expected'})], previous);
   assert.deepEqual(removed.failing, {});
@@ -100,6 +116,8 @@ test('jobs that ran but published nothing are reported, skipped jobs are not', (
   };
   const jobs = [job('E2E Linux', 'Linux', {'can save': 'expected'})];
   assert.deepEqual(findMissingJobs(timeline, jobs), [{job: 'E2E Windows', reason: 'job canceled before publishing results'}]);
+  const byId = [{...jobs[0], job: 'LinuxPart1Of3', jobId: 'j1'}];
+  assert.deepEqual(findMissingJobs(timeline, byId), [{job: 'E2E Windows', reason: 'job canceled before publishing results'}]);
   assert.deepEqual(findMissingJobs(null, jobs), []);
 });
 

@@ -87,7 +87,7 @@ steps:
       if (Test-Path $report) {
         Copy-Item $report $summary
       }
-      @{ stage = "$(System.StageName)"; job = "$(Agent.JobName)"; os = "$(Agent.OS)"; attempt = "$(System.JobAttempt)" } | ConvertTo-Json | Out-File "$summary/job.json" -Encoding utf8
+      @{ stage = "$(System.StageName)"; job = "$(Agent.JobName)"; jobId = "$(System.JobId)"; os = "$(Agent.OS)"; attempt = "$(System.JobAttempt)" } | ConvertTo-Json | Out-File "$summary/job.json" -Encoding utf8
     displayName: Collect E2E summary
     condition: always()
 
@@ -96,7 +96,7 @@ steps:
     condition: always()
     inputs:
       targetPath: $(Agent.TempDirectory)/e2e-summary
-      artifact: "e2e-summary - $(System.StageName) - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
+      artifact: "e2e-summary - $(Agent.JobName) - $(System.JobId) - Attempt #$(System.JobAttempt)"
 
   # Copy artifacts
   - pwsh: |

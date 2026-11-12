@@ -13,6 +13,8 @@ import {parseArgs} from 'node:util';
 const E2E_STAGES = ['DefaultConfigE2E', 'AdditionalConfigE2E'];
 const SLACK_LIST_LIMIT = 10;
 const SLACK_SECTION_LIMIT = 2900;
+// A known failure whose spec file stops running altogether (deleted, renamed) is forgotten after this many runs.
+const MAX_ABSENT_RUNS = 7;
 const OUTCOME_RANK = {skipped: 0, passed: 1, flaky: 2, failed: 3};
 const OUTCOME_BY_STATUS = {expected: 'passed', unexpected: 'failed', flaky: 'flaky', skipped: 'skipped'};
 
@@ -47,7 +49,7 @@ export async function loadJobs(dir) {
         report = null;
       }
     }
-    latest.set(id, {stage: meta.stage, job: meta.job, os: meta.os, attempt, report});
+    latest.set(id, {stage: meta.stage, job: meta.job, jobId: meta.jobId, os: meta.os, attempt, report});
   }
   return [...latest.values()];
 }
@@ -136,17 +138,22 @@ export function findMissingJobs(timeline, jobs) {
   const ran = records.filter(record =>
     record.type === 'Job' && phases.has(record.parentId) && record.result && record.result !== 'skipped');
 
-  const published = new Set(jobs.map(job => `${job.stage}|${job.job}`));
-  const missing = ran.filter(record => !published.has(`${phases.get(record.parentId)}|${record.name}`));
+  const published = new Set(jobs.flatMap(job => [job.jobId, `${job.stage}|${job.job}`]));
+  const missing = ran.filter(record =>
+    !published.has(record.id) && !published.has(`${phases.get(record.parentId)}|${record.name}`));
 
-  // Job names that never line up mean the timeline uses another naming than the agents do;
+  // Jobs that never line up mean the timeline identifies them differently than the agents do;
   // reporting every job as missing would be noise, so trust the published summaries instead.
   if (jobs.length > 0 && ran.length > 0 && missing.length === ran.length) {
-    console.warn('Timeline job names match none of the published summaries; skipping missing-job detection.');
+    console.warn('Timeline jobs match none of the published summaries; skipping missing-job detection.');
     return [];
   }
 
   return missing.map(record => ({job: record.name, reason: `job ${record.result} before publishing results`}));
+}
+
+function fileOf(key) {
+  return key.split(' › ')[0];
 }
 
 function sortedLabels(set) {
@@ -171,14 +178,29 @@ export function buildSummary({tests, infra, previous, build}) {
   }
   stillFailing.sort((a, b) => b.runs - a.runs || a.key.localeCompare(b.key));
 
+  // A known failure only leaves the list on evidence: it passed in a run where every job reported,
+  // it is skipped, or it is gone from a spec file that did run. Anything else (a broken job, a run
+  // that left a whole configuration out) says nothing about the test, so the failure stays open.
+  const filesRun = new Set(all.map(test => fileOf(test.key)));
+  const complete = infra.length === 0;
   const fixed = [];
   for (const [key, known] of Object.entries(previousFailing)) {
     const outcome = tests.get(key)?.outcome;
-    if (outcome === 'passed' || outcome === 'flaky') {
-      fixed.push(key);
-    } else if (!outcome && infra.length > 0) {
-      // The test did not run because a job broke, so it is still an open failure.
-      failing[key] = known;
+    if (outcome === 'failed' || outcome === 'skipped') {
+      continue;
+    }
+    if (outcome) {
+      if (complete) {
+        fixed.push(key);
+      } else {
+        failing[key] = known;
+      }
+      continue;
+    }
+    const absent = (known.absent ?? 0) + 1;
+    const removed = complete && filesRun.has(fileOf(key));
+    if (!removed && absent <= MAX_ABSENT_RUNS) {
+      failing[key] = {...known, absent};
     }
   }
 
