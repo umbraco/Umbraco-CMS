@@ -9,9 +9,9 @@ const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 // Element Type
 const elementTypeName = 'TestElementType';
+const secondElementTypeName = 'TestSecondElementType';
 // Element
 const elementName = 'TestElement';
-const secondElementTypeName = 'TestSecondElementType';
 const secondElementName = 'TestSecondElement';
 const elementFolderName = 'TestElementFolder';
 const elementInFolderName = 'TestElementInFolder';
@@ -126,9 +126,6 @@ test('can select multiple elements in the element picker', async ({umbracoApi, u
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(elementPickerDataTypeName));
   expect(contentData.values[0].value).toContain(firstElementId);
   expect(contentData.values[0].value).toContain(secondElementId);
-
-  // Clean
-  await umbracoApi.element.ensureNameNotExists(secondElementName);
 });
 
 test('can not publish a mandatory element picker with an empty value', async ({umbracoApi, umbracoUi}) => {
@@ -200,9 +197,6 @@ test('can validate maximum amount in element picker', async ({umbracoApi, umbrac
 
   // Assert
   await umbracoUi.content.isChooseButtonVisible(false);
-
-  // Clean
-  await umbracoApi.element.ensureNameNotExists(secondElementName);
 });
 
 test('can remove an element from the element picker in the content', async ({umbracoApi, umbracoUi}) => {
@@ -278,7 +272,6 @@ test('can only pick elements of an accepted type in the element picker', async (
 
 test('can not publish content with an element of a type that is not accepted', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const wrongTypeMessage = 'The selected item is of the wrong type.';
   const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName, true);
   const secondElementId = await umbracoApi.element.createDefaultElement(secondElementName, secondElementTypeId);
@@ -293,12 +286,12 @@ test('can not publish content with an element of a type that is not accepted', a
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isValidationMessageVisible(wrongTypeMessage);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.invalidObjectType);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   expect(await umbracoApi.document.isDocumentPublished(documentId)).toBeFalsy();
 });
 
-test('can only pick elements inside the start node in the element picker', async ({umbracoApi, umbracoUi}) => {
+test('can limit the element picker in the content by setting the start node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
