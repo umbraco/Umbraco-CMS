@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
 using Microsoft.Extensions.Logging;
@@ -204,11 +205,11 @@ public abstract class MigrationExpressionBase : IMigrationExpression
             case TypeCode.UInt16:
             case TypeCode.UInt32:
             case TypeCode.UInt64:
-                return val.ToString()!;
+                return Convert.ToString(val, CultureInfo.InvariantCulture)!;
             case TypeCode.DateTime:
                 return SqlSyntax.GetQuotedValue(SqlSyntax.FormatDateTime((DateTime)val));
             default:
-                return SqlSyntax.GetQuotedValue(val.ToString()!);
+                return SqlSyntax.GetQuotedValue(Convert.ToString(val, CultureInfo.InvariantCulture)!);
         }
     }
 }
