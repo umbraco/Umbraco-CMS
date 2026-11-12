@@ -2,13 +2,13 @@ import type { UmbTemplateCardElement } from '../template-card/template-card.elem
 import type { UmbTemplateItemModel } from '../../repository/item/index.js';
 import { UmbTemplateItemRepository } from '../../repository/item/index.js';
 import { UMB_TEMPLATE_PICKER_MODAL } from '../../modals/index.js';
+import { UMB_TEMPLATE_WORKSPACE_MODAL } from '../../workspace/constants.js';
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 
 import '../template-card/template-card.element.js';
 
@@ -90,11 +90,8 @@ export class UmbInputTemplateElement extends UUIFormControlWithBasicsMixin(UmbLi
 	constructor() {
 		super();
 
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+		new UmbModalRouteRegistrationController(this, UMB_TEMPLATE_WORKSPACE_MODAL)
 			.addAdditionalPath('template')
-			.onSetup(() => {
-				return { data: { entityType: 'template', preset: {} } };
-			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._templatePath = routeBuilder({});
 			});
