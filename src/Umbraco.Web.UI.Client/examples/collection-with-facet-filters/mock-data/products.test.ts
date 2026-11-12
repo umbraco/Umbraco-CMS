@@ -182,6 +182,22 @@ describe('filterProducts', () => {
 			expect(result.facets.priceRange.max).to.equal(Math.max(...tshirtPrices));
 		});
 
+		it('facet counts and price range apply the text filter', () => {
+			const result = filterProducts({ textFilter: 'hoodie' });
+			const matching = products.filter((p) => p.name.toLowerCase().includes('hoodie'));
+			const totalCategoryCount = result.facets.categories.reduce((sum, f) => sum + f.count, 0);
+			expect(totalCategoryCount).to.equal(matching.length);
+			expect(result.facets.priceRange.min).to.equal(Math.min(...matching.map((p) => p.price.amount)));
+			expect(result.facets.priceRange.max).to.equal(Math.max(...matching.map((p) => p.price.amount)));
+		});
+
+		it('price range ignores the price filter itself', () => {
+			const result = filterProducts({ priceRange: { min: 40, max: 60 } });
+			const allPrices = products.map((p) => p.price.amount);
+			expect(result.facets.priceRange.min).to.equal(Math.min(...allPrices));
+			expect(result.facets.priceRange.max).to.equal(Math.max(...allPrices));
+		});
+
 		it('category facet counts reflect cross-filtering (exclude own dimension)', () => {
 			// When filtering by size S, category counts should reflect all products with size S
 			const result = filterProducts({ sizes: ['size-s'] });

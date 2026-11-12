@@ -222,6 +222,9 @@ function matchesFilter(
 	if (excludeField !== 'priceRange' && args.priceRange) {
 		if (product.price.amount < args.priceRange.min || product.price.amount > args.priceRange.max) return false;
 	}
+	if (args.textFilter) {
+		if (!product.name.toLowerCase().includes(args.textFilter.toLowerCase())) return false;
+	}
 	return true;
 }
 
@@ -261,18 +264,13 @@ function countBy(
 export function filterProducts(args: ExampleMockProductFilterArgs): ExampleMockFilteredResult {
 	let items = products.filter((p) => matchesFilter(p, args));
 
-	if (args.textFilter) {
-		const lower = args.textFilter.toLowerCase();
-		items = items.filter((p) => p.name.toLowerCase().includes(lower));
-	}
-
 	// Cross-facet counts: for each dimension, apply all OTHER filters but not the current one
 	const categories = countBy(items, args, 'categories', (p) => [p.category]);
 	const sizes = countBy(items, args, 'sizes', (p) => p.sizes);
 	const colors = countBy(items, args, 'colors', (p) => p.colors);
 
-	// Price range from filtered items
-	const prices = items.map((p) => p.price.amount);
+	// Like the counts, the price range applies every filter except its own, so it doesn't shrink to the selected range
+	const prices = products.filter((p) => matchesFilter(p, args, 'priceRange')).map((p) => p.price.amount);
 	const priceRange = prices.length > 0 ? { min: Math.min(...prices), max: Math.max(...prices) } : { min: 0, max: 0 };
 
 	const total = items.length;
