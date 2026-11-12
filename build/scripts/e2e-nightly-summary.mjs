@@ -89,6 +89,20 @@ function firstLine(text) {
   return clean(text).split('\n').map(line => line.trim()).find(line => line.length > 0) ?? '';
 }
 
+const TARGET_PREFIXES = ['Locator:', '- waiting for'];
+
+/** Finds the element an error message says it was waiting on. */
+function targetOf(message) {
+  for (const line of message.split('\n')) {
+    const text = line.trim();
+    const prefix = TARGET_PREFIXES.find(candidate => text.startsWith(candidate));
+    if (prefix) {
+      return text.slice(prefix.length).trim();
+    }
+  }
+  return '';
+}
+
 /**
  * Describes a failed attempt in one line. The first line of an assertion or timeout error is the same
  * for every test that fails that way, so the element it was waiting on is added to tell failures apart.
@@ -96,39 +110,54 @@ function firstLine(text) {
 function describeFailure(result) {
   const messages = [result?.error, ...(result?.errors ?? [])].map(error => clean(error?.message));
   const headline = firstLine(messages[0]);
-  const target = messages
-    .map(message => message.match(/^\s*(?:Locator:|- waiting for)\s*(.+?)\s*$/m)?.[1])
-    .find(Boolean);
+  const target = messages.map(targetOf).find(Boolean);
   return target && !headline.includes(target) ? `${headline} · ${target}` : headline;
+}
+
+function* walkSuite(suite, titles) {
+  for (const spec of suite.specs ?? []) {
+    for (const test of spec.tests ?? []) {
+      const file = String(spec.file ?? suite.file ?? '').replaceAll('\\', '/');
+      const failure = (test.results ?? []).findLast(result => result.error);
+      yield {
+        key: [file, ...titles, spec.title].join(' › '),
+        outcome: OUTCOME_BY_STATUS[test.status] ?? 'failed',
+        error: describeFailure(failure),
+      };
+    }
+  }
+  for (const child of suite.suites ?? []) {
+    yield* walkSuite(child, [...titles, child.title]);
+  }
 }
 
 /** Flattens a Playwright JSON report into one entry per test. */
 export function* flattenReport(report) {
-  function* walk(suite, titles) {
-    for (const spec of suite.specs ?? []) {
-      for (const test of spec.tests ?? []) {
-        const file = String(spec.file ?? suite.file ?? '').replaceAll('\\', '/');
-        const failure = (test.results ?? []).findLast(result => result.error);
-        yield {
-          key: [file, ...titles, spec.title].join(' › '),
-          outcome: OUTCOME_BY_STATUS[test.status] ?? 'failed',
-          error: describeFailure(failure),
-        };
-      }
-    }
-    for (const child of suite.suites ?? []) {
-      yield* walk(child, [...titles, child.title]);
-    }
-  }
-
   for (const fileSuite of report.suites ?? []) {
-    yield* walk(fileSuite, []);
+    yield* walkSuite(fileSuite, []);
   }
 }
 
 function jobLabel(job) {
   const os = {Windows_NT: 'Windows', Darwin: 'macOS'}[job.os] ?? job.os ?? 'unknown';
   return /sqlite/i.test(`${job.database ?? ''} ${job.job}`) ? `${os} SQLite` : os;
+}
+
+function recordOutcome(test, entry, label) {
+  if (OUTCOME_RANK[entry.outcome] > OUTCOME_RANK[test.outcome]) {
+    test.outcome = entry.outcome;
+  }
+  if (entry.outcome === 'failed') {
+    test.failedIn.add(label);
+    test.error ||= entry.error;
+    return;
+  }
+  if (entry.outcome === 'flaky') {
+    test.flakyIn.add(label);
+  }
+  if (entry.outcome !== 'skipped') {
+    test.passedIn.add(label);
+  }
 }
 
 /** Merges all jobs into one record per test; a test counts by its worst outcome across jobs. */
@@ -151,18 +180,7 @@ export function aggregate(jobs) {
         test = {key: entry.key, outcome: entry.outcome, failedIn: new Set(), flakyIn: new Set(), passedIn: new Set(), error: ''};
         tests.set(entry.key, test);
       }
-      if (OUTCOME_RANK[entry.outcome] > OUTCOME_RANK[test.outcome]) {
-        test.outcome = entry.outcome;
-      }
-      if (entry.outcome === 'failed') {
-        test.failedIn.add(label);
-        test.error ||= entry.error;
-      } else if (entry.outcome === 'flaky') {
-        test.flakyIn.add(label);
-        test.passedIn.add(label);
-      } else if (entry.outcome === 'passed') {
-        test.passedIn.add(label);
-      }
+      recordOutcome(test, entry, label);
     }
   }
 
@@ -214,7 +232,7 @@ function fileOf(key) {
 }
 
 /** Carries the per-test counters one run forward: tests seen now count once more, the rest age out. */
-function updateHistory(previous = {}, keys) {
+function updateHistory(keys, previous = {}) {
   const history = {};
   for (const [key, entry] of Object.entries(previous)) {
     if (entry.age < HISTORY_RUNS) {
@@ -227,8 +245,30 @@ function updateHistory(previous = {}, keys) {
   return history;
 }
 
+function byText(a, b) {
+  return a.localeCompare(b);
+}
+
 function sortedLabels(set) {
-  return [...set].sort();
+  return [...set].sort(byText);
+}
+
+/**
+ * Decides what becomes of a failure known from the previous run that did not fail in this one. It only
+ * leaves the list on evidence: it passed everywhere it failed before, in a run where every job reported;
+ * it is skipped; or it is gone from a spec file that did run. Anything else (a broken job, a run that
+ * left a configuration out) says nothing about the test, so the failure stays open until it has gone
+ * unconfirmed for too long.
+ */
+function resolveKnownFailure(known, test, complete, fileRan) {
+  if (test?.outcome === 'skipped') {
+    return 'skipped';
+  }
+  if (test && complete && (known.jobs ?? []).every(label => test.passedIn.has(label))) {
+    return 'recovered';
+  }
+  const removed = !test && complete && fileRan;
+  return removed || (known.absent ?? 0) >= MAX_ABSENT_RUNS ? 'forgotten' : 'open';
 }
 
 /** Classifies the run against the previous summary and builds the summary document. */
@@ -254,49 +294,29 @@ export function buildSummary({tests, infra, previous, build, failedStages = []})
   }
   stillFailing.sort((a, b) => b.runs - a.runs || a.key.localeCompare(b.key));
 
-  // A known failure only leaves the list on evidence: it passed everywhere it failed before, in a run
-  // where every job reported; it is skipped; or it is gone from a spec file that did run. Anything else
-  // (a broken job, a run that left a configuration out) says nothing about the test, so the failure
-  // stays open until it has gone unconfirmed for too long.
   const filesRun = new Set(all.map(test => fileOf(test.key)));
   const complete = infra.length === 0;
   const passingAgain = [];
   const skippedWhileFailing = [];
   for (const [key, known] of Object.entries(previousFailing)) {
-    const outcome = tests.get(key)?.outcome;
-    if (outcome === 'failed') {
+    const test = tests.get(key);
+    if (test?.outcome === 'failed') {
       continue;
     }
-    if (outcome === 'skipped') {
+    const resolution = resolveKnownFailure(known, test, complete, filesRun.has(fileOf(key)));
+    if (resolution === 'skipped') {
       skippedWhileFailing.push(key);
-      continue;
-    }
-    const absent = (known.absent ?? 0) + 1;
-    const keepOpen = () => {
-      if (absent <= MAX_ABSENT_RUNS) {
-        failing[key] = {...known, absent};
-      }
-    };
-    if (outcome) {
-      const passedIn = tests.get(key).passedIn;
-      if (complete && (known.jobs ?? []).every(label => passedIn.has(label))) {
-        if (known.runs >= MIN_RUNS_TO_REPORT_RECOVERY) {
-          passingAgain.push(key);
-        }
-      } else {
-        keepOpen();
-      }
-      continue;
-    }
-    if (!(complete && filesRun.has(fileOf(key)))) {
-      keepOpen();
+    } else if (resolution === 'open') {
+      failing[key] = {...known, absent: (known.absent ?? 0) + 1};
+    } else if (resolution === 'recovered' && known.runs >= MIN_RUNS_TO_REPORT_RECOVERY) {
+      passingAgain.push(key);
     }
   }
 
   const keysWith = outcome => all.filter(test => test.outcome === outcome).map(test => test.key);
   const history = {
-    failed: updateHistory(previous?.history?.failed, keysWith('failed')),
-    flaky: updateHistory(previous?.history?.flaky, keysWith('flaky')),
+    failed: updateHistory(keysWith('failed'), previous?.history?.failed),
+    flaky: updateHistory(keysWith('flaky'), previous?.history?.flaky),
   };
 
   return {
@@ -306,8 +326,8 @@ export function buildSummary({tests, infra, previous, build, failedStages = []})
     counts: {failed: count('failed'), flaky: count('flaky'), passed: count('passed'), skipped: count('skipped')},
     newFailures,
     stillFailing,
-    passingAgain: passingAgain.sort(),
-    skippedWhileFailing: skippedWhileFailing.sort(),
+    passingAgain: passingAgain.toSorted(byText),
+    skippedWhileFailing: skippedWhileFailing.toSorted(byText),
     failedStages,
     flaky: all
       .filter(test => test.outcome === 'flaky')
@@ -332,7 +352,8 @@ function statusOf(summary) {
 
 function countsLine(counts, bold) {
   const failed = `${counts.failed} failed`;
-  return `${bold && counts.failed > 0 ? `*${failed}*` : failed} · ${counts.flaky} flaky · ${counts.passed} passed · ${counts.skipped} skipped`;
+  const emphasised = bold && counts.failed > 0 ? `*${failed}*` : failed;
+  return `${emphasised} · ${counts.flaky} flaky · ${counts.passed} passed · ${counts.skipped} skipped`;
 }
 
 function plural(count, word) {
@@ -437,7 +458,8 @@ export function renderMarkdown(summary) {
     }
   };
   const where = jobs => (jobs.length > 0 ? ` [${jobs.join(', ')}]` : '');
-  const failure = entry => `- ${entry.key}${where(entry.jobs)}${earlierRuns(entry)}${entry.error ? `\n  - ${entry.error}` : ''}`;
+  const errorLine = entry => (entry.error ? `\n  - ${entry.error}` : '');
+  const failure = entry => `- ${entry.key}${where(entry.jobs)}${earlierRuns(entry)}${errorLine(entry)}`;
 
   if (summary.hasPrevious) {
     list('New since the previous run', summary.newFailures, failure);
@@ -506,7 +528,7 @@ export async function loadPrevious(dir, build) {
 }
 
 async function postToSlack(webhook, payload) {
-  if (!/^https:\/\//.test(webhook ?? '')) {
+  if (!String(webhook ?? '').startsWith('https://')) {
     console.warn('No Slack webhook configured; skipping the notification.');
     return;
   }
@@ -517,7 +539,8 @@ async function postToSlack(webhook, payload) {
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
-      console.warn(`Slack rejected the notification (HTTP ${response.status}): ${await response.text()}`);
+      const reply = truncate(firstLine(await response.text()), 200);
+      console.warn(`Slack rejected the notification (HTTP ${response.status}): ${reply}`);
     }
   } catch (error) {
     console.warn(`Could not reach Slack (${error.message}).`);
