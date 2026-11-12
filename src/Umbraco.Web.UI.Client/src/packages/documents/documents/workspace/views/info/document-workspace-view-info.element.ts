@@ -105,6 +105,11 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		]);
 	}
 
+	#trackVarianceChange() {
+		if (!this._hasSettingsAccess || this._isTrashed) return;
+		this.#workspaceContext?.contentTypeVarianceChangeRedirect.trackVarianceChange();
+	}
+
 	#observeContent() {
 		if (!this.#workspaceContext) return;
 
@@ -219,7 +224,8 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 				<umb-entity-item-ref
 					standalone
 					?readonly=${!this._hasSettingsAccess || this._isTrashed}
-					.item=${this._documentType}></umb-entity-item-ref>
+					.item=${this._documentType}
+					@click=${this.#trackVarianceChange}></umb-entity-item-ref>
 			</div>
 			${this.#renderTemplateInput()}
 			<div class="general-item">
