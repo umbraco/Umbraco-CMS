@@ -1,3 +1,4 @@
+import type { ExampleProductPriceModel } from '../../price/types.js';
 import type { ExampleProductPriceFacetModel } from '../filter/product-price/types.js';
 import type { UmbFacetModel } from '@umbraco-cms/backoffice/filter';
 import type { UmbCollectionFilterModel, UmbCollectionItemModel } from '@umbraco-cms/backoffice/collection';
@@ -14,7 +15,7 @@ export interface ExampleProductCollectionItemModel extends UmbCollectionItemMode
 	category: string;
 	sizes: Array<string>;
 	colors: Array<string>;
-	price: { amount: number; currency: string };
+	price: ExampleProductPriceModel;
 }
 
 export interface ExampleProductCollectionFacetsModel {
