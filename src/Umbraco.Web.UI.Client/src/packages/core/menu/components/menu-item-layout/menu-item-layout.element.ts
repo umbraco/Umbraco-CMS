@@ -1,3 +1,4 @@
+import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, html, ifDefined, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { ensureSlash } from '@umbraco-cms/backoffice/router';
@@ -67,6 +68,14 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 	override connectedCallback() {
 		super.connectedCallback();
 		window.addEventListener('navigationend', this.#onNavigationEnd);
+		this.#checkIsActive();
+	}
+
+	override willUpdate(changedProperties: PropertyValues<this>) {
+		super.willUpdate(changedProperties);
+		if (changedProperties.has('href')) {
+			this.#checkIsActive();
+		}
 	}
 
 	// history.pushState runs synchronously before any router-slot dispatches this event, so the location
