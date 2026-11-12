@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -53,6 +54,26 @@ internal sealed class SerializerTypeCacheRefresherTests : UmbracoIntegrationTest
 
         refresher.RefreshInternal(payloads);
         refresher.Refresh(payloads);
+
+        Assert.Greater(SerializerFactory.ClearCount, clearsBefore);
+    }
+
+    [Test]
+    public async Task Rebuilding_The_Document_Memory_Cache_By_Content_Type_Clears_The_Serializer_Type_Cache()
+    {
+        var clearsBefore = SerializerFactory.ClearCount;
+
+        await GetRequiredService<IDocumentCacheService>().RebuildMemoryCacheByContentTypeAsync([ContentType.Id]);
+
+        Assert.Greater(SerializerFactory.ClearCount, clearsBefore);
+    }
+
+    [Test]
+    public async Task Rebuilding_The_Media_Memory_Cache_By_Content_Type_Clears_The_Serializer_Type_Cache()
+    {
+        var clearsBefore = SerializerFactory.ClearCount;
+
+        await GetRequiredService<IMediaCacheService>().RebuildMemoryCacheByContentTypeAsync([MediaTypeId]);
 
         Assert.Greater(SerializerFactory.ClearCount, clearsBefore);
     }
