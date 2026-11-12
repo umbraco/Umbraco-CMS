@@ -1,0 +1,402 @@
+#!/usr/bin/env node
+// Aggregates the per-job Playwright JSON reports of one pipeline run into a single summary,
+// compares it with the previous run's summary and notifies Slack.
+//
+// Usage: node e2e-nightly-summary.mjs --summaries <dir> --out <dir> [--previous <dir>] [--timeline <file>] [--dry-run]
+
+import {existsSync} from 'node:fs';
+import {mkdir, readdir, readFile, writeFile} from 'node:fs/promises';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {parseArgs} from 'node:util';
+
+const E2E_STAGES = ['DefaultConfigE2E', 'AdditionalConfigE2E'];
+const SLACK_LIST_LIMIT = 10;
+const SLACK_SECTION_LIMIT = 2900;
+const OUTCOME_RANK = {skipped: 0, passed: 1, flaky: 2, failed: 3};
+const OUTCOME_BY_STATUS = {expected: 'passed', unexpected: 'failed', flaky: 'flaky', skipped: 'skipped'};
+
+async function readJson(file) {
+  return JSON.parse((await readFile(file, 'utf8')).replace(/^﻿/, ''));
+}
+
+async function findFiles(dir, name) {
+  if (!dir || !existsSync(dir)) {
+    return [];
+  }
+  const entries = await readdir(dir, {recursive: true});
+  return entries.filter(entry => path.basename(entry) === name).map(entry => path.join(dir, entry));
+}
+
+/** Loads every job that published a summary, keeping only the latest attempt of each job. */
+export async function loadJobs(dir) {
+  const latest = new Map();
+  for (const metaFile of await findFiles(dir, 'job.json')) {
+    const meta = await readJson(metaFile);
+    const attempt = Number(meta.attempt) || 1;
+    const id = `${meta.stage}|${meta.job}`;
+    if (latest.has(id) && latest.get(id).attempt >= attempt) {
+      continue;
+    }
+    const reportFile = path.join(path.dirname(metaFile), 'results.json');
+    let report = null;
+    if (existsSync(reportFile)) {
+      try {
+        report = await readJson(reportFile);
+      } catch {
+        report = null;
+      }
+    }
+    latest.set(id, {stage: meta.stage, job: meta.job, os: meta.os, attempt, report});
+  }
+  return [...latest.values()];
+}
+
+function firstLine(text) {
+  const clean = String(text ?? '').replace(/\u001b\[[0-9;]*m/g, '');
+  return clean.split('\n').map(line => line.trim()).find(line => line.length > 0) ?? '';
+}
+
+/** Flattens a Playwright JSON report into one entry per test. */
+export function* flattenReport(report) {
+  function* walk(suite, titles) {
+    for (const spec of suite.specs ?? []) {
+      for (const test of spec.tests ?? []) {
+        const file = String(spec.file ?? suite.file ?? '').replaceAll('\\', '/');
+        const failure = (test.results ?? []).findLast(result => result.error);
+        yield {
+          key: [file, ...titles, spec.title].join(' › '),
+          outcome: OUTCOME_BY_STATUS[test.status] ?? 'failed',
+          error: firstLine(failure?.error?.message),
+        };
+      }
+    }
+    for (const child of suite.suites ?? []) {
+      yield* walk(child, [...titles, child.title]);
+    }
+  }
+
+  for (const fileSuite of report.suites ?? []) {
+    yield* walk(fileSuite, []);
+  }
+}
+
+function jobLabel(job) {
+  const os = {Windows_NT: 'Windows', Darwin: 'macOS'}[job.os] ?? job.os ?? 'unknown';
+  return /sqlite/i.test(job.job) ? `${os} SQLite` : os;
+}
+
+/** Merges all jobs into one record per test; a test counts by its worst outcome across jobs. */
+export function aggregate(jobs) {
+  const tests = new Map();
+  const infra = [];
+
+  for (const job of jobs) {
+    if (!job.report) {
+      infra.push({job: job.job, reason: 'no test results were produced'});
+      continue;
+    }
+    for (const error of job.report.errors ?? []) {
+      infra.push({job: job.job, reason: firstLine(error.message) || 'run error'});
+    }
+    const label = jobLabel(job);
+    for (const entry of flattenReport(job.report)) {
+      let test = tests.get(entry.key);
+      if (!test) {
+        test = {key: entry.key, outcome: entry.outcome, failedIn: new Set(), flakyIn: new Set(), error: ''};
+        tests.set(entry.key, test);
+      }
+      if (OUTCOME_RANK[entry.outcome] > OUTCOME_RANK[test.outcome]) {
+        test.outcome = entry.outcome;
+      }
+      if (entry.outcome === 'failed') {
+        test.failedIn.add(label);
+        test.error ||= entry.error;
+      } else if (entry.outcome === 'flaky') {
+        test.flakyIn.add(label);
+      }
+    }
+  }
+
+  return {tests, infra};
+}
+
+/** Finds E2E jobs that ran according to the build timeline but never published a summary. */
+export function findMissingJobs(timeline, jobs) {
+  const records = timeline?.records ?? [];
+  const stages = new Map(
+    records
+      .filter(record => record.type === 'Stage')
+      .map(record => [record.id, E2E_STAGES.find(stage => [record.identifier, record.refName, record.name].includes(stage))])
+      .filter(([, stage]) => stage));
+  const phases = new Map(
+    records
+      .filter(record => record.type === 'Phase' && stages.has(record.parentId))
+      .map(record => [record.id, stages.get(record.parentId)]));
+  const ran = records.filter(record =>
+    record.type === 'Job' && phases.has(record.parentId) && record.result && record.result !== 'skipped');
+
+  const published = new Set(jobs.map(job => `${job.stage}|${job.job}`));
+  const missing = ran.filter(record => !published.has(`${phases.get(record.parentId)}|${record.name}`));
+
+  // Job names that never line up mean the timeline uses another naming than the agents do;
+  // reporting every job as missing would be noise, so trust the published summaries instead.
+  if (jobs.length > 0 && ran.length > 0 && missing.length === ran.length) {
+    console.warn('Timeline job names match none of the published summaries; skipping missing-job detection.');
+    return [];
+  }
+
+  return missing.map(record => ({job: record.name, reason: `job ${record.result} before publishing results`}));
+}
+
+function sortedLabels(set) {
+  return [...set].sort();
+}
+
+/** Classifies the run against the previous summary and builds the summary document. */
+export function buildSummary({tests, infra, previous, build}) {
+  const all = [...tests.values()];
+  const count = outcome => all.filter(test => test.outcome === outcome).length;
+  const previousFailing = previous?.failing ?? {};
+  const failing = {};
+  const newFailures = [];
+  const stillFailing = [];
+
+  for (const test of all.filter(test => test.outcome === 'failed').sort((a, b) => a.key.localeCompare(b.key))) {
+    const known = previousFailing[test.key];
+    const runs = (known?.runs ?? 0) + 1;
+    failing[test.key] = {runs, since: known?.since ?? build.number};
+    const entry = {key: test.key, jobs: sortedLabels(test.failedIn), error: test.error, runs};
+    (known ? stillFailing : newFailures).push(entry);
+  }
+  stillFailing.sort((a, b) => b.runs - a.runs || a.key.localeCompare(b.key));
+
+  const fixed = [];
+  for (const [key, known] of Object.entries(previousFailing)) {
+    const outcome = tests.get(key)?.outcome;
+    if (outcome === 'passed' || outcome === 'flaky') {
+      fixed.push(key);
+    } else if (!outcome && infra.length > 0) {
+      // The test did not run because a job broke, so it is still an open failure.
+      failing[key] = known;
+    }
+  }
+
+  return {
+    schema: 1,
+    build,
+    hasPrevious: Boolean(previous),
+    counts: {failed: count('failed'), flaky: count('flaky'), passed: count('passed'), skipped: count('skipped')},
+    newFailures,
+    stillFailing,
+    fixed: fixed.sort(),
+    flaky: all
+      .filter(test => test.outcome === 'flaky')
+      .map(test => ({key: test.key, jobs: sortedLabels(test.flakyIn)}))
+      .sort((a, b) => a.key.localeCompare(b.key)),
+    infra,
+    failing,
+  };
+}
+
+function statusOf(summary) {
+  const total = Object.values(summary.counts).reduce((sum, value) => sum + value, 0);
+  if (total === 0) {
+    return {emoji: '🔴', text: 'no E2E results were produced'};
+  }
+  if (summary.counts.failed > 0 || summary.infra.length > 0) {
+    return {emoji: '🔴', text: 'failed'};
+  }
+  return summary.counts.flaky > 0 ? {emoji: '🟡', text: 'passed with flaky tests'} : {emoji: '🟢', text: 'passed'};
+}
+
+function countsLine(counts, bold) {
+  const failed = `${counts.failed} failed`;
+  return `${bold && counts.failed > 0 ? `*${failed}*` : failed} · ${counts.flaky} flaky · ${counts.passed} passed · ${counts.skipped} skipped`;
+}
+
+function plural(count, word) {
+  return `${count} ${word}${count === 1 ? '' : 's'}`;
+}
+
+function escapeSlack(text) {
+  return String(text).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+}
+
+function truncate(text, limit) {
+  return text.length > limit ? `${text.slice(0, limit - 1)}…` : text;
+}
+
+export function renderSlack(summary) {
+  const {build} = summary;
+  const status = statusOf(summary);
+  const manual = build.reason && build.reason !== 'Schedule' ? ` · ${build.reason.toLowerCase()} run` : '';
+  const header = `${status.emoji} *Nightly E2E · ${escapeSlack(build.branch)}* · ${escapeSlack(build.number)}${manual}`;
+  const blocks = [];
+  const section = text => blocks.push({type: 'section', text: {type: 'mrkdwn', text: truncate(text, SLACK_SECTION_LIMIT)}});
+  const list = (title, items, format) => {
+    if (items.length === 0) {
+      return;
+    }
+    const lines = items.slice(0, SLACK_LIST_LIMIT).map(format);
+    if (items.length > SLACK_LIST_LIMIT) {
+      lines.push(`_+${items.length - SLACK_LIST_LIMIT} more_`);
+    }
+    section(`*${title} (${items.length})*\n${lines.join('\n')}`);
+  };
+  const where = jobs => (jobs.length > 0 ? `  \`${jobs.join(', ')}\`` : '');
+
+  section(`${header}\n${status.text === 'no E2E results were produced' ? 'No E2E results were produced.' : countsLine(summary.counts, true)}`);
+
+  const failureLine = entry => `• ${escapeSlack(entry.key)}${where(entry.jobs)}`;
+  if (summary.hasPrevious) {
+    list('New since the previous run', summary.newFailures, entry =>
+      entry.error ? `${failureLine(entry)}\n      ↳ ${escapeSlack(truncate(entry.error, 140))}` : failureLine(entry));
+    list('Still failing', summary.stillFailing, entry => `${failureLine(entry)} · ${plural(entry.runs, 'run')}`);
+  } else {
+    list('Failing', summary.newFailures, failureLine);
+  }
+  list('Fixed since the previous run', summary.fixed, key => `• ${escapeSlack(key)}`);
+  list('Flaky (passed on retry)', summary.flaky, entry => `• ${escapeSlack(entry.key)}${where(entry.jobs)}`);
+  list('Jobs without results', summary.infra, entry => `• ${escapeSlack(entry.job)} — ${escapeSlack(truncate(entry.reason, 140))}`);
+
+  if (build.url) {
+    blocks.push({
+      type: 'context',
+      elements: [{type: 'mrkdwn', text: `<${build.url}|Build> · <${build.url}&view=ms.vss-test-web.build-test-results-tab|Tests>`}],
+    });
+  }
+
+  return {text: `Nightly E2E ${build.branch} (${build.number}): ${status.text}`, blocks};
+}
+
+export function renderMarkdown(summary) {
+  const {build} = summary;
+  const status = statusOf(summary);
+  const lines = [`# ${status.emoji} Nightly E2E · ${build.branch} · ${build.number}`, '', countsLine(summary.counts, false), ''];
+  const list = (title, items, format) => {
+    if (items.length > 0) {
+      lines.push(`## ${title} (${items.length})`, '', ...items.map(format), '');
+    }
+  };
+  const where = jobs => (jobs.length > 0 ? ` [${jobs.join(', ')}]` : '');
+  const failure = entry => `- ${entry.key}${where(entry.jobs)}${entry.error ? `\n  - ${entry.error}` : ''}`;
+
+  if (summary.hasPrevious) {
+    list('New since the previous run', summary.newFailures, failure);
+    list('Still failing', summary.stillFailing, entry => `${failure(entry)}\n  - failing for ${plural(entry.runs, 'run')}`);
+  } else {
+    list('Failing', summary.newFailures, failure);
+  }
+  list('Fixed since the previous run', summary.fixed, key => `- ${key}`);
+  list('Flaky (passed on retry)', summary.flaky, entry => `- ${entry.key}${where(entry.jobs)}`);
+  list('Jobs without results', summary.infra, entry => `- ${entry.job}: ${entry.reason}`);
+
+  return lines.join('\n');
+}
+
+function readBuildFromEnvironment(env) {
+  const collection = env.SYSTEM_COLLECTIONURI ?? '';
+  const project = env.SYSTEM_TEAMPROJECT ?? '';
+  const id = env.BUILD_BUILDID ?? '';
+  return {
+    id,
+    number: env.BUILD_BUILDNUMBER ?? 'local',
+    branch: (env.BUILD_SOURCEBRANCH ?? 'local').replace(/^refs\/heads\//, ''),
+    commit: env.BUILD_SOURCEVERSION ?? '',
+    reason: env.BUILD_REASON ?? '',
+    url: collection && id ? `${collection}${encodeURIComponent(project)}/_build/results?buildId=${id}` : '',
+  };
+}
+
+async function fetchTimeline(env) {
+  const collection = env.SYSTEM_COLLECTIONURI;
+  const token = env.SYSTEM_ACCESSTOKEN;
+  if (!collection || !token || !env.BUILD_BUILDID) {
+    return null;
+  }
+  const url = `${collection}${encodeURIComponent(env.SYSTEM_TEAMPROJECT)}/_apis/build/builds/${env.BUILD_BUILDID}/timeline?api-version=7.1`;
+  try {
+    const response = await fetch(url, {headers: {Authorization: `Bearer ${token}`}});
+    if (!response.ok) {
+      console.warn(`Could not read the build timeline (HTTP ${response.status}); skipping missing-job detection.`);
+      return null;
+    }
+    return await response.json();
+  } catch (error) {
+    console.warn(`Could not read the build timeline (${error.message}); skipping missing-job detection.`);
+    return null;
+  }
+}
+
+async function loadPrevious(dir, build) {
+  const [file] = await findFiles(dir, 'summary.json');
+  if (!file) {
+    return null;
+  }
+  try {
+    const previous = await readJson(file);
+    return String(previous.build?.id ?? '') === String(build.id) && build.id ? null : previous;
+  } catch {
+    return null;
+  }
+}
+
+async function postToSlack(webhook, payload) {
+  if (!/^https:\/\//.test(webhook ?? '')) {
+    console.warn('No Slack webhook configured; skipping the notification.');
+    return;
+  }
+  try {
+    const response = await fetch(webhook, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      console.warn(`Slack rejected the notification (HTTP ${response.status}): ${await response.text()}`);
+    }
+  } catch (error) {
+    console.warn(`Could not reach Slack (${error.message}).`);
+  }
+}
+
+async function main() {
+  const {values} = parseArgs({
+    options: {
+      summaries: {type: 'string'},
+      previous: {type: 'string'},
+      out: {type: 'string'},
+      timeline: {type: 'string'},
+      'dry-run': {type: 'boolean', default: false},
+    },
+  });
+  if (!values.summaries || !values.out) {
+    throw new Error('Both --summaries and --out are required.');
+  }
+
+  const build = readBuildFromEnvironment(process.env);
+  const jobs = await loadJobs(values.summaries);
+  const timeline = values.timeline ? await readJson(values.timeline) : await fetchTimeline(process.env);
+  const {tests, infra} = aggregate(jobs);
+  infra.push(...findMissingJobs(timeline, jobs));
+
+  const summary = buildSummary({tests, infra, previous: await loadPrevious(values.previous, build), build});
+  const markdown = renderMarkdown(summary);
+  const slack = renderSlack(summary);
+
+  await mkdir(values.out, {recursive: true});
+  await writeFile(path.join(values.out, 'summary.json'), JSON.stringify(summary, null, 2));
+  await writeFile(path.join(values.out, 'summary.md'), markdown);
+  console.log(markdown);
+
+  if (values['dry-run']) {
+    console.log(JSON.stringify(slack, null, 2));
+  } else {
+    await postToSlack(process.env.SLACK_WEBHOOK_URL, slack);
+  }
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await main();
+}

@@ -240,6 +240,24 @@ Key settings in `playwright.config.ts`:
 
 ---
 
+## Nightly Pipeline Results
+
+The nightly E2E pipeline (`build/nightly-E2E-test-pipelines.yml`) ends with a **Report** stage that merges the results of every E2E job into one summary and posts it to Slack. The same summary is attached to the build (Extensions tab) and published as the `e2e-nightly-summary` artifact.
+
+Each test is listed once, with the operating systems it failed on:
+
+| Section | Meaning |
+|---------|---------|
+| New since the previous run | Failed now, did not fail in the previous run on the same branch |
+| Still failing | Failed in the previous run as well, with the number of consecutive runs |
+| Fixed since the previous run | Failed in the previous run, passes now |
+| Flaky (passed on retry) | Failed at least once but passed on a retry — these show as passed in the Tests tab |
+| Jobs without results | A job that ran but produced no test report (timeout, application did not start) |
+
+The comparison is against the latest run of the same branch, so a manual run counts as a "previous run" too. The summary is produced by `build/scripts/e2e-nightly-summary.mjs`; its tests run with `node --test build/scripts/e2e-nightly-summary.test.mjs`.
+
+---
+
 ## Documentation
 
 - [Playwright Documentation](https://playwright.dev/docs/intro)

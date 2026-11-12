@@ -78,6 +78,26 @@ steps:
         displayName: Stop SQL Server LocalDB (Windows)
         condition: and(succeededOrFailed(), eq(variables['Agent.OS'], 'Windows_NT'))
 
+  # Publish the JSON report on its own, so the nightly summary can read every job without downloading traces.
+  # The job details are written even when no report exists, which is how a job that never ran its tests is told apart.
+  - pwsh: |
+      $summary = "$(Agent.TempDirectory)/e2e-summary"
+      New-Item -ItemType Directory -Force -Path $summary | Out-Null
+      $report = "tests/Umbraco.Tests.AcceptanceTest/results/results.json"
+      if (Test-Path $report) {
+        Copy-Item $report $summary
+      }
+      @{ stage = "$(System.StageName)"; job = "$(Agent.JobName)"; os = "$(Agent.OS)"; attempt = "$(System.JobAttempt)" } | ConvertTo-Json | Out-File "$summary/job.json" -Encoding utf8
+    displayName: Collect E2E summary
+    condition: always()
+
+  - task: PublishPipelineArtifact@1
+    displayName: Publish E2E summary
+    condition: always()
+    inputs:
+      targetPath: $(Agent.TempDirectory)/e2e-summary
+      artifact: "e2e-summary - $(System.StageName) - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
+
   # Copy artifacts
   - pwsh: |
       if (Test-Path tests/Umbraco.Tests.AcceptanceTest/results/*) {
