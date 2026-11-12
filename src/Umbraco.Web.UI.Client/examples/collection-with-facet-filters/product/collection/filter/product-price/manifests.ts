@@ -1,5 +1,6 @@
 import { EXAMPLE_PRODUCT_COLLECTION_PRODUCT_PRICE_FILTER_ALIAS } from './constants.js';
 import { EXAMPLE_PRODUCT_COLLECTION_ALIAS } from '../../constants.js';
+import { manifests as localizationManifests } from './localization/manifests.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -26,6 +27,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Example.FilterActiveValue.ProductCollection.ProductPrice',
 		name: 'Product Price Collection Filter Active Value',
 		forFilters: [EXAMPLE_PRODUCT_COLLECTION_PRODUCT_PRICE_FILTER_ALIAS],
-		valueResolver: () => import('./product-price-filter-value.resolver.js'),
+		element: () => import('./product-price-filter-active-value.element.js'),
 	},
+	...localizationManifests,
 ];
