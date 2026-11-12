@@ -11,8 +11,8 @@ export interface UmbPropertyEditorUiInteractionMemoryManagerArgs {
 
 /**
  * Persists a property editor's interaction memories to the app-root interaction-memory store, keyed by
- * a prefix plus a hash of the property editor's configuration, so they survive the property editor
- * being recreated.
+ * a prefix plus a hash of the property editor's configuration (or an explicit memory key), so they
+ * survive the property editor being recreated.
  *
  * This is the only layer that talks to that store. It is deliberately not an
  * `UmbInteractionMemoryManager`: a modal's memories reach it by being relayed up from the scope the
@@ -26,7 +26,7 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbControllerBa
 	memoriesForPropertyEditor = this.#memories.asObservable();
 
 	#interactionMemoryContext?: typeof UMB_INTERACTION_MEMORY_CONTEXT.TYPE;
-	#configHashCode?: number;
+	#memoryKey?: number | string;
 	#memoryUniquePrefix: string;
 	#init?: Promise<unknown>;
 	#warnedAboutMissingConfig = false;
@@ -47,10 +47,11 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbControllerBa
 	/**
 	 * Sets the property editor config, used to create a unique hash for the interaction memory.
 	 * @param {(UmbPropertyEditorConfigCollection | undefined)} config - The property editor configuration.
+	 * @param {string} [memoryKey] - An optional key for sharing memories between differently configured property editors.
 	 * @memberof UmbPropertyEditorUiInteractionMemoryManager
 	 */
-	setPropertyEditorConfig(config: UmbPropertyEditorConfigCollection | undefined) {
-		this.#setConfigHash(config);
+	setPropertyEditorConfig(config: UmbPropertyEditorConfigCollection | undefined, memoryKey?: string) {
+		this.#setMemoryKey(config, memoryKey);
 		this.#observeInteractionMemory();
 	}
 
@@ -62,7 +63,7 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbControllerBa
 	 */
 	async saveMemoriesForPropertyEditor(memories: Array<UmbInteractionMemoryModel>): Promise<void> {
 		await this.#init;
-		if (!this.#hasConfigHash()) return;
+		if (!this.#hasMemoryKey()) return;
 
 		this.#memories.setValue(memories);
 		this.#interactionMemoryContext?.memory.setMemory({ unique: this.#getInteractionMemoryUnique(), memories });
@@ -75,14 +76,14 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbControllerBa
 	 */
 	async deleteMemoriesForPropertyEditor(): Promise<void> {
 		await this.#init;
-		if (!this.#hasConfigHash()) return;
+		if (!this.#hasMemoryKey()) return;
 
 		this.#memories.setValue([]);
 		this.#interactionMemoryContext?.memory.deleteMemory(this.#getInteractionMemoryUnique());
 	}
 
-	#hasConfigHash(): boolean {
-		if (this.#configHashCode !== undefined) return true;
+	#hasMemoryKey(): boolean {
+		if (this.#memoryKey !== undefined) return true;
 
 		// Without a hash there is no key to store under, so the memories would be silently dropped. It
 		// means `setPropertyEditorConfig` was never called — it has to be called unconditionally, before
@@ -97,11 +98,11 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbControllerBa
 	}
 
 	#getInteractionMemoryUnique() {
-		return `${this.#memoryUniquePrefix}PropertyEditorUi${this.#configHashCode !== undefined ? '-' + this.#configHashCode : ''}`;
+		return `${this.#memoryUniquePrefix}PropertyEditorUi${this.#memoryKey !== undefined ? '-' + this.#memoryKey : ''}`;
 	}
 
 	#observeInteractionMemory() {
-		if (!this.#interactionMemoryContext || this.#configHashCode === undefined) return;
+		if (!this.#interactionMemoryContext || this.#memoryKey === undefined) return;
 		this.observe(
 			this.#interactionMemoryContext.memory.memory(this.#getInteractionMemoryUnique()),
 			(memory) => {
@@ -111,8 +112,8 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbControllerBa
 		);
 	}
 
-	#setConfigHash(config: UmbPropertyEditorConfigCollection | undefined) {
+	#setMemoryKey(config: UmbPropertyEditorConfigCollection | undefined, memoryKey?: string) {
 		const configString = config ? JSON.stringify(config.toObject()) : '';
-		this.#configHashCode = simpleHashCode(configString);
+		this.#memoryKey = memoryKey ?? simpleHashCode(configString);
 	}
 }

@@ -25,7 +25,8 @@ export class UmbPropertyEditorUIMediaPickerElement
 	implements UmbPropertyEditorUiElement
 {
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this.#interactionMemoryManager.setPropertyEditorConfig(config);
+		const startNodeId = config?.getValueByAlias<string>('startNodeId') ?? '';
+		this.#interactionMemoryManager.setPropertyEditorConfig(config, startNodeId ? `start-node:${startNodeId}` : 'root');
 
 		if (!config) return;
 
@@ -34,7 +35,6 @@ export class UmbPropertyEditorUIMediaPickerElement
 		this._multiple = Boolean(config.getValueByAlias('multiple'));
 		this._preselectedCrops = config?.getValueByAlias<Array<UmbCropModel>>('crops') ?? [];
 
-		const startNodeId = config.getValueByAlias<string>('startNodeId') ?? '';
 		this._startNode = startNodeId ? { unique: startNodeId, entityType: UMB_MEDIA_ENTITY_TYPE } : undefined;
 
 		const minMax = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
