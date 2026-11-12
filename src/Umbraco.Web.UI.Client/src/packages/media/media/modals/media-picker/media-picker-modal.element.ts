@@ -29,7 +29,7 @@ import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffic
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityModel, UmbEntityOpenedEvent } from '@umbraco-cms/backoffice/entity';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
 import type {
@@ -575,7 +575,8 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 					entryTypes: this.data?.clipboard?.types ?? [],
 					pickableFilter: this.data?.clipboard?.pickableFilter,
 				}}
-				@selection-change=${this.#onClipboardSelectionChange}></umb-clipboard-entry-picker>
+				@selection-change=${this.#onClipboardSelectionChange}
+				@entity-opened=${this.#onClipboardEntityOpened}></umb-clipboard-entry-picker>
 		`;
 	}
 
@@ -699,6 +700,11 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		);
 
 		this.updateValue({ clipboard: { selection } });
+	}
+
+	#onClipboardEntityOpened(event: UmbEntityOpenedEvent) {
+		this.updateValue({ clipboard: { selection: [event.unique] } });
+		this._submitModal();
 	}
 
 	#renderCard(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
