@@ -410,21 +410,17 @@ export const data: Array<UmbMockDataTypeModel> = [
 		noAccess: false,
 	},
 	{
-		name: 'Select List',
+		name: 'Single Select Dropdown',
 		id: 'dt-dropdown',
 		parent: null,
-		editorAlias: 'Umbraco.DropDown.Flexible',
-		editorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+		editorAlias: 'Umbraco.DropDown.Single',
+		editorUiAlias: 'Umb.PropertyEditorUi.Dropdown.Single',
 		hasChildren: false,
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [
-			{
-				alias: 'multiple',
-				value: false,
-			},
 			{
 				alias: 'items',
 				value: ['First Option', 'Second Option', 'I Am the third Option'],
@@ -433,7 +429,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		noAccess: false,
 	},
 	{
-		name: 'Dropdown (Multiple)',
+		name: 'Select List',
 		id: 'dt-dropdown-multiple',
 		parent: null,
 		editorAlias: 'Umbraco.DropDown.Flexible',
@@ -444,10 +440,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [
-			{
-				alias: 'multiple',
-				value: true,
-			},
 			{
 				alias: 'items',
 				value: ['First Option', 'Second Option', 'I Am the third Option'],
