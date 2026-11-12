@@ -319,6 +319,30 @@ public class PropertyValidationServiceTests
         Assert.AreEqual(expectedValid ? 0 : 1, invalid.Length);
     }
 
+    [TestCase(ContentVariation.Segment, null)]
+    [TestCase(ContentVariation.CultureAndSegment, "en-US")]
+    public void Does_Not_Require_Values_In_Non_Default_Segments_Of_Mandatory_Properties(ContentVariation variation, string? culture)
+    {
+        MockObjects(out var validationService, out var dataType);
+
+        var property = new Property(
+            new PropertyType(ShortStringHelper, dataType, "test1")
+            {
+                Mandatory = true,
+                Variations = variation,
+            });
+        property.SetValue("Hello", culture);
+        property.SetValue(string.Empty, culture, "segment-1");
+
+        var content = Mock.Of<IContent>(x => x.Properties == new PropertyCollection(new[] { property }));
+        CultureImpact impact = culture is null ? CultureImpact.Invariant : CultureImpact.Explicit(culture, true);
+
+        var result = validationService.IsPropertyDataValid(content, out var invalid, impact);
+
+        Assert.IsTrue(result);
+        Assert.IsEmpty(invalid);
+    }
+
     [Test]
     public void Does_Not_Validate_Segment_Values_Of_Cultures_Not_Impacted()
     {

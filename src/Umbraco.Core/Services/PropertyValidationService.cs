@@ -232,6 +232,9 @@ public class PropertyValidationService : IPropertyValidationService
 
         var culture = variesByCulture ? impact.Culture : null;
 
+        // a culture invariant value applies to every culture, so when all cultures are impacted it is validated for all of them
+        var validateInvariantValueForAllCultures = variesByCulture is false && impact.ImpactsAllCultures;
+
         return property.Values.Any(value =>
             value.Segment.IsNullOrWhiteSpace() is false
             && property.PropertyType.SupportsVariation(value.Culture, value.Segment, true)
@@ -241,7 +244,7 @@ public class PropertyValidationService : IPropertyValidationService
                 value.EditedValue,
                 new PropertyValidationContext
                 {
-                    Culture = value.Culture,
+                    Culture = validateInvariantValueForAllCultures ? "*" : value.Culture,
                     Segment = value.Segment,
                     CulturesBeingValidated = culturesBeingValidated,
                 }) is false);
