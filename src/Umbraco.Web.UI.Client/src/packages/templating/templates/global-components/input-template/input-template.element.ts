@@ -199,7 +199,7 @@ export class UmbInputTemplateElement extends UUIFormControlWithBasicsMixin(UmbLi
 			compact
 			label=${this.localize.term('general_remove') + ' ' + template.name}
 			@click=${() => this.#removeTemplate(template.unique ?? '')}>
-			<uui-icon name="icon-trash"></uui-icon>
+			<uui-icon name="icon-delete"></uui-icon>
 		</uui-button>`;
 	}
 
