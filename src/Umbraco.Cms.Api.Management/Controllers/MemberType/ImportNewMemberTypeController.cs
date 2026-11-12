@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -45,6 +46,10 @@ public class ImportNewMemberTypeController : MemberTypeControllerBase
     /// </returns>
     [HttpPost("import")]
     [MapToApiVersion("1.0")]
+    [RequiresPermissions([
+        Constants.Permissions.Entities.MemberType.Create,
+        Constants.Permissions.Entities.MemberType.Update,
+    ])]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

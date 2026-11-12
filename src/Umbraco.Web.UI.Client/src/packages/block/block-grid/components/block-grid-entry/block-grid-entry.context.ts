@@ -43,7 +43,7 @@ export class UmbBlockGridEntryContext
 	readonly layoutAreas = this._layout.asObservablePart((x) => x?.areas);
 	readonly columnSpanOptions = this._blockType.asObservablePart((x) => x?.columnSpanOptions ?? []);
 	readonly areaTypeGridColumns = this._blockType.asObservablePart((x) => x?.areaGridColumns);
-	readonly areas = this._blockType.asObservablePart((x) => x?.areas ?? []);
+	readonly areas = this._blockType.asObservablePart((x) => (x ? (x.areas ?? []) : undefined));
 	readonly minMaxRowSpan = this._blockType.asObservablePart((x) =>
 		x ? [x.rowMinSpan ?? 1, x.rowMaxSpan ?? 1] : undefined,
 	);

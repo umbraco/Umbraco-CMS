@@ -145,7 +145,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 
-	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
+	public override readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
 	public readonly nameWriteGuard = new UmbVariantNameWriteGuardManager(this);
 
