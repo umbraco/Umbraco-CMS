@@ -26,7 +26,7 @@ export class UmbPropertyEditorUIMediaPickerElement
 {
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		const startNodeId = config?.getValueByAlias<string>('startNodeId') ?? '';
-		this.#interactionMemoryManager.setPropertyEditorConfig(config, startNodeId ? `start-node:${startNodeId}` : 'root');
+		this.#interactionMemoryManager.setPropertyEditorConfig(config, this.#getInteractionMemoryKey(startNodeId));
 
 		if (!config) return;
 
@@ -40,6 +40,10 @@ export class UmbPropertyEditorUIMediaPickerElement
 		const minMax = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 		this._min = minMax?.min ?? 0;
 		this._max = minMax?.max ?? Infinity;
+	}
+
+	#getInteractionMemoryKey(startNodeId: string): string {
+		return startNodeId ? `start-node:${startNodeId}` : 'root';
 	}
 
 	/**
