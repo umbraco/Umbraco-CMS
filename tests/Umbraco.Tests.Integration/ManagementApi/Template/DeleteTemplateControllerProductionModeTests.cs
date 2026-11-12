@@ -38,10 +38,11 @@ public class DeleteTemplateControllerProductionModeTests : ManagementApiTest<Del
     }
 
     [Test]
-    public async Task Delete_Returns_Bad_Request()
+    public async Task Delete_Removes_The_Template()
     {
         var response = await Client.DeleteAsync(Url);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.IsNull(await TemplateService.GetAsync(_template.Key));
     }
 }

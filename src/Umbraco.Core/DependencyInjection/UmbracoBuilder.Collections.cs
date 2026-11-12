@@ -12,6 +12,8 @@ using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Media.EmbedProviders;
+using Umbraco.Cms.Core.Permissions;
+using Umbraco.Cms.Core.Permissions.Configurators;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.ServerEvents;
@@ -114,6 +116,8 @@ public static partial class UmbracoBuilderExtensions
         builder.WebhookEvents().AddCms(true, webhookPayloadType);
 
         builder.ContentTypeFilters();
+        builder.EnvironmentPermissionsConfigurators()
+            .Add<ProductionRuntimeModeEnvironmentPermissionsConfigurator>();
     }
 
     /// <summary>
@@ -137,6 +141,14 @@ public static partial class UmbracoBuilderExtensions
     /// <returns>The <see cref="EventSourceAuthorizerCollectionBuilder" />.</returns>
     public static EventSourceAuthorizerCollectionBuilder EventSourceAuthorizers(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<EventSourceAuthorizerCollectionBuilder>();
+
+    /// <summary>
+    ///     Gets the environment permissions configurators collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>The <see cref="EnvironmentPermissionsConfiguratorCollectionBuilder" />.</returns>
+    public static EnvironmentPermissionsConfiguratorCollectionBuilder EnvironmentPermissionsConfigurators(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<EnvironmentPermissionsConfiguratorCollectionBuilder>();
 
     /// <summary>
     ///     Gets the server event access filters collection builder.

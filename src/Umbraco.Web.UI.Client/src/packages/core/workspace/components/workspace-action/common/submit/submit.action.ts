@@ -12,6 +12,9 @@ export class UmbSubmitWorkspaceAction<
 	protected _retrieveWorkspaceContext?: Promise<unknown>;
 	protected _workspaceContext?: WorkspaceContextType;
 
+	#hasUnique = false;
+	#isReadOnly = false;
+
 	constructor(host: UmbControllerHost, args: UmbSubmitWorkspaceActionArgs<ArgsMetaType>) {
 		super(host, args);
 
@@ -20,7 +23,7 @@ export class UmbSubmitWorkspaceAction<
 			args.workspaceContextToken ?? UMB_SUBMITTABLE_WORKSPACE_CONTEXT,
 			(context) => {
 				this._workspaceContext = context as WorkspaceContextType;
-				this.#observeUnique();
+				this.#observeSubmittable();
 				this._gotWorkspaceContext();
 			},
 		)
@@ -30,21 +33,35 @@ export class UmbSubmitWorkspaceAction<
 			});
 	}
 
-	#observeUnique() {
+	#observeSubmittable() {
 		this.observe(
 			this._workspaceContext?.unique,
 			(unique) => {
-				if (!this._workspaceContext) return;
 				// We can't save if we don't have a unique
-				if (unique === undefined) {
-					this.disable();
-				} else {
-					// Dangerous, cause this could enable despite a class extension decided to disable it?. [NL]
-					this.enable();
-				}
+				this.#hasUnique = unique !== undefined;
+				this.#updateIsDisabled();
 			},
 			'saveWorkspaceActionUniqueObserver',
 		);
+
+		this.observe(
+			this._workspaceContext?.readOnlyGuard?.permitted,
+			(isReadOnly) => {
+				this.#isReadOnly = isReadOnly ?? false;
+				this.#updateIsDisabled();
+			},
+			'saveWorkspaceActionReadOnlyObserver',
+		);
+	}
+
+	#updateIsDisabled() {
+		if (!this._workspaceContext) return;
+		if (this.#hasUnique && !this.#isReadOnly) {
+			// Dangerous, cause this could enable despite a class extension decided to disable it?. [NL]
+			this.enable();
+		} else {
+			this.disable();
+		}
 	}
 
 	protected _gotWorkspaceContext() {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
@@ -39,6 +40,7 @@ public class AvailableCompositionMemberTypeController : MemberTypeControllerBase
     /// <returns>An <see cref="IActionResult"/> containing a collection of <see cref="AvailableMemberTypeCompositionResponseModel"/> representing the available member type compositions.</returns>
     [HttpPost("available-compositions")]
     [MapToApiVersion("1.0")]
+    [RequiresPermissions([])]
     [ProducesResponseType(typeof(IEnumerable<AvailableMemberTypeCompositionResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets available compositions.")]
     [EndpointDescription("Gets a collection of member types that are available to use as compositions for the specified member type.")]

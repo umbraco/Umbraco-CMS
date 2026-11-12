@@ -148,6 +148,19 @@ describe('UmbSorterController', () => {
 				expect(item.draggable).to.be.false;
 			});
 		});
+
+		it('keeps items non draggable when disabled right after connecting', async () => {
+			const freshElement = document.createElement('test-my-sorter') as UmbSorterTestElement;
+			document.body.appendChild(freshElement);
+			freshElement.sorter.disable();
+			await aTimeout(100);
+
+			const item = freshElement.getSortableItems()[0];
+			item.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, composed: true, button: 0 }));
+			expect(item.draggable).to.be.false;
+
+			freshElement.remove();
+		});
 	});
 
 	describe('enable', () => {

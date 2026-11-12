@@ -185,6 +185,29 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 		this.requestUpdate('containerId', oldValue);
 	}
 
+	/**
+	 * Sets the tab to readonly mode, meaning its groups and properties can't be added, changed, sorted or removed.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean })
+	public get readonly(): boolean {
+		return this.#readonly;
+	}
+	public set readonly(value: boolean) {
+		const oldValue = this.#readonly;
+		if (value === oldValue) return;
+		this.#readonly = value;
+		if (value) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+		this.requestUpdate('readonly', oldValue);
+	}
+	#readonly = false;
+
 	@state()
 	private _groups: Array<UmbPropertyTypeContainerMergedModel> = [];
 
@@ -259,10 +282,11 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	override render() {
 		return html`
 			${
-				this.#containerId !== undefined
+				this.#containerId !== undefined && (this._hasProperties || !this.readonly)
 					? html`
 							<uui-box class="${this._hasProperties ? '' : 'opaque'}">
 								<umb-content-type-design-editor-properties
+									.readonly=${this.readonly}
 									.containerId=${this.containerId}
 									.editContentTypePath=${this._editContentTypePath}></umb-content-type-design-editor-properties>
 							</uui-box>
@@ -277,6 +301,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 						(group) => html`
 							<umb-content-type-design-editor-group
 								?sort-mode-active=${this._sortModeActive}
+								.readonly=${this.readonly}
 								.editContentTypePath=${this._editContentTypePath}
 								.group=${group}
 								.groupStructureHelper=${this.#groupStructureHelper as any}
@@ -292,7 +317,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	}
 
 	#renderAddGroupButton() {
-		if (this._sortModeActive) return;
+		if (this._sortModeActive || this.readonly) return;
 		return html`
 			<uui-button
 				id="btn-add"
