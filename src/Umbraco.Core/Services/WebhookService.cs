@@ -41,8 +41,29 @@ public class WebhookService : IWebhookService
             return WebhookOperationStatus.NoEvents;
         }
 
+        if (webhook.Headers.Any(header => IsValidHeader(header.Key, header.Value) is false))
+        {
+            return WebhookOperationStatus.InvalidHeaders;
+        }
+
         return WebhookOperationStatus.Success;
     }
+
+    // Values arrive from deserialized JSON, where a dictionary value can be null despite the annotation.
+    private static bool IsValidHeader(string name, string? value)
+        => IsHttpToken(name)
+           && Constants.WebhookEvents.ReservedHeaderNames.Contains(name) is false
+           && value is not null
+           && IsSendableHeaderValue(value);
+
+    // RFC 9110 section 5.6.2: a field name is a token of visible characters excluding delimiters.
+    private static bool IsHttpToken(string value)
+        => value.Length > 0 && value.All(c => char.IsAsciiLetterOrDigit(c) || "!#$%&'*+-.^_`|~".Contains(c));
+
+    // HttpClient only sends ASCII request header values unless a header encoding is configured, so the value is
+    // limited to visible ASCII, space and horizontal tab (which also excludes CR, LF and NUL).
+    private static bool IsSendableHeaderValue(string value)
+        => value.All(c => c == '\t' || (c >= ' ' && c <= '~'));
 
     /// <inheritdoc />
     public async Task<Attempt<IWebhook, WebhookOperationStatus>> CreateAsync(IWebhook webhook)
@@ -134,6 +155,7 @@ public class WebhookService : IWebhookService
             return Attempt.FailWithStatus<IWebhook?, WebhookOperationStatus>(WebhookOperationStatus.CancelledByNotification, webhook);
         }
 
+        scope.WriteLock(Constants.Locks.WebhookRequest);
         await _webhookRepository.DeleteAsync(webhook);
         scope.Notifications.Publish(new WebhookDeletedNotification(webhook, eventMessages).WithStateFrom(deletingNotification));
 

@@ -10,6 +10,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 @customElement('umb-media-create-options-modal')
 export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
@@ -31,6 +32,9 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 	@state()
 	private _hasSettingsAccess = false;
 
+	@state()
+	private _isProductionMode?: boolean;
+
 	constructor() {
 		super();
 
@@ -44,6 +48,22 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 				},
 			},
 		]);
+
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this.observe(
+				context?.isProductionMode,
+				(isProductionMode) => {
+					this._isProductionMode = isProductionMode;
+				},
+				'_observeIsProductionMode',
+			);
+		});
+	}
+
+	// Media Type structure can't be edited without Settings access, and shouldn't be in Production mode.
+	// Until the runtime mode is known, treat it as Production (safe default).
+	get #canEditMediaTypeStructure() {
+		return this._hasSettingsAccess && this._isProductionMode === false;
 	}
 
 	override async firstUpdated() {
@@ -105,24 +125,41 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 	}
 
 	#renderNotAllowed() {
+		const isChild = !!this.data?.mediaType?.unique;
+
+		if (!this.#canEditMediaTypeStructure) {
+			return isChild
+				? html`<umb-localize key="create_noMediaTypesWithNoSettingsAccess">
+						The selected media in the tree doesn't allow for any other media to be created below it.
+					</umb-localize>`
+				: html`<umb-localize key="create_noMediaTypesAllowedAtRootWithNoSettingsAccess">
+						There are no Media Types allowed for creating media at the root.
+					</umb-localize>`;
+		}
+
+		if (isChild) {
+			return html`
+				<umb-localize key="create_noMediaTypes">
+					There are no allowed Media Types available for creating media here. You must enable these in
+					<strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the
+					<strong>Allowed child node types</strong> under <strong>Structure</strong>.
+				</umb-localize>
+				<br />
+				<uui-button
+					id="edit-permissions"
+					look="secondary"
+					@click=${() => this._rejectModal()}
+					href=${`/section/settings/workspace/media-type/edit/${this.data?.mediaType?.unique}/view/structure`}
+					label=${this.localize.term('create_noMediaTypesEditPermissions')}></uui-button>
+			`;
+		}
+
 		return html`
-			<umb-localize key="create_noMediaTypes">
+			<umb-localize key="create_noMediaTypesAllowedAtRoot">
 				There are no allowed Media Types available for creating media here. You must enable these in
-				<strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the
-				<strong>Allowed child node types</strong> under <strong>Structure</strong>.
+				<strong>Media Types</strong> within the <strong>Settings</strong> section, by changing the
+				<strong>Allow at root</strong> option under <strong>Structure</strong>.
 			</umb-localize>
-			${when(
-				this._hasSettingsAccess && this.data?.mediaType?.unique,
-				() => html`
-					<br />
-					<uui-button
-						id="edit-permissions"
-						look="secondary"
-						@click=${() => this._rejectModal()}
-						href=${`/section/settings/workspace/media-type/edit/${this.data?.mediaType?.unique}/view/structure`}
-						label=${this.localize.term('create_noMediaTypesEditPermissions')}></uui-button>
-				`,
-			)}
 		`;
 	}
 

@@ -29,7 +29,7 @@ public class QueryBuilderTests : BaseUsingSqlSyntax
         var result = translator.Translate();
         var strResult = result.SQL;
 
-        var expectedResult = "SELECT *\nFROM umbracoNode\nWHERE (upper([umbracoNode].[path]) LIKE upper(@0))";
+        var expectedResult = "SELECT *\nFROM umbracoNode\nWHERE (upper([umbracoNode].[path]) LIKE upper(@0) ESCAPE '\\')";
 
         // Assert
         Assert.That(strResult, Is.Not.Empty);

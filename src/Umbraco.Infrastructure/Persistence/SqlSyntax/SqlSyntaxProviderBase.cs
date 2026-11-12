@@ -268,6 +268,12 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
         $"upper({column}) LIKE upper(@{paramIndex})";
 
+    /// <inheritdoc />
+    public virtual string EscapeLikeValue(string value) => SqlLikeEscaping.EscapeValue(value);
+
+    /// <inheritdoc />
+    public virtual string GetLikeEscapeClause() => SqlLikeEscaping.EscapeClause;
+
     /// <summary>
     /// Generates a SQL expression that concatenates the specified arguments using the SQL CONCAT function.
     /// </summary>
@@ -671,6 +677,10 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         string.Join(" ", ClauseOrder
             .Select(action => action(column))
             .Where(clause => string.IsNullOrEmpty(clause) == false));
+
+    /// <inheritdoc />
+    public virtual string FormatAlterColumn(string? tableName, ColumnDefinition column)
+        => string.Format(AlterColumn, GetQuotedTableName(tableName), Format(column));
 
     /// <summary>
     /// Formats a <see cref="ColumnDefinition"/> for a specific table into a SQL string suitable for use in a CREATE or ALTER TABLE statement.

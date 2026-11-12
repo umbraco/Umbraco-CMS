@@ -70,7 +70,7 @@ public class DynamicRootService : IDynamicRootService
             }
         }
 
-        throw new NotSupportedException($"Did not find any filteres that could handle {dynamicRootQueryStep.Alias}");
+        throw new NotSupportedException($"Did not find any filters that could handle {dynamicRootQueryStep.Alias}");
     }
 
     /// <summary>

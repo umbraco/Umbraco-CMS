@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.PropertyEditors;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -131,13 +132,15 @@ internal sealed class ImageCropperPropertyValueEditor : DataValueEditor, IDispos
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
         // Get the current path
+        string? currentSource = null;
         var currentPath = string.Empty;
         try
         {
             if (currentValue is string currentStringValue)
             {
                 ImageCropperValue? currentImageCropperValue = _jsonSerializer.Deserialize<ImageCropperValue>(currentStringValue);
-                currentPath = currentImageCropperValue?.Src;
+                currentSource = currentImageCropperValue?.Src;
+                currentPath = currentSource;
             }
         }
         catch (Exception ex)
@@ -190,11 +193,27 @@ internal sealed class ImageCropperPropertyValueEditor : DataValueEditor, IDispos
                 return null; // clear
             }
 
-            if (editorImageCropperValue is not null && temporaryFileKey.HasValue)
+            if (editorImageCropperValue is null)
+            {
+                // nothing to begin with and nothing supplied => store null, not the serialized JSON text "null"
+                return null;
+            }
+
+            if (temporaryFileKey.HasValue)
             {
                 // a plausible tempFile value was supplied, but could not be converted to an actual file => clear the src
                 editorImageCropperValue.Src = null;
             }
+            else if (string.IsNullOrWhiteSpace(editorImageCropperValue?.Src) is false
+                     && FileUploadSource.IsAcceptable(editorImageCropperValue.Src, currentSource) is false)
+            {
+                _logger.LogWarning(
+                    "Refused to store the file source '{Source}' while editing content {ContentKey}: it is not a valid file location. The current file source is retained.",
+                    editorImageCropperValue.Src,
+                    contentKey);
+                editorImageCropperValue.Src = currentSource;
+            }
+
             return _jsonSerializer.Serialize(editorImageCropperValue); // unchanged
         }
 
@@ -251,7 +270,9 @@ internal sealed class ImageCropperPropertyValueEditor : DataValueEditor, IDispos
 
     private ImageCropperValue? ParseImageCropperValue(object? editorValue)
     {
-        if (editorValue is null)
+        // Earlier versions could persist an empty value as the JSON text "null" (#24335). Treat it as no value, otherwise
+        // validating such a stored value (e.g. on publish) throws until the property is saved again.
+        if (editorValue is null || (editorValue is string stringValue && stringValue.Trim() == "null"))
         {
             return null;
         }

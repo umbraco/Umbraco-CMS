@@ -314,7 +314,28 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="totalRecords">Total number of documents.</param>
     /// <param name="filter">Query filter.</param>
     /// <param name="ordering">Ordering infos.</param>
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter = null, Ordering? ordering = null);
+
+    /// <summary>
+    ///     Gets descendant documents of a given parent with optional property filtering.
+    /// </summary>
+    /// <param name="id">The parent identifier.</param>
+    /// <param name="pageIndex">The page number.</param>
+    /// <param name="pageSize">The page size.</param>
+    /// <param name="totalRecords">Total number of documents.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load. If null, all properties are loaded.
+    ///     If empty array, no custom properties are loaded.
+    /// </param>
+    /// <param name="filter">Query filter.</param>
+    /// <param name="ordering">Ordering infos.</param>
+    /// <returns>The descendant documents in the page.</returns>
+    // TODO (V19): Remove the default implementation.
+#pragma warning disable CS0618 // Type or member is obsolete
+    IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering)
+        => GetPagedDescendants(id, pageIndex, pageSize, out totalRecords, filter, ordering);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Gets paged documents of a content type.

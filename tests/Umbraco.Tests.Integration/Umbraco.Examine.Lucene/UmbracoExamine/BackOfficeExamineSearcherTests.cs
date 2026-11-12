@@ -5,9 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -15,6 +18,7 @@ using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Search;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -68,6 +72,8 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
         base.CustomTestSetup(builder);
         builder.Services.AddUnique<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
+        builder.AddNotificationHandler<MemberSavedNotification, MemberSavedDistributedCacheNotificationHandler>();
+        builder.AddNotificationHandler<MemberCacheRefresherNotification, MemberIndexingNotificationHandler>();
         builder.AddExamineIndexes();
         builder.Services.AddHostedService<QueuedHostedService>();
     }
@@ -775,6 +781,105 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
         Assert.AreEqual(exactMatch, items.First().Name);
     }
 
+    [TestCase("PO001026")]
+    [TestCase("REPO")]
+    [TestCase("001026")]
+    [TestCase("1026")]
+    [TestCase("eport")]
+    public async Task Search_Matches_Content_Name_Containing_Query_Anywhere_Within_A_Word(string query)
+    {
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+
+        const string contentName = "COA REPORT PO001026 26";
+        await CreateDefaultPublishedContent(contentName);
+
+        ISearchResult[] searchResults = BackOfficeExamineSearch(query).ToArray();
+
+        Assert.AreEqual(1, searchResults.Length);
+        Assert.AreEqual(contentName, searchResults[0].Values["nodeName"]);
+    }
+
+    [Test]
+    public async Task Search_Matches_Query_Shorter_Than_Three_Characters_Only_At_The_Start_Of_A_Word()
+    {
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+
+        // "01" occurs within "po001026", but only "0123" starts with it.
+        const string startsWithMatch = "Annual 0123 Summary";
+        await PublishContents("COA REPORT PO001026 26", startsWithMatch);
+
+        ISearchResult[] searchResults = BackOfficeExamineSearch("01").ToArray();
+
+        Assert.AreEqual(1, searchResults.Length);
+        Assert.AreEqual(startsWithMatch, searchResults[0].Values["nodeName"]);
+    }
+
+    [Test]
+    public async Task Search_Ranks_Content_Name_Starting_With_Query_Above_Name_Containing_It()
+    {
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+
+        // The name that only contains the query is published first, so database order alone would rank it first.
+        const string containsMatch = "Notebook Covers";
+        const string prefixMatch = "Booking Terms";
+        await PublishContents(containsMatch, prefixMatch);
+
+        ISearchResult[] searchResults = BackOfficeExamineSearch("book").ToArray();
+
+        Assert.AreEqual(2, searchResults.Length);
+        Assert.AreEqual(prefixMatch, searchResults[0].Values["nodeName"]);
+        Assert.AreEqual(containsMatch, searchResults[1].Values["nodeName"]);
+    }
+
+    [TestCase("001026", 0)]
+    [TestCase("PO001026", 1)]
+    [TestCase("COA", 1)]
+    public async Task Search_Only_Matches_Start_Of_A_Word_When_Match_Within_Words_Is_Disabled(string query, int expectedCount)
+    {
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await CreateDefaultPublishedContent("COA REPORT PO001026 26");
+
+        ISearchResult[] searchResults = BackOfficeExamineSearch(query, CreateSearcher(minimumMatchWithinWordLength: 0)).ToArray();
+
+        Assert.AreEqual(expectedCount, searchResults.Length);
+    }
+
+    [TestCase(2, 2)]
+    [TestCase(5, 1)]
+    public async Task Search_Matches_Within_Words_From_The_Configured_Minimum_Length(int minimumMatchWithinWordLength, int expectedCount)
+    {
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+
+        // "01" occurs within "po001026", but only "0123" starts with it.
+        await PublishContents("COA REPORT PO001026 26", "Annual 0123 Summary");
+
+        ISearchResult[] searchResults = BackOfficeExamineSearch("01", CreateSearcher(minimumMatchWithinWordLength)).ToArray();
+
+        Assert.AreEqual(expectedCount, searchResults.Length);
+    }
+
+    private BackOfficeExamineSearcher CreateSearcher(int minimumMatchWithinWordLength) =>
+        new(
+            GetRequiredService<IExamineManager>(),
+            LanguageService,
+            GetRequiredService<IBackOfficeSecurityAccessor>(),
+            GetRequiredService<IEntityService>(),
+            GetRequiredService<IUmbracoTreeSearcherFields>(),
+            GetRequiredService<AppCaches>(),
+            new TestOptionsMonitor<IndexCreatorSettings>(new IndexCreatorSettings { BackOfficeSearchMinimumMatchWithinWordLength = minimumMatchWithinWordLength }));
+
+    private static IEnumerable<ISearchResult> BackOfficeExamineSearch(string query, IBackOfficeExamineSearcher searcher) =>
+        searcher.Search(
+            query,
+            UmbracoEntityTypes.Document,
+            pageSize: 20,
+            pageIndex: 0,
+            totalFound: out _,
+            contentTypeAliases: null,
+            trashed: null,
+            searchFrom: null,
+            ignoreUserStartNodes: false);
+
     private async Task PublishContents(params string[] contentNames)
     {
         var contentType = new ContentTypeBuilder()
@@ -802,5 +907,76 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
                 },
                 Constants.UmbracoIndexes.InternalIndexName);
         }
+    }
+
+    [TestCase("member.search@example.com")]
+    [TestCase("member-search-login")]
+    public async Task Search_Matches_Member_Identity_Fields_With_Members_Section_Access(string query)
+    {
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await CreateMember("Jane Doe", "member-search-login", "member.search@example.com");
+
+        ISearchResult[] searchResults = BackOfficeExamineMemberSearch($"\"{query}\"").ToArray();
+
+        Assert.AreEqual(1, searchResults.Length);
+        Assert.AreEqual("Jane Doe", searchResults[0].Values["nodeName"]);
+    }
+
+    [TestCase("member.search@example.com")]
+    [TestCase("member-search-login")]
+    public async Task Search_Does_Not_Match_Member_Identity_Fields_Without_Members_Section_Access(string query)
+    {
+        await SetupUserIdentity(await CreateUserInGroup(Constants.Security.WriterGroupKey));
+        await CreateMember("Jane Doe", "member-search-login", "member.search@example.com");
+
+        ISearchResult[] searchResults = BackOfficeExamineMemberSearch($"\"{query}\"").ToArray();
+
+        Assert.AreEqual(0, searchResults.Length);
+    }
+
+    [Test]
+    public async Task Search_Matches_Member_Name_Without_Members_Section_Access()
+    {
+        await SetupUserIdentity(await CreateUserInGroup(Constants.Security.WriterGroupKey));
+        await CreateMember("Jane Doe", "member-search-login", "member.search@example.com");
+
+        ISearchResult[] searchResults = BackOfficeExamineMemberSearch("Jane").ToArray();
+
+        Assert.AreEqual(1, searchResults.Length);
+        Assert.AreEqual("Jane Doe", searchResults[0].Values["nodeName"]);
+    }
+
+    private IEnumerable<ISearchResult> BackOfficeExamineMemberSearch(string query) =>
+        BackOfficeExamineSearcher.Search(
+            query,
+            UmbracoEntityTypes.Member,
+            pageSize: 20,
+            pageIndex: 0,
+            totalFound: out _,
+            contentTypeAliases: null,
+            trashed: null,
+            searchFrom: null);
+
+    private async Task CreateMember(string name, string username, string email)
+    {
+        var memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        GetRequiredService<IMemberTypeService>().Save(memberType);
+
+        IMemberService memberService = GetRequiredService<IMemberService>();
+
+        IMember member = memberService.CreateMember(username, email, name, memberType);
+        await ExecuteAndWaitForIndexing(() => memberService.Save(member), Constants.UmbracoIndexes.MembersIndexName);
+    }
+
+    private async Task<string> CreateUserInGroup(Guid groupKey)
+    {
+        IUserService userService = GetRequiredService<IUserService>();
+        IUserGroup group = (await GetRequiredService<IUserGroupService>().GetAsync(groupKey))!;
+
+        IUser user = userService.CreateUserWithIdentity("restricted", "restricted@example.com");
+        user.AddGroup(group.ToReadOnlyGroup());
+        userService.Save(user);
+
+        return user.Id.ToString();
     }
 }

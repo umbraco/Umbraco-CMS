@@ -1,12 +1,13 @@
 import { UmbMediaUrlRepository } from '../repository/index.js';
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import type { UmbMediaUrlModel } from '../repository/types.js';
+import { getLinkableMediaUrl, renderImagePreview } from './media-link.function.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import type { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { debounce, sanitizeHTML } from '@umbraco-cms/backoffice/utils';
+import { debounce } from '@umbraco-cms/backoffice/utils';
 
 interface UmbMediaInfoViewLink {
 	url: string | undefined;
@@ -108,15 +109,11 @@ export class UmbMediaLinksWorkspaceInfoAppElement extends UmbLitElement {
 		const popup = window.open('', '_blank');
 		if (!popup) return;
 
-		const html = `<!doctype html>
-<body style="background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(135deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(135deg, transparent 75%, #ccc 75%); background-size:30px 30px; background-position:0 0, 15px 0, 15px -15px, 0px 15px;">
-	<img src="${imagePath}"/>
-	<script>history.pushState(null, null, "${sanitizeHTML(window.location.href)}");</script>
-</body>`;
-
+		// Re-opening the document gives it this document's URL, without which the popup cannot push a history state for it.
 		popup.document.open();
-		popup.document.write(html);
 		popup.document.close();
+		renderImagePreview(popup.document, imagePath);
+		popup.history.pushState(null, '', window.location.href);
 	}
 
 	#renderContent() {
@@ -139,18 +136,27 @@ export class UmbMediaLinksWorkspaceInfoAppElement extends UmbLitElement {
 
 	#renderLinkItem(item: UmbMediaInfoViewLink) {
 		if (!item.url) return nothing;
-		const ext = item.url.split(/[#?]/)[0].split('.').pop()?.trim().toLowerCase();
+		const url = getLinkableMediaUrl(item.url);
+		if (!url) {
+			return html`
+				<div class="link-item">
+					<span class="link-content">${item.url}</span>
+				</div>
+			`;
+		}
+
+		const ext = url.split(/[#?]/)[0].split('.').pop()?.trim().toLowerCase();
 		if (ext === 'svg') {
 			return html`
-				<a href="#" target="_blank" class="link-item with-href" @click=${() => this.#openSvg(item.url!)}>
-					<span class="link-content">${item.url}</span>
+				<a href="#" target="_blank" class="link-item with-href" @click=${() => this.#openSvg(url)}>
+					<span class="link-content">${url}</span>
 					<uui-icon name="icon-out"></uui-icon>
 				</a>
 			`;
 		} else {
 			return html`
-				<a href=${item.url} target="_blank" class="link-item with-href">
-					<span class="link-content">${item.url}</span>
+				<a href=${url} target="_blank" class="link-item with-href">
+					<span class="link-content">${url}</span>
 					<uui-icon name="icon-out"></uui-icon>
 				</a>
 			`;

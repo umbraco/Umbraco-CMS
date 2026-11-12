@@ -597,6 +597,7 @@ export type DataTypeTreeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    parentIsFolder: boolean;
     editorUiAlias?: string | null;
     isDeletable: boolean;
 };
@@ -705,6 +706,7 @@ export type DocumentBlueprintTreeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    parentIsFolder: boolean;
     documentType?: DocumentTypeReferenceResponseModel | null;
     variants: Array<DocumentVariantItemResponseModel>;
 };
@@ -931,6 +933,7 @@ export type DocumentTypeTreeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    parentIsFolder: boolean;
     isElement: boolean;
     icon: string;
 };
@@ -1518,6 +1521,7 @@ export type MediaTypeTreeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    parentIsFolder: boolean;
     icon: string;
     isDeletable: boolean;
 };
@@ -1711,6 +1715,7 @@ export type MemberTypeTreeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    parentIsFolder: boolean;
     icon: string;
 };
 
@@ -3265,8 +3270,17 @@ export type WebhookItemResponseModel = {
     flags: Array<FlagModel>;
     enabled: boolean;
     name: string;
+    /**
+     * @deprecated
+     */
     events: string;
+    /**
+     * @deprecated
+     */
     url: string;
+    /**
+     * @deprecated
+     */
     types: string;
 };
 
@@ -3331,6 +3345,7 @@ export type DocumentBlueprintTreeItemResponseModelWritable = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    parentIsFolder: boolean;
     documentType?: DocumentTypeReferenceResponseModel | null;
     variants: Array<DocumentVariantItemResponseModelWritable>;
 };
@@ -8599,6 +8614,7 @@ export type GetImagingResizeUrlsData = {
     path?: never;
     query?: {
         id?: Array<string>;
+        dataTypeId?: string;
         height?: number;
         width?: number;
         mode?: ImageCropModeModel;
@@ -11061,6 +11077,7 @@ export type GetMediaUrlsData = {
     path?: never;
     query?: {
         id?: Array<string>;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/media/urls';
 };
@@ -18388,6 +18405,10 @@ export type GetItemWebhookErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetItemWebhookResponses = {
