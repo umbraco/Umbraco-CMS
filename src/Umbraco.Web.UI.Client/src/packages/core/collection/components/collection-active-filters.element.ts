@@ -1,5 +1,4 @@
 import { UMB_FILTER_MANAGER_CONTEXT, type UmbActiveFilterModel } from '@umbraco-cms/backoffice/filter';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, nothing, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -27,35 +26,30 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 
 		return html`
 			<div id="active-filters">
-				<small>Showing results for:</small>
-				<div id="active-filter-items">
-					${repeat(
-						this._activeFilters!,
-						(activeFilter) => `${activeFilter.alias}||${activeFilter.unique}`,
-						(activeFilter) =>
-							html`<umb-filter-active-value-extension
-								.alias=${activeFilter.alias}
-								.unique=${activeFilter.unique}
-								.value=${activeFilter.value}></umb-filter-active-value-extension>`,
-					)}
-				</div>
+				${repeat(
+					this._activeFilters!,
+					(activeFilter) => `${activeFilter.alias}||${activeFilter.unique}`,
+					(activeFilter) =>
+						html`<umb-filter-active-value-extension
+							.alias=${activeFilter.alias}
+							.unique=${activeFilter.unique}
+							.value=${activeFilter.value}></umb-filter-active-value-extension>`,
+				)}
 			</div>
 		`;
 	}
 
 	static override styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				display: contents;
 			}
 
 			#active-filters {
-				display: block;
-			}
-
-			#active-filter-items {
-				display: inline;
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: var(--uui-size-space-2);
 			}
 		`,
 	];

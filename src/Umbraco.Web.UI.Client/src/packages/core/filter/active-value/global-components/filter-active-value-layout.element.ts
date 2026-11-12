@@ -24,15 +24,19 @@ export class UmbFilterActiveValueLayoutElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<slot><span id="label">${this.label}</span></slot>
-			<uui-button
-				label=${this.label
-					? this.localize.term('filter_removeValueLabel', this.label)
-					: this.localize.term('general_remove')}
-				compact
-				@click=${this.#onRemove}>
-				<umb-icon name="icon-delete"></umb-icon>
-			</uui-button>
+			<uui-tag look="secondary">
+				<div id="content">
+					<slot><span id="label">${this.label}</span></slot>
+					<uui-button
+						label=${this.label
+							? this.localize.term('filter_removeValueLabel', this.label)
+							: this.localize.term('general_remove')}
+						compact
+						@click=${this.#onRemove}>
+						<uui-icon name="icon-wrong"></uui-icon>
+					</uui-button>
+				</div>
+			</uui-tag>
 		`;
 	}
 
@@ -40,10 +44,29 @@ export class UmbFilterActiveValueLayoutElement extends UmbLitElement {
 		css`
 			:host {
 				display: inline-flex;
+			}
+
+			uui-tag {
+				padding-right: 0;
+			}
+
+			#content {
+				display: flex;
 				align-items: center;
 				gap: var(--uui-size-space-1);
-				padding: 0 0 0 var(--uui-size-space-3);
-				font-size: 12px;
+			}
+
+			uui-button {
+				--uui-button-height: auto;
+				--uui-button-padding-left-factor: 0.5;
+				--uui-button-padding-right-factor: 0.5;
+				--uui-button-padding-top-factor: 0;
+				--uui-button-padding-bottom-factor: 0;
+				font-size: inherit;
+			}
+
+			uui-icon {
+				display: block;
 			}
 		`,
 	];
