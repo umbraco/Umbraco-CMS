@@ -1,6 +1,6 @@
+import type { ExampleProductColorItemModel } from '../repository/item/types.js';
 import { css, customElement, html, nothing, styleMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
-import type { ExampleProductColorItemModel } from '../repository/item/types.js';
 
 @customElement('example-product-color-value-summary')
 export class ExampleProductColorValueSummaryElement extends UmbValueSummaryElementBase<
@@ -8,19 +8,27 @@ export class ExampleProductColorValueSummaryElement extends UmbValueSummaryEleme
 > {
 	override render() {
 		if (!this._value?.length) return nothing;
-		return html`${this._value.map(
-			(item) =>
-				html`<span class="color"
-					><span class="swatch" style=${styleMap({ backgroundColor: item.hex })}></span>${item.name}</span
-				>`,
-		)}`;
+		return html`<div id="colors">
+			${this._value.map(
+				(item) =>
+					html`<span class="color"
+						><span class="swatch" style=${styleMap({ backgroundColor: item.hex })}></span>${item.name}</span
+					>`,
+			)}
+		</div>`;
 	}
 
 	static override styles = [
 		css`
+			#colors {
+				display: flex;
+			}
+
 			.color {
 				margin-right: var(--uui-size-space-3);
 				white-space: nowrap;
+				display: flex;
+				align-items: center;
 			}
 			.swatch {
 				display: inline-block;
