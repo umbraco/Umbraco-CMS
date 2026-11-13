@@ -25,6 +25,11 @@ export const data: Array<UmbMockUserGroupModel> = [
 			'Umb.Document.Rollback',
 			'Umb.Document.PropertyValue.Read',
 			'Umb.Document.PropertyValue.Write',
+			'Umb.ElementContainer.Create',
+			'Umb.ElementContainer.Delete',
+			'Umb.ElementContainer.Move',
+			'Umb.ElementContainer.Read',
+			'Umb.ElementContainer.Update',
 			'Umb.Element.Read',
 			'Umb.Element.Create',
 			'Umb.Element.Update',
@@ -63,45 +68,41 @@ export const data: Array<UmbMockUserGroupModel> = [
 				element: { id: 'permissions-element-read-only-id' },
 				verbs: ['Umb.Element.Read'],
 			},
-			// TODO: remove cast once ElementContainerPermissionPresentationModel is in the backend API [LK]
 			{
 				$type: 'ElementContainerPermissionPresentationModel',
 				elementContainer: { id: 'permissions-element-read-only-id' },
 				verbs: ['Umb.ElementContainer.Create'],
-			} as unknown as UmbMockUserGroupModel['permissions'][number],
+			},
 			{
 				$type: 'ElementPermissionPresentationModel',
 				element: { id: 'permissions-folder-read-only-id' },
 				verbs: ['Umb.Element.Create'],
 			},
-			// TODO: remove cast once ElementContainerPermissionPresentationModel is in the backend API [LK]
 			{
 				$type: 'ElementContainerPermissionPresentationModel',
 				elementContainer: { id: 'permissions-folder-read-only-id' },
 				verbs: ['Umb.ElementContainer.Read'],
-			} as unknown as UmbMockUserGroupModel['permissions'][number],
+			},
 			{
 				$type: 'ElementPermissionPresentationModel',
 				element: { id: 'permissions-both-read-id' },
 				verbs: ['Umb.Element.Read'],
 			},
-			// TODO: remove cast once ElementContainerPermissionPresentationModel is in the backend API [LK]
 			{
 				$type: 'ElementContainerPermissionPresentationModel',
 				elementContainer: { id: 'permissions-both-read-id' },
 				verbs: ['Umb.ElementContainer.Read'],
-			} as unknown as UmbMockUserGroupModel['permissions'][number],
+			},
 			{
 				$type: 'ElementPermissionPresentationModel',
 				element: { id: 'permissions-neither-read-id' },
 				verbs: ['Umb.Element.Create'],
 			},
-			// TODO: remove cast once ElementContainerPermissionPresentationModel is in the backend API [LK]
 			{
 				$type: 'ElementContainerPermissionPresentationModel',
 				elementContainer: { id: 'permissions-neither-read-id' },
 				verbs: ['Umb.ElementContainer.Create'],
-			} as unknown as UmbMockUserGroupModel['permissions'][number],
+			},
 		],
 		sections: [
 			'Umb.Section.Content',

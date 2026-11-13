@@ -22,6 +22,9 @@ internal static class UserGroupsBuilderExtensions
         builder.Services.AddSingleton<IPermissionMapper, ElementPermissionMapper>();
         builder.Services.AddSingleton<IPermissionPresentationMapper, ElementPermissionMapper>();
 
+        builder.Services.AddSingleton<IPermissionMapper, ElementContainerPermissionMapper>();
+        builder.Services.AddSingleton<IPermissionPresentationMapper, ElementContainerPermissionMapper>();
+
         return builder;
     }
 }

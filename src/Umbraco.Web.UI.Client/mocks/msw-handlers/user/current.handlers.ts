@@ -1,7 +1,10 @@
 const { http, HttpResponse } = window.MockServiceWorker;
 import { umbUserMockDb } from '../../db/user.db.js';
 import { UMB_SLUG } from './slug.js';
-import type { GetUserCurrentLoginProvidersResponse, UserPermissionsResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	GetUserCurrentLoginProvidersResponse,
+	UserPermissionsResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
@@ -82,14 +85,14 @@ export const handlers = [
 			permissions: ids.map((id) => ({
 				nodeKey: id,
 				permissions: [
-					'Umb.Element.Browse',
+					'Umb.Element.Read',
 					'Umb.Element.Create',
 					'Umb.Element.Update',
 					'Umb.Element.Delete',
-					'Umb.Element.Move',
-					'Umb.Element.Copy',
 					'Umb.Element.Publish',
 					'Umb.Element.Unpublish',
+					'Umb.Element.Duplicate',
+					'Umb.Element.Move',
 					'Umb.Element.Rollback',
 				],
 			})),

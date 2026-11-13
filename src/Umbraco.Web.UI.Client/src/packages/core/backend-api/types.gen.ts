@@ -1345,6 +1345,8 @@ export type IPermissionPresentationModel = ({
 } & IPermissionPresentationModelDocumentPermissionPresentationModel) | ({
     $type: 'DocumentPropertyValuePermissionPresentationModel';
 } & IPermissionPresentationModelDocumentPropertyValuePermissionPresentationModel) | ({
+    $type: 'ElementContainerPermissionPresentationModel';
+} & IPermissionPresentationModelElementContainerPermissionPresentationModel) | ({
     $type: 'ElementPermissionPresentationModel';
 } & IPermissionPresentationModelElementPermissionPresentationModel) | ({
     $type: 'UnknownTypePermissionPresentationModel';
@@ -1360,6 +1362,12 @@ export type IPermissionPresentationModelDocumentPropertyValuePermissionPresentat
     $type: 'DocumentPropertyValuePermissionPresentationModel';
     documentType: ReferenceByIdModel;
     propertyType: ReferenceByIdModel;
+    verbs: Array<string>;
+};
+
+export type IPermissionPresentationModelElementContainerPermissionPresentationModel = {
+    $type: 'ElementContainerPermissionPresentationModel';
+    elementContainer: ReferenceByIdModel;
     verbs: Array<string>;
 };
 
