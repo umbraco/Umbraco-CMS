@@ -525,6 +525,9 @@ export class UmbDefaultCollectionContext<
 	};
 
 	override destroy(): void {
+		// Drop a load that was queued but has not run yet; it would otherwise run on the destroyed context.
+		this.loadCollection.cancel();
+
 		this.#actionEventContext?.removeEventListener(
 			UmbRequestReloadStructureForEntityEvent.TYPE,
 			this.#onReloadStructureRequest as unknown as EventListener,

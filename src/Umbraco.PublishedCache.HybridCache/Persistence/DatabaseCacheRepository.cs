@@ -108,25 +108,37 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     private ContentCacheNode? CreateElementSourceNode(ContentSourceDto? dto, bool preview)
     {
-        if (dto is null)
+        if (dto is null || HasUsableSource(dto, preview) is false)
         {
-            return null;
-        }
-
-        if (preview is false && dto.PubDataRaw is null && dto.PubData is null)
-        {
-            return null;
-        }
-
-        if (preview is false && dto.Published && dto.PubName is null)
-        {
-            _logger.LogWarning(
-                "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
-                dto.Key);
             return null;
         }
 
         return CreateElementNodeKit(preview, dto);
+    }
+
+    // Whether a source row can be turned into a node for the requested version. A row that is flagged as published
+    // but has no published version name is an inconsistent database state, which is logged rather than silently dropped.
+    private bool HasUsableSource(ContentSourceDto dto, bool preview)
+    {
+        if (preview)
+        {
+            return true;
+        }
+
+        if (dto.PubDataRaw is null && dto.PubData is null)
+        {
+            return false;
+        }
+
+        if (dto.Published && dto.PubName is null)
+        {
+            _logger.LogWarning(
+                "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
+                dto.Key);
+            return false;
+        }
+
+        return true;
     }
 
     /// <inheritdoc/>
@@ -180,21 +192,31 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// <inheritdoc/>
     public async Task<IEnumerable<ContentCacheNode>> GetElementSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
     {
-        Sql<ISqlContext>? sql = SqlElementSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Element))
-            .WhereIn<NodeDto>(x => x.UniqueId, keys)
-            .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
+        Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
+        List<ContentSourceDto> dtos = await FetchContentSourcesAsync(keysArray, GetElementSourcesSql);
 
-        List<ContentSourceDto> dtos = await ReadAsync(database => database.FetchAsync<ContentSourceDto>(sql));
+        return CreateElementSourceNodes(dtos, preview);
+    }
 
-        dtos = dtos
+    /// <inheritdoc/>
+    public IEnumerable<ContentCacheNode> GetElementSources(IEnumerable<Guid> keys, bool preview = false)
+    {
+        Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
+        List<ContentSourceDto> dtos = FetchContentSources(keysArray, GetElementSourcesSql);
+
+        return CreateElementSourceNodes(dtos, preview);
+    }
+
+    private IEnumerable<ContentCacheNode> CreateElementSourceNodes(List<ContentSourceDto> dtos, bool preview)
+    {
+        var filtered = dtos
             .Where(x => x is not null)
-            .Where(x => preview || ((x.PubDataRaw is not null || x.PubData is not null) && (!x.Published || x.PubName is not null)))
+            .Where(x => HasUsableSource(x, preview))
             .ToList();
 
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Element);
-        return dtos
+        return filtered
             .Select(x => CreateContentNodeKit(x, serializer, preview))
             .OfType<ContentCacheNode>();
     }
@@ -378,6 +400,12 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     private Sql<ISqlContext> GetDocumentSourcesSql(IEnumerable<Guid> keys)
         => SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Document))
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
+
+    private Sql<ISqlContext> GetElementSourcesSql(IEnumerable<Guid> keys)
+        => SqlElementSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Element))
             .WhereIn<NodeDto>(x => x.UniqueId, keys)
             .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
 

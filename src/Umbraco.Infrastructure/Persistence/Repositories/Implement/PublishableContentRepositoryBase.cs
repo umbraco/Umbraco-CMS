@@ -181,7 +181,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
 
                 // when invariant, ie 'variations' does not have the culture flag (value 1), it should be safe to simply use the published flag on umbracoDocument/umbracoElement,
                 // otherwise check if there's a version culture variation for the lang, via ccv.id
-                $", (CASE WHEN (ctype.variations & 1) = 0 THEN ({SqlSyntax.GetFieldName<TEntityDto>(x => x.Published)}) ELSE (CASE WHEN ccvp.id IS NULL THEN 0 ELSE 1 END) END) AS ordering "); // trailing space is important!
+                $", (CASE WHEN (ctype.variations & 1) = 0 THEN ({SqlSyntax.GetFieldName<TEntityDto>(x => x.Published)}) ELSE (CASE WHEN ccvp.id IS NULL THEN {SqlSyntax.ConvertIntegerToBoolean(0)} ELSE {SqlSyntax.ConvertIntegerToBoolean(1)} END) END) AS ordering "); // trailing space is important!
 
             sql = Sql(sqlText, sql.Arguments);
 

@@ -1836,8 +1836,13 @@ export class UiBaseLocators extends BasePage {
     // Wait for the backoffice to finish loading; clicking before the current-user extension bundle is ready
     // no-ops, so the modal never opens.
     await this.waitForPageLoad();
-    await this.click(this.currentUserAvatarBtn);
-    await expect(this.currentUserModal).toBeVisible({timeout: ConstantHelper.timeout.long});
+    // Only click while the modal is closed: a click with the modal open closes it.
+    await expect(async () => {
+      if (!(await this.currentUserModal.isVisible())) {
+        await this.click(this.currentUserAvatarBtn);
+      }
+      await expect(this.currentUserModal).toBeVisible({timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.long});
   }
 
   // Collection Methods
