@@ -16,6 +16,7 @@ export class ReportHelper {
       // Reporting is best-effort and must never change the outcome of a test.
       try {
         await fetch(reportUrl, {
+            signal: AbortSignal.timeout(5000),
             method: 'POST',
             headers: {
               'content-type': 'application/json;charset=UTF-8'
