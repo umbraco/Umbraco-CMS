@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
@@ -37,6 +38,7 @@ internal sealed class CacheRefreshingNotificationHandler :
     private readonly IMediaCacheService _mediaCacheService;
     private readonly IElementCacheService _elementCacheService;
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
+    private readonly IContentCacheDataSerializerFactory _serializerFactory;
     private readonly CacheSettings _cacheSettings;
     private readonly ILogger<CacheRefreshingNotificationHandler> _logger;
 
@@ -47,6 +49,7 @@ internal sealed class CacheRefreshingNotificationHandler :
     /// <param name="mediaCacheService">The media cache service.</param>
     /// <param name="elementCacheService">The element cache service.</param>
     /// <param name="publishedContentTypeCache">The published content type cache.</param>
+    /// <param name="serializerFactory">The content cache data serializer factory.</param>
     /// <param name="cacheSettings">The cache settings.</param>
     /// <param name="logger">The logger.</param>
     public CacheRefreshingNotificationHandler(
@@ -54,6 +57,7 @@ internal sealed class CacheRefreshingNotificationHandler :
         IMediaCacheService mediaCacheService,
         IElementCacheService elementCacheService,
         IPublishedContentTypeCache publishedContentTypeCache,
+        IContentCacheDataSerializerFactory serializerFactory,
         IOptions<CacheSettings> cacheSettings,
         ILogger<CacheRefreshingNotificationHandler> logger)
     {
@@ -61,6 +65,7 @@ internal sealed class CacheRefreshingNotificationHandler :
         _mediaCacheService = mediaCacheService;
         _elementCacheService = elementCacheService;
         _publishedContentTypeCache = publishedContentTypeCache;
+        _serializerFactory = serializerFactory;
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
     }
@@ -133,6 +138,8 @@ internal sealed class CacheRefreshingNotificationHandler :
     public Task HandleAsync(ContentTypeRefreshedNotification notification, CancellationToken cancellationToken)
 #pragma warning restore CS0618 // Type or member is obsolete
     {
+        _serializerFactory.ClearTypeCache();
+
         // Split changes into those that need a full raw cmsContentNu rebuild and those that only need the
         // converted content cache cleared (ContentCacheNode only stores ContentTypeId). A structural change
         // flagged RawDataUnaffected (a property removal) keeps its stored blob valid, so it belongs with the
@@ -206,6 +213,8 @@ internal sealed class CacheRefreshingNotificationHandler :
     /// <inheritdoc />
     public Task HandleAsync(ContentTypeDeletedNotification notification, CancellationToken cancellationToken)
     {
+        _serializerFactory.ClearTypeCache();
+
         foreach (IContentType deleted in notification.DeletedEntities)
         {
             _publishedContentTypeCache.ClearContentType(deleted.Id);
@@ -219,6 +228,8 @@ internal sealed class CacheRefreshingNotificationHandler :
     public Task HandleAsync(MediaTypeRefreshedNotification notification, CancellationToken cancellationToken)
 #pragma warning restore CS0618 // Type or member is obsolete
     {
+        _serializerFactory.ClearTypeCache();
+
         // Split changes into those that need a full raw cmsContentNu rebuild and those that only need the
         // converted content cache cleared (ContentCacheNode only stores ContentTypeId). A structural change
         // flagged RawDataUnaffected (a property removal) keeps its stored blob valid, so it belongs with the
@@ -245,6 +256,8 @@ internal sealed class CacheRefreshingNotificationHandler :
     /// <inheritdoc />
     public Task HandleAsync(MediaTypeDeletedNotification notification, CancellationToken cancellationToken)
     {
+        _serializerFactory.ClearTypeCache();
+
         foreach (IMediaType deleted in notification.DeletedEntities)
         {
             _publishedContentTypeCache.ClearContentType(deleted.Id);

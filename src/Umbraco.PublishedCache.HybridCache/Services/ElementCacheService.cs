@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSizeReporter
 {
     private readonly IDatabaseCacheRepository _databaseCacheRepository;
+    private readonly IContentCacheDataSerializerFactory _serializerFactory;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly Microsoft.Extensions.Caching.Hybrid.HybridCache _hybridCache;
     private readonly IPublishedContentFactory _publishedContentFactory;
@@ -84,9 +85,11 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         IOptions<CacheSettings> cacheSettings,
         ILogger<ElementCacheService> logger,
         IConvertedPublishedContentCacheFactory cacheFactory,
-        IPreviewAccessEvaluator previewAccessEvaluator)
+        IPreviewAccessEvaluator previewAccessEvaluator,
+        IContentCacheDataSerializerFactory serializerFactory)
     {
         _databaseCacheRepository = databaseCacheRepository;
+        _serializerFactory = serializerFactory;
         _scopeProvider = scopeProvider;
         _hybridCache = hybridCache;
         _publishedContentFactory = publishedContentFactory;
@@ -601,6 +604,10 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
     public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> elementTypeIds)
     {
+        // Entries evicted below are reloaded on their next miss, through the serializer factory. Discard what it has
+        // derived from the type definitions first, so that reload sees the changed definitions.
+        _serializerFactory.ClearTypeCache();
+
         // Clear the hybrid cache by element type tag for the affected element types.
         var elementTypeIdsAsArray = elementTypeIds as int[] ?? elementTypeIds.ToArray();
         var elementTypeIdTags = elementTypeIdsAsArray.Select(ElementTypeIdTag).ToArray();

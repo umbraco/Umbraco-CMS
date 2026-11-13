@@ -9,9 +9,9 @@ internal sealed class MsgPackContentNestedDataSerializerFactory : IContentCacheD
 {
     private readonly IPropertyCacheCompressionOptions _compressionOptions;
     private readonly IContentTypeService _contentTypeService;
-    private readonly ConcurrentDictionary<(int, string, bool), bool> _isCompressedCache = new();
     private readonly IMediaTypeService _mediaTypeService;
     private readonly PropertyEditorCollection _propertyEditors;
+    private volatile TypeSnapshot _snapshot;
 
     public MsgPackContentNestedDataSerializerFactory(
         IContentTypeService contentTypeService,
@@ -23,36 +23,72 @@ internal sealed class MsgPackContentNestedDataSerializerFactory : IContentCacheD
         _mediaTypeService = mediaTypeService;
         _propertyEditors = propertyEditors;
         _compressionOptions = compressionOptions;
+        _snapshot = new TypeSnapshot(contentTypeService, mediaTypeService);
     }
+
+    public void ClearTypeCache() => _snapshot = new TypeSnapshot(_contentTypeService, _mediaTypeService);
 
     public IContentCacheDataSerializer Create(ContentCacheDataSerializerEntityType types)
     {
-        // Depending on which entity types are being requested, we need to look up those content types
-        // to initialize the compression options.
-        // We need to initialize these options now so that any data lookups required are completed and are not done while the content cache
-        // is performing DB queries which will result in errors since we'll be trying to query with open readers.
-        // NOTE: The calls to GetAll() below should be cached if the data has not been changed.
+        TypeSnapshot snapshot = _snapshot;
+
+        // The type lookups are completed here, ahead of the content cache's own database queries, because querying
+        // while those queries have open readers would fail.
+        return snapshot.Serializers.GetOrAdd(
+            types,
+            static (types, state) => new Lazy<IContentCacheDataSerializer>(
+                () => state.factory.CreateSerializer(types, state.snapshot),
+                LazyThreadSafetyMode.PublicationOnly),
+            (factory: this, snapshot)).Value;
+    }
+
+    private IContentCacheDataSerializer CreateSerializer(ContentCacheDataSerializerEntityType types, TypeSnapshot snapshot)
+    {
         var contentTypes = new Dictionary<int, IContentTypeComposition>();
         if ((types & ContentCacheDataSerializerEntityType.Document) == ContentCacheDataSerializerEntityType.Document)
         {
-            foreach (IContentType ct in _contentTypeService.GetAll())
+            foreach (KeyValuePair<int, IContentTypeComposition> ct in snapshot.DocumentTypes.Value)
             {
-                contentTypes[ct.Id] = ct;
+                contentTypes[ct.Key] = ct.Value;
             }
         }
 
         if ((types & ContentCacheDataSerializerEntityType.Media) == ContentCacheDataSerializerEntityType.Media)
         {
-            foreach (IMediaType ct in _mediaTypeService.GetAll())
+            foreach (KeyValuePair<int, IContentTypeComposition> ct in snapshot.MediaTypes.Value)
             {
-                contentTypes[ct.Id] = ct;
+                contentTypes[ct.Key] = ct.Value;
             }
         }
 
         var compression =
-            new PropertyCacheCompression(_compressionOptions, contentTypes, _propertyEditors, _isCompressedCache);
-        var serializer = new MsgPackContentNestedDataSerializer(compression);
+            new PropertyCacheCompression(_compressionOptions, contentTypes, _propertyEditors, snapshot.IsCompressedCache);
+        return new MsgPackContentNestedDataSerializer(compression);
+    }
 
-        return serializer;
+    /// <summary>
+    ///     One reading of the content type and media type definitions, read on first use, together with what is derived
+    ///     from it: the serializers and the memoised compression answers. Replaced as a whole when the definitions
+    ///     change, so nothing derived from an earlier reading can outlive it.
+    /// </summary>
+    private sealed class TypeSnapshot
+    {
+        public TypeSnapshot(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService)
+        {
+            DocumentTypes = new Lazy<IReadOnlyDictionary<int, IContentTypeComposition>>(
+                () => contentTypeService.GetAll().ToDictionary(x => x.Id, x => (IContentTypeComposition)x),
+                LazyThreadSafetyMode.PublicationOnly);
+            MediaTypes = new Lazy<IReadOnlyDictionary<int, IContentTypeComposition>>(
+                () => mediaTypeService.GetAll().ToDictionary(x => x.Id, x => (IContentTypeComposition)x),
+                LazyThreadSafetyMode.PublicationOnly);
+        }
+
+        public Lazy<IReadOnlyDictionary<int, IContentTypeComposition>> DocumentTypes { get; }
+
+        public Lazy<IReadOnlyDictionary<int, IContentTypeComposition>> MediaTypes { get; }
+
+        public ConcurrentDictionary<ContentCacheDataSerializerEntityType, Lazy<IContentCacheDataSerializer>> Serializers { get; } = new();
+
+        public ConcurrentDictionary<(int, string, bool), bool> IsCompressedCache { get; } = new();
     }
 }
