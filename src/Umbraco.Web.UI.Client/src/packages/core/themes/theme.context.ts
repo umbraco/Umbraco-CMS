@@ -110,6 +110,15 @@ export class UmbThemeContext extends UmbContextBase {
 			this.#styleElement = null;
 		}
 	}
+
+	override destroy(): void {
+		this.#mediaQueryList?.removeEventListener('change', this.#mediaQueryListener);
+		this.#mediaQueryList = undefined;
+		this.#themeManifest = undefined;
+		this.#styleElement?.remove();
+		this.#styleElement = null;
+		super.destroy();
+	}
 }
 
 export const UMB_THEME_CONTEXT = new UmbContextToken<UmbThemeContext>('umbThemeContext');
