@@ -52,10 +52,9 @@ export class UmbCollectionToolbarElement extends UmbLitElement {
 			<div id="slot" class=${this._textFilter ? 'shrink' : ''} ?hidden=${!this._hasSlottedContent}>
 				<slot @slotchange=${this.#onSlotChange}></slot>
 			</div>
-			<div id="end">
-				${this._textFilter ? nothing : html`<umb-collection-filter-bundle></umb-collection-filter-bundle>`}
-				<umb-collection-view-bundle></umb-collection-view-bundle>
-			</div>
+			${this._textFilter || this._hasSlottedContent ? nothing : html`<div id="spacer"></div>`}
+			${this._textFilter ? nothing : html`<umb-collection-filter-bundle></umb-collection-filter-bundle>`}
+			<umb-collection-view-bundle></umb-collection-view-bundle>
 		`;
 	}
 
@@ -81,11 +80,9 @@ export class UmbCollectionToolbarElement extends UmbLitElement {
 				display: none;
 			}
 
-			#end {
-				display: flex;
-				align-items: center;
-				gap: var(--uui-size-space-5);
-				margin-left: auto;
+			/* Pushes the items after it to the end when neither a text filter nor slotted content fills the space. */
+			#spacer {
+				flex: 1;
 			}
 		`,
 	];
