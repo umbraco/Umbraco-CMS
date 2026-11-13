@@ -62,6 +62,13 @@ export class UmbSplitPanelElement extends UmbLitElement {
 
 	#hasInitialized = false;
 
+	override connectedCallback() {
+		super.connectedCallback();
+		if (this.#hasBothPanels) {
+			this.#connect();
+		}
+	}
+
 	override disconnectedCallback() {
 		super.disconnectedCallback();
 		this.#disconnect();
@@ -73,19 +80,6 @@ export class UmbSplitPanelElement extends UmbLitElement {
 		if (!this.#hasInitialized) return;
 
 		if (_changedProperties.has('position')) {
-			if (this.lock !== 'none') {
-				const { width } = this.mainElement.getBoundingClientRect();
-
-				let pos = parseFloat(this.position);
-
-				if (this.position.endsWith('%')) {
-					pos = (pos / 100) * width;
-				}
-
-				const lockedPanelWidth = this.lock === 'start' ? pos : width - pos;
-				this.#lockedPanelWidth = lockedPanelWidth;
-			}
-
 			this.#updateSplit();
 		}
 	}
@@ -107,6 +101,19 @@ export class UmbSplitPanelElement extends UmbLitElement {
 		// If lock is none
 		let maxStartWidth = this.position;
 		let maxEndWidth = '1fr';
+
+		if (this.lock !== 'none') {
+			const { width } = this.mainElement.getBoundingClientRect();
+
+			let pos = parseFloat(this.position);
+
+			if (this.position.endsWith('%')) {
+				pos = (pos / 100) * width;
+			}
+
+			const lockedPanelWidth = this.lock === 'start' ? pos : width - pos;
+			this.#lockedPanelWidth = lockedPanelWidth;
+		}
 
 		if (this.lock === 'start') {
 			maxStartWidth = this.#lockedPanelWidth + 'px';
@@ -188,8 +195,12 @@ export class UmbSplitPanelElement extends UmbLitElement {
 	async #connect() {
 		this.#hasInitialized = true;
 
+		if (this.position === 'var(--umb-split-panel-initial-position)') {
+			this.position = getComputedStyle(this).getPropertyValue('--umb-split-panel-initial-position').trim();
+		}
+
 		this.mainElement.style.display = 'grid';
-		this.mainElement.style.gridTemplateColumns = `${this.position} 0px 1fr`;
+		this.#updateSplit();		
 		this.dividerElement.style.display = 'unset';
 
 		this.dividerTouchAreaElement.addEventListener('pointerdown', this.#onDragStart);
