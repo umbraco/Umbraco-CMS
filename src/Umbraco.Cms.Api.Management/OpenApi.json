@@ -44184,6 +44184,7 @@
           "isDeletable",
           "isFolder",
           "noAccess",
+          "parentIsFolder",
           "name",
           "id",
           "flags",
@@ -44204,6 +44205,9 @@
             "type": "boolean"
           },
           "noAccess": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "name": {
@@ -44447,6 +44451,7 @@
           "variants",
           "isFolder",
           "noAccess",
+          "parentIsFolder",
           "name",
           "id",
           "flags",
@@ -44474,6 +44479,9 @@
             "type": "boolean"
           },
           "noAccess": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "name": {
@@ -45308,6 +45316,7 @@
           "icon",
           "isFolder",
           "noAccess",
+          "parentIsFolder",
           "name",
           "id",
           "flags",
@@ -45325,6 +45334,9 @@
             "type": "boolean"
           },
           "noAccess": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "name": {
@@ -45980,6 +45992,7 @@
           "variants",
           "isFolder",
           "noAccess",
+          "parentIsFolder",
           "name",
           "id",
           "flags",
@@ -46011,6 +46024,9 @@
             "type": "boolean"
           },
           "noAccess": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "name": {
@@ -48341,6 +48357,7 @@
           "isDeletable",
           "isFolder",
           "noAccess",
+          "parentIsFolder",
           "name",
           "id",
           "flags",
@@ -48358,6 +48375,9 @@
             "type": "boolean"
           },
           "noAccess": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "name": {
@@ -49045,6 +49065,7 @@
           "icon",
           "isFolder",
           "noAccess",
+          "parentIsFolder",
           "name",
           "id",
           "flags",
@@ -49059,6 +49080,9 @@
             "type": "boolean"
           },
           "noAccess": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "name": {

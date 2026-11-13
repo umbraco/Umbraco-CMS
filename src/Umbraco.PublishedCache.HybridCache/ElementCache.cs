@@ -26,4 +26,12 @@ public sealed class ElementCache : IPublishedElementCache
     /// <inheritdoc />
     public IPublishedElement? GetById(bool preview, Guid key)
         => _elementCacheService.GetByKey(key, preview);
+
+    /// <inheritdoc />
+    public Task<IReadOnlyList<IPublishedElement>> GetByIdsAsync(IReadOnlyCollection<Guid> keys, bool? preview = null)
+        => _elementCacheService.GetByKeysAsync(keys, preview);
+
+    /// <inheritdoc />
+    public IReadOnlyList<IPublishedElement> GetByIds(bool preview, IReadOnlyCollection<Guid> keys)
+        => _elementCacheService.GetByKeys(keys, preview);
 }

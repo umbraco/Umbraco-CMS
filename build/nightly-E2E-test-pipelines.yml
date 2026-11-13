@@ -323,6 +323,7 @@ stages:
     dependsOn: [Build, Integration]
     condition: in(dependencies.Build.result, 'Succeeded', 'SucceededWithIssues')
     variables:
+      umbracoVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion'] ]
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       # Enable console logging in Release mode
       SERILOG__WRITETO__0__NAME: Async
@@ -506,6 +507,7 @@ stages:
     dependsOn: [Build, DefaultConfigE2E]
     condition: in(dependencies.Build.result, 'Succeeded', 'SucceededWithIssues')
     variables:
+      umbracoVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion'] ]
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       ASPNETCORE_URLS: https://localhost:44331
       PlaywrightPassword: UmbracoAcceptance123!

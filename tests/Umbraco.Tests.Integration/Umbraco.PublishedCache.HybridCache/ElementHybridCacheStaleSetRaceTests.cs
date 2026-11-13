@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -94,7 +95,8 @@ internal sealed class ElementHybridCacheStaleSetRaceTests : UmbracoIntegrationTe
             GetRequiredService<IOptions<CacheSettings>>(),
             new NullLogger<ElementCacheService>(),
             GetRequiredService<IConvertedPublishedContentCacheFactory>(),
-            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewElement(It.IsAny<IPublishedElement>())));
+            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewElement(It.IsAny<IPublishedElement>())),
+            GetRequiredService<IContentCacheDataSerializerFactory>());
     }
 
     [Test]
@@ -171,6 +173,46 @@ internal sealed class ElementHybridCacheStaleSetRaceTests : UmbracoIntegrationTe
             Assert.AreEqual(newNode.Key, cachedNode!.Key, "Cached node should be the refreshed node.");
             Assert.AreEqual(NewName, cachedNode!.Data?.Name, "Cached node should hold the refreshed name.");
         });
+    }
+
+    [Test]
+    public async Task Batched_Read_Through_Does_Not_Clobber_A_Concurrent_Refresh()
+    {
+        ContentCacheNode oldNode = BuildPublishedNode(OldName, OldTitle);
+        ContentCacheNode newNode = BuildPublishedNode(NewName, NewTitle);
+
+        var readReachedDatabase = new TaskCompletionSource();
+        var releaseRead = new TaskCompletionSource();
+        _databaseCacheRepository
+            .Setup(x => x.GetElementSourcesAsync(It.IsAny<IEnumerable<Guid>>(), false))
+            .Returns(async () =>
+            {
+                readReachedDatabase.TrySetResult();
+                await releaseRead.Task;
+                return [oldNode];
+            });
+
+        _databaseCacheRepository
+            .Setup(x => x.GetElementSourceForPublishStatesAsync(_element.Key))
+            .ReturnsAsync((null, newNode));
+
+        await _hybridCache.RemoveAsync($"{_element.Key}");
+
+        Task<IReadOnlyList<IPublishedElement>> staleRead = Task.Run(() => _elementCacheService.GetByKeysAsync([_element.Key], false));
+        await readReachedDatabase.Task;
+
+        await _elementCacheService.RefreshMemoryCacheAsync(_element.Key);
+
+        releaseRead.TrySetResult();
+        IReadOnlyList<IPublishedElement> staleResult = await staleRead;
+
+        Assert.AreEqual(OldName, staleResult.Single().Name, "The set is served from the stale snapshot.");
+
+        // The stale write-back is skipped, so a fresh lookup observes the refreshed content.
+        IReadOnlyList<IPublishedElement> result = await _elementCacheService.GetByKeysAsync([_element.Key], false);
+
+        Assert.AreEqual(NewName, result.Single().Name, "Name was served from the clobbered stale snapshot.");
+        Assert.AreEqual(NewTitle, result.Single().GetProperty("title")?.GetSourceValue());
     }
 
     [Test]

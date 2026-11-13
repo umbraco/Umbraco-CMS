@@ -183,6 +183,13 @@ internal interface IDatabaseCacheRepository
     Task<IEnumerable<ContentCacheNode>> GetElementSourcesAsync(IEnumerable<Guid> keys, bool preview = false);
 
     /// <summary>
+    /// Gets a collection of cache nodes for a collection of element keys, synchronously.
+    /// </summary>
+    /// <param name="keys">The element keys.</param>
+    /// <param name="preview">A flag indicating whether to get the draft (preview) version or the published version.</param>
+    IEnumerable<ContentCacheNode> GetElementSources(IEnumerable<Guid> keys, bool preview = false);
+
+    /// <summary>
     /// Gets all element keys of specific element types.
     /// </summary>
     /// <param name="keys">The element types to find elements using.</param>

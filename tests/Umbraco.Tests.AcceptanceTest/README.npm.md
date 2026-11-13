@@ -1,4 +1,4 @@
-# @umbraco/acceptance-test-helpers
+# @umbraco-cms/acceptance-test-helpers
 
 Test helpers and builders for writing [Playwright](https://playwright.dev/) end-to-end tests for Umbraco CMS solutions.
 
@@ -7,7 +7,7 @@ This package provides API helpers, UI helpers, and JSON model builders to simpli
 ## Installation
 
 ```bash
-npm install -D @umbraco/acceptance-test-helpers
+npm install -D @umbraco-cms/acceptance-test-helpers
 ```
 
 ## Configuration
@@ -46,7 +46,7 @@ env:
 The package exports a custom Playwright `test` fixture that provides two main helper categories:
 
 ```typescript
-import { ConstantHelper, test } from '@umbraco/acceptance-test-helpers';
+import { ConstantHelper, test } from '@umbraco-cms/acceptance-test-helpers';
 import { expect } from '@playwright/test';
 
 test('can create content', async ({ umbracoApi, umbracoUi }) => {
@@ -119,7 +119,7 @@ Direct access to Playwright's Page object for custom interactions.
 ## Helper Constants
 
 ```typescript
-import { ConstantHelper, NotificationConstantHelper, AliasHelper } from '@umbraco/acceptance-test-helpers';
+import { ConstantHelper, NotificationConstantHelper, AliasHelper } from '@umbraco-cms/acceptance-test-helpers';
 
 // Section names
 ConstantHelper.sections.content
@@ -150,7 +150,7 @@ Build complex Umbraco JSON models for test setup using the builder pattern with 
 ### Quick Start
 
 ```typescript
-import { DocumentTypeBuilder, AliasHelper } from '@umbraco/acceptance-test-helpers';
+import { DocumentTypeBuilder, AliasHelper } from '@umbraco-cms/acceptance-test-helpers';
 
 // Minimal — uses defaults
 const simpleDocType = new DocumentTypeBuilder().build();
