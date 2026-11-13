@@ -1,6 +1,6 @@
 import type { ManifestSection } from '../extensions/index.js';
 import type { UmbSectionPickerModalData, UmbSectionPickerModalValue } from './section-picker-modal.token.js';
-import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -63,6 +63,14 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 			</umb-body-layout>
 		`;
 	}
+
+	static override styles = [
+		css`
+			uui-menu-item {
+				margin-bottom: 1px;
+			}
+		`,
+	];
 }
 
 export default UmbSectionPickerModalElement;
