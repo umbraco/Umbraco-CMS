@@ -8,6 +8,10 @@ import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
 const DEFAULT_ALIAS_PATTERN = '^[A-Za-z][A-Za-z0-9_-]{0,254}$';
 
+/**
+ * @element umb-input-with-alias
+ * @slot append - Content shown at the end of the input, after the alias.
+ */
 @customElement('umb-input-with-alias')
 export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
 	UmbLitElement,
@@ -161,6 +165,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 							</uui-input-lock>
 						`
 					: html`<span id="alias" class="muted" slot="append">${this.alias}</span>`}
+				<slot name="append" slot="append"></slot>
 			</uui-input>
 		`;
 	}

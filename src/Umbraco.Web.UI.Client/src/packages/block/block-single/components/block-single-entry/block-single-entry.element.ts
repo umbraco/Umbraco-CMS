@@ -283,7 +283,11 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	}
 
 	readonly #expose = () => {
-		this.#context.expose();
+		if (this._showContentEdit) {
+			this.#context.edit();
+		} else {
+			this.#context.expose();
+		}
 	};
 
 	readonly #onUfmResolved = (event: UmbUfmResolvedEvent) => {

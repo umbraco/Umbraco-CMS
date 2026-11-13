@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -15,6 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Folder;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.DocumentType}/folder")]
 [ApiExplorerSettings(GroupName = "Document Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
+[RequiresPermissionsFor(Constants.Permissions.Entities.DocumentType.Resource)]
 public abstract class DocumentTypeFolderControllerBase : FolderManagementControllerBase<IContentType>
 {
     protected DocumentTypeFolderControllerBase(

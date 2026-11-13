@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -14,6 +15,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.PartialView;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.PartialView}")]
 [ApiExplorerSettings(GroupName = "Partial View")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessPartialViews)]
+[RequiresPermissionsFor(Constants.Permissions.Entities.PartialView.Resource)]
 public class PartialViewControllerBase : FileSystemManagementControllerBase
 {
     protected IActionResult PartialViewOperationStatusResult(PartialViewOperationStatus status) =>
