@@ -7,14 +7,12 @@ resources:
   pipelines:
     - pipeline: build
       source: "Umbraco CMS 9+"
-      # Runs when a build run carrying the release tag succeeds. Manual runs pick the build run under Resources.
       trigger:
         branches:
           include:
-            - refs/heads/release/*
-            - refs/tags/release-*
-            - refs/heads/main
-            - refs/heads/v*/dev
+            # Only branches and tags of this repository. Pull request runs, forks included, are refs/pull/* and never match.
+            - refs/heads/*
+            - refs/tags/*
         tags:
           - release
 
