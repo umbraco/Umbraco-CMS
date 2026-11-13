@@ -162,7 +162,7 @@ stages:
       - job: WaitForApproval
         displayName: Wait for manual approval
         pool: server
-        timeoutInMinutes: 4320 # 3 days
+        timeoutInMinutes: 30
         steps:
           - task: ManualValidation@1
             displayName: Manual approval to publish the release
