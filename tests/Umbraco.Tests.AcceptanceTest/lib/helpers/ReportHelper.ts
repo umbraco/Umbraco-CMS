@@ -9,8 +9,10 @@ export class ReportHelper {
   }
 
   async report(testInfo: TestInfo) {
-    if (testInfo.retry > 0 && process.env.CI) {
-      await fetch("https://functionapp-221110123128.azurewebsites.net/api/PlaywrightTableData", {
+    const reportUrl = process.env.PlaywrightReportUrl;
+    // An undefined pipeline variable arrives as its unexpanded macro text rather than as an empty value.
+    if (testInfo.retry > 0 && process.env.CI && reportUrl && /^https?:\/\//i.test(reportUrl)) {
+      await fetch(reportUrl, {
           method: 'POST',
           headers: {
             'content-type': 'application/json;charset=UTF-8'
