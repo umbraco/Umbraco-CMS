@@ -3,6 +3,7 @@ using Examine;
 using Examine.Search;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -101,17 +102,67 @@ public class VariantDocumentTests : IndexTestBase
         var field = FieldNameHelper.FieldName(property, fieldValues);
         IIndex index = GetIndex(CoreConstants.Search.IndexAliases.PublishedContent);
 
-        IOrdering queryBuilder = index.Searcher.CreateQuery().All();
-        queryBuilder.SelectField(field);
-        ISearchResults results = queryBuilder.Execute();
+        ISearchResults results = index.Searcher.CreateQuery().All().Execute();
 
         // the index stores values culture invariantly, so the expected value must be formatted the same way
         var expectedValue = Convert.ToString(value, CultureInfo.InvariantCulture);
-        var result = results
-            .SelectMany(x => x.Values.Values)
-            .First(x => x == expectedValue);
-        Assert.That(results, Is.Not.Empty);
-        Assert.That(result, Is.EqualTo(expectedValue));
+        ISearchResult result = results.Single(x => x.Id == DocumentIdHelper.CalculateDocumentId(RootKey, culture));
+        Assert.That(result.Values[field], Is.EqualTo(expectedValue));
+    }
+
+    [TestCase("en-US", "1.5", "2026-01-02T03:04:05.0000000")]
+    [TestCase("da-DK", "-2.25", "2026-02-03T04:05:06.0000000")]
+    [TestCase("ja-JP", "3.75", "2026-03-04T05:06:07.0000000")]
+    public async Task CanIndexVariantNumericAndDateValuesByCultureIndependentOfServerCulture(string culture, string expectedDecimal, string expectedDate)
+    {
+        // "," as the decimal separator, U+2212 as the negative sign.
+        await WithServerCulture("sv-SE", CreateVariantDocument);
+
+        ISearchResult result = GetIndex(CoreConstants.Search.IndexAliases.PublishedContent).Searcher.CreateQuery().All().Execute()
+            .Single(x => x.Id == DocumentIdHelper.CalculateDocumentId(RootKey, culture));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Values[FieldNameHelper.FieldName("variantdecimalproperty", Constants.FieldValues.Decimals)], Is.EqualTo(expectedDecimal));
+            Assert.That(result.Values[FieldNameHelper.FieldName("variantdate", Constants.FieldValues.DateTimeOffsets)], Is.EqualTo(expectedDate));
+        });
+    }
+
+    [TestCase("en-US")]
+    [TestCase("de-DE")] // "," as the decimal separator, day-first dates.
+    [TestCase("sv-SE")] // U+2212 as the negative sign.
+    public async Task CanIndexValuesOfFieldsWithoutDefinitionIndependentOfCurrentCulture(string currentCulture)
+    {
+        const string indexAlias = CoreConstants.Search.IndexAliases.PublishedContent;
+        const string propertyName = "fieldWithoutDefinition";
+        var key = Guid.NewGuid();
+
+        await WithServerCulture(currentCulture, () => WaitForIndexing(indexAlias, () => Indexer.AddOrUpdateAsync(
+            indexAlias,
+            key,
+            UmbracoObjectTypes.Document,
+            [new Variation(Culture: null, Segment: null)],
+            [
+                new IndexField(
+                    propertyName,
+                    new IndexValue
+                    {
+                        Integers = [-12],
+                        Decimals = [-12.4552m],
+                        DateTimeOffsets = [new DateTimeOffset(2026, 11, 4, 14, 30, 15, TimeSpan.Zero)],
+                    },
+                    Culture: null,
+                    Segment: null),
+            ],
+            null)));
+
+        ISearchResult result = GetIndex(indexAlias).Searcher.CreateQuery().All().Execute()
+            .Single(x => x.Id == DocumentIdHelper.CalculateDocumentId(key, null));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Values[FieldNameHelper.FieldName(propertyName, Constants.FieldValues.Integers)], Is.EqualTo("-12"));
+            Assert.That(result.Values[FieldNameHelper.FieldName(propertyName, Constants.FieldValues.Decimals)], Is.EqualTo("-12.4552"));
+            Assert.That(result.Values[FieldNameHelper.FieldName(propertyName, Constants.FieldValues.DateTimeOffsets)], Is.EqualTo("2026-11-04T14:30:15.0000000"));
+        });
     }
 
     [TestCase("title", "updatedTitle", "en-US")]
@@ -219,6 +270,18 @@ public class VariantDocumentTests : IndexTestBase
             .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.Decimal)
             .Done()
             .AddPropertyType()
+            .WithAlias("variantdecimalproperty")
+            .WithVariations(ContentVariation.Culture)
+            .WithDataTypeId(dataType.Id)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.Decimal)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("variantdate")
+            .WithVariations(ContentVariation.Culture)
+            .WithDataTypeId(CoreConstants.DataTypes.DateTime)
+            .WithPropertyEditorAlias(CoreConstants.PropertyEditors.Aliases.DateTime)
+            .Done()
+            .AddPropertyType()
             .WithAlias("body")
             .WithVariations(ContentVariation.CultureAndSegment)
             .WithDataTypeId(CoreConstants.DataTypes.Textbox)
@@ -241,6 +304,12 @@ public class VariantDocumentTests : IndexTestBase
         root.SetValue("title", "Root", "en-US");
         root.SetValue("title", "Rod", "da-DK");
         root.SetValue("title", "ル-ト", "ja-JP");
+        root.SetValue("variantdecimalproperty", 1.5, "en-US");
+        root.SetValue("variantdecimalproperty", -2.25, "da-DK");
+        root.SetValue("variantdecimalproperty", 3.75, "ja-JP");
+        root.SetValue("variantdate", new DateTime(2026, 1, 2, 3, 4, 5), "en-US");
+        root.SetValue("variantdate", new DateTime(2026, 2, 3, 4, 5, 6), "da-DK");
+        root.SetValue("variantdate", new DateTime(2026, 3, 4, 5, 6, 7), "ja-JP");
 
         root.SetValue("body", "body-segment-1", "en-US", "segment-1");
         root.SetValue("body", "body-segment-2", "en-US", "segment-2");
@@ -260,6 +329,23 @@ public class VariantDocumentTests : IndexTestBase
         Assert.That(content, Is.Not.Null);
     }
 
+
+    private static async Task WithServerCulture(string culture, Func<Task> action)
+    {
+        CultureInfo originalCulture = CultureInfo.CurrentCulture;
+        CultureInfo? originalDefaultThreadCulture = CultureInfo.DefaultThreadCurrentCulture;
+        try
+        {
+            // indexing runs on background threads, which take the default thread culture
+            CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture = new CultureInfo(culture);
+            await action();
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+            CultureInfo.DefaultThreadCurrentCulture = originalDefaultThreadCulture;
+        }
+    }
 
     private async Task UpdateProperty(string propertyName, object value, string culture)
     {
