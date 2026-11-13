@@ -40,13 +40,14 @@ export abstract class UmbContentPublishedPendingChangesManagerBase<
 
 		const variantIds = args.persistedData.variants?.map((x) => UmbVariantId.Create(x)) ?? [];
 
+		const publishedData = structuredClone(args.publishedData);
+		// remove dates from the comparison
+		publishedData.variants.forEach((variant) => this.#cleanVariantForComparison(variant));
+
 		// Every variant merges the same two lists of values, so index each of them once and share it.
 		// Notice the published data is the persisted side of each merge, and the persisted data is the draft side.
-		const publishedValuesIndex = new UmbPropertyValueIndex(args.publishedData.values);
+		const publishedValuesIndex = new UmbPropertyValueIndex(publishedData.values);
 		const persistedValuesIndex = new UmbPropertyValueIndex(args.persistedData.values);
-		args.publishedData = structuredClone(args.publishedData);
-		// remove dates from the comparison
-		args.publishedData.variants.forEach((variant) => this.#cleanVariantForComparison(variant));
 
 		const pendingChangesPromises = variantIds.map((variantId) =>
 			this.#processVariant(args, variantId, publishedValuesIndex, persistedValuesIndex),
