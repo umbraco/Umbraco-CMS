@@ -868,6 +868,8 @@ export default {
 		publishAll: 'Publiser alle undersider',
 		publishHelp:
 			'Klikk <em>ok</em> for å publisere <strong>%0%</strong> og dermed gjøre innholdet synlig for alle.<br/><br />Du kan publisere denne siden og alle dens undersider ved å krysse av <em>Publiser alle undersider</em> nedenfor.',
+		publishedNotificationTitle: 'Publisert',
+		publishedNotificationDescription: '%0% er nå offentlig tilgjengelig',
 	},
 	colorpicker: {
 		noColors: 'Du har ikke konfigurert noen godkjente farger',
@@ -965,6 +967,7 @@ export default {
 		dictionaryItemSaved: 'Ordbokelement lagret',
 		editContentPublishedFailedByParent: 'Publiseringen feilet fordi den overliggende siden ikke er publisert',
 		editContentPublishedHeader: 'Innhold publisert',
+		editElementPublishedHeader: 'Element publisert',
 		editContentPublishedText: 'og er nå synlig for besøkende',
 		editContentSavedHeader: 'Innhold lagret',
 		editContentSavedText: 'Husk å publisere for å gjøre endringene synlig for besøkende',
@@ -1356,5 +1359,10 @@ export default {
 		browseTab: 'Bla gjennom',
 		searchTab: 'Søk',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'element' : 'elementer'} valgt`,
+	},
+	elements: {
+		confirmPublishDescription: 'Publisering vil gjøre dette offentlig tilgjengelig.',
+		confirmBulkPublishDescription: 'Publisering vil gjøre de valgte elementene offentlig tilgjengelige.',
+		confirmBulkUnpublishDescription: 'De valgte elementene vil ikke lenger være offentlig tilgjengelige.',
 	},
 } as UmbLocalizationDictionary;
