@@ -15,6 +15,12 @@ describe('UmbVariantId', () => {
 			expect(id.segment).to.equal('xmas');
 		});
 
+		it('normalizes empty-string culture and segment to null', () => {
+			const id = new UmbVariantId('', '');
+			expect(id.culture).to.equal(null);
+			expect(id.segment).to.equal(null);
+		});
+
 		it('keeps non-invariant cultures and segments as given', () => {
 			const id = new UmbVariantId('en', 'xmas');
 			expect(id.culture).to.equal('en');
@@ -165,6 +171,20 @@ describe('UmbVariantId', () => {
 	});
 
 	describe('Equal', () => {
+		it('treats empty strings, null and omitted values as the same', () => {
+			expect(UmbVariantId.Equal({ culture: 'en', segment: '' }, { culture: 'en', segment: null })).to.equal(true);
+			expect(UmbVariantId.Equal({ culture: 'en', segment: '' }, { culture: 'en' })).to.equal(true);
+			expect(UmbVariantId.Equal({ culture: '', segment: null }, { culture: null, segment: null })).to.equal(true);
+			expect(UmbVariantId.Equal({ culture: '', segment: null }, { culture: UMB_INVARIANT_CULTURE })).to.equal(true);
+		});
+
+		it('agrees with ToString for objects that differ only by empty values', () => {
+			const a = { culture: 'en', segment: '' };
+			const b = { culture: 'en', segment: null };
+			expect(UmbVariantId.ToString(a)).to.equal(UmbVariantId.ToString(b));
+			expect(UmbVariantId.Equal(a, b)).to.equal(true);
+		});
+
 		it('is true for objects with the same culture and segment', () => {
 			expect(UmbVariantId.Equal({ culture: 'en', segment: 'xmas' }, { culture: 'en', segment: 'xmas' })).to.be.true;
 		});

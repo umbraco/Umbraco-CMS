@@ -3,7 +3,9 @@ import type { UmbObjectWithVariantProperties } from './types.js';
 export const UMB_INVARIANT_CULTURE = 'invariant';
 
 const normalizeCulture = (culture?: string | null): string | null =>
-	(culture === UMB_INVARIANT_CULTURE ? null : culture) ?? null;
+	culture === UMB_INVARIANT_CULTURE ? null : culture || null;
+
+const normalizeSegment = (segment?: string | null): string | null => segment || null;
 
 /**
  * An identifier representing a Variant. This is at current state a culture and a segment.
@@ -38,13 +40,13 @@ export class UmbVariantId {
 
 	/**
 	 * Checks whether two objects hold the same culture and segment, without creating Variant Ids.
-	 * Omitted values, `null` and the `invariant` culture are treated as invariant.
+	 * Omitted values, `null`, empty strings and the `invariant` culture are treated as invariant.
 	 * @param {Partial<UmbObjectWithVariantProperties>} a - The first object.
 	 * @param {Partial<UmbObjectWithVariantProperties>} b - The second object.
 	 * @returns {boolean} True if both culture and segment match.
 	 */
 	public static Equal(a: Partial<UmbObjectWithVariantProperties>, b: Partial<UmbObjectWithVariantProperties>): boolean {
-		return normalizeCulture(a.culture) === normalizeCulture(b.culture) && (a.segment ?? null) === (b.segment ?? null);
+		return normalizeCulture(a.culture) === normalizeCulture(b.culture) && normalizeSegment(a.segment) === normalizeSegment(b.segment);
 	}
 
 	/**
@@ -55,7 +57,8 @@ export class UmbVariantId {
 	 * @returns {string} The string representation.
 	 */
 	public static ToString(variantData: Partial<UmbObjectWithVariantProperties>): string {
-		return (variantData.culture || UMB_INVARIANT_CULTURE) + (variantData.segment ? `_${variantData.segment}` : '');
+		const segment = normalizeSegment(variantData.segment);
+		return (normalizeCulture(variantData.culture) ?? UMB_INVARIANT_CULTURE) + (segment ? `_${segment}` : '');
 	}
 
 	/**
@@ -93,12 +96,12 @@ export class UmbVariantId {
 	public readonly segment: string | null = null;
 
 	/**
-	 * @param {string | null} [culture] - The culture. `null`, `undefined` and `'invariant'` all mean culture invariant.
-	 * @param {string | null} [segment] - The segment. `null` and `undefined` both mean segment invariant.
+	 * @param {string | null} [culture] - The culture. `null`, `undefined`, an empty string and `'invariant'` all mean culture invariant.
+	 * @param {string | null} [segment] - The segment. `null`, `undefined` and an empty string all mean segment invariant.
 	 */
 	constructor(culture?: string | null, segment?: string | null) {
 		this.culture = normalizeCulture(culture);
-		this.segment = segment ?? null;
+		this.segment = normalizeSegment(segment);
 	}
 
 	/**
