@@ -12,7 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('./product-price-filter.api.js'),
 		weight: 90,
 		meta: {
-			label: 'Price Range',
+			label: 'Price',
 		},
 		conditions: [
 			{
