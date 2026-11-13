@@ -3,13 +3,14 @@ import { UMB_FILTER_CONTEXT } from '@umbraco-cms/backoffice/filter';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbFilterExtensionApi } from '@umbraco-cms/backoffice/filter';
 
 interface ExampleProductPriceFilterStateModel {
 	range: ExampleProductPriceFacetModel;
 	limits: { min?: number; max?: number };
 }
 
-export class ExampleProductPriceFilterApi extends UmbControllerBase {
+export class ExampleProductPriceFilterApi extends UmbControllerBase implements UmbFilterExtensionApi {
 	#state = new UmbObjectState<ExampleProductPriceFilterStateModel>({ range: { min: 0, max: 0 }, limits: {} });
 
 	public readonly min = this.#state.asObservablePart((state) => state.range.min);

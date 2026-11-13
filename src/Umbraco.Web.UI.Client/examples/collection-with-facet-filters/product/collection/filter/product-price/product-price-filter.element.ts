@@ -1,9 +1,10 @@
 import type { ExampleProductPriceFilterApi } from './product-price-filter.api.js';
+import type { UmbFilterExtensionElement } from '@umbraco-cms/backoffice/filter';
 import { css, customElement, html, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('example-product-price-filter')
-export class ExampleProductPriceFilterElement extends UmbLitElement {
+export class ExampleProductPriceFilterElement extends UmbLitElement implements UmbFilterExtensionElement {
 	@state()
 	private _min = 0;
 

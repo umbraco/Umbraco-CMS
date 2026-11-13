@@ -2,6 +2,7 @@ import type { ManifestFilterBase } from '../filter.extension.js';
 import type { MetaFilterFacetSelect } from '../facet-select/types.js';
 import type { MetaFilterSelect, UmbSelectFilterOptionModel } from './types.js';
 import type { UmbSelectFilterApiBase } from './select-filter-api.base.js';
+import type { UmbFilterExtensionElement } from '../filter-extension-element.interface.js';
 import { css, customElement, html, ifDefined, repeat, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
@@ -10,7 +11,7 @@ import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 const INLINE_THRESHOLD = 6;
 
 @customElement('umb-select-filter')
-export class UmbSelectFilterElement extends UmbLitElement {
+export class UmbSelectFilterElement extends UmbLitElement implements UmbFilterExtensionElement {
 	@state()
 	private _multiple = false;
 

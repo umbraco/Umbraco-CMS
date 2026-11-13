@@ -1,5 +1,6 @@
 import { UMB_FILTER_CONTEXT } from '../filter.context-token.js';
 import type { ManifestFilterBase } from '../filter.extension.js';
+import type { UmbFilterExtensionApi } from '../filter-extension-api.interface.js';
 import type { UmbSelectFilterOptionModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -11,9 +12,10 @@ import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
  * Base for the APIs of select filters: holds the options, the selected values and their items.
  * Subclasses decide where the options come from and how the selected values are resolved into items.
  */
-export abstract class UmbSelectFilterApiBase<
-	OptionType extends UmbSelectFilterOptionModel = UmbSelectFilterOptionModel,
-> extends UmbControllerBase {
+export abstract class UmbSelectFilterApiBase<OptionType extends UmbSelectFilterOptionModel = UmbSelectFilterOptionModel>
+	extends UmbControllerBase
+	implements UmbFilterExtensionApi
+{
 	#options = new UmbArrayState<OptionType>([], (x) => x.unique);
 	public readonly options = this.#options.asObservable();
 

@@ -85,7 +85,7 @@ describe('ExampleProductPriceFilterApi', () => {
 
 		api.setValue(20, 120);
 		await waitForSelection(20, 120);
-		expect(await activeLimits()).to.be.empty;
+		expect(await activeLimits()).to.deep.equal([]);
 	});
 
 	it('returns to the price facet when the limits are cleared', async () => {

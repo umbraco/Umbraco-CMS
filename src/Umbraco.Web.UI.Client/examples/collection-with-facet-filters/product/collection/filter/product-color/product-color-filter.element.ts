@@ -1,9 +1,10 @@
 import type { ExampleProductColorFilterApi, ExampleProductColorFacetOptionModel } from './product-color-filter.api.js';
+import type { UmbFilterExtensionElement } from '@umbraco-cms/backoffice/filter';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('example-product-color-filter')
-export class ExampleProductColorFilterElement extends UmbLitElement {
+export class ExampleProductColorFilterElement extends UmbLitElement implements UmbFilterExtensionElement {
 	@state()
 	private _options: Array<ExampleProductColorFacetOptionModel> = [];
 
