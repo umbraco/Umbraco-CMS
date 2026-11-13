@@ -1041,6 +1041,7 @@ declare global {
 		examineManagement_rebuildIndexWarning: string;
 		examineManagement_searchDescription: string;
 		examineManagement_searchers: string;
+		examineManagement_searchNotAllowed: string;
 		examineManagement_searchResultsFound: string;
 		examineManagement_tools: string;
 		examineManagement_toolsDescription: string;

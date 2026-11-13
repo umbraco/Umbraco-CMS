@@ -24,4 +24,10 @@ public enum WebhookOperationStatus
     ///     The operation failed because no events were specified for the webhook.
     /// </summary>
     NoEvents,
+
+    /// <summary>
+    ///     The operation failed because one or more of the webhook's headers has an invalid name or value,
+    ///     or is a header that cannot be set on a webhook request.
+    /// </summary>
+    InvalidHeaders,
 }

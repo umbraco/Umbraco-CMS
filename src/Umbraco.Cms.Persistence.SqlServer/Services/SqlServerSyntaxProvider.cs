@@ -43,8 +43,25 @@ public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerS
         V2016 = 7,
         V2017 = 8,
         V2019 = 9,
+        V2022 = 10,
+        V2025 = 11,
         Other = 99,
     }
+
+    private static readonly IReadOnlyDictionary<string, VersionName> _versionNamesByMajorVersion = new Dictionary<string, VersionName>
+    {
+        ["7"] = VersionName.V7,
+        ["8"] = VersionName.V2000,
+        ["9"] = VersionName.V2005,
+        ["10"] = VersionName.V2008,
+        ["11"] = VersionName.V2012,
+        ["12"] = VersionName.V2014,
+        ["13"] = VersionName.V2016,
+        ["14"] = VersionName.V2017,
+        ["15"] = VersionName.V2019,
+        ["16"] = VersionName.V2022,
+        ["17"] = VersionName.V2025,
+    };
 
     private readonly IOptions<GlobalSettings> _globalSettings;
     private readonly ILogger<SqlServerSyntaxProvider> _logger;
@@ -96,34 +113,15 @@ public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerS
 
     private static VersionName MapProductVersion(string productVersion)
     {
-        var firstPart = string.IsNullOrWhiteSpace(productVersion)
-            ? "??"
-            : productVersion.Split(Core.Constants.CharArrays.Period)[0];
-        switch (firstPart)
+        if (string.IsNullOrWhiteSpace(productVersion))
         {
-            case "??":
-                return VersionName.Invalid;
-            case "15":
-                return VersionName.V2019;
-            case "14":
-                return VersionName.V2017;
-            case "13":
-                return VersionName.V2016;
-            case "12":
-                return VersionName.V2014;
-            case "11":
-                return VersionName.V2012;
-            case "10":
-                return VersionName.V2008;
-            case "9":
-                return VersionName.V2005;
-            case "8":
-                return VersionName.V2000;
-            case "7":
-                return VersionName.V7;
-            default:
-                return VersionName.Other;
+            return VersionName.Invalid;
         }
+
+        var majorVersion = productVersion.Split(Core.Constants.CharArrays.Period)[0];
+        return _versionNamesByMajorVersion.TryGetValue(majorVersion, out VersionName versionName)
+            ? versionName
+            : VersionName.Other;
     }
 
     internal ServerVersionInfo GetSetVersion(string? connectionString, string? providerName, ILogger logger)
