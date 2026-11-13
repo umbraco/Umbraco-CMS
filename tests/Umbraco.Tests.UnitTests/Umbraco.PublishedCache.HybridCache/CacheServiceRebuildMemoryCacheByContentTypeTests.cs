@@ -97,4 +97,31 @@ public class CacheServiceRebuildMemoryCacheByContentTypeTests
 
         Assert.That(_events, Is.EqualTo(new[] { Cleared, Evicted }));
     }
+
+    [Test]
+    public async Task Rebuilding_Elements_By_Content_Type_Clears_The_Serializer_Type_Cache_Before_Evicting()
+    {
+        var cacheFactory = new Mock<IConvertedPublishedContentCacheFactory>();
+        cacheFactory
+            .Setup(x => x.Create<string, IPublishedElement>(It.IsAny<int?>(), It.IsAny<string>()))
+            .Returns(Mock.Of<IConvertedPublishedContentCache<string, IPublishedElement>>());
+        var service = new ElementCacheService(
+            Mock.Of<IDatabaseCacheRepository>(),
+            Mock.Of<ICoreScopeProvider>(),
+            _hybridCache.Object,
+            Mock.Of<IPublishedContentFactory>(),
+            Mock.Of<ICacheNodeFactory>(),
+            [],
+            Mock.Of<IPublishedModelFactory>(),
+            Mock.Of<IPreviewService>(),
+            new OptionsWrapper<CacheSettings>(new CacheSettings()),
+            NullLogger<ElementCacheService>.Instance,
+            cacheFactory.Object,
+            Mock.Of<IPreviewAccessEvaluator>(),
+            _serializerFactory.Object);
+
+        await service.RebuildMemoryCacheByContentTypeAsync([1]);
+
+        Assert.That(_events, Is.EqualTo(new[] { Cleared, Evicted }));
+    }
 }

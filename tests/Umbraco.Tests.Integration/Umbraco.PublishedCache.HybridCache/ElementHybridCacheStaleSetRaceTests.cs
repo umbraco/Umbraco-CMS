@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
@@ -94,7 +95,8 @@ internal sealed class ElementHybridCacheStaleSetRaceTests : UmbracoIntegrationTe
             GetRequiredService<IOptions<CacheSettings>>(),
             new NullLogger<ElementCacheService>(),
             GetRequiredService<IConvertedPublishedContentCacheFactory>(),
-            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewElement(It.IsAny<IPublishedElement>())));
+            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewElement(It.IsAny<IPublishedElement>())),
+            GetRequiredService<IContentCacheDataSerializerFactory>());
     }
 
     [Test]
