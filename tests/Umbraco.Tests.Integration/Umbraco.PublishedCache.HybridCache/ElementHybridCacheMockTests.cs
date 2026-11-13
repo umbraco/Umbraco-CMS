@@ -285,7 +285,7 @@ internal sealed class ElementHybridCacheMockTests : UmbracoIntegrationTest
             new NullLogger<ElementCacheService>(),
             new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()),
             Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewElement(It.IsAny<IPublishedElement>()) == canPreview),
-            GetRequiredService<IContentCacheDataSerializerFactory>());
+            Mock.Of<IContentCacheDataSerializerFactory>());
 
     private ContentCacheNode BuildCacheNode(bool isDraft, Guid? key = null)
         => new()
