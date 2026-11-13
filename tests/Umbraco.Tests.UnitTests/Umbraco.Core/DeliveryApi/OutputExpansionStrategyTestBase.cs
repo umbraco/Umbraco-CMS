@@ -257,6 +257,112 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
     }
 
     [Test]
+    public void OutputExpansionStrategy_DoesNotRecurseIntoAnElementReferencingItself()
+    {
+        var accessor = CreateOutputExpansionStrategyAccessor("properties[element[properties[$all]]]");
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
+        var apiElementBuilder = new ApiElementBuilder(accessor);
+
+        var content = CreatePublishedContentMock();
+        var selfReferencingElement = CreateElementMock("self");
+        var recursionDepth = 0;
+        selfReferencingElement.SetupGet(e => e.Properties).Returns(new[]
+        {
+            CreateNumberProperty(selfReferencingElement.Object, 42, "number"),
+            CreateElementReferenceProperty(selfReferencingElement.Object, "self", selfReferencingElement.Object, apiElementBuilder, () =>
+            {
+                if (++recursionDepth > 10)
+                {
+                    throw new InvalidOperationException("Element mapping recursed too deeply.");
+                }
+            })
+        });
+
+        SetupContentMock(
+            content,
+            CreateElementReferenceProperty(content.Object, "element", selfReferencingElement.Object, apiElementBuilder, () =>
+            {
+                if (++recursionDepth > 10)
+                {
+                    throw new InvalidOperationException("Element mapping recursed too deeply.");
+                }
+            }));
+
+        var result = apiContentBuilder.Build(content.Object);
+
+        var elementOutput = result.Properties["element"] as IApiElement;
+        Assert.IsNotNull(elementOutput);
+        Assert.AreEqual(2, elementOutput.Properties.Count);
+        Assert.AreEqual(42, elementOutput.Properties["number"]);
+
+        var selfReferenceOutput = elementOutput.Properties["self"] as IApiElement;
+        Assert.IsNotNull(selfReferenceOutput);
+        Assert.IsEmpty(selfReferenceOutput.Properties);
+    }
+
+    [Test]
+    public void OutputExpansionStrategy_DoesNotRecurseIntoElementsReferencingEachOther()
+    {
+        var accessor = CreateOutputExpansionStrategyAccessor("properties[element[properties[$all]]]");
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor, CreateVariationContextAccessor());
+        var apiElementBuilder = new ApiElementBuilder(accessor);
+
+        var content = CreatePublishedContentMock();
+        var firstElement = CreateElementMock("first");
+        var secondElement = CreateElementMock("second");
+        var recursionDepth = 0;
+
+        firstElement.SetupGet(e => e.Properties).Returns(new[]
+        {
+            CreateNumberProperty(firstElement.Object, 10, "number"),
+            CreateElementReferenceProperty(firstElement.Object, "other", secondElement.Object, apiElementBuilder, () =>
+            {
+                if (++recursionDepth > 10)
+                {
+                    throw new InvalidOperationException("Element mapping recursed too deeply.");
+                }
+            })
+        });
+
+        secondElement.SetupGet(e => e.Properties).Returns(new[]
+        {
+            CreateNumberProperty(secondElement.Object, 20, "number"),
+            CreateElementReferenceProperty(secondElement.Object, "other", firstElement.Object, apiElementBuilder, () =>
+            {
+                if (++recursionDepth > 10)
+                {
+                    throw new InvalidOperationException("Element mapping recursed too deeply.");
+                }
+            })
+        });
+
+        SetupContentMock(
+            content,
+            CreateElementReferenceProperty(content.Object, "element", firstElement.Object, apiElementBuilder, () =>
+            {
+                if (++recursionDepth > 10)
+                {
+                    throw new InvalidOperationException("Element mapping recursed too deeply.");
+                }
+            }));
+
+        var result = apiContentBuilder.Build(content.Object);
+
+        var elementOutput = result.Properties["element"] as IApiElement;
+        Assert.IsNotNull(elementOutput);
+        Assert.AreEqual(2, elementOutput.Properties.Count);
+        Assert.AreEqual(10, elementOutput.Properties["number"]);
+
+        var otherOutput = elementOutput.Properties["other"] as IApiElement;
+        Assert.IsNotNull(otherOutput);
+        Assert.AreEqual(20, otherOutput.Properties["number"]);
+
+        var cyclicOtherOutput = otherOutput.Properties["other"] as IApiElement;
+        Assert.IsNotNull(cyclicOtherOutput);
+        Assert.IsEmpty(cyclicOtherOutput.Properties);
+    }
+
+    [Test]
     public void OutputExpansionStrategy_MappingContent_ThrowsOnInvalidItemType()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false);
@@ -462,6 +568,47 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         var elementPropertyType = SetupPublishedPropertyType(elementValueConverter.Object, elementPropertyAlias, "My.Element.Property");
 
         var propertyData = new PropertyData { Value = "doesn't matter, it's mocked", Culture = string.Empty, Segment = string.Empty  };
+        return new PublishedProperty(elementPropertyType, parent, VariationContextAccessorMock(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
+    }
+
+    internal Mock<IPublishedElement> CreateElementMock(string name)
+    {
+        var element = new Mock<IPublishedElement>();
+        element.SetupGet(e => e.Key).Returns(Guid.NewGuid());
+        element.SetupGet(e => e.Name).Returns(name);
+        element.SetupGet(e => e.ContentType).Returns(_elementType);
+        return element;
+    }
+
+    internal PublishedPropertyBase CreateElementReferenceProperty(
+        IPublishedElement parent,
+        string propertyAlias,
+        IPublishedElement referencedElement,
+        IApiElementBuilder apiElementBuilder,
+        Action? onRecursion = null)
+    {
+        var elementValueConverter = new Mock<IDeliveryApiPropertyValueConverter>();
+        elementValueConverter
+            .Setup(p => p.ConvertIntermediateToDeliveryApiObject(
+                It.IsAny<IPublishedElement>(),
+                It.IsAny<IPublishedPropertyType>(),
+                It.IsAny<PropertyCacheLevel>(),
+                It.IsAny<object?>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>()))
+            .Returns(() =>
+            {
+                onRecursion?.Invoke();
+                return apiElementBuilder.Build(referencedElement);
+            });
+        elementValueConverter.Setup(p => p.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
+        elementValueConverter.Setup(p => p.IsValue(It.IsAny<object?>(), It.IsAny<PropertyValueLevel>())).Returns(true);
+        elementValueConverter.Setup(p => p.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
+        elementValueConverter.Setup(p => p.GetDeliveryApiPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
+        elementValueConverter.Setup(p => p.GetDeliveryApiPropertyCacheLevelForExpansion(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
+
+        var elementPropertyType = SetupPublishedPropertyType(elementValueConverter.Object, propertyAlias, "My.Element.Property");
+        var propertyData = new PropertyData { Value = "doesn't matter, it's mocked", Culture = string.Empty, Segment = string.Empty };
         return new PublishedProperty(elementPropertyType, parent, VariationContextAccessorMock(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
     }
 
