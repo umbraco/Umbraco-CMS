@@ -387,7 +387,7 @@ public partial class ContentEditingServiceTests
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.AllowedAsRoot = true;
         contentType.IsElement = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var createModel = new ContentCreateModel
         {
@@ -411,17 +411,17 @@ public partial class ContentEditingServiceTests
     {
         var rootContentType = ContentTypeBuilder.CreateBasicContentType("root", "Root");
         rootContentType.AllowedAsRoot = true;
-        ContentTypeService.Save(rootContentType);
+        await ContentTypeService.CreateAsync(rootContentType, Constants.Security.SuperUserKey);
 
         var elementType = ContentTypeBuilder.CreateBasicContentType("element", "Element");
         elementType.IsElement = true;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         rootContentType.AllowedContentTypes = new[]
         {
             new ContentTypeSort(elementType.Key, 1, elementType.Alias)
         };
-        ContentTypeService.Save(rootContentType);
+        await ContentTypeService.UpdateAsync(rootContentType, Constants.Security.SuperUserKey);
 
         var rootKey = (await ContentEditingService.CreateAsync(
             new ContentCreateModel
