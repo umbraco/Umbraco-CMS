@@ -1,8 +1,12 @@
 import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
-import { debounce } from '@umbraco-cms/backoffice/utils';
+import { debounce, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
+/**
+ * @deprecated Deprecated since v17. Register a `collectionTextFilter` extension (for example `kind: 'default'`) for the
+ * collection instead; the collection toolbar renders it. Scheduled for removal in Umbraco 21.
+ */
 @customElement('umb-collection-filter-field')
 export class UmbCollectionFilterFieldElement extends UmbLitElement {
 	@state()
@@ -13,6 +17,13 @@ export class UmbCollectionFilterFieldElement extends UmbLitElement {
 
 	constructor() {
 		super();
+
+		new UmbDeprecation({
+			deprecated: 'umb-collection-filter-field',
+			removeInVersion: '21.0.0',
+			solution:
+				"Register a collectionTextFilter extension (for example kind: 'default') for the collection; the collection toolbar renders it.",
+		}).warn();
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
 			this.#collectionContext = context;
