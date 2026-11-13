@@ -57,6 +57,7 @@ steps:
       CommitId: $(Build.SourceVersion)
       AgentOs: $(Agent.OS)
       PlaywrightReportUrl: $(PlaywrightReportUrl)
+      UmbracoVersion: $(umbracoVersion)
       AZUREADB2CTESTUSEREMAIL: ${{ parameters.AZUREB2CTESTUSEREMAIL }}
       AZUREADB2CTESTUSERPASSWORD: ${{ parameters.AZUREB2CTESTUSERPASSWORD }}
 
