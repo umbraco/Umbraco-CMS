@@ -78,6 +78,7 @@ stages:
 
               $buildNumber = if ($dryRun) { "$version - dry run" } else { $version }
               Write-Host "##vso[build.updatebuildnumber]$buildNumber"
+              if ($kind -eq 'nightly') { Write-Host "##vso[build.addbuildtag]nightly" }
 
               Write-Host "##vso[task.setvariable variable=kind;isOutput=true]$kind"
               Write-Host "##vso[task.setvariable variable=npmDistTag;isOutput=true]$npmDistTag"
@@ -198,6 +199,8 @@ stages:
                   packagesToPush: $(Pipeline.Workspace)/build/nupkg/**/*.nupkg
                   nuGetFeedType: "external"
                   publishFeedCredentials: "NuGet - Umbraco.*"
+              - script: echo "##vso[build.addbuildtag]nuget"
+                displayName: Tag the run nuget
 
   - stage: Deploy_Npm
     displayName: Npm release
@@ -233,6 +236,16 @@ stages:
               displayName: Push test helpers to npm
               npmTag: $(npmDistTag)
               dryRun: ${{ parameters.dryRun }}
+      - ${{ if not(parameters.dryRun) }}:
+          - job: TagRun
+            displayName: Tag the run npm
+            dependsOn:
+              - Publish
+              - PublishTestHelpers
+            steps:
+              - checkout: none
+              - script: echo "##vso[build.addbuildtag]npm"
+                displayName: Tag the run npm
 
   - stage: Upload_API_Docs
     pool:
