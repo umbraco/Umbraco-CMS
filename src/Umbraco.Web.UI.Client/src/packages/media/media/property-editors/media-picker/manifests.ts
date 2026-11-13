@@ -1,4 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.MediaPicker.js';
+import { manifests as clipboardManifests } from './clipboard/manifests.js';
 import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 const propertyEditorUiAlias = 'Umb.PropertyEditorUi.MediaPicker';
@@ -43,4 +44,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Clear Media Picker Property Action',
 		forPropertyEditorUis: [propertyEditorUiAlias],
 	},
+	...clipboardManifests,
 ];

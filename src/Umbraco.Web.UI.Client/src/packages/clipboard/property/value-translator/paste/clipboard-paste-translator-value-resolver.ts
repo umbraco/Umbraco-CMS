@@ -4,6 +4,7 @@ import type { ManifestClipboardPastePropertyValueTranslator } from './clipboard-
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi, type ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorConfigProperty } from '@umbraco-cms/backoffice/property-editor';
 
 export class UmbClipboardPastePropertyValueTranslatorValueResolver<
 	PropertyValueType = unknown,
@@ -13,6 +14,7 @@ export class UmbClipboardPastePropertyValueTranslatorValueResolver<
 	async resolve(
 		clipboardEntryValues: UmbClipboardEntryValuesType,
 		propertyEditorUiAlias: string,
+		propertyEditorConfig?: Array<UmbPropertyEditorConfigProperty>,
 	): Promise<PropertyValueType> {
 		if (!clipboardEntryValues.length) {
 			throw new Error('Clipboard entry values are required.');
@@ -31,7 +33,7 @@ export class UmbClipboardPastePropertyValueTranslatorValueResolver<
 			throw new Error(`Value to translate is missing`);
 		}
 
-		return pasteTranslator.translate(valueToTranslate.value);
+		return pasteTranslator.translate(valueToTranslate.value, propertyEditorConfig);
 	}
 
 	/**
