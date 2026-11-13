@@ -12,6 +12,8 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbEntityDeletedEvent } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
@@ -66,6 +68,8 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 
 	readonly splitViewContext = new UmbWorkspaceSplitViewContext(this);
 
+	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+
 	#onVariantSelectorSlotChanged(e: Event) {
 		this._variantSelectorSlotHasContent = (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
 	}
@@ -96,7 +100,33 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 			},
 			null,
 		);
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
+			this.#eventContext?.removeEventListener(
+				UmbEntityDeletedEvent.TYPE,
+				this.#onEntityDeletedEvent as unknown as EventListener,
+			);
+			this.#eventContext = context;
+			this.#eventContext?.addEventListener(
+				UmbEntityDeletedEvent.TYPE,
+				this.#onEntityDeletedEvent as unknown as EventListener,
+			);
+		});
 	}
+
+	#onEntityDeletedEvent = (event: UmbEntityDeletedEvent) => {
+		// Only one split view should navigate, otherwise each would push its own history entry.
+		if (!this.displayNavigation || !this.backPath) return;
+
+		const workspaceContext = this.splitViewContext.getWorkspaceContext();
+		const unique = workspaceContext?.getUnique();
+		if (!unique) return;
+
+		if (event.getEntityType() !== workspaceContext?.getEntityType()) return;
+		if (event.getUnique() !== unique) return;
+
+		history.pushState({}, '', this.backPath);
+	};
 
 	override render() {
 		return html`
@@ -129,6 +159,14 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 		return html`<umb-workspace-entity-action-menu
 			slot="action-menu"
 			data-mark="workspace:action-menu"></umb-workspace-entity-action-menu>`;
+	}
+
+	override destroy(): void {
+		this.#eventContext?.removeEventListener(
+			UmbEntityDeletedEvent.TYPE,
+			this.#onEntityDeletedEvent as unknown as EventListener,
+		);
+		super.destroy();
 	}
 
 	static override readonly styles = [
