@@ -211,12 +211,15 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return;
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        // The rebuild runs in its own scope rather than inside the caching scope below, so that it can take its write
+        // lock before anything in its transaction reads (see RebuildAllUrlsAsync).
         if (SkipDatabaseWrites() is false && ShouldRebuildUrls())
         {
             _logger.LogInformation("Rebuilding all document URLs.");
             await RebuildAllUrlsAsync();
         }
+
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         _logger.LogInformation("Caching document URLs.");
 
@@ -277,6 +280,10 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
+
+        // Take the write lock before the first read. On SQLite a transaction that has read cannot then become the
+        // writer if another connection committed in the meantime, and the rebuild reads every document first.
+        scope.WriteLock(Constants.Locks.DocumentUrls);
 
         IEnumerable<IContent> documents = _documentRepository.GetMany(Array.Empty<int>());
 
