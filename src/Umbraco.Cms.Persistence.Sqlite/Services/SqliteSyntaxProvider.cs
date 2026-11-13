@@ -107,8 +107,9 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
     /// <inheritdoc />
     /// <remarks>
-    /// SQLite stores date and time values as text, so this and the other date and time formats match those the ADO.NET provider writes for
-    /// parameters, keeping values comparable and sortable whichever way they were written.
+    /// SQLite stores date and time values as text, so the formats for <see cref="DateTimeOffset"/>, <see cref="DateOnly"/>
+    /// and <see cref="TimeOnly"/> match those the ADO.NET provider writes for parameters, keeping values comparable and
+    /// sortable whichever way they were written.
     /// </remarks>
     public override string FormatDateTimeOffset(DateTimeOffset dateTimeOffset)
         => dateTimeOffset.ToString(@"yyyy\-MM\-dd HH\:mm\:ss.FFFFFFFzzz", CultureInfo.InvariantCulture);
