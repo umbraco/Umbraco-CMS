@@ -1,6 +1,7 @@
 import { manifests as collectionActionManifests } from './action/manifests.js';
 import { manifests as collectionRepositoryManifests } from './repository/manifests.js';
 import { manifests as collectionViewManifests } from './views/manifests.js';
+import { manifests as collectionFilterManifests } from './filter/manifests.js';
 import { manifests as itemManifests } from './item/manifests.js';
 import { UMB_DOCUMENT_COLLECTION_REPOSITORY_ALIAS, UMB_DOCUMENT_COLLECTION_ALIAS } from './constants.js';
 
@@ -10,7 +11,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: UMB_DOCUMENT_COLLECTION_ALIAS,
 		name: 'Document Collection',
 		api: () => import('./document-collection.context.js'),
-		element: () => import('./document-collection.element.js'),
 		meta: {
 			repositoryAlias: UMB_DOCUMENT_COLLECTION_REPOSITORY_ALIAS,
 		},
@@ -18,5 +18,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...collectionActionManifests,
 	...collectionRepositoryManifests,
 	...collectionViewManifests,
+	...collectionFilterManifests,
 	...itemManifests,
 ];
