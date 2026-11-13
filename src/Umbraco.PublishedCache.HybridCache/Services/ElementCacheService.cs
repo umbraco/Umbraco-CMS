@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSizeReporter
 {
     private readonly IDatabaseCacheRepository _databaseCacheRepository;
+    private readonly IContentCacheDataSerializerFactory _serializerFactory;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly Microsoft.Extensions.Caching.Hybrid.HybridCache _hybridCache;
     private readonly IPublishedContentFactory _publishedContentFactory;
@@ -28,7 +29,6 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IPreviewSessionService _previewSessionService;
     private readonly IPreviewAccessEvaluator _previewAccessEvaluator;
-    private readonly IContentCacheDataSerializerFactory _serializerFactory;
     private readonly CacheSettings _cacheSettings;
     private readonly ILogger<ElementCacheService> _logger;
     private readonly ElementSourceReader _readElementSourceAsync;
@@ -89,6 +89,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         IContentCacheDataSerializerFactory serializerFactory)
     {
         _databaseCacheRepository = databaseCacheRepository;
+        _serializerFactory = serializerFactory;
         _scopeProvider = scopeProvider;
         _hybridCache = hybridCache;
         _publishedContentFactory = publishedContentFactory;
@@ -97,7 +98,6 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         _publishedModelFactory = publishedModelFactory;
         _previewSessionService = previewSessionService;
         _previewAccessEvaluator = previewAccessEvaluator;
-        _serializerFactory = serializerFactory;
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
         _publishedElementCache = cacheFactory.Create<string, IPublishedElement>(_cacheSettings.Entry.Element.MaximumLocalCacheItems, CacheName);
