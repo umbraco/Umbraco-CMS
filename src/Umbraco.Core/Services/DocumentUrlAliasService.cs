@@ -461,8 +461,8 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
-        // Take the write lock before the first read. On SQLite a transaction that has read cannot then become the
-        // writer if another connection committed in the meantime.
+        // Take the write lock before the first read. Some providers (for example SQLite in WAL mode) cannot let a
+        // transaction that has already read become the writer once another connection has committed.
         scope.WriteLock(Constants.Locks.DocumentUrlAliases);
 
         // Get all languages for culture-to-languageId mapping

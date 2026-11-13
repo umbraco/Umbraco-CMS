@@ -281,8 +281,9 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
-        // Take the write lock before the first read. On SQLite a transaction that has read cannot then become the
-        // writer if another connection committed in the meantime, and the rebuild reads every document first.
+        // Take the write lock before the first read, as the rebuild reads every document before it writes. Some
+        // providers (for example SQLite in WAL mode) cannot let a transaction that has already read become the
+        // writer once another connection has committed.
         scope.WriteLock(Constants.Locks.DocumentUrls);
 
         IEnumerable<IContent> documents = _documentRepository.GetMany(Array.Empty<int>());
