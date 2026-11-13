@@ -1,14 +1,14 @@
 import { EXAMPLE_PRODUCT_COLLECTION_PRODUCT_COLOR_FILTER_ALIAS } from './constants.js';
 import { EXAMPLE_PRODUCT_COLOR_ITEM_REPOSITORY_ALIAS } from '../../../../product-color/repository/item/constants.js';
 import { EXAMPLE_PRODUCT_COLLECTION_ALIAS } from '../../constants.js';
-import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		type: 'filter',
+		type: 'collectionFilter',
 		kind: 'facetSelect',
 		alias: EXAMPLE_PRODUCT_COLLECTION_PRODUCT_COLOR_FILTER_ALIAS,
 		name: 'Product Color Collection Filter',
+		forCollections: [EXAMPLE_PRODUCT_COLLECTION_ALIAS],
 		weight: 80,
 		element: () => import('./product-color-filter.element.js'),
 		api: () => import('./product-color-filter.api.js'),
@@ -16,12 +16,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Color',
 			itemRepositoryAlias: EXAMPLE_PRODUCT_COLOR_ITEM_REPOSITORY_ALIAS,
 		},
-		conditions: [
-			{
-				alias: UMB_COLLECTION_ALIAS_CONDITION,
-				match: EXAMPLE_PRODUCT_COLLECTION_ALIAS,
-			},
-		],
 	},
 	{
 		type: 'filterActiveValue',

@@ -1,5 +1,6 @@
 import { UmbFacetSelectFilterApi } from './facet-select-filter.api.js';
-import type { ManifestFilterFacetSelectKind } from './types.js';
+import type { MetaFilterFacetSelect } from './types.js';
+import type { ManifestFilterBase } from '../filter.extension.js';
 import { UmbFilterContext } from '../filter.context.js';
 import { UmbFilterManagerContext } from '../filter-manager.context.js';
 import { expect } from '@open-wc/testing';
@@ -30,12 +31,12 @@ class TestItemRepository extends UmbControllerBase {
 }
 
 const manifest = {
-	type: 'filter',
+	type: 'umbTestFilter',
 	kind: 'facetSelect',
 	alias: FILTER_ALIAS,
 	name: FILTER_ALIAS,
 	meta: { label: 'Test', itemRepositoryAlias: ITEM_REPOSITORY_ALIAS },
-} as ManifestFilterFacetSelectKind;
+} as unknown as ManifestFilterBase & { meta: MetaFilterFacetSelect };
 
 function waitFor<T>(observable: Observable<T>, predicate: (value: T) => boolean): Promise<T> {
 	return new Promise((resolve) => {

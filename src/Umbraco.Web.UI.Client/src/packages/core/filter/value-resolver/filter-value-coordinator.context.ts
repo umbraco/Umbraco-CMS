@@ -1,5 +1,5 @@
 import type { ManifestFilterActiveValue } from '../active-value/filter-active-value.extension.js';
-import type { ManifestFilter } from '../filter.extension.js';
+import type { ManifestFilterBase } from '../filter.extension.js';
 import type { UmbFilterValueResolver } from './filter-value-resolver.interface.js';
 import { UMB_FILTER_VALUE_COORDINATOR_CONTEXT } from './filter-value-coordinator.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -21,11 +21,12 @@ function getFilterActiveValueManifest(alias: string): ManifestFilterActiveValue 
 }
 
 /**
+ * Looks up by alias alone, so it finds the filter whichever host's filter extension type registered it.
  * @param {string} alias - The filter alias.
- * @returns {ManifestFilter | undefined} The filter manifest, merged with its kind.
+ * @returns {ManifestFilterBase | undefined} The filter manifest, merged with its kind.
  */
-function getFilterManifest(alias: string): ManifestFilter | undefined {
-	return umbExtensionsRegistry.getByTypeAndFilter('filter', (ext: ManifestFilter) => ext.alias === alias)[0];
+function getFilterManifest(alias: string): ManifestFilterBase | undefined {
+	return umbExtensionsRegistry.getByAlias<ManifestFilterBase>(alias);
 }
 
 /**

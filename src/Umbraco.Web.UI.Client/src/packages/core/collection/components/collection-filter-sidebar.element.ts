@@ -3,6 +3,10 @@ import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/e
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
+import type { ManifestCollectionFilter } from '../filter/collection-filter.extension.js';
+
+const FILTERS_CONTROLLER_ALIAS = 'umbCollectionFilterExtensions';
 
 @customElement('umb-collection-filter-sidebar')
 export class UmbCollectionFilterSidebarElement extends UmbLitElement {
@@ -12,15 +16,26 @@ export class UmbCollectionFilterSidebarElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		new UmbExtensionsElementAndApiInitializer(
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
+			this.#observeFilters(context?.manifest?.alias);
+		});
+	}
+
+	#observeFilters(collectionAlias: string | undefined) {
+		this.removeUmbControllerByAlias(FILTERS_CONTROLLER_ALIAS);
+		this._filters = [];
+		if (!collectionAlias) return;
+
+		new UmbExtensionsElementAndApiInitializer<ManifestCollectionFilter, 'collectionFilter'>(
 			this,
 			umbExtensionsRegistry,
-			'filter',
+			'collectionFilter',
 			undefined,
-			undefined,
+			(manifest) => manifest.forCollections.includes(collectionAlias),
 			(filters) => {
 				this._filters = filters;
 			},
+			FILTERS_CONTROLLER_ALIAS,
 		);
 	}
 

@@ -1,5 +1,5 @@
 import { UmbFilterManagerContext } from '../../filter-manager.context.js';
-import type { ManifestFilter } from '../../filter.extension.js';
+import type { ManifestFilterBase } from '../../filter.extension.js';
 import type { UmbFilterValueResolver } from '../../value-resolver/filter-value-resolver.interface.js';
 import type { ManifestFilterActiveValue } from '../filter-active-value.extension.js';
 import { UmbFilterActiveValueElementBase } from '../base/filter-active-value-element.base.js';
@@ -58,11 +58,11 @@ describe('UmbFilterActiveValueExtensionElement', () => {
 	beforeEach(() => {
 		umbExtensionsRegistry.registerMany(defaultKindManifests);
 		umbExtensionsRegistry.register({
-			type: 'filter',
+			type: 'umbTestFilter',
 			alias: FILTER_ALIAS,
 			name: FILTER_ALIAS,
 			meta: { label: 'Colour' },
-		} as unknown as ManifestFilter);
+		} as unknown as ManifestFilterBase);
 
 		host = document.createElement('test-filter-active-value-host') as TestHostElement;
 		document.body.appendChild(host);

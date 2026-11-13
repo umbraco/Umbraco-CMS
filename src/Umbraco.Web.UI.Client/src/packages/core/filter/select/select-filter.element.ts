@@ -1,4 +1,4 @@
-import type { ManifestFilter } from '../filter.extension.js';
+import type { ManifestFilterBase } from '../filter.extension.js';
 import type { MetaFilterFacetSelect } from '../facet-select/types.js';
 import type { MetaFilterSelect, UmbSelectFilterOptionModel } from './types.js';
 import type { UmbSelectFilterApiBase } from './select-filter-api.base.js';
@@ -14,11 +14,11 @@ export class UmbSelectFilterElement extends UmbLitElement {
 	@state()
 	private _multiple = false;
 
-	#manifest?: ManifestFilter;
-	public get manifest(): ManifestFilter | undefined {
+	#manifest?: ManifestFilterBase;
+	public get manifest(): ManifestFilterBase | undefined {
 		return this.#manifest;
 	}
-	public set manifest(manifest: ManifestFilter | undefined) {
+	public set manifest(manifest: ManifestFilterBase | undefined) {
 		this.#manifest = manifest;
 		this._multiple = !!(manifest?.meta as MetaFilterSelect | MetaFilterFacetSelect | undefined)?.multiple;
 	}

@@ -1,4 +1,4 @@
-import type { ManifestFilter } from '../filter.extension.js';
+import type { ManifestFilterBase } from '../filter.extension.js';
 import type { MetaFilterSelect } from './types.js';
 import { UmbSelectFilterApiBase } from './select-filter-api.base.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -29,7 +29,7 @@ export class UmbSelectFilterApi extends UmbSelectFilterApiBase {
 		}
 	}
 
-	protected override _onManifest(manifest: ManifestFilter | undefined) {
+	protected override _onManifest(manifest: ManifestFilterBase | undefined) {
 		const meta = manifest?.meta as MetaFilterSelect | undefined;
 		if (meta?.datalistDataSource) {
 			this.#datalistDataSource = new meta.datalistDataSource(this);

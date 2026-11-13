@@ -3,8 +3,12 @@ import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/e
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
+import type { ManifestCollectionFilter } from '../filter/collection-filter.extension.js';
 
 import '../../filter/filter.element.js';
+
+const FILTERS_CONTROLLER_ALIAS = 'umbCollectionFilterExtensions';
 
 @customElement('umb-collection-filter-bundle')
 export class UmbCollectionFilterBundleElement extends UmbLitElement {
@@ -17,16 +21,9 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		new UmbExtensionsElementAndApiInitializer(
-			this,
-			umbExtensionsRegistry,
-			'filter',
-			undefined,
-			undefined,
-			(filters) => {
-				this._filters = filters;
-			},
-		);
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
+			this.#observeFilters(context?.manifest?.alias);
+		});
 
 		this.consumeContext(UMB_FILTER_MANAGER_CONTEXT, (manager) => {
 			if (!manager) return;
@@ -35,6 +32,24 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 				this._totalActiveValues = total ?? 0;
 			});
 		});
+	}
+
+	#observeFilters(collectionAlias: string | undefined) {
+		this.removeUmbControllerByAlias(FILTERS_CONTROLLER_ALIAS);
+		this._filters = [];
+		if (!collectionAlias) return;
+
+		new UmbExtensionsElementAndApiInitializer<ManifestCollectionFilter, 'collectionFilter'>(
+			this,
+			umbExtensionsRegistry,
+			'collectionFilter',
+			undefined,
+			(manifest) => manifest.forCollections.includes(collectionAlias),
+			(filters) => {
+				this._filters = filters;
+			},
+			FILTERS_CONTROLLER_ALIAS,
+		);
 	}
 
 	override render() {

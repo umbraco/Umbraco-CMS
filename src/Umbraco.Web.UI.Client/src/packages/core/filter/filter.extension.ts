@@ -4,14 +4,11 @@ export interface MetaFilter {
 	label: string;
 }
 
-export interface ManifestFilter
+/**
+ * The manifest shape shared by the filter extension types of every filter host. A host declares its own extension
+ * type on top of it, for example `collectionFilter`, which scopes filters to collections with `forCollections`.
+ */
+export interface ManifestFilterBase
 	extends ManifestElementAndApi<any, any>, ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
-	type: 'filter';
 	meta: MetaFilter;
-}
-
-declare global {
-	interface UmbExtensionManifestMap {
-		umbFilter: ManifestFilter;
-	}
 }

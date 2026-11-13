@@ -1,10 +1,4 @@
-import type { ManifestFilter, MetaFilter } from '../filter.extension.js';
-
-export interface ManifestFilterFacetSelectKind extends ManifestFilter {
-	type: 'filter';
-	kind: 'facetSelect';
-	meta: MetaFilterFacetSelect;
-}
+import type { MetaFilter } from '../filter.extension.js';
 
 export interface MetaFilterFacetSelect extends MetaFilter {
 	/**
@@ -12,10 +6,4 @@ export interface MetaFilterFacetSelect extends MetaFilter {
 	 */
 	itemRepositoryAlias: string;
 	multiple?: boolean;
-}
-
-declare global {
-	interface UmbExtensionManifestMap {
-		umbFilterFacetSelectKind: ManifestFilterFacetSelectKind;
-	}
 }

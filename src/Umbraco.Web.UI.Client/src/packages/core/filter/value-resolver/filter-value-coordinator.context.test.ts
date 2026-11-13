@@ -2,7 +2,7 @@ import { UmbFilterValueCoordinatorContext } from './filter-value-coordinator.con
 import { UMB_FILTER_VALUE_COORDINATOR_CONTEXT } from './filter-value-coordinator.context-token.js';
 import type { UmbFilterValueResolver } from './filter-value-resolver.interface.js';
 import type { ManifestFilterActiveValue } from '../active-value/filter-active-value.extension.js';
-import type { ManifestFilter } from '../filter.extension.js';
+import type { ManifestFilterBase } from '../filter.extension.js';
 import { UmbFilterManagerContext } from '../filter-manager.context.js';
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
@@ -18,7 +18,7 @@ const TEST_ENTITY_TYPE = 'test-filter-value';
 const createdResolvers: Array<UmbFilterValueResolver> = [];
 
 class TestNameResolver implements UmbFilterValueResolver {
-	manifest?: ManifestFilter;
+	manifest?: ManifestFilterBase;
 	constructor() {
 		createdResolvers.push(this);
 	}
@@ -36,11 +36,11 @@ class TestNameResolver implements UmbFilterValueResolver {
 
 function registerFilter(alias: string) {
 	umbExtensionsRegistry.register({
-		type: 'filter',
+		type: 'umbTestFilter',
 		alias,
 		name: alias,
 		meta: { label: alias },
-	} as unknown as ManifestFilter);
+	} as unknown as ManifestFilterBase);
 }
 
 function registerFilterActiveValue(alias: string, extra: Partial<ManifestFilterActiveValue>) {

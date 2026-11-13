@@ -1,4 +1,4 @@
-import type { ManifestFilter } from '../filter.extension.js';
+import type { ManifestFilterBase } from '../filter.extension.js';
 import type { UmbDisplayBatchResolver } from '@umbraco-cms/backoffice/display-batch-resolver';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
@@ -18,7 +18,7 @@ export interface UmbFilterValueResolver<
 	/**
 	 * The manifest of the filter this resolver resolves values for. Set by the coordinator when the resolver is created.
 	 */
-	manifest?: ManifestFilter;
+	manifest?: ManifestFilterBase;
 }
 
 type UmbFilterValueResolverModule =

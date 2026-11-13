@@ -1,5 +1,5 @@
 import { UMB_FILTER_CONTEXT } from '../filter.context-token.js';
-import type { ManifestFilter } from '../filter.extension.js';
+import type { ManifestFilterBase } from '../filter.extension.js';
 import type { UmbFacetModel } from '../types.js';
 import { UmbSelectFilterApiBase } from '../select/select-filter-api.base.js';
 import type { UmbSelectFilterOptionModel } from '../select/types.js';
@@ -37,7 +37,7 @@ export class UmbFacetSelectFilterApi<
 		});
 	}
 
-	protected override _onManifest(manifest: ManifestFilter | undefined) {
+	protected override _onManifest(manifest: ManifestFilterBase | undefined) {
 		const itemRepositoryAlias = (manifest?.meta as MetaFilterFacetSelect | undefined)?.itemRepositoryAlias;
 		if (!itemRepositoryAlias || this.#facetItemsManager) return;
 

@@ -1,5 +1,5 @@
 import { UMB_FILTER_CONTEXT } from '../filter.context-token.js';
-import type { ManifestFilter } from '../filter.extension.js';
+import type { ManifestFilterBase } from '../filter.extension.js';
 import type { UmbSelectFilterOptionModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -27,11 +27,11 @@ export abstract class UmbSelectFilterApiBase<
 
 	#filterContext?: typeof UMB_FILTER_CONTEXT.TYPE;
 
-	#manifest?: ManifestFilter;
-	public get manifest(): ManifestFilter | undefined {
+	#manifest?: ManifestFilterBase;
+	public get manifest(): ManifestFilterBase | undefined {
 		return this.#manifest;
 	}
-	public set manifest(manifest: ManifestFilter | undefined) {
+	public set manifest(manifest: ManifestFilterBase | undefined) {
 		this.#manifest = manifest;
 		this._onManifest(manifest);
 	}
@@ -77,7 +77,7 @@ export abstract class UmbSelectFilterApiBase<
 		}
 	}
 
-	protected abstract _onManifest(manifest: ManifestFilter | undefined): void;
+	protected abstract _onManifest(manifest: ManifestFilterBase | undefined): void;
 
 	protected abstract _requestValueItems(uniques: Array<string>): void;
 

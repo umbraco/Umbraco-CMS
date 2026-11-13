@@ -4,20 +4,15 @@ import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collecti
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		type: 'filter',
+		type: 'collectionFilter',
 		kind: 'select',
 		alias: UMB_EXTENSION_COLLECTION_EXTENSION_TYPE_FILTER_ALIAS,
 		name: 'Extension Type Collection Filter',
+		forCollections: ['Umb.Collection.Extension'],
 		meta: {
 			label: 'Type',
 			datalistDataSource: UmbExtensionCollectionDatalistDataSource,
 		},
-		conditions: [
-			{
-				alias: UMB_COLLECTION_ALIAS_CONDITION,
-				match: 'Umb.Collection.Extension',
-			},
-		],
 	},
 	{
 		type: 'collectionTextFilter',
