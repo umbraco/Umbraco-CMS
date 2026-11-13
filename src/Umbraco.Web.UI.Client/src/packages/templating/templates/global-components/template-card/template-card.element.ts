@@ -1,4 +1,4 @@
-import { css, customElement, html, ifDefined, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UUICardElement } from '@umbraco-cms/backoffice/external/uui';
@@ -17,6 +17,15 @@ export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 
 	@property({ type: Boolean, reflect: true })
 	default = false;
+
+	/**
+	 * Sets the card to readonly mode, meaning it can't be made the default template but can still be opened.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	#id = '';
 
@@ -63,17 +72,23 @@ export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 	override render() {
 		return html`
 			<div id="card">
-				${this.href ? this.#renderLink() : this.#renderButton()}
-				<uui-button
-					id="bottom"
-					label=${this.localize.term('settings_defaulttemplate')}
-					look=${this.default ? 'default' : 'secondary'}
-					?disabled=${this.default}
-					@click=${this.#setSelection}>
-					${this.localize.term(this.default ? 'settings_defaulttemplate' : 'grid_setAsDefault')}
-				</uui-button>
+				${this.href ? this.#renderLink() : this.#renderButton()} ${this.#renderDefaultButton()}
 				<slot name="actions"></slot>
 			</div>
+		`;
+	}
+
+	#renderDefaultButton() {
+		if (this.readonly && !this.default) return nothing;
+		return html`
+			<uui-button
+				id="bottom"
+				label=${this.localize.term('settings_defaulttemplate')}
+				look=${this.default ? 'default' : 'secondary'}
+				?disabled=${this.default || this.readonly}
+				@click=${this.#setSelection}>
+				${this.localize.term(this.default ? 'settings_defaulttemplate' : 'grid_setAsDefault')}
+			</uui-button>
 		`;
 	}
 

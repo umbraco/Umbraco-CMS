@@ -111,7 +111,9 @@ import type {
 // Model Type Definitions
 // ============================================================================
 
-export type UmbMockDataTypeModel = DataTypeResponseModel & DataTypeTreeItemResponseModel & DataTypeItemResponseModel;
+export type UmbMockDataTypeModel = DataTypeResponseModel &
+	Omit<DataTypeTreeItemResponseModel, 'parentIsFolder'> &
+	DataTypeItemResponseModel;
 
 export type UmbMockDictionaryModel = DictionaryItemResponseModel &
 	NamedEntityTreeItemResponseModel &
@@ -129,10 +131,10 @@ export type UmbMockDocumentModel = DocumentResponseModel &
 
 export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
 	DocumentBlueprintItemResponseModel &
-	DocumentBlueprintTreeItemResponseModel;
+	Omit<DocumentBlueprintTreeItemResponseModel, 'parentIsFolder'>;
 
 export type UmbMockDocumentTypeModel = DocumentTypeResponseModel &
-	DocumentTypeTreeItemResponseModel &
+	Omit<DocumentTypeTreeItemResponseModel, 'parentIsFolder'> &
 	DocumentTypeItemResponseModel;
 
 export type UmbMockElementModel = Omit<ElementResponseModel, 'documentType'> &
@@ -154,7 +156,7 @@ export type UmbMockMediaModel = MediaResponseModel &
 	};
 
 export type UmbMockMediaTypeModel = MediaTypeResponseModel &
-	MediaTypeTreeItemResponseModel &
+	Omit<MediaTypeTreeItemResponseModel, 'parentIsFolder'> &
 	MediaTypeItemResponseModel;
 
 export type UmbMockMemberModel = MemberResponseModel & MemberItemResponseModel;
@@ -162,7 +164,7 @@ export type UmbMockMemberModel = MemberResponseModel & MemberItemResponseModel;
 export type UmbMockMemberGroupModel = MemberGroupItemResponseModel;
 
 export type UmbMockMemberTypeModel = MemberTypeResponseModel &
-	MemberTypeTreeItemResponseModel &
+	Omit<MemberTypeTreeItemResponseModel, 'parentIsFolder'> &
 	MemberTypeItemResponseModel & {
 		hasListView: boolean;
 	};
