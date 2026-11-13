@@ -78,7 +78,7 @@ export abstract class UmbDetailRepositoryBase<
 		return {
 			data,
 			error,
-			asObservable: () => this.#detailStore?.byUnique(unique),
+			asObservable: () => this.#detailStore?.byUnique(data?.unique ?? unique),
 		};
 	}
 
