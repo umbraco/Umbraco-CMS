@@ -24,7 +24,7 @@ test('can create a template', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   const templateId = await umbracoUi.template.clickSaveButtonAndWaitForTemplateToBeCreated();
 
   // Assert
-  expect(await umbracoApi.template.doesExist(templateId)).toBe(false);
+  expect(await umbracoApi.template.doesExist(templateId)).toBe(true);
   await umbracoUi.template.isTemplateRootTreeItemVisible(templateName);
 });
 
