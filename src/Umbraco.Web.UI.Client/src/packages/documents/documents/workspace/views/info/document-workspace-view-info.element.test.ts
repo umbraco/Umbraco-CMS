@@ -197,4 +197,21 @@ describe('UmbDocumentWorkspaceViewInfoElement', () => {
 			expect(context.setTemplateCalls).to.be.empty;
 		});
 	});
+
+	describe('document type', () => {
+		it('does not give a read-only document type reference more height than an editable one', async () => {
+			context.setAllowedTemplates([]);
+			await element.updateComplete;
+
+			const ref = element.shadowRoot!.querySelector<HTMLElement & { readonly: boolean }>('uui-ref-node-document-type')!;
+			await waitUntil(() => ref.hasAttribute('readonly'), 'document type reference is not read-only');
+			const readOnlyHeight = ref.getBoundingClientRect().height;
+
+			ref.readonly = false;
+			await waitUntil(() => !ref.hasAttribute('readonly'), 'document type reference is still read-only');
+			const editableHeight = ref.getBoundingClientRect().height;
+
+			expect(readOnlyHeight).to.be.at.most(editableHeight);
+		});
+	});
 });

@@ -395,11 +395,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			.variant-state > span {
 				color: var(--uui-color-divider-emphasis);
 			}
-
-			uui-ref-node-document-type[readonly] {
-				padding-top: 7px;
-				padding-bottom: 7px;
-			}
 		`,
 	];
 }
