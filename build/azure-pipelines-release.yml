@@ -1,0 +1,320 @@
+name: $(TeamProject)_$(Build.DefinitionName)_$(Date:yyyyMMdd)$(Rev:.r)
+
+trigger: none
+pr: none
+
+resources:
+  pipelines:
+    - pipeline: build
+      source: "Umbraco CMS 9+"
+      # Runs when a build run carrying the release tag succeeds. Manual runs pick the build run under Resources.
+      trigger:
+        branches:
+          include:
+            - refs/heads/release/*
+            - refs/tags/release-*
+            - refs/heads/main
+            - refs/heads/v*/dev
+        tags:
+          - release
+
+parameters:
+  - name: skipNuGetPush
+    displayName: Skip the push to NuGet
+    type: boolean
+    default: false
+  - name: skipNpmPush
+    displayName: Skip the push to npm
+    type: boolean
+    default: false
+  - name: skipApiDocsUpload
+    displayName: Skip the API docs upload
+    type: boolean
+    default: false
+  - name: skipDependencyTrackUpload
+    displayName: Skip the Dependency Track upload
+    type: boolean
+    default: false
+  - name: dryRun
+    displayName: Dry run (validate everything, publish nothing)
+    type: boolean
+    default: false
+
+stages:
+  ###############################################
+  ## Read metadata
+  ###############################################
+  - stage: Read_Metadata
+    displayName: Read release metadata
+    jobs:
+      - job: Resolve
+        displayName: Resolve release kind and version
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - checkout: none
+          - download: build
+            artifact: release-metadata
+            displayName: Download release metadata
+          - pwsh: |
+              function Fail($message) {
+                Write-Host "##vso[task.logissue type=error]$message"
+                exit 1
+              }
+
+              $metadata = Get-Content -Raw -Path "$(Pipeline.Workspace)/build/release-metadata/release-metadata.json" | ConvertFrom-Json
+              $kind = $metadata.kind
+              $version = $metadata.version
+              $versionMajor = $metadata.versionMajor
+              $prerelease = if ($null -eq $metadata.prerelease) { '' } else { $metadata.prerelease }
+
+              if ($kind -cnotmatch '\A(nightly|public)\z') { Fail 'Unexpected kind in the release metadata.' }
+              if ($version -cnotmatch '\A[0-9]+\.[0-9]+\.[0-9]+[0-9A-Za-z.+-]*\z') { Fail 'Unexpected version in the release metadata.' }
+              if ($versionMajor -cnotmatch '\A[0-9]+\z') { Fail 'Unexpected major version in the release metadata.' }
+              if ($prerelease -cnotmatch '\A[0-9A-Za-z.-]*\z') { Fail 'Unexpected pre-release label in the release metadata.' }
+
+              $npmDistTag = if ($prerelease -ne '') { 'next' } else { 'latest' }
+              $dryRun = $env:DRY_RUN -eq 'True'
+
+              Write-Host "Version $version ($kind release), npm dist-tag $npmDistTag, dry run $dryRun"
+
+              $buildNumber = if ($dryRun) { "$version - dry run" } else { $version }
+              Write-Host "##vso[build.updatebuildnumber]$buildNumber"
+
+              Write-Host "##vso[task.setvariable variable=kind;isOutput=true]$kind"
+              Write-Host "##vso[task.setvariable variable=npmDistTag;isOutput=true]$npmDistTag"
+              Write-Host "##vso[task.setvariable variable=versionMajor;isOutput=true]$versionMajor"
+            name: resolve
+            displayName: Resolve release kind and version
+            env:
+              DRY_RUN: ${{ parameters.dryRun }}
+
+  ###############################################
+  ## Release
+  ###############################################
+  - stage: Deploy_MyGet
+    displayName: MyGet pre-release
+    dependsOn: Read_Metadata
+    variables:
+      myGetFeed: $[ iif(eq(stageDependencies.Read_Metadata.Resolve.outputs['resolve.kind'], 'public'), 'prerelease', 'nightly') ]
+      myGetNpmRegistry: $[ iif(eq(stageDependencies.Read_Metadata.Resolve.outputs['resolve.kind'], 'public'), 'https://www.myget.org/F/umbracoprereleases/npm/', 'https://www.myget.org/F/umbraconightly/npm/') ]
+    jobs:
+      - job:
+        pool:
+          vmImage: "windows-latest" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so we'll use windows until an alternative is available.
+        displayName: Push to pre-release feed
+        steps:
+          - checkout: none
+          - download: build
+            artifact: nupkg
+            displayName: Download nupkg
+          - ${{ if parameters.dryRun }}:
+              - pwsh: Get-ChildItem -Path '$(Pipeline.Workspace)/build/nupkg' -Filter *.nupkg -Recurse | ForEach-Object { "Would push $($_.Name) to the $(myGetFeed) feed" }
+                displayName: List packages (dry run)
+          - ${{ else }}:
+              # Service connections are resolved when the pipeline compiles, so each feed needs its own step.
+              - task: NuGetCommand@2
+                displayName: MyGet push (nightly)
+                condition: and(succeeded(), eq(variables['myGetFeed'], 'nightly'))
+                inputs:
+                  command: "push"
+                  packagesToPush: $(Pipeline.Workspace)/build/nupkg/**/*.nupkg
+                  nuGetFeedType: "external"
+                  publishFeedCredentials: "MyGet - Umbraco Nightly"
+              - task: NuGetCommand@2
+                displayName: MyGet push (pre-release)
+                condition: and(succeeded(), eq(variables['myGetFeed'], 'prerelease'))
+                inputs:
+                  command: "push"
+                  packagesToPush: $(Pipeline.Workspace)/build/nupkg/**/*.nupkg
+                  nuGetFeedType: "external"
+                  publishFeedCredentials: "MyGet - Pre-releases"
+      # Pre-release/nightly feeds: keep the `latest` dist-tag default (no `next` split).
+      - job:
+        displayName: Push to pre-release feed (npm)
+        steps:
+          - template: templates/npm-publish.yml
+            parameters:
+              pipeline: build
+              artifactName: npm
+              customEndpoint: "MyGet (npm) - Umbracoprereleases, MyGet (npm) - Umbraconightly"
+              displayName: Push to npm (MyGet)
+              registry: $(myGetNpmRegistry)
+              dryRun: ${{ parameters.dryRun }}
+      - job: PublishTestHelpersNpm
+        displayName: Push TestHelpers to pre-release feed (npm)
+        steps:
+          - template: templates/npm-publish.yml
+            parameters:
+              pipeline: build
+              artifactName: npm-testhelpers
+              customEndpoint: "MyGet (npm) - Umbracoprereleases, MyGet (npm) - Umbraconightly"
+              displayName: Push test helpers to npm (MyGet)
+              registry: $(myGetNpmRegistry)
+              dryRun: ${{ parameters.dryRun }}
+
+  - stage: Approve_Release
+    displayName: Approve public release
+    dependsOn:
+      - Read_Metadata
+      - Deploy_MyGet
+    # A MyGet failure doesn't block the approval; inspect the direct results rather than succeeded(), which is transitive.
+    condition: and(in(dependencies.Read_Metadata.result, 'Succeeded', 'SucceededWithIssues'), in(dependencies.Deploy_MyGet.result, 'Succeeded', 'SucceededWithIssues', 'Failed', 'Skipped'), eq(dependencies.Read_Metadata.outputs['Resolve.resolve.kind'], 'public'), or(${{ not(parameters.skipNuGetPush) }}, ${{ not(parameters.skipNpmPush) }}, ${{ not(parameters.skipApiDocsUpload) }}))
+    jobs:
+      - job: WaitForApproval
+        displayName: Wait for manual approval
+        pool: server
+        timeoutInMinutes: 4320 # 3 days
+        steps:
+          - task: ManualValidation@1
+            displayName: Manual approval to publish the release
+            inputs:
+              notifyUsers: ''
+              instructions: 'Approve to publish $(Build.BuildNumber) to NuGet, npm and the API docs.'
+              onTimeout: 'reject'
+
+  - stage: Deploy_NuGet
+    displayName: NuGet release
+    dependsOn:
+      - Read_Metadata
+      - Approve_Release
+    condition: and(in(dependencies.Read_Metadata.result, 'Succeeded', 'SucceededWithIssues'), in(dependencies.Approve_Release.result, 'Succeeded', 'SucceededWithIssues'), eq(dependencies.Read_Metadata.outputs['Resolve.resolve.kind'], 'public'), ${{ not(parameters.skipNuGetPush) }})
+    jobs:
+      - job: Push
+        displayName: Push to NuGet
+        pool:
+          vmImage: "windows-latest" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so we'll use windows until an alternative is available.
+        steps:
+          - checkout: none
+          - download: build
+            artifact: nupkg
+            displayName: Download nupkg
+          - ${{ if parameters.dryRun }}:
+              - pwsh: Get-ChildItem -Path '$(Pipeline.Workspace)/build/nupkg' -Filter *.nupkg -Recurse | ForEach-Object { "Would push $($_.Name) to NuGet" }
+                displayName: List packages (dry run)
+          - ${{ else }}:
+              - task: NuGetCommand@2
+                displayName: NuGet push
+                inputs:
+                  command: "push"
+                  packagesToPush: $(Pipeline.Workspace)/build/nupkg/**/*.nupkg
+                  nuGetFeedType: "external"
+                  publishFeedCredentials: "NuGet - Umbraco.*"
+
+  - stage: Deploy_Npm
+    displayName: Npm release
+    dependsOn:
+      - Read_Metadata
+      - Approve_Release
+    condition: and(in(dependencies.Read_Metadata.result, 'Succeeded', 'SucceededWithIssues'), in(dependencies.Approve_Release.result, 'Succeeded', 'SucceededWithIssues'), eq(dependencies.Read_Metadata.outputs['Resolve.resolve.kind'], 'public'), ${{ not(parameters.skipNpmPush) }})
+    variables:
+      # `latest` for stable releases, `next` for prereleases.
+      npmDistTag: $[ stageDependencies.Read_Metadata.Resolve.outputs['resolve.npmDistTag'] ]
+    jobs:
+      - job: Publish
+        displayName: Push to NPM
+        steps:
+          - template: templates/npm-publish.yml
+            parameters:
+              pipeline: build
+              artifactName: npm
+              registry: https://registry.npmjs.org/
+              customEndpoint: "NPM - Umbraco Backoffice"
+              displayName: Push to npm
+              npmTag: $(npmDistTag)
+              dryRun: ${{ parameters.dryRun }}
+      - job: PublishTestHelpers
+        displayName: Push Test Helpers to NPM
+        steps:
+          - template: templates/npm-publish.yml
+            parameters:
+              pipeline: build
+              artifactName: npm-testhelpers
+              registry: https://registry.npmjs.org/
+              customEndpoint: "NPM - Umbraco Backoffice"
+              displayName: Push test helpers to npm
+              npmTag: $(npmDistTag)
+              dryRun: ${{ parameters.dryRun }}
+
+  - stage: Upload_API_Docs
+    pool:
+      vmImage: "windows-latest" # Apparently AzureFileCopy is windows only :(
+    variables:
+      umbracoMajorVersion: $[ stageDependencies.Read_Metadata.Resolve.outputs['resolve.versionMajor'] ]
+    displayName: Upload API Documentation
+    dependsOn:
+      - Read_Metadata
+      - Approve_Release
+    condition: and(in(dependencies.Read_Metadata.result, 'Succeeded', 'SucceededWithIssues'), in(dependencies.Approve_Release.result, 'Succeeded', 'SucceededWithIssues'), eq(dependencies.Read_Metadata.outputs['Resolve.resolve.kind'], 'public'), ${{ not(parameters.skipApiDocsUpload) }})
+    jobs:
+      - template: templates/upload-api-docs.yml
+        parameters:
+          pipeline: build
+          displayName: C# Docs
+          artifactName: csharp-docs
+          blobPrefix: csharp
+          umbracoMajorVersion: $(umbracoMajorVersion)
+          dryRun: ${{ parameters.dryRun }}
+      - template: templates/upload-api-docs.yml
+        parameters:
+          pipeline: build
+          displayName: Storybook
+          artifactName: ui-docs
+          blobPrefix: ui
+          umbracoMajorVersion: $(umbracoMajorVersion)
+          dryRun: ${{ parameters.dryRun }}
+      - template: templates/upload-api-docs.yml
+        parameters:
+          pipeline: build
+          displayName: UI API Docs
+          artifactName: ui-api-docs
+          blobPrefix: ui-api
+          umbracoMajorVersion: $(umbracoMajorVersion)
+          dryRun: ${{ parameters.dryRun }}
+
+  - stage: Upload_Dependency_Track
+    displayName: Dependency Track
+    dependsOn: Read_Metadata
+    condition: and(in(dependencies.Read_Metadata.result, 'Succeeded', 'SucceededWithIssues'), eq(dependencies.Read_Metadata.outputs['Resolve.resolve.kind'], 'public'), ${{ not(parameters.skipDependencyTrackUpload) }})
+    variables:
+      # Public releases are tracked per major version.
+      umbracoVersion: $[ stageDependencies.Read_Metadata.Resolve.outputs['resolve.versionMajor'] ]
+      # A stable release may become the latest version; the template confirms it is a release of main's major.
+      isStableRelease: $[ eq(stageDependencies.Read_Metadata.Resolve.outputs['resolve.npmDistTag'], 'latest') ]
+    jobs:
+      - ${{ if parameters.dryRun }}:
+          - job: CheckBoms
+            displayName: Check the BOM artifacts (dry run)
+            steps:
+              - checkout: none
+              - download: build
+                artifact: bom-backend
+              - download: build
+                artifact: bom-login
+              - download: build
+                artifact: bom-backoffice
+              - download: build
+                artifact: bom-e2e
+              - bash: echo "Would upload the BOMs to Dependency Track as Umbraco-CMS version $(umbracoVersion) (latest candidate $(isStableRelease))"
+                displayName: Skip upload (dry run)
+      - ${{ else }}:
+          - template: templates/dependency-track.yml
+            parameters:
+              pipeline: build
+              projectName: "Umbraco-CMS"
+              umbracoVersion: $(umbracoVersion)
+              isLatestCandidate: $(isStableRelease)
+              latestVersionFileUrl: "https://raw.githubusercontent.com/umbraco/Umbraco-CMS/main/version.json"
+              projects:
+                - name: "Backend"
+                  artifact: "bom-backend"
+                  bomFilePath: "bom-dotnet.xml"
+                - name: "Login"
+                  artifact: "bom-login"
+                  bomFilePath: "bom-login.xml"
+                - name: "Backoffice"
+                  artifact: "bom-backoffice"
+                  bomFilePath: "bom-backoffice.xml"
+                - name: "E2E"
+                  artifact: "bom-e2e"
+                  bomFilePath: "bom-e2e.xml"

@@ -1,0 +1,42 @@
+parameters:
+  - name: pipeline # pipeline resource alias to download the artifact from
+    type: string
+  - name: displayName # what is uploaded, e.g. "C# Docs"
+    type: string
+  - name: artifactName # artifact holding <artifactName>.zip
+    type: string
+  - name: blobPrefix # folder under v<major>/ in the docs container
+    type: string
+  - name: umbracoMajorVersion
+    type: string
+  - name: dryRun # skip the copy to blob storage
+    type: boolean
+    default: false
+
+jobs:
+  - job:
+    displayName: Upload ${{ parameters.displayName }}
+    steps:
+      - checkout: none
+      - download: ${{ parameters.pipeline }}
+        artifact: ${{ parameters.artifactName }}
+        displayName: Download artifact
+      - task: ExtractFiles@1
+        inputs:
+          archiveFilePatterns: $(Pipeline.Workspace)/${{ parameters.pipeline }}/${{ parameters.artifactName }}/${{ parameters.artifactName }}.zip
+          destinationFolder: $(Build.ArtifactStagingDirectory)/${{ parameters.artifactName }}
+          overwriteExistingFiles: true
+      - ${{ if parameters.dryRun }}:
+          - pwsh: Write-Host "Would copy ${{ parameters.displayName }} to v${{ parameters.umbracoMajorVersion }}/${{ parameters.blobPrefix }}"
+            displayName: Skip copy (dry run)
+      - ${{ else }}:
+          - task: AzureFileCopy@6
+            displayName: "Copy ${{ parameters.displayName }} to blob storage"
+            inputs:
+              SourcePath: "$(Build.ArtifactStagingDirectory)/${{ parameters.artifactName }}/*"
+              azureSubscription: umbraco-storage-wif
+              Destination: AzureBlob
+              storage: umbracoapidocs
+              ContainerName: "$web"
+              BlobPrefix: v${{ parameters.umbracoMajorVersion }}/${{ parameters.blobPrefix }}
+              CleanTargetBeforeCopy: true
