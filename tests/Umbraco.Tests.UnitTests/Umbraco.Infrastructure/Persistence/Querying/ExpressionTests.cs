@@ -97,14 +97,14 @@ public class ExpressionTests : BaseUsingSqlSyntax
         cachedExpression.Wrap(predicate1);
         var modelToSqlExpressionHelper1 = new ModelToSqlExpressionVisitor<IContent>(SqlContext.SqlSyntax, Mappers);
         var result1 = modelToSqlExpressionHelper1.Visit(cachedExpression);
-        Assert.AreEqual("upper([umbracoNode].[path]) LIKE upper(@0)", result1);
+        Assert.AreEqual("upper([umbracoNode].[path]) LIKE upper(@0) ESCAPE '\\'", result1);
         Assert.AreEqual("-1%", modelToSqlExpressionHelper1.GetSqlParameters()[0]);
 
         Expression<Func<IContent, bool>> predicate2 = content => content.Path.StartsWith("-1,123,97");
         cachedExpression.Wrap(predicate2);
         var modelToSqlExpressionHelper2 = new ModelToSqlExpressionVisitor<IContent>(SqlContext.SqlSyntax, Mappers);
         var result2 = modelToSqlExpressionHelper2.Visit(cachedExpression);
-        Assert.AreEqual("upper([umbracoNode].[path]) LIKE upper(@0)", result2);
+        Assert.AreEqual("upper([umbracoNode].[path]) LIKE upper(@0) ESCAPE '\\'", result2);
         Assert.AreEqual("-1,123,97%", modelToSqlExpressionHelper2.GetSqlParameters()[0]);
     }
 
@@ -116,7 +116,7 @@ public class ExpressionTests : BaseUsingSqlSyntax
         var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(SqlContext.SqlSyntax, Mappers);
         var result = modelToSqlExpressionHelper.Visit(predicate);
 
-        Assert.AreEqual("upper([umbracoNode].[path]) LIKE upper(@0)", result);
+        Assert.AreEqual("upper([umbracoNode].[path]) LIKE upper(@0) ESCAPE '\\'", result);
         Assert.AreEqual("-1%", modelToSqlExpressionHelper.GetSqlParameters()[0]);
     }
 
@@ -205,6 +205,26 @@ public class ExpressionTests : BaseUsingSqlSyntax
         public string Value { get; set; }
     }
 
+    [TestCase("StartsWith", "a\\%b\\_c\\\\d\\[e%")]
+    [TestCase("EndsWith", "%a\\%b\\_c\\\\d\\[e")]
+    [TestCase("Contains", "%a\\%b\\_c\\\\d\\[e%")]
+    public void Literal_String_Comparisons_Escape_Wildcard_Characters(string method, string expectedPattern)
+    {
+        const string value = "a%b_c\\d[e";
+        Expression<Func<UserDto, object>> predicate = method switch
+        {
+            "StartsWith" => user => user.Login.StartsWith(value),
+            "EndsWith" => user => user.Login.EndsWith(value),
+            _ => user => user.Login.Contains(value),
+        };
+        var visitor = new PocoToSqlExpressionVisitor<UserDto>(SqlContext, null);
+
+        var result = visitor.Visit(predicate);
+
+        Assert.AreEqual("upper([umbracoUser].[userLogin]) LIKE upper(@0) ESCAPE '\\'", result);
+        Assert.AreEqual(expectedPattern, visitor.GetSqlParameters()[0]);
+    }
+
     [Test]
     public void StartsWith()
     {
@@ -213,21 +233,21 @@ public class ExpressionTests : BaseUsingSqlSyntax
         var result = modelToSqlExpressionHelper.Visit(predicate);
 
         Console.WriteLine(result);
-        Assert.AreEqual("upper([umbracoUser].[userLogin]) LIKE upper(@0)", result);
+        Assert.AreEqual("upper([umbracoUser].[userLogin]) LIKE upper(@0) ESCAPE '\\'", result);
 
         predicate = user => user.Login.StartsWith(GetSomeValue("aaaaa"));
         modelToSqlExpressionHelper = new PocoToSqlExpressionVisitor<UserDto>(SqlContext, null);
         result = modelToSqlExpressionHelper.Visit(predicate);
 
         Console.WriteLine(result);
-        Assert.AreEqual("upper([umbracoUser].[userLogin]) LIKE upper(@0)", result);
+        Assert.AreEqual("upper([umbracoUser].[userLogin]) LIKE upper(@0) ESCAPE '\\'", result);
 
         predicate = user => user.Login.StartsWith(GetSomeValue("aaaaa"));
         modelToSqlExpressionHelper = new PocoToSqlExpressionVisitor<UserDto>(SqlContext, null);
         result = modelToSqlExpressionHelper.Visit(predicate);
 
         Console.WriteLine(result);
-        Assert.AreEqual("upper([umbracoUser].[userLogin]) LIKE upper(@0)", result);
+        Assert.AreEqual("upper([umbracoUser].[userLogin]) LIKE upper(@0) ESCAPE '\\'", result);
 
         var foo = new Foo { Value = "aaaaa" };
         predicate = user => user.Login.StartsWith(foo.Value);
@@ -235,7 +255,7 @@ public class ExpressionTests : BaseUsingSqlSyntax
         result = modelToSqlExpressionHelper.Visit(predicate);
 
         Console.WriteLine(result);
-        Assert.AreEqual("upper([umbracoUser].[userLogin]) LIKE upper(@0)", result);
+        Assert.AreEqual("upper([umbracoUser].[userLogin]) LIKE upper(@0) ESCAPE '\\'", result);
 
         // below does not work, we want to output
         // LIKE concat([group].[name], ',%')

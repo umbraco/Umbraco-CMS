@@ -28,6 +28,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IPreviewService _previewService;
     private readonly IPreviewAccessEvaluator _previewAccessEvaluator;
+    private readonly IContentCacheDataSerializerFactory _serializerFactory;
     private readonly CacheSettings _cacheSettings;
     private readonly ILogger<ElementCacheService> _logger;
     private readonly ElementSourceReader _readElementSourceAsync;
@@ -84,7 +85,8 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         IOptions<CacheSettings> cacheSettings,
         ILogger<ElementCacheService> logger,
         IConvertedPublishedContentCacheFactory cacheFactory,
-        IPreviewAccessEvaluator previewAccessEvaluator)
+        IPreviewAccessEvaluator previewAccessEvaluator,
+        IContentCacheDataSerializerFactory serializerFactory)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _scopeProvider = scopeProvider;
@@ -95,6 +97,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         _publishedModelFactory = publishedModelFactory;
         _previewService = previewService;
         _previewAccessEvaluator = previewAccessEvaluator;
+        _serializerFactory = serializerFactory;
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
         _publishedElementCache = cacheFactory.Create<string, IPublishedElement>(_cacheSettings.Entry.Element.MaximumLocalCacheItems, CacheName);
@@ -601,6 +604,10 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
     public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> elementTypeIds)
     {
+        // Entries evicted below are reloaded on their next miss, through the serializer factory. Discard what it has
+        // derived from the type definitions first, so that reload sees the changed definitions.
+        _serializerFactory.ClearTypeCache();
+
         // Clear the hybrid cache by element type tag for the affected element types.
         var elementTypeIdsAsArray = elementTypeIds as int[] ?? elementTypeIds.ToArray();
         var elementTypeIdTags = elementTypeIdsAsArray.Select(ElementTypeIdTag).ToArray();

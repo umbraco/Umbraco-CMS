@@ -4,7 +4,7 @@ End-to-end acceptance tests for Umbraco CMS using [Playwright](https://playwrigh
 
 You can watch a video following these instructions [here](https://www.youtube.com/watch?v=N4hBKB0U-d8) and a longer UmbraCollab recording [here](https://www.youtube.com/watch?v=hvoI28s_fDI). Make sure to use the latest recommended `main` branch rather than v10 that's mentioned in the video.
 
-> **npm package**: This project is also published to npm as [`@umbraco/acceptance-test-helpers`](https://www.npmjs.com/package/@umbraco/acceptance-test-helpers). See [README.npm.md](./README.npm.md) for the package documentation.
+> **npm package**: This project is also published to npm as [`@umbraco-cms/acceptance-test-helpers`](https://www.npmjs.com/package/@umbraco-cms/acceptance-test-helpers). See [README.npm.md](./README.npm.md) for the package documentation.
 
 ---
 
@@ -243,4 +243,4 @@ Key settings in `playwright.config.ts`:
 
 - [Playwright Documentation](https://playwright.dev/docs/intro)
 - [Umbraco Documentation](https://docs.umbraco.com/)
-- [@umbraco/acceptance-test-helpers](https://www.npmjs.com/package/@umbraco/acceptance-test-helpers) (published from this project)
+- [@umbraco-cms/acceptance-test-helpers](https://www.npmjs.com/package/@umbraco-cms/acceptance-test-helpers) (published from this project)

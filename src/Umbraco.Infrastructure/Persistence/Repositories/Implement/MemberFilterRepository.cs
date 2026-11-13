@@ -272,9 +272,10 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
         if (filter.Filter.IsNullOrWhiteSpace() is false)
         {
             var keyword = hasWhere ? "AND" : "WHERE";
+            var escape = SqlSyntax.GetLikeEscapeClause();
             sql = sql.Append(
-                $"{keyword} ({emailCol} LIKE @filterParam OR {usernameCol} LIKE @filterParam OR {nameCol} LIKE @filterParam)",
-                new { filterParam = $"%{filter.Filter}%" });
+                $"{keyword} ({emailCol} LIKE @filterParam {escape} OR {usernameCol} LIKE @filterParam {escape} OR {nameCol} LIKE @filterParam {escape})",
+                new { filterParam = $"%{SqlSyntax.EscapeLikeValue(filter.Filter)}%" });
         }
     }
 

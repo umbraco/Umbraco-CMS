@@ -22,6 +22,9 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 	@state()
 	private _allowedTemplateIds?: Array<string>;
 
+	@state()
+	private _isReadOnly = false;
+
 	constructor() {
 		super();
 		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (documentTypeContext) => {
@@ -58,6 +61,12 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 				this.requestUpdate('_allowedTemplateIds', oldValue);
 			},
 			'_observeAllowedTemplateIds',
+		);
+
+		this.observe(
+			this.#workspaceContext.readOnlyGuard.permitted,
+			(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+			'_observeIsReadOnly',
 		);
 	}
 
@@ -103,6 +112,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 						<umb-input-template
 							.defaultUnique=${this._defaultTemplateId ?? ''}
 							.selection=${this._allowedTemplateIds}
+							?readonly=${this._isReadOnly}
 							@change=${this.#templateInputChange}>
 						</umb-input-template>
 					</div>
