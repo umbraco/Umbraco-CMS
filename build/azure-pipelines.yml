@@ -227,7 +227,7 @@ stages:
 
       # js API Reference
       - job:
-        displayName: Build js API Reference
+        displayName: Build Storybook
         pool:
           vmImage: "ubuntu-latest"
         variables:
@@ -258,6 +258,18 @@ stages:
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/ui-docs.zip
               artifact: ui-docs
+
+      - job:
+        displayName: Build UI API Reference
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - checkout: self
+            submodules: false
+            lfs: false,
+            fetchDepth: 1
+            fetchFilter: tree:0
+          - template: templates/backoffice-install.yml
           - script: npm run generate:ui-api-docs
             displayName: Generate API Docs
             workingDirectory: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client
