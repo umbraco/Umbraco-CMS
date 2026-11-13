@@ -1,4 +1,8 @@
-import type { UmbLinkPickerModalData, UmbLinkPickerModalValue } from './link-picker-modal.token.js';
+import type {
+	UmbLinkPickerConfig,
+	UmbLinkPickerModalData,
+	UmbLinkPickerModalValue,
+} from './link-picker-modal.token.js';
 import { UmbLinkPickerModalElement } from './link-picker-modal.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
@@ -71,6 +75,50 @@ describe('UmbLinkPickerModalElement', () => {
 	it('is defined with its own instance', async () => {
 		const { modal } = await setup();
 		expect(modal).to.be.instanceOf(UmbLinkPickerModalElement);
+	});
+
+	describe('name autofill', () => {
+		const setupWithConfig = async (config: UmbLinkPickerConfig) => {
+			const state = new UmbObjectState<UmbLinkPickerModalValue>({ link: { type: 'external' } });
+			const modalContext = {
+				value: state.asObservable(),
+				size: new UmbStringState('small').asObservable(),
+				getValue: () => state.getValue(),
+				updateValue: (partial: Partial<UmbLinkPickerModalValue>) => state.update(partial),
+			} as unknown as UmbModalContext<UmbLinkPickerModalData, UmbLinkPickerModalValue>;
+
+			const modal = await fixture<UmbLinkPickerModalElement>(
+				html`<umb-link-picker-modal
+					.modalContext=${modalContext}
+					.data=${{ config, index: null, isNew: true }}></umb-link-picker-modal>`,
+			);
+
+			const enterUrl = async (url: string) => {
+				const input = modal.shadowRoot!.querySelector<HTMLInputElement>('[data-mark="input:url"]')!;
+				input.value = url;
+				input.dispatchEvent(new Event('input'));
+				await modal.updateComplete;
+			};
+
+			return { state, enterUrl };
+		};
+
+		it('suggests a name from the entered URL', async () => {
+			const { state, enterUrl } = await setupWithConfig({});
+
+			await enterUrl('https://example.com/page');
+
+			expect(state.getValue().link.name).to.equal('example.com');
+		});
+
+		it('leaves the name empty when name autofill is disabled', async () => {
+			const { state, enterUrl } = await setupWithConfig({ disableNameAutofill: true });
+
+			await enterUrl('https://example.com/page');
+
+			expect(state.getValue().link.url).to.equal('https://example.com/page');
+			expect(state.getValue().link.name).to.not.be.ok;
+		});
 	});
 
 	describe('interaction memory', () => {
