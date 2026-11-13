@@ -24,7 +24,7 @@ public class PublishedMediaStatusFilteringServiceTests
 
         // An all-L0-hit chunk must be served synchronously — the batched read is never engaged.
         Assert.IsEmpty(batchedKeys);
-        serviceMock.Verify(s => s.GetByKeysAsync(It.IsAny<IReadOnlyCollection<Guid>>()), Times.Never);
+        serviceMock.Verify(s => s.GetByKeys(It.IsAny<IReadOnlyCollection<Guid>>()), Times.Never);
     }
 
     [Test]
@@ -67,11 +67,11 @@ public class PublishedMediaStatusFilteringServiceTests
         Assert.AreEqual(items.Count, batchedKeys.Distinct().Count());
 
         // ...but collapsed into a handful of batched reads rather than one per item.
-        serviceMock.Verify(s => s.GetByKeysAsync(It.IsAny<IReadOnlyCollection<Guid>>()), Times.AtMost(5));
+        serviceMock.Verify(s => s.GetByKeys(It.IsAny<IReadOnlyCollection<Guid>>()), Times.AtMost(5));
     }
 
     // When warm, TryGetCached serves every key from L0; otherwise every key misses L0 and is routed
-    // through the batched GetByKeysAsync, whose requested keys are recorded in the returned list.
+    // through the batched GetByKeys, whose requested keys are recorded in the returned list.
     private static (
         PublishedMediaStatusFilteringService Service,
         Dictionary<Guid, IPublishedContent> Items,
@@ -105,8 +105,8 @@ public class PublishedMediaStatusFilteringServiceTests
                 return false;
             }));
         serviceMock
-            .Setup(s => s.GetByKeysAsync(It.IsAny<IReadOnlyCollection<Guid>>()))
-            .ReturnsAsync((IReadOnlyCollection<Guid> keys) =>
+            .Setup(s => s.GetByKeys(It.IsAny<IReadOnlyCollection<Guid>>()))
+            .Returns((IReadOnlyCollection<Guid> keys) =>
             {
                 batchedKeys.AddRange(keys);
                 return (IReadOnlyList<IPublishedContent>)keys

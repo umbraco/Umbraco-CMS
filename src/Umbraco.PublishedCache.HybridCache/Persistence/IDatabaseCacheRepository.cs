@@ -5,6 +5,13 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 /// <summary>
 /// Defines a repository for persisting content cache data.
 /// </summary>
+/// <remarks>
+/// The source reads (<see cref="GetContentSource"/>, <see cref="GetContentSources"/>,
+/// <see cref="GetContentSourceForPublishStates"/>, <see cref="GetMediaSource"/>, <see cref="GetMediaSources"/> and
+/// their asynchronous counterparts) may be called without an ambient scope, as they are on a cache miss. Inside a
+/// scope they read within its transaction, so they see what the scope has written. The other members read and write
+/// through the ambient scope.
+/// </remarks>
 internal interface IDatabaseCacheRepository
 {
     /// <summary>
@@ -18,6 +25,32 @@ internal interface IDatabaseCacheRepository
     /// <param name="key">The document key.</param>
     /// <param name="preview">A flag indicating whether to get the draft (preview) version or the published version.</param>
     Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false);
+
+    /// <summary>
+    /// Gets a single cache node for a document key, synchronously.
+    /// </summary>
+    /// <param name="key">The document key.</param>
+    /// <param name="preview">A flag indicating whether to get the draft (preview) version or the published version.</param>
+    ContentCacheNode? GetContentSource(Guid key, bool preview = false);
+
+    /// <summary>
+    /// Gets a collection of cache nodes for a collection of document keys, synchronously.
+    /// </summary>
+    /// <param name="keys">The document keys.</param>
+    /// <param name="preview">A flag indicating whether to get the draft (preview) version or the published version.</param>
+    IEnumerable<ContentCacheNode> GetContentSources(IEnumerable<Guid> keys, bool preview = false);
+
+    /// <summary>
+    /// Gets a single cache node for a media key, synchronously.
+    /// </summary>
+    /// <param name="key">The media key.</param>
+    ContentCacheNode? GetMediaSource(Guid key);
+
+    /// <summary>
+    /// Gets a collection of cache nodes for a collection of media keys, synchronously.
+    /// </summary>
+    /// <param name="keys">The media keys.</param>
+    IEnumerable<ContentCacheNode> GetMediaSources(IEnumerable<Guid> keys);
 
     /// <summary>
     /// Gets both draft and published cache nodes for a document key in a single query.
