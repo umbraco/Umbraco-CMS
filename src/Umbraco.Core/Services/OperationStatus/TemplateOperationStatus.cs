@@ -46,13 +46,13 @@ public enum TemplateOperationStatus
     LayoutTemplateCannotBeDeleted,
 
     /// <summary>
-    ///     The operation is not allowed when running in production mode.
+    ///     The operation failed because it is not allowed in production mode.
     /// </summary>
     [Obsolete("No longer returned, as environment permissions deny template changes in production mode. Scheduled for removal in Umbraco 20.")]
     NotAllowedInProductionMode,
 
     /// <summary>
-    ///     The template content cannot be changed when running in production mode.
+    ///     The operation failed because changing template content is not allowed in production mode.
     /// </summary>
     [Obsolete("No longer returned, as environment permissions deny template changes in production mode. Scheduled for removal in Umbraco 20.")]
     ContentChangeNotAllowedInProductionMode,

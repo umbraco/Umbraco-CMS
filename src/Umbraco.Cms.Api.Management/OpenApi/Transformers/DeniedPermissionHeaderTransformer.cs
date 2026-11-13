@@ -12,9 +12,8 @@ namespace Umbraco.Cms.Api.Management.OpenApi.Transformers;
 /// Documents the 403 response and the denied permission header of every operation environment permissions can deny.
 /// </summary>
 /// <remarks>
-/// It applies to every OpenAPI document with back-office authentication, so any controller with
-/// <see cref="RequiresPermissionsForAttribute"/>, or action with <see cref="RequiresPermissionsAttribute"/>, gets them
-/// documented in its own document too.
+/// It is added with the backoffice security requirements, so any document using them documents its controllers with
+/// <see cref="RequiresPermissionsForAttribute"/>, or actions with <see cref="RequiresPermissionsAttribute"/>, too.
 /// </remarks>
 internal sealed class DeniedPermissionHeaderTransformer : IOpenApiOperationTransformer
 {

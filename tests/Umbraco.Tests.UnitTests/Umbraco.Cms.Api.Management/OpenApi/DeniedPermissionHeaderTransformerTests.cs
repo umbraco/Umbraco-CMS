@@ -104,19 +104,20 @@ internal sealed class DeniedPermissionHeaderTransformerTests
     private static OpenApiOperationTransformerContext CreateContext(Type controllerType, string httpMethod, params object[] endpointMetadata)
     {
         MethodInfo methodInfo = controllerType.GetMethod("Action")!;
+        var apiDescription = new ApiDescription
+        {
+            HttpMethod = httpMethod,
+            ActionDescriptor = new ControllerActionDescriptor
+            {
+                ControllerTypeInfo = controllerType.GetTypeInfo(),
+                MethodInfo = methodInfo,
+                EndpointMetadata = endpointMetadata,
+            },
+        };
         return new OpenApiOperationTransformerContext
         {
             Document = new OpenApiDocument(),
-            Description = new ApiDescription
-            {
-                HttpMethod = httpMethod,
-                ActionDescriptor = new ControllerActionDescriptor
-                {
-                    ControllerTypeInfo = controllerType.GetTypeInfo(),
-                    MethodInfo = methodInfo,
-                    EndpointMetadata = endpointMetadata,
-                },
-            },
+            Description = apiDescription,
             DocumentName = "test",
             ApplicationServices = new ServiceCollection().BuildServiceProvider(),
         };
