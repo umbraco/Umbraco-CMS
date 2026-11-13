@@ -70,10 +70,6 @@ export class ExampleProductPriceFilterApi extends UmbControllerBase {
 		if (max < range.max) limits.push({ key: 'max', amount: max });
 		this.#filterContext?.setValues(limits.map((value) => ({ unique: value.key, value })));
 	}
-
-	public clear(): void {
-		this.#filterContext?.clearAllValues();
-	}
 }
 
 export { ExampleProductPriceFilterApi as api };
