@@ -1,5 +1,5 @@
 import type { UmbMockDataTypeModel } from '../../mock-data-set.types.js';
-import { AREA_KEYS, DATA_TYPE_IDS, DOCUMENT_TYPE_IDS, MEDIA_TYPE_IDS } from './ids.js';
+import { AREA_KEYS, DATA_TYPE_IDS, DOCUMENT_TYPE_IDS, ELEMENT_FOLDER_IDS, MEDIA_TYPE_IDS } from './ids.js';
 import { PRODUCT_DOCUMENT_CATEGORIES } from './product-documents.js';
 
 type UmbMbcsDataTypeValues = UmbMockDataTypeModel['values'];
@@ -32,6 +32,14 @@ const nodePicker = (id: string, name: string, documentTypeId: string, maxNumber:
 		{ alias: 'minNumber', value: 0 },
 		{ alias: 'maxNumber', value: maxNumber },
 		{ alias: 'showOpenButton', value: true },
+		{ alias: 'ignoreUserStartNodes', value: false },
+	]);
+
+const elementPicker = (id: string, name: string, elementTypeId: string, maxNumber: number, startFolderId?: string) =>
+	dataType(id, name, 'Umbraco.ElementPicker', 'Umb.PropertyEditorUi.ElementPicker', [
+		{ alias: 'allowedContentTypes', value: elementTypeId },
+		{ alias: 'validationLimit', value: { min: 0, max: maxNumber } },
+		...(startFolderId ? [{ alias: 'startNodeId', value: [startFolderId] }] : []),
 		{ alias: 'ignoreUserStartNodes', value: false },
 	]);
 
@@ -392,6 +400,13 @@ export const data: Array<UmbMockDataTypeModel> = [
 						allowInAreas: true,
 					}),
 					block({
+						elementTypeId: DOCUMENT_TYPE_IDS.promoBanner,
+						columnSpans: [6, 12],
+						allowAtRoot: false,
+						allowInAreas: true,
+						label: '{=headline}',
+					}),
+					block({
 						elementTypeId: DOCUMENT_TYPE_IDS.materialShowcaseBlock,
 						columnSpans: [6, 12],
 						allowAtRoot: false,
@@ -427,6 +442,14 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{ alias: 'useLiveEditing', value: true },
 			{ alias: 'useInlineEditingAsDefault', value: true },
 		],
+	),
+	elementPicker(DATA_TYPE_IDS.promotionsPicker, 'Promotions Picker', DOCUMENT_TYPE_IDS.promoBanner, 3),
+	elementPicker(
+		DATA_TYPE_IDS.sizeGuidePicker,
+		'Size Guide Picker',
+		DOCUMENT_TYPE_IDS.sizeGuide,
+		1,
+		ELEMENT_FOLDER_IDS.shared,
 	),
 	dataType(
 		DATA_TYPE_IDS.mediaCollection,
