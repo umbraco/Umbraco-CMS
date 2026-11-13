@@ -1,5 +1,17 @@
 import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import {
+	UMB_USER_PERMISSION_ELEMENT_CREATE,
+	UMB_USER_PERMISSION_ELEMENT_DELETE,
+	UMB_USER_PERMISSION_ELEMENT_DUPLICATE,
+	UMB_USER_PERMISSION_ELEMENT_MOVE,
+	UMB_USER_PERMISSION_ELEMENT_PUBLISH,
+	UMB_USER_PERMISSION_ELEMENT_READ,
+	UMB_USER_PERMISSION_ELEMENT_ROLLBACK,
+	UMB_USER_PERMISSION_ELEMENT_UNPUBLISH,
+	UMB_USER_PERMISSION_ELEMENT_UPDATE,
+} from '../../user-permissions/constants.js';
+import {
+	UMB_ELEMENT_FOLDER_ELEMENTS_PERMISSION_GROUP,
 	UMB_USER_PERMISSION_ELEMENT_FOLDER_CREATE,
 	UMB_USER_PERMISSION_ELEMENT_FOLDER_DELETE,
 	UMB_USER_PERMISSION_ELEMENT_FOLDER_MOVE,
@@ -7,7 +19,10 @@ import {
 	UMB_USER_PERMISSION_ELEMENT_FOLDER_UPDATE,
 } from './constants.js';
 import { manifests as conditions } from './conditions/manifests.js';
-import type { ManifestEntityUserPermission, ManifestGranularUserPermission } from '@umbraco-cms/backoffice/user-permission';
+import type {
+	ManifestEntityUserPermission,
+	ManifestGranularUserPermission,
+} from '@umbraco-cms/backoffice/user-permission';
 
 const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 	{
@@ -71,6 +86,126 @@ const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 	},
 ];
 
+const granularEntityUserPermissions: Array<ManifestEntityUserPermission> = [
+	{
+		type: 'entityUserPermission',
+		alias: 'Umb.EntityUserPermission.ElementFolder.CreateElement',
+		name: 'Create Element in Element Folder User Permission',
+		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
+		meta: {
+			verbs: [UMB_USER_PERMISSION_ELEMENT_CREATE],
+			label: '#userPermissions_create',
+			description: '#userPermissions_create_element',
+			group: UMB_ELEMENT_FOLDER_ELEMENTS_PERMISSION_GROUP,
+			granularOnly: true,
+		},
+	},
+	{
+		type: 'entityUserPermission',
+		alias: 'Umb.EntityUserPermission.ElementFolder.DeleteElement',
+		name: 'Delete Element in Element Folder User Permission',
+		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
+		meta: {
+			verbs: [UMB_USER_PERMISSION_ELEMENT_DELETE],
+			label: '#userPermissions_delete',
+			description: '#userPermissions_delete_element',
+			group: UMB_ELEMENT_FOLDER_ELEMENTS_PERMISSION_GROUP,
+			granularOnly: true,
+		},
+	},
+	{
+		type: 'entityUserPermission',
+		alias: 'Umb.EntityUserPermission.ElementFolder.DuplicateElement',
+		name: 'Duplicate Element in Element Folder User Permission',
+		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
+		meta: {
+			verbs: [UMB_USER_PERMISSION_ELEMENT_DUPLICATE],
+			label: '#userPermissions_duplicate',
+			description: '#userPermissions_duplicate_element',
+			group: UMB_ELEMENT_FOLDER_ELEMENTS_PERMISSION_GROUP,
+			granularOnly: true,
+		},
+	},
+	{
+		type: 'entityUserPermission',
+		alias: 'Umb.EntityUserPermission.ElementFolder.MoveElement',
+		name: 'Move Element in Element Folder User Permission',
+		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
+		meta: {
+			verbs: [UMB_USER_PERMISSION_ELEMENT_MOVE],
+			label: '#userPermissions_move',
+			description: '#userPermissions_move_element',
+			group: UMB_ELEMENT_FOLDER_ELEMENTS_PERMISSION_GROUP,
+			granularOnly: true,
+		},
+	},
+	{
+		type: 'entityUserPermission',
+		alias: 'Umb.EntityUserPermission.ElementFolder.PublishElement',
+		name: 'Publish Element in Element Folder User Permission',
+		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
+		meta: {
+			verbs: [UMB_USER_PERMISSION_ELEMENT_PUBLISH],
+			label: '#userPermissions_publish',
+			description: '#userPermissions_publish_element',
+			group: UMB_ELEMENT_FOLDER_ELEMENTS_PERMISSION_GROUP,
+			granularOnly: true,
+		},
+	},
+	{
+		type: 'entityUserPermission',
+		alias: 'Umb.EntityUserPermission.ElementFolder.ReadElement',
+		name: 'Read Element in Element Folder User Permission',
+		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
+		meta: {
+			verbs: [UMB_USER_PERMISSION_ELEMENT_READ],
+			label: '#userPermissions_read',
+			description: '#userPermissions_read_element',
+			group: UMB_ELEMENT_FOLDER_ELEMENTS_PERMISSION_GROUP,
+			granularOnly: true,
+		},
+	},
+	{
+		type: 'entityUserPermission',
+		alias: 'Umb.EntityUserPermission.ElementFolder.RollbackElement',
+		name: 'Rollback Element in Element Folder User Permission',
+		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
+		meta: {
+			verbs: [UMB_USER_PERMISSION_ELEMENT_ROLLBACK],
+			label: '#userPermissions_rollback',
+			description: '#userPermissions_rollback_element',
+			group: UMB_ELEMENT_FOLDER_ELEMENTS_PERMISSION_GROUP,
+			granularOnly: true,
+		},
+	},
+	{
+		type: 'entityUserPermission',
+		alias: 'Umb.EntityUserPermission.ElementFolder.UnpublishElement',
+		name: 'Unpublish Element in Element Folder User Permission',
+		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
+		meta: {
+			verbs: [UMB_USER_PERMISSION_ELEMENT_UNPUBLISH],
+			label: '#userPermissions_unpublish',
+			description: '#userPermissions_unpublish_element',
+			group: UMB_ELEMENT_FOLDER_ELEMENTS_PERMISSION_GROUP,
+			granularOnly: true,
+		},
+	},
+	{
+		type: 'entityUserPermission',
+		alias: 'Umb.EntityUserPermission.ElementFolder.UpdateElement',
+		name: 'Update Element in Element Folder User Permission',
+		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
+		meta: {
+			verbs: [UMB_USER_PERMISSION_ELEMENT_UPDATE],
+			label: '#userPermissions_update',
+			description: '#userPermissions_update_element',
+			group: UMB_ELEMENT_FOLDER_ELEMENTS_PERMISSION_GROUP,
+			granularOnly: true,
+		},
+	},
+];
+
 const granularPermissions: Array<ManifestGranularUserPermission> = [
 	{
 		type: 'userGranularPermission',
@@ -87,4 +222,9 @@ const granularPermissions: Array<ManifestGranularUserPermission> = [
 	},
 ];
 
-export const manifests: Array<UmbExtensionManifest> = [...conditions, ...entityUserPermissions, ...granularPermissions];
+export const manifests: Array<UmbExtensionManifest> = [
+	...conditions,
+	...entityUserPermissions,
+	...granularEntityUserPermissions,
+	...granularPermissions,
+];

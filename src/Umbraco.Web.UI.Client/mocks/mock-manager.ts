@@ -37,7 +37,7 @@ class UmbMockManager {
 		userPermissions: {
 			label: 'User Permissions',
 			loader: () => import('./data/sets/user-permissions/index.js') as Promise<UmbMockDataSet>,
-			visible: false,
+			visible: true,
 		},
 		documents: {
 			label: 'Documents',

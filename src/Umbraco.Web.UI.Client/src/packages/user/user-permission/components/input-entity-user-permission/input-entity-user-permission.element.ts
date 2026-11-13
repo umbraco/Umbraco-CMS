@@ -23,6 +23,21 @@ export class UmbInputEntityUserPermissionElement extends UmbFormControlMixin(Umb
 	@property({ attribute: false })
 	allowedVerbs: Array<string> = [];
 
+	/**
+	 * Leaves out permissions that are marked as granular only.
+	 */
+	@property({ type: Boolean, attribute: 'exclude-granular-only' })
+	public get excludeGranularOnly(): boolean {
+		return this.#excludeGranularOnly;
+	}
+	public set excludeGranularOnly(value: boolean) {
+		this.#excludeGranularOnly = value;
+		this.#groupManifests();
+	}
+	#excludeGranularOnly = false;
+
+	#manifests: Array<ManifestEntityUserPermission> = [];
+
 	@state()
 	private _groupedPermissions: Array<[string, ManifestEntityUserPermission[]]> = [];
 
@@ -44,14 +59,20 @@ export class UmbInputEntityUserPermissionElement extends UmbFormControlMixin(Umb
 				manifest.forEntityTypes.includes(this.entityType),
 			),
 			(manifests) => {
-				const groupedPermissions = Object.groupBy(
-					manifests,
-					(manifest: ManifestEntityUserPermission) => manifest.meta.group ?? 'undefined',
-				);
-				this._groupedPermissions = Object.entries(groupedPermissions).map(([group, entries]) => [group, entries ?? []]);
+				this.#manifests = manifests;
+				this.#groupManifests();
 			},
 			'umbUserPermissionManifestsObserver',
 		);
+	}
+
+	#groupManifests() {
+		const manifests = this.#excludeGranularOnly ? this.#manifests.filter((m) => !m.meta.granularOnly) : this.#manifests;
+		const groupedPermissions = Object.groupBy(
+			manifests,
+			(manifest: ManifestEntityUserPermission) => manifest.meta.group ?? 'undefined',
+		);
+		this._groupedPermissions = Object.entries(groupedPermissions).map(([group, entries]) => [group, entries ?? []]);
 	}
 
 	#onChangeUserPermission(event: UmbChangeEvent, permissionVerbs: Array<string>) {

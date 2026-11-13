@@ -41,6 +41,7 @@ export class UmbUserGroupEntityTypePermissionsElement extends UmbLitElement {
 		if (!this.entityType) return nothing;
 		return html`
 			<umb-input-entity-user-permission
+				exclude-granular-only
 				.entityType=${this.entityType}
 				.allowedVerbs=${this._fallBackPermissions || []}
 				@change=${this.#onPermissionChange}></umb-input-entity-user-permission>

@@ -103,6 +103,16 @@ export const data: Array<UmbMockUserGroupModel> = [
 				elementContainer: { id: 'permissions-neither-read-id' },
 				verbs: ['Umb.ElementContainer.Create'],
 			},
+			{
+				$type: 'ElementContainerPermissionPresentationModel',
+				elementContainer: { id: 'permissions-folder-with-element-read-id' },
+				verbs: ['Umb.ElementContainer.Create', 'Umb.Element.Read'],
+			},
+			{
+				$type: 'ElementContainerPermissionPresentationModel',
+				elementContainer: { id: 'permissions-folder-without-element-verbs-id' },
+				verbs: ['Umb.ElementContainer.Read'],
+			},
 		],
 		sections: [
 			'Umb.Section.Content',
