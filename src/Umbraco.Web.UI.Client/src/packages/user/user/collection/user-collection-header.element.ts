@@ -48,10 +48,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	override render() {
 		return html`
 			<umb-collection-toolbar slot="header">
-				<div id="toolbar">
-					<umb-collection-filter-field></umb-collection-filter-field>
-					${this.#renderOrderBy()}
-				</div>
+				<div id="toolbar">${this.#renderOrderBy()}</div>
 			</umb-collection-toolbar>
 		`;
 	}
@@ -83,7 +80,6 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		css`
 			:host {
 				height: 100%;
-				width: 100%;
 				display: flex;
 				justify-content: space-between;
 				white-space: nowrap;
@@ -92,15 +88,10 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 			}
 
 			#toolbar {
-				flex: 1;
 				display: flex;
 				gap: var(--uui-size-space-4);
 				justify-content: space-between;
 				align-items: center;
-			}
-
-			umb-collection-filter-field {
-				width: 100%;
 			}
 
 			.filter {
