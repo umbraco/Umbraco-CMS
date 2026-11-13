@@ -1,6 +1,7 @@
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import type { ManifestBase } from '../types/index.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
+import { compareExtensionsByWeight } from '../functions/compare-extensions-by-weight.function.js';
 import type { UmbBaseExtensionInitializer } from './base-extension-initializer.controller.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -200,7 +201,7 @@ export abstract class UmbBaseExtensionsInitializer<
 		});
 
 		// Sorting:
-		approvedExtensions.sort((a, b) => b.weight - a.weight);
+		approvedExtensions.sort(compareExtensionsByWeight);
 
 		if (this.#single && approvedExtensions.length > 1) {
 			approvedExtensions = [approvedExtensions[0]];

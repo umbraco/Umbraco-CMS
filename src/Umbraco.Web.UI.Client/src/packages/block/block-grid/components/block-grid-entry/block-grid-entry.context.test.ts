@@ -47,6 +47,10 @@ class UmbTestBlockGridEntryContext extends UmbBlockGridEntryContext {
 	setBlockType(blockType: Partial<UmbBlockGridTypeModel>) {
 		this._blockType.setValue(blockType as UmbBlockGridTypeModel);
 	}
+
+	getLayoutAreas() {
+		return this._layout.getValue()?.areas;
+	}
 }
 
 const layoutWithColumnSpan = (columnSpan: number): UmbBlockGridLayoutModel => ({
@@ -92,6 +96,65 @@ describe('UmbBlockGridEntryContext', () => {
 			context.setBlockType({ columnSpanOptions: [] });
 
 			expect(context.getColumnSpan()).to.equal(12);
+		});
+	});
+
+	describe('area correction', () => {
+		let host: UmbControllerHostElement;
+		let context: UmbTestBlockGridEntryContext;
+
+		const areaItem = { key: 'item-key', contentKey: 'item-content-key', columnSpan: 12, rowSpan: 1 };
+		const layoutWithAreas = (...areaKeys: Array<string>): UmbBlockGridLayoutModel => ({
+			key: 'layout-key',
+			contentKey: 'content-key',
+			columnSpan: 12,
+			rowSpan: 1,
+			areas: areaKeys.map((key) => ({ key, items: [areaItem] })),
+		});
+		const areaConfig = (key: string) => ({ key, alias: key, columnSpan: 12, rowSpan: 1 });
+
+		beforeEach(async () => {
+			host = await fixture(html`<umb-test-block-grid-entry-host></umb-test-block-grid-entry-host>`);
+			context = new UmbTestBlockGridEntryContext(host);
+			context.connect();
+			context.setLayoutColumns(12);
+		});
+
+		afterEach(() => {
+			context.destroy();
+		});
+
+		it('keeps the area items while the block type has not loaded yet', () => {
+			context.setLayout(layoutWithAreas('area-a'));
+
+			expect(context.getLayoutAreas()).to.deep.equal([{ key: 'area-a', items: [areaItem] }]);
+		});
+
+		it('keeps the items of areas the loaded block type defines', () => {
+			context.setLayout(layoutWithAreas('area-a'));
+
+			context.setBlockType({ areas: [areaConfig('area-a')] });
+
+			expect(context.getLayoutAreas()).to.deep.equal([{ key: 'area-a', items: [areaItem] }]);
+		});
+
+		it('empties the areas the loaded block type does not define', () => {
+			context.setLayout(layoutWithAreas('area-a', 'area-b'));
+
+			context.setBlockType({ areas: [areaConfig('area-a')] });
+
+			expect(context.getLayoutAreas()).to.deep.equal([
+				{ key: 'area-a', items: [areaItem] },
+				{ key: 'area-b', items: [] },
+			]);
+		});
+
+		it('empties every area when the loaded block type has no areas configured', () => {
+			context.setLayout(layoutWithAreas('area-a'));
+
+			context.setBlockType({});
+
+			expect(context.getLayoutAreas()).to.deep.equal([{ key: 'area-a', items: [] }]);
 		});
 	});
 });

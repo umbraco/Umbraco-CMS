@@ -318,7 +318,7 @@ public class PublishedContentStatusFilteringServiceTests
         // An all-L0-hit chunk must be served synchronously — the batched read is never engaged.
         Assert.IsEmpty(batchedKeys);
         serviceMock.Verify(
-            s => s.GetByKeysAsync(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<bool?>()),
+            s => s.GetByKeys(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<bool?>()),
             Times.Never);
     }
 
@@ -381,7 +381,7 @@ public class PublishedContentStatusFilteringServiceTests
 
         // ...but collapsed into a handful of batched reads rather than one per item.
         serviceMock.Verify(
-            s => s.GetByKeysAsync(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<bool?>()),
+            s => s.GetByKeys(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<bool?>()),
             Times.AtMost(5));
     }
 
@@ -389,7 +389,7 @@ public class PublishedContentStatusFilteringServiceTests
     // - 10 invariant documents with IDs 0 through 9
     // - even IDs are published, odd are not (relevant only for non-preview)
     // When warm, TryGetCached serves every key from L0; otherwise every key misses L0 and is routed
-    // through the batched GetByKeysAsync, whose requested keys are recorded in the returned list.
+    // through the batched GetByKeys, whose requested keys are recorded in the returned list.
     private static (
         PublishedContentStatusFilteringService Service,
         Dictionary<Guid, IPublishedContent> Items,
@@ -429,8 +429,8 @@ public class PublishedContentStatusFilteringServiceTests
                 return false;
             }));
         serviceMock
-            .Setup(s => s.GetByKeysAsync(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<bool?>()))
-            .ReturnsAsync((IReadOnlyCollection<Guid> keys, bool? _) =>
+            .Setup(s => s.GetByKeys(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<bool?>()))
+            .Returns((IReadOnlyCollection<Guid> keys, bool? _) =>
             {
                 batchedKeys.AddRange(keys);
                 return (IReadOnlyList<IPublishedContent>)keys
@@ -632,7 +632,7 @@ public class PublishedContentStatusFilteringServiceTests
         return variationContextAccessor.Object;
     }
 
-    // Routes every key through the batched GetByKeysAsync (L0 always misses), returning the matching
+    // Routes every key through the batched GetByKeys (L0 always misses), returning the matching
     // items in order. This isolates the filtering service from the cache-tier logic under test elsewhere.
     private static IDocumentCacheService SetupDocumentCacheService(Dictionary<Guid, IPublishedContent> items)
     {
@@ -645,8 +645,8 @@ public class PublishedContentStatusFilteringServiceTests
                 return false;
             }));
         serviceMock
-            .Setup(s => s.GetByKeysAsync(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<bool?>()))
-            .ReturnsAsync((IReadOnlyCollection<Guid> keys, bool? _) =>
+            .Setup(s => s.GetByKeys(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<bool?>()))
+            .Returns((IReadOnlyCollection<Guid> keys, bool? _) =>
                 (IReadOnlyList<IPublishedContent>)keys
                     .Select(k => items.TryGetValue(k, out IPublishedContent? item) ? item : null)
                     .WhereNotNull()

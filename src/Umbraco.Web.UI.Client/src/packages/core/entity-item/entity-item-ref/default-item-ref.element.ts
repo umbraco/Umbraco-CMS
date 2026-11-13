@@ -33,7 +33,7 @@ export class UmbDefaultItemRefElement extends UmbEntityItemRefFrameMixin(UmbLitE
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon(this.item)}
 			</uui-ref-node>
-			${this.renderEntityFrame(name)}
+			${this.renderEntityFrame()}
 		`;
 	}
 

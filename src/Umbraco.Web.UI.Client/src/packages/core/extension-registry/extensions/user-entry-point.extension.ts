@@ -7,8 +7,8 @@ import type { ManifestPlainJs, UmbEntryPointModule } from '@umbraco-cms/backoffi
  * For changes to the current user within the session (permissions, languages, etc.), observe UMB_CURRENT_USER_CONTEXT instead — this extension type only marks the session boundaries.
  *
  * `onUnload` is called when the user session ends (sign-out or timeout) or the extension is
- * unregistered. If the user authorizes again, `onInit` runs again — note the current user may
- * then be a different user than in the previous session.
+ * unregistered. If the same user signs in again, `onInit` runs again. If a different user signs in,
+ * the backoffice starts over with a full page load, and `onInit` runs on the new page for that user.
  *
  * This type of extension gives full control and will simply load the specified JS file.
  * You could have custom logic to decide which extensions to load/register by using extensionRegistry.

@@ -153,10 +153,12 @@ public class ItemTypeMapDefinition : IMapDefinition
     {
         target.Id = source.Key;
         target.Name = source.Name ?? source.Url;
-        target.Url = source.Url;
         target.Enabled = source.Enabled;
+#pragma warning disable CS0618 // Type or member is obsolete
+        target.Url = source.Url;
         target.Events = string.Join(",", source.Events);
         target.Types = string.Join(",", source.ContentTypeKeys);
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     private static void Map(IEntitySlim source, NamedItemResponseModel target, MapperContext context)

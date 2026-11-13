@@ -59,6 +59,17 @@ export default {
 		unpublish: 'Avpublicera',
 		update: 'Uppdatera',
 	},
+	actionGroups: {
+		clipboard: 'Urklipp',
+		create: 'Skapa',
+		edit: 'Redigera',
+		importExport: 'Import och export',
+		notifications: 'Meddelanden',
+		other: 'Övrigt',
+		publishing: 'Publicering',
+		routing: 'Routning',
+		structure: 'Struktur',
+	},
 	actionCategories: {
 		administration: 'Administration',
 		structure: 'Struktur',
@@ -161,6 +172,8 @@ export default {
 	validation: {
 		entriesShort: 'Minsta %0% poster, kräver <strong>%1%</strong> mer.',
 		entriesExceed: 'Max %0% poster, <strong>%1%</strong> för många.',
+		itemMissingValueMessage: 'Objekt %0% saknar ett värde',
+		invalidEmpty: 'Värdet kan inte vara tomt',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Skapa en ny innehållsmall för <em>%0%</em>',
@@ -426,7 +439,7 @@ export default {
 		addLink: 'Lägg till länk',
 		assignDomain: 'Hantera domännamn',
 		closeThisWindow: 'Stäng fönstret',
-		confirmdelete: 'Är du säker på att du vill ta bort',
+		confirmdelete: (name: string) => `Är du säker på att du vill ta bort${name ? ` <strong>${name}</strong>` : ''}?`,
 		confirmdeleteNumberOfItems:
 			'Är du säker på att du vill ta bort <strong>%0%</strong> av <strong>%1%</strong> objekt',
 		confirmdisable: 'Är du säker på att du vill avaktivera',

@@ -224,7 +224,7 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
                     objectType,
                     content.Key,
                     (id, pageIndex, pageSize, query, ordering) => _contentService
-                        .GetPagedDescendants(id, pageIndex, pageSize, out _, query, ordering)
+                        .GetPagedDescendants(id, pageIndex, pageSize, out _, propertyAliases: null, filter: query, ordering: ordering)
                         .ToArray(),
                     ProcessDescendants);
                 break;

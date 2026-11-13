@@ -6,7 +6,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'default',
 		alias: 'Umb.EntityAction.User.ChangePassword',
 		name: 'Change User Password Entity Action',
-		weight: 600,
+		weight: 550,
 		api: () => import('./change-user-password.action.js'),
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {

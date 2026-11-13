@@ -82,6 +82,17 @@ export default {
 		loadMore: 'Load more',
 		showMore: 'Show more',
 	},
+	actionGroups: {
+		clipboard: 'Clipboard',
+		create: 'Create',
+		edit: 'Edit',
+		importExport: 'Import and export',
+		notifications: 'Notifications',
+		other: 'Other',
+		publishing: 'Publishing',
+		routing: 'Routing',
+		structure: 'Structure',
+	},
 	actionCategories: {
 		content: 'Content',
 		administration: 'Administration',
@@ -1254,7 +1265,8 @@ export default {
 		userFailedLogin: "Oops! We couldn't log you in. Please check your credentials and try again.",
 		userLockedOut: 'Your account has been locked out. Please try again later.',
 		receivedErrorFromServer: 'Received an error from the server',
-		passwordResetUnavailable: 'Sorry, password reset is not currently available. Please try again later or contact your administrator.',
+		passwordResetUnavailable:
+			'Sorry, password reset is not currently available. Please try again later or contact your administrator.',
 		resetCodeExpired: 'The link you have clicked on is invalid or has expired',
 		userInviteWelcomeMessage:
 			"Hello there and welcome to Umbraco! In just 1 minute you'll be good to go, we just need you to setup a password.",
@@ -1986,6 +1998,9 @@ export default {
 		elementTypeOnlyAllowedInLibrarySupport:
 			'This is only applicable for an Element Type that is allowed in the Library.',
 		propertyHasChanges: 'You have made changes to this property. Are you sure you want to discard them?',
+		confirmPropertyAliasChangeHeadline: 'Changing the alias may cause data loss',
+		confirmPropertyAliasChangeMessage:
+			'Existing content for <strong>%0%</strong> will be removed where it is used as embedded content, such as in a local Block.',
 		displaySettingsHeadline: 'Appearance',
 		displaySettingsLabelOnLeft: 'Label to the left',
 		displaySettingsLabelOnTop: 'Label above (full-width)',
@@ -2314,7 +2329,8 @@ export default {
 		languagesHelp: 'Limit the languages users have access to edit',
 		allowAccessToAllLanguages: 'Allow access to all languages',
 		allowAccessToInvariantForVariant: 'Allow editing shared content',
-		invariantForVariantHelp: 'Allows editing of content shared across languages. *Does not apply to culture-invariant content.*',
+		invariantForVariantHelp:
+			'Allows editing of content shared across languages. *Does not apply to culture-invariant content.*',
 		allowAccessToAllDocuments: 'Allow access to all documents',
 		allowAccessToAllElements: 'Allow access to all elements',
 		allowAccessToAllDocumentBlueprints: 'Allow access to all document blueprints',
@@ -2474,6 +2490,7 @@ export default {
 		customValidation: 'Custom validation',
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
 		entriesExceed: 'Maximum %0% entries, you have entered <strong>%1%</strong> too many.',
+		itemMissingValueMessage: 'Item %0% is missing a value',
 		entriesAreasMismatch: 'The content amount requirements are not met for one or more areas.',
 		minimumOnlyWhenInUse:
 			'The minimum applies once items have been added. To require a value, mark the property as mandatory.',
@@ -3233,50 +3250,50 @@ export default {
 		invalidTimeZone: 'The selected time zone is not valid',
 	},
 	searchExamine: {
-	  showFields: 'Show Fields',
-	  invariantCulture: 'Invariant',
-	  headline: 'Search Document Fields',
-	  filterPlaceholder: 'Filter fields by name or value...',
-	  filterLabel: 'Filter fields by name or value',
-	  fieldCount: (count: number) => {
-	    switch (count) {
-	      case 1:
-	        return '1 field';
-	      default:
-	        return `${count} fields`;
-	    }
-	  },
-	  tableColumnName: 'Name',
-	  tableColumnValue: 'Value',
-	  copyValue: 'Copy value',
-	  seeMore: 'See more',
-	  seeLess: 'See less',
-	  noFieldsMatch: 'No fields match your filter.',
-	  noFields: 'This document has no indexed fields.',
-	  loadError: 'Failed to load document fields. Please try again.',
-	  valueIndex: (index: number) => `Value ${index}`,
-	  fieldType: (type: string) => {
-	    switch (type) {
-	      case 'keywords':
-	        return 'Keyword (exact match)';
-	      case 'texts':
-	        return 'Full Text';
-	      case 'textsr1':
-	        return 'Full Text (Boost: High)';
-	      case 'textsr2':
-	        return 'Full Text (Boost: Medium)';
-	      case 'textsr3':
-	        return 'Full Text (Boost: Low)';
-	      case 'integers':
-	        return 'Integer';
-	      case 'decimals':
-	        return 'Decimal';
-	      case 'datetimeoffsets':
-	        return 'Date/Time';
-	      default:
-	        return type;
-	    }
-	  },
+		showFields: 'Show Fields',
+		invariantCulture: 'Invariant',
+		headline: 'Search Document Fields',
+		filterPlaceholder: 'Filter fields by name or value...',
+		filterLabel: 'Filter fields by name or value',
+		fieldCount: (count: number) => {
+			switch (count) {
+				case 1:
+					return '1 field';
+				default:
+					return `${count} fields`;
+			}
+		},
+		tableColumnName: 'Name',
+		tableColumnValue: 'Value',
+		copyValue: 'Copy value',
+		seeMore: 'See more',
+		seeLess: 'See less',
+		noFieldsMatch: 'No fields match your filter.',
+		noFields: 'This document has no indexed fields.',
+		loadError: 'Failed to load document fields. Please try again.',
+		valueIndex: (index: number) => `Value ${index}`,
+		fieldType: (type: string) => {
+			switch (type) {
+				case 'keywords':
+					return 'Keyword (exact match)';
+				case 'texts':
+					return 'Full Text';
+				case 'textsr1':
+					return 'Full Text (Boost: High)';
+				case 'textsr2':
+					return 'Full Text (Boost: Medium)';
+				case 'textsr3':
+					return 'Full Text (Boost: Low)';
+				case 'integers':
+					return 'Integer';
+				case 'decimals':
+					return 'Decimal';
+				case 'datetimeoffsets':
+					return 'Date/Time';
+				default:
+					return type;
+			}
+		},
 	},
 	searchManagement: {
 		treeHeader: 'Search',
@@ -3330,6 +3347,7 @@ export default {
 		cultureSelectLabel: 'Culture',
 		searchDisabled: 'Search unavailable. Index status:',
 		searchError: 'Search failed. Try again.',
+		searchNotAllowed: 'You do not have permission to search this index.',
 	},
 	uiCulture: {
 		ar: 'العربية',

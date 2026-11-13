@@ -1,12 +1,16 @@
 import { UmbEntityActionListElement } from '../../entity-action-list.element.js';
 import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
-import { html, customElement, property, css, query } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, css, query, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import type { UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-entity-actions-dropdown')
 export class UmbEntityActionsDropdownElement extends UmbLitElement {
 	@property({ type: Boolean })
 	compact = false;
+
+	@property({ type: String })
+	public look?: UUIInterfaceLook;
 
 	@property({ type: String })
 	public label?: string;
@@ -60,6 +64,7 @@ export class UmbEntityActionsDropdownElement extends UmbLitElement {
 				this.#onActionExecuted();
 			}}
 			.label=${this.label}
+			look=${ifDefined(this.look)}
 			?compact=${this.compact}
 			hide-expand>
 			<slot name="label" slot="label"></slot>

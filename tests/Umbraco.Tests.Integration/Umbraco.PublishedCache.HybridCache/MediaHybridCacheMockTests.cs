@@ -72,6 +72,12 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
         _mockDatabaseCacheRepository
             .Setup(r => r.GetMediaSourcesAsync(It.IsAny<IEnumerable<Guid>>()))
             .ReturnsAsync([mediaCacheNode]);
+        _mockDatabaseCacheRepository
+            .Setup(r => r.GetMediaSource(It.IsAny<Guid>()))
+            .Returns(mediaCacheNode);
+        _mockDatabaseCacheRepository
+            .Setup(r => r.GetMediaSources(It.IsAny<IEnumerable<Guid>>()))
+            .Returns([mediaCacheNode]);
 
         _mediaCacheService = new MediaCacheService(
             _mockDatabaseCacheRepository.Object,
@@ -85,6 +91,73 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
             new OptionsWrapper<CacheSettings>(new CacheSettings()),
             new NullLogger<MediaCacheService>(),
             new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()));
+    }
+
+    [Test]
+    public async Task Synchronous_Lookup_By_Key_Reads_The_Database_Synchronously()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{_mediaItem.Key}");
+
+        IPublishedContent? media = _mediaCacheService.GetByKey(_mediaItem.Key);
+
+        Assert.AreEqual(_mediaItem.Key, media?.Key);
+        _mockDatabaseCacheRepository.Verify(x => x.GetMediaSource(_mediaItem.Key), Times.Once);
+        _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourceAsync(It.IsAny<Guid>()), Times.Never);
+    }
+
+    [Test]
+    public async Task Synchronous_Lookup_By_Id_Reads_The_Database_Synchronously()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{_mediaItem.Key}");
+
+        IPublishedContent? media = _mediaCacheService.GetById(_mediaItem.Id);
+
+        Assert.AreEqual(_mediaItem.Key, media?.Key);
+        _mockDatabaseCacheRepository.Verify(x => x.GetMediaSource(_mediaItem.Key), Times.Once);
+        _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourceAsync(It.IsAny<Guid>()), Times.Never);
+    }
+
+    [Test]
+    public async Task Synchronous_Batched_Lookup_Reads_The_Database_Synchronously()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{_mediaItem.Key}");
+
+        IReadOnlyList<IPublishedContent> result = _mediaCacheService.GetByKeys([_mediaItem.Key, Guid.NewGuid()]);
+
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual(_mediaItem.Key, result[0].Key);
+        _mockDatabaseCacheRepository.Verify(x => x.GetMediaSources(It.IsAny<IEnumerable<Guid>>()), Times.Once);
+        _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourcesAsync(It.IsAny<IEnumerable<Guid>>()), Times.Never);
+    }
+
+    // The synchronous members block on these tasks, so with no distributed cache to wait for they must have
+    // completed by the time they are returned. A task that has not means some step of the shared read logic
+    // awaited asynchronous work, and synchronous callers are blocking on it again.
+    [Test]
+    public async Task Synchronous_Read_Logic_Completes_Synchronously_On_A_Cache_Miss()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{_mediaItem.Key}");
+
+        Task<IPublishedContent?> task = ((MediaCacheService)_mediaCacheService).GetByKeyWithSynchronousReadsAsync(_mediaItem.Key);
+
+        Assert.IsTrue(task.IsCompleted);
+        Assert.AreEqual(_mediaItem.Key, (await task)?.Key);
+    }
+
+    [Test]
+    public async Task Synchronous_Batched_Read_Logic_Completes_Synchronously_On_A_Cache_Miss()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{_mediaItem.Key}");
+
+        Task<IReadOnlyList<IPublishedContent>> task = ((MediaCacheService)_mediaCacheService).GetByKeysWithSynchronousReadsAsync([_mediaItem.Key]);
+
+        Assert.IsTrue(task.IsCompleted);
+        Assert.AreEqual(_mediaItem.Key, (await task).Single().Key);
     }
 
     [Test]

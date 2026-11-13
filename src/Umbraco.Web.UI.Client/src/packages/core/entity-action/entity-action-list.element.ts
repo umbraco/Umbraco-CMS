@@ -1,12 +1,12 @@
 import type { UmbEntityActionArgs } from './types.js';
 import type { ManifestEntityAction, MetaEntityAction } from './entity-action.extension.js';
 import { UmbEntityContext, UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { html, customElement, property, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, query, state, css } from '@umbraco-cms/backoffice/external/lit';
+import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type {
-	UmbApiConstructorArgumentsMethodType,
-	UmbExtensionElementAndApiInitializer,
-} from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
@@ -51,21 +51,27 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	}
 
 	@state()
-	private _filter?: (extension: ManifestEntityAction<MetaEntityAction>) => boolean;
-
-	@state()
 	private _props: Partial<UmbEntityActionArgs<unknown>> = {};
 
 	@state()
-	private _apiArgs?: UmbApiConstructorArgumentsMethodType<
-		ManifestEntityAction<MetaEntityAction>,
-		[UmbEntityActionArgs<MetaEntityAction>]
-	>;
+	private _actions: Array<UmbExtensionElementAndApiInitializer<ManifestEntityAction>> = [];
+
+	@query('umb-action-group-list')
+	private _actionList?: HTMLElementTagNameMap['umb-action-group-list'];
 
 	#fallbackEntityContext?: UmbEntityContext;
 
+	// Actions appear as their conditions resolve, so the first action keeps focus until the user takes over.
+	#followFirstAction = false;
+
+	#stopFollowingFirstAction = () => {
+		this.#followFirstAction = false;
+	};
+
 	constructor() {
 		super();
+		this.addEventListener('keydown', this.#stopFollowingFirstAction);
+		this.addEventListener('pointerdown', this.#stopFollowingFirstAction);
 
 		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
 			if (!context) return;
@@ -86,47 +92,41 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	}
 
 	#generateApiArgs() {
-		if (!this._props.entityType || this._props.unique === undefined) return;
+		const { entityType, unique } = this._props;
+		if (!entityType || unique === undefined) return;
 
-		this._filter = (extension: ManifestEntityAction<MetaEntityAction>) =>
-			extension.forEntityTypes.includes(this._props.entityType!);
-		this.#hasRenderedOnce = false;
-
-		this._apiArgs = (manifest: ManifestEntityAction<MetaEntityAction>) => {
-			return [{ entityType: this._props.entityType!, unique: this._props.unique!, meta: manifest.meta }];
-		};
+		this.#followFirstAction = true;
+		const initializer = new UmbExtensionsElementAndApiInitializer(
+			this,
+			umbExtensionsRegistry,
+			'entityAction',
+			(manifest: ManifestEntityAction<MetaEntityAction>) => [{ entityType, unique, meta: manifest.meta }],
+			(manifest: ManifestEntityAction<MetaEntityAction>) => manifest.forEntityTypes.includes(entityType),
+			(actions) => (this._actions = actions),
+			'umbEntityActionsInitializer',
+		);
+		initializer.elementProperties = { entityType, unique };
 	}
 
 	override focus() {
-		this.#firstEntityAction?.focus();
+		this._actionList?.focus();
 	}
 
-	#firstEntityAction?: HTMLElement;
+	protected override updated(changedProperties: PropertyValues) {
+		super.updated(changedProperties);
+		if (changedProperties.has('_actions')) void this.#focusFirstAction();
+	}
 
-	#hasRenderedOnce?: boolean;
-
-	#renderEntityAction = (ext: UmbExtensionElementAndApiInitializer<ManifestEntityAction>, i: number) => {
-		if (!this.#hasRenderedOnce && i === 0) {
-			this.#firstEntityAction = ext.component;
-			this.#firstEntityAction?.focus();
-			this.#hasRenderedOnce = true;
-		}
-
-		const separator = i > 0 && ext.manifest?.separatorBefore;
-		return html`${separator ? html`<umb-separator></umb-separator>` : nothing}${ext.component}`;
-	};
+	async #focusFirstAction() {
+		if (!this.#followFirstAction || !this._actionList) return;
+		await this._actionList.updateComplete;
+		if (this.#followFirstAction) this._actionList.focus();
+	}
 
 	override render() {
-		return this._filter
-			? html`
-					<umb-extension-with-api-slot
-						type="entityAction"
-						.filter=${this._filter}
-						.elementProps=${this._props}
-						.apiArgs=${this._apiArgs}
-						.renderMethod=${this.#renderEntityAction}></umb-extension-with-api-slot>
-				`
-			: '';
+		return html`<umb-action-group-list
+			group-type="entityActionGroup"
+			.actions=${this._actions}></umb-action-group-list>`;
 	}
 
 	static override styles = [

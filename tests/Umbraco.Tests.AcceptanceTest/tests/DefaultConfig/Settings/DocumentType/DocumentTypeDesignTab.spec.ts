@@ -38,7 +38,7 @@ test('can add a property to a document type', {tag: '@smoke'}, async ({umbracoAp
 test('can update a property in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const newDataTypeName = 'Image Media Picker';
+  const newDataTypeName = 'Single Image Media Picker';
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
@@ -149,7 +149,7 @@ test('can create a document type with a property in a tab', {tag: '@smoke'}, asy
 test('can create a document type with multiple groups', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const secondDataTypeName = 'Image Media Picker';
+  const secondDataTypeName = 'Single Image Media Picker';
   const secondGroupName = 'TesterGroup';
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName);
   const secondDataType = await umbracoApi.dataType.getByName(secondDataTypeName);
@@ -171,7 +171,7 @@ test('can create a document type with multiple groups', {tag: '@release'}, async
 test('can create a document type with multiple tabs', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const secondDataTypeName = 'Image Media Picker';
+  const secondDataTypeName = 'Single Image Media Picker';
   const secondGroupName = 'TesterGroup';
   const secondTabName = 'SecondTab';
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditorInTab(documentTypeName, dataTypeName, dataTypeData.id, tabName, groupName);

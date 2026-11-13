@@ -172,11 +172,18 @@ public class WebhookRepository : IWebhookRepository
     /// <returns>A task representing the asynchronous delete operation.</returns>
     public async Task DeleteAsync(IWebhook webhook)
     {
-        Sql<ISqlContext> sql = _scopeAccessor.AmbientScope!.Database.SqlContext.Sql()
+        IUmbracoDatabase database = _scopeAccessor.AmbientScope!.Database;
+
+        // Queued requests reference the webhook by key without a foreign key, so they don't cascade.
+        Sql<ISqlContext> deleteRequestsSql = database.SqlContext.Sql()
+            .Delete<WebhookRequestDto>()
+            .Where<WebhookRequestDto>(x => x.WebhookKey == webhook.Key);
+        await database.ExecuteAsync(deleteRequestsSql);
+
+        Sql<ISqlContext> sql = database.SqlContext.Sql()
             .Delete<WebhookDto>()
             .Where<WebhookDto>(x => x.Key == webhook.Key);
-
-        await _scopeAccessor.AmbientScope?.Database.ExecuteAsync(sql)!;
+        await database.ExecuteAsync(sql);
     }
 
     /// <summary>

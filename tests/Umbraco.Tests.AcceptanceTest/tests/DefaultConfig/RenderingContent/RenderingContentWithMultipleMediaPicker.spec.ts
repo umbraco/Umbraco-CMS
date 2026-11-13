@@ -22,7 +22,7 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can render content with multiple media picker value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeName = 'Multiple Media Picker';
+  const dataTypeName = 'Media Picker';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   // Create multiple images
   const firstMediaFileId = await umbracoApi.media.createDefaultMediaFile(firstMediaFileName);
@@ -42,7 +42,7 @@ test('can render content with multiple media picker value', async ({umbracoApi, 
 
 test('can render content with multiple image media picker value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeName = 'Multiple Image Media Picker';
+  const dataTypeName = 'Image Media Picker';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   // Create multiple images
   const firstMediaFileId = await umbracoApi.media.createDefaultMediaWithImage(firstMediaFileName);

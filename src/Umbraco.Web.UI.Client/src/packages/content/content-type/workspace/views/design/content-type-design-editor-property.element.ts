@@ -1,5 +1,10 @@
 import type { UmbContentTypePropertyStructureHelper } from '../../../structure/index.js';
-import type { UmbContentTypeModel, UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from '../../../types.js';
+import type {
+	UmbContentTypeDetailModel,
+	UmbContentTypeModel,
+	UmbPropertyTypeModel,
+	UmbPropertyTypeScaffoldModel,
+} from '../../../types.js';
 import { UmbPropertyTypeContext } from './content-type-design-editor-property.context.js';
 import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
@@ -10,6 +15,7 @@ import { UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/back
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
+import { UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 /**
  *  @element umb-content-type-design-editor-property
@@ -82,8 +88,54 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	@property({ type: String, reflect: false })
 	protected editPropertyTypePath?: string;
 
+	/**
+	 * Sets the property to readonly mode, meaning it can't be changed, sorted or removed.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean })
+	public readonly = false;
+
 	@state()
 	private _dataTypeName?: string;
+
+	#aliasChangeConfirmed = false;
+
+	/**
+	 * Only an Element Type keys its property values by alias, so only there does a rename orphan them.
+	 * Confirmed once the alias is left alone, rather than on every keystroke.
+	 */
+	async #confirmAliasChange() {
+		if (!this._property) return;
+		const workspaceContext = await this.getContext(UMB_ENTITY_DETAIL_WORKSPACE_CONTEXT);
+		const persistedContentType = workspaceContext?.getPersistedData() as UmbContentTypeDetailModel | undefined;
+		if (persistedContentType?.isElement !== true) return;
+
+		const persistedAlias = persistedContentType.properties?.find((x) => x.unique === this._property!.unique)?.alias;
+		if (persistedAlias === undefined) return;
+
+		if (persistedAlias === this._property.alias) {
+			this.#aliasChangeConfirmed = false;
+			return;
+		}
+
+		if (this.#aliasChangeConfirmed) return;
+
+		try {
+			await umbConfirmModal(this, {
+				headline: this.localize.term('contentTypeEditor_confirmPropertyAliasChangeHeadline'),
+				content: html`<umb-localize
+					key="contentTypeEditor_confirmPropertyAliasChangeMessage"
+					.args=${[this._property.name]}></umb-localize>`,
+				confirmLabel: '#general_change',
+				color: 'danger',
+			});
+			this.#aliasChangeConfirmed = true;
+		} catch {
+			this.#singleValueUpdate('alias', persistedAlias);
+		}
+	}
 
 	async #checkInherited() {
 		if (this._propertyStructureHelper && this._property) {
@@ -154,17 +206,17 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 	override render() {
 		// TODO: Only show alias on label if user has access to DocumentType within settings: [NL]
-		return this._inherited ? this.#renderInheritedProperty() : this.#renderEditableProperty();
+		return this._inherited || this.readonly ? this.#renderReadOnlyProperty() : this.#renderEditableProperty();
 	}
 
-	#renderInheritedProperty() {
+	#renderReadOnlyProperty() {
 		if (!this.property) return;
 
 		if (this.sortModeActive) {
 			return this.#renderSortableProperty();
 		} else {
 			return html`
-				<div id="header">
+				<div id="header" class="read-only">
 					<p>${this.localize.string(this.property.name)}<i>${this.property.alias}</i></p>
 					<p>${this.property.description ?? ''}</p>
 				</div>
@@ -204,6 +256,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 						.value=${this.property.name}
 						.alias=${this.property.alias}
 						@change=${this.#onNameAliasChange}
+						@focusout=${this.#confirmAliasChange}
 						${umbBindToValidation(this)}></umb-input-with-alias>
 					<umb-form-validation-message for="name-alias-input"></umb-form-validation-message>
 
@@ -417,10 +470,8 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				border-radius: var(--uui-border-radius);
 			}
 
-			:host([_inherited]) {
-				#header {
-					padding: 0 var(--uui-size-3, 9px);
-				}
+			#header.read-only {
+				padding: 0 var(--uui-size-3, 9px);
 			}
 
 			p {

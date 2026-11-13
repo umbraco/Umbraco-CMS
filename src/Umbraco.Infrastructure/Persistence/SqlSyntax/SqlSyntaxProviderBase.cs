@@ -672,6 +672,10 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
             .Select(action => action(column))
             .Where(clause => string.IsNullOrEmpty(clause) == false));
 
+    /// <inheritdoc />
+    public virtual string FormatAlterColumn(string? tableName, ColumnDefinition column)
+        => string.Format(AlterColumn, GetQuotedTableName(tableName), Format(column));
+
     /// <summary>
     /// Formats a <see cref="ColumnDefinition"/> for a specific table into a SQL string suitable for use in a CREATE or ALTER TABLE statement.
     /// </summary>

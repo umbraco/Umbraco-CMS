@@ -10,6 +10,16 @@ public static class AuthorizationPolicies
     public const string BackOfficeAccess = nameof(BackOfficeAccess);
     public const string DenyLocalLoginIfConfigured = nameof(DenyLocalLoginIfConfigured);
     public const string RequireAdminAccess = nameof(RequireAdminAccess);
+
+    /// <summary>
+    ///     Policy required to query search indexes and read the raw field values they hold.
+    /// </summary>
+    /// <remarks>
+    ///     Defaults to administrators only, as an index can hold any data an implementor chooses to put in it. It can be
+    ///     replaced by re-registering the policy, for example in a
+    ///     <c>PostConfigure&lt;AuthorizationOptions&gt;</c> callback.
+    /// </remarks>
+    public const string SearcherQueryAccess = nameof(SearcherQueryAccess);
     public const string UserBelongsToUserGroupInRequest = nameof(UserBelongsToUserGroupInRequest);
     public const string UserPermissionByResource = nameof(UserPermissionByResource);
 
