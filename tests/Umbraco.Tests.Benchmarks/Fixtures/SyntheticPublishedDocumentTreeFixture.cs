@@ -116,6 +116,10 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
         publishStatusMock.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>(), It.IsAny<string>())).Returns(true);
         publishStatusMock.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>())).Returns(true);
 
+        publishStatusMock
+            .Setup(x => x.WhereAncestorPathPublished(It.IsAny<IEnumerable<Guid>>(), It.IsAny<string?>()))
+            .Returns((IEnumerable<Guid> keys, string? _) => keys);
+
         // Repository: when seeded, never called (everything is pre-seeded into HybridCache below).
         // When NOT seeded, it serves nodes from the in-memory map, counting round trips and applying
         // an optional per-call latency so the benchmark can model database round-trip cost — the single

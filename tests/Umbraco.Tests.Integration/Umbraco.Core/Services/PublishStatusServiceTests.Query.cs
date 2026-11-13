@@ -95,8 +95,8 @@ internal sealed partial class PublishStatusServiceTests
             Assert.IsTrue(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage2.Key));
             Assert.IsTrue(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage3.Key));
 
-            Assert.IsTrue(PublishStatusQueryService.HasPublishedAncestorPath(Textpage.Key));
-            Assert.IsTrue(PublishStatusQueryService.HasPublishedAncestorPath(Subpage.Key));
+            Assert.IsTrue(PublishStatusQueryService.WhereAncestorPathPublished(new[] { Textpage.Key }, null).Any());
+            Assert.IsTrue(PublishStatusQueryService.WhereAncestorPathPublished(new[] { Subpage.Key }, null).Any());
         });
     }
 
@@ -125,7 +125,7 @@ internal sealed partial class PublishStatusServiceTests
             Assert.IsFalse(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture));
             Assert.IsTrue(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture));
 
-            Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(Subpage.Key));
+            Assert.IsFalse(PublishStatusQueryService.WhereAncestorPathPublished(new[] { Subpage.Key }, null).Any());
         });
     }
 
@@ -177,9 +177,9 @@ internal sealed partial class PublishStatusServiceTests
         ContentService.Unpublish(child, cultureToUnpublish);
 
         var publishedCulture = cultureToUnpublish is "en-US" ? "da-DK" : "en-US";
-        Assert.IsTrue(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, publishedCulture));
-        Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, cultureToUnpublish));
-        Assert.IsTrue(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, Constants.System.InvariantCulture));
+        Assert.IsTrue(PublishStatusQueryService.WhereAncestorPathPublished(new[] { grandchild.Key }, publishedCulture).Any());
+        Assert.IsFalse(PublishStatusQueryService.WhereAncestorPathPublished(new[] { grandchild.Key }, cultureToUnpublish).Any());
+        Assert.IsTrue(PublishStatusQueryService.WhereAncestorPathPublished(new[] { grandchild.Key }, Constants.System.InvariantCulture).Any());
     }
 
     [TestCase(true)]
@@ -251,8 +251,8 @@ internal sealed partial class PublishStatusServiceTests
         Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(child.Key, "da-DK"));
         Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(child.Key, Constants.System.InvariantCulture));
 
-        Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, "da-DK"));
-        Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, "en-US"));
-        Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, Constants.System.InvariantCulture));
+        Assert.IsFalse(PublishStatusQueryService.WhereAncestorPathPublished(new[] { grandchild.Key }, "da-DK").Any());
+        Assert.IsFalse(PublishStatusQueryService.WhereAncestorPathPublished(new[] { grandchild.Key }, "en-US").Any());
+        Assert.IsFalse(PublishStatusQueryService.WhereAncestorPathPublished(new[] { grandchild.Key }, Constants.System.InvariantCulture).Any());
     }
 }
