@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 internal sealed class CacheRefreshingNotificationHandler :
     INotificationHandler<ContentRefreshNotification>,
     INotificationHandler<MediaRefreshNotification>,
+    INotificationHandler<ElementRefreshNotification>,
     INotificationAsyncHandler<ContentRefreshNotification>,
     INotificationAsyncHandler<ContentDeletedNotification>,
     INotificationAsyncHandler<MediaRefreshNotification>,
@@ -114,6 +115,14 @@ internal sealed class CacheRefreshingNotificationHandler :
             await _mediaCacheService.DeleteItemAsync(deletedEntity);
         }
     }
+
+    /// <inheritdoc />
+    /// <remarks>Same reasoning as <see cref="Handle(ContentRefreshNotification)"/>, under the element tree lock.</remarks>
+    // TODO (V20): register HandleAsync instead once locks and notification publishing are asynchronous.
+#pragma warning disable CS0618 // Type or member is obsolete
+    public void Handle(ElementRefreshNotification notification)
+#pragma warning restore CS0618 // Type or member is obsolete
+        => _elementCacheService.RefreshElement(notification.Entity);
 
     /// <inheritdoc />
     public async Task HandleAsync(ElementRefreshNotification notification, CancellationToken cancellationToken)
