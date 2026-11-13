@@ -150,9 +150,18 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 			this.observe(
 				instance?.theme,
 				(themeAlias) => {
-					this.theme = themeAlias ? this.#translateTheme(themeAlias) : CodeEditorTheme.Light;
+					this.#themeAlias = themeAlias;
+					this.#updateTheme();
 				},
 				'_observeTheme',
+			);
+			this.observe(
+				instance?.colorScheme,
+				(colorScheme) => {
+					this.#colorScheme = colorScheme;
+					this.#updateTheme();
+				},
+				'_observeColorScheme',
 			);
 		});
 	}
@@ -224,17 +233,16 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		};
 	}
 
-	#translateTheme(theme: string) {
-		switch (theme) {
-			case 'umb-light-theme':
-				return CodeEditorTheme.Light;
-			case 'umb-dark-theme':
-				return CodeEditorTheme.Dark;
-			case 'umb-high-contrast-theme':
-				return CodeEditorTheme.HighContrastLight;
-			default:
-				return CodeEditorTheme.Light;
+	#themeAlias?: string;
+	#colorScheme?: string;
+
+	#updateTheme() {
+		// A bit hacky, but it works for now: [NL]
+		if (this.#themeAlias === 'umb-high-contrast-theme') {
+			this.theme = CodeEditorTheme.HighContrastLight;
+			return;
 		}
+		this.theme = this.#colorScheme === 'dark' ? CodeEditorTheme.Dark : CodeEditorTheme.Light;
 	}
 
 	/**
