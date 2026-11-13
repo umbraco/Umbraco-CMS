@@ -12,7 +12,7 @@ parameters:
   - name: npmTag # dist-tag to publish under
     type: string
     default: latest
-  - name: dryRun # download and prepare the package, but don't authenticate or publish
+  - name: dryRun # run npm publish with --dry-run
     type: boolean
     default: false
 
@@ -25,21 +25,19 @@ steps:
     workingDirectory: $(Pipeline.Workspace)/${{ parameters.pipeline }}/${{ parameters.artifactName }}
     env:
       REGISTRY_URL: ${{ parameters.registry }}
-  - ${{ if parameters.dryRun }}:
-      - bash: for package in *.tgz; do echo "Would publish $package to $REGISTRY_URL with the $NPM_TAG dist-tag"; done
-        displayName: List packages (dry run)
-        workingDirectory: $(Pipeline.Workspace)/${{ parameters.pipeline }}/${{ parameters.artifactName }}
-        env:
-          REGISTRY_URL: ${{ parameters.registry }}
-          NPM_TAG: ${{ parameters.npmTag }}
-  - ${{ else }}:
-      - task: npmAuthenticate@0
-        displayName: Authenticate with npm
-        inputs:
-          workingFile: $(Pipeline.Workspace)/${{ parameters.pipeline }}/${{ parameters.artifactName }}/.npmrc
-          customEndpoint: ${{ parameters.customEndpoint }}
-      - bash: npm publish *.tgz --tag "$NPM_TAG"
-        displayName: ${{ parameters.displayName }}
-        workingDirectory: $(Pipeline.Workspace)/${{ parameters.pipeline }}/${{ parameters.artifactName }}
-        env:
-          NPM_TAG: ${{ parameters.npmTag }}
+  - task: npmAuthenticate@0
+    displayName: Authenticate with npm
+    inputs:
+      workingFile: $(Pipeline.Workspace)/${{ parameters.pipeline }}/${{ parameters.artifactName }}/.npmrc
+      customEndpoint: ${{ parameters.customEndpoint }}
+  - bash: |
+      args=(--tag "$NPM_TAG")
+      if [ "$NPM_DRY_RUN" == "True" ]; then
+        args+=(--dry-run)
+      fi
+      npm publish *.tgz "${args[@]}"
+    displayName: ${{ parameters.displayName }}
+    workingDirectory: $(Pipeline.Workspace)/${{ parameters.pipeline }}/${{ parameters.artifactName }}
+    env:
+      NPM_TAG: ${{ parameters.npmTag }}
+      NPM_DRY_RUN: ${{ parameters.dryRun }}
