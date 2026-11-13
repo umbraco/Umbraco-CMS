@@ -161,7 +161,7 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
             });
         }
 
-        IDbCommand[] commands;
+        string commandText;
         string expected;
         int inserted;
         using (var scope = ScopeProvider.CreateScope())
@@ -173,12 +173,23 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
             string P(int from) => string.Join(",", Enumerable.Range(from, 6).Select(i => prefix + i));
             expected = $"INSERT INTO {databaseType.EscapeTableName("umbracoServer")} ({C("address")}, {C("computerName")}, {C("registeredDate")}, {C("lastNotifiedDate")}, {C("isActive")}, {C("isSchedulingPublisher")}) VALUES ({P(0)}), ({P(6)})";
 
-            commands = database.GenerateBulkInsertCommands(servers.ToArray());
-            inserted = commands[0].ExecuteNonQuery();
+            IDbCommand[] commands = database.GenerateBulkInsertCommands(servers.ToArray());
+            try
+            {
+                commandText = commands[0].CommandText;
+                inserted = commands[0].ExecuteNonQuery();
+            }
+            finally
+            {
+                foreach (IDbCommand command in commands)
+                {
+                    command.Dispose();
+                }
+            }
         }
 
         // Assert
-        Assert.That(commands[0].CommandText, Is.EqualTo(expected));
+        Assert.That(commandText, Is.EqualTo(expected));
         Assert.That(inserted, Is.EqualTo(2));
     }
 
