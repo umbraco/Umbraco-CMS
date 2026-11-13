@@ -25,7 +25,11 @@ export class ReportHelper {
               "CommitId": process.env.CommitId,
               "RetryNumber": testInfo.retry,
               "OS": process.env.AgentOs,
-              "UmbracoVersion": umbracoVersion && !umbracoVersion.startsWith('$(') ? umbracoVersion : undefined
+              "UmbracoVersion": umbracoVersion && !umbracoVersion.startsWith('$(') ? umbracoVersion : undefined,
+              // Tags such as '@smoke' are not part of testInfo.title, so they are reported separately.
+              "Tags": testInfo.tags,
+              "BuildNumber": process.env.BUILD_BUILDNUMBER,
+              "PipelineUrl": this.getPipelineUrl()
             })
           }
         );
@@ -33,5 +37,16 @@ export class ReportHelper {
         console.warn(`Failed to report the test retry: ${error}`);
       }
     }
+  }
+
+  // Link to the test results of the current Azure DevOps run, built from predefined pipeline variables.
+  private getPipelineUrl(): string | undefined {
+    const collectionUri = process.env.SYSTEM_TEAMFOUNDATIONCOLLECTIONURI;
+    const project = process.env.SYSTEM_TEAMPROJECT;
+    const buildId = process.env.BUILD_BUILDID;
+    if (!collectionUri || !project || !buildId) {
+      return undefined;
+    }
+    return `${collectionUri}${encodeURIComponent(project)}/_build/results?buildId=${buildId}&view=ms.vss-test-web.build-test-results-tab`;
   }
 }
