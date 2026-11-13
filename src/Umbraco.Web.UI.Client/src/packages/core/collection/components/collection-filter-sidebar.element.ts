@@ -29,6 +29,9 @@ export class UmbCollectionFilterSidebarElement extends UmbLitElement {
 
 		return html`
 			<div id="sidebar">
+				<div id="text-filter">
+					<umb-extension-with-api-slot single type="collectionTextFilter"></umb-extension-with-api-slot>
+				</div>
 				${repeat(
 					this._filters,
 					(filter) => filter.alias,

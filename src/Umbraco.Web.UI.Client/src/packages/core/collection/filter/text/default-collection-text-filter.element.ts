@@ -10,6 +10,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  * Renders a text input that allows users to filter collection items.
  * Works in conjunction with {@link UmbDefaultCollectionTextFilterApi} to apply the filter.
  * @element umb-default-collection-text-filter
+ * @slot filters - Controls that refine the collection alongside the text, for example a button that opens the filters.
  */
 @customElement('umb-default-collection-text-filter')
 export class UmbDefaultCollectionTextFilterElement extends UmbLitElement {
@@ -48,7 +49,9 @@ export class UmbDefaultCollectionTextFilterElement extends UmbLitElement {
 				@input=${this.#onTextFilterChange}
 				label=${this.localize.term('placeholders_filter')}
 				placeholder=${this.localize.term('placeholders_filter')}
-				data-mark="collection-text-filter"></uui-input>
+				data-mark="collection-text-filter">
+				<slot name="filters" slot="append"></slot>
+			</uui-input>
 		`;
 	}
 
