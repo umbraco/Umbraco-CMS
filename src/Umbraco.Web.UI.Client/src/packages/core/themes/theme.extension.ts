@@ -9,12 +9,11 @@ export interface ManifestTheme extends ManifestPlainCss {
 
 export interface MetaTheme {
 	/**
-	 * A media query that the stylesheet only applies under, for example `(prefers-color-scheme: dark)`.
-	 * When set, the theme follows the query live and its color scheme is `dark` while the query matches.
+	 * A media query that defined when the theme applies, for example `(prefers-color-scheme: dark)`.
 	 */
 	mediaQuery?: string;
 	/**
-	 * The color scheme the theme presents when it has no `mediaQuery`. Defaults to `light`.
+	 * The color scheme the theme presents. Defaults to `light`.
 	 */
 	colorScheme?: UmbThemeColorScheme;
 }

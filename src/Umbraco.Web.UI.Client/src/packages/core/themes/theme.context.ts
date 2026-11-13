@@ -13,17 +13,24 @@ const LOCAL_STORAGE_KEY = 'umb-theme-alias';
 export class UmbThemeContext extends UmbContextBase {
 	#theme = new UmbStringState(UMB_THEME_LIGHT_ALIAS);
 	#themeObserver?: UmbObserverController<ManifestTheme[]>;
+	#themeManifest?: ManifestTheme;
 
+	/**
+	 * The currently active theme alias.
+	 */
 	public readonly theme = this.#theme.asObservable();
 
 	#colorScheme = new UmbBasicState<UmbThemeColorScheme>('light');
 	/**
-	 * The color scheme the active theme currently presents, resolved for themes that follow a media query.
+	 * The color scheme accordingly to the presented theme.
 	 */
 	public readonly colorScheme = this.#colorScheme.asObservable();
 
 	#mediaQueryList?: MediaQueryList;
-	#mediaQueryListener = () => this.#colorScheme.setValue(this.#mediaQueryList?.matches ? 'dark' : 'light');
+	#mediaQueryListener = () =>
+		this.#colorScheme.setValue(
+			this.#mediaQueryList?.matches ? (this.#themeManifest?.meta?.colorScheme ?? 'light') : 'light',
+		);
 
 	#styleElement: HTMLLinkElement | HTMLStyleElement | null = null;
 
@@ -39,6 +46,7 @@ export class UmbThemeContext extends UmbContextBase {
 	#trackColorScheme(theme?: ManifestTheme) {
 		this.#mediaQueryList?.removeEventListener('change', this.#mediaQueryListener);
 		this.#mediaQueryList = undefined;
+		this.#themeManifest = theme;
 
 		if (theme?.meta?.mediaQuery) {
 			this.#mediaQueryList = window.matchMedia(theme.meta.mediaQuery);

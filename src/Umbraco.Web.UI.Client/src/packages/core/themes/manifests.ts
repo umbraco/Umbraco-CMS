@@ -19,7 +19,7 @@ export const themes: Array<UmbExtensionManifest> = [
 		alias: UMB_THEME_AUTO_ALIAS,
 		name: 'Auto (Experimental)',
 		css: '/umbraco/backoffice/css/dark.css',
-		meta: { mediaQuery: '(prefers-color-scheme: dark)' },
+		meta: { colorScheme: 'dark', mediaQuery: '(prefers-color-scheme: dark)' },
 		weight: 400,
 	},
 	{
