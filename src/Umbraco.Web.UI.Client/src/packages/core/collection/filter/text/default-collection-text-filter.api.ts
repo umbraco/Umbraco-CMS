@@ -20,6 +20,7 @@ export class UmbDefaultCollectionTextFilterApi extends UmbControllerBase impleme
 	public readonly text = this.#text.asObservable();
 
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
+	#hasUncommittedText = false;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -32,6 +33,8 @@ export class UmbDefaultCollectionTextFilterApi extends UmbControllerBase impleme
 
 	#observeFilter() {
 		this.observe(this.#collectionContext?.filter, (value) => {
+			// Text not yet written to the collection must not be replaced by the value it is replacing.
+			if (this.#hasUncommittedText) return;
 			const filterText = (value as UmbCollectionFilterModel)?.filter;
 			this.#text.setValue(filterText);
 		});
@@ -43,10 +46,15 @@ export class UmbDefaultCollectionTextFilterApi extends UmbControllerBase impleme
 	 * @param {string} value - The text value to filter the collection by.
 	 */
 	public setText(value: string) {
+		this.#hasUncommittedText = true;
+		this.#text.setValue(value);
 		this.#debouncedFilter(value);
 	}
 
-	#debouncedFilter = debounce((value: string) => this.#collectionContext?.setFilter({ filter: value }), 500);
+	#debouncedFilter = debounce((value: string) => {
+		this.#hasUncommittedText = false;
+		this.#collectionContext?.setFilter({ filter: value });
+	}, 500);
 
 	override destroy() {
 		this.#debouncedFilter.cancel();
