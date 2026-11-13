@@ -187,6 +187,8 @@ public abstract class MigrationExpressionBase : IMigrationExpression
         {
             case Guid guid:
                 return SqlSyntax.GetQuotedValue(SqlSyntax.FormatGuid(guid));
+            case DateTime dateTime:
+                return SqlSyntax.GetQuotedValue(SqlSyntax.FormatDateTime(dateTime));
             case DateTimeOffset dateTimeOffset:
                 return SqlSyntax.GetQuotedValue(SqlSyntax.FormatDateTimeOffset(dateTimeOffset));
             case DateOnly date:
@@ -213,8 +215,6 @@ public abstract class MigrationExpressionBase : IMigrationExpression
             case TypeCode.UInt32:
             case TypeCode.UInt64:
                 return Convert.ToString(val, CultureInfo.InvariantCulture)!;
-            case TypeCode.DateTime:
-                return SqlSyntax.GetQuotedValue(SqlSyntax.FormatDateTime((DateTime)val));
             default:
                 return SqlSyntax.GetQuotedValue(Convert.ToString(val, CultureInfo.InvariantCulture)!);
         }

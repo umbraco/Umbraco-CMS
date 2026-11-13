@@ -57,12 +57,13 @@ public class MigrationExpressionBaseTests
         var sql = ExecuteInsert(
             new InsertionDataDefinition
             {
+                new("created", new DateTime(2026, 11, 3, 10, 30, 15)),
                 new("date", new DateOnly(2026, 11, 3)),
                 new("time", new TimeOnly(10, 30, 15)),
                 new("moment", new DateTimeOffset(2026, 11, 3, 10, 30, 15, TimeSpan.FromHours(-1))),
             });
 
-        Assert.That(sql, Does.EndWith("VALUES ('20261103','10:30:15.0000000','2026-11-03T10:30:15.0000000-01:00');"));
+        Assert.That(sql, Does.EndWith("VALUES ('20261103 10:30:15','20261103','10:30:15.0000000','2026-11-03T10:30:15.0000000-01:00');"));
     }
 
     [Test]
