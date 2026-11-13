@@ -1,4 +1,4 @@
-import { UMB_THEME_LIGHT_ALIAS } from './constants.js';
+import { UMB_THEME_AUTO_ALIAS } from './constants.js';
 import type { ManifestTheme, UmbThemeColorScheme } from './theme.extension.js';
 import { loadManifestPlainCss } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -11,7 +11,7 @@ import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-a
 const LOCAL_STORAGE_KEY = 'umb-theme-alias';
 
 export class UmbThemeContext extends UmbContextBase {
-	#theme = new UmbStringState(UMB_THEME_LIGHT_ALIAS);
+	#theme = new UmbStringState(UMB_THEME_AUTO_ALIAS);
 	#themeObserver?: UmbObserverController<ManifestTheme[]>;
 
 	public readonly theme = this.#theme.asObservable();
@@ -31,9 +31,7 @@ export class UmbThemeContext extends UmbContextBase {
 		super(host, UMB_THEME_CONTEXT);
 
 		const storedTheme = localStorage.getItem(LOCAL_STORAGE_KEY);
-		if (storedTheme) {
-			this.setThemeByAlias(storedTheme);
-		}
+		this.#applyTheme(storedTheme || UMB_THEME_AUTO_ALIAS);
 	}
 
 	#trackColorScheme(theme?: ManifestTheme) {
@@ -50,11 +48,20 @@ export class UmbThemeContext extends UmbContextBase {
 	}
 
 	public setThemeByAlias(themeAlias: string) {
+		if (themeAlias) {
+			localStorage.setItem(LOCAL_STORAGE_KEY, themeAlias);
+		} else {
+			localStorage.removeItem(LOCAL_STORAGE_KEY);
+		}
+
+		this.#applyTheme(themeAlias);
+	}
+
+	#applyTheme(themeAlias: string) {
 		this.#theme.setValue(themeAlias);
 
 		this.#themeObserver?.destroy();
 		if (themeAlias) {
-			localStorage.setItem(LOCAL_STORAGE_KEY, themeAlias);
 			this.#themeObserver = this.observe(
 				umbExtensionsRegistry.byTypeAndFilter('theme', (extension) => extension.alias === themeAlias),
 				async (themes) => {
@@ -93,8 +100,6 @@ export class UmbThemeContext extends UmbContextBase {
 			);
 		} else {
 			// Super clean, we got a falsy value, so we remove the theme.
-
-			localStorage.removeItem(LOCAL_STORAGE_KEY);
 			this.#trackColorScheme();
 			this.#styleElement?.remove();
 			this.#styleElement?.childNodes.forEach((node) => node.remove());
