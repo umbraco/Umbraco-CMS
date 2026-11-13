@@ -21,7 +21,7 @@ describe('UmbFilterManagerContext', () => {
 		document.body.innerHTML = '';
 	});
 
-	it('counts every active value in totalActiveFilters, not the number of filters', () => {
+	it('counts every active value in totalActiveValues, not the number of filters', () => {
 		manager.setFilterValues('color', [
 			{ unique: 'black', value: 'black' },
 			{ unique: 'white', value: 'white' },
@@ -29,7 +29,7 @@ describe('UmbFilterManagerContext', () => {
 		manager.setFilterValues('size', [{ unique: 'large', value: 'large' }]);
 
 		let total: number | undefined;
-		manager.totalActiveFilters.subscribe((value) => (total = value)).unsubscribe();
+		manager.totalActiveValues.subscribe((value) => (total = value)).unsubscribe();
 		expect(total).to.equal(3);
 	});
 });

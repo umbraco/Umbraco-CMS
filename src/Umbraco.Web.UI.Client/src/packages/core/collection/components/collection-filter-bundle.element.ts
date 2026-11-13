@@ -12,7 +12,7 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 	private _filters: Array<any> = [];
 
 	@state()
-	private _totalActiveFilters = 0;
+	private _totalActiveValues = 0;
 
 	constructor() {
 		super();
@@ -31,8 +31,8 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 		this.consumeContext(UMB_FILTER_MANAGER_CONTEXT, (manager) => {
 			if (!manager) return;
 
-			this.observe(manager.totalActiveFilters, (total) => {
-				this._totalActiveFilters = total ?? 0;
+			this.observe(manager.totalActiveValues, (total) => {
+				this._totalActiveValues = total ?? 0;
 			});
 		});
 	}
@@ -43,7 +43,7 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 		return html`
 			<uui-button compact popovertarget="collection-filter-bundle-popover" label="Filters">
 				<umb-icon name="icon-equalizer"></umb-icon>
-				Filters ${this._totalActiveFilters > 0 ? html`<uui-badge>${this._totalActiveFilters}</uui-badge>` : nothing}
+				Filters ${this._totalActiveValues > 0 ? html`<uui-badge>${this._totalActiveValues}</uui-badge>` : nothing}
 			</uui-button>
 			<uui-popover-container id="collection-filter-bundle-popover" placement="bottom-end">
 				<umb-popover-layout>
