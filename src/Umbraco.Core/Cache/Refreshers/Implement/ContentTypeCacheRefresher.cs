@@ -286,26 +286,16 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
 
             // Clear the converted content cache for the remaining changes (HybridCache entries remain valid).
             // In auto models builder mode (InMemoryAuto), the factory reset above invalidates ALL compiled
-            // model types, so we must clear all entries to prevent stale instances of other types
-            // (e.g. Model.Parent<T>()) from being returned. In non-auto modes, only affected types need clearing.
+            // model types, whatever kind of type changed. Converted items of every kind can hold instances of
+            // them (e.g. Model.Parent<T>(), or a document's block items built from an element type), so every
+            // converted content cache is cleared. In non-auto modes, only affected types need clearing.
             var isAutoFactory = _publishedModelFactory is IAutoPublishedModelFactory;
 
             if (isAutoFactory)
             {
-                if (rebuildDocumentTypeIds.Length > 0 || convertedOnlyDocumentTypeIds.Length > 0)
-                {
-                    _documentCacheService.ClearConvertedContentCache();
-                }
-
-                if (rebuildElementTypeIds.Length > 0 || convertedOnlyElementTypeIds.Length > 0)
-                {
-                    _elementCacheService.ClearConvertedContentCache();
-                }
-
-                if (rebuildMediaTypeIds.Length > 0 || convertedOnlyMediaTypeIds.Length > 0)
-                {
-                    _mediaCacheService.ClearConvertedContentCache();
-                }
+                _documentCacheService.ClearConvertedContentCache();
+                _elementCacheService.ClearConvertedContentCache();
+                _mediaCacheService.ClearConvertedContentCache();
             }
             else
             {
