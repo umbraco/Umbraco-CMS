@@ -110,6 +110,10 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 	static override styles = [
 		...UmbCollectionDefaultElement.styles,
 		css`
+			umb-body-layout {
+				--umb-body-layout-color-background: transparent;
+			}
+
 			umb-dropzone-media {
 				top: var(--uui-size-layout-4);
 				left: 0;
