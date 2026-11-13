@@ -229,6 +229,11 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
         var group = QuoteColumnName("group");
         var first = true;
 
+        // HACK: SQLite (or rather SQL server setup was a hack)
+        // Both the tag and the group must be Unicode literals on SQL Server, otherwise characters outside the
+        // database code page are lost (or replaced with a best-fit character) before they reach cmsTags.
+        var unicodePrefix = SqlContext.DatabaseType.IsSqlServer() ? "N" : string.Empty;
+
         sql.Append("(");
 
         foreach (ITag tag in tags)
@@ -242,18 +247,13 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
                 sql.Append(" UNION ");
             }
 
-            // HACK: SQLite (or rather SQL server setup was a hack)
-            if (SqlContext.DatabaseType.IsSqlServer())
-            {
-                sql.Append("SELECT N'");
-            }
-            else
-            {
-                sql.Append("SELECT '");
-            }
-
+            sql.Append("SELECT ");
+            sql.Append(unicodePrefix);
+            sql.Append('\'');
             sql.Append(SqlSyntax.EscapeString(tag.Text));
-            sql.Append("' AS tag, '");
+            sql.Append("' AS tag, ");
+            sql.Append(unicodePrefix);
+            sql.Append('\'');
             sql.Append(SqlSyntax.EscapeString(tag.Group));
             sql.Append("' AS ");
             sql.Append(group);

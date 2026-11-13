@@ -2,7 +2,7 @@ import type { UmbTemplateCardElement } from '../template-card/template-card.elem
 import type { UmbTemplateItemModel } from '../../repository/item/index.js';
 import { UmbTemplateItemRepository } from '../../repository/item/index.js';
 import { UMB_TEMPLATE_PICKER_MODAL } from '../../modals/index.js';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -26,13 +26,13 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 	min?: number;
 
 	/**
-	 * Min validation message.
+	 * Min validation message. When not set, a localized message stating the minimum and how many more items are needed is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field needs more items';
+	minMessage?: string;
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -44,13 +44,13 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 	max?: number;
 
 	/**
-	 * Max validation message.
+	 * Max validation message. When not set, a localized message stating the maximum and how many items are over it is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'max-message' })
-	maxMessage = 'This field exceeds the allowed amount of items';
+	maxMessage?: string;
 
 	@property({ type: Array })
 	public set selection(newKeys: Array<string> | undefined) {
@@ -71,6 +71,15 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 		return this.#defaultUnique;
 	}
 	#defaultUnique = '';
+
+	/**
+	 * Sets the input to readonly mode, meaning the templates and the default template cannot be changed but can still be opened.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	@state()
 	private _pickedTemplates: UmbTemplateItemModel[] = [];
@@ -176,23 +185,35 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 						.name=${template.name}
 						.href=${this._templatePath ? this._templatePath + 'edit/' + template.unique : undefined}
 						?default=${template.unique === this.defaultUnique}
+						?readonly=${this.readonly}
 						@change=${this.#onCardChange}>
-						<uui-button
-							slot="actions"
-							compact
-							label=${this.localize.term('general_remove') + ' ' + template.name}
-							@click=${() => this.#removeTemplate(template.unique ?? '')}>
-							<uui-icon name="icon-trash"></uui-icon>
-						</uui-button>
+						${this.#renderTemplateActions(template)}
 					</umb-template-card>
 				`,
 			)}
-			<uui-button
-				id="btn-add"
-				look="placeholder"
-				label=${this.localize.term('general_choose')}
-				@click=${this.#openPicker}></uui-button>
+			${this.#renderAddButton()}
 		`;
+	}
+
+	#renderTemplateActions(template: UmbTemplateItemModel) {
+		if (this.readonly) return nothing;
+		return html`<uui-button
+			slot="actions"
+			compact
+			label=${this.localize.term('general_remove') + ' ' + template.name}
+			@click=${() => this.#removeTemplate(template.unique ?? '')}>
+			<uui-icon name="icon-trash"></uui-icon>
+		</uui-button>`;
+	}
+
+	#renderAddButton() {
+		if (this.readonly && this.#selection.length > 0) return nothing;
+		return html`<uui-button
+			id="btn-add"
+			look="placeholder"
+			label=${this.localize.term('general_choose')}
+			?disabled=${this.readonly}
+			@click=${this.#openPicker}></uui-button>`;
 	}
 
 	static override readonly styles = [

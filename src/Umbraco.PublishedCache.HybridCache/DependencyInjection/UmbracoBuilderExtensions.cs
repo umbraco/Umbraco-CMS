@@ -76,9 +76,14 @@ public static class UmbracoBuilderExtensions
         });
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, HybridCacheStartupNotificationHandler>(); // Need to happen before notification handlers use the cache. Eg. seeding
         builder.Services.AddSingleton<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
-        builder.AddNotificationAsyncHandler<ContentRefreshNotification, CacheRefreshingNotificationHandler>();
+
+        // Synchronous on purpose: these run inside the content transaction, under the content tree lock.
+        // TODO (V20): register the async handlers again once locks and notification publishing are asynchronous.
+#pragma warning disable CS0618 // Type or member is obsolete
+        builder.AddNotificationHandler<ContentRefreshNotification, CacheRefreshingNotificationHandler>();
+        builder.AddNotificationHandler<MediaRefreshNotification, CacheRefreshingNotificationHandler>();
+#pragma warning restore CS0618 // Type or member is obsolete
         builder.AddNotificationAsyncHandler<ContentDeletedNotification, CacheRefreshingNotificationHandler>();
-        builder.AddNotificationAsyncHandler<MediaRefreshNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<MediaDeletedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<ContentTypeRefreshedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<ContentTypeDeletedNotification, CacheRefreshingNotificationHandler>();
@@ -86,6 +91,8 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<MediaTypeDeletedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeChangedNotification, DeferredCacheRebuildNotificationHandler>();
         builder.AddNotificationHandler<MediaTypeChangedNotification, DeferredCacheRebuildNotificationHandler>();
+        builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, SerializerTypeCacheRefresherNotificationHandler>();
+        builder.AddNotificationHandler<DataTypeCacheRefresherNotification, SerializerTypeCacheRefresherNotificationHandler>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, SeedingNotificationHandler>();
         builder.AddNotificationHandler<UmbracoApplicationStartingNotification, DomainCacheSeedingNotificationHandler>();
         builder.AddCacheSeeding();

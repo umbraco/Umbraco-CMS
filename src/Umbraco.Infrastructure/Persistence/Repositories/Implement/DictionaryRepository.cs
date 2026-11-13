@@ -212,8 +212,8 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         // values in raw SQL, and as a predicate when matched on its own.
         (string Pattern, Expression<Func<DictionaryDto, bool>> Predicate) keyMatch = settings.KeySearchMode switch
         {
-            DictionaryKeySearchMode.Contains => ($"%{filter}%", x => x.Key.Contains(filter)),
-            DictionaryKeySearchMode.StartsWith => ($"{filter}%", x => x.Key.StartsWith(filter)),
+            DictionaryKeySearchMode.Contains => ($"%{SqlSyntax.EscapeLikeValue(filter)}%", x => x.Key.Contains(filter)),
+            DictionaryKeySearchMode.StartsWith => ($"{SqlSyntax.EscapeLikeValue(filter)}%", x => x.Key.StartsWith(filter)),
             _ => throw new ArgumentOutOfRangeException(nameof(settings.KeySearchMode), settings.KeySearchMode, null),
         };
 
@@ -223,9 +223,9 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
             // Use a subquery to find dictionary items that have matching translations
             // Then fetch ALL translations for those items
             sql.Where(
-                $"({QuotedColumn("key")} LIKE @0 OR {QuotedColumn("id")} IN (SELECT DISTINCT {QuoteColumnName("UniqueId")} FROM {QuoteTableName(LanguageTextDto.TableName)} WHERE {QuoteColumnName("value")} LIKE @1))",
+                $"({QuotedColumn("key")} LIKE @0 {SqlSyntax.GetLikeEscapeClause()} OR {QuotedColumn("id")} IN (SELECT DISTINCT {QuoteColumnName("UniqueId")} FROM {QuoteTableName(LanguageTextDto.TableName)} WHERE {QuoteColumnName("value")} LIKE @1 {SqlSyntax.GetLikeEscapeClause()}))",
                 keyMatch.Pattern,
-                $"%{filter}%");
+                $"%{SqlSyntax.EscapeLikeValue(filter)}%");
         }
         else
         {

@@ -94,7 +94,8 @@ public abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCache
     /// </summary>
     protected void EnsureCacheIsSynced()
     {
-        var synced = _cacheVersionService.IsCacheSyncedAsync<TEntity>().GetAwaiter().GetResult();
+        // TODO (V20): call IsCacheSyncedAsync once locks and notification publishing are asynchronous.
+        var synced = _cacheVersionService.IsCacheSynced<TEntity>();
         if (synced)
         {
             return;
@@ -106,5 +107,6 @@ public abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCache
     /// <summary>
     /// Registers a change in the cache.
     /// </summary>
-    protected void RegisterCacheChange() => _cacheVersionService.SetCacheUpdatedAsync<TEntity>().GetAwaiter().GetResult();
+    // TODO (V20): call SetCacheUpdatedAsync once locks and notification publishing are asynchronous.
+    protected void RegisterCacheChange() => _cacheVersionService.SetCacheUpdated<TEntity>();
 }
