@@ -14,8 +14,8 @@ export class UserUiHelper extends UiBaseLocators {
   private readonly changePasswordBtn: Locator;
   private readonly searchInUserSectionTxt: Locator;
   private readonly userSectionCard: Locator;
-  private readonly statusBtn: Locator;
-  private readonly groupBtn: Locator;
+  private readonly filtersBtn: Locator;
+  private readonly filtersPopover: Locator;
   private readonly chooseUserGroupsBtn: Locator;
   private readonly allowAccessToAllDocumentsToggle: Locator;
   private readonly allowAccessToAllMediaToggle: Locator;
@@ -45,10 +45,10 @@ export class UserUiHelper extends UiBaseLocators {
     this.chooseUserGroupsBtn = page.locator('umb-user-group-input').getByLabel('Choose');
     this.updatedNameOfTheUserTxt = page.locator('umb-workspace-header-name-editable').locator('input');
     this.changePasswordBtn = page.getByLabel('Change password');
-    this.searchInUserSectionTxt = page.locator('umb-collection-filter-field #input');
+    this.searchInUserSectionTxt = page.locator('umb-collection-toolbar').getByTestId('collection-text-filter').locator('#input');
     this.userSectionCard = page.locator('uui-card-user');
-    this.statusBtn = page.locator('uui-button', {hasText: 'Status'});
-    this.groupBtn = page.locator('uui-button', {hasText: 'Groups'});
+    this.filtersBtn = page.locator('umb-collection-toolbar').getByTestId('collection:filters');
+    this.filtersPopover = page.locator('#collection-filter-bundle-popover');
     this.allowAccessToAllDocumentsToggle = page.locator('umb-property-layout').filter({hasText: 'Allow access to all documents'}).locator('#toggle');
     this.allowAccessToAllMediaToggle = page.locator('umb-property-layout').filter({hasText: 'Allow access to all media'}).locator('#toggle');
     this.mediaInput = page.locator('umb-input-media');
@@ -185,13 +185,13 @@ export class UserUiHelper extends UiBaseLocators {
   }
 
   async filterByStatusName(statusName: string) {
-    await this.click(this.statusBtn);
-    await this.click(this.page.locator('label').filter({hasText: statusName}));
+    await this.click(this.filtersBtn);
+    await this.click(this.filtersPopover.locator('umb-filter', {hasText: 'Status'}).locator('label').filter({hasText: statusName}));
   }
 
   async filterByGroupName(groupName: string) {
-    await this.click(this.groupBtn);
-    await this.click(this.page.locator('label').filter({hasText: groupName}));
+    await this.click(this.filtersBtn);
+    await this.click(this.filtersPopover.locator('umb-filter', {hasText: 'Groups'}).locator('label').filter({hasText: groupName}));
   }
 
   async isPasswordUpdatedForUserWithId(userId: string) {

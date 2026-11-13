@@ -467,7 +467,8 @@ export class UiBaseLocators extends BasePage {
     this.typeToFilterSearchTxt = page.locator('[type="search"] #input');
     this.filterChooseBtn = page.locator("button").filter({ hasText: "Choose" });
     this.searchTxt = this.page
-      .locator("umb-collection-filter-field")
+      .locator("umb-collection-toolbar")
+      .getByTestId("collection-text-filter")
       .locator("#input");
 
     // Text Input

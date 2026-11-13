@@ -41,7 +41,11 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 		if (!this._filters.length) return nothing;
 
 		return html`
-			<uui-button compact popovertarget="collection-filter-bundle-popover" label="Filters">
+			<uui-button
+				compact
+				popovertarget="collection-filter-bundle-popover"
+				label="Filters"
+				data-mark="collection:filters">
 				<umb-icon name="icon-equalizer"></umb-icon>
 				Filters ${this._totalActiveValues > 0 ? html`<uui-badge>${this._totalActiveValues}</uui-badge>` : nothing}
 			</uui-button>
