@@ -107,6 +107,14 @@ internal sealed class DatabaseCacheRebuilderTests : UmbracoIntegrationTest
     [Test]
     public async Task Rebuilding_During_Publishing_Keeps_Every_Published_Element_Cached()
     {
+        if (BaseTestDatabase.IsSqlite())
+        {
+            // On SQLite a read lock doesn't exclude a writer, so a rebuild overlapping a publish waits on SQLite's
+            // single writer instead of being serialized by the tree locks this test verifies.
+            Assert.Ignore("The tree read locks that serialize the rebuild with publishing apply to SQL Server only.");
+            return;
+        }
+
         IContentType elementType = ContentTypeBuilder.CreateSimpleElementType();
         elementType.AllowedInLibrary = true;
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
