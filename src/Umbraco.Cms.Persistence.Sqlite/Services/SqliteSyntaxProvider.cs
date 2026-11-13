@@ -1,5 +1,6 @@
 using System.Data;
 using System.Data.Common;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -103,6 +104,23 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     /// avoid case sensitivity issues when comparing values.
     /// </remarks>
     public override string FormatGuid(Guid guid) => guid.ToString().ToUpperInvariant();
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// SQLite stores date and time values as text, so the formats for <see cref="DateTimeOffset"/>, <see cref="DateOnly"/>
+    /// and <see cref="TimeOnly"/> match those the ADO.NET provider writes for parameters, keeping values comparable and
+    /// sortable whichever way they were written.
+    /// </remarks>
+    public override string FormatDateTimeOffset(DateTimeOffset dateTimeOffset)
+        => dateTimeOffset.ToString(@"yyyy\-MM\-dd HH\:mm\:ss.FFFFFFFzzz", CultureInfo.InvariantCulture);
+
+    /// <inheritdoc />
+    public override string FormatDateOnly(DateOnly date)
+        => date.ToString(@"yyyy\-MM\-dd", CultureInfo.InvariantCulture);
+
+    /// <inheritdoc />
+    public override string FormatTimeOnly(TimeOnly time)
+        => time.ToString(time.Ticks % TimeSpan.TicksPerSecond == 0 ? "HH:mm:ss" : "HH:mm:ss.fffffff", CultureInfo.InvariantCulture);
 
     /// <inheritdoc />
     public override string Format(TableDefinition table)

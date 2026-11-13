@@ -11,7 +11,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
@@ -311,11 +310,11 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual string GetQuotedName(string? name) => $"\"{name}\"";
 
     /// <summary>
-    /// Returns the specified string value enclosed in single quotes.
+    /// Returns the specified string value enclosed in single quotes, with any single quotes it contains escaped.
     /// </summary>
     /// <param name="value">The string value to quote.</param>
     /// <returns>The quoted string value.</returns>
-    public virtual string GetQuotedValue(string value) => $"'{value}'";
+    public virtual string GetQuotedValue(string value) => $"'{value.Replace("'", "''")}'";
 
     /// <inheritdoc />
     public virtual string GetNullCastSuffix<T>() => string.Empty;
@@ -568,6 +567,24 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     /// <inheritdoc />
     public virtual string FormatGuid(Guid guid) => guid.ToString();
+
+    /// <inheritdoc />
+    /// <remarks>
+    ///     ISO 8601 with a "T" separator is unambiguous for SQL Server date types, whatever the language
+    ///     or DATEFORMAT setting of the connection.
+    /// </remarks>
+    public virtual string FormatDateTimeOffset(DateTimeOffset dateTimeOffset)
+        => dateTimeOffset.ToString("yyyy-MM-ddTHH:mm:ss.fffffffzzz", CultureInfo.InvariantCulture);
+
+    /// <inheritdoc />
+    /// <remarks>
+    ///     YYYYMMDD is unambiguous for all SQL Server date types, whatever the language or DATEFORMAT
+    ///     setting of the connection.
+    /// </remarks>
+    public virtual string FormatDateOnly(DateOnly date) => date.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+
+    /// <inheritdoc />
+    public virtual string FormatTimeOnly(TimeOnly time) => time.ToString("HH:mm:ss.fffffff", CultureInfo.InvariantCulture);
 
     /// <summary>
     /// Formats a SQL create table statement for the specified table definition.
