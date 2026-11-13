@@ -64,6 +64,8 @@ export class UmbDefaultCollectionTextFilterElement extends UmbLitElement {
 
 			uui-input {
 				width: 100%;
+				/* Lets content in the filters slot, such as a badge, extend past the input's border. */
+				overflow: visible;
 			}
 		`,
 	];
