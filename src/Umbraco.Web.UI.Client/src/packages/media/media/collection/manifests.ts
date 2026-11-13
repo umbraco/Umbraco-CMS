@@ -1,6 +1,7 @@
 import { manifests as collectionActionManifests } from './action/manifests.js';
 import { manifests as collectionRepositoryManifests } from './repository/manifests.js';
 import { manifests as collectionViewManifests } from './views/manifests.js';
+import { manifests as collectionFilterManifests } from './filter/manifests.js';
 import { manifests as itemManifests } from './item/manifests.js';
 import { UMB_MEDIA_COLLECTION_REPOSITORY_ALIAS, UMB_MEDIA_COLLECTION_ALIAS } from './constants.js';
 
@@ -18,5 +19,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...collectionActionManifests,
 	...collectionRepositoryManifests,
 	...collectionViewManifests,
+	...collectionFilterManifests,
 	...itemManifests,
 ];

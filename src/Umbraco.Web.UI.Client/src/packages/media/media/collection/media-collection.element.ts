@@ -87,9 +87,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 
 	protected override renderToolbar() {
 		return html`
-			<umb-collection-toolbar slot="header">
-				<umb-collection-filter-field></umb-collection-filter-field>
-			</umb-collection-toolbar>
+			<umb-collection-toolbar slot="header"></umb-collection-toolbar>
 			${when(this._progress >= 0, () => html`<uui-loader-bar progress=${this._progress}></uui-loader-bar>`)}
 			<umb-dropzone-media
 				id="dropzone"
