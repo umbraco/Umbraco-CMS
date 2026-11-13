@@ -204,9 +204,9 @@ internal sealed class DocumentUrlRebuildConcurrentWriteTests : UmbracoIntegratio
 
         public void SetValue(string key, string value) => _inner.SetValue(key, value);
 
-        public void SetValue(string key, string originalValue, string newValue) => _inner.SetValue(key, originalValue, newValue);
+        public void SetValue(string key, string originValue, string newValue) => _inner.SetValue(key, originValue, newValue);
 
-        public bool TrySetValue(string key, string originalValue, string newValue) => _inner.TrySetValue(key, originalValue, newValue);
+        public bool TrySetValue(string key, string originValue, string newValue) => _inner.TrySetValue(key, originValue, newValue);
     }
 
     private sealed class WriteDuringRebuildDocumentUrlAliasRepository : IDocumentUrlAliasRepository
