@@ -40,11 +40,13 @@ internal sealed class PropertyValueOrderingTests : UmbracoIntegrationTest
     public async Task Ordering_Content_By_A_Decimal_Property_Follows_Numeric_Order()
     {
         // The pairs differing only in their last digit catch conversions through floating point. They stay within
-        // the digits every database's decimal column keeps.
+        // the digits every database's decimal column keeps. Fractions of different lengths and whole numbers catch
+        // conversions that pad text: 1.5 must sort above 1.25, and a value without a decimal point keeps its digits.
         decimal[] values =
         [
             2.25m, -1.5m, 10.1m, 0m, -0.25m, 99999999999.5m, -12345.678m, -0.000001m,
             99999999998.999999m, 99999999998.999998m, -99999999998.999999m, -99999999998.999998m,
+            1.5m, 1.25m, -1.25m, -5m, 7m,
         ];
 
         IEnumerable<string> names = await GetNamesOrderedByProperty(Constants.DataTypes.LabelDecimal, ValueStorageType.Decimal, values.Cast<object>());
