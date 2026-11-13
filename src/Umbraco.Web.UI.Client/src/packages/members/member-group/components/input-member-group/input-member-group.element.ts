@@ -13,6 +13,7 @@ import {
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
@@ -300,8 +301,41 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 				width: 100%;
 			}
 
+			uui-ref-node::after {
+				content: '';
+				position: absolute;
+				z-index: 1;
+				pointer-events: none;
+				inset: 0;
+				border: 1px solid transparent;
+				border-radius: var(--uui-border-radius);
+
+				transition: border-color 240ms ease-in;
+			}
+
 			uui-ref-node[drag-placeholder] {
-				opacity: 0.2;
+				--uui-color-focus: transparent;
+				color: transparent;
+			}
+
+			uui-ref-node[drag-placeholder]::after {
+				display: block;
+				border-width: 2px;
+				border-color: var(--uui-color-interactive-emphasis);
+				animation: ${UUIBlinkAnimationValue};
+			}
+			uui-ref-node[drag-placeholder]::before {
+				content: '';
+				position: absolute;
+				pointer-events: none;
+				inset: 0;
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-interactive-emphasis);
+				opacity: 0.12;
+			}
+			uui-ref-node[drag-placeholder] > * {
+				transition: opacity 50ms 16ms;
+				opacity: 0;
 			}
 		`,
 	];
