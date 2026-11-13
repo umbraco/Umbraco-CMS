@@ -1,5 +1,6 @@
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using NPoco;
@@ -8,8 +9,6 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
-
-// TODO (V18): Remove the default implementations in this interface.
 
 /// <summary>
 ///     Defines an SqlSyntaxProvider.
@@ -346,6 +345,31 @@ public interface ISqlSyntaxProvider
     /// <param name="guid">The guid.</param>
     /// <returns>A string representation of the guid formatted for SQL.</returns>
     string FormatGuid(Guid guid) => guid.ToString();
+
+    /// <summary>
+    /// Formats a <see cref="DateTimeOffset"/> value as a string suitable for use in SQL queries.
+    /// </summary>
+    /// <param name="dateTimeOffset">The date, time and offset value to format.</param>
+    /// <returns>A string representation of the value formatted for SQL, independent of the current culture.</returns>
+    // TODO (V20): Remove the default implementation.
+    string FormatDateTimeOffset(DateTimeOffset dateTimeOffset)
+        => dateTimeOffset.ToString("yyyy-MM-ddTHH:mm:ss.fffffffzzz", CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// Formats a <see cref="DateOnly"/> value as a string suitable for use in SQL queries.
+    /// </summary>
+    /// <param name="date">The date value to format.</param>
+    /// <returns>A string representation of the date formatted for SQL, independent of the current culture.</returns>
+    // TODO (V20): Remove the default implementation.
+    string FormatDateOnly(DateOnly date) => date.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// Formats a <see cref="TimeOnly"/> value as a string suitable for use in SQL queries.
+    /// </summary>
+    /// <param name="time">The time value to format.</param>
+    /// <returns>A string representation of the time formatted for SQL, independent of the current culture.</returns>
+    // TODO (V20): Remove the default implementation.
+    string FormatTimeOnly(TimeOnly time) => time.ToString("HH:mm:ss.fffffff", CultureInfo.InvariantCulture);
 
     /// <summary>
     /// Formats a <see cref="TableDefinition"/> into its corresponding SQL statement.
