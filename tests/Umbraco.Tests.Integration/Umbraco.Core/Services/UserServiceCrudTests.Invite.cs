@@ -1,8 +1,11 @@
+using System.Net.Sockets;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -160,5 +163,131 @@ internal sealed partial class UserServiceCrudTests
         var invitedUser = await userService.GetAsync(result.Result.InvitedUser!.Key);
         Assert.IsNotNull(invitedUser);
         Assert.AreEqual(UserState.Invited, invitedUser.UserState);
+    }
+
+    [Test]
+    public async Task Invitation_Is_Sent_Outside_A_Transaction()
+    {
+        bool? sentWithinTransaction = null;
+        var senderMock = CreateInviteSenderMock();
+        senderMock
+            .Setup(x => x.InviteUser(It.IsAny<UserInvitationMessage>()))
+            .Callback(() => sentWithinTransaction = ScopeAccessor.AmbientScope is not null)
+            .Returns(Task.CompletedTask);
+        IUserService userService = CreateUserService(inviteSender: senderMock.Object);
+
+        var result = await userService.InviteAsync(Constants.Security.SuperUserKey, await CreateInviteModel());
+
+        Assert.IsTrue(result.Success);
+        Assert.IsFalse(sentWithinTransaction);
+    }
+
+    [Test]
+    public async Task Invited_User_Is_Kept_When_The_Invitation_Cannot_Be_Sent()
+    {
+        var senderMock = CreateInviteSenderMock();
+        senderMock
+            .Setup(x => x.InviteUser(It.IsAny<UserInvitationMessage>()))
+            .ThrowsAsync(new SocketException());
+        IUserService userService = CreateUserService(inviteSender: senderMock.Object);
+
+        var result = await userService.InviteAsync(Constants.Security.SuperUserKey, await CreateInviteModel());
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserOperationStatus.UnknownFailure, result.Status);
+        Assert.IsNotNull(result.Result.Error);
+        var invitedUser = await userService.GetAsync(result.Result.InvitedUser!.Key);
+        Assert.IsNotNull(invitedUser);
+        Assert.AreEqual(UserState.Invited, invitedUser!.UserState);
+    }
+
+    [Test]
+    public async Task Can_Resend_Invitation()
+    {
+        bool? sentWithinTransaction = null;
+        var senderMock = CreateInviteSenderMock();
+        IUserService userService = CreateUserService(inviteSender: senderMock.Object);
+        var inviteResult = await userService.InviteAsync(Constants.Security.SuperUserKey, await CreateInviteModel());
+        Assert.IsTrue(inviteResult.Success);
+        IUser invitedUser = inviteResult.Result.InvitedUser!;
+        DateTime? originalInvitedDate = (await userService.GetAsync(invitedUser.Key))!.InvitedDate;
+
+        senderMock
+            .Setup(x => x.InviteUser(It.IsAny<UserInvitationMessage>()))
+            .Callback(() => sentWithinTransaction = ScopeAccessor.AmbientScope is not null)
+            .Returns(Task.CompletedTask);
+
+        var result = await userService.ResendInvitationAsync(
+            Constants.Security.SuperUserKey,
+            new UserResendInviteModel { InvitedUserKey = invitedUser.Key });
+
+        Assert.IsTrue(result.Success);
+        Assert.IsFalse(sentWithinTransaction);
+        senderMock.Verify(x => x.InviteUser(It.Is<UserInvitationMessage>(m => m.Recipient.Key == invitedUser.Key)), Times.Exactly(2));
+        Assert.That((await userService.GetAsync(invitedUser.Key))!.InvitedDate, Is.GreaterThanOrEqualTo(originalInvitedDate));
+    }
+
+    [Test]
+    public async Task Resend_Invitation_Send_Failure_Is_Returned_As_Failed_Attempt()
+    {
+        var senderMock = CreateInviteSenderMock();
+        IUserService userService = CreateUserService(inviteSender: senderMock.Object);
+        var inviteResult = await userService.InviteAsync(Constants.Security.SuperUserKey, await CreateInviteModel());
+        Assert.IsTrue(inviteResult.Success);
+
+        senderMock
+            .Setup(x => x.InviteUser(It.IsAny<UserInvitationMessage>()))
+            .ThrowsAsync(new SocketException());
+
+        var result = await userService.ResendInvitationAsync(
+            Constants.Security.SuperUserKey,
+            new UserResendInviteModel { InvitedUserKey = inviteResult.Result.InvitedUser!.Key });
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserOperationStatus.UnknownFailure, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Resend_Invitation_To_User_Not_In_Invited_State()
+    {
+        var userGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
+        IUserService userService = CreateUserService();
+        var createResult = await userService.CreateAsync(
+            Constants.Security.SuperUserKey,
+            new UserCreateModel
+            {
+                UserName = "active@email.com",
+                Email = "active@email.com",
+                Name = "Active",
+                UserGroupKeys = new HashSet<Guid> { userGroup!.Key },
+            },
+            true);
+        Assert.IsTrue(createResult.Success);
+
+        var result = await userService.ResendInvitationAsync(
+            Constants.Security.SuperUserKey,
+            new UserResendInviteModel { InvitedUserKey = createResult.Result.CreatedUser!.Key });
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserOperationStatus.NotInInviteState, result.Status);
+    }
+
+    private static Mock<IUserInviteSender> CreateInviteSenderMock()
+    {
+        var senderMock = new Mock<IUserInviteSender>();
+        senderMock.Setup(x => x.CanSendInvites()).Returns(true);
+        return senderMock;
+    }
+
+    private async Task<UserInviteModel> CreateInviteModel()
+    {
+        var userGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
+        return new UserInviteModel
+        {
+            UserName = "invited@email.com",
+            Email = "invited@email.com",
+            Name = "Invited",
+            UserGroupKeys = new HashSet<Guid> { userGroup!.Key },
+        };
     }
 }
