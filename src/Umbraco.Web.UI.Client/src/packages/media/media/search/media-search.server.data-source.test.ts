@@ -2,10 +2,16 @@ import { UmbMediaSearchServerDataSource } from './media-search.server.data-sourc
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('test-media-search-data-source-host')
-class UmbTestMediaSearchDataSourceHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+class UmbTestMediaSearchDataSourceHostElement extends UmbControllerHostElementMixin(HTMLElement) {
+	constructor() {
+		super();
+		new UmbNotificationContext(this);
+	}
+}
 
 const makeSearchItem = (id: string) => ({
 	id,
