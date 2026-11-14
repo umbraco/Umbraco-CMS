@@ -161,18 +161,36 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
             });
         }
 
-        IDbCommand[] commands;
+        string commandText;
+        string expected;
+        int inserted;
         using (var scope = ScopeProvider.CreateScope())
         {
-            commands = ScopeAccessor.AmbientScope.Database.GenerateBulkInsertCommands(servers.ToArray());
-            scope.Complete();
+            var database = ScopeAccessor.AmbientScope.Database;
+            var databaseType = database.DatabaseType;
+            var prefix = databaseType.GetParameterPrefix(database.ConnectionString);
+            string C(string name) => databaseType.EscapeSqlIdentifier(name);
+            string P(int from) => string.Join(",", Enumerable.Range(from, 6).Select(i => prefix + i));
+            expected = $"INSERT INTO {databaseType.EscapeTableName("umbracoServer")} ({C("address")}, {C("computerName")}, {C("registeredDate")}, {C("lastNotifiedDate")}, {C("isActive")}, {C("isSchedulingPublisher")}) VALUES ({P(0)}), ({P(6)})";
+
+            IDbCommand[] commands = database.GenerateBulkInsertCommands(servers.ToArray());
+            try
+            {
+                commandText = commands[0].CommandText;
+                inserted = commands[0].ExecuteNonQuery();
+            }
+            finally
+            {
+                foreach (IDbCommand command in commands)
+                {
+                    command.Dispose();
+                }
+            }
         }
 
         // Assert
-        Assert.That(
-            commands[0].CommandText,
-            Is.EqualTo(
-                "INSERT INTO [umbracoServer] ([umbracoServer].[address], [umbracoServer].[computerName], [umbracoServer].[registeredDate], [umbracoServer].[lastNotifiedDate], [umbracoServer].[isActive], [umbracoServer].[isSchedulingPublisher]) VALUES (@0,@1,@2,@3,@4,@5), (@6,@7,@8,@9,@10,@11)"));
+        Assert.That(commandText, Is.EqualTo(expected));
+        Assert.That(inserted, Is.EqualTo(2));
     }
 
     [Test]
