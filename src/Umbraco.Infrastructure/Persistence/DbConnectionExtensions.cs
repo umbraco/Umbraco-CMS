@@ -3,7 +3,7 @@ using System.Data.Common;
 using Microsoft.Extensions.Logging;
 using StackExchange.Profiling.Data;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
+using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Extensions;
 
@@ -79,9 +79,9 @@ public static class DbConnectionExtensions
                 unwrapped = profiled.WrappedConnection;
             }
 
-            if (unwrapped is RetryDbConnection retrying)
+            if (unwrapped is IWrappedDbConnection wrapped)
             {
-                unwrapped = retrying.Inner;
+                unwrapped = wrapped.Inner;
             }
         }
         while (c != unwrapped);
