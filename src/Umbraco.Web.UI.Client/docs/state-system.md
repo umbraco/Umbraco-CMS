@@ -53,6 +53,8 @@ readonly itemCount = this.#items.asObservablePart((items) => items.length);
 
 Default memoization handles both objects (deep-equal via JSON) and primitives (`===`). Pass a custom memoization function as the second arg when the default is too coarse or too fine.
 
+Derive values with `asObservablePart`, `createObservablePart` or `mergeObservables`, not with `.pipe(...)`. These let go of their State when nobody observes them, while a piped observable is unmarked and keeps everything derived from it subscribed to the source (see `umbMarkAsStatefulObservable`).
+
 ---
 
 ## Mute / Unmute (UmbDeepState only)
