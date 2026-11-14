@@ -40,6 +40,8 @@ public static class UmbracoBuilderAuthExtensions
 
     private static void ConfigureOpenIddict(IUmbracoBuilder builder)
     {
+        builder.Services.AddUnique<IOpenIddictPathsToHandleProvider, OpenIddictPathsToHandleProvider>();
+
         builder.Services.AddOpenIddict()
             // Register the OpenIddict server components.
             .AddServer(options =>
