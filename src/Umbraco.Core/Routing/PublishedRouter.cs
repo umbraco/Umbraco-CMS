@@ -755,20 +755,13 @@ public class PublishedRouter : IPublishedRouter
             {
                 ITemplate? template = GetTemplate(templateId);
                 request.SetTemplate(template);
-                if (template != null)
+                if (template != null && _logger.IsEnabled(LogLevel.Debug))
                 {
-                    if (_logger.IsEnabled(LogLevel.Debug))
-                    {
-                        _logger.LogDebug(
-                            "FindTemplate: Running with template id={TemplateId} key={TemplateKey} alias={TemplateAlias}",
-                            template.Id,
-                            template.Key,
-                            template.Alias);
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("FindTemplate: Could not find template with id {TemplateId}", templateId);
+                    _logger.LogDebug(
+                        "FindTemplate: Running with template id={TemplateId} key={TemplateKey} alias={TemplateAlias}",
+                        template.Id,
+                        template.Key,
+                        template.Alias);
                 }
             }
         }
@@ -883,16 +876,13 @@ public class PublishedRouter : IPublishedRouter
             _logger.LogDebug("GetTemplateModel: Get template id={TemplateId}", templateId);
         }
 
-        if (templateId == null)
-        {
-            throw new InvalidOperationException("The template is not set, the page cannot render.");
-        }
-
         ITemplate? template = _fileService.GetTemplate(templateId.Value);
         if (template == null)
         {
-            throw new InvalidOperationException("The template with Id " + templateId +
-                                                " does not exist, the page cannot render.");
+            // Published content keeps the identifier of a template that has since been deleted until it is
+            // republished, so a missing template is handled as no template rather than failing the request.
+            _logger.LogWarning("GetTemplateModel: Could not find template with id {TemplateId}", templateId);
+            return null;
         }
 
         if (_logger.IsEnabled(LogLevel.Debug))
