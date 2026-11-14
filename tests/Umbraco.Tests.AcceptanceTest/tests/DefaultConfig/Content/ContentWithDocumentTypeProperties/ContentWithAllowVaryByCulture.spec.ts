@@ -55,9 +55,9 @@ test('can create content with names that vary by culture', async ({umbracoApi, u
   // Assert
   expect(await umbracoApi.document.doesNameExist(danishContentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(danishContentName);
-  expect(contentData.variants.length).toBe(2);
-  expect(contentData.variants[0].name).toBe(danishContentName);
-  expect(contentData.variants[1].name).toBe(contentName);
+  expect(contentData.variants.length).toBe(3);
+  expect(contentData.variants[1].name).toBe(danishContentName);
+  expect(contentData.variants[2].name).toBe(contentName);
 });
 
 test('can create content with names that vary by culture and content that is invariant', async ({umbracoApi, umbracoUi}) => {
@@ -82,9 +82,9 @@ test('can create content with names that vary by culture and content that is inv
   // Assert
   expect(await umbracoApi.document.doesNameExist(danishContentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(danishContentName);
-  expect(contentData.variants.length).toBe(2);
-  expect(contentData.variants[0].name).toBe(danishContentName);
-  expect(contentData.variants[1].name).toBe(contentName);
+  expect(contentData.variants.length).toBe(3);
+  expect(contentData.variants[1].name).toBe(danishContentName);
+  expect(contentData.variants[2].name).toBe(contentName);
   expect(contentData.values.length).toBe(1);
   expect(contentData.values[0].value).toBe(textContent);
 });
@@ -113,9 +113,9 @@ test('can create content with names and content that vary by culture', async ({u
   // Assert
   expect(await umbracoApi.document.doesNameExist(danishContentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(danishContentName);
-  expect(contentData.variants.length).toBe(2);
-  expect(contentData.variants[0].name).toBe(danishContentName);
-  expect(contentData.variants[1].name).toBe(contentName);
+  expect(contentData.variants.length).toBe(3);
+  expect(contentData.variants[1].name).toBe(danishContentName);
+  expect(contentData.variants[2].name).toBe(contentName);
   expect(contentData.values.length).toBe(2);
   expect(contentData.values[0].value).toBe(danishTextContent);
   expect(contentData.values[1].value).toBe(textContent);

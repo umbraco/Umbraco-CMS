@@ -432,6 +432,9 @@
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.UpdateAndPublish.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\PropertyEditors\BlockListElementLevelVariationTests.EditedTracking.cs">
+      <DependentUpon>BlockListElementLevelVariationTests.cs</DependentUpon>
+    </Compile>
     <None Update="Umbraco.Cms.Search.Extension.FileToText\TestFiles\Lorem ipsum.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

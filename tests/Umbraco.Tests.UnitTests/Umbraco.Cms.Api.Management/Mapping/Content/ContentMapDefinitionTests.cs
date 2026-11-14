@@ -48,7 +48,7 @@ public class ContentMapDefinitionTests
             .Select(variant => variant.Culture)
             .ToArray();
 
-        CollectionAssert.AreEqual(new string?[] { "da-DK", "en-US" }, variants);
+        CollectionAssert.AreEqual(new string?[] { null, "da-DK", "en-US" }, variants);
     }
 
     internal static IContent CreateContent(string[] cultures, params IProperty[] properties)
