@@ -5,15 +5,21 @@ const dataTypeName = 'Element Picker';
 const customDataTypeName = 'Custom Element Picker';
 const editorAlias = 'Umbraco.ElementPicker';
 const editorUiAlias = 'Umb.PropertyEditorUi.ElementPicker';
+const elementTypeName = 'TestElementPickerElementType';
+const elementFolderName = 'TestElementPickerFolder';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
+  await umbracoApi.element.ensureNameNotExists(elementFolderName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
+  await umbracoApi.element.ensureNameNotExists(elementFolderName);
 });
 
 test('can create an element picker data type', async ({umbracoApi, umbracoUi}) => {
@@ -76,4 +82,32 @@ test('can set minimum and maximum amount', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   expect(await umbracoApi.dataType.doesElementPickerHaveMinAndMaxAmount(customDataTypeName, minAmount, maxAmount)).toBeTruthy();
+});
+
+test('can set accepted types', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
+  await umbracoApi.dataType.createDefaultElementPickerDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.addElementPickerAcceptedType(elementTypeName);
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'allowedContentTypes', elementTypeId)).toBeTruthy();
+});
+
+test('can set start node', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
+  await umbracoApi.dataType.createDefaultElementPickerDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.addElementPickerStartNode(elementFolderName);
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'startNodeId', [elementFolderId])).toBeTruthy();
 });

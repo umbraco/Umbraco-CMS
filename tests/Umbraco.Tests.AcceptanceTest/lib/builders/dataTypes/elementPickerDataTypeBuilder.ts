@@ -3,6 +3,8 @@ import {DataTypeBuilder} from './dataTypeBuilder';
 export class ElementPickerDataTypeBuilder extends DataTypeBuilder {
   minValidation: number;
   maxValidation: number;
+  allowedContentTypeIds: string[];
+  startNodeId: string;
 
   constructor() {
     super();
@@ -19,6 +21,16 @@ export class ElementPickerDataTypeBuilder extends DataTypeBuilder {
     this.maxValidation = max;
     return this;
   }
+
+  withAllowedContentTypeIds(allowedContentTypeIds: string[]) {
+    this.allowedContentTypeIds = allowedContentTypeIds;
+    return this;
+  }
+
+  withStartNodeId(startNodeId: string) {
+    this.startNodeId = startNodeId;
+    return this;
+  }
   
   getValues() {
     let values: any[] = [];
@@ -30,6 +42,20 @@ export class ElementPickerDataTypeBuilder extends DataTypeBuilder {
           min: this.minValidation !== undefined ? this.minValidation : undefined,
           max: this.maxValidation !== undefined ? this.maxValidation : undefined
         }
+      });
+    }
+
+    if (this.allowedContentTypeIds?.length) {
+      values.push({
+        alias: 'allowedContentTypes',
+        value: this.allowedContentTypeIds.join(',')
+      });
+    }
+
+    if (this.startNodeId) {
+      values.push({
+        alias: 'startNodeId',
+        value: [this.startNodeId]
       });
     }
 
