@@ -123,7 +123,7 @@ export class UmbDataTypeDetailsWorkspacePropertyEditorPickerElement extends UmbF
 		return html`
 			<uui-action-bar slot="actions">
 				<uui-button
-					label=${this.localize.term('general_change')}
+					label=${this.localize.term('actions_replace')}
 					@click=${this.#openPropertyEditorUIPicker}></uui-button>
 			</uui-action-bar>
 		`;
