@@ -645,6 +645,65 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         });
     }
 
+    [TestCase("SortOrder")]
+    [TestCase("SORTORDER")]
+    [TestCase("ItemName")]
+    public async Task Can_Order_List_View_Items_By_List_View_Field_Regardless_Of_Case(string orderByField)
+    {
+        // Arrange
+        var root = await CreateRootContentWithFiveChildrenAndListViewProperty();
+
+        // Act
+        var result = await ContentListViewService.GetListViewItemsByKeyAsync(
+            SuperUser,
+            root.Key,
+            _customListViewKey,
+            orderByField,
+            null,
+            Direction.Descending,
+            null,
+            0,
+            10);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
+            Assert.IsNotNull(result.Result);
+        });
+
+        var actualNames = result.Result.Items.Items.Select(c => c.Name);
+        CollectionAssert.AreEqual(new[] { "Item 5", "Item 4", "Item 3", "Item 2", "Item 1" }, actualNames);
+    }
+
+    [Test]
+    public async Task Can_Order_List_View_Items_By_Owner_When_Creator_Is_Configured()
+    {
+        // Arrange
+        var root = await CreateRootContentWithFiveChildrenAndListViewProperty(creatorColumnAlias: "creator");
+
+        // Act
+        var result = await ContentListViewService.GetListViewItemsByKeyAsync(
+            SuperUser,
+            root.Key,
+            _customListViewKey,
+            "owner",
+            null,
+            Direction.Ascending,
+            null,
+            0,
+            10);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
+            Assert.AreEqual(5, result.Result?.Items.Total);
+        });
+    }
+
     [TestCase("00000003-0000-0000-0000-000000000000", "Item 3")]
     [TestCase("Item 3", "Item 3")]
     public async Task Can_Filter_List_View_Items(string filter, string expectedName)
@@ -1038,7 +1097,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         return result.Result;
     }
 
-    private async Task<IContent> CreateRootContentWithFiveChildrenAndListViewProperty()
+    private async Task<IContent> CreateRootContentWithFiveChildrenAndListViewProperty(string creatorColumnAlias = "owner")
     {
         var listViewConfiguration = new Dictionary<string, object>
         {
@@ -1046,7 +1105,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             {
                 new Dictionary<string, object> { { "alias", "sortOrder" }, { "isSystem", true } },
                 new Dictionary<string, object> { { "alias", "updateDate" }, { "isSystem", true } },
-                new Dictionary<string, object> { { "alias", "owner" }, { "isSystem", true } },
+                new Dictionary<string, object> { { "alias", creatorColumnAlias }, { "isSystem", true } },
                 new Dictionary<string, object> { { "alias", "itemName" }, { "isSystem", false } },
                 new Dictionary<string, object> { { "alias", "price" }, { "isSystem", false } },
             },

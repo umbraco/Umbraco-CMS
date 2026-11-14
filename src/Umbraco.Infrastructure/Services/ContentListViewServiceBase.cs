@@ -100,14 +100,24 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
             return Attempt.FailWithStatus<Ordering?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.MissingPropertiesInCollectionConfiguration, null);
         }
 
-        IEnumerable<string> listViewPropertyAliases = listViewProperties
+        string[] listViewPropertyAliases = listViewProperties
             .Select(p => p.Alias)
-            .WhereNotNull();
+            .WhereNotNull()
+            .ToArray();
 
-        if (listViewPropertyAliases.Contains(orderBy) == false && orderBy.InvariantEquals("name") == false)
+        // Configurations saved by earlier versions may hold the alias in another case, or "owner" for the "creator" column (#24545).
+        var configuredAlias = listViewPropertyAliases.FirstOrDefault(alias => alias.InvariantEquals(orderBy));
+        if (configuredAlias is null && orderBy.InvariantEquals("owner"))
+        {
+            configuredAlias = listViewPropertyAliases.FirstOrDefault(alias => alias.InvariantEquals("creator"));
+        }
+
+        if (configuredAlias is null && orderBy.InvariantEquals("name") is false)
         {
             return Attempt.FailWithStatus<Ordering?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.OrderByNotPartOfCollectionConfiguration, null);
         }
+
+        orderBy = configuredAlias ?? orderBy;
 
         // Service layer expects "owner" instead of "creator", so make sure to pass in the correct field
         if (orderBy.InvariantEquals("creator"))
