@@ -105,5 +105,10 @@ public static partial class Constants
         ///     All document URL aliases.
         /// </summary>
         public const int DocumentUrlAliases = -348;
+
+        /// <summary>
+        ///     All relations and relation types.
+        /// </summary>
+        public const int Relations = -351;
     }
 }
