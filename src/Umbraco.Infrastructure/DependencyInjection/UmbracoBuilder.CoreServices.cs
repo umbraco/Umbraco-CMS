@@ -192,6 +192,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
         builder.Services.AddTransient<IEmailSenderClient, BasicSmtpEmailSenderClient>();
+        builder.Services.AddUnique<IEmailDeliveryQueue, InMemoryEmailDeliveryQueue>();
+        builder.Services.AddHostedService<EmailDeliveryHostedService>();
 
         // replace
         builder.Services.AddSingleton<IEmailSender, EmailSender>(
@@ -200,6 +202,7 @@ public static partial class UmbracoBuilderExtensions
                 services.GetRequiredService<IOptionsMonitor<GlobalSettings>>(),
                 services.GetRequiredService<IEventAggregator>(),
                 services.GetRequiredService<IEmailSenderClient>(),
+                services.GetRequiredService<IEmailDeliveryQueue>(),
                 services.GetService<INotificationHandler<SendEmailNotification>>(),
                 services.GetService<INotificationAsyncHandler<SendEmailNotification>>()));
 
