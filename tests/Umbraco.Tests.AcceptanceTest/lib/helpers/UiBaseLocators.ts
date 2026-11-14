@@ -1941,6 +1941,46 @@ export class UiBaseLocators extends BasePage {
     await this.clickEntityActionWithName("Create");
   }
 
+  // Action Group Methods
+  /**
+   * Asserts the registered action groups of the open actions menu, in render order.
+   * The count must match exactly, so list every rendered group. The Other group has no alias and isn't counted.
+   * @param groupAliases - The aliases of the groups, for example `Umb.EntityActionGroup.Create`
+   */
+  async doesOpenActionMenuHaveActionGroups(groupAliases: string[]) {
+    const groups = this.page.locator("#action-modal[open]").getByTestId(/^action-group:/);
+    await this.hasCount(groups, groupAliases.length);
+    for (const [index, alias] of groupAliases.entries()) {
+      await this.hasAttribute(groups.nth(index), "data-mark", "action-group:" + alias);
+    }
+  }
+
+  /**
+   * Asserts whether an entity action of the open actions menu renders inside a group.
+   * @param actionName - The end of the action's manifest alias, for example `MoveTo` for `Umb.EntityAction.Document.MoveTo`
+   * @param groupLabel - The group's accessible name: its localized label (for example `Structure`, or `Other`), not its alias
+   * @param isInGroup - Whether the action is expected inside that group
+   */
+  async isEntityActionInActionGroup(actionName: string, groupLabel: string, isInGroup: boolean = true) {
+    const action = this.page
+      .locator("#action-modal[open]")
+      .getByRole("group", { name: groupLabel, exact: true })
+      .getByTestId(new RegExp(`^entity-action:.*${actionName}$`));
+    await this.isVisible(action, isInGroup);
+  }
+
+  /**
+   * Asserts whether an entity action renders anywhere in the open actions menu, whatever its group.
+   * @param actionName - The end of the action's manifest alias, for example `Trash` for `Umb.EntityAction.Document.RecycleBin.Trash`
+   * @param isVisible - Whether the action is expected in the menu
+   */
+  async isEntityActionInOpenActionMenuVisible(actionName: string, isVisible: boolean = true) {
+    const action = this.page
+      .locator("#action-modal[open]")
+      .getByTestId(new RegExp(`^entity-action:.*${actionName}$`));
+    await this.isVisible(action, isVisible);
+  }
+
   async clickTrashActionMenuOption() {
     await this.clickEntityActionWithName("Trash");
   }
