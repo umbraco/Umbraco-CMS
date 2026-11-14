@@ -615,6 +615,73 @@ internal partial class BlockListElementLevelVariationTests
     }
 
     [Test]
+    public async Task Validation_Paths_Use_Position_In_Submitted_Block_Data_When_Preceding_Blocks_Are_Not_Exposed()
+    {
+        var elementType = await CreateElementTypeWithValidationAsync();
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        // the first block only has English values, so it is only exposed in English; the second block is exposed in both cultures.
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            [
+                (Guid.NewGuid(), Guid.NewGuid(), new BlockProperty(
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "Valid invariant content value" },
+                        new() { Alias = "variantText", Value = "Valid content value in English", Culture = "en-US" },
+                    },
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "Valid invariant settings value" },
+                        new() { Alias = "variantText", Value = "Valid settings value in English", Culture = "en-US" },
+                    },
+                    null,
+                    null)),
+                (Guid.NewGuid(), Guid.NewGuid(), new BlockProperty(
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "Valid invariant content value" },
+                        new() { Alias = "variantText", Value = "Valid content value in English", Culture = "en-US" },
+                        new() { Alias = "variantText", Value = "Invalid content value in Danish", Culture = "da-DK" },
+                    },
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "Valid invariant settings value" },
+                        new() { Alias = "variantText", Value = "Valid settings value in English", Culture = "en-US" },
+                        new() { Alias = "variantText", Value = "Invalid settings value in Danish", Culture = "da-DK" },
+                    },
+                    null,
+                    null)),
+            ]);
+
+        var result = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Variants =
+                [
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK" }
+                ],
+                Properties =
+                [
+                    new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
+                ]
+            },
+            contentType,
+            ["da-DK"]);
+
+        var errors = result.ValidationErrors.ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, errors.Length);
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[1].values[2].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[1].values[2].value"));
+        });
+    }
+
+    [Test]
     public async Task Can_Validate_Properties_Variant_Blocks()
     {
         var elementType = await CreateElementTypeWithValidationAsync(ContentVariation.Nothing);
