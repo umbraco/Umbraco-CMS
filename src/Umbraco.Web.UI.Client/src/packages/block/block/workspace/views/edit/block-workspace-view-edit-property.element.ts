@@ -4,7 +4,7 @@ import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type'
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-block-workspace-view-edit-property')
 export class UmbBlockWorkspaceViewEditPropertyElement extends UmbLitElement {
@@ -31,10 +31,10 @@ export class UmbBlockWorkspaceViewEditPropertyElement extends UmbLitElement {
 		super.willUpdate(changedProperties);
 		if (changedProperties.has('type') || changedProperties.has('variantId') || changedProperties.has('ownerContext')) {
 			if (this.variantId && this.property && this.ownerContext) {
-				const propertyVariantId = new UmbVariantId(
-					this.property.variesByCulture ? this.variantId.culture : null,
-					this.property.variesBySegment ? this.variantId.segment : null,
-				);
+				const structure = this.ownerContext.structure;
+				const propertyVariantId = this.variantId
+					.toVariant(structure.getVariesByCulture(), structure.getVariesBySegment())
+					.toVariant(this.property.variesByCulture, this.property.variesBySegment);
 				this._dataPath = `$.values[${UmbDataPathPropertyValueQuery({
 					alias: this.property.alias,
 					culture: propertyVariantId.culture,
