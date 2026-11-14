@@ -69,13 +69,20 @@ export class UmbPreviewEnvironmentsElement extends UmbLitElement {
 		if (!this._unique) return;
 		if (!item.urlProviderAlias) return;
 
+		// Opened before the preview URL round-trip, while the click's activation is still valid in Safari.
+		// The controller adopts or closes it (#22626).
+		const previewWindow = window.open('', `umbpreview-${this._unique}`);
+
 		try {
-			await this.#previewController.preview({
-				unique: this._unique,
-				urlProviderAlias: item.urlProviderAlias,
-				culture: this._culture,
-				segment: this._segment,
-			});
+			await this.#previewController.preview(
+				{
+					unique: this._unique,
+					urlProviderAlias: item.urlProviderAlias,
+					culture: this._culture,
+					segment: this._segment,
+				},
+				previewWindow,
+			);
 		} catch {
 			// The controller already shows an error notification; nothing more to do here.
 		}
