@@ -3,7 +3,7 @@ import { expect, waitUntil } from '@open-wc/testing';
 import { ignoreResizeObserverLoopErrors } from '@umbraco-cms/internal/test-utils';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS } from '@umbraco-cms/backoffice/document';
+import { UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS, UMB_DOCUMENT_TREE_ALIAS } from '@umbraco-cms/backoffice/document';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbInteractionMemoryManager,
@@ -47,25 +47,57 @@ const searchProviderManifest = {
 	meta: { label: 'Documents' },
 };
 
+const TREE_REPOSITORY_ALIAS = 'Umb.Test.DocumentLinkPicker.TreeRepository';
+
+// Stands in for the document tree, so the picker can establish where it is browsing and render the tree there.
+const treeManifests = [
+	{
+		type: 'repository',
+		alias: TREE_REPOSITORY_ALIAS,
+		name: 'Test Document Tree Repository',
+		api: class {
+			destroy() {}
+			async requestTreeRoot() {
+				return { data: { unique: null, entityType: 'document-root', name: 'Content' } };
+			}
+			async requestTreeItemAncestors() {
+				return { data: [] };
+			}
+		},
+	},
+	{
+		type: 'tree',
+		alias: UMB_DOCUMENT_TREE_ALIAS,
+		name: 'Test Document Tree',
+		meta: { repositoryAlias: TREE_REPOSITORY_ALIAS },
+	},
+];
+
 describe('UmbDocumentLinkPickerModalElement', () => {
 	let host: UmbTestScopeHostElement;
 	let restoreErrorHandler: () => void;
 
 	before(() => {
 		umbExtensionsRegistry.register(searchProviderManifest as never);
+		umbExtensionsRegistry.registerMany(treeManifests as Array<never>);
 	});
 
 	after(() => {
 		umbExtensionsRegistry.unregister(searchProviderManifest.alias);
+		umbExtensionsRegistry.unregisterMany(treeManifests.map((manifest) => manifest.alias));
 	});
 
 	const mount = async () => {
 		const element = document.createElement('umb-document-link-picker-modal');
 		host.appendChild(element);
 		await element.updateComplete;
+		const getTree = () =>
+			element
+				.shadowRoot!.querySelector('umb-document-picker-browse')
+				?.shadowRoot?.querySelector<UmbTreeElement>('umb-tree');
+		await waitUntil(() => !!getTree(), 'the tree was never rendered');
 		await tick();
-		const tree = element.shadowRoot!.querySelector<UmbTreeElement>('umb-tree')!;
-		return { element, tree };
+		return { element, tree: getTree()! };
 	};
 
 	beforeEach(() => {
@@ -82,6 +114,27 @@ describe('UmbDocumentLinkPickerModalElement', () => {
 	it('is defined with its own instance', async () => {
 		const { element } = await mount();
 		expect(element).to.be.instanceOf(UmbDocumentLinkPickerModalElement);
+	});
+
+	describe('browsing', () => {
+		it('browses with umb-document-picker-browse, so it gets the breadcrumb', async () => {
+			const { element } = await mount();
+			const picker = element.shadowRoot?.querySelector('umb-document-picker-browse');
+
+			await waitUntil(
+				() =>
+					!!picker?.shadowRoot
+						?.querySelector('umb-tree-item-picker-breadcrumb')
+						?.shadowRoot?.querySelector('uui-breadcrumb-item'),
+				'the breadcrumb was never rendered',
+			);
+		});
+
+		it('hides the tree root', async () => {
+			const { tree } = await mount();
+
+			expect(tree.props?.hideTreeRoot).to.be.true;
+		});
 	});
 
 	describe('tabs', () => {
@@ -126,7 +179,8 @@ describe('UmbDocumentLinkPickerModalElement', () => {
 
 			await clickTab(element, 'search');
 
-			expect(getPane(element, 'browse')?.querySelector('umb-tree')).to.equal(tree);
+			const picker = getPane(element, 'browse')?.querySelector('umb-document-picker-browse');
+			expect(picker?.shadowRoot?.querySelector('umb-tree')).to.equal(tree);
 		});
 
 		it('renders one language selector, shared by both tabs', async () => {
