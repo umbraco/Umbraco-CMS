@@ -1,4 +1,5 @@
 import { UmbUserDetailRepository } from '../../../repository/index.js';
+import { UmbUserConfigRepository } from '../../../repository/config/index.js';
 import { UmbUserKind } from '../../../utils/index.js';
 import type { UmbUserKindType } from '../../../utils/index.js';
 import { UMB_CREATE_USER_SUCCESS_MODAL } from './create-user-success-modal.token.js';
@@ -6,15 +7,32 @@ import type { UmbCreateUserModalData } from './create-user-modal.token.js';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { umbOpenModal, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, nothing, query, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-create-user-modal')
 export class UmbCreateUserModalElement extends UmbModalBaseElement<UmbCreateUserModalData> {
 	#userDetailRepository = new UmbUserDetailRepository(this);
+	#userConfigRepository = new UmbUserConfigRepository(this);
 
 	@query('#CreateUserForm')
 	private _form?: HTMLFormElement;
+
+	@state()
+	private _usernameIsEmail = true;
+
+	constructor() {
+		super();
+		this.observe(
+			this.#userConfigRepository.part('usernameIsEmail'),
+			(usernameIsEmail) => (this._usernameIsEmail = usernameIsEmail ?? true),
+			null,
+		);
+	}
+
+	get #showUsername() {
+		return this._usernameIsEmail === false && this.data?.user.kind !== UmbUserKind.API;
+	}
 
 	async #onSubmit(e: SubmitEvent) {
 		e.preventDefault();
@@ -41,10 +59,9 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<UmbCreateUser
 		userScaffold.kind = this.data?.user.kind ?? UmbUserKind.DEFAULT;
 		userScaffold.name = name;
 		userScaffold.email = email;
-		userScaffold.userName = email;
+		userScaffold.userName = this.#showUsername ? (formData.get('username') as string) : email;
 		userScaffold.userGroupUniques = userGroupReferences;
 
-		// TODO: figure out when to use email or username
 		const { data } = await this.#userDetailRepository.create(userScaffold);
 
 		if (data) {
@@ -104,6 +121,7 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<UmbCreateUser
 					</uui-label>
 					<uui-input id="email" label="email" type="email" name="email" required></uui-input>
 				</uui-form-layout-item>
+				${this.#renderUsername()}
 				<uui-form-layout-item>
 					<uui-label id="userGroupsLabel" slot="label" for="userGroups" required>
 						<umb-localize key="user_usergroups"></umb-localize>
@@ -115,6 +133,23 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<UmbCreateUser
 				</uui-form-layout-item>
 			</form>
 		</uui-form>`;
+	}
+
+	#renderUsername() {
+		if (!this.#showUsername) return nothing;
+		return html`<uui-form-layout-item>
+			<uui-label id="usernameLabel" slot="label" for="username" required>
+				<umb-localize key="user_loginname"></umb-localize>
+			</uui-label>
+			<uui-input
+				id="username"
+				label=${this.localize.term('user_loginname')}
+				type="text"
+				name="username"
+				autocomplete="off"
+				required
+				required-message=${this.localize.term('user_loginnameRequired')}></uui-input>
+		</uui-form-layout-item>`;
 	}
 
 	static override styles = [
