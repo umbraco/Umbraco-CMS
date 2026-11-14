@@ -50,6 +50,7 @@ interface UmbMbcsDocumentTypeOptions {
 	id: string;
 	alias: string;
 	name: string;
+	description?: string;
 	icon: string;
 	allowedAsRoot?: boolean;
 	isElement?: boolean;
@@ -65,7 +66,7 @@ const documentType = (options: UmbMbcsDocumentTypeOptions): UmbMockDocumentTypeM
 	id: options.id,
 	alias: options.alias,
 	name: options.name,
-	description: null,
+	description: options.description ?? null,
 	icon: options.icon,
 	allowedTemplates: [],
 	defaultTemplate: null,
@@ -393,6 +394,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		id: DOCUMENT_TYPE_IDS.productMaterial,
 		alias: 'productMaterial',
 		name: 'Product Material',
+		description: 'One material the product is made from, with a close-up image of the fabric.',
 		icon: 'icon-palette',
 		isElement: true,
 		parent: DOCUMENT_TYPE_IDS.blocksFolder,
@@ -412,6 +414,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		id: DOCUMENT_TYPE_IDS.materialShowcaseBlock,
 		alias: 'materialShowcaseBlock',
 		name: 'Material Showcase',
+		description: 'Show the materials a collection is made from. Use it where the fabric is a selling point.',
 		icon: 'icon-palette',
 		isElement: true,
 		parent: DOCUMENT_TYPE_IDS.blocksFolder,
@@ -485,6 +488,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		id: DOCUMENT_TYPE_IDS.imageBlock,
 		alias: 'imageBlock',
 		name: 'Image Block',
+		description: 'A standalone image, such as a lookbook or in-store photo. Add a caption when it needs context.',
 		icon: 'icon-picture',
 		isElement: true,
 		parent: DOCUMENT_TYPE_IDS.blocksFolder,
@@ -498,6 +502,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		id: DOCUMENT_TYPE_IDS.textBlock,
 		alias: 'textBlock',
 		name: 'Text Block',
+		description: 'Body copy for the page. Use it for any section that is mainly text.',
 		icon: 'icon-font',
 		isElement: true,
 		parent: DOCUMENT_TYPE_IDS.blocksFolder,
@@ -516,6 +521,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		id: DOCUMENT_TYPE_IDS.productTeaserBlock,
 		alias: 'productTeaserBlock',
 		name: 'Product Teaser',
+		description: "Highlight a product and link to its product page. Add a label such as 'New in' to make it stand out.",
 		icon: 'icon-tag',
 		isElement: true,
 		parent: DOCUMENT_TYPE_IDS.blocksFolder,
@@ -534,6 +540,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		id: DOCUMENT_TYPE_IDS.articleTeaserBlock,
 		alias: 'articleTeaserBlock',
 		name: 'Article Teaser',
+		description: 'Link to an article, to add depth to a page or keep visitors reading.',
 		icon: 'icon-article',
 		isElement: true,
 		parent: DOCUMENT_TYPE_IDS.blocksFolder,
