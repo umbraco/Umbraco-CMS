@@ -1,9 +1,16 @@
 import type { UmbPropertyValueDataPotentiallyWithEditorAlias } from '../index.js';
+import type { ManifestPropertyValueResolver } from '../property-value-resolver/property-value-resolver.extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionsManifestCache } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
+	#resolvers = new UmbExtensionsManifestCache<ManifestPropertyValueResolver>(
+		this,
+		'propertyValueResolver',
+		(manifest, editorAlias) => manifest.forEditorAlias === editorAlias,
+	);
+
 	/**
 	 * Maps the property values of the given property data.
 	 * @template ValueType
@@ -37,12 +44,7 @@ export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 		if (!editorAlias) {
 			return [mapOfThisProperty];
 		}
-		// Find the resolver for this editor alias:
-		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
-			'propertyValueResolver',
-			(x) => x.forEditorAlias === editorAlias,
-		)[0];
-
+		const manifest = this.#resolvers.getManifests(editorAlias)[0];
 		if (!manifest) {
 			return [mapOfThisProperty];
 		}
@@ -52,6 +54,7 @@ export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 			return [mapOfThisProperty];
 		}
 
+		// TODO: Setting the manifest on the api is legacy, the implementation should not have to do this. [NL]
 		api.manifest = manifest;
 
 		if (api.processValues) {

@@ -337,4 +337,109 @@ describe('UmbPropertyValuePresetBuilderController', () => {
 			expect(result[2]?.value).to.be.equal('first_async');
 		});
 	});
+	describe('Looking up presets', () => {
+		beforeEach(async () => {
+			umbExtensionsRegistry.register({
+				type: 'propertyValuePreset',
+				name: 'test-preset-for-ui',
+				alias: 'Umb.Test.Preset.ForUi',
+				api: TestPropertyValuePresetFirstApi,
+				forPropertyEditorUiAlias: 'test-editor-ui',
+			} as ManifestPropertyValuePreset);
+			umbExtensionsRegistry.register({
+				type: 'propertyValuePreset',
+				name: 'test-preset-for-schema',
+				alias: 'Umb.Test.Preset.ForSchema',
+				api: TestPropertyValuePresetSecondApi,
+				forPropertyEditorSchemaAlias: 'test-editor-schema',
+			} as ManifestPropertyValuePreset);
+		});
+		afterEach(async () => {
+			umbExtensionsRegistry.unregister('Umb.Test.Preset.ForUi');
+			umbExtensionsRegistry.unregister('Umb.Test.Preset.ForSchema');
+		});
+
+		const createArgs = { entityUnique: 'test-unique', entityType: 'test' };
+
+		it('applies presets registered for the schema alias only when the property type has a schema alias', async () => {
+			const withoutSchema = await new UmbPropertyValuePresetBuilderController(
+				new UmbTestControllerHostElement(),
+			).create(
+				[{ alias: 'test', propertyEditorUiAlias: 'test-editor-ui-other', config: [], typeArgs: {} }],
+				createArgs,
+			);
+			const withSchema = await new UmbPropertyValuePresetBuilderController(new UmbTestControllerHostElement()).create(
+				[
+					{
+						alias: 'test',
+						propertyEditorUiAlias: 'test-editor-ui-other',
+						propertyEditorSchemaAlias: 'test-editor-schema',
+						config: [],
+						typeArgs: {},
+					} as UmbPropertyTypePresetWithSchemaAliasModel,
+				],
+				createArgs,
+			);
+
+			expect(withoutSchema.length).to.equal(0);
+			expect(withSchema.length).to.equal(1);
+			expect(withSchema[0].value).to.equal('second');
+		});
+
+		it('searches the registry once for property types that share the same editors', async () => {
+			const ctrl = new UmbPropertyValuePresetBuilderController(new UmbTestControllerHostElement());
+			const original = umbExtensionsRegistry.getByTypeAndFilter;
+			let searches = 0;
+			umbExtensionsRegistry.getByTypeAndFilter = function (this: unknown, ...args: Array<never>) {
+				if ((args[0] as string) === 'propertyValuePreset') searches++;
+				return (original as (...a: Array<never>) => unknown).apply(umbExtensionsRegistry, args);
+			} as typeof original;
+
+			let result;
+			try {
+				result = await ctrl.create(
+					[
+						{ alias: 'a', propertyEditorUiAlias: 'test-editor-ui', config: [], typeArgs: {} },
+						{ alias: 'b', propertyEditorUiAlias: 'test-editor-ui', config: [], typeArgs: {} },
+						{ alias: 'c', propertyEditorUiAlias: 'test-editor-ui-other', config: [], typeArgs: {} },
+					],
+					createArgs,
+				);
+			} finally {
+				umbExtensionsRegistry.getByTypeAndFilter = original;
+			}
+
+			expect(result.map((x) => x.alias)).to.deep.equal(['a', 'b']);
+			expect(searches).to.equal(2);
+		});
+
+		it('skips and logs a preset whose API can not be created, and still applies the others', async () => {
+			umbExtensionsRegistry.register({
+				type: 'propertyValuePreset',
+				name: 'test-preset-broken',
+				alias: 'Umb.Test.Preset.Broken',
+				forPropertyEditorUiAlias: 'test-editor-ui',
+			} as ManifestPropertyValuePreset);
+			const originalError = console.error;
+			let logged = 0;
+			console.error = () => {
+				logged++;
+			};
+
+			let result;
+			try {
+				result = await new UmbPropertyValuePresetBuilderController(new UmbTestControllerHostElement()).create(
+					[{ alias: 'test', propertyEditorUiAlias: 'test-editor-ui', config: [], typeArgs: {} }],
+					createArgs,
+				);
+			} finally {
+				console.error = originalError;
+				umbExtensionsRegistry.unregister('Umb.Test.Preset.Broken');
+			}
+
+			expect(result).to.have.lengthOf(1);
+			expect(result[0].value).to.equal('first');
+			expect(logged).to.equal(1);
+		});
+	});
 });

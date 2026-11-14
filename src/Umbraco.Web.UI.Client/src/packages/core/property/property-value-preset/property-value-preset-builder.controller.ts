@@ -1,4 +1,5 @@
 import type { UmbPropertyValueData, UmbPropertyValueDataPotentiallyWithEditorAlias } from '../index.js';
+import { UmbPropertyValueIndex } from '../property-value-index/property-value-index.class.js';
 import type {
 	ManifestPropertyValuePreset,
 	UmbPropertyTypePresetModel,
@@ -8,13 +9,27 @@ import type {
 	UmbPropertyValuePresetApiCallArgsEntityBase,
 } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionApis } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestCache } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+
+type UmbPropertyValuePresetLookupKey = { schemaAlias?: string; uiAlias: string };
 
 export class UmbPropertyValuePresetBuilderController<
 	ReturnType extends UmbPropertyValueData = UmbPropertyValueData | UmbPropertyValueDataPotentiallyWithEditorAlias,
 > extends UmbControllerBase {
+	#presets = new UmbExtensionsManifestCache<ManifestPropertyValuePreset, UmbPropertyValuePresetLookupKey>(
+		this,
+		'propertyValuePreset',
+		// A preset applies when registered for the UI alias, or, if the property type has a schema alias, for the schema alias.
+		(manifest, key) =>
+			manifest.forPropertyEditorUiAlias === key.uiAlias ||
+			(!!key.schemaAlias && manifest.forPropertyEditorSchemaAlias === key.schemaAlias),
+		(key) => JSON.stringify([key.schemaAlias ?? null, key.uiAlias]),
+	);
 	#baseCreateArgs?: UmbPropertyValuePresetApiCallArgsEntityBase;
+	#hasCreated = false;
+	#existingValuesIndex?: UmbPropertyValueIndex<ReturnType>;
 	protected _existingValues?: Array<ReturnType>;
 
 	setValues(values: Array<ReturnType>): void {
@@ -22,16 +37,38 @@ export class UmbPropertyValuePresetBuilderController<
 	}
 
 	/**
+	 * Finds the first existing value with the given alias, and when a variant is given, the same variant.
+	 * @param {string} alias - The property alias.
+	 * @param {UmbVariantId} [variantId] - The variant to match. When omitted, the variant of the existing value is ignored.
+	 * @returns {ReturnType | undefined} The first matching existing value, if any.
+	 */
+	protected _findExistingValue(alias: string, variantId?: UmbVariantId): ReturnType | undefined {
+		if (!this._existingValues) {
+			return undefined;
+		}
+		this.#existingValuesIndex ??= new UmbPropertyValueIndex(this._existingValues);
+		return this.#existingValuesIndex.find(alias, variantId);
+	}
+
+	/**
 	 * Clones the property data.
+	 *
+	 * The controller destroys itself when done, so `create` can only be called once per controller instance.
 	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} propertyTypes - Data about the properties to make a preset for.
 	 * @param {Partial<UmbPropertyValuePresetApiCallArgsEntityBase>} [createArgs] - The base arguments used when calling the preset APIs.
 	 * @returns {Promise<UmbPropertyValueDataPotentiallyWithEditorAlias>} - A promise that resolves to the cloned property data.
+	 * @throws {Error} When `create` has already been called on this controller.
 	 */
 	async create<GivenPropertyTypesType extends UmbPropertyTypePresetModel>(
 		propertyTypes: Array<GivenPropertyTypesType>,
 		// TODO: Remove that the argument is Optional and as well remove Partial<> in v.17.0 [NL]
 		createArgs?: Partial<UmbPropertyValuePresetApiCallArgsEntityBase>,
 	): Promise<Array<ReturnType>> {
+		if (this.#hasCreated) {
+			throw new Error('create() can only be called once per controller instance, as it destroys the controller.');
+		}
+		this.#hasCreated = true;
+
 		//
 		// TODO: Clean up warnings in v.17.0 [NL]
 		this.#baseCreateArgs = {
@@ -71,28 +108,16 @@ export class UmbPropertyValuePresetBuilderController<
 			throw new Error(`propertyEditorUiAlias was not defined in ${propertyType}`);
 		}
 
-		let filter: (x: ManifestPropertyValuePreset) => boolean;
-		if (editorAlias && editorUiAlias) {
-			filter = (x) => x.forPropertyEditorSchemaAlias === editorAlias || x.forPropertyEditorUiAlias === editorUiAlias;
-		} else {
-			filter = (x) => x.forPropertyEditorUiAlias === editorUiAlias;
-		}
-
-		// Find a preset for this editor alias:
-		const manifests = umbExtensionsRegistry.getByTypeAndFilter('propertyValuePreset', filter);
-
-		const apis = (
-			await Promise.all(
-				manifests.map((x) =>
-					createExtensionApi(this, x).then((x) => {
-						if (x) {
-							(x as any).manifest = x;
-						}
-						return x;
-					}),
-				),
-			)
-		).filter((x) => x !== undefined) as Array<UmbPropertyValuePreset>;
+		const manifests = this.#presets.getManifests({ schemaAlias: editorAlias, uiAlias: editorUiAlias });
+		const apis: Array<UmbPropertyValuePreset> = [];
+		(await createExtensionApis(this, manifests)).forEach((api, index) => {
+			if (!api) {
+				return;
+			}
+			// TODO: Setting the manifest on the api is legacy, the implementation should not have to do this. [NL]
+			(api as { manifest?: ManifestPropertyValuePreset }).manifest = manifests[index];
+			apis.push(api);
+		});
 
 		const result = await this._generatePropertyValues(apis, propertyType);
 
@@ -108,7 +133,7 @@ export class UmbPropertyValuePresetBuilderController<
 		propertyType: UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel,
 	): Promise<Array<ReturnType>> {
 		const args: Partial<UmbPropertyValuePresetApiCallArgs> = {
-			value: this._existingValues?.find((x) => x.alias === propertyType.alias)?.value,
+			value: this._findExistingValue(propertyType.alias)?.value,
 		};
 		const property = await this._generatePropertyValue(apis, propertyType, args);
 		return property ? [property] : [];

@@ -1,11 +1,18 @@
 import { umbQueryMapperForJsonPaths } from '../../utils/query-mapper-json-paths.function.js';
+import type { ManifestPropertyValidationPathTranslator } from './property-validation-path-translator.extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionsManifestCache } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbPropertyValueDataPotentiallyWithEditorAlias } from '@umbraco-cms/backoffice/property';
 
 // Write interface that can be handed to the API for the Host, so each path Translator can communicate back to the host here. For translating inner values.
 export class UmbValidationPropertyPathTranslationController extends UmbControllerBase {
+	#translators = new UmbExtensionsManifestCache<ManifestPropertyValidationPathTranslator<unknown>>(
+		this,
+		'propertyValidationPathTranslator',
+		(manifest, editorAlias) => manifest.forEditorAlias === editorAlias,
+	);
+
 	/**
 	 * translates the property data.
 	 * @param {Array<string>} paths - The paths to be translated.
@@ -39,12 +46,7 @@ export class UmbValidationPropertyPathTranslationController extends UmbControlle
 			return propertyPaths;
 		}
 
-		// Find the cloner for this editor alias:
-		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
-			'propertyValidationPathTranslator',
-			(x) => x.forEditorAlias === editorAlias,
-		)[0];
-
+		const manifest = this.#translators.getManifests(editorAlias)[0];
 		if (!manifest) {
 			return propertyPaths;
 		}
@@ -54,7 +56,8 @@ export class UmbValidationPropertyPathTranslationController extends UmbControlle
 			return propertyPaths;
 		}
 
-		(api as any).manifest = manifest;
+		// TODO: Setting the manifest on the api is legacy, the implementation should not have to do this. [NL]
+		(api as { manifest?: ManifestPropertyValidationPathTranslator<unknown> }).manifest = manifest;
 
 		propertyPaths = (await api.translate(propertyPaths, propertyData)) ?? propertyPaths;
 
