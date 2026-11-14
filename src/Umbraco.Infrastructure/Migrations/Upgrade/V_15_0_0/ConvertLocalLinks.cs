@@ -118,6 +118,11 @@ public class ConvertLocalLinks : MigrationBase
     {
     }
 
+    /// <summary>
+    /// Gets the number of property data rows processed per page.
+    /// </summary>
+    internal virtual int PageSize => 10000;
+
     /// <inheritdoc/>
     protected override void Migrate()
     {
@@ -181,7 +186,7 @@ public class ConvertLocalLinks : MigrationBase
                                            ?? throw new InvalidOperationException(
                                                "The data type value editor could not be fetched.");
 
-            long propertyDataCount = Database.ExecuteScalar<long>(BuildPropertyDataSql(propertyType, true));
+            long propertyDataCount = Database.ExecuteScalar<long>(BuildPropertyDataSql(propertyType, Sql().SelectCount()));
             if (propertyDataCount == 0)
             {
                 continue;
@@ -194,21 +199,19 @@ public class ConvertLocalLinks : MigrationBase
                 propertyType.Key,
                 propertyEditorAlias);
 
-            // Process in pages to avoid loading all property data from the database into memory at once.
-            Sql<ISqlContext> sql = BuildPropertyDataSql(propertyType);
-            const int PageSize = 10000;
+            // Process in pages to avoid loading all property data from the database into memory at once. Each page is
+            // a window of consecutive row ids over all the property's data, so every query is bounded to one window
+            // however sparse the convertible values are, and page boundaries stay stable while rows are updated.
             long pageNumber = 1;
             long pageCount = (propertyDataCount + PageSize - 1) / PageSize;
-            int processedCount = 0;
-            while (processedCount < propertyDataCount)
+            var lastId = int.MinValue;
+            while (Database.ExecuteScalar<int?>(BuildPageEndIdSql(propertyType, lastId)) is int pageEndId)
             {
-                Page<PropertyDataDto> propertyDataDtoPage = Database.Page<PropertyDataDto>(pageNumber, PageSize, sql);
-                if (propertyDataDtoPage.Items.Count == 0)
-                {
-                    break;
-                }
+                List<PropertyDataDto> propertyDataDtos = Database.Fetch<PropertyDataDto>(
+                    BuildConvertiblePropertyDataSql(propertyType, lastId, pageEndId));
+                lastId = pageEndId;
 
-                var updateBatchCollection = propertyDataDtoPage.Items
+                var updateBatchCollection = propertyDataDtos
                     .Select(propertyDataDto =>
                         UpdateBatch.For(propertyDataDto, Database.StartSnapshot(propertyDataDto)))
                     .ToList();
@@ -277,7 +280,6 @@ public class ConvertLocalLinks : MigrationBase
                     _logger.LogDebug("  - no properties to convert, continuing");
 
                     pageNumber++;
-                    processedCount += propertyDataDtoPage.Items.Count;
 
                     continue;
                 }
@@ -300,20 +302,52 @@ public class ConvertLocalLinks : MigrationBase
                     result);
 
                 pageNumber++;
-                processedCount += propertyDataDtoPage.Items.Count;
             }
         }
 
         return true;
     }
 
-    private Sql<ISqlContext> BuildPropertyDataSql(IPropertyType propertyType, bool isCount = false)
+    private Sql<ISqlContext> BuildPageEndIdSql(IPropertyType propertyType, int afterId)
     {
-        Sql<ISqlContext> sql = isCount
-            ? Sql().SelectCount()
-            : Sql().Select<PropertyDataDto>();
+        var idColumn = PropertyDataColumn(PropertyDataDto.PrimaryKeyColumnName);
+        Sql<ISqlContext> pageIdsSql = SqlSyntax.SelectTop(
+            BuildPropertyDataSql(propertyType, Sql().Select(idColumn))
+                .Where<PropertyDataDto>(propertyData => propertyData.Id > afterId)
+                .OrderBy<PropertyDataDto>(propertyData => propertyData.Id),
+            PageSize);
 
-        sql = sql.From<PropertyDataDto>()
+        var pageIdColumn = SqlSyntax.GetQuotedColumnName(PropertyDataDto.PrimaryKeyColumnName);
+        return Sql($"SELECT MAX({pageIdColumn}) FROM ({pageIdsSql.SQL}) pageIds", pageIdsSql.Arguments);
+    }
+
+    private Sql<ISqlContext> BuildConvertiblePropertyDataSql(IPropertyType propertyType, int afterId, int toId)
+    {
+        Sql<ISqlContext> sql = BuildPropertyDataSql(propertyType, Sql().Select<PropertyDataDto>())
+            .Where<PropertyDataDto>(propertyData => propertyData.Id > afterId && propertyData.Id <= toId);
+
+        // Only values that contain a legacy local link or a rich text block UDI can be changed by the local link
+        // processors, so skip everything else in the database rather than round-tripping it through the value
+        // editors. The match must remain a superset of every pattern the processors convert. The column is
+        // matched without wrapping it in a function, as the legacy ntext type does not support one.
+        var localLinkPattern = DatabaseType == DatabaseType.SQLite
+            ? "%locallink%" // SQLite's LIKE is case insensitive for ASCII characters.
+            : "%[lL][oO][cC][aA][lL][lL][iI][nN][kK]%"; // Case insensitive regardless of the database collation.
+        const string BlockUdiPattern = "%data-content-udi%";
+        var textValueColumn = PropertyDataColumn(PropertyDataDto.TextValueColumnName);
+        var varcharValueColumn = PropertyDataColumn(PropertyDataDto.VarcharValueColumnName);
+
+        return sql
+            .Where(
+                $"({textValueColumn} LIKE @0 OR {textValueColumn} LIKE @1 OR {varcharValueColumn} LIKE @0 OR {varcharValueColumn} LIKE @1)",
+                localLinkPattern,
+                BlockUdiPattern)
+            .OrderBy<PropertyDataDto>(propertyData => propertyData.Id);
+    }
+
+    private static Sql<ISqlContext> BuildPropertyDataSql(IPropertyType propertyType, Sql<ISqlContext> selectSql)
+        => selectSql
+            .From<PropertyDataDto>()
             .InnerJoin<ContentVersionDto>()
             .On<PropertyDataDto, ContentVersionDto>((propertyData, contentVersion) =>
                 propertyData.VersionId == contentVersion.Id)
@@ -325,8 +359,8 @@ public class ConvertLocalLinks : MigrationBase
                     (contentVersion.Current || documentVersion.Published)
                     && propertyData.PropertyTypeId == propertyType.Id);
 
-        return sql;
-    }
+    private string PropertyDataColumn(string columnName)
+        => $"{SqlSyntax.GetQuotedTableName(PropertyDataDto.TableName)}.{SqlSyntax.GetQuotedColumnName(columnName)}";
 
     private bool ProcessPropertyDataDto(
         PropertyDataDto propertyDataDto,
