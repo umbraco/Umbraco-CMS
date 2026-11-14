@@ -153,6 +153,77 @@ describe('UmbInputDimensionsElement', () => {
 		expect(element.width).to.equal(100); // unchanged
 	});
 
+	describe('required', () => {
+		it('passes required down to both inputs', async () => {
+			element = await fixture(html`<umb-input-dimensions required></umb-input-dimensions>`);
+			expect(element.shadowRoot!.querySelector('#width')?.hasAttribute('required')).to.be.true;
+			expect(element.shadowRoot!.querySelector('#height')?.hasAttribute('required')).to.be.true;
+		});
+
+		it('is invalid when required and width or height is missing', async () => {
+			element = await fixture(html`<umb-input-dimensions required .width=${100}></umb-input-dimensions>`);
+			expect(element.checkValidity()).to.be.false;
+		});
+
+		it('is valid when required and both width and height are set', async () => {
+			element = await fixture(html`<umb-input-dimensions required .width=${100} .height=${50}></umb-input-dimensions>`);
+			expect(element.checkValidity()).to.be.true;
+		});
+
+		it('is valid when empty and not required', async () => {
+			expect(element.checkValidity()).to.be.true;
+		});
+	});
+
+	describe('as a form control', () => {
+		it('clears a side and fires change when its input is emptied', async () => {
+			element = await fixture(html`<umb-input-dimensions .width=${100} .height=${50}></umb-input-dimensions>`);
+			const widthInput = element.shadowRoot!.querySelector<HTMLInputElement>('#width')!;
+			widthInput.value = '';
+			setTimeout(() => widthInput.dispatchEvent(new Event('input')));
+			await oneEvent(element, 'change');
+			expect(element.width).to.be.undefined;
+			expect(element.height).to.equal(50);
+		});
+
+		it('is invalid when required and a field is emptied', async () => {
+			element = await fixture(
+				html`<umb-input-dimensions required .width=${100} .height=${50}></umb-input-dimensions>`,
+			);
+			const heightInput = element.shadowRoot!.querySelector<HTMLInputElement>('#height')!;
+			heightInput.value = '';
+			heightInput.dispatchEvent(new Event('input'));
+			await element.updateComplete;
+			expect(element.checkValidity()).to.be.false;
+		});
+
+		it('uses the ratio of a value assigned directly while locked', async () => {
+			element = await fixture(html`<umb-input-dimensions .width=${100} .height=${100}></umb-input-dimensions>`);
+			element.value = { width: 200, height: 100 };
+			await element.updateComplete;
+			const widthInput = element.shadowRoot!.querySelector<HTMLInputElement>('#width')!;
+			widthInput.value = '400';
+			widthInput.dispatchEvent(new Event('input'));
+			await element.updateComplete;
+			expect(element.height).to.equal(200);
+		});
+
+		it('clears the value on form reset', async () => {
+			element = await fixture(
+				html`<umb-input-dimensions value="abc" .width=${100} .height=${50}></umb-input-dimensions>`,
+			);
+			element.formResetCallback();
+			expect(element.value).to.be.undefined;
+		});
+
+		it('is invalid when a field is zero', async () => {
+			element = await fixture(html`<umb-input-dimensions .width=${100} .height=${50}></umb-input-dimensions>`);
+			element.value = { width: 0, height: 50 };
+			await element.updateComplete;
+			expect(element.checkValidity()).to.be.false;
+		});
+	});
+
 	it('disables inputs and buttons when disabled', async () => {
 		element = await fixture(
 			html`<umb-input-dimensions .width=${100} .height=${100} .disabled=${true}></umb-input-dimensions>`,
@@ -165,6 +236,22 @@ describe('UmbInputDimensionsElement', () => {
 		expect(widthInput?.hasAttribute('disabled')).to.be.true;
 		expect(heightInput?.hasAttribute('disabled')).to.be.true;
 		expect(lockButton?.hasAttribute('disabled')).to.be.true;
+	});
+
+	it('makes inputs readonly and disables buttons when readonly', async () => {
+		element = await fixture(
+			html`<umb-input-dimensions
+				.width=${100}
+				.height=${100}
+				.naturalWidth=${200}
+				.naturalHeight=${200}
+				readonly></umb-input-dimensions>`,
+		);
+
+		expect(element.shadowRoot!.querySelector('#width')?.hasAttribute('readonly')).to.be.true;
+		expect(element.shadowRoot!.querySelector('#height')?.hasAttribute('readonly')).to.be.true;
+		expect(element.shadowRoot!.querySelector('uui-button')?.hasAttribute('disabled')).to.be.true;
+		expect(element.shadowRoot!.querySelector('#reset')?.hasAttribute('disabled')).to.be.true;
 	});
 
 	it('does not show reset button when no natural dimensions', async () => {
