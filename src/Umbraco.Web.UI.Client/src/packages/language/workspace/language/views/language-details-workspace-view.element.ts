@@ -176,7 +176,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 						max="1"
 						?readonly=${this._isReadOnly}
 						@change=${this.#handleFallbackChange}
-						.filter=${(language: UmbLanguageItemModel) =>
+						.browsePickableFilter=${(language: UmbLanguageItemModel) =>
 							language.unique !== this._language?.unique}></umb-input-language>
 				</umb-property-layout>
 			</uui-box>

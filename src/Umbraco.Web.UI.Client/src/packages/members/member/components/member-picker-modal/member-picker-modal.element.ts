@@ -1,13 +1,13 @@
 import { UmbMemberCollectionRepository } from '../../collection/index.js';
 import { UMB_MEMBER_ENTITY_TYPE } from '../../constants.js';
 import { type UmbMemberDetailModel } from '../../types.js';
-import type { UmbMemberItemModel } from '../../item/types.js';
 import type { UmbMemberPickerModalValue, UmbMemberPickerModalData } from './member-picker-modal.token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbCollectionItemPickerContext } from '@umbraco-cms/backoffice/collection';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-member-picker-modal')
 export class UmbMemberPickerModalElement extends UmbModalBaseElement<
@@ -15,13 +15,13 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	UmbMemberPickerModalValue
 > {
 	@state()
-	private _members: Array<UmbMemberItemModel | UmbMemberDetailModel> = [];
+	private _members: Array<UmbMemberDetailModel> = [];
 
 	@state()
 	private _searchQuery?: string;
 
 	@state()
-	private _selectableFilter: (item: UmbMemberItemModel) => boolean = () => true;
+	private _selectableFilter: (item: UmbMemberDetailModel) => boolean = () => true;
 
 	#collectionRepository = new UmbMemberCollectionRepository(this);
 	#pickerContext = new UmbCollectionItemPickerContext(this);
@@ -44,6 +44,19 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 			},
 			null,
 		);
+	}
+
+	protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
+		super.willUpdate(_changedProperties);
+
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		if (_changedProperties.has('data') && this.data?.filter) {
+			new UmbDeprecation({
+				deprecated: 'The `filter` option of UmbMemberPickerModalData',
+				removeInVersion: '21.0.0',
+				solution: 'Use `pickableFilter` to prevent members from being picked instead.',
+			}).warn();
+		}
 	}
 
 	protected override async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
@@ -81,8 +94,10 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	}
 
 	get #filteredMembers() {
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
 		if (this.data?.filter) {
-			return this._members.filter(this.data.filter as any);
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
+			return this._members.filter(this.data.filter);
 		} else {
 			return this._members;
 		}
@@ -93,7 +108,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMembers')}>
 				<uui-box>
 					<umb-picker-search-field .alias=${UMB_MEMBER_ENTITY_TYPE}></umb-picker-search-field>
-					<umb-picker-search-result></umb-picker-search-result>
+					<umb-picker-search-result .pickableFilter=${this.data?.search?.pickableFilter}></umb-picker-search-result>
 					${this.#renderItems()}</uui-box
 				>
 				${this.#renderActions()}
@@ -115,9 +130,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	#renderMemberItem(item: UmbMemberItemModel | UmbMemberDetailModel) {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore - TODO: MemberDetailModel does not have a name. It should have so we ignore this for now.
+	#renderMemberItem(item: UmbMemberDetailModel) {
 		const selectable = this._selectableFilter(item);
 
 		return html`

@@ -19,7 +19,7 @@ import {
 	repeat,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
-import { debounce, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { debounce, UmbDeprecation, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
@@ -161,6 +161,19 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			this._selectableFilter = this.data?.pickableFilter;
+		}
+	}
+
+	protected override willUpdate(_changedProperties: PropertyValues): void {
+		super.willUpdate(_changedProperties);
+
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		if (_changedProperties.has('data') && this.data?.filter) {
+			new UmbDeprecation({
+				deprecated: 'The `filter` option of UmbMediaPickerModalData has no effect.',
+				removeInVersion: '21.0.0',
+				solution: 'Use `pickableFilter` to prevent media from being picked instead.',
+			}).warn();
 		}
 	}
 
