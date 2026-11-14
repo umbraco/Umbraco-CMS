@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Globalization;
 using Examine;
 using Examine.Lucene;
 using Examine.Lucene.Providers;
@@ -128,7 +129,36 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
         {
             ApplySpecialIndexValueTransformations(e);
         }
+
+        FormatValuesOfFieldsWithoutDefinition(e);
     }
+
+    // Examine indexes a field without a definition as text, formatted in the culture of its indexing thread, so such
+    // values are formatted here, the same way on every server.
+    private void FormatValuesOfFieldsWithoutDefinition(IndexingItemEventArgs e)
+    {
+        var fieldNames = e.ValueSet.Values
+            .Where(x => x.Value.Any(IsFormattedPerCulture) && FieldDefinitions.TryGetValue(x.Key, out _) is false)
+            .Select(x => x.Key)
+            .ToArray();
+        if (fieldNames.Length == 0)
+        {
+            return;
+        }
+
+        var updatedValues = e.ValueSet.Values.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value);
+        foreach (var fieldName in fieldNames)
+        {
+            updatedValues[fieldName] = e.ValueSet.Values[fieldName]
+                .Select(x => IsFormattedPerCulture(x) ? ((IFormattable)x).ToString(null, CultureInfo.InvariantCulture) : x)
+                .ToArray();
+        }
+
+        e.SetValues(updatedValues);
+    }
+
+    private static bool IsFormattedPerCulture(object value)
+        => value is decimal or double or float or DateTime or DateTimeOffset;
 
     /// <summary>
     ///     Updates the index ValueSet with a special __Path and __Icon fields.
