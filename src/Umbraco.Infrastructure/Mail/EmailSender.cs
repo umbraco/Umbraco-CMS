@@ -32,6 +32,7 @@ public class EmailSender : IEmailSender
     private Task<bool>? _smtpProbe;
     private DateTimeOffset _smtpProbeExpiry;
     private int _smtpProbeGeneration;
+    private readonly AsyncLocal<bool> _isPublishingNotification = new();
 
     /// <summary>
     /// The maximum time the SMTP probe may take before the server is treated as unavailable.
@@ -128,7 +129,10 @@ public class EmailSender : IEmailSender
     /// <inheritdoc/>
     /// <remarks>
     ///     We assume this is possible if either an event handler is registered or an smtp server is configured
-    ///     or a pickup directory location is configured.
+    ///     or a pickup directory location is configured. A registered handler only receives the emails the
+    ///     <see cref="SendEmailNotification"/> is published for, which is every email when
+    ///     <see cref="SmtpSettings.PublishNotificationForAllEmails"/> is enabled, and otherwise only those whose sender
+    ///     requests it.
     /// </remarks>
     public bool IsEmailConfigured() => _globalSettings.IsSmtpServerConfigured
                                        || _globalSettings.IsPickupDirectoryLocationConfigured
@@ -205,13 +209,33 @@ public class EmailSender : IEmailSender
         => _globalSettings.IsSmtpServerConfigured
            && (_globalSettings.IsPickupDirectoryLocationConfigured is false || string.IsNullOrWhiteSpace(_globalSettings.Smtp?.From));
 
+#pragma warning disable CS0618 // Type or member is obsolete
+    private bool PublishNotificationForAllEmails => _globalSettings.Smtp?.PublishNotificationForAllEmails is true;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    // TODO (V20): Always publish the SendEmailNotification and remove SmtpSettings.PublishNotificationForAllEmails.
     private async Task SendAsyncInternal(EmailMessage message, string emailType, bool enableNotification, TimeSpan? expires)
     {
-        if (enableNotification)
+        var publishNotification = enableNotification || PublishNotificationForAllEmails;
+
+        // A handler may send the email on through this sender, for example after amending it. Unless its sender asks for
+        // the notification, that send goes to the transport rather than publishing again because of the setting, which
+        // would recurse.
+        var sentOnFromNotificationHandler = enableNotification is false && _isPublishingNotification.Value;
+        if (publishNotification && sentOnFromNotificationHandler is false)
         {
             var notification =
                 new SendEmailNotification(message.ToNotificationEmail(_globalSettings.Smtp?.From), emailType);
-            await _eventAggregator.PublishAsync(notification);
+
+            _isPublishingNotification.Value = true;
+            try
+            {
+                await _eventAggregator.PublishAsync(notification);
+            }
+            finally
+            {
+                _isPublishingNotification.Value = false;
+            }
 
             // if a handler handled sending the email then don't continue.
             if (notification.IsHandled)
@@ -228,7 +252,17 @@ public class EmailSender : IEmailSender
 
         if (!_globalSettings.IsSmtpServerConfigured && !_globalSettings.IsPickupDirectoryLocationConfigured)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
+            if (publishNotification is false && _notificationHandlerRegistered)
+            {
+                _logger.LogWarning(
+                    "Could not send an email. There is no SMTP configured, and the registered email notification handler did not receive it because the notification is not published for this email. Enable Umbraco:CMS:Global:Smtp:PublishNotificationForAllEmails to publish it for every email.");
+            }
+            else if (publishNotification && sentOnFromNotificationHandler)
+            {
+                _logger.LogWarning(
+                    "Could not send an email that an email notification handler sent on. There is no SMTP configured to deliver it.");
+            }
+            else if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug(
                 "Could not send email for {Subject}. It was not handled by a notification handler and there is no SMTP configured.",

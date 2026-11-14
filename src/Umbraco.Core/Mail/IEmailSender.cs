@@ -22,6 +22,16 @@ public interface IEmailSender
     /// <summary>
     /// Sends a message asynchronously.
     /// </summary>
+    /// <param name="message">The message to send.</param>
+    /// <param name="emailType">The type of email, which notification handlers can use to decide whether to handle it.</param>
+    /// <param name="enableNotification">
+    /// Whether to publish the <see cref="Notifications.SendEmailNotification"/> so that a handler can send the email instead.
+    /// The notification is published regardless when <see cref="Configuration.Models.SmtpSettings.PublishNotificationForAllEmails"/>
+    /// is enabled.
+    /// </param>
+    /// <param name="expires">An optional time after which the email expires.</param>
+    // TODO (V20): The notification is always published, so add overloads without enableNotification (avoiding optional
+    // parameters, so calls don't bind ambiguously), obsolete this one and move internal callers to them.
     Task SendAsync(EmailMessage message, string emailType, bool enableNotification = false, TimeSpan? expires = null)
 #pragma warning disable CS0618 // Type or member is obsolete
         => SendAsync(message, emailType, enableNotification);
@@ -39,7 +49,8 @@ public interface IEmailSender
     /// <returns><c>true</c> if the email sender is configured; otherwise, <c>false</c>.</returns>
     /// <remarks>
     /// This checks configuration only and performs no I/O, so it is suitable for deciding which features to offer.
-    /// Use <see cref="IsEmailAvailableAsync"/> to check that the transport can be reached.
+    /// Use <see cref="IsEmailAvailableAsync"/> to check that the transport can be reached. A registered
+    /// <see cref="Notifications.SendEmailNotification"/> handler can only send the emails the notification is published for.
     /// </remarks>
     // TODO (V19): Remove the default implementation when CanSendRequiredEmail is removed.
     bool IsEmailConfigured()
