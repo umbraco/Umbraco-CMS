@@ -8,6 +8,7 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-rename-modal')
 export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalData, UmbRenameServerFileModalValue> {
@@ -15,6 +16,9 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 	#itemRepository?: UmbItemRepository<any>;
 	#renameRepository?: UmbRenameServerFileRepository<any>;
 	#init?: Promise<unknown>;
+	#submitting = false;
+	// A name typed before the file has loaded wins over the loaded one.
+	#typedName?: string;
 
 	@state()
 	private _name = '';
@@ -62,13 +66,12 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 		if (!this.#itemRepository) throw new Error('Item repository is not available');
 
 		const { data } = await this.#itemRepository.requestItems([this.data.unique]);
-		this._name = data?.[0].name ?? '';
+		this._name = data?.[0]?.name ?? '';
 	}
 
 	async #onSubmit(event: SubmitEvent) {
 		event.preventDefault();
-		if (!this.#renameRepository) throw new Error('Rename repository is not available');
-		if (!this.data?.unique) throw new Error('Unique identifier is not available');
+		if (this.#submitting) return;
 
 		const form = event.target as HTMLFormElement;
 		if (!form) return;
@@ -78,6 +81,21 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 
 		const formData = new FormData(form);
 		const name = formData.get('name') as string;
+
+		this.#submitting = true;
+		try {
+			await this.#rename(name);
+		} finally {
+			this.#submitting = false;
+		}
+	}
+
+	async #rename(name: string) {
+		if (!this.data?.unique) throw new Error('Unique identifier is not available');
+
+		// The form can be submitted before the repositories have loaded.
+		await this.#init;
+		if (!this.#renameRepository) throw new Error('Rename repository is not available');
 
 		const { data } = await this.#renameRepository.rename(this.data.unique, name);
 
@@ -93,6 +111,10 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 		}
 	}
 
+	#onNameInput(event: UUIInputEvent) {
+		this.#typedName = event.target.value as string;
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout headline=${'Rename'}>
@@ -105,7 +127,8 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 									type="text"
 									id="name"
 									name="name"
-									value=${this._name}
+									value=${this.#typedName ?? this._name}
+									@input=${this.#onNameInput}
 									placeholder="Enter new name..."
 									required
 									required-message="Name is required"

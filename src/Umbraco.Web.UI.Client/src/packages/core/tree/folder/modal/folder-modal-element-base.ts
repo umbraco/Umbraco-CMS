@@ -6,6 +6,7 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 export abstract class UmbFolderModalElementBase<
 	FolderModalDataType extends { folderRepositoryAlias: string },
@@ -16,6 +17,12 @@ export abstract class UmbFolderModalElementBase<
 
 	folderRepository?: UmbDetailRepository<UmbFolderModel>;
 
+	#repositoryReady?: Promise<void>;
+	#init?: void | Promise<void>;
+	#submitting = false;
+	// A name typed before the folder has loaded wins over the loaded one.
+	#typedName?: string;
+
 	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#observeRepository();
@@ -24,7 +31,7 @@ export abstract class UmbFolderModalElementBase<
 	#observeRepository() {
 		if (!this.data?.folderRepositoryAlias) throw new Error('A folder repository alias is required');
 
-		new UmbExtensionApiInitializer(
+		this.#repositoryReady = new UmbExtensionApiInitializer(
 			this,
 			umbExtensionsRegistry,
 			this.data.folderRepositoryAlias,
@@ -32,17 +39,18 @@ export abstract class UmbFolderModalElementBase<
 			(permitted, ctrl) => {
 				this.folderRepository = permitted ? (ctrl.api as UmbDetailRepository<UmbFolderModel>) : undefined;
 				if (this.folderRepository) {
-					this.init();
+					this.#init = this.init();
 				}
 			},
-		);
+		).asPromise();
 	}
 
-	abstract init(): void;
-	abstract onFormSubmit({ name }: { name: string }): void;
+	abstract init(): void | Promise<void>;
+	abstract onFormSubmit({ name }: { name: string }): void | Promise<void>;
 
 	async #onSubmit(event: SubmitEvent) {
 		event.preventDefault();
+		if (this.#submitting) return;
 
 		const form = event.target as HTMLFormElement;
 		if (!form) return;
@@ -53,7 +61,20 @@ export abstract class UmbFolderModalElementBase<
 		const formData = new FormData(form);
 		const name = formData.get('name') as string;
 
-		this.onFormSubmit({ name });
+		this.#submitting = true;
+		try {
+			// The form can be submitted before the repository has loaded and the modal has initialised.
+			await this.#repositoryReady;
+			await this.#init;
+
+			await this.onFormSubmit({ name });
+		} finally {
+			this.#submitting = false;
+		}
+	}
+
+	#onNameInput(event: UUIInputEvent) {
+		this.#typedName = event.target.value as string;
 	}
 
 	override render() {
@@ -71,7 +92,8 @@ export abstract class UmbFolderModalElementBase<
 									id="name"
 									name="name"
 									.label=${this.localize.term('create_enterFolderName')}
-									.value="${this.value?.folder?.name || ''}"
+									.value=${this.#typedName ?? (this.value?.folder?.name || '')}
+									@input=${this.#onNameInput}
 									required
 									${umbFocus()}></uui-input>
 							</uui-form-layout-item>
