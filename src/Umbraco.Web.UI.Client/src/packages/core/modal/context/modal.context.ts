@@ -85,8 +85,8 @@ export class UmbModalContext<
 			this.type = this.alias.getDefaultModal()?.type || this.type;
 			size = this.alias.getDefaultModal()?.size ?? size;
 			this.element = this.alias.getDefaultModal()?.element || this.element;
-			this.backdropBackground = this.alias.getDefaultModal()?.backdropBackground || this.backdropBackground;
-			this.isReference = this.alias.getDefaultModal()?.isReference || this.isReference;
+			this.backdropBackground = this.alias.getDefaultModal()?.backdropBackground ?? this.backdropBackground;
+			this.isReference = this.alias.getDefaultModal()?.isReference ?? this.isReference;
 			title = this.alias.getDefaultModal()?.title ?? undefined;
 		}
 
@@ -95,8 +95,8 @@ export class UmbModalContext<
 		this.type = args.modal?.type || this.type;
 		size = args.modal?.size ?? size;
 		this.element = args.modal?.element || this.element;
-		this.backdropBackground = args.modal?.backdropBackground || this.backdropBackground;
-		this.isReference = args.modal?.isReference || this.isReference;
+		this.backdropBackground = args.modal?.backdropBackground ?? this.backdropBackground;
+		this.isReference = args.modal?.isReference ?? this.isReference;
 
 		this.#size.setValue(size);
 

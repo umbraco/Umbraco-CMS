@@ -6,15 +6,13 @@ import { css, customElement, html, ifDefined, nothing, state } from '@umbraco-cm
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_ITEM_PICKER_MODAL, umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UmbTemplateItemRepository } from '@umbraco-cms/backoffice/template';
+import { UMB_TEMPLATE_WORKSPACE_MODAL, UmbTemplateItemRepository } from '@umbraco-cms/backoffice/template';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
 import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
+import type { UmbDocumentTypeDetailModel, UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
 
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
@@ -23,13 +21,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 	// Document Type
 	@state()
-	private _documentTypeUnique?: string = '';
-
-	@state()
-	private _documentTypeName?: string;
-
-	@state()
-	private _documentTypeIcon?: string;
+	private _documentType?: UmbDocumentTypeItemModel;
 
 	@state()
 	private _allowedTemplates?: UmbDocumentTypeDetailModel['allowedTemplates'];
@@ -58,24 +50,19 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	#documentPublishingWorkspaceContext?: typeof UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	private _routeBuilder?: UmbModalRouteBuilder;
+	private _editTemplatePath = '';
 
 	constructor() {
 		super();
 
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('general/:entityType')
-			.onSetup((params) => {
-				this.#workspaceContext?.contentTypeVarianceChangeRedirect.trackVarianceChange();
-				return { data: { entityType: params.entityType, preset: {} } };
-			})
+		new UmbModalRouteRegistrationController(this, UMB_TEMPLATE_WORKSPACE_MODAL)
+			.addAdditionalPath('template')
 			.observeRouteBuilder((routeBuilder) => {
-				this._routeBuilder = routeBuilder;
+				this._editTemplatePath = routeBuilder({});
 			});
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
-			this._documentTypeUnique = this.#workspaceContext?.getContentTypeUnique();
 			this.#observeContent();
 		});
 
@@ -112,14 +99,27 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		]);
 	}
 
+	// TODO: Weak reference, we should instead track the variance change through a more robust mechanism that doesn't rely on the UX relation.
+	#trackVarianceChange() {
+		if (!this._hasSettingsAccess || this._isTrashed) return;
+		this.#workspaceContext?.contentTypeVarianceChangeRedirect.trackVarianceChange();
+	}
+
 	#observeContent() {
 		if (!this.#workspaceContext) return;
 
 		this.observe(
 			this.#workspaceContext.structure.ownerContentType,
 			(documentType) => {
-				this._documentTypeName = documentType?.name;
-				this._documentTypeIcon = documentType?.icon;
+				this._documentType = documentType
+					? {
+							entityType: documentType.entityType,
+							unique: documentType.unique,
+							name: documentType.name,
+							isElement: documentType.isElement,
+							icon: documentType.icon,
+						}
+					: undefined;
 				this._allowedTemplates = documentType?.allowedTemplates;
 			},
 			'_documentType',
@@ -209,8 +209,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	}
 
 	#renderGeneralSection() {
-		const editDocumentTypePath = this._routeBuilder?.({ entityType: 'document-type' }) ?? '';
-
 		return html`
 			<div class="general-item"><span>${this.#renderStateTag()}</span></div>
 			${this.#renderCreateDate()} ${this.#renderUpdateDate()} ${this.#renderPublishDate()}
@@ -218,15 +216,11 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 			<div class="general-item">
 				<strong><umb-localize key="content_documentType">Document Type</umb-localize></strong>
-				<uui-ref-node-document-type
+				<umb-entity-item-ref
 					standalone
-					href=${ifDefined(
-						this._hasSettingsAccess ? editDocumentTypePath + 'edit/' + this._documentTypeUnique : undefined,
-					)}
 					?readonly=${!this._hasSettingsAccess || this._isTrashed}
-					name=${ifDefined(this.localize.string(this._documentTypeName ?? ''))}>
-					<umb-icon slot="icon" name=${ifDefined(this._documentTypeIcon)}></umb-icon>
-				</uui-ref-node-document-type>
+					.item=${this._documentType}
+					@click=${this.#trackVarianceChange}></umb-entity-item-ref>
 			</div>
 			${this.#renderTemplateInput()}
 			<div class="general-item">
@@ -239,8 +233,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	#renderTemplateInput() {
 		if (this._allowedTemplates?.length === 0 && !this._templateUnique) return nothing;
 
-		const editTemplatePath = this._routeBuilder?.({ entityType: 'template' }) ?? '';
-
 		return html`
 			<div class="general-item">
 				<strong><umb-localize key="template_template">Template</umb-localize></strong>
@@ -250,7 +242,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 								standalone
 								name=${ifDefined(this._templateName)}
 								href=${ifDefined(
-									this._hasSettingsAccess ? editTemplatePath + 'edit/' + this._templateUnique : undefined,
+									this._hasSettingsAccess ? this._editTemplatePath + 'edit/' + this._templateUnique : undefined,
 								)}
 								?readonly=${!this._hasSettingsAccess || this._isTrashed}
 								style=${ifDefined(!this.#isTemplateAllowed ? 'color: var(--uui-color-danger)' : undefined)}
@@ -394,11 +386,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 			.variant-state > span {
 				color: var(--uui-color-divider-emphasis);
-			}
-
-			uui-ref-node-document-type[readonly] {
-				padding-top: 7px;
-				padding-bottom: 7px;
 			}
 		`,
 	];

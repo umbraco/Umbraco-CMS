@@ -1,15 +1,13 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../media-workspace.context-token.js';
-import { css, customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbMediaTypeItemRepository, UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbMediaTypeItemRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
 import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbMediaTypeItemModel } from '@umbraco-cms/backoffice/media-type';
 
 @customElement('umb-media-workspace-view-info')
@@ -18,13 +16,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 	private _mediaTypeUnique: string | undefined = undefined;
 
 	@state()
-	private _mediaTypeName?: UmbMediaTypeItemModel['name'];
-
-	@state()
-	private _mediaTypeIcon?: UmbMediaTypeItemModel['icon'];
-
-	@state()
-	private _editMediaTypePath = '';
+	private _mediaType?: UmbMediaTypeItemModel;
 
 	@state()
 	private _mediaUnique = '';
@@ -47,15 +39,6 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 
 	constructor() {
 		super();
-
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('media-type')
-			.onSetup(() => {
-				return { data: { entityType: UMB_MEDIA_TYPE_ENTITY_TYPE, preset: {} } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._editMediaTypePath = routeBuilder({});
-			});
 
 		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
 			{
@@ -90,8 +73,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 		if (!this.#workspaceContext) return;
 		if (!this._mediaTypeUnique) throw new Error('Media type unique is not set');
 		const { data } = await this.#mediaTypeItemRepository.requestItems([this._mediaTypeUnique]);
-		this._mediaTypeName = data?.[0].name;
-		this._mediaTypeIcon = data?.[0].icon;
+		this._mediaType = data?.[0];
 	}
 
 	#observeContent() {
@@ -132,15 +114,10 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			${this.#renderTrashState()} ${this.#renderCreateDate()} ${this.#renderUpdateDate()}
 			<div class="general-item">
 				<strong><umb-localize key="content_mediaType">Media Type</umb-localize></strong>
-				<uui-ref-node-document-type
+				<umb-entity-item-ref
 					standalone
-					href=${ifDefined(
-						this._hasSettingsAccess ? this._editMediaTypePath + 'edit/' + this._mediaTypeUnique : undefined,
-					)}
 					?readonly=${!this._hasSettingsAccess || this._isTrashed}
-					name=${ifDefined(this._mediaTypeName)}>
-					${this._mediaTypeIcon ? html`<umb-icon slot="icon" name=${this._mediaTypeIcon}></umb-icon>` : nothing}
-				</uui-ref-node-document-type>
+					.item=${this._mediaType}></umb-entity-item-ref>
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="template_id">Id</umb-localize></strong>
@@ -218,11 +195,6 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 
 			.general-item:not(:last-child) {
 				margin-bottom: var(--uui-size-space-6);
-			}
-
-			uui-ref-node-document-type[readonly] {
-				padding-top: 7px;
-				padding-bottom: 7px;
 			}
 		`,
 	];

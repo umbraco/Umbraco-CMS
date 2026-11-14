@@ -2,6 +2,7 @@ import { css, customElement, html, ifDefined, nothing, property } from '@umbraco
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UUICardElement } from '@umbraco-cms/backoffice/external/uui';
+import { UmbEntityItemRefFrameMixin } from '@umbraco-cms/backoffice/entity-item';
 
 /**
  * @element umb-template-card
@@ -11,7 +12,7 @@ import { UUICardElement } from '@umbraco-cms/backoffice/external/uui';
  */
 // TOOD: Consider if this should be select in the 'persisted'-select style when it is selected as a default. (But its should not use the runtime-selection style)
 @customElement('umb-template-card')
-export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
+export class UmbTemplateCardElement extends UmbEntityItemRefFrameMixin(UmbElementMixin(UUICardElement)) {
 	@property({ type: String })
 	name = '';
 
@@ -57,6 +58,10 @@ export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 		return this.#id;
 	}
 
+	protected override get isEntityFrameNavigable() {
+		return !this.disabled;
+	}
+
 	#setSelection(e: KeyboardEvent) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -74,6 +79,7 @@ export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 			<div id="card">
 				${this.href ? this.#renderLink() : this.#renderButton()} ${this.#renderDefaultButton()}
 				<slot name="actions"></slot>
+				${this.renderEntityFrame()}
 			</div>
 		`;
 	}
@@ -120,7 +126,7 @@ export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 	}
 
 	static override readonly styles = [
-		...UUICardElement.styles,
+		...super.styles,
 		css`
 			:host {
 				display: contents;
@@ -138,6 +144,8 @@ export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 				border: 1px solid var(--uui-color-border);
 				background-color: var(--uui-color-surface);
 				padding: var(--uui-size-4);
+
+				--umb-entity-frame-offset: -1px;
 			}
 
 			#bottom {
