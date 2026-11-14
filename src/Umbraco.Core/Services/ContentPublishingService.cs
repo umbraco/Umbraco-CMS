@@ -87,7 +87,10 @@ internal sealed class ContentPublishingService : IContentPublishingService
 
         ContentScheduleCollection schedules = _contentService.GetContentScheduleByContentId(key);
 
-        foreach (CulturePublishScheduleModel cultureToSchedule in culturesToPublishOrSchedule.Where(c => c.Schedule is not null))
+        CulturePublishScheduleModel[] culturesToSchedule = culturesToPublishOrSchedule.Where(c => c.Schedule is not null).ToArray();
+        int? schedulingUserId = culturesToSchedule.Length > 0 ? await _userIdKeyResolver.GetAsync(userKey) : null;
+
+        foreach (CulturePublishScheduleModel cultureToSchedule in culturesToSchedule)
         {
             var culture = cultureToSchedule.Culture ?? Constants.System.InvariantCulture;
 
@@ -97,7 +100,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             }
             else
             {
-                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule!.PublishDate.Value.UtcDateTime, ContentScheduleAction.Release);
+                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule.PublishDate.Value.UtcDateTime, ContentScheduleAction.Release, schedulingUserId);
             }
 
             if (cultureToSchedule.Schedule!.UnpublishDate is null)
@@ -106,7 +109,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             }
             else
             {
-                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule!.UnpublishDate.Value.UtcDateTime, ContentScheduleAction.Expire);
+                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule.UnpublishDate.Value.UtcDateTime, ContentScheduleAction.Expire, schedulingUserId);
             }
         }
 

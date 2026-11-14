@@ -11,6 +11,7 @@ internal sealed class ContentScheduleDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentSchedule;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string UserIdColumnName = "userId";
 
     /// <summary>
     /// Gets or sets the unique identifier of the content schedule.
@@ -49,4 +50,12 @@ internal sealed class ContentScheduleDto
     /// </summary>
     [Column("action")]
     public string? Action { get; set; }
+
+    /// <summary>
+    /// Gets or sets the identifier of the user who scheduled the action, or <c>null</c> if the user isn't known.
+    /// </summary>
+    [Column(UserIdColumnName)]
+    [ForeignKey(typeof(UserDto))]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    public int? UserId { get; set; }
 }

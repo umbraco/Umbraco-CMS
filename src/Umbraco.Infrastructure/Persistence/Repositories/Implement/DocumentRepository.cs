@@ -249,7 +249,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 scheduleDto.Date,
                 scheduleDto.Action == ContentScheduleAction.Release.ToString()
                     ? ContentScheduleAction.Release
-                    : ContentScheduleAction.Expire));
+                    : ContentScheduleAction.Expire,
+                scheduleDto.UserId));
         }
 
         return result;
@@ -2106,7 +2107,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                     scheduleDto.Date,
                     scheduleDto.Action == ContentScheduleAction.Release.ToString()
                         ? ContentScheduleAction.Release
-                        : ContentScheduleAction.Expire))
+                        : ContentScheduleAction.Expire,
+                    scheduleDto.UserId))
                     .ToList().AsEnumerable()); // We have to materialize it here,
                                                // to avoid this being used after the scope is disposed.
 
