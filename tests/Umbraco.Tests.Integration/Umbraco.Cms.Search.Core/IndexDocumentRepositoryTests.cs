@@ -11,8 +11,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class IndexDocumentRepositoryTests : UmbracoIntegrationTest
 {
-    // Exceeds the parameter ceiling of every supported database (SQL Server: 2100, SQLite: 32766).
-    private const int IdCount = 40_000;
+    // Exceeds the parameter ceiling of every supported database (SQL Server: 2100, SQLite: 250000).
+    private const int IdCount = 260_000;
 
     [Test]
     public async Task DeleteAsync_Supports_More_Ids_Than_The_Database_Parameter_Limit()
