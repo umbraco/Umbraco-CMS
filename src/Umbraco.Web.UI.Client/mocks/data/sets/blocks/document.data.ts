@@ -141,7 +141,7 @@ export const data: Array<UmbMockDocumentModel> = [
 	{
 		// Block-level variance. "Shared block" is exposed in both cultures, "English only" only in en-US and
 		// "Danish only" only in da, so un-exposing can be tried from either culture. "No editor" has no workspace
-		// to open, so it can only be set as draft through its block action.
+		// to open, so it can only be made draft through its block action.
 		id: '2bb5536f-deb6-429c-b6d4-dc2975646a4b',
 		createDate: '2024-01-15T10:00:00.000Z',
 		parent: null,
@@ -241,7 +241,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		flags: [],
 	},
 	{
-		// Block-level variance with inline editing. Inline blocks open no workspace, so setting one as draft is
+		// Block-level variance with inline editing. Inline blocks open no workspace, so making one draft is
 		// only possible through its block action.
 		id: 'cdef107b-33a9-4514-a0d3-b9000e5c6230',
 		createDate: '2024-01-15T10:00:00.000Z',

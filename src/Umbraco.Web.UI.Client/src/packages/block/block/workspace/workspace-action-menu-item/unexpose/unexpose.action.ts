@@ -10,7 +10,7 @@ export class UmbUnexposeBlockWorkspaceActionMenuItem extends UmbWorkspaceActionM
 		if (!workspaceContext) {
 			throw new Error('Block workspace context not found');
 		}
-		await workspaceContext.submitAsDraft();
+		await workspaceContext.submitAndUnexpose();
 	}
 }
 

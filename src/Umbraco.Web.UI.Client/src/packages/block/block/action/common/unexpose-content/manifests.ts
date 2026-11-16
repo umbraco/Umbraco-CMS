@@ -13,11 +13,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'default',
 		alias: UMB_BLOCK_ACTION_UNEXPOSE_CONTENT_ALIAS,
 		name: 'Unexpose Content Block Action',
-		weight: 200,
+		weight: 399,
 		api: () => import('./unexpose-content-block.action.js'),
 		meta: {
 			icon: '',
-			label: '#blockEditor_setAsDraft',
+			label: '#blockEditor_setUnexpose',
 		},
 		conditions: [
 			{ alias: UMB_BLOCK_ENTRY_VARIES_BY_VARIANT_CONDITION_ALIAS },

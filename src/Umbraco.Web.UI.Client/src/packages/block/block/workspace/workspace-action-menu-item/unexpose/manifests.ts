@@ -12,7 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		forWorkspaceActions: 'Umb.WorkspaceAction.Block.SubmitUpdate',
 		meta: {
 			icon: '',
-			label: '#blockEditor_setAsDraft',
+			label: '#blockEditor_setUnexpose',
 		},
 		conditions: [
 			{ alias: UMB_BLOCK_WORKSPACE_VARIES_BY_VARIANT_CONDITION_ALIAS },

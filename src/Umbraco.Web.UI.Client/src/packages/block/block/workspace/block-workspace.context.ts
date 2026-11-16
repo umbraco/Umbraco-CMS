@@ -620,7 +620,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	 * Stores the edits and sets the block as not exposed for the current variant, without validating.
 	 * The content of the variant is kept, so exposing the block again restores it.
 	 */
-	async submitAsDraft() {
+	async submitAndUnexpose() {
 		await this.#storeData();
 		this.unexpose();
 		this.#clearVariantValidationMessages();
