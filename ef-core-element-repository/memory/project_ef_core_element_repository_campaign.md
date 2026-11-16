@@ -99,3 +99,8 @@ hook and both EF Core factory overloads accept null but cannot build from it, an
 `TryGetValue` result to the hook unchecked. PR 4b makes the base throw a named `InvalidOperationException` and the hook
 and EF Core overloads non-nullable; it depends on PR 4 and runs alongside PR 5. The board now has PRs 0, 1, 2, 2b, 3, 4,
 4b, 5, 6.
+
+Update 16-11-2026 (later): PR 4 (#24542) merged as `62e2911cc6e` into `v18/feature/ef-core-repositories`. PRs 1, 2, 2b,
+3 and 4 are in. Next are PR 5 (`ElementService` cut-over, notification hooks, NPoco `ElementRepository` deleted) and
+PR 4b (required content type on the generic read path); both cut from the integration branch at or after `62e2911cc6e`.
+The integration branch had no v19/dev merge-up between PR 4's cut and its merge, so no merge audit is pending.
