@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.HybridCache;
@@ -393,6 +394,7 @@ public class ElementCacheServiceRefreshMemoryCacheTests
             new OptionsWrapper<CacheSettings>(new CacheSettings()),
             NullLogger<ElementCacheService>.Instance,
             cacheFactory.Object,
-            Mock.Of<IPreviewAccessEvaluator>());
+            Mock.Of<IPreviewAccessEvaluator>(),
+            Mock.Of<IContentCacheDataSerializerFactory>());
     }
 }
