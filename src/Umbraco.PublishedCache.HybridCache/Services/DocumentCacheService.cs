@@ -28,6 +28,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCacheSizeReporter
 {
     private readonly IDatabaseCacheRepository _databaseCacheRepository;
+    private readonly IContentCacheDataSerializerFactory _serializerFactory;
     private readonly IIdKeyMap _idKeyMap;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly Microsoft.Extensions.Caching.Hybrid.HybridCache _hybridCache;
@@ -104,6 +105,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     /// <param name="logger">The logger.</param>
     /// <param name="cacheFactory">The factory that creates the in-memory converted-content (L0) cache.</param>
     /// <param name="previewAccessEvaluator">The evaluator that decides whether the preview user may see a document's unpublished version.</param>
+    /// <param name="serializerFactory">The factory whose content type snapshot is discarded when the memory cache is rebuilt by content type.</param>
     public DocumentCacheService(
         IDatabaseCacheRepository databaseCacheRepository,
         IIdKeyMap idKeyMap,
@@ -118,9 +120,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         IPublishStatusQueryService publishStatusQueryService,
         ILogger<DocumentCacheService> logger,
         IConvertedPublishedContentCacheFactory cacheFactory,
-        IPreviewAccessEvaluator previewAccessEvaluator)
+        IPreviewAccessEvaluator previewAccessEvaluator,
+        IContentCacheDataSerializerFactory serializerFactory)
     {
         _databaseCacheRepository = databaseCacheRepository;
+        _serializerFactory = serializerFactory;
         _idKeyMap = idKeyMap;
         _scopeProvider = scopeProvider;
         _hybridCache = hybridCache;
@@ -416,11 +420,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     // every request.
     private async Task ReadFromDatabaseAsync(List<Guid> keys, bool preview, long generation, Dictionary<Guid, IPublishedContent> resolved, ContentSourcesReader readContentSources)
     {
-        IReadOnlyCollection<ContentCacheNode> coldNodes;
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            coldNodes = (await readContentSources(keys, preview)).ToArray();
-        }
+        IReadOnlyCollection<ContentCacheNode> coldNodes = (await readContentSources(keys, preview)).ToArray();
 
         // Mirrors GetNodeAsync, which warms the id/key map for every node the database returns,
         // regardless of the ancestor guard below.
@@ -572,7 +572,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
         async Task<(ContentCacheNode? Node, bool AncestorCheckFailed)> GetContentCacheNodeFromRepo()
         {
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
             ContentCacheNode? contentCacheNode = await readContentSource(key, preview);
 
             // If we can resolve the content cache node, we still need to check if the ancestor path is published.
@@ -949,6 +948,10 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     /// <inheritdoc />
     public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> contentTypeIds)
     {
+        // Entries evicted below are reloaded on their next miss, through the serializer factory. Discard what it has
+        // derived from the type definitions first, so that reload sees the changed definitions.
+        _serializerFactory.ClearTypeCache();
+
         // Clear the hybrid cache by content type tag for the affected content types.
         var contentTypeIdsAsArray = contentTypeIds as int[] ?? contentTypeIds.ToArray();
         var contentTypeIdTags = contentTypeIdsAsArray.Select(ContentTypeIdTag).ToArray();

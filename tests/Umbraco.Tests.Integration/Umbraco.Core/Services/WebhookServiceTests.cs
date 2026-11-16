@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -165,4 +166,16 @@ internal sealed class WebhookServiceTests : UmbracoIntegrationTest
         Assert.IsNotEmpty(result);
         Assert.AreEqual(2, result.Count());
     }
+
+    [Test]
+    public async Task Can_Create_With_Valid_Header()
+    {
+        var result = await WebhookService.CreateAsync(CreateWebhookWithHeader("Content-Type", "application/vnd.custom+json"));
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(WebhookOperationStatus.Success, result.Status);
+    }
+
+    private static Webhook CreateWebhookWithHeader(string name, string value)
+        => new("https://example.com", true, events: [Constants.WebhookEvents.Aliases.ContentPublish], headers: new Dictionary<string, string> { [name] = value });
 }

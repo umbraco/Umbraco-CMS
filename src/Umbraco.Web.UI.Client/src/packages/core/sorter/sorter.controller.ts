@@ -399,7 +399,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	}
 
 	#initialize = () => {
-		if (this.#isConnected === false) return;
+		if (this.#isConnected === false || this.#enabled === false) return;
 		if (this.#containerElement) {
 			// This can happen, so no need to show an error as it seems to be happening in some cases. We will just reject. [NL]
 			//console.error('Container element already initialized', this.#containerElement);

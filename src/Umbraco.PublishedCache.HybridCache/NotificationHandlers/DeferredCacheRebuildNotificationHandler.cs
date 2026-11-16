@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
@@ -20,24 +21,30 @@ internal sealed class DeferredCacheRebuildNotificationHandler :
     IDistributedCacheNotificationHandler<MediaTypeChangedNotification>
 {
     private readonly IDeferredCacheRebuildService _deferredCacheRebuildService;
+    private readonly IContentCacheDataSerializerFactory _serializerFactory;
     private readonly CacheSettings _cacheSettings;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DeferredCacheRebuildNotificationHandler" /> class.
     /// </summary>
     /// <param name="deferredCacheRebuildService">The deferred cache rebuild service.</param>
+    /// <param name="serializerFactory">The content cache data serializer factory.</param>
     /// <param name="cacheSettings">The cache settings.</param>
     public DeferredCacheRebuildNotificationHandler(
         IDeferredCacheRebuildService deferredCacheRebuildService,
+        IContentCacheDataSerializerFactory serializerFactory,
         IOptions<CacheSettings> cacheSettings)
     {
         _deferredCacheRebuildService = deferredCacheRebuildService;
+        _serializerFactory = serializerFactory;
         _cacheSettings = cacheSettings.Value;
     }
 
     /// <inheritdoc />
     public void Handle(ContentTypeChangedNotification notification)
     {
+        _serializerFactory.ClearTypeCache();
+
         if (_cacheSettings.ContentTypeRebuildMode != ContentTypeRebuildMode.Deferred)
         {
             return;
@@ -57,6 +64,8 @@ internal sealed class DeferredCacheRebuildNotificationHandler :
     /// <inheritdoc />
     public void Handle(MediaTypeChangedNotification notification)
     {
+        _serializerFactory.ClearTypeCache();
+
         if (_cacheSettings.ContentTypeRebuildMode != ContentTypeRebuildMode.Deferred)
         {
             return;

@@ -224,7 +224,8 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undef
 	}
 
 	#renderAddButton() {
-		if (this.disabled || this.readonly) return nothing;
+		if (this.disabled) return nothing;
+		if (this.readonly && this._items.length > 0) return nothing;
 		if (this.max === 1 && this._items.length > 0) return nothing;
 		return html`
 			<uui-button
@@ -232,7 +233,7 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undef
 				id="action"
 				label=${this.localize.term('general_add')}
 				look="placeholder"
-				?disabled=${this.disabled}
+				?disabled=${this.readonly}
 				@click=${this.#onAdd}></uui-button>
 		`;
 	}

@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace Umbraco.Cms.Core;
 
 public static partial class Constants
@@ -22,6 +24,21 @@ public static partial class Constants
             /// </summary>
             public const string RetryCount = "Umb-Webhook-RetryCount";
         }
+
+        /// <summary>
+        ///     Gets the names of the HTTP headers that cannot be configured on a webhook, because they are set by the
+        ///     HTTP transport or by Umbraco when a webhook request is sent. Names are compared case-insensitively.
+        /// </summary>
+        public static readonly IReadOnlySet<string> ReservedHeaderNames = new ReadOnlySet<string>(
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "Host",
+                "Content-Length",
+                "Transfer-Encoding",
+                "Connection",
+                HeaderNames.EventName,
+                HeaderNames.RetryCount,
+            });
 
         /// <summary>
         ///     Contains webhook event alias constants.
