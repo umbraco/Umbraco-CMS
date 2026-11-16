@@ -20,7 +20,7 @@ export class UmbBlockEntryVariesByVariantCondition
 				context.variesByVariant,
 				(varies) => {
 					if (varies !== undefined) {
-						this.permitted = varies === (this.config.match !== undefined ? this.config.match : true);
+						this.permitted = varies === (this.config.match ?? true);
 					}
 				},
 				'observeVariesByVariant',

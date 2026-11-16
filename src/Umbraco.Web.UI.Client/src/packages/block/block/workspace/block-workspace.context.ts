@@ -92,6 +92,15 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#exposed = new UmbBooleanState<undefined>(undefined);
 	readonly exposed = this.#exposed.asObservable();
 
+	readonly variesByVariant = observeMultiple([
+		this.content.structure.variesByCulture,
+		this.content.structure.variesBySegment,
+	]).pipe(
+		map(([variesByCulture, variesBySegment]) =>
+			variesByCulture === undefined || variesBySegment === undefined ? undefined : variesByCulture || variesBySegment,
+		),
+	);
+
 	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
@@ -621,8 +630,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	 * The content of the variant is kept, so exposing the block again restores it.
 	 */
 	async submitAndUnexpose() {
-		await this.#storeData();
-		this.unexpose();
+		const layoutData = await this.#storeData();
+		const variantId = this.#variantId.getValue();
+		if (!variantId) throw new Error('Failed to unexpose block, missing variant id.');
+		this.#blockManager?.removeOneExpose(layoutData.contentKey, variantId);
 		this.#clearVariantValidationMessages();
 		this.setIsNew(false);
 		this._closeModal();
@@ -688,14 +699,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		const contentKey = this.#layout.value?.contentKey;
 		if (!contentKey) throw new Error('Failed to expose block, missing content key.');
 		this.#expose(contentKey);
-	}
-
-	unexpose() {
-		const contentKey = this.#layout.value?.contentKey;
-		if (!contentKey) throw new Error('Failed to unexpose block, missing content key.');
-		const variantId = this.#variantId.getValue();
-		if (!variantId) throw new Error('Failed to unexpose block, missing variant id.');
-		this.#blockManager?.removeOneExpose(contentKey, variantId);
 	}
 
 	#expose(unique: string) {
