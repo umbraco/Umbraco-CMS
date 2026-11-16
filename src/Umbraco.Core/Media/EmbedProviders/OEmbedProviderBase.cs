@@ -96,7 +96,10 @@ public abstract class OEmbedProviderBase : IEmbedProvider
     /// </summary>
     /// <param name="url">The URL to download from.</param>
     /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
-    /// <returns>A task that represents the asynchronous operation, containing the response content as a string.</returns>
+    /// <returns>
+    ///     A task that represents the asynchronous operation, containing the response content as a string, or an empty
+    ///     string if the response doesn't have a success status code.
+    /// </returns>
     public virtual async Task<string> DownloadResponseAsync(string url, CancellationToken cancellationToken)
     {
         // The timeout is applied per request rather than via HttpClient.Timeout, as the client is shared
@@ -107,6 +110,14 @@ public abstract class OEmbedProviderBase : IEmbedProvider
 
         using var request = new HttpRequestMessage(HttpMethod.Get, url);
         using HttpResponseMessage response = await GetHttpClient().SendAsync(request, timeoutCancellation.Token);
+
+        // An error response (e.g. YouTube's plain-text "Not Found" for a removed video) is not an OEmbed
+        // document, and parsing it would throw.
+        if (response.IsSuccessStatusCode is false)
+        {
+            return string.Empty;
+        }
+
         return await response.Content.ReadAsStringAsync(timeoutCancellation.Token);
     }
 
@@ -121,6 +132,11 @@ public abstract class OEmbedProviderBase : IEmbedProvider
         where T : class
     {
         var response = await DownloadResponseAsync(url, cancellationToken);
+        if (string.IsNullOrWhiteSpace(response))
+        {
+            return null;
+        }
+
         return _jsonSerializer.Deserialize<T>(response);
     }
 
@@ -136,6 +152,12 @@ public abstract class OEmbedProviderBase : IEmbedProvider
         // resolution (both on the reader and the document) to prevent potential XXE attacks.
         var response = await DownloadResponseAsync(url, cancellationToken);
         var doc = new XmlDocument { XmlResolver = null };
+        if (string.IsNullOrWhiteSpace(response))
+        {
+            // No document to read: properties read from it are empty.
+            return doc;
+        }
+
         var settings = new XmlReaderSettings
         {
             DtdProcessing = DtdProcessing.Prohibit,
