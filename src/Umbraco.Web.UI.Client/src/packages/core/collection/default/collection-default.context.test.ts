@@ -316,4 +316,20 @@ describe('UmbDefaultCollectionContext requesting the collection', () => {
 
 		expect(appliedItems).to.eql([['latest']]);
 	});
+
+	it('drops a queued load when the context is destroyed', async () => {
+		let requests = 0;
+		context.useRepository({
+			requestCollection: () => {
+				requests++;
+				return new Promise(() => {});
+			},
+		} as unknown as UmbTestDeferredCollectionRepository);
+
+		context.loadCollection();
+		context.destroy();
+		await new Promise((resolve) => setTimeout(resolve, 150));
+
+		expect(requests).to.equal(0);
+	});
 });

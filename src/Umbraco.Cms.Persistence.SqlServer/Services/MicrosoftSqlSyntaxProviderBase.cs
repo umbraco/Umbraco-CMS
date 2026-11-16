@@ -38,6 +38,16 @@ public abstract class MicrosoftSqlSyntaxProviderBase<TSyntax> : SqlSyntaxProvide
 
     public override string AddColumn => "ALTER TABLE {0} ADD {1}";
 
+    /// <inheritdoc />
+    /// <remarks>
+    ///     Covers the whole <c>DECIMAL(38,6)</c> range. An offset into the non-negative range would need more digits
+    ///     than SQL Server allows, so negative values are complemented and sort below the others instead.
+    /// </remarks>
+    public override string ConvertDecimalToOrderableString =>
+        "CASE WHEN {0} < 0"
+        + " THEN '0' + RIGHT(REPLICATE('0', 39) + CAST(CAST(99999999999999999999999999999999.999999 + {0} AS DECIMAL(38,6)) AS VARCHAR(39)), 39)"
+        + " ELSE '1' + RIGHT(REPLICATE('0', 39) + CAST(CAST({0} AS DECIMAL(38,6)) AS VARCHAR(39)), 39) END";
+
     public override string GetQuotedTableName(string? tableName)
     {
         if (tableName?.Contains('.') == false)

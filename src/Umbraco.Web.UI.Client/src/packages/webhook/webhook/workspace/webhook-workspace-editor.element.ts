@@ -1,5 +1,5 @@
 import { UMB_WEBHOOK_WORKSPACE_CONTEXT } from './webhook-workspace.context-token.js';
-import { html, customElement, state, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { umbFocus, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -17,6 +17,9 @@ export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _description = '';
 
+	@state()
+	private _isReadOnly = false;
+
 	constructor() {
 		super();
 
@@ -25,6 +28,12 @@ export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 			this.observe(this.#workspaceContext?.url, (url) => (this._url = url ?? ''));
 			this.observe(this.#workspaceContext?.name, (name) => (this._name = name ?? ''));
 			this.observe(this.#workspaceContext?.description, (description) => (this._description = description ?? ''));
+
+			this.observe(
+				context?.readOnlyGuard.permitted,
+				(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+				'_observeIsReadOnly',
+			);
 		});
 	}
 
@@ -48,8 +57,14 @@ export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 							label=${this.localize.term('placeholders_entername')}
 							placeholder=${this.localize.term('placeholders_entername')}
 							.value=${this._name}
+							?readonly=${this._isReadOnly}
 							@change=${this.#onNameChange}
 							${umbFocus()}>
+							${this._isReadOnly
+								? html`<uui-tag id="read-only-tag" slot="append" look="secondary">
+										${this.localize.term('general_readOnly')}
+									</uui-tag>`
+								: nothing}
 						</uui-input>
 
 						<uui-input
@@ -57,6 +72,7 @@ export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 							.label=${this.localize.term('placeholders_enterDescription')}
 							.value=${this._description}
 							.placeholder=${this.localize.term('placeholders_enterDescription')}
+							?readonly=${this._isReadOnly}
 							@input=${this.#onDescriptionChange}></uui-input>
 					</div>
 				</div>
@@ -85,6 +101,12 @@ export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 
 			#description:hover {
 				--uui-input-border-color: var(--uui-color-border);
+			}
+
+			#read-only-tag {
+				align-self: center;
+				margin: 0 var(--uui-size-space-2);
+				white-space: nowrap;
 			}
 		`,
 	];

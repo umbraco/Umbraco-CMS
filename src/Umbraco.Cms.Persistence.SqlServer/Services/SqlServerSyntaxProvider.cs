@@ -93,6 +93,10 @@ public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerS
 
     public override string CreateIndex => "CREATE {0}{1}INDEX {2} ON {3} ({4}){5}";
 
+    /// <inheritdoc />
+    /// <remarks>SQL Server also treats <c>[</c> as a wildcard, opening a character set.</remarks>
+    public override string EscapeLikeValue(string value) => base.EscapeLikeValue(value).Replace("[", @"\[");
+
     public override DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString)
     {
         var setting = _globalSettings.Value.DatabaseFactoryServerVersion;
