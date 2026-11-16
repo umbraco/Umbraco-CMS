@@ -271,7 +271,7 @@ describe('UmbTableElement', () => {
 			await element.updateComplete;
 
 			const headCells = element.shadowRoot!.querySelectorAll('uui-table-head-cell:has(button)');
-			expect(headCells.length).to.equal(3);
+			expect(headCells).to.have.lengthOf(3);
 			headCells.forEach((cell) => {
 				const cellRect = cell.getBoundingClientRect();
 				const labelRect = cell.querySelector('button > span')!.getBoundingClientRect();
