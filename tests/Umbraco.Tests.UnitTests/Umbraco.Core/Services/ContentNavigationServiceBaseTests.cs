@@ -923,6 +923,77 @@ public class ContentNavigationServiceBaseTests
     }
 
     [Test]
+    public void Cannot_Get_Ancestors_Or_Self_From_Non_Existing_Content_Key()
+    {
+        // Act
+        var result = _navigationService.TryGetAncestorsOrSelfKeys(Guid.NewGuid(), out IEnumerable<Guid> ancestorsOrSelfKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result);
+            Assert.IsEmpty(ancestorsOrSelfKeys);
+        });
+    }
+
+    [Test]
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", new string[0])] // Root
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", new[] { "E48DD82A-7059-418E-9B82-CDD5205796CF" })] // Child 1
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", new[] { "D63C1621-C74A-4106-8587-817DEE5FB732", "60E0E5C4-084E-4144-A560-7393BEAD2E96", "E48DD82A-7059-418E-9B82-CDD5205796CF" })] // Great-grandchild 1
+    public void Can_Get_Ancestors_Or_Self_From_Existing_Content_Key_With_The_Content_Key_First(Guid childKey, string[] ancestors)
+    {
+        // Arrange
+        Guid[] expectedAncestorsOrSelf = [childKey, .. Array.ConvertAll(ancestors, Guid.Parse)];
+
+        // Act
+        var result = _navigationService.TryGetAncestorsOrSelfKeys(childKey, out IEnumerable<Guid> ancestorsOrSelfKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.That(ancestorsOrSelfKeys, Is.EqualTo(expectedAncestorsOrSelf));
+        });
+    }
+
+    [Test]
+    [TestCase(1)]
+    [TestCase(4)]
+    [TestCase(16)] // as many ancestors as the stack buffer used to collect the keys holds, minus the leaf itself
+    [TestCase(17)] // exactly fills the buffer with ancestors; with the content itself, one over
+    [TestCase(18)]
+    [TestCase(40)]
+    public void Can_Get_Ancestors_And_Ancestors_Or_Self_In_Bottom_Up_Order_At_Any_Depth(int depth)
+    {
+        // Arrange
+        var navigationService = new TestContentNavigationService(
+            CreateScopeProvider(),
+            _navigationRepository.Object,
+            Mock.Of<IContentTypeService>());
+        Guid[] chain = Enumerable.Range(0, depth).Select(_ => Guid.NewGuid()).ToArray();
+        for (var i = 0; i < depth; i++)
+        {
+            navigationService.Add(chain[i], ContentType, i == 0 ? null : chain[i - 1]);
+        }
+
+        Guid leaf = chain[^1];
+        Guid[] expectedAncestors = chain[..^1].Reverse().ToArray();
+
+        // Act
+        var ancestorsResult = navigationService.TryGetAncestorsKeys(leaf, out IEnumerable<Guid> ancestorsKeys);
+        var ancestorsOrSelfResult = navigationService.TryGetAncestorsOrSelfKeys(leaf, out IEnumerable<Guid> ancestorsOrSelfKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(ancestorsResult);
+            Assert.IsTrue(ancestorsOrSelfResult);
+            Assert.That(ancestorsKeys, Is.EqualTo(expectedAncestors));
+            Assert.That(ancestorsOrSelfKeys, Is.EqualTo(new[] { leaf }.Concat(expectedAncestors)));
+        });
+    }
+
+    [Test]
     public void Cannot_Get_Ancestors_Of_Type_From_Non_Existing_Content_Type_Alias()
     {
         // Arrange
