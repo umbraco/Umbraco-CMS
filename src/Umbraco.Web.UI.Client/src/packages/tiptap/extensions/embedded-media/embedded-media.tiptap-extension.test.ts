@@ -28,6 +28,17 @@ describe('embedded-media.tiptap-extension', () => {
 		expect(editor.getHTML()).to.equal(markup);
 	});
 
+	it('parses legacy embeds that only carry the "embeditem" class, preserving the embedded markup', () => {
+		editor.commands.setContent(
+			'<div class="mceNonEditable embeditem" data-embed-url="https://example.com/embed" data-embed-height="240" data-embed-width="360" data-embed-constrain="true"><iframe src="https://example.com/embed"></iframe></div>',
+		);
+
+		const html = editor.getHTML();
+		expect(html).to.include('umb-embed-holder');
+		expect(html).to.include('data-embed-url="https://example.com/embed"');
+		expect(html).to.include('<iframe');
+	});
+
 	it('does not render the literal text "null" when the markup attribute is unset', () => {
 		editor.commands.insertContent({ type: 'umbEmbeddedMedia', attrs: { 'data-embed-url': 'https://example.com' } });
 
