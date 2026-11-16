@@ -300,7 +300,7 @@ internal class DocumentRepository
     }
 
     /// <inheritdoc />
-    protected override IContent BuildEntity(ContentRow<DocumentDto, DocumentVersionDto> row, IContentType? contentType) =>
+    protected override IContent BuildEntity(ContentRow<DocumentDto, DocumentVersionDto> row, IContentType contentType) =>
         ContentBaseFactory.BuildEntity(row.Entity, row.Node, row.ContentVersion, row.PublishedContentVersion, contentType);
 
     /// <inheritdoc />

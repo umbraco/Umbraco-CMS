@@ -110,10 +110,11 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     /// </summary>
     /// <param name="row">The materialized row: the node, entity, content and version rows, plus the published version when one exists.</param>
     /// <param name="contentType">
-    ///     The content type for the entity, or <see langword="null" /> if the content type could not be resolved.
+    ///     The content type for the entity. The read fails before this is called when a row's content type cannot
+    ///     be resolved.
     /// </param>
     /// <returns>The constructed domain entity.</returns>
-    protected abstract TEntity BuildEntity(ContentRow<TEntityDto, TContentVersionDto> row, IContentType? contentType);
+    protected abstract TEntity BuildEntity(ContentRow<TEntityDto, TContentVersionDto> row, IContentType contentType);
 
     /// <summary>
     ///     Builds the entity row (<typeparamref name="TEntityDto" />) inserted for a new domain entity, once its node id
@@ -1979,10 +1980,16 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
 
         // Pre-populate content type map. ContentTypeRepository caches, so no extra DB round-trips
         // after the first call per type — and we need the types up front to gate variation queries.
-        var contentTypeMap = new Dictionary<int, IContentType?>();
+        var contentTypeMap = new Dictionary<int, IContentType>();
         foreach (int contentTypeId in rows.Select(row => row.Content.ContentTypeId).Distinct())
         {
-            contentTypeMap[contentTypeId] = await ContentTypeRepository.GetAsync(contentTypeId, cancellationToken);
+            IContentType? contentType = await ContentTypeRepository.GetAsync(contentTypeId, cancellationToken);
+            if (contentType is null)
+            {
+                throw new InvalidOperationException($"Content type {contentTypeId} was not found.");
+            }
+
+            contentTypeMap[contentTypeId] = contentType;
         }
 
         (Dictionary<int, IReadOnlyList<ContentVersionCultureVariationDto>> contentVersionCultureVariationsByVersionId,
@@ -1994,7 +2001,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
 
         foreach (ContentRow<TEntityDto, TContentVersionDto> row in rows)
         {
-            contentTypeMap.TryGetValue(row.Content.ContentTypeId, out IContentType? contentType);
+            IContentType contentType = contentTypeMap[row.Content.ContentTypeId];
 
             TEntity entity = BuildEntity(row, contentType);
 
@@ -2034,7 +2041,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             }
             else
             {
-                IPropertyType[] compositionProperties = contentType?.CompositionPropertyTypes.ToArray() ?? [];
+                IPropertyType[] compositionProperties = contentType.CompositionPropertyTypes.ToArray();
                 entity.Properties = new PropertyCollection(
                     await PropertyFactory.BuildEntities(
                         compositionProperties,
@@ -2102,12 +2109,12 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             UmbracoDbContext db,
             List<int> versionIds,
             int[] nodeIds,
-            Dictionary<int, IContentType?> contentTypeMap,
+            Dictionary<int, IContentType> contentTypeMap,
             CancellationToken cancellationToken)
     {
         // Skip variation queries entirely when no loaded content type varies by culture —
         // the common case for sites with only invariant content types.
-        if (!contentTypeMap.Values.Any(contentType => contentType?.VariesByCulture() ?? false))
+        if (!contentTypeMap.Values.Any(contentType => contentType.VariesByCulture()))
         {
             return (new(), new(), new());
         }

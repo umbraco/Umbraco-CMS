@@ -112,7 +112,7 @@ internal sealed class AsyncElementRepository
     }
 
     /// <inheritdoc />
-    protected override IElement BuildEntity(ContentRow<ElementDto, ElementVersionDto> row, IContentType? contentType) =>
+    protected override IElement BuildEntity(ContentRow<ElementDto, ElementVersionDto> row, IContentType contentType) =>
         ContentBaseFactory.BuildEntity(row.Entity, row.Node, row.ContentVersion, row.PublishedContentVersion, contentType);
 
     /// <inheritdoc />
