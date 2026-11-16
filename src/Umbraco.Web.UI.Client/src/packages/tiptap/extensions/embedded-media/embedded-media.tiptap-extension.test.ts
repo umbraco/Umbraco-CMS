@@ -39,6 +39,17 @@ describe('embedded-media.tiptap-extension', () => {
 		expect(html).to.include('<iframe');
 	});
 
+	it('parses legacy embeds without any "data-embed-*" attributes, keeping the embedded markup', () => {
+		editor.commands.setContent(
+			'<div class="mceNonEditable embeditem"><iframe src="https://example.com/embed"></iframe></div>',
+		);
+
+		const html = editor.getHTML();
+		expect(html).to.include('umb-embed-holder');
+		expect(html).to.include('<iframe');
+		expect(html).to.not.include('null');
+	});
+
 	it('does not render the literal text "null" when the markup attribute is unset', () => {
 		editor.commands.insertContent({ type: 'umbEmbeddedMedia', attrs: { 'data-embed-url': 'https://example.com' } });
 
