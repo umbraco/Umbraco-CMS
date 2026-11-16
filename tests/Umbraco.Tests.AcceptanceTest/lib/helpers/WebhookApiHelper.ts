@@ -160,7 +160,6 @@ export class WebhookApiHelper {
     return null;
   }
 
-  // A webhook is sent to the receiver that generated its token.
   private async getWebhookUrl(token: string) {
     return (WebhookReceiver.hasToken(token) ? await WebhookReceiver.start() : this.webhookSiteUrl) + token;
   }

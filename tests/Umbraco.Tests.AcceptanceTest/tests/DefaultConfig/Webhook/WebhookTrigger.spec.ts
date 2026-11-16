@@ -215,7 +215,7 @@ test('cannot trigger when the webhook is disabled', async ({umbracoApi, umbracoU
   await umbracoUi.content.isSuccessNotificationVisible();
 
   // Assert
-  const receivedRequests = await umbracoApi.webhook.getReceivedRequests(receiverToken, undefined, 7000);
+  const receivedRequests = await umbracoApi.webhook.getReceivedRequests(receiverToken, undefined, ConstantHelper.timeout.veryLong);
   expect(receivedRequests).toBeFalsy();
 });
 
