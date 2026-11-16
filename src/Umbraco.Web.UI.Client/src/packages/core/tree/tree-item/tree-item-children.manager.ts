@@ -97,6 +97,12 @@ export class UmbTreeItemChildrenManager<
 		this.targetPagination.setTakeSize(size);
 	}
 
+	/**
+	 * Sets a window of items to load around the target. While a window is set, children are only loaded around a
+	 * target, so without one no children are loaded.
+	 * @param {number | undefined} before - The number of items to load before the target
+	 * @param {number | undefined} after - The number of items to load after the target
+	 */
 	public setTargetTakeSize(before: number | undefined, after: number | undefined): void {
 		this.#takeBeforeTarget = before;
 		this.#takeAfterTarget = after;
@@ -276,20 +282,28 @@ export class UmbTreeItemChildrenManager<
 		const repository = this.#treeContext?.getRepository();
 		if (!repository) throw new Error('Could not request children, repository is missing');
 
+		const baseTarget = this.targetPagination.getBaseTarget();
+		const hasCustomTargetWindow = this.#takeBeforeTarget !== undefined || this.#takeAfterTarget !== undefined;
+
+		if (hasCustomTargetWindow && !baseTarget?.unique) {
+			this.clear();
+			return;
+		}
+
 		this.#isLoading.setValue(true);
 
 		const parent = this.#getParent();
 		const foldersOnly = this.getFoldersOnly();
 		const additionalArgs = this.getAdditionalRequestArgs();
-		const baseTarget = this.targetPagination.getBaseTarget();
 
 		// When reloading we only want to send the target values with the request if we can find the target to reload from.
-		const canSendTarget = reload === false || (reload && this.targetPagination.hasBaseTargetInCurrentItems());
+		// A custom target window does not depend on the loaded items, so it can always be sent.
+		const hasBaseTargetInCurrentItems = this.targetPagination.hasBaseTargetInCurrentItems();
+		const canSendTarget = reload === false || hasCustomTargetWindow || hasBaseTargetInCurrentItems;
 
 		// If all known items fit within a single page, skip target pagination and load from
 		// the start instead, this prevents "show more" appearing on small lists after operations
 		// that change item order like sort children.
-		const hasCustomTargetWindow = this.#takeBeforeTarget !== undefined || this.#takeAfterTarget !== undefined;
 		const totalKnownItems = this.offsetPagination.getTotalItems();
 		const fitsInSinglePage =
 			!hasCustomTargetWindow && reload && totalKnownItems > 0 && totalKnownItems <= this.offsetPagination.getPageSize();
@@ -305,16 +319,18 @@ export class UmbTreeItemChildrenManager<
 						 Currently we use 5, but this could be anything that feels "right".
 						 When reloading from target when want to retrieve the same number of items that a currently loaded
 						*/
-						takeBefore: reload
-							? this.targetPagination.getNumberOfCurrentItemsBeforeBaseTarget()
-							: this.#takeBeforeTarget !== undefined
-								? this.#takeBeforeTarget
-								: this.targetPagination.getTakeSize(),
-						takeAfter: reload
-							? this.targetPagination.getNumberOfCurrentItemsAfterBaseTarget()
-							: this.#takeAfterTarget !== undefined
-								? this.#takeAfterTarget
-								: this.targetPagination.getTakeSize(),
+						takeBefore:
+							reload && hasBaseTargetInCurrentItems
+								? this.targetPagination.getNumberOfCurrentItemsBeforeBaseTarget()
+								: this.#takeBeforeTarget !== undefined
+									? this.#takeBeforeTarget
+									: this.targetPagination.getTakeSize(),
+						takeAfter:
+							reload && hasBaseTargetInCurrentItems
+								? this.targetPagination.getNumberOfCurrentItemsAfterBaseTarget()
+								: this.#takeAfterTarget !== undefined
+									? this.#takeAfterTarget
+									: this.targetPagination.getTakeSize(),
 					}
 				: undefined;
 

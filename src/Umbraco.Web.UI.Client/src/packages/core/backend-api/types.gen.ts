@@ -655,6 +655,7 @@ export type DataTypeTreeItemResponseModel = {
     isDeletable: boolean;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;
@@ -723,6 +724,7 @@ export type DocumentBlueprintTreeItemResponseModel = {
     variants: Array<DocumentVariantItemResponseModel>;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;
@@ -919,6 +921,7 @@ export type DocumentTypeTreeItemResponseModel = {
     icon: string;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;
@@ -1086,6 +1089,7 @@ export type ElementTreeItemResponseModel = {
     variants: Array<ElementVariantItemResponseModel>;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;
@@ -1727,6 +1731,7 @@ export type MediaTypeTreeItemResponseModel = {
     isDeletable: boolean;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;
@@ -1902,6 +1907,7 @@ export type MemberTypeTreeItemResponseModel = {
     icon: string;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;

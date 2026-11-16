@@ -753,12 +753,15 @@ declare global {
 		create_newStyleSheetFile: string;
 		create_noDocumentTypes: string;
 		create_noDocumentTypesAllowedAtRoot: string;
+		create_noDocumentTypesAllowedAtRootWithNoSettingsAccess: string;
 		create_noDocumentTypesAtRoot: string;
 		create_noDocumentTypesCreateNew: string;
 		create_noDocumentTypesEditPermissions: string;
 		create_noDocumentTypesWithNoSettingsAccess: string;
 		create_noElementTypes: string;
 		create_noMediaTypes: string;
+		create_noMediaTypesAllowedAtRoot: string;
+		create_noMediaTypesAllowedAtRootWithNoSettingsAccess: string;
 		create_noMediaTypesEditPermissions: string;
 		create_noMediaTypesWithNoSettingsAccess: string;
 		create_updateData: string;

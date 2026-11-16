@@ -49,7 +49,7 @@ export const richTextValue = (
 				: {},
 			contentData: instances.map(toContentData),
 			settingsData: [],
-			expose: instances.flatMap(toExposeEntries),
+			expose: instances.flatMap((block) => toExposeEntries(block)),
 		},
 	});
 };
@@ -136,7 +136,7 @@ const flatten = (block: UmbMbcsBlockInstance): Array<UmbMbcsBlockInstance> => [
 
 /**
  * The Block Grid itself is invariant; text inside the blocks varies through the element types (block-level variation),
- * so every block is exposed in each culture.
+ * so every block is exposed in each culture, unless a block grid limits it with `exposedCultures`.
  */
 const toContentData = (block: UmbMbcsBlockInstance) => ({
 	contentTypeKey: block.elementTypeId,
@@ -163,17 +163,21 @@ const toContentData = (block: UmbMbcsBlockInstance) => ({
 	),
 });
 
-const toExposeEntries = (block: UmbMbcsBlockInstance) =>
-	CULTURES.map((culture) => ({ contentKey: block.key, culture, segment: null }));
+const toExposeEntries = (block: UmbMbcsBlockInstance, cultures: ReadonlyArray<string> = CULTURES) =>
+	cultures.map((culture) => ({ contentKey: block.key, culture, segment: null }));
 
-export const blockGridValue = (alias: string, blocks: Array<UmbMbcsBlock>): Array<UmbMbcsValue> => {
+export const blockGridValue = (
+	alias: string,
+	blocks: Array<UmbMbcsBlock>,
+	exposedCultures?: ReadonlyArray<string>,
+): Array<UmbMbcsValue> => {
 	const instances = blocks.map(withKeys);
 	const all = instances.flatMap(flatten);
 
 	return invariant('Umbraco.BlockGrid', alias, {
 		contentData: all.map(toContentData),
 		settingsData: [],
-		expose: all.flatMap(toExposeEntries),
+		expose: all.flatMap((block) => toExposeEntries(block, exposedCultures)),
 		layout: { 'Umbraco.BlockGrid': instances.map(toLayoutItem) },
 	});
 };
@@ -184,7 +188,7 @@ const toBlockListValue = (blocks: Array<UmbMbcsBlock>) => {
 	return {
 		contentData: instances.map(toContentData),
 		settingsData: [],
-		expose: instances.flatMap(toExposeEntries),
+		expose: instances.flatMap((block) => toExposeEntries(block)),
 		layout: {
 			'Umbraco.BlockList': instances.map((block) => ({
 				contentUdi: mbcsElementUdi(block.key),

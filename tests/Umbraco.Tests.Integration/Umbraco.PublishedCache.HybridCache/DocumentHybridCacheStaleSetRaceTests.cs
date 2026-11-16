@@ -96,7 +96,8 @@ internal sealed class DocumentHybridCacheStaleSetRaceTests : UmbracoIntegrationT
             publishStatus.Object,
             new NullLogger<DocumentCacheService>(),
             new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()),
-            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())));
+            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())),
+            Mock.Of<IContentCacheDataSerializerFactory>());
     }
 
     [Test]

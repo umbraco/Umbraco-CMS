@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.HybridCache;
 
@@ -21,6 +22,7 @@ public class CacheRefreshingNotificationHandlerTests
     private Mock<IMediaCacheService> _mediaCacheService = null!;
     private Mock<IElementCacheService> _elementCacheService = null!;
     private Mock<IPublishedContentTypeCache> _publishedContentTypeCache = null!;
+    private Mock<IContentCacheDataSerializerFactory> _serializerFactory = null!;
     private CacheRefreshingNotificationHandler _handler = null!;
 
     [SetUp]
@@ -30,6 +32,7 @@ public class CacheRefreshingNotificationHandlerTests
         _mediaCacheService = new Mock<IMediaCacheService>(MockBehavior.Strict);
         _elementCacheService = new Mock<IElementCacheService>(MockBehavior.Strict);
         _publishedContentTypeCache = new Mock<IPublishedContentTypeCache>();
+        _serializerFactory = new Mock<IContentCacheDataSerializerFactory>();
 
         _handler = CreateHandler(ContentTypeRebuildMode.Immediate);
     }
@@ -40,8 +43,67 @@ public class CacheRefreshingNotificationHandlerTests
             _mediaCacheService.Object,
             _elementCacheService.Object,
             _publishedContentTypeCache.Object,
+            _serializerFactory.Object,
             Options.Create(new CacheSettings { ContentTypeRebuildMode = mode }),
             NullLogger<CacheRefreshingNotificationHandler>.Instance);
+
+    /// <summary>
+    ///     Verifies that the serializer factory's type cache is cleared before the rebuild that depends on it runs.
+    /// </summary>
+    [Test]
+    public async Task Type_Cache_Is_Cleared_Before_The_Rebuild_That_Depends_On_It()
+    {
+        var calls = new List<string>();
+        _serializerFactory.Setup(x => x.ClearTypeCache()).Callback(() => calls.Add("clear"));
+        _documentCacheService
+            .Setup(x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()))
+            .Callback(() => calls.Add("rebuild"));
+        _mediaCacheService
+            .Setup(x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()))
+            .Callback(() => calls.Add("rebuild"));
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        await _handler.HandleAsync(
+            new ContentTypeRefreshedNotification(
+                new ContentTypeChange<IContentType>(CreateContentType(100), ContentTypeChangeTypes.RefreshMain),
+                new EventMessages()),
+            CancellationToken.None);
+        await _handler.HandleAsync(
+            new MediaTypeRefreshedNotification(
+                new ContentTypeChange<IMediaType>(CreateMediaType(200), ContentTypeChangeTypes.RefreshMain),
+                new EventMessages()),
+            CancellationToken.None);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        Assert.AreEqual(new[] { "clear", "rebuild", "clear", "rebuild" }, calls);
+    }
+
+    /// <summary>
+    ///     Verifies that every content type and media type change or deletion clears the serializer factory's type cache.
+    /// </summary>
+    [Test]
+    public async Task Type_Changes_And_Deletions_Clear_The_Serializer_Type_Cache()
+    {
+        _documentCacheService.Setup(x => x.ClearConvertedContentCache(It.IsAny<IReadOnlyCollection<int>>()));
+        _mediaCacheService.Setup(x => x.ClearConvertedContentCache(It.IsAny<IReadOnlyCollection<int>>()));
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        await _handler.HandleAsync(
+            new ContentTypeRefreshedNotification(
+                new ContentTypeChange<IContentType>(CreateContentType(100), ContentTypeChangeTypes.RefreshOther),
+                new EventMessages()),
+            CancellationToken.None);
+        await _handler.HandleAsync(
+            new MediaTypeRefreshedNotification(
+                new ContentTypeChange<IMediaType>(CreateMediaType(200), ContentTypeChangeTypes.RefreshOther),
+                new EventMessages()),
+            CancellationToken.None);
+#pragma warning restore CS0618 // Type or member is obsolete
+        await _handler.HandleAsync(new ContentTypeDeletedNotification(CreateContentType(100), new EventMessages()), CancellationToken.None);
+        await _handler.HandleAsync(new MediaTypeDeletedNotification(CreateMediaType(200), new EventMessages()), CancellationToken.None);
+
+        _serializerFactory.Verify(x => x.ClearTypeCache(), Times.Exactly(4));
+    }
 
     /// <summary>
     ///     Verifies that a structural content type change in immediate mode triggers a synchronous database cache rebuild.

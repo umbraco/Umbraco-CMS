@@ -1,4 +1,4 @@
-using System.Runtime.ConstrainedExecution;
+using System.Globalization;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using NPoco;
@@ -181,10 +181,20 @@ public abstract class MigrationExpressionBase : IMigrationExpression
             return "NULL";
         }
 
-        // Format Guids via the syntax provider to ensure consistent storage (e.g. Guids need to be uppercase for SQLite).
-        if (val is Guid guid)
+        // Format Guids and date/time types via the syntax provider to ensure consistent storage
+        // (e.g. Guids need to be uppercase for SQLite) and literals the database reads unambiguously.
+        switch (val)
         {
-            return SqlSyntax.GetQuotedValue(SqlSyntax.FormatGuid(guid));
+            case Guid guid:
+                return SqlSyntax.GetQuotedValue(SqlSyntax.FormatGuid(guid));
+            case DateTime dateTime:
+                return SqlSyntax.GetQuotedValue(SqlSyntax.FormatDateTime(dateTime));
+            case DateTimeOffset dateTimeOffset:
+                return SqlSyntax.GetQuotedValue(SqlSyntax.FormatDateTimeOffset(dateTimeOffset));
+            case DateOnly date:
+                return SqlSyntax.GetQuotedValue(SqlSyntax.FormatDateOnly(date));
+            case TimeOnly time:
+                return SqlSyntax.GetQuotedValue(SqlSyntax.FormatTimeOnly(time));
         }
 
         Type type = val.GetType();
@@ -204,11 +214,9 @@ public abstract class MigrationExpressionBase : IMigrationExpression
             case TypeCode.UInt16:
             case TypeCode.UInt32:
             case TypeCode.UInt64:
-                return val.ToString()!;
-            case TypeCode.DateTime:
-                return SqlSyntax.GetQuotedValue(SqlSyntax.FormatDateTime((DateTime)val));
+                return Convert.ToString(val, CultureInfo.InvariantCulture)!;
             default:
-                return SqlSyntax.GetQuotedValue(val.ToString()!);
+                return SqlSyntax.GetQuotedValue(Convert.ToString(val, CultureInfo.InvariantCulture)!);
         }
     }
 }

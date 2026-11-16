@@ -28,6 +28,7 @@ using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Permissions;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -478,6 +479,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // add validation services
             Services.AddUnique<IElementSwitchValidator, ElementSwitchValidator>();
+
+            // Environment permissions
+            Services.AddUnique<IEnvironmentPermissions, EnvironmentPermissions>();
 
             // Routing
             Services.AddUnique<DocumentUrlService, DocumentUrlService>();

@@ -29,6 +29,9 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 	@state()
 	private _isElementType = false;
 
+	@state()
+	private _isReadOnly = false;
+
 	constructor() {
 		super();
 
@@ -78,6 +81,12 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 			(isElement) => (this._isElementType = isElement ?? false),
 			'_isElementTypeObserver',
 		);
+
+		this.observe(
+			this.#workspaceContext.readOnlyGuard.permitted,
+			(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+			'_isReadOnlyObserver',
+		);
 	}
 
 	override render() {
@@ -94,6 +103,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 									label=${this.localize.term('contentTypeEditor_allowAtRootHeading')}
 									?checked=${this._allowedAtRoot}
 									?disabled=${this._isElementType}
+									?readonly=${this._isReadOnly}
 									@change=${(e: CustomEvent) => {
 										this.#workspaceContext?.setAllowedAtRoot((e.target as UUIToggleElement).checked);
 									}}></uui-toggle>
@@ -111,6 +121,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 								<uui-toggle
 									label=${this.localize.term('contentTypeEditor_allowInLibraryHeading')}
 									?checked=${this._allowedInLibrary}
+									?readonly=${this._isReadOnly}
 									@change=${(e: CustomEvent) => {
 										this.#workspaceContext?.setAllowedInLibrary((e.target as UUIToggleElement).checked);
 									}}></uui-toggle>
@@ -137,6 +148,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 								<umb-input-document-type
 									.documentTypesOnly=${true}
 									.selection=${this._allowedContentTypeUniques ?? []}
+									?readonly=${this._isReadOnly}
 									@change="${(e: CustomEvent & { target: UmbInputDocumentTypeElement }) => {
 										const sortedContentTypesList: Array<UmbContentTypeSortModel> = e.target.selection.map(
 											(id, index) => ({
@@ -164,6 +176,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 								<umb-input-content-type-collection-configuration
 									default-value="c0808dd3-8133-4e4b-8ce8-e2bea84a96a4"
 									.value=${this._collection ?? undefined}
+									?readonly=${this._isReadOnly}
 									@change=${(e: CustomEvent) => {
 										const unique = (e.target as UmbInputContentTypeCollectionConfigurationElement).value as string;
 										this.#workspaceContext?.setCollection({ unique });

@@ -506,6 +506,8 @@ export default {
 		noDocumentTypesCreateNew: 'Create a new Document Type',
 		noDocumentTypesAllowedAtRoot:
 			'There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Structure</strong>.',
+		noDocumentTypesAllowedAtRootWithNoSettingsAccess:
+			'There are no Document Types allowed for creating content at the root.',
 		noMediaTypes:
 			'There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Structure</strong>.',
 		noMediaTypesWithNoSettingsAccess:
@@ -513,6 +515,9 @@ export default {
 		noMediaTypesEditPermissions: 'Edit permissions for this Media Type',
 		noElementTypes:
 			'There are no allowed Element Types available for creating elements here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allow in Library</strong> under <strong>Structure</strong>.',
+		noMediaTypesAllowedAtRoot:
+			'There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow at root</strong> option under <strong>Structure</strong>.',
+		noMediaTypesAllowedAtRootWithNoSettingsAccess: 'There are no Media Types allowed for creating media at the root.',
 		documentTypeWithoutTemplate: 'Document Type without a template',
 		documentTypeWithTemplate: 'Document Type with Template',
 		documentTypeWithTemplateDescription:

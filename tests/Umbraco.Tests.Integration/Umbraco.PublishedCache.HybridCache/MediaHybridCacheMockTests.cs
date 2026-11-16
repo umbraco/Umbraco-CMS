@@ -94,7 +94,8 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
             GetRequiredService<IPublishedModelFactory>(),
             new OptionsWrapper<CacheSettings>(new CacheSettings()),
             new NullLogger<MediaCacheService>(),
-            new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()));
+            new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()),
+            Mock.Of<IContentCacheDataSerializerFactory>());
     }
 
     [Test]

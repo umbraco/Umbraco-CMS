@@ -11,7 +11,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
@@ -268,6 +267,12 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
         $"upper({column}) LIKE upper(@{paramIndex})";
 
+    /// <inheritdoc />
+    public virtual string EscapeLikeValue(string value) => SqlLikeEscaping.EscapeValue(value);
+
+    /// <inheritdoc />
+    public virtual string GetLikeEscapeClause() => SqlLikeEscaping.EscapeClause;
+
     /// <summary>
     /// Generates a SQL expression that concatenates the specified arguments using the SQL CONCAT function.
     /// </summary>
@@ -305,11 +310,11 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual string GetQuotedName(string? name) => $"\"{name}\"";
 
     /// <summary>
-    /// Returns the specified string value enclosed in single quotes.
+    /// Returns the specified string value enclosed in single quotes, with any single quotes it contains escaped.
     /// </summary>
     /// <param name="value">The string value to quote.</param>
     /// <returns>The quoted string value.</returns>
-    public virtual string GetQuotedValue(string value) => $"'{value}'";
+    public virtual string GetQuotedValue(string value) => $"'{value.Replace("'", "''")}'";
 
     /// <inheritdoc />
     public virtual string GetNullCastSuffix<T>() => string.Empty;
@@ -562,6 +567,24 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     /// <inheritdoc />
     public virtual string FormatGuid(Guid guid) => guid.ToString();
+
+    /// <inheritdoc />
+    /// <remarks>
+    ///     ISO 8601 with a "T" separator is unambiguous for SQL Server date types, whatever the language
+    ///     or DATEFORMAT setting of the connection.
+    /// </remarks>
+    public virtual string FormatDateTimeOffset(DateTimeOffset dateTimeOffset)
+        => dateTimeOffset.ToString("yyyy-MM-ddTHH:mm:ss.fffffffzzz", CultureInfo.InvariantCulture);
+
+    /// <inheritdoc />
+    /// <remarks>
+    ///     YYYYMMDD is unambiguous for all SQL Server date types, whatever the language or DATEFORMAT
+    ///     setting of the connection.
+    /// </remarks>
+    public virtual string FormatDateOnly(DateOnly date) => date.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+
+    /// <inheritdoc />
+    public virtual string FormatTimeOnly(TimeOnly time) => time.ToString("HH:mm:ss.fffffff", CultureInfo.InvariantCulture);
 
     /// <summary>
     /// Formats a SQL create table statement for the specified table definition.
@@ -976,7 +999,8 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     /// Gets the SQL expression that converts an integer to a zero-padded, orderable string representation.
     /// This is typically used to ensure that integer values are sorted correctly as strings in SQL queries.
     /// </summary>
-    public virtual string ConvertIntegerToOrderableString => "REPLACE(STR({0}, 8), SPACE(1), '0')";
+    /// <remarks>Offsets the value into the non-negative range so every integer has the same number of digits.</remarks>
+    public virtual string ConvertIntegerToOrderableString => "RIGHT('0000000000' + CAST(CAST({0} AS BIGINT) + 2147483648 AS VARCHAR(10)), 10)";
 
     /// <summary>
     /// Gets the SQL expression that converts a date value to an ISO 8601 string (format 120),
@@ -989,7 +1013,11 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     /// Gets the SQL expression used to convert a decimal value into a string format that preserves numeric ordering when sorted lexicographically.
     /// This is typically used to ensure that decimal values are correctly ordered in string-based SQL operations.
     /// </summary>
-    public virtual string ConvertDecimalToOrderableString => "REPLACE(STR({0}, 20, 9), SPACE(1), '0')";
+    /// <remarks>
+    ///     Offsets the value into the non-negative range and formats it with a fixed number of digits on both sides of
+    ///     the decimal point, which covers the default decimal column definition.
+    /// </remarks>
+    public virtual string ConvertDecimalToOrderableString => "RIGHT('0000000000000000000000' + CAST(CAST({0} + 100000000000 AS DECIMAL(21,9)) AS VARCHAR(22)), 22)";
 
     /// <summary>
     /// Gets the SQL expression used to convert a uniqueidentifier value to its string representation (nvarchar(36)).

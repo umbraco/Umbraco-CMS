@@ -260,6 +260,9 @@ internal sealed class DocumentHybridCacheSynchronousPersistenceTests : UmbracoIn
         public Task<IEnumerable<ContentCacheNode>> GetElementSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
             => _inner.GetElementSourcesAsync(keys, preview);
 
+        public IEnumerable<ContentCacheNode> GetElementSources(IEnumerable<Guid> keys, bool preview = false)
+            => _inner.GetElementSources(keys, preview);
+
         public IEnumerable<Guid> GetElementKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false)
             => _inner.GetElementKeysByContentTypeKeys(keys, published);
 
