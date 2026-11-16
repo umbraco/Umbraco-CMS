@@ -21,10 +21,6 @@ using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Routing;
 
-/// <summary>
-/// Verifies that redirects registered when a page's URL changes are found by the content finder for requests to the
-/// old URL, i.e. that the route the redirect tracker stores is the one the finder looks up for the routed request.
-/// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Mock)]
 internal sealed class ContentFinderByRedirectUrlTests : UmbracoIntegrationTest
@@ -61,6 +57,10 @@ internal sealed class ContentFinderByRedirectUrlTests : UmbracoIntegrationTest
         };
     }
 
+    /// <summary>
+    /// Verifies that a redirect registered for a page below a culture-only (wildcard) domain is found for a request
+    /// to the old URL on the hostname domain above it, as the request is routed by the hostname domain.
+    /// </summary>
     [Test]
     public async Task TryFindContent_Redirects_Renamed_Page_Below_Culture_Only_Domain_Under_Hostname_Domain()
     {
@@ -73,6 +73,10 @@ internal sealed class ContentFinderByRedirectUrlTests : UmbracoIntegrationTest
         await AssertRedirectsAsync(new Uri("https://example.com/section/page"), page, "https://example.com/section/renamed-page/");
     }
 
+    /// <summary>
+    /// Verifies that a redirect registered for a page below a culture-only (wildcard) domain, with no hostname domain
+    /// above it, is found for a request to the old URL, which no domain matches.
+    /// </summary>
     [Test]
     public async Task TryFindContent_Redirects_Renamed_Page_Below_Culture_Only_Domain_Without_Hostname_Domain()
     {
