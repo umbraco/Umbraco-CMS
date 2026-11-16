@@ -88,6 +88,7 @@ public static class UmbracoBuilderExtensions
 #pragma warning disable CS0618 // Type or member is obsolete
         builder.AddNotificationHandler<ContentRefreshNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationHandler<MediaRefreshNotification, CacheRefreshingNotificationHandler>();
+        builder.AddNotificationHandler<ElementRefreshNotification, CacheRefreshingNotificationHandler>();
 #pragma warning restore CS0618 // Type or member is obsolete
         builder.AddNotificationAsyncHandler<ContentDeletedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<MediaDeletedNotification, CacheRefreshingNotificationHandler>();
@@ -95,7 +96,6 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<ContentTypeDeletedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<MediaTypeRefreshedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<MediaTypeDeletedNotification, CacheRefreshingNotificationHandler>();
-        builder.AddNotificationAsyncHandler<ElementRefreshNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<ElementDeletedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeChangedNotification, DeferredCacheRebuildNotificationHandler>();
         builder.AddNotificationHandler<MediaTypeChangedNotification, DeferredCacheRebuildNotificationHandler>();

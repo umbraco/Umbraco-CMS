@@ -143,9 +143,14 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetElementSourceForPublishStatesAsync(Guid key)
-    {
-        ContentSourceDto? dto = await GetElementSourceDto(key);
+        => ToElementPublishStateNodes(key, await GetElementSourceDto(key));
 
+    /// <inheritdoc/>
+    public (ContentCacheNode? Draft, ContentCacheNode? Published) GetElementSourceForPublishStates(Guid key)
+        => ToElementPublishStateNodes(key, Read(database => database.FirstOrDefault<ContentSourceDto>(GetElementSourceSql(key))));
+
+    private (ContentCacheNode? Draft, ContentCacheNode? Published) ToElementPublishStateNodes(Guid key, ContentSourceDto? dto)
+    {
         if (dto is null)
         {
             return (null, null);
@@ -230,8 +235,20 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc/>
+    public void RefreshElement(ContentCacheNode contentCacheNode)
+    {
+        IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Element);
+
+        OnRepositoryRefreshedSync(serializer, contentCacheNode, contentCacheNode.IsDraft);
+    }
+
+    /// <inheritdoc/>
     public Task RemovePublishedElementAsync(int id)
         => RemovePublishedAsync(id);
+
+    /// <inheritdoc/>
+    public void RemovePublishedElement(int id)
+        => Database.Execute(RemovePublishedSql(id));
 
     /// <inheritdoc/>
     public void Rebuild(
