@@ -176,6 +176,16 @@ internal interface IDatabaseCacheRepository
     Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetElementSourceForPublishStatesAsync(Guid key);
 
     /// <summary>
+    /// Gets the draft and published cache nodes of an element without leaving the calling thread.
+    /// </summary>
+    /// <remarks>See <see cref="GetDocumentSourceForPublishStates"/>.</remarks>
+    /// <param name="key">The key of the element.</param>
+    /// <returns>The draft and published cache nodes; either is <c>null</c> when that state does not exist.</returns>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    (ContentCacheNode? Draft, ContentCacheNode? Published) GetElementSourceForPublishStates(Guid key)
+        => GetElementSourceForPublishStatesAsync(key).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Gets a collection of cache nodes for a collection of element keys.
     /// </summary>
     /// <param name="keys">The element keys.</param>
@@ -203,9 +213,23 @@ internal interface IDatabaseCacheRepository
     Task RefreshElementAsync(ContentCacheNode contentCacheNode);
 
     /// <summary>
+    /// Refreshes an element's rows without leaving the calling thread.
+    /// </summary>
+    /// <param name="contentCacheNode">The cache node to write.</param>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void RefreshElement(ContentCacheNode contentCacheNode) => RefreshElementAsync(contentCacheNode).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Removes the cache of published content for the given element.
     /// </summary>
     Task RemovePublishedElementAsync(int id);
+
+    /// <summary>
+    /// Removes an element's published row without leaving the calling thread.
+    /// </summary>
+    /// <param name="id">The identifier of the element.</param>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void RemovePublishedElement(int id) => RemovePublishedElementAsync(id).GetAwaiter().GetResult();
 
     #endregion
 
