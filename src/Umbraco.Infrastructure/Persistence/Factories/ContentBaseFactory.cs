@@ -74,9 +74,9 @@ internal sealed class ContentBaseFactory
     ///     The content version row of the published version, or <c>null</c> if the element has never been published.
     /// </param>
     /// <param name="contentType">The element type; required, an element cannot exist without one.</param>
-    /// <returns>An <see cref="IElement" /> instance populated from the rows.</returns>
+    /// <returns>An <see cref="Element" /> instance populated from the rows.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="contentType" /> is <c>null</c>.</exception>
-    public static IElement BuildEntity(
+    public static Element BuildEntity(
         EFCoreDtos.ElementDto dto,
         EFCoreDtos.NodeDto node,
         EFCoreDtos.ContentVersionDto contentVersion,
@@ -85,7 +85,7 @@ internal sealed class ContentBaseFactory
     {
         ArgumentNullException.ThrowIfNull(contentType);
 
-        var entity = new Element(node.Text ?? throw new ArgumentException("The element did not have a name", nameof(node)), contentType);
+        var entity = new Element(contentVersion.Text ?? string.Empty, node.ParentId, contentType);
 
         try
         {
