@@ -2810,6 +2810,8 @@ export default {
 		addSettingsElementType: 'Add settings',
 		confirmDeleteBlockTitle: 'Delete %0%?',
 		confirmDeleteBlockMessage: 'Are you sure you want to delete this %0%?',
+		confirmDeleteVariantBlockMessage:
+			'This will delete this %0% in all languages. To remove it from this language only, use "Remove from this language" instead.',
 		removeFromLanguage: 'Remove from this language',
 		confirmUnexposeBlockTitle: 'Remove %0% from this language?',
 		confirmUnexposeBlockMessage:

@@ -827,7 +827,12 @@ export abstract class UmbBlockEntryContext<
 		const blockName = this.getName();
 		await umbConfirmModal(this, {
 			headline: this.localize.term('blockEditor_confirmDeleteBlockTitle', blockName),
-			content: this.localize.term('blockEditor_confirmDeleteBlockMessage', escapeHTML(blockName)),
+			content: this.localize.term(
+				this.#variesByVariant.getValue()
+					? 'blockEditor_confirmDeleteVariantBlockMessage'
+					: 'blockEditor_confirmDeleteBlockMessage',
+				escapeHTML(blockName),
+			),
 			confirmLabel: '#general_delete',
 			color: 'danger',
 		});
