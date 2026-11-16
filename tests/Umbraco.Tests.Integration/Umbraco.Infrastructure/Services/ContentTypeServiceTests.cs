@@ -9,11 +9,11 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -696,6 +696,99 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(bannerStillExists, Is.False);
         Assert.That(bannerPropertyStillExists, Is.False);
         Assert.That(homepage.CompositionPropertyTypes.Count(), Is.EqualTo(4));
+    }
+
+    [Test]
+    public async Task Removing_Composition_Deletes_Only_The_Composition_Property_Data_Of_The_Composing_Content()
+    {
+        var composition = ContentTypeBuilder.CreateBasicContentType("composition", "Composition");
+        composition.AddPropertyType(
+            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "compositionText")
+            {
+                Name = "Composition Text",
+                DataTypeId = Constants.DataTypes.Textbox,
+            },
+            "composition",
+            "Composition");
+        await ContentTypeService.CreateAsync(composition, Constants.Security.SuperUserKey);
+        var compositionPropertyTypeIds = composition.PropertyTypes.Select(x => x.Id).ToArray();
+
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var unrelatedType = ContentTypeBuilder.CreateSimpleContentType("unrelated", "Unrelated", randomizeAliases: true, defaultTemplateId: template.Id);
+        await ContentTypeService.CreateAsync(unrelatedType, Constants.Security.SuperUserKey);
+
+        // Create enough unrelated property data that rows exist whose primary key equals a composition property type id.
+        for (var i = 0; i < 20; i++)
+        {
+            var unrelatedContent = ContentBuilder.CreateBasicContent(unrelatedType);
+            unrelatedContent.Name = $"Unrelated {i}";
+            foreach (IPropertyType propertyType in unrelatedType.PropertyTypes)
+            {
+                unrelatedContent.SetValue(propertyType.Alias, $"Unrelated value {i}");
+            }
+
+            ContentService.Save(unrelatedContent);
+            ContentService.Publish(unrelatedContent, ["*"]);
+        }
+
+        var composingType = ContentTypeBuilder.CreateSimpleContentType("composing", "Composing", randomizeAliases: true, defaultTemplateId: template.Id);
+        composingType.AddContentType(composition);
+        await ContentTypeService.CreateAsync(composingType, Constants.Security.SuperUserKey);
+        var composingOwnPropertyTypeIds = composingType.PropertyTypes.Select(x => x.Id).ToArray();
+
+        var composingContentIds = new List<int>();
+        for (var i = 0; i < 3; i++)
+        {
+            var composingContent = ContentBuilder.CreateBasicContent(composingType);
+            composingContent.Name = $"Composing {i}";
+            composingContent.SetValue("compositionText", $"Composition value {i}");
+            foreach (IPropertyType propertyType in composingType.PropertyTypes)
+            {
+                composingContent.SetValue(propertyType.Alias, $"Own value {i}");
+            }
+
+            ContentService.Save(composingContent);
+            ContentService.Publish(composingContent, ["*"]);
+            composingContentIds.Add(composingContent.Id);
+        }
+
+        List<PropertyDataDto> before = FetchAllPropertyData();
+        Assert.Multiple(() =>
+        {
+            Assert.That(before.Count(x => compositionPropertyTypeIds.Contains(x.PropertyTypeId)), Is.GreaterThan(0));
+            Assert.That(before.Select(x => x.Id), Is.SupersetOf(compositionPropertyTypeIds));
+        });
+
+        composingType.RemoveContentType(composition.Alias);
+        var result = await ContentTypeService.UpdateAsync(composingType, Constants.Security.SuperUserKey);
+        Assert.That(result.Success, Is.True);
+
+        List<PropertyDataDto> after = FetchAllPropertyData();
+        var expectedRemaining = before
+            .Where(x => compositionPropertyTypeIds.Contains(x.PropertyTypeId) is false)
+            .Select(x => x.Id)
+            .ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(after.Where(x => compositionPropertyTypeIds.Contains(x.PropertyTypeId)), Is.Empty);
+            Assert.That(after.Select(x => x.Id), Is.EquivalentTo(expectedRemaining));
+            Assert.That(after.Count(x => composingOwnPropertyTypeIds.Contains(x.PropertyTypeId)), Is.GreaterThan(0));
+        });
+
+        foreach (var id in composingContentIds)
+        {
+            IContent content = ContentService.GetById(id)!;
+            Assert.That(content.Properties.Contains("compositionText"), Is.False);
+        }
+    }
+
+    private List<PropertyDataDto> FetchAllPropertyData()
+    {
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        return scope.Database.Fetch<PropertyDataDto>();
     }
 
     [Test]
