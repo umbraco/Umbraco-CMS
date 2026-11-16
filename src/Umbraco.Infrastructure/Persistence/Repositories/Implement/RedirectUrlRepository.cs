@@ -226,7 +226,9 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
     {
         var wcPlaceholder = SqlSyntax.GetWildcardPlaceholder();
         Sql<ISqlContext> sql = GetBaseQuery(false)
-            .WhereLike<RedirectUrlDto>(x => x.Url, wcPlaceholder + searchTerm.Trim() + wcPlaceholder)
+            .Where(
+                $"{SqlSyntax.GetFieldName<RedirectUrlDto>(x => x.Url)} LIKE @0 {SqlSyntax.GetLikeEscapeClause()}",
+                wcPlaceholder + SqlSyntax.EscapeLikeValue(searchTerm.Trim()) + wcPlaceholder)
             .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
         Page<RedirectUrlDto> result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
         total = Convert.ToInt32(result.TotalItems);
