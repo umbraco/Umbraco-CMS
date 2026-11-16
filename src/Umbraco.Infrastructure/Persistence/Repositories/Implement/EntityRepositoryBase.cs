@@ -144,6 +144,29 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     }
 
     /// <summary>
+    ///     Ensures the isolated cache is synced with the changes made by other servers.
+    /// </summary>
+    /// <remarks>
+    ///     The <see cref="CachePolicy" /> does this for the lookups that go through it. Call this before reading
+    ///     <see cref="IsolatedCache" /> directly.
+    /// </remarks>
+    protected void EnsureIsolatedCacheIsSynced()
+    {
+        if (AppCaches == AppCaches.NoCache || AmbientScope.RepositoryCacheMode == RepositoryCacheMode.None)
+        {
+            return;
+        }
+
+        // TODO (V20): call IsCacheSyncedAsync once locks and notification publishing are asynchronous.
+        if (RepositoryCacheVersionService.IsCacheSynced<TEntity>())
+        {
+            return;
+        }
+
+        CacheSyncService.SyncInternal(CancellationToken.None);
+    }
+
+    /// <summary>
     ///     Adds or Updates an entity of type TEntity
     /// </summary>
     /// <remarks>This method is backed by an <see cref="IAppPolicyCache" /> cache</remarks>

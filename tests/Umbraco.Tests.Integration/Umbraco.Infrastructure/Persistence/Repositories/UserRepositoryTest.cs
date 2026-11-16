@@ -275,6 +275,29 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Get_By_Int_Id_Does_Not_Check_Cache_Version_When_Scope_Does_Not_Cache()
+    {
+        ICoreScopeProvider provider = ScopeProvider;
+        using (provider.CreateCoreScope(repositoryCacheMode: RepositoryCacheMode.None, autoComplete: true))
+        {
+            var caches = new AppCaches(
+                new ObjectCacheAppCache(),
+                NoAppCache.Instance,
+                new IsolatedCaches(_ => new ObjectCacheAppCache()));
+            var versionService = new Mock<IRepositoryCacheVersionService>();
+            var syncService = new Mock<ICacheSyncService>();
+            var repository = CreateRepository(provider, caches, versionService.Object, syncService.Object);
+
+            var user = UserBuilderInstance.WithoutIdentity().Build();
+            repository.Save(user);
+
+            Assert.IsNotNull(repository.Get(user.Id));
+            versionService.Verify(x => x.IsCacheSynced<IUser>(), Times.Never);
+            syncService.Verify(x => x.SyncInternal(It.IsAny<CancellationToken>()), Times.Never);
+        }
+    }
+
+    [Test]
     public void Can_Perform_GetByQuery_On_UserRepository()
     {
         // Arrange

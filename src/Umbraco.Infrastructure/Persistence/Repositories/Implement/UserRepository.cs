@@ -1095,8 +1095,7 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
     /// </returns>
     public IUser? Get(int id)
     {
-        // This lookup bypasses the repository cache policy, so sync the cache with other servers ourselves.
-        EnsureCacheIsSynced();
+        EnsureIsolatedCacheIsSynced();
 
         string cacheKey = RepositoryCacheKeys.GetKey<IUser, int>(id);
         IUser? cachedUser = IsolatedCache.GetCacheItem<IUser>(cacheKey);
@@ -1123,17 +1122,6 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         IsolatedCache.Insert(cacheKey, () => user, RepositoryCacheConstants.DefaultCacheDuration, true);
 
         return user;
-    }
-
-    private void EnsureCacheIsSynced()
-    {
-        // TODO (V20): call IsCacheSyncedAsync once locks and notification publishing are asynchronous.
-        if (RepositoryCacheVersionService.IsCacheSynced<IUser>())
-        {
-            return;
-        }
-
-        CacheSyncService.SyncInternal(CancellationToken.None);
     }
 
     /// <summary>
