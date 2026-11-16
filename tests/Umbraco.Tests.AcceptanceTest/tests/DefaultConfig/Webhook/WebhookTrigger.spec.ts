@@ -3,7 +3,7 @@ import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/accepta
 
 // Webhook
 const webhookName = 'Test Webhook';
-let webhookSiteToken = '';
+let receiverToken = '';
 
 // Content
 const documentName = 'Test Webhook Content';
@@ -16,7 +16,7 @@ const mediaTypeName = 'Image';
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.webhook.ensureNameNotExists(webhookName);
-  webhookSiteToken = await umbracoApi.webhook.generateWebhookSiteToken();
+  receiverToken = await umbracoApi.webhook.generateReceiverToken();
   documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
 });
 
@@ -32,7 +32,7 @@ test('can trigger when content is published', async ({umbracoApi, umbracoUi}) =>
 
   // Arrange
   const event = 'Content Published';
-  await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken, event);
+  await umbracoApi.webhook.createDefaultWebhook(webhookName, receiverToken, event);
   const contentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.webhook.goToSection(ConstantHelper.sections.content);
@@ -42,8 +42,9 @@ test('can trigger when content is published', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, undefined, undefined, contentId);
-  expect(webhookSiteData[0].content).toContain(contentId);
+  const receivedRequests = await umbracoApi.webhook.getReceivedRequests(receiverToken, contentId);
+  expect(receivedRequests).toBeTruthy();
+  expect(receivedRequests[0].content).toContain(contentId);
 });
 
 test('can trigger when content is deleted', async ({umbracoApi, umbracoUi}) => {
@@ -51,7 +52,7 @@ test('can trigger when content is deleted', async ({umbracoApi, umbracoUi}) => {
 
   // Arrange
   const event = 'Content Deleted';
-  await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken, event);
+  await umbracoApi.webhook.createDefaultWebhook(webhookName, receiverToken, event);
   const contentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
   await umbracoApi.document.moveToRecycleBin(contentId);
   await umbracoUi.goToBackOffice();
@@ -62,8 +63,9 @@ test('can trigger when content is deleted', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied();
 
   // Assert
-  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, undefined, undefined, contentId);
-  expect(webhookSiteData[0].content).toContain(contentId);
+  const receivedRequests = await umbracoApi.webhook.getReceivedRequests(receiverToken, contentId);
+  expect(receivedRequests).toBeTruthy();
+  expect(receivedRequests[0].content).toContain(contentId);
 });
 
 test('can trigger when content is unpublished', async ({umbracoApi, umbracoUi}) => {
@@ -71,7 +73,7 @@ test('can trigger when content is unpublished', async ({umbracoApi, umbracoUi}) 
 
   // Arrange
   const event = 'Content Unpublished';
-  await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken, event);
+  await umbracoApi.webhook.createDefaultWebhook(webhookName, receiverToken, event);
   const contentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
   await umbracoApi.document.publish(contentId);
   await umbracoUi.goToBackOffice();
@@ -84,8 +86,9 @@ test('can trigger when content is unpublished', async ({umbracoApi, umbracoUi}) 
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
 
   // Assert
-  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, undefined, undefined, contentId);
-  expect(webhookSiteData[0].content).toContain(contentId);
+  const receivedRequests = await umbracoApi.webhook.getReceivedRequests(receiverToken, contentId);
+  expect(receivedRequests).toBeTruthy();
+  expect(receivedRequests[0].content).toContain(contentId);
 });
 
 test('can trigger when media is saved', async ({umbracoApi, umbracoUi}) => {
@@ -93,7 +96,7 @@ test('can trigger when media is saved', async ({umbracoApi, umbracoUi}) => {
 
   // Arrange
   const event = 'Media Saved';
-  await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken, event);
+  await umbracoApi.webhook.createDefaultWebhook(webhookName, receiverToken, event);
   const mediaId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.webhook.goToSection(ConstantHelper.sections.media);
@@ -103,8 +106,9 @@ test('can trigger when media is saved', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickSaveButtonAndWaitForMediaToBeUpdated();
 
   // Assert
-  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, undefined, undefined, mediaId);
-  expect(webhookSiteData[0].content).toContain(mediaId);
+  const receivedRequests = await umbracoApi.webhook.getReceivedRequests(receiverToken, mediaId);
+  expect(receivedRequests).toBeTruthy();
+  expect(receivedRequests[0].content).toContain(mediaId);
 });
 
 test('can trigger when media is deleted', async ({umbracoApi, umbracoUi}) => {
@@ -112,7 +116,7 @@ test('can trigger when media is deleted', async ({umbracoApi, umbracoUi}) => {
 
   // Arrange
   const event = 'Media Deleted';
-  await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken, event);
+  await umbracoApi.webhook.createDefaultWebhook(webhookName, receiverToken, event);
   const mediaId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
   await umbracoApi.media.trashMediaItem(mediaName);
   await umbracoUi.goToBackOffice();
@@ -123,8 +127,9 @@ test('can trigger when media is deleted', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.deleteMediaItemAndWaitForMediaToBeDeleted(mediaName);
 
   // Assert
-  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, undefined, undefined, mediaId);
-  expect(webhookSiteData[0].content).toContain(mediaId);
+  const receivedRequests = await umbracoApi.webhook.getReceivedRequests(receiverToken, mediaId);
+  expect(receivedRequests).toBeTruthy();
+  expect(receivedRequests[0].content).toContain(mediaId);
 });
 
 test('can trigger the webhook for a specific media type', async ({umbracoApi, umbracoUi}) => {
@@ -133,7 +138,7 @@ test('can trigger the webhook for a specific media type', async ({umbracoApi, um
   // Arrange
   const event = 'Media Deleted';
   const secondMediaName = 'Test Second Media';
-  await umbracoApi.webhook.createWebhookForSpecificContentType(webhookName, webhookSiteToken, event, mediaTypeName);
+  await umbracoApi.webhook.createWebhookForSpecificContentType(webhookName, receiverToken, event, mediaTypeName);
   const mediaId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
   const secondMediaId = await umbracoApi.media.createDefaultMediaWithArticle(secondMediaName);
   await umbracoApi.media.trashMediaItem(mediaName);
@@ -147,9 +152,10 @@ test('can trigger the webhook for a specific media type', async ({umbracoApi, um
   await umbracoUi.media.deleteMediaItem(secondMediaName);
 
   // Assert
-  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, undefined, undefined, mediaId);
-  expect(webhookSiteData[0].content).toContain(mediaId);
-  expect(webhookSiteData[0].content).not.toContain(secondMediaId);
+  const receivedRequests = await umbracoApi.webhook.getReceivedRequests(receiverToken, mediaId);
+  expect(receivedRequests).toBeTruthy();
+  expect(receivedRequests[0].content).toContain(mediaId);
+  expect(receivedRequests[0].content).not.toContain(secondMediaId);
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(secondMediaName);
@@ -164,7 +170,7 @@ test('can trigger the webhook for a specific content type', async ({umbracoApi, 
   const secondDocumentTypeName = 'SecondTestDocumentTypeForWebhook';
   const secondDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(secondDocumentTypeName);
   const secondContentId = await umbracoApi.document.createDefaultDocument(secondDocumentName, secondDocumentTypeId);
-  await umbracoApi.webhook.createWebhookForSpecificContentType(webhookName, webhookSiteToken, event, documentTypeName);
+  await umbracoApi.webhook.createWebhookForSpecificContentType(webhookName, receiverToken, event, documentTypeName);
   const contentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
 
   await umbracoUi.goToBackOffice();
@@ -181,9 +187,10 @@ test('can trigger the webhook for a specific content type', async ({umbracoApi, 
   await umbracoUi.content.isSuccessNotificationVisible();
 
   // Assert
-  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, undefined, undefined, contentId);
-  expect(webhookSiteData[0].content).toContain(contentId);
-  expect(webhookSiteData[0].content).not.toContain(secondContentId);
+  const receivedRequests = await umbracoApi.webhook.getReceivedRequests(receiverToken, contentId);
+  expect(receivedRequests).toBeTruthy();
+  expect(receivedRequests[0].content).toContain(contentId);
+  expect(receivedRequests[0].content).not.toContain(secondContentId);
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(secondDocumentTypeName);
@@ -195,7 +202,7 @@ test('cannot trigger when the webhook is disabled', async ({umbracoApi, umbracoU
 
   // Arrange
   const event = 'Content Published';
-  await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken, event, false);
+  await umbracoApi.webhook.createDefaultWebhook(webhookName, receiverToken, event, false);
   await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
 
   await umbracoUi.goToBackOffice();
@@ -208,8 +215,8 @@ test('cannot trigger when the webhook is disabled', async ({umbracoApi, umbracoU
   await umbracoUi.content.isSuccessNotificationVisible();
 
   // Assert
-  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, 7000);
-  expect(webhookSiteData).toBeFalsy();
+  const receivedRequests = await umbracoApi.webhook.getReceivedRequests(receiverToken, undefined, 7000);
+  expect(receivedRequests).toBeFalsy();
 });
 
 test('can custom header for the webhook request', async ({umbracoApi, umbracoUi}) => {
@@ -219,7 +226,7 @@ test('can custom header for the webhook request', async ({umbracoApi, umbracoUi}
   const event = 'Content Published';
   const headerName = 'test-header-name';
   const headerValue = 'automation-test';
-  await umbracoApi.webhook.createWebhookWithHeader(webhookName, webhookSiteToken, event, headerName, headerValue);
+  await umbracoApi.webhook.createWebhookWithHeader(webhookName, receiverToken, event, headerName, headerValue);
   const contentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
 
   await umbracoUi.goToBackOffice();
@@ -232,6 +239,7 @@ test('can custom header for the webhook request', async ({umbracoApi, umbracoUi}
   await umbracoUi.content.isSuccessNotificationVisible();
 
   // Assert
-  const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, undefined, undefined, contentId);
-  expect(webhookSiteData[0].headers[headerName]).toEqual([headerValue]);
+  const receivedRequests = await umbracoApi.webhook.getReceivedRequests(receiverToken, contentId);
+  expect(receivedRequests).toBeTruthy();
+  expect(receivedRequests[0].headers[headerName]).toEqual([headerValue]);
 });
