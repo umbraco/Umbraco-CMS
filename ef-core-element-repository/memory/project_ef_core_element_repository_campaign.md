@@ -104,3 +104,9 @@ Update 16-11-2026 (later): PR 4 (#24542) merged as `62e2911cc6e` into `v18/featu
 3 and 4 are in. Next are PR 5 (`ElementService` cut-over, notification hooks, NPoco `ElementRepository` deleted) and
 PR 4b (required content type on the generic read path); both cut from the integration branch at or after `62e2911cc6e`.
 The integration branch had no v19/dev merge-up between PR 4's cut and its merge, so no merge audit is pending.
+
+Update 16-11-2026 (PR 4b): implemented and opened as draft #24624 (`12857ebae14`, branch
+`v20/feature/ef-core-element-repository-4b-required-content-type`). Trap worth keeping: the test for a missing content
+type is written against the public repository surface with a Moq `IContentTypeRepository` returning null, injected
+through a new `CreateRepository` overload on `DocumentRepositoryTest`; the FK on `umbracoContent.contentTypeId` means an
+orphan row cannot be produced through the public surface, so the mock is the only red-first route. Next: PR 5.

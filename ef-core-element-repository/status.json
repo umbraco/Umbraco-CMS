@@ -269,10 +269,10 @@
       "id": "4b",
       "slug": "required-content-type",
       "title": "Required content type on the generic read path",
-      "status": "planned",
+      "status": "in-review",
       "branch": "v20/feature/ef-core-element-repository-4b-required-content-type",
-      "pr": "",
-      "prUrl": "",
+      "pr": "#24624",
+      "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24624",
       "dependsOn": [
         4
       ],
@@ -280,23 +280,23 @@
       "tasks": [
         {
           "text": "AssembleEntitiesAsync throws InvalidOperationException naming node key and content type id when the map has no entry",
-          "done": false
+          "done": true
         },
         {
           "text": "BuildEntity hook and both EF Core ContentBaseFactory overloads take non-nullable IContentType; ThrowIfNull dropped; DocumentRepository and AsyncElementRepository overrides updated",
-          "done": false
+          "done": true
         },
         {
           "text": "Test: unresolvable content type fails with node key and type id in the message, red first against the bare ArgumentNullException",
-          "done": false
+          "done": true
         },
         {
           "text": "Document and element fixtures at unchanged counts",
-          "done": false
+          "done": true
         }
       ],
       "acceptance": "Hook and EF Core factory overloads non-nullable; the new test green and red first; Document and element fixtures at unchanged counts.",
-      "notes": "Independent of PR 5; can merge before or after it. The NPoco overloads keep IContentType? until PR 5/PR 6 delete them."
+      "notes": "Independent of PR 5; can merge before or after it. The NPoco overloads keep IContentType? until PR 5/PR 6 delete them. Implemented 16-11-2026 on the branch: the base throws naming the content type id and the node keys referencing it; the new DocumentRepositoryTest case was red (bare ArgumentNullException) then green; DocumentRepositoryTest + AsyncElementRepositoryTest 223/223 on SQLite. Committed as 12857ebae14 and opened as draft PR #24624 on 16-11-2026; independent review had no must-fix findings."
     },
     {
       "id": 5,
@@ -394,6 +394,14 @@
     }
   ],
   "log": [
+    {
+      "date": "16-11-2026",
+      "text": "PR 4b opened as draft #24624 (12857ebae14). Review: no must-fix findings. Next: PR 5."
+    },
+    {
+      "date": "16-11-2026",
+      "text": "PR 4b implemented on v20/feature/ef-core-element-repository-4b-required-content-type: named InvalidOperationException in the base, non-nullable hook and EF Core factory overloads, red-then-green test. Document and element fixtures 223/223 on SQLite. Awaiting review and commit."
+    },
     {
       "date": "16-11-2026",
       "text": "PR 4 (#24542) merged as 62e2911cc6e. The integration branch now carries the EF Core AsyncElementRepository plus the two merge-up fixes. Next: PR 5 (ElementService cut-over) and PR 4b (required content type on the read path), both cut from the integration branch; no v19/dev merge-up since PR 4 was cut, so no merge audit is due."
