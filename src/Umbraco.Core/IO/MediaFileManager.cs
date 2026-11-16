@@ -29,31 +29,6 @@ public sealed class MediaFileManager
     /// <param name="logger">The logger.</param>
     /// <param name="shortStringHelper">The short string helper.</param>
     /// <param name="serviceProvider">The service provider.</param>
-    [Obsolete("Please use the constructor taking all arguments, scheduled for removal in Umbraco 19")]
-    public MediaFileManager(
-        IFileSystem fileSystem,
-        IMediaPathScheme mediaPathScheme,
-        ILogger<MediaFileManager> logger,
-        IShortStringHelper shortStringHelper,
-        IServiceProvider serviceProvider)
-        : this(
-            fileSystem,
-            mediaPathScheme,
-            logger,
-            shortStringHelper,
-            serviceProvider,
-            StaticServiceProvider.Instance.GetRequiredService<Lazy<ICoreScopeProvider>>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MediaFileManager"/> class.
-    /// </summary>
-    /// <param name="fileSystem">The file system for media storage.</param>
-    /// <param name="mediaPathScheme">The media path scheme.</param>
-    /// <param name="logger">The logger.</param>
-    /// <param name="shortStringHelper">The short string helper.</param>
-    /// <param name="serviceProvider">The service provider.</param>
     /// <param name="coreScopeProvider">The core scope provider.</param>
     public MediaFileManager(
         IFileSystem fileSystem,

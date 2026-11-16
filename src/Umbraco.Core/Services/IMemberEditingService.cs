@@ -63,14 +63,12 @@ public interface IMemberEditingService
     /// </summary>
     /// <param name="key">The unique key to check.</param>
     /// <returns>A task that represents the asynchronous operation. The task result is <c>true</c> if the key belongs to an external-only member; otherwise, <c>false</c>.</returns>
-    // TODO (V19): Remove the default implementation.
-    Task<bool> IsExternalMemberAsync(Guid key) => Task.FromResult(false);
+    Task<bool> IsExternalMemberAsync(Guid key);
 
     /// <summary>
     ///     Gets an external-only member by its unique key.
     /// </summary>
     /// <param name="key">The unique key of the external member.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the <see cref="ExternalMemberIdentity"/> if found; otherwise, <c>null</c>.</returns>
-    // TODO (V19): Remove the default implementation.
-    Task<ExternalMemberIdentity?> GetExternalMemberAsync(Guid key) => Task.FromResult<ExternalMemberIdentity?>(null);
+    Task<ExternalMemberIdentity?> GetExternalMemberAsync(Guid key);
 }

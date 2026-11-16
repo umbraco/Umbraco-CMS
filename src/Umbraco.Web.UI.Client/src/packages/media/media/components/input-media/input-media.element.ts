@@ -1,5 +1,7 @@
 import type { UmbMediaCardItemModel } from '../../types.js';
 import { UmbMediaPickerFolderFilter, UmbMediaPickerInputContext } from './input-media.context.js';
+import type { UmbMediaClipboardConfig } from '../../clipboard/types.js';
+import { UmbClipboardCopyRequestEvent, UmbClipboardPasteRequestEvent } from '@umbraco-cms/backoffice/clipboard';
 import {
 	css,
 	customElement,
@@ -12,7 +14,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { isAboveZeroAndBelowMinimum, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
@@ -60,13 +62,13 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	}
 
 	/**
-	 * Min validation message.
+	 * Min validation message. When not set, a localized message stating the minimum and how many more items are needed is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field needs more items';
+	minMessage?: string;
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -84,13 +86,13 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	}
 
 	/**
-	 * Max validation message.
+	 * Max validation message. When not set, a localized message stating the maximum and how many items are over it is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'max-message' })
-	maxMessage = 'This field exceeds the allowed amount of items';
+	maxMessage?: string;
 
 	public set selection(ids: Array<string>) {
 		this.#pickerInputContext.setSelection(ids);
@@ -111,6 +113,14 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
+
+	/**
+	 * The clipboard affordances to offer. Supplied by the hosting property editor, because it is the one that owns
+	 * the value on both sides — see the `clipboard-copy-request` and `clipboard-paste-request` events.
+	 * @type {UmbMediaClipboardConfig}
+	 */
+	@property({ type: Object, attribute: false })
+	clipboardConfig?: UmbMediaClipboardConfig;
 
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {
@@ -189,21 +199,26 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 		this.addValidator(
 			'rangeUnderflow',
-			() => this.minMessage,
-			() => !this.readonly && !!this.min && this.selection.length < this.min,
+			() =>
+				this.minMessage ||
+				this.localize.term('validation_entriesShort', this.min, (this.min ?? 0) - this.selection.length),
+			() => !this.readonly && isAboveZeroAndBelowMinimum(this.selection.length, this.min),
 		);
 		this.addValidator(
 			'rangeOverflow',
-			() => this.maxMessage,
+			() =>
+				this.maxMessage ||
+				this.localize.term('validation_entriesExceed', this.max, this.selection.length - (this.max ?? 0)),
 			() => !this.readonly && !!this.max && this.selection.length > this.max,
 		);
 	}
 
-	#openPicker() {
-		this.#pickerInputContext.openPicker(
+	async #openPicker() {
+		const modalValue = await this.#pickerInputContext.openPickerForValue(
 			{
 				multiple: this.max > 1,
 				startNode: this.startNode,
+				clipboard: this.clipboardConfig?.paste,
 			},
 			{
 				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({
@@ -213,6 +228,19 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				includeTrashed: this.includeTrashed,
 				folderFilter: this.folderFilter,
 			},
+		);
+
+		const clipboardSelection = modalValue?.clipboard?.selection;
+		if (clipboardSelection?.length) {
+			// Requested, not resolved: only the hosting property editor can turn entries into its value.
+			this.dispatchEvent(new UmbClipboardPasteRequestEvent(clipboardSelection));
+		}
+	}
+
+	// Requested, not written: only the hosting property editor can produce the value for the item.
+	#requestClipboardCopy(item: UmbMediaCardItemModel) {
+		this.dispatchEvent(
+			new UmbClipboardCopyRequestEvent({ unique: item.unique, name: item.name, icon: item.mediaType.icon }),
 		);
 	}
 
@@ -295,8 +323,22 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 					icon=${item.mediaType.icon}
 					file-ext=${ifDefined(item.extension)}></umb-media-thumbnail>
 				${this.#renderIsTrashed(item)}
-				<uui-action-bar slot="actions">${this.#renderRemoveAction(unique)}</uui-action-bar>
+				<uui-action-bar slot="actions">
+					${this.#renderCopyAction(item)} ${this.#renderRemoveAction(unique)}
+				</uui-action-bar>
 			</uui-card-media>
+		`;
+	}
+
+	#renderCopyAction(item: UmbMediaCardItemModel) {
+		if (this.readonly || !this.clipboardConfig?.copy.enabled) return nothing;
+		return html`
+			<uui-button
+				label=${this.localize.term('clipboard_labelForCopyToClipboard')}
+				look="secondary"
+				@click=${() => this.#requestClipboardCopy(item)}>
+				<uui-icon name="icon-clipboard-copy"></uui-icon>
+			</uui-button>
 		`;
 	}
 

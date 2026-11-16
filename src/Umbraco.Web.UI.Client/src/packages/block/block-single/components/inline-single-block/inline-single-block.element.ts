@@ -1,6 +1,6 @@
 import { UMB_BLOCK_SINGLE_ENTRY_CONTEXT } from '../../context/index.js';
-import { UMB_BLOCK_WORKSPACE_ALIAS } from '@umbraco-cms/backoffice/block';
-import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_BLOCK_WORKSPACE_ALIAS, UmbBlockRefNameSlotMixin } from '@umbraco-cms/backoffice/block';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExtensionApiInitializer, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
@@ -12,8 +12,8 @@ import type {
 	UmbBlockLabelUfmValueType,
 	UMB_BLOCK_WORKSPACE_CONTEXT,
 } from '@umbraco-cms/backoffice/block';
-import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
+import '../../../block/components/block-state-tag/block-state-tag.element.js';
 import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
@@ -22,14 +22,12 @@ const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest:
 
 /**
  * @element umb-inline-single-block
+ * @slot name - Content rendered as the block's primary label. The expected projection is a `<umb-ufm-render>` element owned by the parent block-single entry.
  */
 @customElement('umb-inline-single-block')
-export class UmbInlineSingleBlockElement extends UmbLitElement {
+export class UmbInlineSingleBlockElement extends UmbBlockRefNameSlotMixin(UmbLitElement) {
 	#blockContext?: typeof UMB_BLOCK_SINGLE_ENTRY_CONTEXT.TYPE;
 	#contentKey?: string;
-
-	@property({ type: String, reflect: false })
-	label?: string;
 
 	@property({ type: String, reflect: false })
 	icon?: string;
@@ -131,12 +129,8 @@ export class UmbInlineSingleBlockElement extends UmbLitElement {
 		this._workspaceContext.load(this.#contentKey);
 	}
 
-	#expose = () => {
+	readonly #expose = () => {
 		this._workspaceContext?.expose();
-	};
-
-	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
-		this.#blockContext?.setName(event.detail.text);
 	};
 
 	override render() {
@@ -171,23 +165,9 @@ export class UmbInlineSingleBlockElement extends UmbLitElement {
 				<span id="icon">
 					<umb-icon .name=${this.icon}></umb-icon>
 				</span>
-				<div id="info">
-					<umb-ufm-render
-						id="name"
-						inline
-						.markdown=${this.label}
-						.value=${blockValue}
-						@umb-ufm-resolved=${this.#onUfmResolved}>
-					</umb-ufm-render>
-				</div>
+				<div id="info">${this.renderNameSlot(blockValue)}</div>
 			</span>
-			${when(
-				this.unpublished,
-				() =>
-					html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
-						><umb-localize key="blockEditor_notExposedLabel"></umb-localize
-					></uui-tag>`,
-			)}
+			<umb-block-state-tag slot="name"></umb-block-state-tag>
 		`;
 	}
 
@@ -196,19 +176,23 @@ export class UmbInlineSingleBlockElement extends UmbLitElement {
 			return html`<umb-view-loader></umb-view-loader>`;
 		}
 		if (this._exposed === false) {
-			return html`<uui-button id="exposeButton" draggable="false" @click=${this.#expose}
-				><uui-icon name="icon-add"></uui-icon>
-				<umb-localize
-					key="blockEditor_createThisFor"
-					.args=${[this._ownerContentTypeName, this._variantName]}></umb-localize
-			></uui-button>`;
+			return html`
+				<uui-button id="exposeButton" draggable="false" @click=${this.#expose}>
+					<uui-icon name="icon-add"></uui-icon>
+					<umb-localize
+						key="blockEditor_createThisFor"
+						.args=${[this._ownerContentTypeName, this._variantName]}></umb-localize>
+				</uui-button>
+			`;
 		} else {
-			return html`<umb-block-workspace-view-edit-content-no-router
-				draggable="false"></umb-block-workspace-view-edit-content-no-router>`;
+			return html`
+				<umb-block-workspace-view-edit-content-no-router draggable="false">
+				</umb-block-workspace-view-edit-content-no-router>
+			`;
 		}
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			#host {
@@ -310,28 +294,24 @@ export class UmbInlineSingleBlockElement extends UmbLitElement {
 				padding-left: var(--uui-size-2, 6px);
 			}
 
-			#name {
+			#name,
+			::slotted([slot='name']) {
 				font-weight: 700;
-			}
-
-			uui-tag {
-				margin-left: 0.5em;
-				margin-bottom: -0.3em;
-				margin-top: -0.3em;
-				vertical-align: text-top;
 			}
 
 			:host(:not([disabled])) #open-part:hover #icon {
 				color: var(--uui-color-interactive-emphasis);
 			}
-			:host(:not([disabled])) #open-part:hover #name {
+			:host(:not([disabled])) #open-part:hover #name,
+			:host(:not([disabled])) #open-part:hover ::slotted([slot='name']) {
 				color: var(--uui-color-interactive-emphasis);
 			}
 
 			:host([disabled]) #icon {
 				color: var(--uui-color-disabled-contrast);
 			}
-			:host([disabled]) #name {
+			:host([disabled]) #name,
+			:host([disabled]) ::slotted([slot='name']) {
 				color: var(--uui-color-disabled-contrast);
 			}
 		`,

@@ -1,7 +1,7 @@
 {
 	"name": "@umbraco-cms/backoffice",
 	"license": "MIT",
-	"version": "18.4.0-rc",
+	"version": "19.1.0-rc",
 	"type": "module",
 	"exports": {
 		".": null,
@@ -15,6 +15,7 @@
 		"./embedded-media": "./dist-cms/packages/embedded-media/index.js",
 		"./extension-api": "./dist-cms/libs/extension-api/index.js",
 		"./extension-types": "./dist-cms/packages/extension-types/index.d.ts",
+		"./hook-api": "./dist-cms/libs/hook-api/index.js",
 		"./localization-api": "./dist-cms/libs/localization-api/index.js",
 		"./observable-api": "./dist-cms/libs/observable-api/index.js",
 		"./action": "./dist-cms/packages/core/action/index.js",
@@ -46,6 +47,7 @@
 		"./document-type": "./dist-cms/packages/documents/document-types/index.js",
 		"./document": "./dist-cms/packages/documents/documents/index.js",
 		"./dropzone": "./dist-cms/packages/media/dropzone/index.js",
+		"./dynamic-root": "./dist-cms/packages/dynamic-root/dynamic-root/index.js",
 		"./entity-action": "./dist-cms/packages/core/entity-action/index.js",
 		"./entity-bulk-action": "./dist-cms/packages/core/entity-bulk-action/index.js",
 		"./entity-create-option-action": "./dist-cms/packages/core/entity-create-option-action/index.js",
@@ -81,6 +83,7 @@
 		"./modal": "./dist-cms/packages/core/modal/index.js",
 		"./models": "./dist-cms/packages/core/models/index.js",
 		"./search": "./dist-cms/packages/core/search/index.js",
+		"./search-management": "./dist-cms/packages/search-management/index.js",
 		"./multi-url-picker": "./dist-cms/packages/multi-url-picker/index.js",
 		"./notification": "./dist-cms/packages/core/notification/index.js",
 		"./object-type": "./dist-cms/packages/core/object-type/index.js",
@@ -143,7 +146,6 @@
 		"./external/luxon": "./dist-cms/external/luxon/index.js",
 		"./external/marked": "./dist-cms/external/marked/index.js",
 		"./external/monaco-editor": "./dist-cms/external/monaco-editor/index.js",
-		"./external/openid": "./dist-cms/external/openid/index.js",
 		"./external/rxjs": "./dist-cms/external/rxjs/index.js",
 		"./external/signalr": "./dist-cms/external/signalr/index.js",
 		"./external/uui": "./dist-cms/external/uui/index.js"
@@ -237,6 +239,7 @@
 		"npm": ">=11"
 	},
 	"dependencies": {
+		"@hey-api/openapi-ts": "^0.99.0",
 		"element-internals-polyfill": "^3.0.2"
 	},
 	"devDependencies": {

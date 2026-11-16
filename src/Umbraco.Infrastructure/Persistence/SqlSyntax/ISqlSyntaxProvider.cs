@@ -1,5 +1,6 @@
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using NPoco;
@@ -219,6 +220,30 @@ public interface ISqlSyntaxProvider
     /// <returns>A string representing the SQL WHERE clause fragment for a wildcard comparison on the specified column.</returns>
     string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType);
 
+    /// <summary>
+    ///     Escapes the LIKE wildcard characters in a value, so that a pattern built from it matches the value literally.
+    /// </summary>
+    /// <param name="value">The text to match literally.</param>
+    /// <returns>The value with its wildcard and escape characters escaped.</returns>
+    /// <remarks>
+    ///     A comparison using the escaped value must be followed by <see cref="GetLikeEscapeClause" />.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation.
+    string EscapeLikeValue(string value) => SqlLikeEscaping.EscapeValue(value);
+
+    /// <summary>
+    ///     Gets the <c>ESCAPE</c> clause that follows a LIKE comparison with a value escaped by <see cref="EscapeLikeValue" />.
+    /// </summary>
+    /// <returns>The <c>ESCAPE</c> clause.</returns>
+    /// <remarks>
+    ///     The default uses a backslash as the escape character, written as the string literal <c>'\'</c>. A provider
+    ///     for a database that treats a backslash inside a string literal as an escape must override this method and
+    ///     <see cref="EscapeLikeValue" /> together, so that the clause is valid and names the character the value is
+    ///     escaped with.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation.
+    string GetLikeEscapeClause() => SqlLikeEscaping.EscapeClause;
+
     /// <summary>Concatenates the specified string arguments into a single string using the SQL syntax appropriate for the database.</summary>
     /// <param name="args">The string arguments to concatenate.</param>
     /// <returns>A string representing the SQL concatenation of the arguments.</returns>
@@ -318,6 +343,31 @@ public interface ISqlSyntaxProvider
     string FormatGuid(Guid guid) => guid.ToString();
 
     /// <summary>
+    /// Formats a <see cref="DateTimeOffset"/> value as a string suitable for use in SQL queries.
+    /// </summary>
+    /// <param name="dateTimeOffset">The date, time and offset value to format.</param>
+    /// <returns>A string representation of the value formatted for SQL, independent of the current culture.</returns>
+    // TODO (V20): Remove the default implementation.
+    string FormatDateTimeOffset(DateTimeOffset dateTimeOffset)
+        => dateTimeOffset.ToString("yyyy-MM-ddTHH:mm:ss.fffffffzzz", CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// Formats a <see cref="DateOnly"/> value as a string suitable for use in SQL queries.
+    /// </summary>
+    /// <param name="date">The date value to format.</param>
+    /// <returns>A string representation of the date formatted for SQL, independent of the current culture.</returns>
+    // TODO (V20): Remove the default implementation.
+    string FormatDateOnly(DateOnly date) => date.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// Formats a <see cref="TimeOnly"/> value as a string suitable for use in SQL queries.
+    /// </summary>
+    /// <param name="time">The time value to format.</param>
+    /// <returns>A string representation of the time formatted for SQL, independent of the current culture.</returns>
+    // TODO (V20): Remove the default implementation.
+    string FormatTimeOnly(TimeOnly time) => time.ToString("HH:mm:ss.fffffff", CultureInfo.InvariantCulture);
+
+    /// <summary>
     /// Formats a <see cref="TableDefinition"/> into its corresponding SQL statement.
     /// </summary>
     /// <param name="table">The <see cref="TableDefinition"/> to format.</param>
@@ -374,6 +424,16 @@ public interface ISqlSyntaxProvider
     /// <param name="sqls">Outputs additional SQL statements required for the column definition.</param>
     /// <returns>A SQL string representing the column definition.</returns>
     string Format(ColumnDefinition column, string tableName, out IEnumerable<string> sqls);
+
+    /// <summary>
+    /// Formats the SQL statement that alters an existing column to match the specified <see cref="ColumnDefinition"/>.
+    /// </summary>
+    /// <param name="tableName">The name of the table containing the column.</param>
+    /// <param name="column">The new definition of the column.</param>
+    /// <returns>A SQL statement that alters the column.</returns>
+    // TODO (V20): Remove the default implementation.
+    string FormatAlterColumn(string? tableName, ColumnDefinition column)
+        => string.Format(AlterColumn, GetQuotedTableName(tableName), Format(column));
 
     /// <summary>
     /// Formats the specified <see cref="IndexDefinition"/> into its corresponding SQL statement.
@@ -483,6 +543,10 @@ public interface ISqlSyntaxProvider
     /// </summary>
     /// <param name="db">The <see cref="IDatabase"/> instance representing the database to inspect.</param>
     /// <returns>An <see cref="IEnumerable{ColumnInfo}"/> containing details for each column in the database schema.</returns>
+    /// <remarks>
+    /// Implementations must return a materialized collection, so that it can be enumerated more than once,
+    /// or only partially, without querying the database again or leaving database resources open.
+    /// </remarks>
     IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db);
 
     /// <summary>
@@ -578,24 +642,19 @@ public interface ISqlSyntaxProvider
     /// <param name="tableName">The base name for the temporary table (without any provider-specific prefix).</param>
     /// <param name="columnDefinitionSql">The SQL column definitions (e.g., "Id INT NOT NULL PRIMARY KEY").</param>
     /// <returns>A SQL statement that creates the temporary table.</returns>
-    // TODO (V19): Remove default implementation.
-    string CreateTempTable(string tableName, string columnDefinitionSql)
-        => $"CREATE TEMP TABLE {tableName} ({columnDefinitionSql})";
+    string CreateTempTable(string tableName, string columnDefinitionSql);
 
     /// <summary>
     /// Gets the properly qualified name for a temporary table, applying any provider-specific prefix.
     /// </summary>
     /// <param name="baseName">The base name for the temporary table.</param>
     /// <returns>The qualified temporary table name.</returns>
-    // TODO (V19): Remove default implementation.
-    string TempTableName(string baseName) => baseName;
+    string TempTableName(string baseName);
 
     /// <summary>
     /// Gets the SQL to drop a temporary table if it exists.
     /// </summary>
     /// <param name="tableName">The base name for the temporary table (without any provider-specific prefix).</param>
     /// <returns>A SQL statement that drops the temporary table if it exists.</returns>
-    // TODO (V19): Remove default implementation.
-    string DropTempTable(string tableName)
-        => $"DROP TABLE IF EXISTS {tableName}";
+    string DropTempTable(string tableName);
 }

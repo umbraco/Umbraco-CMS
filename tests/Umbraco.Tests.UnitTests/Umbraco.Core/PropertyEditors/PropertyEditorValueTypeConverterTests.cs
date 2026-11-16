@@ -44,8 +44,8 @@ public class PropertyEditorValueTypeConverterTests
     [TestCase("", 0)]
     [TestCase("Hello, world!", 0)]
     [TestCase("-1", -1)]
-    [TestCase("1.65", 1.65)]
-    [TestCase("-1.65", -1.65)]
+    [TestCase("1.65", "1.65")]
+    [TestCase("-1.65", "-1.65")]
     public void CanConvertDecimalValueTypePropertyEditor(object value, decimal expected)
     {
         var propertyEditors = ValueTypePropertyEditorCollection(ValueTypes.Decimal);

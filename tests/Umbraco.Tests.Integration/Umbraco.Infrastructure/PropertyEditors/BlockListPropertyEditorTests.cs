@@ -276,7 +276,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
             ],
             Expose =
             [
-                new (contentElementKey, null, null)
+                new (contentElementKey, null)
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(blockListValue);
@@ -360,7 +360,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
             ],
             Expose =
             [
-                new (contentElementKey, "en-US", null)
+                new (contentElementKey, "en-US")
             ]
         };
         var blocksPropertyValue = JsonSerializer.Serialize(blockListValue);
@@ -400,6 +400,60 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
         });
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Handle_Missing_Layout_Keys(bool useLayoutKey)
+    {
+        var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
+        elementType.IsElement = true;
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
+
+        var blockListContentType = await CreateBlockListContentType(elementType);
+
+        var contentElementKey = Guid.NewGuid();
+        var layoutKey = Guid.NewGuid();
+        var layoutItem = useLayoutKey
+            ? new BlockListLayoutItem { Key = layoutKey, ContentKey = contentElementKey }
+            : new BlockListLayoutItem { ContentKey = contentElementKey };
+        var blockListValue = new BlockListValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                {
+                    Constants.PropertyEditors.Aliases.BlockList, [layoutItem]
+                },
+            },
+            ContentData =
+            [
+                new()
+                {
+                    Key = contentElementKey,
+                    ContentTypeAlias = elementType.Alias,
+                    ContentTypeKey = elementType.Key,
+                    Values = [],
+                }
+            ],
+            Expose = [new(contentElementKey, null)],
+        };
+        var blocksPropertyValue = JsonSerializer.Serialize(blockListValue);
+
+        var content = new ContentBuilder()
+            .WithContentType(blockListContentType)
+            .WithName("My Blocks")
+            .WithPropertyValues(new { blocks = blocksPropertyValue })
+            .Build();
+        ContentService.Save(content);
+
+        var valueEditor = await GetValueEditor(blockListContentType);
+        var toEditorValue = valueEditor.ToEditor(content.Properties["blocks"]!) as BlockListValue;
+        Assert.IsNotNull(toEditorValue);
+
+        var blockListLayoutItems = toEditorValue!.GetLayouts().ToArray();
+        Assert.IsNotNull(blockListLayoutItems);
+        Assert.AreEqual(1, blockListLayoutItems.Length);
+        Assert.AreEqual(useLayoutKey ? layoutKey : contentElementKey, blockListLayoutItems.First().Key);
+    }
+
     [Test]
     public async Task Can_Read_Value_Stored_By_The_Single_Block_Editor()
     {
@@ -432,7 +486,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
             ],
             Expose =
             [
-                new(contentElementKey, null, null),
+                new(contentElementKey, null),
             ],
         };
 
@@ -518,8 +572,8 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
             ],
             Expose =
             [
-                new(firstContentKey, null, null),
-                new(secondContentKey, null, null),
+                new(firstContentKey, null),
+                new(secondContentKey, null),
             ]
         };
 
@@ -619,8 +673,8 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
             ],
             Expose =
             [
-                new(firstNestedContentKey, null, null),
-                new(secondNestedContentKey, null, null),
+                new(firstNestedContentKey, null),
+                new(secondNestedContentKey, null),
             ]
         };
 
@@ -648,7 +702,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
                     ]
                 }
             ],
-            Expose = [new(rootContentKey, null, null)]
+            Expose = [new(rootContentKey, null)]
         };
 
         var content = new ContentBuilder()

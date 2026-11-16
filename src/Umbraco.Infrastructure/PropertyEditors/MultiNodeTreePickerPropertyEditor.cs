@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -20,6 +21,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 /// Represents a multi-node tree picker property editor.
 /// </summary>
+[Obsolete("The multi node tree picker is replaced by the dedicated document, media, element and member pickers. Scheduled for removal in Umbraco 22.")]
 [DataEditor(
     Constants.PropertyEditors.Aliases.MultiNodeTreePicker,
     ValueType = ValueTypes.Text,
@@ -80,14 +82,14 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
         // Add minItems/maxItems from configuration if available
         if (configuration is MultiNodePickerConfiguration pickerConfig)
         {
-            if (pickerConfig.MinNumber > 0)
+            if (pickerConfig.ValidationLimit.Min is int min && min > 0)
             {
-                schema["minItems"] = pickerConfig.MinNumber;
+                schema["minItems"] = min;
             }
 
-            if (pickerConfig.MaxNumber > 0)
+            if (pickerConfig.ValidationLimit.Max is int max && max > 0)
             {
-                schema["maxItems"] = pickerConfig.MaxNumber;
+                schema["maxItems"] = max;
             }
         }
 
@@ -138,6 +140,9 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
                 new ObjectTypeValidator(localizedTextService, coreScopeProvider, entityService),
                 new ContentTypeValidator(localizedTextService, coreScopeProvider, contentService, mediaService, memberService)));
         }
+
+        /// <inheritdoc/>
+        public override IValueRequiredValidator RequiredValidator => new MultiNodeTreePickerRequiredValidator(_jsonSerializer);
 
         /// <inheritdoc/>
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
@@ -216,7 +221,44 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
         /// </summary>
         internal const string MemberObjectType = "member";
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// A custom <see cref="IValueRequiredValidator" /> that treats a value holding no entity references as no value.
+        /// </summary>
+        /// <remarks>
+        /// The editor value is a JSON array of entity references, which the default validator cannot detect as empty
+        /// because the value is stored as text. The persisted value is a comma separated list of UDIs, which is already
+        /// handled by the default validator.
+        /// </remarks>
+        internal sealed class MultiNodeTreePickerRequiredValidator : RequiredValidator
+        {
+            private readonly IJsonSerializer _jsonSerializer;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="MultiNodeTreePickerRequiredValidator"/> class.
+            /// </summary>
+            /// <param name="jsonSerializer">The JSON serializer.</param>
+            public MultiNodeTreePickerRequiredValidator(IJsonSerializer jsonSerializer) => _jsonSerializer = jsonSerializer;
+
+            /// <inheritdoc/>
+            public override IEnumerable<ValidationResult> ValidateRequired(object? value, string? valueType)
+            {
+                IEnumerable<ValidationResult> validationResults = base.ValidateRequired(value, valueType);
+
+                if (value is null)
+                {
+                    return validationResults;
+                }
+
+                if (_jsonSerializer.TryDeserialize(value, out EditorEntityReference[]? entityReferences)
+                    && entityReferences.Length == 0)
+                {
+                    validationResults = validationResults.Append(new ValidationResult(Constants.Validation.ErrorMessages.Properties.Empty, ["value"]));
+                }
+
+                return validationResults;
+            }
+        }
+
         /// <summary>
         /// Validates the min/max configuration for the multi-node tree picker property editor.
         /// </summary>
@@ -243,13 +285,16 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
                     return validationResults;
                 }
 
-                if (configuration.MinNumber > 0 && (entityReferences is null || entityReferences.Length < configuration.MinNumber))
+                var minNumber = configuration.ValidationLimit.Min ?? 0;
+                var maxNumber = configuration.ValidationLimit.Max ?? 0;
+
+                if (ItemCountValidationHelper.IsAboveZeroAndBelowMinimum(entityReferences?.Length ?? 0, minNumber))
                 {
                     validationResults.Add(new ValidationResult(
                         _localizedTextService.Localize(
                             "validation",
                             "entriesShort",
-                            [configuration.MinNumber.ToString(), (configuration.MinNumber - (entityReferences?.Length ?? 0)).ToString()
+                            [minNumber.ToString(), (minNumber - (entityReferences?.Length ?? 0)).ToString()
                             ]),
                         ["value"]));
                 }
@@ -259,13 +304,13 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
                     return validationResults;
                 }
 
-                if (configuration.MaxNumber > 0 && entityReferences.Length > configuration.MaxNumber)
+                if (maxNumber > 0 && entityReferences.Length > maxNumber)
                 {
                     validationResults.Add(new ValidationResult(
                         _localizedTextService.Localize(
                             "validation",
                             "entriesExceed",
-                            [configuration.MaxNumber.ToString(), (entityReferences.Length - configuration.MaxNumber).ToString()
+                            [maxNumber.ToString(), (entityReferences.Length - maxNumber).ToString()
                             ]),
                         ["value"]));
                 }

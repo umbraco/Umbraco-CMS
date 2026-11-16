@@ -85,7 +85,7 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 			});
 			this.#serverKeyValues.push({
 				name: 'User document start nodes',
-				data: currentUser.documentStartNodeUniques.join(', '),
+				data: currentUser.documentStartNodeUniques.map((startNode) => startNode.unique).join(', '),
 			});
 		}
 

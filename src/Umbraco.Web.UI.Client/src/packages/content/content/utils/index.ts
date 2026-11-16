@@ -1,1 +1,1 @@
-export * from './append-content-value.function.js';
+export * from './entry-append-value.function.js';

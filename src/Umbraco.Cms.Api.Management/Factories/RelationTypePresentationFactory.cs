@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -40,28 +39,6 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
         _documentPresentationFactory = documentPresentationFactory;
         _elementPresentationFactory = elementPresentationFactory;
         _scopeProvider = scopeProvider;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RelationTypePresentationFactory"/> class.
-    /// </summary>
-    /// <param name="umbracoMapper">The Umbraco mapper.</param>
-    /// <param name="entityRepository">The entity repository.</param>
-    /// <param name="documentPresentationFactory">The document presentation factory.</param>
-    /// <param name="scopeProvider">The scope provider.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
-    public RelationTypePresentationFactory(
-        IUmbracoMapper umbracoMapper,
-        IEntityRepository entityRepository,
-        IDocumentPresentationFactory documentPresentationFactory,
-        IScopeProvider scopeProvider)
-        : this(
-            umbracoMapper,
-            entityRepository,
-            documentPresentationFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IElementPresentationFactory>(),
-            scopeProvider)
-    {
     }
 
     /// <inheritdoc />

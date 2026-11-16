@@ -13,8 +13,7 @@ public interface IDocumentUrlAliasService
     /// <remarks>
     /// False while the application is upgrading, when the alias table may not exist yet.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    bool IsInitialized => true;
+    bool IsInitialized { get; }
 
     /// <summary>
     /// Initializes the service and ensures the alias cache is populated from the database.
@@ -57,9 +56,7 @@ public interface IDocumentUrlAliasService
     /// </summary>
     /// <param name="document">The document whose aliases to persist.</param>
     /// <returns>A task that completes when the aliases are persisted.</returns>
-    // TODO (V19): Remove the default implementation.
-    Task PersistAliasesAsync(IContent document)
-        => PersistAliasesAsync(document, contentTreeWriteLockHeld: false);
+    Task PersistAliasesAsync(IContent document);
 
     /// <summary>
     /// Persists the aliases of a document from the document itself.
@@ -75,13 +72,10 @@ public interface IDocumentUrlAliasService
     /// <paramref name="document"/>. Only a change to the document's published state or trashed state can change its
     /// aliases, so any other save is a no-op. Implementations must work from <paramref name="document"/> itself:
     /// inside the content transaction the repository caches still hold the document as it was before the save, so
-    /// loading it by key would persist the previous aliases. The default implementation only keeps implementations
-    /// written before this member compiling; it is not a correct implementation of the contract.
+    /// loading it by key would persist the previous aliases.
     /// </remarks>
     /// <returns>A task that completes when the aliases are persisted.</returns>
-    // TODO (V19): Remove the default implementation.
-    Task PersistAliasesAsync(IContent document, bool contentTreeWriteLockHeld)
-        => CreateOrUpdateAliasesAsync(document.Key);
+    Task PersistAliasesAsync(IContent document, bool contentTreeWriteLockHeld);
 
     /// <summary>
     /// Deletes all aliases from the cache for a collection of document keys.
@@ -108,15 +102,13 @@ public interface IDocumentUrlAliasService
     /// Updates the in-memory alias cache for a single document without writing to the database.
     /// </summary>
     /// <param name="documentKey">The document key.</param>
-    // TODO (V19): Remove default implementation when external implementations have had time to adopt.
-    Task UpdateAliasCacheAsync(Guid documentKey)
-        => CreateOrUpdateAliasesAsync(documentKey);
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    Task UpdateAliasCacheAsync(Guid documentKey);
 
     /// <summary>
     /// Updates the in-memory alias cache for a document and its descendants without writing to the database.
     /// </summary>
     /// <param name="documentKey">The document key.</param>
-    // TODO (V19): Remove default implementation when external implementations have had time to adopt.
-    Task UpdateAliasCacheWithDescendantsAsync(Guid documentKey)
-        => CreateOrUpdateAliasesWithDescendantsAsync(documentKey);
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    Task UpdateAliasCacheWithDescendantsAsync(Guid documentKey);
 }

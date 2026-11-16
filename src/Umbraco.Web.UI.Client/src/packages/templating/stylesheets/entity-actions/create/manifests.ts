@@ -1,14 +1,6 @@
 import { UMB_STYLESHEET_FOLDER_ENTITY_TYPE, UMB_STYLESHEET_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_STYLESHEET_FOLDER_REPOSITORY_ALIAS } from '../../tree/folder/repository/index.js';
 
-/** @deprecated No longer used internally. This will be removed in Umbraco 18. [LK] */
-const modal: UmbExtensionManifest = {
-	type: 'modal',
-	alias: 'Umb.Modal.Stylesheet.CreateOptions',
-	name: 'Stylesheet Create Options Modal',
-	element: () => import('./options-modal/stylesheet-create-options-modal.element.js'),
-};
-
 const entityAction: UmbExtensionManifest = {
 	type: 'entityAction',
 	kind: 'create',
@@ -53,4 +45,4 @@ const entityCreateOptionActions: Array<UmbExtensionManifest> = [
 	},
 ];
 
-export const manifests: Array<UmbExtensionManifest> = [modal, entityAction, ...entityCreateOptionActions];
+export const manifests: Array<UmbExtensionManifest> = [entityAction, ...entityCreateOptionActions];

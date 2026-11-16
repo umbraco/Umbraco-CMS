@@ -123,6 +123,6 @@ public class ValueEditorCacheTests
 
         public IConfigurationEditor GetConfigurationEditor() => throw new NotImplementedException();
 
-        public IPropertyIndexValueFactory PropertyIndexValueFactory { get; }
+        public bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue) => Equals(editedValue, publishedValue);
     }
 }

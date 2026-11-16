@@ -95,5 +95,67 @@ describe('UmbBlockRtePropertyValueCloner', () => {
 			expect(result.value?.blocks?.settingsData[0].key).to.not.be.equal('settings-1');
 			expect(result.value?.blocks?.settingsData[0].key).to.be.equal(newSettingsKey);
 		});
+
+		describe('markup layout keys', () => {
+			const cloneRteValue = async (markup: string, layout: Array<any>, contentData: Array<any>) => {
+				const ctrl = new UmbPropertyValueCloneController(new UmbTestControllerHostElement());
+				const value = {
+					editorAlias: UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS,
+					alias: 'test',
+					culture: null,
+					segment: null,
+					value: {
+						markup,
+						blocks: {
+							layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout },
+							contentData,
+							settingsData: [],
+							expose: [],
+						},
+					},
+				};
+				const result = (await ctrl.clone(value)) as { value: UmbPropertyEditorRteValueType };
+
+				const clonedLayout = result.value.blocks!.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]![0];
+				const element = new DOMParser().parseFromString(result.value.markup, 'text/html').body
+					.firstElementChild as HTMLElement;
+				return { clonedLayout, element };
+			};
+
+			it('renews data-key and data-content-key in the markup to match the cloned layout', async () => {
+				const { clonedLayout, element } = await cloneRteValue(
+					'<umb-rte-block data-key="layout-1" data-content-key="content-1"></umb-rte-block>',
+					[{ key: 'layout-1', contentKey: 'content-1' }],
+					[{ key: 'content-1', contentTypeKey: 'fictive-content-type', values: [] }],
+				);
+
+				expect(clonedLayout.key).to.not.be.equal('layout-1');
+				expect(element.getAttribute('data-key')).to.be.equal(clonedLayout.key);
+				expect(element.getAttribute('data-content-key')).to.be.equal(clonedLayout.contentKey);
+			});
+
+			it('renews data-key but keeps data-content-key for external content', async () => {
+				const { clonedLayout, element } = await cloneRteValue(
+					'<umb-rte-block data-key="layout-1" data-content-key="external-content-1"></umb-rte-block>',
+					[{ key: 'layout-1', contentKey: 'external-content-1', isExternalContent: true }],
+					[],
+				);
+
+				expect(clonedLayout.key).to.not.be.equal('layout-1');
+				expect(element.getAttribute('data-key')).to.be.equal(clonedLayout.key);
+				expect(element.getAttribute('data-content-key')).to.be.equal('external-content-1');
+			});
+
+			it('adds the cloned layout key to legacy markup without data-key', async () => {
+				const { clonedLayout, element } = await cloneRteValue(
+					'<umb-rte-block data-content-key="content-1"></umb-rte-block>',
+					[{ key: 'content-1', contentKey: 'content-1' }],
+					[{ key: 'content-1', contentTypeKey: 'fictive-content-type', values: [] }],
+				);
+
+				expect(element.getAttribute('data-key')).to.be.equal(clonedLayout.key);
+				expect(element.getAttribute('data-content-key')).to.be.equal(clonedLayout.contentKey);
+			});
+		});
 	});
 });

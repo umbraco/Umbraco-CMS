@@ -21,21 +21,6 @@ namespace Umbraco.Cms.Api.Management.DependencyInjection;
 public static class BackOfficeAuthBuilderExtensions
 {
     /// <summary>
-    /// Configures and adds the necessary authentication services for the Umbraco back office to the specified builder.
-    /// </summary>
-    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to which back office authentication services will be added.</param>
-    /// <returns>The same <see cref="IUmbracoBuilder"/> instance with back office authentication configured.</returns>
-    [Obsolete("Use AddBackOffice() or AddBackOfficeSignIn() instead. Scheduled for removal in Umbraco 19.")]
-    public static IUmbracoBuilder AddBackOfficeAuthentication(this IUmbracoBuilder builder)
-    {
-        builder
-            .AddBackOfficeCookieAuthentication()
-            .AddBackOfficeOpenIddictServices();
-
-        return builder;
-    }
-
-    /// <summary>
     /// Registers handlers with the back-office authentication builder to automatically revoke user authentication tokens
     /// when certain user-related events occur, such as saving, deleting, or successful login of a user.
     /// </summary>
@@ -46,6 +31,7 @@ public static class BackOfficeAuthBuilderExtensions
         builder.AddNotificationAsyncHandler<UserSavedNotification, RevokeUserAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<UserDeletedNotification, RevokeUserAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<UserLoginSuccessNotification, RevokeUserAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<UserLogoutSuccessNotification, RevokeUserAuthenticationTokensNotificationHandler>();
 
         return builder;
     }
@@ -66,9 +52,6 @@ public static class BackOfficeAuthBuilderExtensions
                 o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             })
 
-            // Add a cookie scheme that can be used for authenticating backoffice users outside the scope of the backoffice.
-            .AddCookie(Constants.Security.BackOfficeExposedAuthenticationType)
-
             // Although we don't natively support this, we add it anyways so that if end-users implement the required logic
             // they don't have to worry about manually adding this scheme or modifying the sign in manager
             .AddCookie(Constants.Security.BackOfficeTwoFactorAuthenticationType, options =>
@@ -84,7 +67,6 @@ public static class BackOfficeAuthBuilderExtensions
 
         builder.Services.AddScoped<BackOfficeSecurityStampValidator>();
         builder.Services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
-        builder.Services.ConfigureOptions<ConfigureBackOfficeExposedCookieOptions>();
         builder.Services.ConfigureOptions<ConfigureBackOfficeSecurityStampValidatorOptions>();
 
         builder.AddAuthorizationPolicies();
@@ -105,19 +87,20 @@ public static class BackOfficeAuthBuilderExtensions
         builder.Services.AddSingleton<BackOfficeAuthorizationInitializationMiddleware>();
         builder.Services.Configure<UmbracoPipelineOptions>(options => options.AddFilter(new BackofficePipelineFilter("Backoffice")));
 
-        // Add OpenIddict server event handler to refresh the cookie that exposes the backoffice authentication outside the scope of the backoffice.
-        builder.Services.AddSingleton<ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler>();
+        builder.Services.AddSingleton<BackOfficeRedirectUriValidationHandler>();
         builder.Services.Configure<OpenIddictServerOptions>(options =>
         {
             options.Handlers.Add(
                 OpenIddictServerHandlerDescriptor
-                    .CreateBuilder<OpenIddictServerEvents.GenerateTokenContext>()
-                    .UseSingletonHandler<ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler>()
+                    .CreateBuilder<OpenIddictServerEvents.ValidateAuthorizationRequestContext>()
+                    .UseSingletonHandler<BackOfficeRedirectUriValidationHandler>()
+                    .SetOrder(OpenIddictServerHandlers.Authentication.ValidateRedirectUriParameter.Descriptor.Order + 1)
                     .Build());
             options.Handlers.Add(
                 OpenIddictServerHandlerDescriptor
-                    .CreateBuilder<OpenIddictServerEvents.ApplyRevocationResponseContext>()
-                    .UseSingletonHandler<ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler>()
+                    .CreateBuilder<OpenIddictServerEvents.ValidateEndSessionRequestContext>()
+                    .UseSingletonHandler<BackOfficeRedirectUriValidationHandler>()
+                    .SetOrder(OpenIddictServerHandlers.Session.ValidatePostLogoutRedirectUriParameter.Descriptor.Order + 1)
                     .Build());
         });
 

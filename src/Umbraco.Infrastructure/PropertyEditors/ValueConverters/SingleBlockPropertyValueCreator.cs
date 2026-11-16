@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 
@@ -16,7 +17,9 @@ internal sealed class SingleBlockPropertyValueCreator : BlockPropertyValueCreato
     /// </summary>
     /// <param name="blockEditorConverter">The service used to convert block editor data.</param>
     /// <param name="variationContextAccessor">Provides access to the current variation context.</param>
+    /// <param name="propertyRenderingContextAccessor">Provides access to the current rendering context.</param>
     /// <param name="blockEditorVarianceHandler">Handles variance logic for block editors.</param>
+    /// <param name="elementCacheService">The cache for elements.</param>
     /// <param name="jsonSerializer">The serializer used for JSON serialization and deserialization.</param>
     /// <param name="constructorCache">A cache for constructors used in block list property value creation.</param>
     /// <param name="languageService">Service used to retrieve language information for fallback resolution.</param>
@@ -25,10 +28,11 @@ internal sealed class SingleBlockPropertyValueCreator : BlockPropertyValueCreato
         IVariationContextAccessor variationContextAccessor,
         IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
         BlockEditorVarianceHandler blockEditorVarianceHandler,
+        IElementCacheService elementCacheService,
         IJsonSerializer jsonSerializer,
         BlockListPropertyValueConstructorCache constructorCache,
         ILanguageService languageService)
-        : base(blockEditorConverter, variationContextAccessor, propertyRenderingContextAccessor, blockEditorVarianceHandler, languageService)
+        : base(blockEditorConverter, variationContextAccessor, propertyRenderingContextAccessor, blockEditorVarianceHandler, languageService, elementCacheService)
     {
         _jsonSerializer = jsonSerializer;
         _constructorCache = constructorCache;

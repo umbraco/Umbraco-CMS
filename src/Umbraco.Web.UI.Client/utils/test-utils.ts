@@ -25,3 +25,29 @@ export function ignoreResizeObserverLoopErrors(): () => void {
 		window.onerror = previousHandler;
 	};
 }
+
+/**
+ * Reads the blocks rendered by `<umb-action-group-list>` as a sequence: '[label' for a group, '[Other' for the
+ * named block of actions without a group or '[' when that block has no name, then the actions with '|' marking a line
+ * inside the block, then ']'.
+ * @param {Element | null | undefined} list - The `<umb-action-group-list>` element.
+ * @param {(action: Element) => string} readAction - Reads one action element.
+ * @returns {Array<string>} The sequence.
+ */
+export function readActionGroupList(list: Element | null | undefined, readAction: (action: Element) => string) {
+	const readActions = (children: Iterable<Element>): Array<string> =>
+		Array.from(children).flatMap((child, index) =>
+			child.classList.contains('segment')
+				? [...(index > 0 ? ['|'] : []), ...readActions(child.children)]
+				: [readAction(child)],
+		);
+	const readName = (block: HTMLElement) => {
+		if (block.getAttribute('role') !== 'group') return '';
+		return block.dataset.mark ? block.getAttribute('aria-label') : 'Other';
+	};
+	return Array.from(list?.shadowRoot?.querySelectorAll<HTMLElement>('.block') ?? []).flatMap((block) => [
+		`[${readName(block)}`,
+		...readActions(block.children),
+		']',
+	]);
+}

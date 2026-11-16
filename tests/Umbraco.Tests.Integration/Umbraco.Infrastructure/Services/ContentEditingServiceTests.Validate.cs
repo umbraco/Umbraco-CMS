@@ -132,11 +132,8 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new VariantModel { Culture = "en-US", Segment = "seg-1", Name = "Updated English segment 1 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-1", Name = "Updated Danish segment 1 Name" },
-                new VariantModel { Culture = "en-US", Segment = "seg-2", Name = "Updated English segment 2 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-2", Name = "Updated Danish segment 2 Name" }
-
+                new VariantModel { Culture = "en-US", Name = "Updated English segment 1 Name" },
+                new VariantModel { Culture = "da-DK", Name = "Updated Danish segment 1 Name" }
             ],
         };
 
@@ -163,10 +160,8 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new VariantModel { Culture = "en-US", Segment = "seg-1", Name = "Updated English segment 1 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-1", Name = "Updated Danish segment 1 Name" },
-                new VariantModel { Culture = "en-US", Segment = "seg-2", Name = "Updated English segment 2 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-2", Name = "Updated Danish segment 2 Name" }
+                new VariantModel { Culture = "en-US", Name = "Updated English segment 1 Name" },
+                new VariantModel { Culture = "da-DK", Name = "Updated Danish segment 1 Name" }
             ],
         };
 
@@ -200,6 +195,88 @@ public partial class ContentEditingServiceTests
         Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await ContentEditingService.ValidateUpdateAsync(content.Key, validateContentUpdateModel, englishEditor.Key);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+    }
+
+    [Test]
+    public async Task Will_Succeed_For_Invalid_Invariant_Property_Without_Access_To_Invariant_For_Variant()
+    {
+        var content = await CreateCultureVariantContentWithMandatoryInvariantTitle();
+
+        IUser editor = await CreateEditorWithoutAccessToInvariantForVariant();
+
+        var validateContentUpdateModel = new ValidateContentUpdateModel
+        {
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = null },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated Danish title", Culture = "da-DK" }
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "Updated English Name" },
+                new VariantModel { Culture = "da-DK", Name = "Updated Danish Name" }
+            ],
+        };
+
+        Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await ContentEditingService.ValidateUpdateAsync(content.Key, validateContentUpdateModel, editor.Key);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+    }
+
+    [Test]
+    public async Task Will_Fail_For_Invalid_Invariant_Property_With_Access_To_Invariant_For_Variant()
+    {
+        var content = await CreateCultureVariantContentWithMandatoryInvariantTitle();
+
+        var validateContentUpdateModel = new ValidateContentUpdateModel
+        {
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = null },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated Danish title", Culture = "da-DK" }
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "Updated English Name" },
+                new VariantModel { Culture = "da-DK", Name = "Updated Danish Name" }
+            ],
+        };
+
+        // super user has access to invariant-for-variant by default, so the invariant property is validated
+        Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await ContentEditingService.ValidateUpdateAsync(content.Key, validateContentUpdateModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.PropertyValidationError, result.Status);
+        Assert.AreEqual(1, result.Result.ValidationErrors.Count());
+        Assert.AreEqual("#validation_invalidNull", result.Result.ValidationErrors.Single(x => x.Alias == "invariantTitle").ErrorMessages[0]);
+    }
+
+    [Test]
+    public async Task Will_Fail_Invalid_Invariant_Content_Without_Access_To_Invariant_For_Variant()
+    {
+        var content = await CreateInvariantContent();
+
+        IUser editor = await CreateEditorWithoutAccessToInvariantForVariant();
+
+        var validateContentUpdateModel = new ValidateContentUpdateModel
+        {
+            Variants =
+            [
+                new () { Name = "Updated Name" }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = null },
+                new PropertyValueModel { Alias = "text", Value = "The updated text" }
+            ]
+        };
+
+        Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await ContentEditingService.ValidateUpdateAsync(content.Key, validateContentUpdateModel, editor.Key);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.PropertyValidationError, result.Status);
+        Assert.AreEqual(1, result.Result.ValidationErrors.Count());
+        Assert.AreEqual("#validation_invalidNull", result.Result.ValidationErrors.Single(x => x.Alias == "title").ErrorMessages[0]);
     }
 
     [Test]
@@ -348,9 +425,10 @@ public partial class ContentEditingServiceTests
         };
     }
 
-    private async Task<IUser> CreateEnglishLanguageOnlyEditor() => await CreateSingleLanguageEditor("en-US");
+    private async Task<IUser> CreateEnglishLanguageOnlyEditor(bool withHasAccessToInvariantForVariant = false)
+        => await CreateSingleLanguageEditor("en-US", withHasAccessToInvariantForVariant);
 
-    private async Task<IUser> CreateSingleLanguageEditor(string isoCode)
+    private async Task<IUser> CreateSingleLanguageEditor(string isoCode, bool withHasAccessToInvariantForVariant = false)
     {
         var language = await LanguageService.GetAsync(isoCode);
         var alias = isoCode.Replace("-", string.Empty);
@@ -359,6 +437,7 @@ public partial class ContentEditingServiceTests
             .WithAlias($"{alias}Editors")
             .WithAllowedLanguages([language.Id])
             .Build();
+        userGroup.HasAccessToInvariantForVariant = withHasAccessToInvariantForVariant;
 
         var createUserGroupResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
         Assert.IsTrue(createUserGroupResult.Success);
@@ -373,5 +452,46 @@ public partial class ContentEditingServiceTests
         Assert.IsTrue(createUserAttempt.Success);
 
         return await UserService.GetAsync(createUserAttempt.Result.CreatedUser.Key);
+    }
+
+    private async Task<IContent> CreateCultureVariantContentWithMandatoryInvariantTitle()
+    {
+        var contentType = await CreateVariantContentType(invariantTitleAsMandatory: true);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The initial invariant title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The initial English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The initial Danish title", Culture = "da-DK" }
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "Initial English Name" },
+                new VariantModel { Culture = "da-DK", Name = "Initial Danish Name" }
+            ]
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        return result.Result.Content!;
+    }
+
+    private async Task<IUser> CreateEditorWithoutAccessToInvariantForVariant()
+    {
+        var user = UserBuilder.CreateUser();
+        UserService.Save(user);
+
+        var group = UserGroupBuilder.CreateUserGroup();
+        group.HasAccessToAllLanguages = true;
+        group.HasAccessToInvariantForVariant = false;
+
+        var userGroupResult = await UserGroupService.CreateAsync(group, Constants.Security.SuperUserKey, [user.Key]);
+        Assert.IsTrue(userGroupResult.Success);
+
+        return user;
     }
 }

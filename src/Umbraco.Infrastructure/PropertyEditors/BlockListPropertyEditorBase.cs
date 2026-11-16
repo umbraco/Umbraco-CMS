@@ -21,22 +21,17 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public abstract class BlockListPropertyEditorBase : DataEditor, IValueSchemaProvider
 {
-    private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
     private readonly IJsonSerializer _jsonSerializer;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BlockListPropertyEditorBase"/> class.
     /// </summary>
-    protected BlockListPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory, IJsonSerializer jsonSerializer)
+    protected BlockListPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IJsonSerializer jsonSerializer)
         : base(dataValueEditorFactory)
     {
-        _blockValuePropertyIndexValueFactory = blockValuePropertyIndexValueFactory;
         _jsonSerializer = jsonSerializer;
         SupportsReadOnly = true;
     }
-
-    /// <inheritdoc/>
-    public override IPropertyIndexValueFactory PropertyIndexValueFactory => _blockValuePropertyIndexValueFactory;
 
     /// <inheritdoc />
     public virtual Type? GetValueType(object? configuration) => typeof(string); // JSON string representation
@@ -151,7 +146,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor, IValueSchemaProv
         }
 
         /// <inheritdoc />
-        public override IValueRequiredValidator RequiredValidator => new BlockListValueRequiredValidator(JsonSerializer);
+        public override IValueRequiredValidator RequiredValidator => new BlockEditorValueRequiredValidator<BlockListValue>(JsonSerializer);
 
         /// <inheritdoc/>
         protected override BlockListValue CreateWithLayout(IEnumerable<BlockListLayoutItem> layout) => new(layout);
@@ -185,7 +180,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor, IValueSchemaProv
             {
                 var blockConfig = (BlockListConfiguration?)dataTypeConfiguration;
 
-                BlockListConfiguration.NumberRange? validationLimit = blockConfig?.ValidationLimit;
+                NumberRange? validationLimit = blockConfig?.ValidationLimit;
                 if (validationLimit == null)
                 {
                     return Array.Empty<ValidationResult>();

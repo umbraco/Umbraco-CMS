@@ -1,4 +1,4 @@
-import {Page, Locator, expect} from "@playwright/test";
+﻿import {Page, Locator, expect} from "@playwright/test";
 import {UiBaseLocators} from "./UiBaseLocators";
 import {ConstantHelper} from "./ConstantHelper";
 
@@ -25,11 +25,9 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly aliasTxt: Locator;
   private readonly widthTxt: Locator;
   private readonly heightTxt: Locator;
-  private readonly minimumTxt: Locator;
-  private readonly maximumTxt: Locator;
+  private readonly rangeLowValueTxt: Locator;
+  private readonly rangeHighValueTxt: Locator;
   private readonly stepSizeTxt: Locator;
-  private readonly sliderMinimumTxt: Locator;
-  private readonly sliderMaximumTxt: Locator;
   private readonly optionTxt: Locator;
   private readonly addOptionBtn: Locator;
   private readonly maximumAllowedCharsTxt: Locator;
@@ -38,12 +36,9 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly maxHeightTxt: Locator;
   private readonly acceptedFileExtensionsTxt: Locator;
   private readonly addAcceptedFileExtensionsBtn: Locator;
-  private readonly minimumNumberOfItemsTxt: Locator;
-  private readonly maximumNumberOfItemsTxt: Locator;
   private readonly ignoreUserStartNodesToggle: Locator;
   private readonly overlaySizeDropDownBox: Locator;
   private readonly hideAnchorQueryStringInputToggle: Locator;
-  private readonly pickMultipleItemsToggle: Locator;
   private readonly enableFocalPointToggle: Locator;
   private readonly amountLowValueTxt: Locator;
   private readonly amountHighValueTxt: Locator;
@@ -55,7 +50,6 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly hideLabelToggle: Locator;
   private readonly defineTagGroupTxt: Locator;
   private readonly showOpenButtonToggle: Locator;
-  private readonly enableMultipleChoiceToggle: Locator;
   private readonly addOptionsBtn: Locator;
   private readonly presetValueToggle: Locator;
   private readonly showToggleLabelsToggle: Locator;
@@ -197,15 +191,13 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.createCropBtn = this.propertyCrops.getByRole('button', {name: 'Create'});
     this.editCropBtn = this.propertyCrops.locator('.crop-form uui-button[type="submit"]');
 
+    // Range control - the validationRange min/max control shared by Numeric, Decimal and Slider
+    this.rangeLowValueTxt = page.getByTestId('property:validationRange').getByLabel('Low value');
+    this.rangeHighValueTxt = page.getByTestId('property:validationRange').getByLabel('High value');
+
     // Numeric
-    this.minimumTxt = page.getByTestId('property:min').locator('#input');
-    this.maximumTxt = page.getByTestId('property:max').locator('#input');
     this.stepSizeTxt = page.getByTestId('property:step').locator('#input');
     this.allowDecimalsToggle = page.locator('umb-property[label="Allow decimals"] #toggle');
-
-    // Slider (uses minVal/maxVal aliases rather than the Numeric min/max)
-    this.sliderMinimumTxt = page.getByTestId('property:minVal').locator('#input');
-    this.sliderMaximumTxt = page.getByTestId('property:maxVal').locator('#input');
 
     // Radiobox
     this.optionTxt = page.getByTestId('property:items').locator('#input');
@@ -222,13 +214,10 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.addAcceptedFileExtensionsBtn = page.getByTestId('property:fileExtensions').getByLabel('Add', {exact: true});
 
     // Multi URL Picker
-    this.minimumNumberOfItemsTxt = page.getByTestId('property:minNumber').locator('#input');
-    this.maximumNumberOfItemsTxt = page.getByTestId('property:maxNumber').locator('#input');
     this.overlaySizeDropDownBox = page.getByTestId('property:overlaySize').locator('select');
     this.hideAnchorQueryStringInputToggle = page.getByTestId('property:hideAnchor').locator('#toggle');
 
     // Media Picker
-    this.pickMultipleItemsToggle = page.getByTestId('property:multiple').locator('#toggle');
     this.enableFocalPointToggle = page.getByTestId('property:enableLocalFocalPoint').locator('#toggle');
     this.amountLowValueTxt = page.getByTestId('property:validationLimit').getByLabel('Low value');
     this.amountHighValueTxt = page.getByTestId('property:validationLimit').getByLabel('High value');
@@ -255,7 +244,6 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.showOpenButtonToggle = page.getByTestId('property:showOpenButton').locator('#toggle');
 
     // Dropdown
-    this.enableMultipleChoiceToggle = page.getByTestId('property:multiple').locator('#toggle');
     this.addOptionsBtn = page.getByTestId('property:items').getByLabel('Add', {exact: true});
 
     // True/false
@@ -341,10 +329,10 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.dataSourceChooseBtn = page.locator('[label="Data Source"]').locator(this.chooseBtn);
 
     // Dynamic Root
-    this.dynamicRootComponent = page.locator('umb-input-content-picker-document-root');
+    this.dynamicRootComponent = page.locator('umb-input-document-dynamic-root');
     this.dynamicRootPlaceholderBtn = this.dynamicRootComponent.locator('uui-button[look="placeholder"]');
-    this.dynamicRootOriginPickerModal = page.locator('umb-dynamic-root-origin-picker-modal');
-    this.dynamicRootQueryStepPickerModal = page.locator('umb-dynamic-root-query-step-picker-modal');
+    this.dynamicRootOriginPickerModal = page.locator('umb-document-dynamic-root-origin-picker-modal');
+    this.dynamicRootQueryStepPickerModal = page.locator('umb-document-dynamic-root-query-step-picker-modal');
     this.closeDynamicRootOriginPickerModalBtn = this.dynamicRootOriginPickerModal.getByLabel('Close');
   }
 
@@ -440,9 +428,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async moveDataTypeToFolder(folderName: string) {
-    await this.clickMoveToActionMenuOption();
-    await this.click(this.sidebarModal.getByText(folderName, {exact: true}));
-    await this.click(this.chooseModalBtn);
+    await this.moveToFolder(folderName);
   }
 
   async duplicateDataTypeToFolder(folderName: string) {
@@ -486,11 +472,6 @@ export class DataTypeUiHelper extends UiBaseLocators {
   async addColor(value: string) {
     await this.click(this.addColorBtn);
     await this.enterText(this.colorValueTxt, value);
-  }
-
-  // Label
-  async changeValueType(valueType: string) {
-    await this.selectByText(this.page.getByLabel('Select a value type'), valueType);
   }
 
   // Date Picker
@@ -594,11 +575,11 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   // Numeric
   async enterMinimumValue(value: string) {
-    await this.enterText(this.minimumTxt, value);
+    await this.enterText(this.rangeLowValueTxt, value);
   }
 
   async enterMaximumValue(value: string) {
-    await this.enterText(this.maximumTxt, value);
+    await this.enterText(this.rangeHighValueTxt, value);
   }
 
   async enterStepSizeValue(value: string) {
@@ -606,11 +587,11 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async enterSliderMinimumValue(value: string) {
-    await this.enterText(this.sliderMinimumTxt, value);
+    await this.enterText(this.rangeLowValueTxt, value);
   }
 
   async enterSliderMaximumValue(value: string) {
-    await this.enterText(this.sliderMaximumTxt, value);
+    await this.enterText(this.rangeHighValueTxt, value);
   }
 
   async clickAllowDecimalsToggle() {
@@ -664,11 +645,11 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   // Multi URL Picker
   async enterMinimumNumberOfItemsValue(value: string) {
-    await this.enterText(this.minimumNumberOfItemsTxt, value);
+    await this.enterText(this.minAmountTxt, value);
   }
 
   async enterMaximumNumberOfItemsValue(value: string) {
-    await this.enterText(this.maximumNumberOfItemsTxt, value);
+    await this.enterText(this.maxAmountTxt, value);
   }
 
   async clickIgnoreUserStartNodesToggle() {
@@ -684,10 +665,6 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   // Media Picker
-  async clickPickMultipleItemsToggle() {
-    await this.click(this.pickMultipleItemsToggle);
-  }
-
   async clickEnableFocalPointToggle() {
     await this.click(this.enableFocalPointToggle);
   }
@@ -802,11 +779,6 @@ export class DataTypeUiHelper extends UiBaseLocators {
     const startNodeLocator = this.entityItem.filter({has: this.page.locator(`[name="${contentName}"]`)});
     await this.hoverAndClick(startNodeLocator, startNodeLocator.getByLabel('Remove'));
     await this.clickConfirmRemoveButton();
-  }
-
-  // Dropdown
-  async clickEnableMultipleChoiceToggle() {
-    await this.click(this.enableMultipleChoiceToggle);
   }
 
   async clickAddOptionsButton() {

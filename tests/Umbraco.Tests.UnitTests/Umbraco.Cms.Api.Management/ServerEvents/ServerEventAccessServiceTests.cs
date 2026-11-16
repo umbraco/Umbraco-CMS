@@ -152,6 +152,39 @@ public class ServerEventAccessServiceTests
         Assert.That(await filter.HasAccessAsync(restricted, PathContext("-1,3")), Is.False);
     }
 
+    [Test]
+    public async Task Can_Grant_Element_Access_Only_Within_Start_Node()
+    {
+        var entityService = CreateEntityServiceMock();
+        var filter = new ElementServerEventAccessFilter(entityService.Object, AppCaches.Disabled);
+
+        IUser restricted = new UserBuilder().WithStartElementIds(new[] { HomeNodeId }).Build();
+
+        Assert.That(await filter.HasAccessAsync(restricted, PathContext("-1,2,4")), Is.True);
+        Assert.That(await filter.HasAccessAsync(restricted, PathContext("-1,3")), Is.False);
+    }
+
+    [Test]
+    public void Element_Filter_Applies_To_Element_And_Element_Container_Sources()
+    {
+        var filter = new ElementServerEventAccessFilter(CreateEntityServiceMock().Object, AppCaches.Disabled);
+
+        Assert.That(
+            filter.FilteredEventSources,
+            Is.EquivalentTo(new[] { Constants.ServerEvents.EventSource.Element, Constants.ServerEvents.EventSource.ElementContainer }));
+    }
+
+    [Test]
+    public async Task Cannot_Grant_Element_Access_Without_Entity_Path()
+    {
+        var entityService = CreateEntityServiceMock();
+        var filter = new ElementServerEventAccessFilter(entityService.Object, AppCaches.Disabled);
+
+        IUser admin = new UserBuilder().WithStartElementIds(new[] { Constants.System.Root }).Build();
+
+        Assert.That(await filter.HasAccessAsync(admin, new ServerEventRoutingContext()), Is.False);
+    }
+
     private static ServerEventRoutingContext PathContext(string entityPath) => new() { EntityPath = entityPath };
 
     private static ServerEventAccessService CreateSut(bool mediaStartNodes = false)

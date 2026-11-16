@@ -3,7 +3,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -422,6 +421,99 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual("anotherGroup", contentType.PropertyGroups.First(g => g.Name == "AnotherGroup").Alias);
 
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.Create);
+    }
+
+    [TestCase("#Technical data - Display", "technicalDataDisplay")]
+    [TestCase("Tab: Settings (old)!", "tabSettingsOld")]
+    [TestCase("My   Tab", "myTab")]
+    [TestCase("  My Tab  ", "myTab")]
+    [TestCase("my.tab-name", "myTabName")]
+    [TestCase("SEO Settings", "seoSettings")]
+    [TestCase("myTAB", "myTAB")]
+    [TestCase("1st Tab", "1stTab")]
+    [TestCase("Content/Settings", "contentSettings")]
+    [TestCase("Ærø Info", "ærøInfo")]
+    public async Task Property_Container_Alias_Is_CamelCased_Name_Without_Punctuation(string name, string expectedAlias)
+    {
+        var createModel = ContentTypeCreateModel("Test", "test");
+        var container = ContentTypePropertyContainerModel(name, type: TabContainerType);
+        createModel.Containers = new[] { container };
+        createModel.Properties = new[] { ContentTypePropertyTypeModel("My Property", "myProperty", containerKey: container.Key) };
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        var contentType = await ContentTypeService.GetAsync(result.Result!.Key);
+
+        Assert.AreEqual(expectedAlias, contentType!.PropertyGroups.Single().Alias);
+    }
+
+    [Test]
+    public async Task Property_Container_Alias_Only_Separates_Parent_And_Child()
+    {
+        var createModel = ContentTypeCreateModel("Test", "test");
+        var tab = ContentTypePropertyContainerModel("Content/Settings", type: TabContainerType);
+        var group = ContentTypePropertyContainerModel("Meta/Data", type: GroupContainerType);
+        group.ParentKey = tab.Key;
+        createModel.Containers = new[] { tab, group };
+        createModel.Properties = new[] { ContentTypePropertyTypeModel("My Property", "myProperty", containerKey: group.Key) };
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        var contentType = await ContentTypeService.GetAsync(result.Result!.Key);
+
+        Assert.AreEqual("contentSettings", contentType!.PropertyGroups.Single(g => g.Key == tab.Key).Alias);
+        Assert.AreEqual("contentSettings/metaData", contentType.PropertyGroups.Single(g => g.Key == group.Key).Alias);
+    }
+
+    [Test]
+    public async Task Property_Container_Aliases_Are_Made_Unique_By_Appending_A_Number()
+    {
+        var createModel = ContentTypeCreateModel("Test", "test");
+        var tab1 = ContentTypePropertyContainerModel("Content", type: TabContainerType);
+        var tab2 = ContentTypePropertyContainerModel("Content!", type: TabContainerType);
+        var tab3 = ContentTypePropertyContainerModel("content", type: TabContainerType);
+        var group1 = ContentTypePropertyContainerModel("Info", type: GroupContainerType);
+        group1.ParentKey = tab2.Key;
+        var group2 = ContentTypePropertyContainerModel("Info:", type: GroupContainerType);
+        group2.ParentKey = tab2.Key;
+        createModel.Containers = new[] { group1, group2, tab1, tab2, tab3 };
+        createModel.Properties = new[]
+        {
+            ContentTypePropertyTypeModel("My Property 1", "myProperty1", containerKey: tab1.Key),
+            ContentTypePropertyTypeModel("My Property 2", "myProperty2", containerKey: tab3.Key),
+            ContentTypePropertyTypeModel("My Property 3", "myProperty3", containerKey: group1.Key),
+            ContentTypePropertyTypeModel("My Property 4", "myProperty4", containerKey: group2.Key),
+        };
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        var contentType = await ContentTypeService.GetAsync(result.Result!.Key);
+
+        Assert.AreEqual(5, contentType!.PropertyGroups.Count);
+        Assert.AreEqual("content", contentType.PropertyGroups.Single(g => g.Key == tab1.Key).Alias);
+        Assert.AreEqual("content1", contentType.PropertyGroups.Single(g => g.Key == tab2.Key).Alias);
+        Assert.AreEqual("content2", contentType.PropertyGroups.Single(g => g.Key == tab3.Key).Alias);
+        Assert.AreEqual("content1/info", contentType.PropertyGroups.Single(g => g.Key == group1.Key).Alias);
+        Assert.AreEqual("content1/info1", contentType.PropertyGroups.Single(g => g.Key == group2.Key).Alias);
+        Assert.AreEqual(4, contentType.PropertyTypes.Count());
+    }
+
+    [Test]
+    public async Task Property_Container_Alias_Is_Key_When_Name_Has_No_Letters_Or_Digits()
+    {
+        var createModel = ContentTypeCreateModel("Test", "test");
+        var tab = ContentTypePropertyContainerModel("###", type: TabContainerType);
+        var group = ContentTypePropertyContainerModel("- !", type: GroupContainerType);
+        group.ParentKey = tab.Key;
+        createModel.Containers = new[] { tab, group };
+        createModel.Properties = new[] { ContentTypePropertyTypeModel("My Property", "myProperty", containerKey: group.Key) };
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        var contentType = await ContentTypeService.GetAsync(result.Result!.Key);
+
+        Assert.AreEqual(tab.Key.ToString(), contentType!.PropertyGroups.Single(g => g.Key == tab.Key).Alias);
+        Assert.AreEqual($"{tab.Key}/{group.Key}", contentType.PropertyGroups.Single(g => g.Key == group.Key).Alias);
     }
 
     [Test]
@@ -1506,14 +1598,55 @@ internal sealed partial class ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Cannot_Create_Element_Type_With_Segment_Variation()
+    public async Task Can_Create_Element_Type_With_Segment_Variation()
     {
         var createModel = ContentTypeCreateModel("Test", "test", isElement: true);
         createModel.VariesBySegment = true;
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.Success, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Create_With_Property_Varying_By_Culture_When_Content_Type_Does_Not()
+    {
+        var propertyType = ContentTypePropertyTypeModel("Title", "title");
+        propertyType.VariesByCulture = true;
+        var createModel = ContentTypeCreateModel("Test", "test", propertyTypes: [propertyType]);
+        createModel.VariesByCulture = false;
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidSegmentVariationForElementType, result.Status);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidPropertyTypeVariation, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Create_With_Property_Varying_By_Segment_When_Content_Type_Does_Not()
+    {
+        var propertyType = ContentTypePropertyTypeModel("Title", "title");
+        propertyType.VariesBySegment = true;
+        var createModel = ContentTypeCreateModel("Test", "test", propertyTypes: [propertyType]);
+        createModel.VariesBySegment = false;
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidPropertyTypeVariation, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Create_With_Property_Varying_By_Segment_When_Content_Type_Does()
+    {
+        var propertyType = ContentTypePropertyTypeModel("Title", "title");
+        propertyType.VariesBySegment = true;
+        var createModel = ContentTypeCreateModel("Test", "test", propertyTypes: [propertyType]);
+        createModel.VariesBySegment = true;
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
     }
 }

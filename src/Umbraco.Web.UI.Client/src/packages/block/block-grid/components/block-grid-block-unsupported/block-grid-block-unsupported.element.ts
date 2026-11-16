@@ -1,39 +1,57 @@
+import { UMB_BLOCK_ENTRY_CONTEXT } from '../../../block/context/block-entry.context-token.js';
+import { getUnsupportedBlockMessageKeys } from '../../../block/utils/get-unsupported-block-message-keys.function.js';
+import type { UmbBlockExternalContentFailureReason } from '../../../block/types.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-block-grid-block-unsupported')
 export class UmbBlockGridBlockUnsupportedElement extends UmbLitElement {
+	@state()
+	private _externalContentFailure?: UmbBlockExternalContentFailureReason;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
+			this.observe(
+				context?.externalContentFailure,
+				(failure) => (this._externalContentFailure = failure),
+				'observeExternalContentFailure',
+			);
+		});
+	}
+
 	override render() {
+		const keys = getUnsupportedBlockMessageKeys(this._externalContentFailure);
 		return html`
 			<div id="host">
 				<div id="open-part">
-					${this.#renderBlockInfo()}
+					${this.#renderBlockInfo(keys.nameKey)}
 					<slot></slot>
 					<slot name="tag"></slot>
 				</div>
-				${this.#renderInside()}
+				${this.#renderInside(keys.descriptionKey)}
 			</div>
 		`;
 	}
 
-	#renderBlockInfo() {
+	#renderBlockInfo(nameKey: string) {
 		return html`
 			<span id="content">
 				<span id="icon">
 					<umb-icon name="icon-alert"></umb-icon>
 				</span>
 				<div id="info">
-					<span id="name">${this.localize.term('blockEditor_unsupportedBlockName')}</span>
+					<span id="name">${this.localize.term(nameKey)}</span>
 				</div>
 			</span>
 		`;
 	}
 
-	#renderInside() {
+	#renderInside(descriptionKey: string) {
 		return html`
 			<div id="inside" draggable="false">
-				${this.localize.term('blockEditor_unsupportedBlockDescription')}
+				${this.localize.term(descriptionKey)}
 				<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
 			</div>
 		`;

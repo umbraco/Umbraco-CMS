@@ -1,7 +1,5 @@
-using System.Security.Cryptography;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Server;
 using OpenIddict.Validation;
 using Umbraco.Cms.Api.Common.Configuration;
@@ -9,9 +7,9 @@ using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.DependencyInjection;
 
@@ -107,49 +105,15 @@ public static class UmbracoBuilderAuthExtensions
                 // for more information
                 options.UseDataProtection();
 
-                // Register encryption and signing credentials to protect tokens.
-                // Note that for tokens generated/validated using ASP.NET Core Data Protection,
-                // a separate key ring is used, distinct from the credentials discussed in
-                // https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html
-                // More details can be found here: https://github.com/openiddict/openiddict-core/issues/1892#issuecomment-1737308506
-                // "When using ASP.NET Core Data Protection to generate opaque tokens, the signing and encryption credentials
-                // registered via Add*Key/Certificate() are not used". But since OpenIddict requires the registration of such,
-                // we can generate random keys per instance without them taking effect.
-                // - see also https://github.com/openiddict/openiddict-core/issues/1231
-                options
-                    .AddEncryptionKey(new SymmetricSecurityKey(RandomNumberGenerator.GetBytes(32))) // generate a cryptographically secure random 256-bits key
-                    .AddSigningKey(new RsaSecurityKey(RSA.Create(keySizeInBits: 2048))); // generate RSA key with recommended size of 2048-bits
+                // The encryption and signing credentials are registered by ConfigureOpenIddictServerCredentials, from the
+                // replaceable ISecurityTokenCredentialsProvider - identity tokens are JWTs signed with them, even with
+                // Data Protection enabled.
 
                 // Add custom handler for the "ProcessRequestContext" server event, to stop OpenIddict from handling
                 // every last request to the server (including front-end requests).
                 options.AddEventHandler<OpenIddictServerEvents.ProcessRequestContext>(configuration =>
                 {
                     configuration.UseSingletonHandler<ProcessRequestContextHandler>().SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ResolveRequestUri.Descriptor.Order - 1);
-                });
-
-                options.AddEventHandler<OpenIddictServerEvents.ApplyTokenResponseContext>(configuration =>
-                {
-                    configuration
-                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessJsonResponse<OpenIddictServerEvents.ApplyTokenResponseContext>.Descriptor.Order - 1);
-                });
-                options.AddEventHandler<OpenIddictServerEvents.ApplyAuthorizationResponseContext>(configuration =>
-                {
-                    configuration
-                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.ProcessQueryResponse.Descriptor.Order - 1);
-                });
-                options.AddEventHandler<OpenIddictServerEvents.ExtractTokenRequestContext>(configuration =>
-                {
-                    configuration
-                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractPostRequest<OpenIddictServerEvents.ExtractTokenRequestContext>.Descriptor.Order + 1);
-                });
-                options.AddEventHandler<OpenIddictServerEvents.ExtractRevocationRequestContext>(configuration =>
-                {
-                    configuration
-                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractPostRequest<OpenIddictServerEvents.ExtractRevocationRequestContext>.Descriptor.Order + 1);
                 });
             })
 
@@ -175,19 +139,11 @@ public static class UmbracoBuilderAuthExtensions
                 {
                     configuration.UseSingletonHandler<ProcessRequestContextHandler>().SetOrder(OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ResolveRequestUri.Descriptor.Order - 1);
                 });
-
-                options.AddEventHandler<OpenIddictValidationEvents.ProcessAuthenticationContext>(configuration =>
-                {
-                    configuration
-                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                        // IMPORTANT: the handler must be AFTER the built-in query string handler, because the client-side SignalR library sometimes appends access tokens to the query string.
-                        .SetOrder(OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ExtractAccessTokenFromQueryString.Descriptor.Order + 1);
-                });
             });
 
         builder.Services.AddSingleton<IDistributedBackgroundJob, OpenIddictCleanupJob>();
         builder.Services.ConfigureOptions<ConfigureOpenIddict>();
-
-        builder.AddNotificationHandler<UserLogoutSuccessNotification, HideBackOfficeTokensHandler>();
+        builder.Services.AddUnique<ISecurityTokenCredentialsProvider, EphemeralSecurityTokenCredentialsProvider>();
+        builder.Services.ConfigureOptions<ConfigureOpenIddictServerCredentials>();
     }
 }

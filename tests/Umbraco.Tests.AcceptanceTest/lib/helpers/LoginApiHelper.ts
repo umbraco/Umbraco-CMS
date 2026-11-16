@@ -1,7 +1,15 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
-import {Page} from "@playwright/test";
-import {createHash} from "crypto";
+import {expect, Page} from "@playwright/test";
+import {ConstantHelper} from "./ConstantHelper";
 
+/**
+ * Back-office authentication against the Management API.
+ *
+ * Back-office auth is cookie-only: POST /security/back-office/login signs the user in and the
+ * response sets the httpOnly authentication cookie. There is no authorization code, no PKCE and
+ * no readable token - the cookie is the sole credential. Playwright's `page.request` shares the
+ * browser context's cookie jar, so every subsequent API and UI request carries it automatically.
+ */
 export class LoginApiHelper {
   api: ApiHelpers;
   page: Page;
@@ -11,23 +19,11 @@ export class LoginApiHelper {
     this.page = page;
   }
 
+  /**
+   * Signs the given user in and leaves the authentication cookie on the browser context.
+   */
   public async login(userEmail: string, password: string) {
-    const codeVerifier = "12345";
-    const stateValue = 'myStateValue';
-    const sessionCookie = await this.authenticate(userEmail, password);
-    const codeChallenge = this.createCodeChallenge(codeVerifier);
-    const authorizationResponse = await this.authorize(codeChallenge, sessionCookie, stateValue);
-    const PKCECookie = this.extractPKCECookie(authorizationResponse);
-    await this.exchangeCodeForTokens(sessionCookie, codeVerifier, PKCECookie);
-  }
-
-  private extractPKCECookie(setCookies: string) {
-    const match = setCookies.match(/.*(__Host-umbPkceCode=[A-Za-z0-9_-]+;)/s);
-    return match?.[1] ?? "";
-  }
-
-  private async authenticate(userEmail: string, password: string){
-    const response = await this.page.request.post(this.api.baseUrl + '/umbraco/management/api/v1/security/back-office/login', {
+    const response = await this.page.request.post(this.api.baseUrl + ConstantHelper.apiEndpoints.backOfficeLogin, {
       headers: {
         'Content-Type': 'application/json',
         Referer: this.api.baseUrl,
@@ -40,49 +36,49 @@ export class LoginApiHelper {
       ignoreHTTPSErrors: true
     });
 
-    return response.headers()['set-cookie'];
+    // Playwright shows this as the step title in the report whether or not it passes, so it reads
+    // as a description rather than as a failure.
+    expect(response.status(), `Sign in ${userEmail}`).toBe(ConstantHelper.statusCodes.ok);
+
+    return response;
   }
 
-  private createCodeChallenge(codeVerifier: string) {
-    return createHash('sha256').update(codeVerifier, 'utf8').digest('base64').replace(/=/g, '').trim();
-  }
-
-  private async authorize(codeChallenge: string, cookie: string, stateValue: string){
-    const authorizationUrl = `${this.api.baseUrl}/umbraco/management/api/v1/security/back-office/authorize?client_id=umbraco-back-office&response_type=code&redirect_uri=${encodeURIComponent(this.api.baseUrl + '/umbraco/oauth_complete')}&code_challenge_method=S256&code_challenge=${codeChallenge}&state=${stateValue}&scope=offline_access&prompt=consent&access_type=offline`;
-    const response = await this.page.request.get(authorizationUrl, {
+  /**
+   * Clears the authentication cookie server-side. The endpoint answers with a redirect to the
+   * client logout landing, which is irrelevant here - only the cleared cookie matters.
+   */
+  public async signOut() {
+    return await this.page.request.get(this.api.baseUrl + ConstantHelper.apiEndpoints.backOfficeSignOut, {
       headers: {
-        Cookie: cookie,
         Referer: this.api.baseUrl,
       },
       ignoreHTTPSErrors: true,
       maxRedirects: 0
     });
-
-    if (response.status() !== 302) {
-      console.error('Authorization failed');
-    }
-    return response.headers()['set-cookie'];
   }
 
-  private async exchangeCodeForTokens(cookie: string, codeVerifier: string, pkceCookie: string) {
-    const response = await this.page.request.post(this.api.baseUrl + '/umbraco/management/api/v1/security/back-office/token', {
+  /**
+   * Renews the session cookie. Returns false when there is no session to renew.
+   */
+  public async keepAlive() {
+    const response = await this.page.request.post(this.api.baseUrl + ConstantHelper.apiEndpoints.backOfficeKeepAlive, {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Cookie: pkceCookie + cookie,
-        Origin: this.api.baseUrl
-      },
-      form: {
-        grant_type: 'authorization_code',
-        client_id: 'umbraco-back-office',
-        redirect_uri: this.api.baseUrl + '/umbraco/oauth_complete',
-        code: '[redacted]',
-        code_verifier: codeVerifier
+        Origin: this.api.baseUrl,
       },
       ignoreHTTPSErrors: true
     });
 
-    if (response.status() !== 200) {
-      console.error('Token exchange failed');
-    }
+    return response.ok();
+  }
+
+  /**
+   * Probes the current session without renewing it. A non-ok response means "no session".
+   */
+  public async hasSession() {
+    const response = await this.page.request.get(this.api.baseUrl + ConstantHelper.apiEndpoints.currentUserConfiguration, {
+      ignoreHTTPSErrors: true
+    });
+
+    return response.ok();
   }
 }

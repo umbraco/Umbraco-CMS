@@ -2,25 +2,25 @@
 
 Image processing library using **ImageSharp 2.x** for backwards compatibility with existing deployments. Use this package only when migrating from older Umbraco versions that depend on ImageSharp 2.x behavior.
 
-**Namespace Note**: Uses `Umbraco.Cms.Imaging.ImageSharp` (same as v3 package) for drop-in replacement - no code changes needed when switching.
+**Namespace Note**: Uses `Umbraco.Cms.Imaging.ImageSharp` (same as the v4 package) for drop-in replacement - no code changes needed when switching.
 
 ---
 
 ## 1. Architecture
 
 **Type**: Class Library (NuGet Package)
-**Target Framework**: .NET 10.0
+**Target Framework**: .NET 11.0
 **Purpose**: ImageSharp 2.x compatibility layer
 
 ### Package Versions (Pinned)
 
 ```xml
 <!-- From csproj lines 7-8 -->
-<PackageReference Include="SixLabors.ImageSharp" VersionOverride="[2.1.11, 3)" />
+<PackageReference Include="SixLabors.ImageSharp" VersionOverride="[2.1.13, 3)" />
 <PackageReference Include="SixLabors.ImageSharp.Web" VersionOverride="[2.0.2, 3)" />
 ```
 
-Version constraint `[2.1.11, 3)` means: minimum 2.1.11, below 3.0.
+Version constraint `[2.1.13, 3)` means: minimum 2.1.13, below 3.0.
 
 ### Project Structure (7 source files, plus 5 linked from the 3.x package)
 
@@ -43,11 +43,11 @@ csproj is the list. Edit them in the 3.x project; both packages pick up the chan
 
 ---
 
-## 2. Key Differences from ImageSharp (3.x)
+## 2. Key Differences from ImageSharp (4.x)
 
-| Feature | ImageSharp2 (this) | ImageSharp (3.x) |
+| Feature | ImageSharp2 (this) | ImageSharp (4.x) |
 |---------|-------------------|------------------|
-| **Package version** | 2.1.11 - 2.x | 3.x+ |
+| **Package version** | 2.1.13 - 2.x | 4.x |
 | **HMAC signing** | Not supported | Supported |
 | **WebP default** | Lossy (native) | Lossless (overridden to Lossy) |
 | **Cache buster param** | `rnd` only | `rnd` or `v` |
@@ -62,7 +62,7 @@ csproj is the list. Edit them in the 3.x project; both packages pick up the chan
 // v2: Direct method call
 IImageInfo imageInfo = Image.Identify(_configuration, stream);
 
-// v3: Uses DecoderOptions
+// v4: Uses DecoderOptions
 ImageInfo imageInfo = Image.Identify(options, stream);
 ```
 
@@ -71,11 +71,11 @@ ImageInfo imageInfo = Image.Identify(options, stream);
 // v2: Size is a method
 Size size = image.Image.Size();
 
-// v3: Size is a property
+// v4: Size is a property
 Size size = image.Image.Size;
 ```
 
-### Missing Features (vs ImageSharp 3.x)
+### Missing Features (vs ImageSharp 4.x)
 
 1. **No HMAC request authorization** - `HMACSecretKey` setting is ignored
 2. **No `v` cache buster** - Only `rnd` parameter triggers immutable headers
@@ -108,9 +108,10 @@ nothing takes it again. The 3.x package re-enters its decode hook on a retry and
 - Migrating from Umbraco versions that used ImageSharp 2.x
 - Third-party packages have hard dependency on ImageSharp 2.x
 - Need exact byte-for-byte output compatibility with existing cached images
+- Prefer to avoid ImageSharp's license change in v3+
 
-**Use ImageSharp (3.x) when:**
-- New installations
+**Use ImageSharp (4.x) when:**
+- New installations (this is the default, referenced by the `Umbraco.Cms` meta-package)
 - Need HMAC URL signing for security
 - Want latest performance improvements
 
@@ -118,7 +119,7 @@ nothing takes it again. The 3.x package re-enters its decode hook on a retry and
 
 ## 4. Configuration
 
-Same as ImageSharp 3.x. See `/src/Umbraco.Cms.Imaging.ImageSharp/CLAUDE.md` → Section 3 for full configuration details.
+Same as ImageSharp 4.x. See `/src/Umbraco.Cms.Imaging.ImageSharp/CLAUDE.md` → Section 3 for full configuration details.
 
 **Key difference**: `HMACSecretKey` setting exists but is **ignored** in this package (no HMAC support in v2).
 
@@ -147,7 +148,7 @@ dotnet test tests/Umbraco.Tests.UnitTests/ --filter "FullyQualifiedName~ImageSha
 
 ### Switching Between Packages
 
-To switch from ImageSharp2 to ImageSharp (3.x):
+To switch from ImageSharp2 to ImageSharp (4.x):
 1. Remove `Umbraco.Cms.Imaging.ImageSharp2` package reference
 2. Add `Umbraco.Cms.Imaging.ImageSharp` package reference
 3. Clear media cache folder (`~/umbraco/Data/TEMP/MediaCache`)
@@ -155,10 +156,10 @@ To switch from ImageSharp2 to ImageSharp (3.x):
 
 ### Getting Help
 
-- **ImageSharp 3.x Documentation**: `/src/Umbraco.Cms.Imaging.ImageSharp/CLAUDE.md`
+- **ImageSharp 4.x Documentation**: `/src/Umbraco.Cms.Imaging.ImageSharp/CLAUDE.md`
 - **Root Documentation**: `/CLAUDE.md`
 - **SixLabors ImageSharp 2.x Docs**: https://docs.sixlabors.com/
 
 ---
 
-**This is a backwards-compatibility package. For new projects, use `Umbraco.Cms.Imaging.ImageSharp` (3.x) instead.**
+**This is a backwards-compatibility package. For new projects, use `Umbraco.Cms.Imaging.ImageSharp` (4.x) instead.**

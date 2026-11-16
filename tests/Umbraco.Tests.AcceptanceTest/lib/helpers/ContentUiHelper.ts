@@ -32,6 +32,8 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly textAreaTxt: Locator;
   private readonly plusIconBtn: Locator;
   private readonly enterTagTxt: Locator;
+  private readonly documentMenuItem: Locator;
+  private readonly documentRecycleBinMenuItem: Locator;
   private readonly menuItemTree: Locator;
   private readonly hostnameComboBox: Locator;
   private readonly confirmToUnpublishBtn: Locator;
@@ -241,14 +243,17 @@ export class ContentUiHelper extends UiBaseLocators {
     this.textAreaTxt = page.locator('umb-property-editor-ui-textarea textarea');
     this.plusIconBtn = page.locator('#icon-add svg');
     this.enterTagTxt = page.getByPlaceholder('Enter tag');
-    this.menuItemTree = page.locator('umb-menu-item-tree-default');
+    this.documentMenuItem = page.locator('[data-mark="menu-item:Umb.MenuItem.Document"]');
+    this.documentRecycleBinMenuItem = page.locator('[data-mark="menu-item:Umb.MenuItem.Document.RecycleBin"]');
+    this.menuItemTree = this.documentMenuItem.or(this.documentRecycleBinMenuItem);
     this.confirmToUnpublishBtn = page.locator('umb-content-unpublish-modal').getByLabel('Unpublish');
     this.confirmToPublishBtn = page.locator('umb-content-publish-modal').getByLabel('Publish');
     this.dropdown = page.locator("select#native");
     this.splitView = page.locator("#splitViews");
     this.setADateTxt = page.getByLabel("Set a date…");
+    // The single and multiple media pickers are separate elements, and a property can be either.
     this.chooseMediaPickerBtn = page.locator(
-      "umb-property-editor-ui-media-picker #btn-add",
+      "umb-property-editor-ui-media-picker #btn-add, umb-property-editor-ui-single-media-picker #btn-add",
     );
     this.chooseMemberPickerBtn = page.locator(
       "umb-property-editor-ui-member-picker #btn-add",
@@ -378,7 +383,7 @@ export class ContentUiHelper extends UiBaseLocators {
       .locator("#button");
     this.rollbackItem = page.locator(".rollback-item");
     this.activeRollbackItem = page.locator(".rollback-item.active");
-    this.actionsMenu = page.locator("uui-scroll-container");
+    this.actionsMenu = page.locator("umb-entity-action-list");
     this.linkToDocumentBtn = this.linkPickerModal
       .getByTestId("action:document")
       .locator("#button");
@@ -546,9 +551,10 @@ export class ContentUiHelper extends UiBaseLocators {
     // The alias suffix (Classic/Table) is stable across entity types, but the entity segment isn't, so match on suffix only.
     this.treeViewClassicOptionBtnInPickerModal = this.sidebarModal.locator('[data-mark^="tree:switch-view:"][data-mark$=".Classic"]');
     this.treeViewTableOptionBtnInPickerModal = this.sidebarModal.locator('[data-mark^="tree:switch-view:"][data-mark$=".Table"]');
-    this.treeTableViewInPickerModal = this.sidebarModal.locator('umb-table-tree-view');
-    this.treeTableRowInPickerModal = this.sidebarModal.locator('umb-table-tree-view uui-table-row');
-    this.selectableTreeTableRowInPickerModal = this.sidebarModal.locator('umb-table-tree-view uui-table-row[selectable]');
+    // Trees may render the table view through their own element extending the base one.
+    this.treeTableViewInPickerModal = this.sidebarModal.locator('umb-table-tree-view, umb-document-table-tree-view');
+    this.treeTableRowInPickerModal = this.treeTableViewInPickerModal.locator('uui-table-row');
+    this.selectableTreeTableRowInPickerModal = this.treeTableViewInPickerModal.locator('uui-table-row[selectable]');
     // Public Access
     this.containerSetupBtn = this.container.getByLabel('Setup');
     this.containerEditBtn = this.container.getByLabel('Edit');
@@ -623,12 +629,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async openContentCaretButtonForName(name: string) {
-    const menuItem = this.menuItemTree.filter({hasText: name}).last();
-    const isCaretButtonOpen = await menuItem.getAttribute('show-children');
-
-    if (isCaretButtonOpen === null) {
-      await this.clickCaretButtonForContentName(name);
-    }
+    await this.openCaretButtonForName(name);
   }
 
   async clickCaretButtonForContentName(name: string) {
@@ -1216,11 +1217,6 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.page.locator('.variant.culture-variant').filter({hasText: contentName}).locator(this.expandSegmentBtn).click();
   }
 
-  async clickSegmentVariantButton(segmentName: string) {
-    await this.click(this.page.getByRole('button', {name: segmentName}));
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
-  }
-
   async clickVariantAddModeButtonForLanguageName(language: string) {
     await this.click(this.variantAddModeBtn.getByText(language));
     await this.page.waitForTimeout(ConstantHelper.wait.short);
@@ -1340,6 +1336,10 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async isDocumentReadOnly(isVisible: boolean = true) {
     await this.isVisible(this.documentReadOnly, isVisible, ConstantHelper.timeout.long);
+  }
+
+  async doesDocumentNameInputHaveValue(name: string) {
+    await expect(this.contentNameTxt).toHaveValue(name, {timeout: ConstantHelper.timeout.long});
   }
 
   async isDocumentNameInputEditable(isEditable: boolean = true) {
@@ -1706,7 +1706,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickEditBlockListEntryWithName(blockListElementName: string) {
-    await this.click(this.blockListEntry.filter({hasText: blockListElementName}).getByLabel('edit'), {force: true});
+    await this.click(this.blockListEntry.filter({hasText: blockListElementName}).getByLabel('edit'));
   }
 
   async clickEditBlockGridEntryWithName(blockGridElementName: string) {
@@ -1860,25 +1860,25 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async doesClipboardHaveCopiedBlockWithName(contentName: string, propertyName: string, blockName: string, index: number = 0) {
-    await this.isVisible(this.clipboardEntryPicker.getByLabel(`${contentName} - ${propertyName} - ${blockName}`).nth(index));
+    await this.isVisible(this.clipboardEntryPicker.getByTestId(`clipboard-entry:${contentName} - ${propertyName} - ${blockName}`).nth(index));
   }
 
   async doesClipboardHaveCopiedBlocks(contentName: string, propertyName: string, index: number = 0) {
-    await this.isVisible(this.clipboardEntryPicker.getByLabel(`${contentName} - ${propertyName}`).nth(index));
+    await this.isVisible(this.clipboardEntryPicker.getByTestId(`clipboard-entry:${contentName} - ${propertyName}`).nth(index));
   }
 
   async doesClipboardContainCopiedBlocksCount(count: number) {
-    await this.hasCount(this.clipboardEntryPicker.locator(this.menuItem), count);
+    await this.hasCount(this.clipboardEntryPicker.getByTestId(/^clipboard-entry:/), count);
   }
 
   async selectClipboardEntryWithName(contentName: string, propertyName: string, blockName: string, index: number = 0) {
     await this.doesClipboardHaveCopiedBlockWithName(contentName, propertyName, blockName, index);
-    await this.click(this.clipboardEntryPicker.getByLabel(`${contentName} - ${propertyName} - ${blockName}`).nth(index));
+    await this.click(this.clipboardEntryPicker.getByTestId(`clipboard-entry:${contentName} - ${propertyName} - ${blockName}`).nth(index).locator('#select-checkbox'));
   }
 
   async selectClipboardEntriesWithName(contentName: string, propertyName: string, index: number = 0) {
     await this.doesClipboardHaveCopiedBlocks(contentName, propertyName, index);
-    await this.click(this.clipboardEntryPicker.getByLabel(`${contentName} - ${propertyName}`).nth(index));
+    await this.click(this.clipboardEntryPicker.getByTestId(`clipboard-entry:${contentName} - ${propertyName}`).nth(index).locator('#select-checkbox'));
   }
 
   async goToBlockGridBlockWithName(groupName: string, propertyName: string, blockName: string, index: number = 0) {
@@ -2113,6 +2113,11 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.containsText(this.documentVariantLanguagePicker, name);
   }
 
+  async isAppLanguageReadOnly(isReadOnly: boolean = true) {
+    const tag = this.documentLanguageSelect.getByText('Read-only');
+    await this.isVisible(tag, isReadOnly);
+  }
+
   async clickSchedulePublishLanguageButton(languageName: string) {
     await this.click(this.page.getByRole('menu').filter({hasText: languageName}));
   }
@@ -2155,7 +2160,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickBlockElementInRTEWithName(elementTypeName: string) {
-    const blockElementLocator = this.page.locator('uui-ref-node umb-ufm-render').filter({hasText: elementTypeName});
+    const blockElementLocator = this.page.locator('umb-ref-rte-block umb-ufm-render').filter({hasText: elementTypeName});
     await this.click(blockElementLocator, {force: true});
   }
 
@@ -2312,6 +2317,12 @@ export class ContentUiHelper extends UiBaseLocators {
     await expect(propertyLocator).toBeEditable({editable: isEditable});
   }
 
+  async clickCloseButtonInBlockWorkspace(elementTypeName: string) {
+    const blockWorkspace = this.blockModal.filter({has: this.page.getByTestId('layout-headline').filter({hasText: elementTypeName})});
+    await this.click(blockWorkspace.getByRole('button', {name: 'Close', exact: true}));
+    await this.isVisible(blockWorkspace, false);
+  }
+
   async clickEditNestedBlockListEntry(parentElementTypeName: string, blockListElementName: string) {
     const innerEntry = this.blockModal
       .filter({has: this.page.getByTestId('layout-headline').filter({hasText: parentElementTypeName})})
@@ -2360,6 +2371,10 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickSaveModalButtonAndWaitForDomainToBeCreated() {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.domains, this.click(this.sidebarSaveBtn), ConstantHelper.statusCodes.ok);
+  }
+
+  async isDocumentBlueprintSaveButtonDisabled() {
+    await expect(this.documentBlueprintSaveBtn).toBeDisabled({timeout: ConstantHelper.timeout.medium});
   }
 
   async clickSaveModalButtonAndWaitForDocumentBlueprintToBeCreated() {

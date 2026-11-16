@@ -1,37 +1,65 @@
 import { manifest as schemaManifest } from './Umbraco.MediaPicker.js';
+import { manifest as singleSchemaManifest } from './Umbraco.MediaPicker.Single.js';
+import { manifests as clipboardManifests } from './clipboard/manifests.js';
 import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
+
+const keywords = [
+	'select',
+	'image',
+	'photo',
+	'picture',
+	'banner',
+	'thumbnail',
+	'logo',
+	'avatar',
+	'gallery',
+	'media',
+	'video',
+	'file',
+	'attachment',
+	'cover',
+];
+
+const propertyEditorUiAlias = 'Umb.PropertyEditorUi.MediaPicker';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.MediaPicker',
+		alias: propertyEditorUiAlias,
 		name: 'Media Picker Property Editor UI',
 		element: () => import('./property-editor-ui-media-picker.element.js'),
 		meta: {
-			supportsVariantChange: true,
 			label: 'Media Picker',
 			propertyEditorSchemaAlias: 'Umbraco.MediaPicker3',
+			icon: 'icon-pictures',
+			group: '#propertyEditorUIGroups_media',
+			keywords: [...keywords, 'multiple', 'several'],
+			supportsReadOnly: true,
+		},
+	},
+	{
+		type: 'propertyEditorUi',
+		alias: 'Umb.PropertyEditorUi.MediaPicker.Single',
+		name: 'Single Media Picker Property Editor UI',
+		element: () => import('./property-editor-ui-single-media-picker.element.js'),
+		meta: {
+			label: 'Single Media Picker',
+			propertyEditorSchemaAlias: 'Umbraco.MediaPicker.Single',
 			icon: 'icon-picture',
 			group: '#propertyEditorUIGroups_media',
-			keywords: [
-				'select',
-				'image',
-				'photo',
-				'picture',
-				'banner',
-				'thumbnail',
-				'logo',
-				'avatar',
-				'gallery',
-				'media',
-				'video',
-				'file',
-				'attachment',
-				'cover',
-			],
+			keywords: [...keywords, 'single', 'one'],
 			supportsReadOnly: true,
 		},
 	},
 	schemaManifest,
+	singleSchemaManifest,
 	...valueSummaryManifests,
+	{
+		type: 'propertyAction',
+		kind: 'clear',
+		alias: 'Umb.PropertyAction.MediaPicker.Clear',
+		name: 'Clear Media Picker Property Action',
+		forPropertyEditorUis: [propertyEditorUiAlias],
+	},
+	...clipboardManifests,
 ];

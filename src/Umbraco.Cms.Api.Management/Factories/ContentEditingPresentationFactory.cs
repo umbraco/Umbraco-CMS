@@ -21,7 +21,7 @@ internal abstract class ContentEditingPresentationFactory<TValueModel, TVariantM
                 .Variants
                 .Select(variant => new VariantModel
                 {
-                    Culture = variant.Culture, Segment = variant.Segment, Name = variant.Name
+                    Culture = variant.Culture, Name = variant.Name
                 })
         };
 }

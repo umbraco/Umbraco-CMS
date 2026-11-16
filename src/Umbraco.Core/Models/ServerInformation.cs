@@ -14,18 +14,6 @@ public class ServerInformation
     /// <param name="semVersion">The semantic version of the Umbraco installation.</param>
     /// <param name="timeZoneInfo">The time zone information for the server.</param>
     /// <param name="runtimeMode">The current runtime mode of the server.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public ServerInformation(SemVersion semVersion, TimeZoneInfo timeZoneInfo, RuntimeMode runtimeMode)
-        : this(semVersion, timeZoneInfo, runtimeMode, isDebugMode: false)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ServerInformation"/> class.
-    /// </summary>
-    /// <param name="semVersion">The semantic version of the Umbraco installation.</param>
-    /// <param name="timeZoneInfo">The time zone information for the server.</param>
-    /// <param name="runtimeMode">The current runtime mode of the server.</param>
     /// <param name="isDebugMode">A value indicating whether the server is running in debug mode.</param>
     public ServerInformation(SemVersion semVersion, TimeZoneInfo timeZoneInfo, RuntimeMode runtimeMode, bool isDebugMode)
     {

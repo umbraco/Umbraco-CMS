@@ -48,6 +48,17 @@ public class CurrentUserResponseModel : UserPresentationBase
     public required bool HasElementRootAccess { get; init; }
 
     /// <summary>
+    /// Gets the set of document blueprint start node IDs (as <see cref="ReferenceByIdModel"/>) associated with the current user.
+    /// These define the containers in the document blueprint tree that the user has access to.
+    /// </summary>
+    public required ISet<ReferenceByIdModel> DocumentBlueprintStartNodeIds { get; init; } = new HashSet<ReferenceByIdModel>();
+
+    /// <summary>
+    /// Gets a value indicating whether the current user has access to the document blueprint root.
+    /// </summary>
+    public required bool HasDocumentBlueprintRootAccess { get; init; }
+
+    /// <summary>
     /// Gets or sets the collection of URLs representing the current user's avatars, which may include multiple sizes or formats.
     /// </summary>
     public required IEnumerable<string> AvatarUrls { get; init; } = Enumerable.Empty<string>();
@@ -60,6 +71,15 @@ public class CurrentUserResponseModel : UserPresentationBase
 
     /// <summary>Gets or sets a value indicating whether the current user has access to all languages.</summary>
     public required bool HasAccessToAllLanguages { get; init; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the current user can edit invariant (shared) property data on variant content.
+    /// </summary>
+    /// <remarks>
+    /// Aggregated across the user's groups: a single group granting the permission is sufficient.
+    /// The permission is not consulted when editing invariant content types.
+    /// </remarks>
+    public required bool HasAccessToInvariantForVariant { get; init; }
 
     /// <summary>Indicates whether the current user has access to sensitive data.</summary>
     public required bool HasAccessToSensitiveData { get; set; }

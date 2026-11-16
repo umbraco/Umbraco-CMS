@@ -98,7 +98,7 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 				result.push(variant);
 				continue;
 			}
-			const hasCultureVariant = variants.some((v) => v.culture === defaultLanguage && v.segment === variant.segment);
+			const hasCultureVariant = variants.some((v) => v.culture === defaultLanguage);
 			if (!hasCultureVariant) {
 				result.push({ ...variant, culture: defaultLanguage });
 			}
@@ -125,7 +125,7 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 			if (variant.culture === null) {
 				result.push(variant);
 			} else if (variant.culture === cultureToKeep) {
-				const hasInvariantVariant = variants.some((v) => v.culture === null && v.segment === variant.segment);
+				const hasInvariantVariant = variants.some((v) => v.culture === null);
 				if (!hasInvariantVariant) {
 					result.push({ ...variant, culture: null });
 				}
@@ -161,8 +161,8 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 	}
 
 	#getDefaultLanguage(): string {
-		const languages = this.#workspace.getLanguages();
-		const defaultLanguage = languages.find((lang) => lang.isDefault)?.unique;
+		const languages = this.#workspace.variantOptionsManager.getLanguages();
+		const defaultLanguage = languages?.find((lang) => lang.isDefault)?.unique;
 		if (!defaultLanguage) {
 			throw new Error('Default language not found');
 		}

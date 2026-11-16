@@ -2,8 +2,16 @@ import type { UmbBlockWorkspaceOriginData } from '../workspace/block-workspace.m
 import type { UmbBlockDataModel, UmbBlockLayoutBaseModel, UmbBlockValueType } from '../types.js';
 import type { UmbBlockDataObjectModel, UmbBlockManagerContext } from './block-manager.context.js';
 import { UMB_BLOCK_ENTRIES_CONTEXT } from './block-entries.context-token.js';
-import { type Observable, UmbArrayState, UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UmbArrayState,
+	UmbBasicState,
+	UmbBooleanState,
+	UmbStringState,
+	observeMultiple,
+} from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbElementTypeStructureRepository } from '@umbraco-cms/backoffice/element';
+import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
@@ -30,9 +38,16 @@ export abstract class UmbBlockEntriesContext<
 
 	public abstract readonly canCreate: Observable<boolean>;
 
-	protected _layoutEntries = new UmbArrayState<BlockLayoutType>([], (x) => x.contentKey);
+	protected _layoutEntries = new UmbArrayState<BlockLayoutType>([], (x) => x.key);
 	readonly layoutEntries = this._layoutEntries.asObservable();
 	readonly layoutEntriesLength = this._layoutEntries.asObservablePart((x) => x.length);
+
+	#libraryAllowedElementTypeKeys = new UmbArrayState<string>([], (x) => x);
+	readonly libraryAllowedElementTypeKeys = this.#libraryAllowedElementTypeKeys.asObservable();
+	#libraryAllowedElementTypeKeysPromise: Promise<Array<string>>;
+
+	#hasLibraryElements = new UmbBooleanState(false);
+	readonly hasLibraryElements = this.#hasLibraryElements.asObservable();
 
 	getLength() {
 		return this._layoutEntries.getValue().length;
@@ -54,6 +69,16 @@ export abstract class UmbBlockEntriesContext<
 			this._manager = blockGridManager;
 			this._gotBlockManager();
 		}).asPromise({ preventTimeout: true });
+
+		this.#libraryAllowedElementTypeKeysPromise = this.#loadLibraryAllowedElementTypeKeys();
+	}
+
+	async #loadLibraryAllowedElementTypeKeys(): Promise<Array<string>> {
+		const repo = new UmbElementTypeStructureRepository(this);
+		const { data: allowedTypes } = await repo.requestAllowedChildrenOf(null, null);
+		const keys = allowedTypes?.items.filter((t) => t.unique).map((t) => t.unique!) ?? [];
+		this.#libraryAllowedElementTypeKeys.setValue(keys);
+		return keys;
 	}
 
 	async getManager() {
@@ -72,8 +97,14 @@ export abstract class UmbBlockEntriesContext<
 	layoutOf(contentKey: string) {
 		return this._layoutEntries.asObservablePart((source) => source.find((x) => x.contentKey === contentKey));
 	}
+	byKey(key: string) {
+		return this._layoutEntries.asObservablePart((source) => source.find((x) => x.key === key));
+	}
 	getLayoutOf(contentKey: string) {
 		return this._layoutEntries.getValue().find((x) => x.contentKey === contentKey);
+	}
+	getByKey(key: string) {
+		return this._layoutEntries.getValue().find((x) => x.key === key);
 	}
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		return this._layoutEntries.setValue(layouts);
@@ -85,9 +116,47 @@ export abstract class UmbBlockEntriesContext<
 	public abstract getPathForCreateBlock(index: number): string | undefined;
 	public abstract getPathForClipboard(index: number): string | undefined;
 
+	/**
+	 * Returns the element type uniques allowed at the library root that overlap
+	 * with the given block types — used to filter the library picker in the
+	 * block catalogue modal.
+	 * @param {Array<BlockType>} blockTypes The block types to filter by.
+	 * @returns {Promise<Array<string>>} The allowed element type uniques.
+	 */
+	protected async _getLibraryAllowedElementTypeKeys(blockTypes: Array<BlockType>): Promise<Array<string>> {
+		const allowedKeys = await this.#libraryAllowedElementTypeKeysPromise;
+		const blockTypeKeys = new Set(blockTypes.map((bt) => bt.contentElementTypeKey));
+		return allowedKeys.filter((key) => blockTypeKeys.has(key));
+	}
+
+	/**
+	 * Keeps `hasLibraryElements` in sync with whether any of the given block types
+	 * is also allowed at the library root — the same rule the block catalogue modal
+	 * uses to offer the Library tab.
+	 * @param {Observable<Array<BlockType>>} blockTypes The block types the editor offers.
+	 */
+	protected _observeLibraryBlockTypes(blockTypes: Observable<Array<BlockType>>) {
+		this.observe(
+			observeMultiple([blockTypes, this.libraryAllowedElementTypeKeys]),
+			([types, libraryKeys]) => {
+				this.#hasLibraryElements.setValue(types.some((x) => libraryKeys.includes(x.contentElementTypeKey)));
+			},
+			'observeHasLibraryElements',
+		);
+	}
+
+	/**
+	 * Inserts an existing Library element as an external-content reference.
+	 * @param {string} elementKey The key of the element to reference.
+	 * @param {UmbBlockWorkspaceOriginData} [originData] Where the block was requested from, used to position it.
+	 */
+	protected _insertExternalContent(elementKey: string, originData?: UmbBlockWorkspaceOriginData) {
+		this._manager?.insertExternalContent(elementKey, originData as BlockOriginData | undefined);
+	}
+
 	public abstract create(
 		contentElementTypeKey: string,
-		layoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+		layoutEntry?: Omit<BlockLayoutType, 'contentKey' | 'key'>,
 		originData?: BlockOriginData,
 	): Promise<UmbBlockDataObjectModel<BlockLayoutType> | undefined>;
 
@@ -98,19 +167,25 @@ export abstract class UmbBlockEntriesContext<
 		originData: BlockOriginData,
 	): Promise<boolean>;
 
-	public async delete(contentKey: string) {
+	public async delete(key: string) {
 		await this._retrieveManager;
-		const layout = this._layoutEntries.value.find((x) => x.contentKey === contentKey);
+		const layout = this._layoutEntries.value.find((x) => x.key === key);
 		if (!layout) {
-			throw new Error(`Cannot delete block, missing layout for ${contentKey}`);
+			throw new Error(`Cannot delete block, missing layout for ${key}`);
 		}
-		this._layoutEntries.removeOne(contentKey);
+		this._layoutEntries.removeOne(key);
 
-		this._manager!.removeOneContent(contentKey);
-		if (layout.settingsKey) {
-			this._manager!.removeOneSettings(layout.settingsKey);
+		// Only remove content/settings/exposes if no other layout references the same contentKey
+		const hasOtherReference = this._layoutEntries.value.some(
+			(x) => x.key !== key && x.contentKey === layout.contentKey,
+		);
+		if (!hasOtherReference) {
+			this._manager!.removeOneContent(layout.contentKey);
+			if (layout.settingsKey) {
+				this._manager!.removeOneSettings(layout.settingsKey);
+			}
+			this._manager!.removeExposesOf(layout.contentKey);
 		}
-		this._manager!.removeExposesOf(contentKey);
 	}
 
 	// insert/paste from property value methods:
@@ -133,6 +208,12 @@ export abstract class UmbBlockEntriesContext<
 		value: UmbBlockValueType,
 		originData: BlockOriginData,
 	) {
+		// External-content references have no inline contentData — insert as a reference instead.
+		if (layoutEntry.isExternalContent) {
+			await this._manager?.insertExternalContent(layoutEntry.contentKey, originData);
+			return;
+		}
+
 		const content = value.contentData.find((x) => x.key === layoutEntry.contentKey);
 		if (!content) {
 			throw new Error('No content found for layout entry');

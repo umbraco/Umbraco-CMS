@@ -17,9 +17,8 @@ public sealed class CultureImpact
     ///     Initializes a new instance of the <see cref="CultureImpact" /> class.
     /// </summary>
     /// <param name="culture">The culture code.</param>
-    /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
-    /// <param name="allowEditInvariantFromNonDefault">A value indicating if publishing invariant properties from non-default language.</param>
-    internal CultureImpact(string? culture, bool isDefault = false, bool allowEditInvariantFromNonDefault = false)
+    /// <param name="includeInvariantForVariant">A value indicating if editing (publishing) invariant properties should be included for variant content.</param>
+    internal CultureImpact(string? culture, bool includeInvariantForVariant = false)
     {
         if (culture != null && culture.IsNullOrWhiteSpace())
         {
@@ -28,41 +27,7 @@ public sealed class CultureImpact
 
         Culture = culture;
 
-        if ((culture == null || culture == "*") && isDefault)
-        {
-            throw new ArgumentException("The invariant or 'all' culture can not be the default culture.");
-        }
-
-        ImpactsOnlyDefaultCulture = isDefault;
-
-        AllowEditInvariantFromNonDefault = allowEditInvariantFromNonDefault;
-    }
-
-    /// <summary>
-    ///     Defines behavior flags for culture impact.
-    /// </summary>
-    [Flags]
-    public enum Behavior : byte
-    {
-        /// <summary>
-        ///     Impacts all cultures.
-        /// </summary>
-        AllCultures = 1,
-
-        /// <summary>
-        ///     Impacts only the invariant culture.
-        /// </summary>
-        InvariantCulture = 2,
-
-        /// <summary>
-        ///     Impacts an explicit culture.
-        /// </summary>
-        ExplicitCulture = 4,
-
-        /// <summary>
-        ///     Impacts invariant properties.
-        /// </summary>
-        InvariantProperties = 8,
+        IncludeInvariantForVariant = includeInvariantForVariant;
     }
 
     /// <summary>
@@ -105,57 +70,13 @@ public sealed class CultureImpact
     public bool ImpactsExplicitCulture => Culture != null && Culture != "*";
 
     /// <summary>
-    ///     Gets a value indicating whether this impact impacts the default culture, directly,
-    ///     not because all cultures are impacted.
-    /// </summary>
-    public bool ImpactsOnlyDefaultCulture { get; }
-
-    /// <summary>
-    ///     Gets a value indicating whether this impact impacts the invariant properties, either
-    ///     directly, or because all cultures are impacted, or because the default culture is impacted.
-    /// </summary>
-    public bool ImpactsInvariantProperties => Culture == null || Culture == "*" || ImpactsOnlyDefaultCulture;
-
-    /// <summary>
-    ///     Gets a value indicating whether this also impact impacts the invariant properties,
+    ///     Gets a value indicating whether this impact also impacts the invariant properties,
     ///     even though it does not impact the invariant culture, neither directly (ImpactsInvariantCulture)
     ///     nor indirectly (ImpactsAllCultures).
     /// </summary>
     public bool ImpactsAlsoInvariantProperties => !ImpactsOnlyInvariantCulture &&
                                                   !ImpactsAllCultures &&
-                                                  (ImpactsOnlyDefaultCulture || AllowEditInvariantFromNonDefault);
-
-    /// <summary>
-    ///     Gets the behavior flags for this culture impact.
-    /// </summary>
-    public Behavior CultureBehavior
-    {
-        get
-        {
-            // null can only be invariant
-            if (Culture == null)
-            {
-                return Behavior.InvariantCulture | Behavior.InvariantProperties;
-            }
-
-            // * is All which means its also invariant properties since this will include the default language
-            if (Culture == "*")
-            {
-                return Behavior.AllCultures | Behavior.InvariantProperties;
-            }
-
-            // else it's explicit
-            Behavior result = Behavior.ExplicitCulture;
-
-            // if the explicit culture is the default, then the behavior is also InvariantProperties
-            if (ImpactsOnlyDefaultCulture)
-            {
-                result |= Behavior.InvariantProperties;
-            }
-
-            return result;
-        }
-    }
+                                                  IncludeInvariantForVariant;
 
     /// <summary>
     ///     Utility method to return the culture used for invariant property errors based on what cultures are being actively
@@ -227,7 +148,7 @@ public sealed class CultureImpact
     }
 
     /// <summary>
-    ///     Gets a value indicating whether editing invariant properties from a non-default language is allowed.
+    ///     Gets a value indicating whether editing invariant properties for variant content.
     /// </summary>
-    public bool AllowEditInvariantFromNonDefault { get; }
+    public bool IncludeInvariantForVariant { get; }
 }

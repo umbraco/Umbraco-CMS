@@ -21,11 +21,6 @@ namespace Umbraco.Cms.Infrastructure.Mail.Interfaces
         /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
         /// <returns>A <see cref="Task"/> that completes when the transport is reachable.</returns>
         /// <exception cref="Exception">Thrown when the transport cannot be reached.</exception>
-        /// <remarks>
-        /// The default implementation performs no check, so clients that don't override it are assumed to be reachable.
-        /// </remarks>
-        // TODO (V19): Remove the default implementation.
-        public Task VerifyConnectionAsync(CancellationToken cancellationToken = default)
-            => Task.CompletedTask;
+        public Task VerifyConnectionAsync(CancellationToken cancellationToken = default);
     }
 }

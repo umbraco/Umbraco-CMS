@@ -97,6 +97,7 @@ test('can create document blueprint with permission enabled', {tag: '@release'},
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   await umbracoUi.content.clickCreateBlueprintActionMenuOption();
+  await umbracoUi.content.clickModalMenuItemWithName('Document Blueprints');
   await umbracoUi.content.enterDocumentBlueprintName(documentBlueprintName);
   await umbracoUi.content.clickSaveDocumentBlueprintButton();
 
@@ -656,8 +657,8 @@ test('can not see delete button in content for userGroup with delete permission 
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
 
   // Assert
-  await umbracoUi.content.isPermissionInActionsMenuVisible('Delete…', false);
   await umbracoUi.content.isPermissionInActionsMenuVisible('Create…', true);
+  await umbracoUi.content.isPermissionInActionsMenuVisible('Delete…', false);
 });
 
 test('can create and update content with permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {

@@ -1,4 +1,4 @@
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -9,6 +9,9 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.HybridCache;
+
+// The multi node tree picker is obsolete, but must keep working for the whole deprecation period.
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
@@ -35,7 +38,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
     private PublishedDataType MultiNodePickerPublishedDataType(bool multiSelect, string entityType) =>
         new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiNodePickerConfiguration
         {
-            MaxNumber = multiSelect ? 10 : 1,
+            ValidationLimit = new NumberRange { Max = multiSelect ? 10 : 1 },
             TreeSource = new MultiNodePickerConfigurationTreeSource
             {
                 ObjectType = entityType
@@ -325,3 +328,5 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.IsEmpty(result);
     }
 }
+
+#pragma warning restore CS0618 // Type or member is obsolete

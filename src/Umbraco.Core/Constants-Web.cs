@@ -13,15 +13,14 @@ public static partial class Constants
         public const string PreviewCookieName = "UMB_PREVIEW";
 
         /// <summary>
+        ///     The preview cookie value
+        /// </summary>
+        internal const string PreviewCookieValue = "preview";
+
+        /// <summary>
         ///     Client-side cookie that determines whether the user has accepted to be in Preview Mode when visiting the website.
         /// </summary>
         public const string AcceptPreviewCookieName = "UMB-WEBSITE-PREVIEW-ACCEPT";
-
-        /// <summary>
-        ///     The installer cookie name (obsolete).
-        /// </summary>
-        [Obsolete("InstallerCookieName is no longer used. Scheduled for removal in Umbraco 19.")]
-        public const string InstallerCookieName = "umb_installId";
 
         /// <summary>
         ///     The cookie name that is used to store the validation value

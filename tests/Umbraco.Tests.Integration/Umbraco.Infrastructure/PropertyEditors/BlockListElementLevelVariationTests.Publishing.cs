@@ -3,7 +3,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
@@ -1174,7 +1173,6 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase("variantText", "en-US", new[] { "en-US" })]
     [TestCase("variantText", "da-DK", new[] { "en-US", "da-DK" })]
     [TestCase("variantText", "da-DK", new[] { "da-DK" })]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Removing_Block_Property_Value_Is_Propagated_To_Published_Value(string removedAlias, string? removedCulture, string[] culturesToPublish)
     {
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -1779,7 +1777,6 @@ internal partial class BlockListElementLevelVariationTests
     }
 
     [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Publish_Invariant_Properties_Without_Default_Culture_With_AllowEditInvariantFromNonDefault()
     {
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -1907,7 +1904,9 @@ internal partial class BlockListElementLevelVariationTests
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         ContentService.Save(content);
 
-        PublishContent(content, contentType, ["da-DK"]);
+        var userId = (await CreateLimitedUser(hasAccessToInvariantForVariant: false)).Id;
+
+        PublishContent(content, contentType, ["da-DK"], userId);
 
         AssertPropertyValues("en-US", 0);
 
@@ -2403,6 +2402,178 @@ internal partial class BlockListElementLevelVariationTests
         }
     }
 
+    [Test]
+    public async Task Performs_Automatic_Segment_Fallback_For_Missing_Segment_Values()
+    {
+        var elementType = await CreateElementType(ContentVariation.Segment);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Segment, blockListDataType);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new []
+            {
+                new BlockProperty(
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "English invariantText content value" },
+                        new() { Alias = "variantText", Value = "English variantText content value, default", Segment = null },
+                        new() { Alias = "variantText", Value = "English variantText content value, s1", Segment = "s1" },
+                    },
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "English invariantText settings value" },
+                        new() { Alias = "variantText", Value = "English variantText settings value, default", Segment = null },
+                        new() { Alias = "variantText", Value = "English variantText settings value, s2", Segment = "s2" }
+                    },
+                    null,
+                    null)
+            },
+            true);
+
+        AssertPropertyValues(
+            null,
+            "English invariantText content value",
+            "English variantText content value, default",
+            "English invariantText settings value",
+            "English variantText settings value, default");
+
+        AssertPropertyValues(
+            "s1",
+            "English invariantText content value",
+            "English variantText content value, s1",
+            "English invariantText settings value",
+            "English variantText settings value, default"); // missing for s1, fallback to default segment value
+
+        AssertPropertyValues(
+            "s2",
+            "English invariantText content value",
+            "English variantText content value, default", // missing for s2, fallback to default segment value
+            "English invariantText settings value",
+            "English variantText settings value, s2");
+
+        void AssertPropertyValues(
+            string? segment,
+            string expectedInvariantContentValue,
+            string expectedVariantContentValue,
+            string expectedInvariantSettingsValue,
+            string expectedVariantSettingsValue)
+        {
+            SetVariationContext(null, segment);
+            var publishedContent = GetPublishedContent(content.Key);
+
+            var publishedValueFallback = GetRequiredService<IPublishedValueFallback>();
+            var value = publishedContent.Value<BlockListModel>(publishedValueFallback, "blocks");
+            Assert.IsNotNull(value);
+            Assert.AreEqual(1, value.Count);
+
+            var blockListItem = value.First();
+            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(expectedInvariantContentValue, blockListItem.Content.Value<string>("invariantText"));
+                Assert.AreEqual(expectedVariantContentValue, blockListItem.Content.Value<string>("variantText"));
+            });
+
+            Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(expectedInvariantSettingsValue, blockListItem.Settings.Value<string>("invariantText"));
+                Assert.AreEqual(expectedVariantSettingsValue, blockListItem.Settings.Value<string>("variantText"));
+            });
+        }
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Property_Value_Order_Is_Irrelevant_For_Segment_Values(bool defaultFirst)
+    {
+        var elementType = await CreateElementType(ContentVariation.Segment);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Segment, blockListDataType);
+
+        var contentValues = new List<BlockPropertyValue>
+        {
+            new() { Alias = "invariantText", Value = "English invariantText content value" },
+        };
+        var settingsValues = new List<BlockPropertyValue>
+        {
+                new() { Alias = "invariantText", Value = "English invariantText settings value" },
+        };
+        if (defaultFirst)
+        {
+            contentValues.AddRange(
+                new() { Alias = "variantText", Value = "English variantText content value, default", Segment = null },
+                new() { Alias = "variantText", Value = "English variantText content value, s1", Segment = "s1" });
+            settingsValues.AddRange(
+                new() { Alias = "variantText", Value = "English variantText settings value, default", Segment = null },
+                new() { Alias = "variantText", Value = "English variantText settings value, s1", Segment = "s1" });
+        }
+        else
+        {
+            contentValues.AddRange(
+                new() { Alias = "variantText", Value = "English variantText content value, s1", Segment = "s1" },
+                new() { Alias = "variantText", Value = "English variantText content value, default", Segment = null });
+            settingsValues.AddRange(
+                new() { Alias = "variantText", Value = "English variantText settings value, s1", Segment = "s1" },
+                new() { Alias = "variantText", Value = "English variantText settings value, default", Segment = null });
+        }
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            [
+                new BlockProperty(contentValues, settingsValues, null, null),
+            ],
+            true);
+
+        AssertPropertyValues(
+            null,
+            "English invariantText content value",
+            "English variantText content value, default",
+            "English invariantText settings value",
+            "English variantText settings value, default");
+
+        AssertPropertyValues(
+            "s1",
+            "English invariantText content value",
+            "English variantText content value, s1",
+            "English invariantText settings value",
+            "English variantText settings value, s1");
+
+        void AssertPropertyValues(
+            string? segment,
+            string expectedInvariantContentValue,
+            string expectedVariantContentValue,
+            string expectedInvariantSettingsValue,
+            string expectedVariantSettingsValue)
+        {
+            SetVariationContext(null, segment);
+            var publishedContent = GetPublishedContent(content.Key);
+
+            var publishedValueFallback = GetRequiredService<IPublishedValueFallback>();
+            var value = publishedContent.Value<BlockListModel>(publishedValueFallback, "blocks");
+            Assert.IsNotNull(value);
+            Assert.AreEqual(1, value.Count);
+
+            var blockListItem = value.First();
+            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(expectedInvariantContentValue, blockListItem.Content.Value<string>("invariantText"));
+                Assert.AreEqual(expectedVariantContentValue, blockListItem.Content.Value<string>("variantText"));
+            });
+
+            Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(expectedInvariantSettingsValue, blockListItem.Settings.Value<string>("invariantText"));
+                Assert.AreEqual(expectedVariantSettingsValue, blockListItem.Settings.Value<string>("variantText"));
+            });
+        }
+    }
+
     [TestCase(true, true)]
     [TestCase(true, false)]
     [TestCase(false, true)]
@@ -2487,7 +2658,7 @@ internal partial class BlockListElementLevelVariationTests
 
         // Update Expose to only have invariant entry (no culture)
         blockListValue.Expose = blockListValue.Expose
-            .Select(e => new BlockItemVariation(e.ContentKey, null, null))
+            .Select(e => new BlockItemVariation(e.ContentKey, null))
             .DistinctBy(e => e.ContentKey)
             .ToList();
 
@@ -2682,8 +2853,8 @@ internal partial class BlockListElementLevelVariationTests
         var contentKey = blockListValue.Expose[0].ContentKey;
         blockListValue.Expose =
         [
-            new BlockItemVariation(contentKey, "en-US", null),
-            new BlockItemVariation(contentKey, "da-DK", null)
+            new BlockItemVariation(contentKey, "en-US"),
+            new BlockItemVariation(contentKey, "da-DK")
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
@@ -2722,10 +2893,10 @@ internal partial class BlockListElementLevelVariationTests
             $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
 
         // Verify Expose entries are not duplicated
-        var exposeGroups = publishedBlockListValue.Expose.GroupBy(e => (e.ContentKey, e.Culture, e.Segment));
+        var exposeGroups = publishedBlockListValue.Expose.GroupBy(e => (e.ContentKey, e.Culture));
         Assert.IsTrue(
             exposeGroups.All(g => g.Count() == 1),
-            $"Duplicate Expose entries found. Expose: {string.Join(", ", publishedBlockListValue.Expose.Select(e => $"{e.ContentKey}:{e.Culture}:{e.Segment}"))}");
+            $"Duplicate Expose entries found. Expose: {string.Join(", ", publishedBlockListValue.Expose.Select(e => $"{e.ContentKey}:{e.Culture}"))}");
 
         void AssertPropertyValues(
             string culture,
@@ -3378,6 +3549,272 @@ internal partial class BlockListElementLevelVariationTests
         {
             Assert.IsTrue(content.IsCultureEdited("da-DK"), "Danish content changed and must be flagged as edited.");
             Assert.IsFalse(content.IsCultureEdited("en-US"), "English content did not change and must not be flagged as edited.");
+        });
+    }
+
+    [Test]
+    public async Task Publishing_Block_Values_Added_After_The_First_Publish_Does_Not_Leave_Content_Edited()
+    {
+        var elementType = await CreateHeadlineAndBodyTextElementType();
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "headline", Value = "Headline in English", Culture = "en-US" },
+                new() { Alias = "headline", Value = "Headline in Danish", Culture = "da-DK" },
+            },
+            [],
+            publishContent: false);
+
+        var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
+        await UpdateBlocksAsync(content, blockListValue);
+        content = ContentService.GetById(content.Key)!;
+        PublishContent(content, contentType, ["en-US", "da-DK"]);
+        AssertNoCultureIsEdited(content.Key);
+
+        // the second property is only filled in after the first publish, so the published value has no entries for
+        // it yet; the values are submitted in canonical order, as the backoffice does
+        blockListValue.ContentData[0].Values =
+        [
+            new() { Alias = "bodyText", Value = "Body text in Danish", Culture = "da-DK" },
+            new() { Alias = "headline", Value = "Headline in Danish", Culture = "da-DK" },
+            new() { Alias = "bodyText", Value = "Body text in English", Culture = "en-US" },
+            new() { Alias = "headline", Value = "Headline in English", Culture = "en-US" },
+        ];
+        await UpdateBlocksAsync(content, blockListValue);
+        content = ContentService.GetById(content.Key)!;
+        PublishContent(content, contentType, ["en-US", "da-DK"]);
+
+        AssertNoCultureIsEdited(content.Key);
+    }
+
+    [Test]
+    public async Task Saving_Unchanged_Block_Values_In_Another_Order_Than_Published_Does_Not_Leave_Content_Edited()
+    {
+        var elementType = await CreateHeadlineAndBodyTextElementType();
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "headline", Value = "Headline in English", Culture = "en-US" },
+                new() { Alias = "bodyText", Value = "Body text in English", Culture = "en-US" },
+                new() { Alias = "headline", Value = "Headline in Danish", Culture = "da-DK" },
+                new() { Alias = "bodyText", Value = "Body text in Danish", Culture = "da-DK" },
+            },
+            [],
+            publishContent: true);
+        AssertNoCultureIsEdited(content.Key);
+
+        var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
+        blockListValue.ContentData[0].Values = blockListValue.ContentData[0].Values.Reverse().ToList();
+        blockListValue.Expose = blockListValue.Expose.Reverse().ToList();
+        await UpdateBlocksAsync(content, blockListValue);
+
+        AssertNoCultureIsEdited(content.Key);
+    }
+
+    [Test]
+    public async Task Block_Values_That_Differ_Only_In_The_Order_Of_Values_And_Exposes_Are_Equivalent()
+    {
+        var elementType = await CreateHeadlineAndBodyTextElementType();
+        var contentKey = Guid.NewGuid();
+        var settingsKey = Guid.NewGuid();
+
+        var publishedValue = BlockListPropertyValue(
+            elementType,
+            contentKey,
+            settingsKey,
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    new() { Alias = "headline", Value = "Headline in English", Culture = "en-US" },
+                    new() { Alias = "bodyText", Value = "Body text in English", Culture = "en-US" },
+                    new() { Alias = "headline", Value = "Headline in Danish", Culture = "da-DK" },
+                },
+                [],
+                null,
+                null));
+        var editedValue = BlockListPropertyValue(
+            elementType,
+            contentKey,
+            settingsKey,
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    new() { Alias = "headline", Value = "Headline in Danish", Culture = "da-DK" },
+                    new() { Alias = "bodyText", Value = "Body text in English", Culture = "en-US" },
+                    new() { Alias = "headline", Value = "Headline in English", Culture = "en-US" },
+                },
+                [],
+                null,
+                null));
+        CollectionAssert.AreNotEqual(
+            publishedValue.Expose.Select(e => e.Culture),
+            editedValue.Expose.Select(e => e.Culture));
+
+        IDataEditor dataEditor = PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList]!;
+        Assert.IsTrue(dataEditor.ArePropertyValuesEquivalent(JsonSerializer.Serialize(editedValue), JsonSerializer.Serialize(publishedValue)));
+    }
+
+    [Test]
+    public async Task Block_Values_With_Different_Content_Are_Not_Equivalent()
+    {
+        var elementType = await CreateHeadlineAndBodyTextElementType();
+        var firstBlock = (Guid.NewGuid(), Guid.NewGuid(), new BlockProperty(
+            new List<BlockPropertyValue> { new() { Alias = "headline", Value = "First headline", Culture = "en-US" } },
+            [],
+            null,
+            null));
+        var secondBlock = (Guid.NewGuid(), Guid.NewGuid(), new BlockProperty(
+            new List<BlockPropertyValue> { new() { Alias = "headline", Value = "Second headline", Culture = "en-US" } },
+            [],
+            null,
+            null));
+        var publishedValue = JsonSerializer.Serialize(BlockListPropertyValue(elementType, [firstBlock, secondBlock]));
+
+        var editedValueWithChangedValue = JsonSerializer.Deserialize<BlockListValue>(publishedValue)!;
+        editedValueWithChangedValue.ContentData[0].Values[0].Value = "Updated headline";
+        var editedValueWithReorderedBlocks = BlockListPropertyValue(elementType, [secondBlock, firstBlock]);
+        var editedValueWithRemovedExpose = JsonSerializer.Deserialize<BlockListValue>(publishedValue)!;
+        editedValueWithRemovedExpose.Expose.RemoveAt(0);
+
+        IDataEditor dataEditor = PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList]!;
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(dataEditor.ArePropertyValuesEquivalent(JsonSerializer.Serialize(editedValueWithChangedValue), publishedValue), "A changed block value must not be equivalent.");
+            Assert.IsFalse(dataEditor.ArePropertyValuesEquivalent(JsonSerializer.Serialize(editedValueWithReorderedBlocks), publishedValue), "Reordered blocks must not be equivalent.");
+            Assert.IsFalse(dataEditor.ArePropertyValuesEquivalent(JsonSerializer.Serialize(editedValueWithRemovedExpose), publishedValue), "A removed exposure must not be equivalent.");
+        });
+    }
+
+    [Test]
+    public async Task Nested_Block_Values_That_Differ_Only_In_The_Order_Of_Values_Are_Equivalent()
+    {
+        var (rootElementType, nestedElementType) = await CreateElementTypeWithValidationAndNestedBlocksAsync();
+        var rootContentKey = Guid.NewGuid();
+        var rootSettingsKey = Guid.NewGuid();
+        var nestedContentKey = Guid.NewGuid();
+        var nestedSettingsKey = Guid.NewGuid();
+
+        var publishedValue = BlockListPropertyValue(
+            rootElementType,
+            rootContentKey,
+            rootSettingsKey,
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    new()
+                    {
+                        Alias = "nestedBlocks",
+                        Value = BlockListPropertyValue(
+                            nestedElementType,
+                            nestedContentKey,
+                            nestedSettingsKey,
+                            new BlockProperty(
+                                new List<BlockPropertyValue>
+                                {
+                                    new() { Alias = "variantText", Value = "Valid nested value in English", Culture = "en-US" },
+                                    new() { Alias = "variantText", Value = "Valid nested value in Danish", Culture = "da-DK" },
+                                },
+                                [],
+                                null,
+                                null)),
+                    },
+                },
+                [],
+                null,
+                null));
+        var editedValue = BlockListPropertyValue(
+            rootElementType,
+            rootContentKey,
+            rootSettingsKey,
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    new()
+                    {
+                        Alias = "nestedBlocks",
+                        Value = BlockListPropertyValue(
+                            nestedElementType,
+                            nestedContentKey,
+                            nestedSettingsKey,
+                            new BlockProperty(
+                                new List<BlockPropertyValue>
+                                {
+                                    new() { Alias = "variantText", Value = "Valid nested value in Danish", Culture = "da-DK" },
+                                    new() { Alias = "variantText", Value = "Valid nested value in English", Culture = "en-US" },
+                                },
+                                [],
+                                null,
+                                null)),
+                    },
+                },
+                [],
+                null,
+                null));
+
+        IDataEditor dataEditor = PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList]!;
+        Assert.IsTrue(dataEditor.ArePropertyValuesEquivalent(JsonSerializer.Serialize(editedValue), JsonSerializer.Serialize(publishedValue)));
+    }
+
+    private async Task<IContentType> CreateHeadlineAndBodyTextElementType()
+    {
+        var elementType = new ContentTypeBuilder()
+            .WithAlias("myHeadlineAndBodyTextElementType")
+            .WithName("My Headline And Body Text Element Type")
+            .WithIsElement(true)
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyType()
+                .WithAlias("headline")
+                .WithName("Headline")
+                .WithDataTypeId(Constants.DataTypes.Textbox)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+                .WithValueStorageType(ValueStorageType.Nvarchar)
+                .WithVariations(ContentVariation.Culture)
+                .Done()
+            .AddPropertyType()
+                .WithAlias("bodyText")
+                .WithName("Body text")
+                .WithDataTypeId(Constants.DataTypes.Textbox)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+                .WithValueStorageType(ValueStorageType.Nvarchar)
+                .WithVariations(ContentVariation.Culture)
+                .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+        return elementType;
+    }
+
+    private async Task UpdateBlocksAsync(IContent content, BlockListValue blockListValue)
+    {
+        var updateModel = new ContentUpdateModel
+        {
+            Properties = [new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }],
+            Variants =
+            [
+                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US" },
+                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK" },
+            ],
+        };
+        var updateResult = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(updateResult.Success);
+    }
+
+    private void AssertNoCultureIsEdited(Guid contentKey)
+    {
+        var content = ContentService.GetById(contentKey)!;
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(content.IsCultureEdited("en-US"), "English must not be flagged as edited after publishing all cultures.");
+            Assert.IsFalse(content.IsCultureEdited("da-DK"), "Danish must not be flagged as edited after publishing all cultures.");
         });
     }
 }

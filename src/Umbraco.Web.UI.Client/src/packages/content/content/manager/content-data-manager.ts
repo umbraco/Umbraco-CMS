@@ -1,5 +1,5 @@
 import type { UmbContentDetailModel } from '../types.js';
-import { UmbElementWorkspaceDataManager } from './element-data-manager.js';
+import { UmbEntryWorkspaceDataManager } from './entry-data-manager.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { appendToFrozenArray, jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId, umbVariantObjectSortCompare, type UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
@@ -9,7 +9,7 @@ export class UmbContentWorkspaceDataManager<
 	ModelVariantType extends UmbEntityVariantModel = ModelType extends { variants: UmbEntityVariantModel[] }
 		? ModelType['variants'][0]
 		: never,
-> extends UmbElementWorkspaceDataManager<ModelType> {
+> extends UmbEntryWorkspaceDataManager<ModelType> {
 	//
 	//#repository;
 	#variantScaffold?: ModelVariantType;
@@ -76,22 +76,21 @@ export class UmbContentWorkspaceDataManager<
 		const currentData = this.getCurrent();
 		if (!currentData) throw new Error('Data is missing');
 
-		// If varies by segment:
+		// If variant-id varies by segment:
 		if (!variantId.isSegmentInvariant()) {
-			// The server requires a segment name. It doesn't matter what it is as long as it is not empty. The server will overwrite it with the name of the default.
-			update = { ...update, name: 'Segment' } as ModelVariantType;
+			throw new Error('A segmented variant cannot have variant data.');
 		}
 
-		const variant = currentData.variants.find((x) => variantId.compare(x));
+		const variant = currentData.variants.find((x) => variantId.culture === x.culture);
 		const newVariants = appendToFrozenArray(
 			currentData.variants,
 			{
 				...this.#variantScaffold,
-				...variantId.toObject(),
+				culture: variantId.culture,
 				...variant,
 				...update,
 			} as ModelVariantType,
-			(x) => variantId.compare(x),
+			(x) => variantId.culture === x.culture,
 		).sort(umbVariantObjectSortCompare) as Array<ModelVariantType>;
 		this.updateCurrent({ variants: newVariants } as unknown as ModelType);
 	}
@@ -100,13 +99,12 @@ export class UmbContentWorkspaceDataManager<
 		const currentData = this.getCurrent();
 		if (!currentData) throw new Error('Data is missing');
 
-		const invariantVariantId = UmbVariantId.CreateInvariant();
-		const variant = currentData.variants.find((x) => invariantVariantId.compare(x));
+		const variant = currentData.variants.find((x) => x.culture === null);
 		// Cause we are invariant, we will just overwrite all variants with this one:
 		const newVariants = [
 			{
 				...this.#variantScaffold,
-				...invariantVariantId.toObject(),
+				culture: null,
 				...variant,
 				...update,
 			} as ModelVariantType,
@@ -119,19 +117,17 @@ export class UmbContentWorkspaceDataManager<
 		const current = this.getCurrent();
 		if (!current) throw new Error('Current data is missing');
 
-		const changedVariants = current?.variants.map((variant) => {
-			const persistedVariant = persisted?.variants.find((x) => UmbVariantId.Create(variant).compare(x));
+		const changedVariants: Array<GatheredVariantData> = current?.variants.map((variant) => {
+			const persistedVariant = persisted?.variants.find((x) => x.culture === variant.culture);
 			return {
 				culture: variant.culture,
-				segment: variant.segment,
 				equal: persistedVariant ? jsonStringComparison(variant, persistedVariant) : false,
 			};
 		});
 
-		const changedProperties = current?.values.map((value) => {
-			const persistedValues = persisted?.values.find(
-				(x) => x.alias === value.alias && UmbVariantId.Create(value).compare(x),
-			);
+		const changedProperties: Array<GatheredVariantData> = current?.values.map((value) => {
+			const variantId = UmbVariantId.Create(value);
+			const persistedValues = persisted?.values.find((x) => x.alias === value.alias && variantId.compare(x));
 			return {
 				culture: value.culture,
 				segment: value.segment,
@@ -148,3 +144,9 @@ export class UmbContentWorkspaceDataManager<
 		);
 	}
 }
+
+type GatheredVariantData = {
+	culture: string | null;
+	segment?: string | null;
+	equal: boolean;
+};

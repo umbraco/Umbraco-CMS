@@ -29,9 +29,6 @@ class UmbTestTreeItemCardApi {
 	#path = new UmbStringState('');
 	readonly path = this.#path.asObservable();
 
-	#hasActions = new UmbBooleanState(false);
-	readonly hasActions = this.#hasActions.asObservable();
-
 	setSelectableContext(value: boolean) {
 		this.#isSelectableContext.setValue(value);
 		this.#isSelectable.setValue(value);

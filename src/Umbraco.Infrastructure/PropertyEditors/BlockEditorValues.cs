@@ -63,11 +63,18 @@ public class BlockEditorValues<TValue, TLayout>
 
     private BlockEditorData<TValue, TLayout>? Clean(BlockEditorData<TValue, TLayout> blockEditorData)
     {
-        if (blockEditorData.BlockValue.ContentData.Count == 0)
+        if (blockEditorData.BlockValue.Layout.Count == 0)
         {
             // if there's no content ensure there's no settings too
             blockEditorData.BlockValue.SettingsData.Clear();
             return null;
+        }
+
+        if (blockEditorData.BlockValue.ContentData.Count == 0
+            && blockEditorData.BlockValue.SettingsData.Count == 0)
+        {
+            // no local content or settings; the block editor must contain only global elements
+            return blockEditorData;
         }
 
         var contentTypePropertyTypes = new Dictionary<string, Dictionary<string, IPropertyType>>();

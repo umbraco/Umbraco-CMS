@@ -13,6 +13,7 @@ export const UMB_ELEMENT_PUBLISH_MODAL_ALIAS = 'Umb.Modal.ElementPublish';
 export interface UmbElementPublishModalData extends UmbElementVariantPickerData {
 	headline?: string;
 	confirmLabel?: string;
+	unique?: string;
 }
 
 /** @deprecated Use `UmbContentPublishModalValue` from `@umbraco-cms/backoffice/content` instead. Scheduled for removal in Umbraco 20. */

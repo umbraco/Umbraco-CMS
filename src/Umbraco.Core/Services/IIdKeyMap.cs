@@ -49,10 +49,7 @@ public interface IIdKeyMap
     /// <remarks>
     /// Only supply pairs read from persisted entities: the mapping is assumed to be unique and permanent.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    void PopulateCache(IReadOnlyCollection<(int Id, Guid Key)> pairs, UmbracoObjectTypes umbracoObjectType)
-    {
-    }
+    void PopulateCache(IReadOnlyCollection<(int Id, Guid Key)> pairs, UmbracoObjectTypes umbracoObjectType);
 
     /// <summary>
     /// Adds a known ID/key pair to the cache, so subsequent lookups do not need to hit the database.

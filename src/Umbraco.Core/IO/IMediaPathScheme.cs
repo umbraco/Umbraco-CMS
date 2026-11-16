@@ -50,6 +50,5 @@ public interface IMediaPathScheme
     ///         belongs to the item being processed rather than one supplied by a client to target another item's file.
     ///     </para>
     /// </remarks>
-    // TODO (V19): Remove default implementation.
-    bool IsFilePathOwnedBy(MediaFileManager fileManager, string filepath, Guid itemGuid, Guid propertyGuid) => true;
+    bool IsFilePathOwnedBy(MediaFileManager fileManager, string filepath, Guid itemGuid, Guid propertyGuid);
 }

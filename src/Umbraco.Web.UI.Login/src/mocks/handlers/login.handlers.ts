@@ -65,4 +65,18 @@ export const handlers: HttpHandler[] = [
 			return HttpResponse.json(user);
 		},
 	),
+
+	// Backs the ?flow=mfa full-page-load path (e.g. redirected here after an external login provider),
+	// where there's no same-page login() response to read provider options from.
+	http.get('/umbraco/management/api/v1/security/back-office/pending-2fa', async () => {
+		await delay();
+		const user = umbLoginData.users.find((user) => user.twoFactor);
+		if (!user) {
+			return HttpResponse.json({ error: 'No pending two-factor sign-in' }, { status: 404 });
+		}
+		return HttpResponse.json({
+			twoFactorLoginView: user.twoFactorLoginView,
+			enabledTwoFactorProviderNames: user.enabledTwoFactorProviderNames,
+		});
+	}),
 ];

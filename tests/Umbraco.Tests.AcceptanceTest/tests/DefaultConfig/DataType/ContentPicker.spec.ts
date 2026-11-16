@@ -1,7 +1,7 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
-const dataTypeName = 'Content Picker';
+const dataTypeName = 'Single Document Picker';
 const customDataTypeName = 'Custom Content Picker';
 const editorAlias = 'Umbraco.ContentPicker';
 const editorUiAlias = 'Umb.PropertyEditorUi.DocumentPicker';

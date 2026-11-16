@@ -8,9 +8,9 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -120,6 +120,9 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
         // an optional per-call latency so the benchmark can model database round-trip cost — the single
         // vs batched read count is what distinguishes the cold per-key path from the batched one.
         var repoMock = new Mock<IDatabaseCacheRepository>();
+        repoMock
+            .Setup(r => r.GetKeysOfEntityTypes(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<ContentCacheDataSerializerEntityType>()))
+            .Returns(new HashSet<Guid>());
         repoMock.Setup(r => r.GetDocumentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .Returns(async (Guid key, bool _) =>
             {
@@ -147,8 +150,8 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
                     .ToArray();
             });
 
-        var previewMock = new Mock<IPreviewService>();
-        previewMock.Setup(x => x.IsInPreview()).Returns(false);
+        var previewMock = new Mock<IPreviewSessionService>();
+        previewMock.Setup(x => x.IsActive()).Returns(false);
 
         var idKeyMapMock = new Mock<IIdKeyMap>();
         idKeyMapMock.Setup(x => x.GetKeyForId(It.IsAny<int>(), It.IsAny<UmbracoObjectTypes>()))
@@ -179,7 +182,9 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
             previewMock.Object,
             publishStatusMock.Object,
             NullLogger<DocumentCacheService>.Instance,
-            new ConvertedPublishedContentCacheFactory(null, NullLogger<ConvertedPublishedContentCacheFactory>.Instance));
+            new ConvertedPublishedContentCacheFactory(null, NullLogger<ConvertedPublishedContentCacheFactory>.Instance),
+            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())),
+            Mock.Of<IContentCacheDataSerializerFactory>());
 
         _hybridCache = hybridCache;
         _cacheService = cacheService;
@@ -200,12 +205,7 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
             }
         }
 
-        var documentCache = new DocumentCache(
-            cacheService,
-            contentTypeCache,
-            navigationService,
-            Mock.Of<IDocumentUrlService>(),
-            new Lazy<IPublishedUrlProvider>(() => Mock.Of<IPublishedUrlProvider>()));
+        var documentCache = new DocumentCache(cacheService);
 
         PublishedContentCache = documentCache;
         NavigationQueryService = navigationService;

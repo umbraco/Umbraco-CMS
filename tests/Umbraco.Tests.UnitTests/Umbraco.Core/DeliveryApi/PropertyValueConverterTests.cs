@@ -97,11 +97,8 @@ public class PropertyValueConverterTests : DeliveryApiTests
 
         PublishedElementCacheMock = new Mock<IPublishedElementCache>();
         PublishedElementCacheMock
-            .Setup(ecc => ecc.GetByIdAsync(elementKey, false))
-            .Returns(Task.FromResult(publishedElement.Object));
-        PublishedElementCacheMock
-            .Setup(ecc => ecc.GetById(false, elementKey))
-            .Returns(publishedElement.Object);
+            .Setup(ecc => ecc.GetByIds(false, It.Is<IReadOnlyCollection<Guid>>(keys => keys.SequenceEqual(new[] { elementKey }))))
+            .Returns([publishedElement.Object]);
 
         var cacheMock = new Mock<ICacheManager>();
         cacheMock.SetupGet(cache => cache.Content).Returns(PublishedContentCacheMock.Object);

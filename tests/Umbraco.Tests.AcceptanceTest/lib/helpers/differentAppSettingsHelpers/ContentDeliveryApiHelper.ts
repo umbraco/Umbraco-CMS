@@ -1,5 +1,8 @@
 ﻿import {expect} from "@playwright/test";
 import {ApiHelpers} from "../ApiHelpers";
+import {ConstantHelper} from '../ConstantHelper';
+
+export type ContentQueryResult = {total: number; items: {name: string}[]};
 
 export class ContentDeliveryApiHelper {
   api: ApiHelpers
@@ -64,6 +67,75 @@ export class ContentDeliveryApiHelper {
     return await this.api.get(this.api.baseUrl + '/umbraco/delivery/api/v2/content' + query, undefined, extraHeaders);
   }
 
+  async waitUntilContentQueryReturnsNames(filter: string | undefined, sort: string | undefined, expectedNames: string[], expectedTotal?: number, extraHeaders?: { [key: string]: string; }): Promise<ContentQueryResult> {
+    const take = 100;
+    expect(expectedNames.length).toBeGreaterThan(0);
+    let contentItemsJson: ContentQueryResult | undefined;
+    await expect
+      .poll(
+        async () => {
+          const response = await this.getContentItemsFromAQuery(extraHeaders, undefined, filter, sort, 0, take);
+          if (!response.ok()) {
+            return [`query failed with status ${response.status()}`];
+          }
+          contentItemsJson = await response.json();
+          if (contentItemsJson.total > take) {
+            return [`page does not hold every match: total ${contentItemsJson.total} exceeds take ${take}`];
+          }
+          const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
+          const missing = expectedNames.filter((name) => !returnedNames.includes(name));
+          if (missing.length > 0) {
+            return missing;
+          }
+          return expectedTotal === undefined || contentItemsJson.total === expectedTotal
+            ? []
+            : [`expected total ${expectedTotal}, got ${contentItemsJson.total}`];
+        },
+        {timeout: ConstantHelper.timeout.pageLoad},
+      )
+      .toEqual([]);
+    return contentItemsJson!;
+  }
+
+  async waitUntilContentQueryExcludesNames(filter: string | undefined, sort: string | undefined, unexpectedNames: string[], extraHeaders?: { [key: string]: string; }): Promise<ContentQueryResult> {
+    const take = 100;
+    expect(unexpectedNames.length).toBeGreaterThan(0);
+    let contentItemsJson: ContentQueryResult | undefined;
+    await expect
+      .poll(
+        async () => {
+          const response = await this.getContentItemsFromAQuery(extraHeaders, undefined, filter, sort, 0, take);
+          if (!response.ok()) {
+            return [`query failed with status ${response.status()}`];
+          }
+          contentItemsJson = await response.json();
+          if (contentItemsJson.total > take) {
+            return [`page too small to prove absence: total ${contentItemsJson.total} exceeds take ${take}`];
+          }
+          const returnedNames = contentItemsJson.items.map((item: {name: string}) => item.name);
+          return unexpectedNames.filter((name) => returnedNames.includes(name));
+        },
+        {timeout: ConstantHelper.timeout.pageLoad},
+      )
+      .toEqual([]);
+    return contentItemsJson!;
+  }
+
+  async waitUntilContentQueryTotalIs(filter: string | undefined, expectedTotal: number, extraHeaders?: { [key: string]: string; }) {
+    await expect
+      .poll(
+        async () => {
+          const response = await this.getContentItemsFromAQuery(extraHeaders, undefined, filter);
+          if (!response.ok()) {
+            return `query failed with status ${response.status()}`;
+          }
+          return (await response.json()).total;
+        },
+        {timeout: ConstantHelper.timeout.pageLoad},
+      )
+      .toBe(expectedTotal);
+  }
+
   async verifyBasicPropertiesForContentItem(contentName: string, contentItemJson) {
     const contentData = await this.api.document.getByName(contentName);
 
@@ -107,11 +179,11 @@ export class ContentDeliveryApiHelper {
     }
   }
 
-  async verifyEditorialPropertiesForContentItemWithMultiURLPicker(contentName: string, contentItemJson, pickerType: string) {
+  async verifyEditorialPropertiesForContentItemWithMultiURLPicker(contentName: string, contentItemJson, pickerType: string, propertyAlias: string = 'multiUrlPicker') {
     const contentData = await this.api.document.getByName(contentName);
-    const multiUrlPickerProperty = contentData.values.find((p) => p.alias === 'multiUrlPicker');
+    const multiUrlPickerProperty = contentData.values.find((p) => p.alias === propertyAlias);
     const expectedMultiUrlPickerValue = multiUrlPickerProperty.value;
-    const actualMultiUrlPickerValue = contentItemJson.properties['multiUrlPicker'];
+    const actualMultiUrlPickerValue = contentItemJson.properties[propertyAlias];
     // Verify that the multi URL picker property has the expected structure and values  
     expect(actualMultiUrlPickerValue[0].queryString).toBe(expectedMultiUrlPickerValue[0].queryString);
     expect(actualMultiUrlPickerValue[0].title).toBe(expectedMultiUrlPickerValue[0].name);
@@ -123,10 +195,11 @@ export class ContentDeliveryApiHelper {
 
   async verifyPropertiesForMediaItem(mediaName: string, mediaItemJson) {
     const mediaData = await this.api.media.getByName(mediaName);
+    const mediaFileValue = mediaData.values.find(x => x.alias === 'umbracoFile')?.value;
 
     expect(mediaItemJson.name).toBe(mediaName);
-    expect(mediaItemJson.focalPoint).toEqual(mediaData.values[0].value.focalPoint);
-    expect(mediaItemJson.crops).toEqual(mediaData.values[0].value.crops);
+    expect(mediaItemJson.focalPoint).toEqual(mediaFileValue?.focalPoint);
+    expect(mediaItemJson.crops).toEqual(mediaFileValue?.crops);
     expect(mediaItemJson.id).toEqual(mediaData.id);
     const expectedWidthValue = mediaData.values.find((p) => p.alias === 'umbracoWidth').value;
     expect(mediaItemJson.width).toEqual(Number(expectedWidthValue));

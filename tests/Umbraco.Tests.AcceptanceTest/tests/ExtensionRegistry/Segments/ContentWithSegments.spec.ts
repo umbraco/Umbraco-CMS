@@ -49,10 +49,11 @@ test.describe('content with culture and segment variations', () => {
     await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeCreated();
 
     // Assert
-    const contentData = await umbracoApi.document.getByName(contentName);
-    expect(contentData.values[0].culture).toBe('en-US');
-    expect(contentData.values[0].segment).toBeNull();
-    expect(contentData.values[0].value).toBe(defaultSegmentValue);
+    const [defaultValue] = await umbracoApi.document.getValuesByCultureAndSegmentForDocument(contentName, [
+      {culture: 'en-US', segment: null},
+    ]);
+    expect(defaultValue).toBeTruthy();
+    expect(defaultValue.value).toBe(defaultSegmentValue);
   });
 
   test('can save VIP segment-specific property value', async ({umbracoApi, umbracoUi}) => {
@@ -225,5 +226,37 @@ test.describe('content with segment-only variations', () => {
     ]);
     expect(vipValue).toBeTruthy();
     expect(vipValue.value).toBe(updatedVipSegmentValue);
+  });
+
+  test('can clear VIP segment value without affecting the default segment value', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    await umbracoApi.document.createDocumentWithMultipleSegmentValues(
+      contentName,
+      documentTypeId,
+      dataTypeName,
+      editorAlias,
+      [
+        {value: defaultSegmentValue, segment: null},
+        {value: vipSegmentValue, segment: vipMemberSegmentAlias},
+      ]
+    );
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.content.goToContentWithName(contentName);
+    await umbracoUi.content.clickSelectVariantButton();
+    await umbracoUi.content.clickSegmentVariantButton(vipMemberSegment);
+
+    // Act
+    await umbracoUi.content.enterTextstring('');
+    await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+    // Assert
+    const [defaultValue, vipValue] = await umbracoApi.document.getValuesByCultureAndSegmentForDocument(contentName, [
+      {culture: null, segment: null},
+      {culture: null, segment: vipMemberSegmentAlias},
+    ]);
+    expect(defaultValue).toBeTruthy();
+    expect(defaultValue.value).toBe(defaultSegmentValue);
+    expect(vipValue).toBeTruthy();
+    expect(vipValue.value).toBe('');
   });
 });

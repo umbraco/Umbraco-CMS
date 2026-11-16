@@ -184,7 +184,7 @@ stages:
               command: test
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
-              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
+              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
 
       # Integration Tests (SQL Server)
       - job:
@@ -307,7 +307,7 @@ stages:
               command: test
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
-              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
+              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
 
           # Stop SQL Server
           - pwsh: docker stop mssql
@@ -323,6 +323,7 @@ stages:
     dependsOn: [Build, Integration]
     condition: in(dependencies.Build.result, 'Succeeded', 'SucceededWithIssues')
     variables:
+      umbracoVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion'] ]
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       # Enable console logging in Release mode
       SERILOG__WRITETO__0__NAME: Async
@@ -341,6 +342,10 @@ stages:
       UMBRACO__CMS__GLOBAL__USEHTTPS: true
       UMBRACO__CMS__HEALTHCHECKS__NOTIFICATION__ENABLED: false
       UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL: https://localhost:44331/
+      # Back-office auth is cookie-only. Sliding the session on every request keeps the shared
+      # admin cookie alive for the length of a shard, so tests never have to re-authenticate
+      # mid-run just to dodge the session expiring.
+      UMBRACO__CMS__SECURITY__KEEPUSERLOGGEDIN: true
       ASPNETCORE_URLS: https://localhost:44331
     jobs:
       # E2E Tests
@@ -502,6 +507,7 @@ stages:
     dependsOn: [Build, DefaultConfigE2E]
     condition: in(dependencies.Build.result, 'Succeeded', 'SucceededWithIssues')
     variables:
+      umbracoVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion'] ]
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       ASPNETCORE_URLS: https://localhost:44331
       PlaywrightPassword: UmbracoAcceptance123!
@@ -599,23 +605,6 @@ stages:
               testFolder: "ContentSettingConfig"
               port: ''
               testCommand: "npx playwright test --project=contentSettingConfig"
-              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
-              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
-              additionalEnvironmentVariables: false
-            # AllowEditInvariantConfig
-            WindowsAllowEditInvariantConfig:
-              vmImage: "windows-latest"
-              testFolder: "AllowEditInvariantConfig"
-              port: ''
-              testCommand: "npx playwright test --project=allowEditInvariantConfig"
-              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
-              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
-              additionalEnvironmentVariables: false
-            LinuxAllowEditInvariantConfig:
-              vmImage: "ubuntu-latest"
-              testFolder: "AllowEditInvariantConfig"
-              port: ''
-              testCommand: "npx playwright test --project=allowEditInvariantConfig"
               CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
               additionalEnvironmentVariables: false

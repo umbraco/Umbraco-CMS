@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -15,6 +15,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// <summary>
 ///     The multi node tree picker property editor value converter.
 /// </summary>
+[Obsolete("The multi node tree picker is replaced by the dedicated document, media, element and member pickers. Scheduled for removal in Umbraco 22.")]
 [DefaultPropertyValueConverter(typeof(MustBeStringValueConverter))]
 public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
@@ -242,7 +243,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
     }
 
     private static bool IsSingleNodePicker(IPublishedPropertyType propertyType) =>
-        propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>()?.MaxNumber == 1;
+        propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>()?.ValidationLimit.Max == 1;
 
     private static string GetEntityType(IPublishedPropertyType propertyType) =>
         propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>()?.TreeSource?.ObjectType ?? Constants.UdiEntityType.Document;

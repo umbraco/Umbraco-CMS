@@ -63,18 +63,10 @@ public static partial class UmbracoBuilderExtensions
         // Register configuration sections.
         builder
             .AddUmbracoOptions<ModelsBuilderSettings>()
-            .AddUmbracoOptions<IndexCreatorSettings>()
             .AddUmbracoOptions<MarketplaceSettings>()
             .AddUmbracoOptions<ContentSettings>()
             .AddUmbracoOptions<DeliveryApiSettings>()
-
-            // Bound to the canonical "Umbraco:CMS:Debug" section (via the UmbracoOptions attribute), plus the
-            // legacy "Umbraco:CMS:Core:Debug" section for backwards compatibility. The legacy bind runs last so
-            // existing configuration under that section continues to take effect.
-            // TODO (V19): remove the legacy section bind.
-            .AddUmbracoOptions<CoreDebugSettings>(optionsBuilder => optionsBuilder.Bind(
-                builder.Config.GetSection(Constants.Configuration.ConfigCoreDebug)))
-
+            .AddUmbracoOptions<DebugSettings>()
             .AddUmbracoOptions<DictionarySettings>()
             .AddUmbracoOptions<ExceptionFilterSettings>()
             .AddUmbracoOptions<GlobalSettings>(optionsBuilder => optionsBuilder.PostConfigure(options =>
@@ -103,18 +95,12 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<BasicAuthSettings>()
             .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
             .AddUmbracoOptions<PackageMigrationSettings>()
-#pragma warning disable CS0618 // Type or member is obsolete
-            .AddUmbracoOptions<HelpPageSettings>()
-#pragma warning restore CS0618 // Type or member is obsolete
             .AddUmbracoOptions<DataTypesSettings>()
             .AddUmbracoOptions<WebhookSettings>()
             .AddUmbracoOptions<CacheSettings>()
             .AddUmbracoOptions<SystemDateMigrationSettings>()
             .AddUmbracoOptions<DistributedJobSettings>()
             .AddUmbracoOptions<ScheduledPublishingSettings>(options => options.ValidateOnStart())
-#pragma warning disable CS0618 // Type or member is obsolete
-            .AddUmbracoOptions<BackOfficeTokenCookieSettings>()
-#pragma warning restore CS0618 // Type or member is obsolete
             .AddUmbracoOptions<WebsiteSettings>()
             .AddUmbracoOptions<SignalRSettings>();
 

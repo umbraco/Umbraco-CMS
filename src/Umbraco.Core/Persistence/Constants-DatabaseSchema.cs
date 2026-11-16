@@ -306,6 +306,11 @@ public static partial class Constants
             public const string ExternalMember2MemberGroup = TableNamePrefix + "ExternalMember2MemberGroup";
 
             /// <summary>
+            ///     The search index document table name.
+            /// </summary>
+            public const string IndexDocument = TableNamePrefix + "IndexDocument";
+
+            /// <summary>
             ///     The member table name.
             /// </summary>
             public const string Member = /*TableNamePrefix*/ "cms" + "Member";

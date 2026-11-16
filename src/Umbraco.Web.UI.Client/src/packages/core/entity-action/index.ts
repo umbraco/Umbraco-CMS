@@ -1,5 +1,6 @@
 import './global-components/index.js';
 
+export * from './action-groups/constants.js';
 export * from './common/index.js';
 export * from './constants.js';
 export * from './entity-action-base.js';

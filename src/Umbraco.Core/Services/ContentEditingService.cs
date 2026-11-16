@@ -77,6 +77,20 @@ internal sealed class ContentEditingService
     /// <inheritdoc/>
     protected override string? RelateParentOnDeleteAlias => Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
 
+    /// <inheritdoc/>
+    protected override async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, IContentType contentType)
+    {
+        // Documents cannot be created from element types. They aren't provided as allowed types, but a direct API or service
+        // request could try to create one. An element type can still be flagged as allowed at root or as a child, as these
+        // settings are retained when a content type is converted to an element type.
+        if (contentType.IsElement)
+        {
+            return (null, ContentEditingOperationStatus.NotAllowed);
+        }
+
+        return await base.TryGetAndValidateParentIdAsync(parentKey, contentType);
+    }
+
     /// <inheritdoc />
     public override Task<IContent?> GetAsync(Guid key)
     {
@@ -125,11 +139,6 @@ internal sealed class ContentEditingService
     /// <inheritdoc />
     public async Task<Attempt<ContentCreateResult, ContentEditingAndPublishingStatus>> CreateAndPublishAsync(ContentCreateModel createModel, ISet<string> culturesToPublish, Guid userKey)
         => await HandleCreateAsync(createModel, culturesToPublish, userKey);
-
-    /// <inheritdoc />
-    [Obsolete("Use the overload taking an ISet<string> of cultures to publish, which reports the save and the publish outcome separately. Scheduled for removal in Umbraco 19.")]
-    public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAndPublishAsync(ContentCreateModel createModel, string[] culturesToPublish, Guid userKey)
-        => ToEditingAttempt(await HandleCreateAsync(createModel, culturesToPublish.ToHashSet(), userKey));
 
     private async Task<Attempt<ContentCreateResult, ContentEditingAndPublishingStatus>> HandleCreateAsync(ContentCreateModel createModel, ISet<string>? culturesToPublish, Guid userKey)
     {
@@ -186,11 +195,6 @@ internal sealed class ContentEditingService
     /// <inheritdoc />
     public async Task<Attempt<ContentUpdateResult, ContentEditingAndPublishingStatus>> UpdateAndPublishAsync(Guid key, ContentUpdateModel updateModel, ISet<string> culturesToPublish, Guid userKey)
         => await HandleUpdateAsync(key, updateModel, culturesToPublish, userKey);
-
-    /// <inheritdoc />
-    [Obsolete("Use the overload taking an ISet<string> of cultures to publish, which reports the save and the publish outcome separately. Scheduled for removal in Umbraco 19.")]
-    public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAndPublishAsync(Guid key, ContentUpdateModel updateModel, string[] culturesToPublish, Guid userKey)
-        => ToEditingAttempt(await HandleUpdateAsync(key, updateModel, culturesToPublish.ToHashSet(), userKey));
 
     private async Task<Attempt<ContentUpdateResult, ContentEditingAndPublishingStatus>> HandleUpdateAsync(Guid key, ContentUpdateModel updateModel, ISet<string>? culturesToPublish, Guid userKey)
     {
@@ -262,11 +266,6 @@ internal sealed class ContentEditingService
     /// <inheritdoc />
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey);
-
-    /// <inheritdoc />
-    [Obsolete("Use the overload that takes an includeDescendants parameter instead. Scheduled for removal in Umbraco 19.")]
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
-        => await RestoreAsync(key, parentKey, userKey, true);
 
     /// <inheritdoc />
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants)
@@ -361,7 +360,9 @@ internal sealed class ContentEditingService
         try
         {
             var currentUserId = await GetUserIdAsync(userKey);
-            OperationResult saveResult = ContentService.Save(content, currentUserId);
+            OperationResult saveResult = await ContentWriteGate.Shared.RunAsync(
+                () => ContentService.Save(content, currentUserId),
+                callerIsInScope: CoreScopeProvider.Context is not null);
             return saveResult.Result switch
             {
                 // these are the only result states currently expected from Save
@@ -393,7 +394,9 @@ internal sealed class ContentEditingService
         try
         {
             var currentUserId = await GetUserIdAsync(userKey);
-            PublishResult publishResult = ContentService.SaveAndPublish(content, culturesToPublish.ToArray(), userId: currentUserId);
+            PublishResult publishResult = await ContentWriteGate.Shared.RunAsync(
+                () => ContentService.SaveAndPublish(content, culturesToPublish.ToArray(), userId: currentUserId),
+                callerIsInScope: CoreScopeProvider.Context is not null);
             if (publishResult.Success)
             {
                 return (

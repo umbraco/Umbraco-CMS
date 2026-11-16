@@ -668,19 +668,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         /// <summary>
-        ///     Retrieves a page of content items based on the specified query, paging, filtering, and ordering parameters.
-        /// </summary>
-        /// <param name="query">The query to filter content items by parent.</param>
-        /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
-        /// <param name="pageSize">The number of items per page.</param>
-        /// <param name="totalRecords">When this method returns, contains the total number of records matching the query and filter.</param>
-        /// <param name="filter">An additional query filter to further refine the results.</param>
-        /// <param name="ordering">The ordering information for sorting the results.</param>
-        /// <returns>An enumerable collection of content items for the specified page.</returns>
-        [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
-        public abstract IEnumerable<TEntity> GetPage(IQuery<TEntity>? query, long pageIndex, int pageSize, out long totalRecords, IQuery<TEntity>? filter, Ordering? ordering);
-
-        /// <summary>
         ///     Retrieves a page of content items, optionally filtering by parent, properties, and additional criteria.
         /// </summary>
         /// <param name="query">An optional query to filter content items by parent.</param>
@@ -693,11 +680,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <param name="filter">An optional additional query to further filter the content items.</param>
         /// <param name="ordering">Optional ordering information for the results.</param>
         /// <returns>An enumerable collection of <typeparamref name="TEntity"/> representing the content items for the specified page.</returns>
-        // TODO (V19): Make this method abstract.
-#pragma warning disable CS0618 // Type or member is obsolete
-        public virtual IEnumerable<TEntity> GetPage(IQuery<TEntity>? query, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<TEntity>? filter, Ordering? ordering)
-            => GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
-#pragma warning restore CS0618 // Type or member is obsolete
+        public abstract IEnumerable<TEntity> GetPage(IQuery<TEntity>? query, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<TEntity>? filter, Ordering? ordering);
 
         /// <summary>
         /// Checks the integrity of content nodes by validating their paths and levels, and optionally fixes detected inconsistencies.
@@ -917,11 +900,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             List<PropertyDataDto> propertyDataDtos;
 
-            if (propertyAliases is { Length: > 0 })
+            // The property aliases are parameters of the same statement as each batch of version ids. If there are too many
+            // to leave a useful batch size, load all properties instead, which includes the requested ones.
+            if (propertyAliases is { Length: > 0 } && propertyAliases.Length <= Constants.Sql.MaxParameterCount / 2)
             {
                 // Only specific properties are requested.
                 // Filter by property alias at SQL level using INNER JOIN to PropertyTypeDto.
-                propertyDataDtos = Database.FetchByGroups<PropertyDataDto, int>(versions, Constants.Sql.MaxParameterCount, batch =>
+                propertyDataDtos = Database.FetchByGroups<PropertyDataDto, int>(versions, Constants.Sql.MaxParameterCount - propertyAliases.Length, batch =>
                     SqlContext.Sql()
                         .Select<PropertyDataDto>()
                         .From<PropertyDataDto>()
@@ -1198,7 +1183,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // of the entire library and the full fetch scales O(total items) on every write.
             // GetUniqueName still applies the authoritative uniqueness filter, so narrowing the
             // fetch to a superset of the names it cares about preserves behaviour.
-            var prefix = GetSafeLikePrefix(SimilarNodeName.GetBaseText(nodeName));
+            var prefix = SimilarNodeName.GetBaseText(nodeName);
 
             Sql<ISqlContext> sql = Sql()
                 .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text!, "name"))
@@ -1209,17 +1194,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             List<SimilarNodeName> siblings = Database.Fetch<SimilarNodeName>(sql);
 
             return SimilarNodeName.GetUniqueName(siblings, id, nodeName);
-        }
-
-        // '[' opens a character-class in a SQL Server LIKE pattern, which could cause the prefix
-        // to match fewer rows than the case-insensitive StartsWith the caller expects. Truncating
-        // at the first '[' keeps the prefix a superset (a shorter prefix only broadens the match)
-        // and avoids needing an ESCAPE clause. '%' and '_' only ever broaden the match, so they
-        // are safe to leave in place.
-        private static string GetSafeLikePrefix(string baseText)
-        {
-            var index = baseText.IndexOf('[');
-            return index < 0 ? baseText : baseText[..index];
         }
 
         private protected string? EnsureUniqueNodeName(int parentId, string? nodeName, int id, out List<SimilarNodeName> siblings)

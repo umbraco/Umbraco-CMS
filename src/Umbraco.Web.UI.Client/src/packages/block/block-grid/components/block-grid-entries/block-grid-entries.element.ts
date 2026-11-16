@@ -18,7 +18,11 @@ import {
 	getInterpolatedIndexOfPositionInWeightMap,
 	isWithinRect,
 } from '@umbraco-cms/backoffice/utils';
-import { UmbFormControlMixin, UmbFormControlValidator } from '@umbraco-cms/backoffice/validation';
+import {
+	isAboveZeroAndBelowMinimum,
+	UmbFormControlMixin,
+	UmbFormControlValidator,
+} from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -113,10 +117,10 @@ function resolvePlacementAsBlockGrid(
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryElement> = {
 	getUniqueOfElement: (element) => {
-		return element.contentKey!;
+		return element.key!;
 	},
 	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.contentKey;
+		return modelEntry.key;
 	},
 	resolvePlacement: resolvePlacementAsBlockGrid,
 	identifier: 'block-grid-editor',
@@ -328,7 +332,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 						(rangeLimit!.min ?? 0) - this._layoutEntries.length,
 					);
 				},
-				() => this._layoutEntries.length < (rangeLimit?.min ?? 0),
+				() => isAboveZeroAndBelowMinimum(this._layoutEntries.length, rangeLimit?.min),
 			);
 		}
 
@@ -412,18 +416,14 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			<div class="umb-block-grid__layout-container" data-area-length=${this._layoutEntries.length}>
 				${repeat(
 					this._layoutEntries,
-					(layout) => layout.contentKey,
+					(layout) => layout.key,
 					(layout, index) =>
-						html`<umb-block-grid-entry
-							class="umb-block-grid__layout-item"
-							index=${index}
-							.contentKey=${layout.contentKey}
-							.layout=${layout}>
+						html`<umb-block-grid-entry class="umb-block-grid__layout-item" index=${index} .layout=${layout}>
 						</umb-block-grid-entry> `,
 				)}
 			</div>
 			${when(this._allowedBlockTypes && this._allowedBlockTypes.length > 0, () => this.#renderCreateButtonGroup())}
-			${when(this._areaKey, () => html`<uui-form-validation-message .for=${this}></uui-form-validation-message>`)}
+			${when(this._areaKey, () => html`<umb-form-validation-message .for=${this}></umb-form-validation-message>`)}
 		`;
 	}
 

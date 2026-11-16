@@ -2,7 +2,7 @@ import { UmbClipboardCollectionRepository } from '../../collection/index.js';
 import type { UmbClipboardEntryDetailModel } from '../types.js';
 import UmbClipboardEntryDetailRepository from '../detail/clipboard-entry-detail.repository.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
+import { UmbEntityContext, UmbEntityOpenedEvent } from '@umbraco-cms/backoffice/entity';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
@@ -14,6 +14,7 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 // TODO: make this into an extension point (Picker) with two kinds of pickers: tree-item-picker and collection-item-picker;
+
 @customElement('umb-clipboard-entry-picker')
 export class UmbClipboardEntryPickerElement extends UmbLitElement {
 	@property({ type: Array })
@@ -24,6 +25,9 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 
 	@state()
 	private _items: Array<UmbClipboardEntryDetailModel> = [];
+
+	@state()
+	private _unpickableUniques: Array<string> = [];
 
 	#collectionRepository = new UmbClipboardCollectionRepository(this);
 	#selectionManager = new UmbSelectionManager(this);
@@ -64,18 +68,36 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 		const sortedEntries = entries.sort((a, b) => new Date(b.updateDate!).getTime() - new Date(a.updateDate!).getTime());
 
 		if (this.config?.filter) {
-			this._items = sortedEntries.filter(this.config.filter);
+			this.#setItems(sortedEntries.filter(this.config.filter));
 			return;
 		}
 
 		if (this.config?.asyncFilter) {
 			const promises = Promise.all(sortedEntries.map(this.config.asyncFilter));
 			const results = await promises;
-			this._items = sortedEntries.filter((_, index) => results[index]);
+			this.#setItems(sortedEntries.filter((_, index) => results[index]));
 			return;
 		}
 
-		this._items = sortedEntries;
+		this.#setItems(sortedEntries);
+	}
+
+	// Resolved before the items are assigned, so no entry is ever rendered as pickable while its compatibility
+	// is still pending.
+	async #setItems(entries: Array<UmbClipboardEntryDetailModel>) {
+		this._unpickableUniques = await this.#resolveUnpickable(entries);
+		this._items = entries;
+	}
+
+	// Unpickable entries stay listed and render disabled, so it is clear the entry exists and only its
+	// compatibility with this destination is the problem.
+	async #resolveUnpickable(entries: Array<UmbClipboardEntryDetailModel>): Promise<Array<string>> {
+		const pickableFilter = this.config?.pickableFilter;
+
+		if (!pickableFilter) return [];
+
+		const results = await Promise.all(entries.map((entry) => pickableFilter(entry)));
+		return entries.filter((_, index) => !results[index]).map((entry) => entry.unique);
 	}
 
 	async #listenToEntityEvents() {
@@ -143,11 +165,19 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 
 		this.#requestItems();
 	}
+	#onOpen(item: UmbClipboardEntryDetailModel) {
+		this.dispatchEvent(
+			new UmbEntityOpenedEvent({
+				entityType: item.entityType,
+				unique: item.unique,
+			}),
+		);
+	}
 
 	override render() {
 		return html`
-			<uui-box headline=${this.localize.term('general_clipboard')}>
-				<span slot="header-actions">
+			<div id="header">
+				<span>
 					${when(
 						this._items.length > 0,
 						() => html`
@@ -159,7 +189,8 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 						() => nothing,
 					)}
 				</span>
-
+			</div>
+			<div id="items">
 				${when(
 					this._items.length > 0,
 					() =>
@@ -170,28 +201,39 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 						),
 					() => html`<p><umb-localize key="clipboard_noItemsMessage">There are no items in the clipboard.</umb-localize></p>`,
 				)}
-			</uui-box>
+			</div>
 		`;
 	}
 
 	#renderItem(item: UmbClipboardEntryDetailModel) {
 		const label = item.name ?? item.unique;
+		const pickable = !this._unpickableUniques.includes(item.unique);
 		return html`
-			<uui-menu-item
-				label=${label}
+			<umb-figure-card
+				data-mark="clipboard-entry:${label}"
+				name=${label}
 				title=${label}
-				selectable
+				?selectable=${pickable}
+				?disabled=${!pickable}
+				?selected=${this.selection.includes(item.unique)}
+				?select-only=${this.selection.length > 0}
 				@selected=${() => this.#selectionManager.select(item.unique)}
 				@deselected=${() => this.#selectionManager.deselect(item.unique)}
-				?selected=${this.selection.includes(item.unique)}>
-				${this.#renderItemIcon(item)} ${this.#renderItemActions(item)}
-			</uui-menu-item>
+				@open=${() => this.#onOpen(item)}>
+				${this.selection.length === 0 ? this.#renderItemActions(item) : nothing}
+				${item.thumbnail ? this.#renderItemThumbnail(item) : this.#renderItemIcon(item)}
+			</umb-figure-card>
 		`;
 	}
 
+	#renderItemThumbnail(item: UmbClipboardEntryDetailModel) {
+		if (!item.thumbnail) return nothing;
+		return html`<img src=${item.thumbnail.src} alt=${item.thumbnail.alt || item.name || ''} decoding="async" />`;
+	}
+
 	#renderItemIcon(item: UmbClipboardEntryDetailModel) {
-		const iconName = item.icon ?? 'icon-clipboard-entry';
-		return html`<umb-icon slot="icon" name=${iconName}></umb-icon>`;
+		const icon = item.icon ?? 'icon-clipboard-entry';
+		return html`<umb-icon name=${icon}></umb-icon>`;
 	}
 
 	#renderItemActions(item: UmbClipboardEntryDetailModel) {
@@ -221,8 +263,15 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 
 	static override styles = [
 		css`
-			:host {
-				--uui-menu-item-flat-structure: 1;
+			#header {
+				margin-bottom: var(--uui-size-layout-1);
+				text-align: end;
+			}
+
+			#items {
+				display: grid;
+				gap: 1rem;
+				grid-template-columns: repeat(auto-fill, minmax(min(var(--umb-card-medium-min-width), 100%), 1fr));
 			}
 		`,
 	];

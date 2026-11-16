@@ -15,7 +15,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Markdown Editor Property Editor UI',
 		element: () => import('./property-editor-ui-markdown-editor.element.js'),
 		meta: {
-			supportsVariantChange: true,
 			label: 'Markdown Editor',
 			propertyEditorSchemaAlias: 'Umbraco.MarkdownEditor',
 			icon: 'icon-code',

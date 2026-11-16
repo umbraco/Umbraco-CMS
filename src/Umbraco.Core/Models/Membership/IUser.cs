@@ -39,6 +39,11 @@ public interface IUser : IMembershipUser, IRememberBeingDirty
     int[]? StartElementIds { get; set; }
 
     /// <summary>
+    ///     Gets or sets the starting document blueprint container identifiers for this user.
+    /// </summary>
+    int[]? StartDocumentBlueprintIds { get; set; }
+
+    /// <summary>
     ///     Gets or sets the preferred language for the user's backoffice UI.
     /// </summary>
     string? Language { get; set; }

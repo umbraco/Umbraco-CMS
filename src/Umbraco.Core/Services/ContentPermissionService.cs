@@ -40,6 +40,10 @@ internal sealed class ContentPermissionService : IContentPermissionService
     }
 
     /// <inheritdoc/>
+    public Task<ContentAuthorizationStatus> AuthorizeAccessAsync(IUser user, Guid contentKey, string permissionToCheck)
+        => AuthorizeAccessAsync(user, contentKey.Yield(), new HashSet<string> { permissionToCheck });
+
+    /// <inheritdoc/>
     public Task<ContentAuthorizationStatus> AuthorizeAccessAsync(
         IUser user,
         IEnumerable<Guid> contentKeys,
@@ -111,7 +115,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
                 var hasPermissionAccess = HasPermissionAccess(user, new[] { descendant.Path }, permissionsToCheck);
 
                 // If this item's path has already been denied or if the user doesn't have access to it, add to the deny list.
-                if (denied.Any(x => descendant.Path.StartsWith($"{x.Path},")) || hasPathAccess == false || hasPermissionAccess == false)
+                if (denied.Any(x => descendant.Path.IsDescendantOfPath(x.Path)) || hasPathAccess == false || hasPermissionAccess == false)
                 {
                     denied.Add(descendant);
                 }

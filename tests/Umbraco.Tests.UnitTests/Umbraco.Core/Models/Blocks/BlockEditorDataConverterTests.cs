@@ -286,7 +286,6 @@ public class BlockEditorDataConverterTests
         {
             Assert.AreEqual(_contentKey, result.BlockValue.Expose[0].ContentKey);
             Assert.IsNull(result.BlockValue.Expose[0].Culture);
-            Assert.IsNull(result.BlockValue.Expose[0].Segment);
         });
     }
 

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -129,7 +130,7 @@ internal sealed class MemberEditingService : IMemberEditingService
         }
 
         // this should be validated already so it's OK to throw an exception here
-        var memberName = createModel.Variants.FirstOrDefault(v => v.Culture is null && v.Segment is null)?.Name
+        var memberName = createModel.Variants.FirstOrDefault(v => v.Culture is null)?.Name
                          ?? throw new ArgumentException("Expected an invariant variant for the member name.", nameof(createModel));
 
         var identityMember = MemberIdentityUser.CreateNew(
@@ -197,7 +198,7 @@ internal sealed class MemberEditingService : IMemberEditingService
             updateModel.IsTwoFactorEnabled = await _twoFactorLoginService.IsTwoFactorEnabledAsync(member.Key);
         }
 
-        MemberIdentityUser? identityMember = await _memberManager.FindByIdAsync(member.Id.ToString());
+        MemberIdentityUser? identityMember = await _memberManager.FindByIdAsync(member.Id.ToString(CultureInfo.InvariantCulture));
         if (identityMember is null)
         {
             status.MemberEditingOperationStatus = MemberEditingOperationStatus.MemberNotFound;
@@ -393,7 +394,7 @@ internal sealed class MemberEditingService : IMemberEditingService
 
     private async Task<MemberEditingOperationStatus> ValidateMemberDataAsync(MemberEditingModelBase model, Guid? memberKey, string? password)
     {
-        if (model.Variants.FirstOrDefault(v => v.Culture is null && v.Segment is null)?.Name.IsNullOrWhiteSpace() is not false)
+        if (model.Variants.FirstOrDefault(v => v.Culture is null)?.Name.IsNullOrWhiteSpace() is not false)
         {
             return MemberEditingOperationStatus.InvalidName;
         }

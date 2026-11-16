@@ -49,24 +49,6 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	}
 
 	/**
-	 * Enables or disables the redirect URL tracker.
-	 * @param {boolean} enabled - Whether the tracker should be enabled.
-	 * @returns {Promise<UmbDataSourceErrorResponse>} Undefined if the operation succeeded, otherwise an error.
-	 * @memberof UmbDocumentRedirectManagementServerDataSource
-	 * @deprecated Deprecated since v17. The backend endpoint is now a no-op; set the
-	 *   `Umbraco:CMS:WebRouting:DisableRedirectUrlTracking` configuration key instead.
-	 *   Scheduled for removal in Umbraco 19.
-	 */
-	async setStatus(enabled: boolean): Promise<UmbDataSourceErrorResponse> {
-		const status = enabled ? RedirectStatusModel.ENABLED : RedirectStatusModel.DISABLED;
-		const { error } = await tryExecute(
-			this.#host,
-			RedirectManagementService.postRedirectManagementStatus({ query: { status } }),
-		);
-		return { error };
-	}
-
-	/**
 	 * Gets the redirects pointing to a specific document.
 	 * @param {string} unique - The document unique identifier.
 	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentRedirectUrlModel>>>} The redirects pointing to the document.

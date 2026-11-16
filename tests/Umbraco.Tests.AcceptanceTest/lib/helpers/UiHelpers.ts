@@ -13,7 +13,6 @@ import {RelationTypeUiHelper} from "./RelationTypeUiHelper";
 import {PackageUiHelper} from "./PackageUiHelper";
 import {LanguageUiHelper} from "./LanguageUiHelper";
 import {ModelsBuilderUiHelper} from "./ModelsBuilderUiHelper";
-import {ExamineManagementUiHelper} from "./ExamineManagementUiHelper";
 import {PublishedStatusUiHelper} from "./PublishedStatusUiHelper";
 import {HealthCheckUiHelper} from "./HealthCheckUiHelper";
 import {ProfilingUiHelper} from "./ProfilingUiHelper";
@@ -40,6 +39,7 @@ import {ExternalLoginUiHelpers} from "./differentAppSettingsHelpers/ExternalLogi
 import {LibraryUiHelper} from "./LibraryUiHelper";
 import {PreviewUiHelper} from "./PreviewUiHelper";
 import {BackofficeSearchUiHelper} from "./BackofficeSearchUiHelper";
+import {SearchManagementUiHelper} from './SearchManagementUiHelper';
 
 export class UiHelpers {
   page: Page;
@@ -56,7 +56,6 @@ export class UiHelpers {
   package: PackageUiHelper;
   language: LanguageUiHelper;
   modelsBuilder: ModelsBuilderUiHelper;
-  examineManagement: ExamineManagementUiHelper;
   publishedStatus: PublishedStatusUiHelper;
   healthCheck: HealthCheckUiHelper;
   profiling: ProfilingUiHelper;
@@ -82,6 +81,7 @@ export class UiHelpers {
   library: LibraryUiHelper;
   preview: PreviewUiHelper;
   backofficeSearch: BackofficeSearchUiHelper;
+  searchManagement: SearchManagementUiHelper;
   private readonly sectionLinks: Locator;
 
   constructor(page: Page) {
@@ -100,7 +100,6 @@ export class UiHelpers {
     this.package = new PackageUiHelper(this.page);
     this.language = new LanguageUiHelper(this.page);
     this.modelsBuilder = new ModelsBuilderUiHelper(this.page);
-    this.examineManagement = new ExamineManagementUiHelper(this.page);
     this.publishedStatus = new PublishedStatusUiHelper(this.page);
     this.healthCheck = new HealthCheckUiHelper(this.page);
     this.profiling = new ProfilingUiHelper(this.page);
@@ -126,6 +125,7 @@ export class UiHelpers {
     this.library = new LibraryUiHelper(this.page);
     this.preview = new PreviewUiHelper(this.page);
     this.backofficeSearch = new BackofficeSearchUiHelper(this.page);
+    this.searchManagement = new SearchManagementUiHelper(this.page);
   }
 
   async goToBackOffice() {

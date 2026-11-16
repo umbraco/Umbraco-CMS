@@ -6,7 +6,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Order Direction Property Editor UI',
 	element: () => import('./property-editor-ui-order-direction.element.js'),
 	meta: {
-		supportsVariantChange: true,
 		label: 'Order Direction',
 		icon: 'icon-autofill',
 		group: '#propertyEditorUIGroups_common',

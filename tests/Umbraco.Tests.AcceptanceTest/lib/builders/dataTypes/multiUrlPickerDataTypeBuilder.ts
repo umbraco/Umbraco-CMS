@@ -40,16 +40,13 @@ export class MultiUrlPickerDataTypeBuilder extends DataTypeBuilder {
 
   getValues() {
     let values: any = [];
-    if (this.minNumber !== undefined) {
+    if (this.minNumber !== undefined || this.maxNumber !== undefined) {
       values.push({
-        alias: 'minNumber',
-        value: this.minNumber
-      });
-    }
-    if (this.maxNumber !== undefined) {
-      values.push({
-        alias: 'maxNumber',
-        value: this.maxNumber
+        alias: 'validationLimit',
+        value: {
+          min: this.minNumber,
+          max: this.maxNumber
+        }
       });
     }
     if (this.ignoreUserStartNodes !== undefined) {
@@ -71,5 +68,15 @@ export class MultiUrlPickerDataTypeBuilder extends DataTypeBuilder {
       });
     }
     return values;
+  }
+}
+
+// A single URL picker holds one link, so it has no link count to configure; the count builders on the base
+// simply have nothing to write to.
+export class SingleUrlPickerDataTypeBuilder extends MultiUrlPickerDataTypeBuilder {
+  constructor() {
+    super();
+    this.editorAlias = 'Umbraco.UrlPicker.Single';
+    this.editorUiAlias = 'Umb.PropertyEditorUi.UrlPicker.Single';
   }
 }

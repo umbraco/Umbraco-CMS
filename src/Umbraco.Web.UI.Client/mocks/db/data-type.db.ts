@@ -1,19 +1,29 @@
 import { queryFilter } from '../utils.js';
 import type { UmbMockDataTypeModel } from '../data/mock-data-set.types.js';
+import { umbMockManager } from '../mock-manager.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityFolderManager } from './utils/entity/entity-folder.manager.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityNamedItemManager } from './utils/entity/entity-named-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type {
-	CreateDataTypeRequestModel,
-	CreateFolderRequestModel,
-	DataTypeItemResponseModel,
-	DataTypeResponseModel,
-	DataTypeTreeItemResponseModel,
-	PagedDataTypeItemResponseModel,
+import {
+	DataTypeChangeModeModel,
+	type CreateDataTypeRequestModel,
+	type CreateFolderRequestModel,
+	type DataTypeItemResponseModel,
+	type DataTypeResponseModel,
+	type DataTypeTreeItemResponseModel,
+	type DatatypeConfigurationResponseModel,
+	type PagedDataTypeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
+
+const defaultConfiguration: DatatypeConfigurationResponseModel = {
+	canBeChanged: DataTypeChangeModeModel.TRUE,
+	documentListViewId: 'c0808dd3-8133-4e4b-8ce8-e2bea84a96a4',
+	mediaListViewId: '3a0156c4-3b8c-4803-bdc1-6871faa83fff',
+	offerDeprecatedPropertyEditors: true,
+};
 
 export interface UmbDataTypeFilterOptions {
 	skip: number;
@@ -31,7 +41,7 @@ const dataQueryFilter = (filterOptions: UmbDataTypeFilterOptions, item: UmbMockD
 	queryFilter(filterOptions.filter ?? '', item.name);
 
 class UmbDataTypeMockDB extends UmbEntityMockDbBase<UmbMockDataTypeModel> {
-	tree = new UmbMockEntityTreeManager<UmbMockDataTypeModel>(this, treeItemMapper);
+	tree = new UmbMockEntityTreeManager<UmbMockDataTypeModel>(this, (item) => treeItemMapper(item, this));
 	folder = new UmbMockEntityFolderManager<UmbMockDataTypeModel>(this, createFolderMockMapper);
 	item = new UmbMockEntityNamedItemManager<UmbMockDataTypeModel>(this, itemResponseMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockDataTypeModel>(this, createDetailMockMapper, detailResponseMapper);
@@ -61,15 +71,21 @@ class UmbDataTypeMockDB extends UmbEntityMockDbBase<UmbMockDataTypeModel> {
 
 		return { total: totalItems, items: paginatedItems };
 	}
+
+	getConfiguration(): DatatypeConfigurationResponseModel {
+		return umbMockManager.getDataSet().dataTypeConfiguration ?? defaultConfiguration;
+	}
 }
 
-const treeItemMapper = (model: UmbMockDataTypeModel): DataTypeTreeItemResponseModel => {
+const treeItemMapper = (model: UmbMockDataTypeModel, db: UmbDataTypeMockDB): DataTypeTreeItemResponseModel => {
 	return {
 		name: model.name,
 		hasChildren: model.hasChildren,
 		id: model.id,
 		parent: model.parent,
+		parentIsFolder: model.parent ? (db.read(model.parent.id)?.isFolder ?? false) : false,
 		isFolder: model.isFolder,
+		editorUiAlias: model.editorUiAlias,
 		isDeletable: model.isDeletable,
 		flags: model.flags,
 		noAccess: model.noAccess,
@@ -127,6 +143,7 @@ const itemResponseMapper = (item: UmbMockDataTypeModel): DataTypeItemResponseMod
 		id: item.id,
 		name: item.name,
 		editorAlias: item.editorAlias,
+		editorUiAlias: item.editorUiAlias,
 		isDeletable: item.isDeletable,
 		flags: item.flags,
 	};

@@ -26,11 +26,6 @@ public enum ContentEditingOperationStatus
     ContentTypeCultureVarianceMismatch,
 
     /// <summary>
-    ///     The content's segment variance does not match the content type's segment variance setting.
-    /// </summary>
-    ContentTypeSegmentVarianceMismatch,
-
-    /// <summary>
     ///     The specified content item was not found.
     /// </summary>
     NotFound,

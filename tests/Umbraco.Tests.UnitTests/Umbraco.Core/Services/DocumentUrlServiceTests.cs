@@ -915,7 +915,7 @@ public class DocumentUrlServiceTests
         DocumentUrlService Service,
         Mock<IIdKeyMap> IdKeyMap,
         Mock<IDocumentNavigationQueryService> NavigationQueryService,
-        Mock<IPublishStatusQueryService> PublishStatusQueryService) CreateDocumentUrlServiceForLegacyRouteTests()
+        Mock<IDocumentPublishStatusQueryService> PublishStatusQueryService) CreateDocumentUrlServiceForLegacyRouteTests()
     {
         var loggerMock = Mock.Of<ILogger<DocumentUrlService>>();
         var documentUrlRepositoryMock = Mock.Of<IDocumentUrlRepository>();
@@ -929,15 +929,14 @@ public class DocumentUrlServiceTests
         var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
         var languageServiceMock = new Mock<ILanguageService>();
         languageServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(languages);
-        languageServiceMock.Setup(x => x.GetDefaultIsoCodeAsync()).ReturnsAsync("en-US");
 
         var keyValueServiceMock = Mock.Of<IKeyValueService>();
         var idKeyMapMock = new Mock<IIdKeyMap>();
         var documentNavigationQueryServiceMock = new Mock<IDocumentNavigationQueryService>();
-        var publishStatusQueryServiceMock = new Mock<IPublishStatusQueryService>();
+        var publishStatusQueryServiceMock = new Mock<IDocumentPublishStatusQueryService>();
         var domainCacheServiceMock = new Mock<IDomainCacheService>();
         domainCacheServiceMock.Setup(x => x.GetAssigned(It.IsAny<int>(), It.IsAny<bool>())).Returns(Enumerable.Empty<Domain>());
-        var defaultCultureAccessorMock = Mock.Of<IDefaultCultureAccessor>();
+        var defaultCultureAccessorMock = Mock.Of<IDefaultCultureAccessor>(x => x.DefaultCulture == "en-US");
         var serverRoleAccessorMock = Mock.Of<IServerRoleAccessor>();
 
         // Enlist must execute its callback immediately for the seeded segment (below) to actually land in the

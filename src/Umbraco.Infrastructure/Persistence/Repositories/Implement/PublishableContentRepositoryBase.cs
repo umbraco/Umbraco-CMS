@@ -111,7 +111,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
                 scheduleDto.Date,
                 scheduleDto.Action == ContentScheduleAction.Release.ToString()
                     ? ContentScheduleAction.Release
-                    : ContentScheduleAction.Expire));
+                    : ContentScheduleAction.Expire,
+                scheduleDto.IncludeInvariantForVariant));
         }
 
         return result;
@@ -180,7 +181,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
 
                 // when invariant, ie 'variations' does not have the culture flag (value 1), it should be safe to simply use the published flag on umbracoDocument/umbracoElement,
                 // otherwise check if there's a version culture variation for the lang, via ccv.id
-                $", (CASE WHEN (ctype.variations & 1) = 0 THEN ({SqlSyntax.GetFieldName<TEntityDto>(x => x.Published)}) ELSE (CASE WHEN ccvp.id IS NULL THEN 0 ELSE 1 END) END) AS ordering "); // trailing space is important!
+                $", (CASE WHEN (ctype.variations & 1) = 0 THEN ({SqlSyntax.GetFieldName<TEntityDto>(x => x.Published)}) ELSE (CASE WHEN ccvp.id IS NULL THEN {SqlSyntax.ConvertIntegerToBoolean(0)} ELSE {SqlSyntax.ConvertIntegerToBoolean(1)} END) END) AS ordering "); // trailing space is important!
 
             sql = Sql(sqlText, sql.Arguments);
 
@@ -1544,17 +1545,6 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
-    public override IEnumerable<TEntity> GetPage(
-        IQuery<TEntity>? query,
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        IQuery<TEntity>? filter,
-        Ordering? ordering)
-        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: filter, ordering: ordering, loadTemplates: true);
-
-    /// <inheritdoc />
     public override IEnumerable<TEntity> GetPage(
         IQuery<TEntity>? query,
         long pageIndex,
@@ -1891,7 +1881,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
                     scheduleDto.Date,
                     scheduleDto.Action == ContentScheduleAction.Release.ToString()
                         ? ContentScheduleAction.Release
-                        : ContentScheduleAction.Expire))
+                        : ContentScheduleAction.Expire,
+                    scheduleDto.IncludeInvariantForVariant))
                     .ToList().AsEnumerable()); // We have to materialize it here,
                                                // to avoid this being used after the scope is disposed.
 

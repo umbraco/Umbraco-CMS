@@ -5,10 +5,11 @@ import { data as dataType } from './data-type.data.js';
 import { data as document } from './document.data.js';
 import { data as documentType } from './document-type.data.js';
 import { data as language } from './language.data.js';
+import { data as segment } from './segment.data.js';
 import { data as user } from './user.data.js';
 import { data as userGroup } from './user-group.data.js';
 
-export { dataType, document, documentType, language, user, userGroup };
+export { dataType, document, documentType, language, segment, user, userGroup };
 
 export const documentTypeConfiguration = {
 	dataTypesCanBeChanged: DataTypeChangeModeModel.TRUE,
@@ -24,6 +25,7 @@ export const documentTypeConfiguration = {
 	documentType,
 	documentTypeConfiguration,
 	language,
+	segment,
 	user,
 	userGroup,
 } satisfies UmbMockDataSet);

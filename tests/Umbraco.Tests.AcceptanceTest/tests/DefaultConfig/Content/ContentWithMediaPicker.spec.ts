@@ -1,7 +1,7 @@
 import {ConstantHelper, test, AliasHelper, NotificationConstantHelper} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
-const dataTypeName = 'Media Picker';
+const dataTypeName = 'Single Media Picker';
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const mediaFileName = 'TestMediaFileForContent';
@@ -83,7 +83,7 @@ test('can remove a media picker in the content', async ({umbracoApi, umbracoUi})
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  await umbracoApi.document.createDocumentWithOneMediaPicker(contentName, documentTypeId, mediaFileId);
+  await umbracoApi.document.createDocumentWithOneMediaPicker(contentName, documentTypeId, mediaFileId, AliasHelper.toAlias(dataTypeName));
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -139,7 +139,7 @@ test('can not publish a mandatory media picker with an empty value', async ({umb
   await umbracoUi.content.goToContentWithName(contentName);
   // Do not pick any media and the validation error appears
   await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   // Pick a media value and the validation error disappears
   await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaFileName);
@@ -190,7 +190,7 @@ test('can navigate away from content with a media picker value without seeing di
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  await umbracoApi.document.createDocumentWithOneMediaPicker(contentName, documentTypeId, mediaFileId);
+  await umbracoApi.document.createDocumentWithOneMediaPicker(contentName, documentTypeId, mediaFileId, AliasHelper.toAlias(dataTypeName));
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
@@ -207,7 +207,7 @@ test('can see discard changes when navigating away from content with a changed m
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  await umbracoApi.document.createDocumentWithOneMediaPicker(contentName, documentTypeId, mediaFileId);
+  await umbracoApi.document.createDocumentWithOneMediaPicker(contentName, documentTypeId, mediaFileId, AliasHelper.toAlias(dataTypeName));
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);

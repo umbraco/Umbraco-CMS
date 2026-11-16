@@ -9,7 +9,12 @@ export const treeHandlers = [
 		const url = new URL(request.url);
 		const skip = Number(url.searchParams.get('skip'));
 		const take = Number(url.searchParams.get('take'));
+		const foldersOnly = url.searchParams.get('foldersOnly') === 'true';
 		const response = umbElementMockDb.tree.getRoot({ skip, take });
+		if (foldersOnly) {
+			response.items = response.items.filter((item: any) => item.isFolder);
+			response.total = response.items.length;
+		}
 		return HttpResponse.json(response);
 	}),
 
@@ -19,7 +24,12 @@ export const treeHandlers = [
 		if (!parentId) return;
 		const skip = Number(url.searchParams.get('skip'));
 		const take = Number(url.searchParams.get('take'));
+		const foldersOnly = url.searchParams.get('foldersOnly') === 'true';
 		const response = umbElementMockDb.tree.getChildrenOf({ parentId, skip, take });
+		if (foldersOnly) {
+			response.items = response.items.filter((item: any) => item.isFolder);
+			response.total = response.items.length;
+		}
 		return HttpResponse.json(response);
 	}),
 
@@ -33,26 +43,12 @@ export const treeHandlers = [
 
 	http.get(umbracoPath(`/tree${UMB_SLUG}/siblings`), ({ request }) => {
 		const url = new URL(request.url);
-		const id = url.searchParams.get('id');
-		if (!id) return new HttpResponse(null, { status: 400 });
-
-		const item = umbElementMockDb.read(id);
-		if (!item) return new HttpResponse(null, { status: 404 });
-
-		const parentId = item.parent?.id;
-		const skip = Number(url.searchParams.get('skip') ?? 0);
-		const take = Number(url.searchParams.get('take') ?? 100);
-
-		let siblings;
-		if (parentId) {
-			siblings = umbElementMockDb.tree.getChildrenOf({ parentId, skip, take });
-		} else {
-			siblings = umbElementMockDb.tree.getRoot({ skip, take });
-		}
-
-		return HttpResponse.json({
-			total: siblings.total,
-			items: siblings.items,
-		});
+		const targetId = url.searchParams.get('target');
+		if (!targetId) return new HttpResponse(null, { status: 400 });
+		const before = Number(url.searchParams.get('before'));
+		const after = Number(url.searchParams.get('after'));
+		const response = umbElementMockDb.tree.getSiblingsOf({ targetId, before, after });
+		if (!response) return new HttpResponse(null, { status: 404, statusText: 'target not found' });
+		return HttpResponse.json(response);
 	}),
 ];
