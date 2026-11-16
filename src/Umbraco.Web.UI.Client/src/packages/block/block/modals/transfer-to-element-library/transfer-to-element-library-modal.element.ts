@@ -1,7 +1,3 @@
-import {
-	umbElementPermissionVerbsSatisfy,
-	umbResolveElementPermissionVerbs,
-} from '../../utils/element-permission-verbs.function.js';
 import type {
 	UmbBlockTransferToElementLibraryModalData,
 	UmbBlockTransferToElementLibraryModalValue,
@@ -13,14 +9,13 @@ import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import {
-	UMB_ELEMENT_FOLDER_ENTITY_TYPE,
-	UMB_ELEMENT_TREE_REPOSITORY_ALIAS,
+	UMB_ELEMENT_CURRENT_USER_PERMISSION_REPOSITORY_ALIAS,
 	UMB_USER_PERMISSION_ELEMENT_CREATE,
 	UMB_USER_PERMISSION_ELEMENT_PUBLISH,
 	UmbElementTypeStructureRepository,
+	type UmbElementCurrentUserPermissionRepository,
 } from '@umbraco-cms/backoffice/element';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbTreeItemModel, UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-block-transfer-to-element-library-modal')
 export class UmbBlockTransferToElementLibraryModalElement extends UmbModalBaseElement<
@@ -100,33 +95,24 @@ export class UmbBlockTransferToElementLibraryModalElement extends UmbModalBaseEl
 	}
 
 	async #isCreateAndPublishPermittedAt(parentUnique: string | null): Promise<boolean> {
-		const context = await this.getContext(UMB_CURRENT_USER_CONTEXT);
-		if (!context) return false;
-		const user = await this.observe(context.currentUser).asPromise();
-
-		const verbs = umbResolveElementPermissionVerbs({
-			permissions: user.permissions,
-			fallbackPermissions: user.fallbackPermissions,
-			path: await this.#getPathTo(parentUnique),
-		});
-
-		return umbElementPermissionVerbsSatisfy(verbs, {
-			allOf: [UMB_USER_PERMISSION_ELEMENT_CREATE, UMB_USER_PERMISSION_ELEMENT_PUBLISH],
-		});
+		const verbs = parentUnique === null ? await this.#getRootVerbs() : await this.#getFolderVerbs(parentUnique);
+		return verbs.includes(UMB_USER_PERMISSION_ELEMENT_CREATE) && verbs.includes(UMB_USER_PERMISSION_ELEMENT_PUBLISH);
 	}
 
-	async #getPathTo(parentUnique: string | null): Promise<Array<string>> {
-		if (parentUnique === null) return [];
+	async #getRootVerbs(): Promise<Array<string>> {
+		const context = await this.getContext(UMB_CURRENT_USER_CONTEXT);
+		if (!context) return [];
+		const user = await this.observe(context.currentUser).asPromise();
+		return user?.hasElementRootAccess ? (user.fallbackPermissions ?? []) : [];
+	}
 
-		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<UmbTreeItemModel, UmbTreeRootModel>>(
+	async #getFolderVerbs(folderUnique: string): Promise<Array<string>> {
+		const repository = await createExtensionApiByAlias<UmbElementCurrentUserPermissionRepository>(
 			this,
-			UMB_ELEMENT_TREE_REPOSITORY_ALIAS,
+			UMB_ELEMENT_CURRENT_USER_PERMISSION_REPOSITORY_ALIAS,
 		);
-		const { data: ancestors } = await treeRepository.requestTreeItemAncestors({
-			treeItem: { unique: parentUnique, entityType: UMB_ELEMENT_FOLDER_ENTITY_TYPE },
-		});
-
-		return [...(ancestors?.map((ancestor) => ancestor.unique) ?? []), parentUnique];
+		const { data } = await repository.requestPermissions([folderUnique]);
+		return data?.find((item) => item.unique === folderUnique)?.verbs ?? [];
 	}
 
 	async #isElementTypeAllowedAt(parentUnique: string | null): Promise<boolean> {
