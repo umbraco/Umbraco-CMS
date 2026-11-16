@@ -3509,8 +3509,8 @@ internal partial class BlockListElementLevelVariationTests
     public async Task Publishing_After_Changing_Element_Property_From_Invariant_To_Variant_Publishes_Unsaved_Invariant_Value_For_Default_Culture(bool nestedInInvariantBlock)
     {
         // 1. Create an invariant content element type and a variant settings element type WITHOUT variant properties
-        var contentElementType = await CreateElementType(ContentVariation.Nothing, "myContentElementType");
-        var settingsElementType = await CreateElementType(ContentVariation.Culture, "mySettingsElementType");
+        var contentElementType = CreateElementType(ContentVariation.Nothing, "myContentElementType");
+        var settingsElementType = CreateElementType(ContentVariation.Culture, "mySettingsElementType");
         settingsElementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Nothing;
         await ContentTypeService.UpdateAsync(settingsElementType, Constants.Security.SuperUserKey);
 
@@ -3542,7 +3542,7 @@ internal partial class BlockListElementLevelVariationTests
             blockListDataType = await CreateBlockListDataType(rootElementType);
         }
 
-        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
 
         // 2. Create content with an invariant settings value and publish it
         var contentKey = Guid.NewGuid();
