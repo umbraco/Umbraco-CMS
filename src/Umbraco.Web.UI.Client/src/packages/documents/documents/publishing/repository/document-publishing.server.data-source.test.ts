@@ -188,3 +188,41 @@ describe('UmbDocumentPublishingServerDataSource (ancestorVariantStates)', () => 
 		expect(data).to.deep.equal([]);
 	});
 });
+
+
+describe('UmbDocumentPublishingServerDataSource (publishWithDescendants)', () => {
+	const originalPublish = DocumentService.putDocumentByIdPublishWithDescendants;
+	let hostElement: UmbTestHostElement;
+
+	beforeEach(() => {
+		hostElement = new UmbTestHostElement();
+		document.body.appendChild(hostElement);
+	});
+
+	afterEach(() => {
+		DocumentService.putDocumentByIdPublishWithDescendants = originalPublish;
+		hostElement.remove();
+	});
+
+	for (const culture of [null, 'en-US']) {
+		it(`sends culture ${culture ?? 'invariant'} only once for multiple segments`, async () => {
+			let requestBody: unknown;
+			DocumentService.putDocumentByIdPublishWithDescendants = (options) => {
+				requestBody = options.body;
+				return Promise.resolve({ data: undefined }) as ReturnType<typeof originalPublish>;
+			};
+
+			const source = new UmbDocumentPublishingServerDataSource(hostElement);
+			await source.publishWithDescendants(
+				'document-id',
+				[new UmbVariantId(culture, null), new UmbVariantId(culture, 'VIP members')],
+				true,
+			);
+
+			expect(requestBody).to.deep.equal({
+				cultures: [culture ?? 'invariant'],
+				includeUnpublishedDescendants: true,
+			});
+		});
+	}
+});

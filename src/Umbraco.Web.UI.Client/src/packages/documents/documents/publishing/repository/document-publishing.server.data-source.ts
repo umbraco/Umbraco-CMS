@@ -172,7 +172,7 @@ export class UmbDocumentPublishingServerDataSource {
 		if (!unique) throw new Error('Id is missing');
 
 		const body: PublishDocumentWithDescendantsRequestModel = {
-			cultures: variantIds.map((variant) => variant.toCultureString()),
+			cultures: [...new Set(variantIds.map((variant) => variant.toCultureString()))],
 			includeUnpublishedDescendants,
 		};
 
