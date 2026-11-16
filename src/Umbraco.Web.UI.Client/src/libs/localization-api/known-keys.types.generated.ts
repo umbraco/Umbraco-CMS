@@ -41,6 +41,7 @@ declare global {
 	interface UmbKnownLocalizationSet extends UmbLocalizationSetBase {
 		actionCategories_administration: string;
 		actionCategories_content: string;
+		actionCategories_elements: string;
 		actionCategories_general: string;
 		actionCategories_other: string;
 		actionCategories_structure: string;

@@ -4,8 +4,15 @@ import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_ENTITY_CONTEXT, type UmbEntityUnique 
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { IPermissionPresentationModelElementPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	IPermissionPresentationModelElementContainerPermissionPresentationModel,
+	IPermissionPresentationModelElementPermissionPresentationModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
+
+type ElementOrContainerPermission =
+	| IPermissionPresentationModelElementPermissionPresentationModel
+	| IPermissionPresentationModelElementContainerPermissionPresentationModel;
 
 export class UmbElementUserPermissionCondition
 	extends UmbConditionBase<UmbElementUserPermissionConditionConfig>
@@ -13,7 +20,7 @@ export class UmbElementUserPermissionCondition
 {
 	#entityType: string | undefined;
 	#unique: string | null | undefined;
-	#elementPermissions?: Array<IPermissionPresentationModelElementPermissionPresentationModel>;
+	#elementPermissions?: Array<ElementOrContainerPermission>;
 	#fallbackPermissions?: Array<string>;
 	#ancestors: Array<UmbEntityUnique> = [];
 
@@ -70,38 +77,28 @@ export class UmbElementUserPermissionCondition
 		if (this.#elementPermissions === undefined) return;
 		if (this.#fallbackPermissions === undefined) return;
 
-		const hasElementPermissions = this.#elementPermissions.length > 0;
+		// If no permission is defined on the path to the current element we use the fallback permissions
+		this.#check(this.#findClosestVerbs(this.#elementPermissions) ?? this.#fallbackPermissions);
+	}
 
-		// if there is no permissions for any elements we use the fallback permissions
-		if (!hasElementPermissions) {
-			this.#check(this.#fallbackPermissions);
-			return;
-		}
-
-		// If there are element permissions, we need to check the full path to see if any permissions are defined for the current element
-		// If we find multiple permissions in the same path, we will apply the closest one
-		if (hasElementPermissions) {
-			// Path including the current element and all ancestors
-			const path = [...this.#ancestors, this.#unique].filter((unique) => unique !== null);
-			// Reverse the path to find the closest element permission quickly
-			const reversedPath = [...path].reverse();
-			const elementPermissionsMap = new Map(this.#elementPermissions.map((p) => [p.element.id, p]));
-
-			// Find the closest element permission in the path
-			const closestElementPermission = reversedPath.find((id) => elementPermissionsMap.has(id));
-
-			// Retrieve the corresponding permission data
-			const match = closestElementPermission ? elementPermissionsMap.get(closestElementPermission) : undefined;
-
-			// no permissions for the current element - use the fallback permissions
-			if (!match) {
-				this.#check(this.#fallbackPermissions);
-				return;
+	#findClosestVerbs(permissions: Array<ElementOrContainerPermission>): Array<string> | undefined {
+		// Element entries are inserted last so they take precedence over a container entry with the same id
+		const permissionsById = new Map<string, ElementOrContainerPermission>();
+		for (const p of permissions) {
+			if (p.$type === 'ElementContainerPermissionPresentationModel') {
+				permissionsById.set(p.elementContainer.id, p);
 			}
-
-			// we found permissions - check them
-			this.#check(match.verbs);
 		}
+		for (const p of permissions) {
+			if (p.$type === 'ElementPermissionPresentationModel') {
+				permissionsById.set(p.element.id, p);
+			}
+		}
+
+		// Walk from the current element up through its ancestors to find the closest permission
+		const path = [...this.#ancestors, this.#unique].filter((unique): unique is string => typeof unique === 'string');
+		const closestId = path.reverse().find((id) => permissionsById.has(id));
+		return closestId ? permissionsById.get(closestId)?.verbs : undefined;
 	}
 
 	#check(verbs: Array<string>) {
@@ -129,13 +126,9 @@ export class UmbElementUserPermissionCondition
 		this.permitted = allOfPermitted && oneOfPermitted;
 	}
 
-	#isElementUserPermission(
-		permission: unknown,
-	): permission is IPermissionPresentationModelElementPermissionPresentationModel {
-		return (
-			(permission as IPermissionPresentationModelElementPermissionPresentationModel).$type ===
-			'ElementPermissionPresentationModel'
-		);
+	#isElementUserPermission(permission: unknown): permission is ElementOrContainerPermission {
+		const type = (permission as ElementOrContainerPermission).$type;
+		return type === 'ElementPermissionPresentationModel' || type === 'ElementContainerPermissionPresentationModel';
 	}
 }
 

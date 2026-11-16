@@ -2,6 +2,7 @@ import { UmbElementFolderItemRepository } from '../repository/item/element-folde
 import { UMB_ELEMENT_PICKER_MODAL } from '../../modals/element-picker-modal.token.js';
 import type { UmbElementFolderItemModel } from '../repository/item/types.js';
 import type { UmbElementTreeItemModel } from '../../tree/types.js';
+import { UMB_ELEMENT_FOLDER_ELEMENTS_PERMISSION_GROUP } from './constants.js';
 import type { UmbElementFolderUserPermissionModel } from './types.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -217,18 +218,26 @@ export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormC
 		const permission = this.#getPermissionForFolder(item.unique);
 		if (!permission) return;
 
-		return umbExtensionsRegistry
-			.getByTypeAndFilter(
-				'entityUserPermission',
-				(manifest) =>
-					manifest.forEntityTypes.includes(item.entityType) &&
-					manifest.meta.verbs.every((verb) => permission.verbs.includes(verb)),
-			)
-			.map((m) => {
-				const manifest = m as ManifestEntityUserPermission;
-				return manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
-			})
-			.join(', ');
+		const manifests = umbExtensionsRegistry.getByTypeAndFilter(
+			'entityUserPermission',
+			(manifest) =>
+				manifest.forEntityTypes.includes(item.entityType) &&
+				manifest.meta.verbs.every((verb) => permission.verbs.includes(verb)),
+		) as Array<ManifestEntityUserPermission>;
+
+		const toLabels = (items: Array<ManifestEntityUserPermission>) =>
+			items.map((m) => (m.meta.label ? this.localize.string(m.meta.label) : m.name)).join(', ');
+
+		const folderLabels = toLabels(
+			manifests.filter((m) => m.meta.group !== UMB_ELEMENT_FOLDER_ELEMENTS_PERMISSION_GROUP),
+		);
+		const elementLabels = toLabels(
+			manifests.filter((m) => m.meta.group === UMB_ELEMENT_FOLDER_ELEMENTS_PERMISSION_GROUP),
+		);
+
+		return [folderLabels, elementLabels && `${this.localize.term('actionCategories_elements')}: ${elementLabels}`]
+			.filter(Boolean)
+			.join(' · ');
 	}
 
 	#getFallbackPermissionVerbsForEntityType(entityType: string) {
@@ -244,7 +253,7 @@ export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormC
 		return [...new Set([...verbs])];
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			#btn-add {
 				width: 100%;

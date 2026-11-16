@@ -88,6 +88,7 @@ export default {
 		structure: 'Structure',
 		general: 'General',
 		other: 'Other',
+		elements: 'Elements',
 	},
 	actionDescriptions: {
 		assignDomain: 'Allow access to assign culture and hostnames',

@@ -1,4 +1,5 @@
 import { UmbElementItemDataResolver } from '../item/data-resolver/element-item-data-resolver.js';
+import { UmbElementTreeItemAncestorsEntityContext } from './element-tree-item-ancestors.entity-context.js';
 import type { UmbElementTreeItemModel, UmbElementTreeRootModel } from './types.js';
 import { UmbDefaultTreeItemContext } from '@umbraco-cms/backoffice/tree';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
@@ -10,6 +11,7 @@ export class UmbElementTreeItemContext extends UmbDefaultTreeItemContext<
 > {
 	// TODO: Provide this together with the EntityContext, ideally this takes part via a extension-type [NL]
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
+	#ancestorsContext = new UmbElementTreeItemAncestorsEntityContext(this);
 	#item = new UmbElementItemDataResolver(this);
 
 	readonly name = this.#item.name;
@@ -29,6 +31,12 @@ export class UmbElementTreeItemContext extends UmbDefaultTreeItemContext<
 			(isTrashed) => {
 				this.#isTrashedContext.setIsTrashed(isTrashed);
 			},
+			null,
+		);
+
+		this.observe(
+			this._treeItem.asObservablePart((item) => item?.parent?.unique),
+			(parentUnique) => this.#ancestorsContext.setParentUnique(parentUnique),
 			null,
 		);
 	}

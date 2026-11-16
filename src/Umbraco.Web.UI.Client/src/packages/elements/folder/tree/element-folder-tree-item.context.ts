@@ -1,3 +1,4 @@
+import { UmbElementTreeItemAncestorsEntityContext } from '../../tree/element-tree-item-ancestors.entity-context.js';
 import type { UmbElementTreeRootModel } from '../../tree/types.js';
 import type { UmbElementFolderTreeItemModel } from '../types.js';
 import { UmbDefaultTreeItemContext } from '@umbraco-cms/backoffice/tree';
@@ -10,6 +11,7 @@ export class UmbElementFolderTreeItemContext extends UmbDefaultTreeItemContext<
 > {
 	// TODO: Provide this together with the EntityContext, ideally this takes part via a extension-type [NL]
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
+	#ancestorsContext = new UmbElementTreeItemAncestorsEntityContext(this);
 
 	// TODO: Move to API
 	readonly isTrashed = this._treeItem.asObservablePart((item) => item?.isTrashed ?? false);
@@ -22,6 +24,12 @@ export class UmbElementFolderTreeItemContext extends UmbDefaultTreeItemContext<
 			(isTrashed) => {
 				this.#isTrashedContext.setIsTrashed(isTrashed);
 			},
+			null,
+		);
+
+		this.observe(
+			this._treeItem.asObservablePart((item) => item?.parent?.unique),
+			(parentUnique) => this.#ancestorsContext.setParentUnique(parentUnique),
 			null,
 		);
 	}
