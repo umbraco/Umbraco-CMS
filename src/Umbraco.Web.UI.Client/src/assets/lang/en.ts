@@ -2810,6 +2810,10 @@ export default {
 		addSettingsElementType: 'Add settings',
 		confirmDeleteBlockTitle: 'Delete %0%?',
 		confirmDeleteBlockMessage: 'Are you sure you want to delete this %0%?',
+		removeFromLanguage: 'Remove from this language',
+		confirmUnexposeBlockTitle: 'Remove %0% from this language?',
+		confirmUnexposeBlockMessage:
+			'This %0% will no longer be shown in this language. Its content is kept, and is restored if the block is created again.',
 		confirmDeleteBlockTypeTitle: 'Delete block configuration?',
 		confirmDeleteBlockTypeMessage: 'Are you sure you want to delete the block configuration <strong>%0%</strong>?',
 		confirmDeleteBlockTypeNotice:

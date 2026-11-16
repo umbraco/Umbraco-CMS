@@ -847,6 +847,17 @@ export abstract class UmbBlockEntryContext<
 		this._manager?.setOneExpose(this.#contentKey, variantId);
 	}
 
+	async requestUnexpose() {
+		const blockName = this.getName();
+		await umbConfirmModal(this, {
+			headline: this.localize.term('blockEditor_confirmUnexposeBlockTitle', blockName),
+			content: this.localize.term('blockEditor_confirmUnexposeBlockMessage', escapeHTML(blockName)),
+			confirmLabel: '#blockEditor_removeFromLanguage',
+			color: 'danger',
+		});
+		this.unexpose();
+	}
+
 	/**
 	 * Reverts the expose of the block for the current variant, returning it to the not-yet-created state.
 	 * The content values of the variant are kept, so exposing again restores them.

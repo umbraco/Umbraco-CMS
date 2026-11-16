@@ -15,7 +15,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('./unexpose-content-block.action.js'),
 		meta: {
 			icon: 'icon-remove',
-			label: '#actions_remove',
+			label: '#blockEditor_removeFromLanguage',
 		},
 		conditions: [
 			{ alias: UMB_BLOCK_ENTRY_VARIES_BY_VARIANT_CONDITION_ALIAS },
