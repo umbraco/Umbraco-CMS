@@ -994,6 +994,53 @@ public class ContentNavigationServiceBaseTests
     }
 
     [Test]
+    [TestCase(20)] // more ancestors than the stack buffer holds, but fewer of them match
+    [TestCase(34)] // the matching ancestors alone overflow the stack buffer by one
+    public void Can_Get_Ancestors_Of_Type_In_Bottom_Up_Order_At_Any_Depth(int depth)
+    {
+        // Arrange
+        const string contentTypeAlias = "contentPage";
+        const string anotherContentTypeAlias = "anotherContentPage";
+        Guid anotherContentTypeKey = Guid.NewGuid();
+
+        var contentTypeMock = new Mock<IContentType>();
+        contentTypeMock.SetupGet(x => x.Alias).Returns(contentTypeAlias);
+        contentTypeMock.SetupGet(x => x.Key).Returns(ContentType);
+
+        var anotherContentTypeMock = new Mock<IContentType>();
+        anotherContentTypeMock.SetupGet(x => x.Alias).Returns(anotherContentTypeAlias);
+        anotherContentTypeMock.SetupGet(x => x.Key).Returns(anotherContentTypeKey);
+
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { contentTypeMock.Object, anotherContentTypeMock.Object });
+
+        var navigationService = new TestContentNavigationService(
+            CreateScopeProvider(),
+            _navigationRepository.Object,
+            contentTypeServiceMock.Object);
+
+        // Alternate the content types down the chain, so the matching ancestors are interleaved with ones to skip.
+        Guid[] chain = Enumerable.Range(0, depth).Select(_ => Guid.NewGuid()).ToArray();
+        for (var i = 0; i < depth; i++)
+        {
+            navigationService.Add(chain[i], i % 2 == 0 ? ContentType : anotherContentTypeKey, i == 0 ? null : chain[i - 1]);
+        }
+
+        Guid leaf = chain[^1];
+        Guid[] expectedAncestors = chain[..^1].Where((_, i) => i % 2 == 0).Reverse().ToArray();
+
+        // Act
+        var result = navigationService.TryGetAncestorsKeysOfType(leaf, contentTypeAlias, out IEnumerable<Guid> ancestorsKeys);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.That(ancestorsKeys, Is.EqualTo(expectedAncestors));
+        });
+    }
+
+    [Test]
     public void Cannot_Get_Ancestors_Of_Type_From_Non_Existing_Content_Type_Alias()
     {
         // Arrange
