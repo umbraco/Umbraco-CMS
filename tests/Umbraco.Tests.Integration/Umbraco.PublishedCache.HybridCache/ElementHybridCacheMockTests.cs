@@ -44,6 +44,9 @@ internal sealed class ElementHybridCacheMockTests : UmbracoIntegrationTest
         ContentCacheNode publishedTestCacheNode = BuildCacheNode(isDraft: false);
 
         _mockDatabaseCacheRepository = new Mock<IDatabaseCacheRepository>();
+        _mockDatabaseCacheRepository
+            .Setup(r => r.GetKeysOfEntityTypes(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<ContentCacheDataSerializerEntityType>()))
+            .Returns(new HashSet<Guid>());
 
         _mockDatabaseCacheRepository.Setup(r => r.GetElementSourceAsync(It.IsAny<Guid>(), true))
             .ReturnsAsync(draftTestCacheNode);
