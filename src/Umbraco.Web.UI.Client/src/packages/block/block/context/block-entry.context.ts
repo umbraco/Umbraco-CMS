@@ -827,12 +827,7 @@ export abstract class UmbBlockEntryContext<
 		const blockName = this.getName();
 		await umbConfirmModal(this, {
 			headline: this.localize.term('blockEditor_confirmDeleteBlockTitle', blockName),
-			content: this.localize.term(
-				this.#variesByVariant.getValue()
-					? 'blockEditor_confirmDeleteVariantBlockMessage'
-					: 'blockEditor_confirmDeleteBlockMessage',
-				escapeHTML(blockName),
-			),
+			content: this.localize.term('blockEditor_confirmDeleteBlockMessage', escapeHTML(blockName)),
 			confirmLabel: '#general_delete',
 			color: 'danger',
 		});
@@ -850,17 +845,6 @@ export abstract class UmbBlockEntryContext<
 		const variantId = this.#variantId.getValue();
 		if (!variantId || !this.#contentKey) return;
 		this._manager?.setOneExpose(this.#contentKey, variantId);
-	}
-
-	async requestUnexpose() {
-		const blockName = this.getName();
-		await umbConfirmModal(this, {
-			headline: this.localize.term('blockEditor_confirmUnexposeBlockTitle', blockName),
-			content: this.localize.term('blockEditor_confirmUnexposeBlockMessage', escapeHTML(blockName)),
-			confirmLabel: '#blockEditor_removeFromLanguage',
-			color: 'danger',
-		});
-		this.unexpose();
 	}
 
 	/**

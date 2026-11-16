@@ -609,6 +609,33 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 
 	async submit() {
+		const layoutData = await this.#storeData();
+		this.#expose(layoutData.contentKey);
+		this.setIsNew(false);
+
+		this.#reportValidation();
+	}
+
+	/**
+	 * Stores the edits and sets the block as not exposed for the current variant, without validating.
+	 * The content of the variant is kept, so exposing the block again restores it.
+	 */
+	async submitAsDraft() {
+		await this.#storeData();
+		this.unexpose();
+		this.#clearVariantValidationMessages();
+		this.setIsNew(false);
+		this._closeModal();
+	}
+
+	#clearVariantValidationMessages() {
+		for (const manager of [this.content, this.settings]) {
+			const messages = manager.validation.messages;
+			messages.removeMessageByKeys(messages.getMessages().map((x) => x.key));
+		}
+	}
+
+	async #storeData(): Promise<LayoutDataType> {
 		const layoutData = this.#layout.value;
 		const contentData = this.content.getData();
 		if (!layoutData || !this.#blockManager || !this.#blockEntries || !contentData || !this.#originData) {
@@ -641,10 +668,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			}
 		}
 
-		this.#expose(layoutData.contentKey);
-		this.setIsNew(false);
-
-		this.#reportValidation();
+		return layoutData;
 	}
 
 	#reportValidation() {
@@ -664,6 +688,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		const contentKey = this.#layout.value?.contentKey;
 		if (!contentKey) throw new Error('Failed to expose block, missing content key.');
 		this.#expose(contentKey);
+	}
+
+	unexpose() {
+		const contentKey = this.#layout.value?.contentKey;
+		if (!contentKey) throw new Error('Failed to unexpose block, missing content key.');
+		const variantId = this.#variantId.getValue();
+		if (!variantId) throw new Error('Failed to unexpose block, missing variant id.');
+		this.#blockManager?.removeOneExpose(contentKey, variantId);
 	}
 
 	#expose(unique: string) {

@@ -16,7 +16,7 @@ export class UmbBlockEntryHasSettingsCondition
 			this.observe(
 				context.settingsElementTypeKey,
 				(settingsElementTypeKey) => {
-					this.permitted = !!settingsElementTypeKey;
+					this.permitted = !!settingsElementTypeKey === (this.config.match !== undefined ? this.config.match : true);
 				},
 				'observeSettingsElementTypeKey',
 			);

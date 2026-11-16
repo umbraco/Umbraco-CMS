@@ -4,6 +4,7 @@ import {
 	NESTED_OUTER_BLOCK_LIST_DATA_TYPE_ID,
 	TEXTSTRING_DATA_TYPE_ID,
 	VARIANT_BLOCK_LIST_DATA_TYPE_ID,
+	VARIANT_INLINE_BLOCK_LIST_DATA_TYPE_ID,
 } from './data-type.data.js';
 
 export const NESTED_INLINE_BLOCK_LIST_FOLDER_ID = '6a6f0a9a-4294-4d5e-b0e6-4fa779a80957';
@@ -11,7 +12,9 @@ export const NESTED_BLOCK_LIST_DOCUMENT_TYPE_ID = '9ef9a53e-ed33-4583-b104-3c7f0
 export const NESTED_BLOCK_LIST_OUTER_ELEMENT_TYPE_ID = '9c86f35b-42d9-480f-bc4a-f8475fde6999';
 export const NESTED_BLOCK_LIST_INNER_ELEMENT_TYPE_ID = '9ad6ab46-3eef-4561-bb1c-98ec3026e18a';
 export const VARIANT_BLOCK_ELEMENT_TYPE_ID = '086f0418-9ab5-4eef-8073-98e57f0a4cd8';
+export const VARIANT_HIDDEN_EDITOR_ELEMENT_TYPE_ID = '45bb055d-f580-45f6-95d8-6807a6841b03';
 export const VARIANT_BLOCK_LIST_DOCUMENT_TYPE_ID = '63661a2d-173f-4961-a71c-69338bf50568';
+export const VARIANT_INLINE_BLOCK_LIST_DOCUMENT_TYPE_ID = '414f5e98-8759-43bb-8d95-f2cc22fba799';
 
 export const data: Array<UmbMockDocumentTypeModel> = [
 	{
@@ -299,6 +302,101 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				description: null,
 				dataType: { id: TEXTSTRING_DATA_TYPE_ID },
 				variesByCulture: true,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	},
+	{
+		// Same shape as the Variant Block, but the block list hides its content editor, so it has no workspace to open.
+		id: VARIANT_HIDDEN_EDITOR_ELEMENT_TYPE_ID,
+		alias: 'variantHiddenEditorElement',
+		name: 'Variant Block (Hidden Editor)',
+		description: null,
+		icon: 'icon-item-arrangement',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: false,
+		variesByCulture: true,
+		variesBySegment: false,
+		isElement: true,
+		hasChildren: false,
+		parent: { id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID },
+		isFolder: false,
+		properties: [
+			{
+				id: '4e3b36f0-27f5-4a24-b1b5-317521f44637',
+				container: null,
+				alias: 'headline',
+				name: 'Headline',
+				description: null,
+				dataType: { id: TEXTSTRING_DATA_TYPE_ID },
+				variesByCulture: true,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	},
+	{
+		id: VARIANT_INLINE_BLOCK_LIST_DOCUMENT_TYPE_ID,
+		alias: 'variantInlineBlockList',
+		name: 'Variant Inline Block List',
+		description: null,
+		icon: 'icon-document',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: true,
+		variesByCulture: true,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: { id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID },
+		isFolder: false,
+		properties: [
+			{
+				id: '75337bab-ae33-4c1c-9e81-b53a2cb34086',
+				container: null,
+				alias: 'blocks',
+				name: 'Blocks',
+				description: null,
+				dataType: { id: VARIANT_INLINE_BLOCK_LIST_DATA_TYPE_ID },
+				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 0,
 				validation: {
