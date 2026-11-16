@@ -120,7 +120,13 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     private DocumentRepository CreateRepository(AppCaches appCaches) =>
         CreateRepository(appCaches, Mock.Of<IEventAggregator>());
 
-    private DocumentRepository CreateRepository(AppCaches appCaches, IEventAggregator eventAggregator) => new(
+    private DocumentRepository CreateRepository(AppCaches appCaches, IEventAggregator eventAggregator) =>
+        CreateRepository(appCaches, eventAggregator, GetRequiredService<IContentTypeRepository>());
+
+    private DocumentRepository CreateRepository(
+        AppCaches appCaches,
+        IEventAggregator eventAggregator,
+        IContentTypeRepository contentTypeRepository) => new(
         GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
         appCaches,
         LoggerFactory,
@@ -133,7 +139,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         eventAggregator,
         Mock.Of<IRepositoryCacheVersionService>(),
         Mock.Of<ICacheSyncService>(),
-        GetRequiredService<IContentTypeRepository>(),
+        contentTypeRepository,
         GetRequiredService<ITemplateRepository>(),
         GetRequiredService<IIdKeyMap>(),
         GetRequiredService<ITagRepository>(),
@@ -267,6 +273,23 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result!.HasIdentity, Is.True);
+        scope.Complete();
+    }
+
+    [Test]
+    public void GetAsync_WhenContentTypeCannotBeResolved_FailsNamingNodeAndContentType()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var contentTypeRepository = new Mock<IContentTypeRepository>();
+        contentTypeRepository
+            .Setup(x => x.GetAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IContentType?)null);
+        var repository = CreateRepository(AppCaches.Disabled, Mock.Of<IEventAggregator>(), contentTypeRepository.Object);
+
+        InvalidOperationException? exception = Assert.ThrowsAsync<InvalidOperationException>(
+            () => repository.GetAsync(_textpage.Key, CancellationToken.None));
+
+        Assert.That(exception!.Message, Does.Contain(_textpage.Key.ToString()).And.Contain(_textpage.ContentTypeId.ToString()));
         scope.Complete();
     }
 

@@ -39,14 +39,14 @@ internal sealed class ContentBaseFactory
     /// <param name="publishedContentVersion">
     ///     The content version row of the published version, or <c>null</c> if the document has never been published.
     /// </param>
-    /// <param name="contentType">The content type, or <c>null</c> if it could not be resolved.</param>
+    /// <param name="contentType">The content type; required, a document cannot exist without one.</param>
     /// <returns>A <see cref="Content"/> instance populated from the rows.</returns>
     public static Content BuildEntity(
         EFCoreDtos.DocumentDto dto,
         EFCoreDtos.NodeDto node,
         EFCoreDtos.ContentVersionDto contentVersion,
         EFCoreDtos.ContentVersionDto? publishedContentVersion,
-        IContentType? contentType)
+        IContentType contentType)
     {
         var entity = new Content(contentVersion.Text ?? string.Empty, node.ParentId, contentType);
 
@@ -75,16 +75,13 @@ internal sealed class ContentBaseFactory
     /// </param>
     /// <param name="contentType">The element type; required, an element cannot exist without one.</param>
     /// <returns>An <see cref="Element" /> instance populated from the rows.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="contentType" /> is <c>null</c>.</exception>
     public static Element BuildEntity(
         EFCoreDtos.ElementDto dto,
         EFCoreDtos.NodeDto node,
         EFCoreDtos.ContentVersionDto contentVersion,
         EFCoreDtos.ContentVersionDto? publishedContentVersion,
-        IContentType? contentType)
+        IContentType contentType)
     {
-        ArgumentNullException.ThrowIfNull(contentType);
-
         var entity = new Element(contentVersion.Text ?? string.Empty, node.ParentId, contentType);
 
         try
