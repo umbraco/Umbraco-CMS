@@ -2,31 +2,20 @@
 import {ApiHelpers} from "./ApiHelpers";
 import {WebhookBuilder} from "../builders";
 import {ConstantHelper} from "./ConstantHelper";
-import {randomUUID} from "crypto";
 import {WebhookReceiver} from "./WebhookReceiver";
 
 export class WebhookApiHelper {
   api: ApiHelpers;
   page: Page;
+  webhookSiteUrl: string = 'https://webhook.site/';
   /**
-   * The receiver's base URL, known once a token has been generated or a webhook has been created.
+   * The base URL of the receiver in the test process, known once a receiver token has been generated.
    */
   receiverUrl: string = '';
 
   constructor(api: ApiHelpers, page: Page) {
     this.api = api;
     this.page = page;
-  }
-
-  /**
-   * @deprecated Use {@link receiverUrl} instead.
-   */
-  get webhookSiteUrl() {
-    return this.receiverUrl;
-  }
-
-  set webhookSiteUrl(url: string) {
-    this.receiverUrl = url;
   }
 
   async get(id: string) {
@@ -93,27 +82,17 @@ export class WebhookApiHelper {
     return null;
   }
 
-  async generateReceiverToken() {
-    await this.startReceiver();
-    return randomUUID();
-  }
-
-  private async startReceiver() {
-    // A URL that has been set on the helper is kept, so webhooks can be pointed at another receiver.
-    this.receiverUrl ||= await WebhookReceiver.start();
-    return this.receiverUrl;
-  }
-
   /**
-   * @deprecated Use {@link generateReceiverToken} instead. The token is no longer a webhook.site token: requests
-   * are received in the test process, so the site under test must run on the same machine.
+   * Generates a token for the receiver in the test process. The site under test must be able to reach this machine
+   * on its loopback address; use {@link generateWebhookSiteToken} when it cannot.
    */
-  async generateWebhookSiteToken() {
-    return await this.generateReceiverToken();
+  async generateReceiverToken() {
+    this.receiverUrl = await WebhookReceiver.start();
+    return WebhookReceiver.createToken();
   }
 
   /**
-   * Waits for requests to be received for the token.
+   * Waits for requests to be received in the test process for the token.
    *
    * @param expectedContentFragment When given, only requests whose content contains it are waited for and returned.
    * @returns The received requests, or null when none were received within the timeout.
@@ -138,11 +117,52 @@ export class WebhookApiHelper {
   }
 
   /**
-   * @deprecated Use {@link getReceivedRequests} instead. The returned requests only hold the method, url,
-   * content and headers.
+   * Generates a token at webhook.site, for a site under test that cannot reach the receiver in the test process.
    */
+  async generateWebhookSiteToken() {
+    const createWebhookResponse = await this.page.request.post(this.webhookSiteUrl + 'token', {
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    const webhookData = await createWebhookResponse.json();
+    return webhookData.uuid;
+  }
+
   async getWebhookSiteRequestResponse(webhookSiteToken: string, timeoutMs: number = ConstantHelper.timeout.veryLong, pollInterval: number = ConstantHelper.timeout.short, expectedContentFragment?: string) {
-    return await this.getReceivedRequests(webhookSiteToken, expectedContentFragment, timeoutMs, pollInterval);
+    const requestUrl = this.webhookSiteUrl + 'token/' + webhookSiteToken + '/requests';
+    const start = Date.now();
+
+    while (Date.now() - start < timeoutMs) {
+      const requestResponse = await this.page.request.get(requestUrl, {
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      const requestJson = await requestResponse.json();
+      const requests = requestJson.data ?? [];
+      // Delivery to webhook.site is async and an unrelated request can arrive first, so when an
+      // expected content is given, keep polling until the matching webhook has actually been received.
+      if (expectedContentFragment === undefined) {
+        if (requests.length > 0) {
+          return requests;
+        }
+      } else {
+        const matches = requests.filter((request) => (request.content ?? '').includes(expectedContentFragment));
+        if (matches.length > 0) {
+          return matches;
+        }
+      }
+
+      // Polling again if the expected webhook has not been received yet
+      await new Promise((resolve) => setTimeout(resolve, pollInterval));
+    }
+    return null;
+  }
+
+  // A webhook is sent to the receiver that generated its token.
+  private async getWebhookUrl(token: string) {
+    return (WebhookReceiver.hasToken(token) ? await WebhookReceiver.start() : this.webhookSiteUrl) + token;
   }
 
   async doesWebhookHaveEvent(webhookName: string, eventName: string) {
@@ -180,9 +200,9 @@ export class WebhookApiHelper {
     return eventData?.alias || '';
   }
 
-  async createDefaultWebhook(webhookName: string, receiverToken: string, eventName: string = 'Content Published', isEnabled: boolean = true) {
+  async createDefaultWebhook(webhookName: string, token: string, eventName: string = 'Content Published', isEnabled: boolean = true) {
     await this.ensureNameNotExists(webhookName);
-    const webhookUrl = await this.startReceiver() + receiverToken;
+    const webhookUrl = await this.getWebhookUrl(token);
     const eventAlias = await this.getEventAliasValue(eventName);
 
     const webhook = new WebhookBuilder()
@@ -195,9 +215,9 @@ export class WebhookApiHelper {
     return await this.create(webhook);
   }
 
-  async createWebhookForSpecificContentType(webhookName: string, receiverToken: string, eventName: string, contentTypeName: string) {
+  async createWebhookForSpecificContentType(webhookName: string, token: string, eventName: string, contentTypeName: string) {
     await this.ensureNameNotExists(webhookName);
-    const webhookUrl = await this.startReceiver() + receiverToken;
+    const webhookUrl = await this.getWebhookUrl(token);
     const eventAlias = await this.getEventAliasValue(eventName);
     const eventType = await this.getEventTypeValue(eventName);
     let contentTypeData;
@@ -217,9 +237,9 @@ export class WebhookApiHelper {
     return await this.create(webhook);
   }
 
-  async createWebhookWithHeader(webhookName: string, receiverToken: string, eventName: string, headerName: string, headerValue: string) {
+  async createWebhookWithHeader(webhookName: string, token: string, eventName: string, headerName: string, headerValue: string) {
     await this.ensureNameNotExists(webhookName);
-    const webhookUrl = await this.startReceiver() + receiverToken;
+    const webhookUrl = await this.getWebhookUrl(token);
     const eventAlias = await this.getEventAliasValue(eventName);
 
     const webhook = new WebhookBuilder()

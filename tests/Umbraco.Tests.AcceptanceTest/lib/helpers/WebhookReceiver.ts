@@ -1,3 +1,4 @@
+import {randomUUID} from "crypto";
 import {createServer} from "http";
 import {AddressInfo} from "net";
 
@@ -52,6 +53,19 @@ export class WebhookReceiver {
       });
     });
     return WebhookReceiver.url;
+  }
+
+  /**
+   * @returns A new token to receive requests for.
+   */
+  static createToken(): string {
+    const token = randomUUID();
+    WebhookReceiver.requests.set(token, []);
+    return token;
+  }
+
+  static hasToken(token: string): boolean {
+    return WebhookReceiver.requests.has(token);
   }
 
   /**
