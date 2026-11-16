@@ -276,10 +276,10 @@
       "dependsOn": [
         4
       ],
-      "summary": "From the PR 4 review: the BuildEntity hook and both EF Core ContentBaseFactory overloads accept IContentType? but neither can build from null, and the base hands an unresolved TryGetValue result to the hook unchecked, so a row with an unknown content type fails every read with a bare ArgumentNullException that names nothing. The base resolves the type first and throws an InvalidOperationException naming the node key and content type id; the hook and the EF Core factory overloads become non-nullable.",
+      "summary": "From the PR 4 review: the BuildEntity hook and both EF Core ContentBaseFactory overloads accept IContentType? but neither can build from null, and the base hands an unresolved TryGetValue result to the hook unchecked, so a row with an unknown content type fails every read with a bare ArgumentNullException that names nothing. The base resolves the type first and throws an InvalidOperationException naming the content type id; the hook and the EF Core factory overloads become non-nullable.",
       "tasks": [
         {
-          "text": "AssembleEntitiesAsync throws InvalidOperationException naming node key and content type id when the map has no entry",
+          "text": "AssembleEntitiesAsync throws InvalidOperationException naming the content type id when the map has no entry",
           "done": true
         },
         {
@@ -287,7 +287,7 @@
           "done": true
         },
         {
-          "text": "Test: unresolvable content type fails with node key and type id in the message, red first against the bare ArgumentNullException",
+          "text": "Test: unresolvable content type fails with the type id in the message, red first against the bare ArgumentNullException",
           "done": true
         },
         {
@@ -296,7 +296,7 @@
         }
       ],
       "acceptance": "Hook and EF Core factory overloads non-nullable; the new test green and red first; Document and element fixtures at unchanged counts.",
-      "notes": "Independent of PR 5; can merge before or after it. The NPoco overloads keep IContentType? until PR 5/PR 6 delete them. Implemented 16-11-2026 on the branch: the base throws naming the content type id and the node keys referencing it; the new DocumentRepositoryTest case was red (bare ArgumentNullException) then green; DocumentRepositoryTest + AsyncElementRepositoryTest 223/223 on SQLite. Committed as 12857ebae14 and opened as draft PR #24624 on 16-11-2026; independent review had no must-fix findings."
+      "notes": "Independent of PR 5; can merge before or after it. The NPoco overloads keep IContentType? until PR 5/PR 6 delete them. Implemented 16-11-2026 on the branch: the base throws naming the content type id; the new DocumentRepositoryTest case was red (bare ArgumentNullException) then green; DocumentRepositoryTest + AsyncElementRepositoryTest 223/223 on SQLite. Committed as 12857ebae14 and opened as draft PR #24624 on 16-11-2026; independent review had no must-fix findings. Review suggestion 16-11 (node-key list could reach thousands of keys on bulk reads): the key list was dropped from the message, commit on the PR branch."
     },
     {
       "id": 5,
@@ -394,6 +394,10 @@
     }
   ],
   "log": [
+    {
+      "date": "16-11-2026",
+      "text": "PR 4b: the unresolved-type exception now names only the content type id; listing referencing node keys was dropped after a review note about bulk reads."
+    },
     {
       "date": "16-11-2026",
       "text": "PR 4b opened as draft #24624 (12857ebae14). Review: no must-fix findings. Next: PR 5."
