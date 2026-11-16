@@ -555,6 +555,118 @@ internal sealed partial class ContentTypeEditingServiceTests
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
+    [Test]
+    public async Task Changing_Property_Alias_Retains_The_Property_Type_And_Its_Values()
+    {
+        var createModel = ContentTypeCreateModel("Test", "test");
+        createModel.AllowedAsRoot = true;
+        createModel.Properties = [ContentTypePropertyTypeModel("Test Property", "oldAlias")];
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+        IPropertyType originalPropertyType = contentType.PropertyTypes.Single();
+
+        Content content = ContentBuilder.CreateBasicContent(contentType);
+        content.SetValue("oldAlias", "The published value");
+        ContentService.Save(content);
+        Assert.IsTrue(ContentService.Publish(content, ["*"]).Success);
+        content.SetValue("oldAlias", "The draft value");
+        ContentService.Save(content);
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var updateModel = ContentTypeUpdateModel("Test", "test");
+        updateModel.AllowedAsRoot = true;
+        updateModel.Properties = [ContentTypePropertyTypeModel("Test Property", "newAlias", key: originalPropertyType.Key)];
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        contentType = await ContentTypeService.GetAsync(contentType.Key);
+        IContent? updatedContent = ContentService.GetById(content.Key);
+
+        Assert.Multiple(() =>
+        {
+            IPropertyType propertyType = contentType!.PropertyTypes.Single();
+            Assert.AreEqual("newAlias", propertyType.Alias);
+            Assert.AreEqual(originalPropertyType.Key, propertyType.Key);
+            Assert.AreEqual(originalPropertyType.Id, propertyType.Id);
+
+            Assert.IsNotNull(updatedContent);
+            Assert.IsFalse(updatedContent!.HasProperty("oldAlias"));
+            Assert.AreEqual("The draft value", updatedContent.GetValue("newAlias"));
+            Assert.AreEqual("The published value", updatedContent.GetValue("newAlias", published: true));
+        });
+
+        // expect RefreshMain when changing a property alias
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType!.Id, ContentTypeChangeTypes.RefreshMain);
+    }
+
+    [Test]
+    public async Task Property_Matched_By_Alias_Keeps_Its_Key_When_The_Model_Has_An_Unknown_Key()
+    {
+        var createModel = ContentTypeCreateModel("Test", "test");
+        createModel.Properties = [ContentTypePropertyTypeModel("Test Property", "testProperty")];
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+        IPropertyType originalPropertyType = contentType.PropertyTypes.Single();
+
+        var updateModel = ContentTypeUpdateModel("Test", "test");
+        updateModel.Properties = [ContentTypePropertyTypeModel("Test Property 2", "testProperty", key: Guid.NewGuid())];
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        contentType = await ContentTypeService.GetAsync(contentType.Key);
+        IPropertyType propertyType = contentType!.PropertyTypes.Single();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Test Property 2", propertyType.Name);
+            Assert.AreEqual(originalPropertyType.Key, propertyType.Key);
+            Assert.AreEqual(originalPropertyType.Id, propertyType.Id);
+        });
+    }
+
+    [Test]
+    public async Task Can_Swap_Property_Aliases()
+    {
+        var createModel = ContentTypeCreateModel("Test", "test");
+        createModel.AllowedAsRoot = true;
+        createModel.Properties =
+        [
+            ContentTypePropertyTypeModel("Property 1", "aliasOne"),
+            ContentTypePropertyTypeModel("Property 2", "aliasTwo"),
+        ];
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+        Guid propertyKeyOne = contentType.PropertyTypes.Single(pt => pt.Alias == "aliasOne").Key;
+        Guid propertyKeyTwo = contentType.PropertyTypes.Single(pt => pt.Alias == "aliasTwo").Key;
+
+        Content content = ContentBuilder.CreateBasicContent(contentType);
+        content.SetValue("aliasOne", "Value 1");
+        content.SetValue("aliasTwo", "Value 2");
+        ContentService.Save(content);
+
+        var updateModel = ContentTypeUpdateModel("Test", "test");
+        updateModel.AllowedAsRoot = true;
+        updateModel.Properties =
+        [
+            ContentTypePropertyTypeModel("Property 1", "aliasTwo", key: propertyKeyOne),
+            ContentTypePropertyTypeModel("Property 2", "aliasOne", key: propertyKeyTwo),
+        ];
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        IContent? updatedContent = ContentService.GetById(content.Key);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Value 1", updatedContent!.GetValue("aliasTwo"));
+            Assert.AreEqual("Value 2", updatedContent.GetValue("aliasOne"));
+        });
+    }
+
     public enum PropertyMoveOperation
     {
         ToEarlier,
