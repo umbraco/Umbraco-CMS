@@ -1116,7 +1116,7 @@ public class DocumentUrlServiceTests
 
     /// <summary>
     /// Seeds a published hierarchy (the document first, then its ancestors up to the root) with a cached URL segment for
-    /// every document, and returns the id each document key resolves to (1 for the document, 2 for its parent, and so on).
+    /// every document, mapping each document key to an id (1 for the document, 2 for its parent, and so on).
     /// </summary>
     private static async Task SetupHierarchyAsync(
         DocumentUrlService service,
