@@ -157,13 +157,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
             return;
         }
 
-        // TODO (V20): call IsCacheSyncedAsync once locks and notification publishing are asynchronous.
-        if (RepositoryCacheVersionService.IsCacheSynced<TEntity>())
-        {
-            return;
-        }
-
-        CacheSyncService.SyncInternal(CancellationToken.None);
+        RepositoryCacheVersionService.EnsureCacheIsSynced<TEntity>(CacheSyncService);
     }
 
     /// <summary>
