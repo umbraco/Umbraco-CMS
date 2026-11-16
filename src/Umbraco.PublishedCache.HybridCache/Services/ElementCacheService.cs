@@ -35,6 +35,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
     private readonly ElementSourceReader _readElementSource;
     private readonly ElementSourcesReader _readElementSourcesAsync;
     private readonly ElementSourcesReader _readElementSources;
+    private readonly KeyedLock<Guid> _refreshLocks = new();
     private HashSet<Guid>? _seedKeys;
 
     private readonly IConvertedPublishedContentCache<string, IPublishedElement> _publishedElementCache;
@@ -358,6 +359,12 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
         (bool exists, ContentCacheNode? contentCacheNode) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
 
+        // The entry is another entity type's, so the key identifies no element.
+        if (contentCacheNode?.IsOtherEntityType(ContentCacheDataSerializerEntityType.Element) is true)
+        {
+            return null;
+        }
+
         // A value found in the backing store is already current, so it can always populate the caches
         // below; only a value built from the read-through DB fetch needs the generation guard.
         bool snapshotIsCurrent = true;
@@ -369,12 +376,13 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
             // memory permanently stale until a full clear).
             long generation = Interlocked.Read(ref _cacheGeneration);
 
-            contentCacheNode = await GetContentCacheNodeFromRepo();
+            bool cacheable;
+            (contentCacheNode, cacheable) = await GetContentCacheNodeFromRepo();
             snapshotIsCurrent = IsCacheGenerationCurrent(generation);
 
             // Skip the write when the generation moved — a refresh has superseded this snapshot. A null
             // node is still written when current (negative caching, tagged so it can be cleared).
-            if (snapshotIsCurrent)
+            if (cacheable && snapshotIsCurrent)
             {
                 await _hybridCache.SetAsync(
                     cacheKey,
@@ -409,9 +417,21 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
         return result;
 
-        async Task<ContentCacheNode?> GetContentCacheNodeFromRepo()
+        async Task<(ContentCacheNode? Node, bool Cacheable)> GetContentCacheNodeFromRepo()
         {
-            return await readElementSource(key, preview);
+            ContentCacheNode? node = await readElementSource(key, preview);
+
+            // A null cached under a key that another cache also reads would hide that cache's item. Documents read
+            // the same published and draft keys as elements; media reads only the published one.
+            if (node is null)
+            {
+                ContentCacheDataSerializerEntityType entityTypes = preview
+                    ? ContentCacheDataSerializerEntityType.Document
+                    : ContentCacheDataSerializerEntityType.Document | ContentCacheDataSerializerEntityType.Media;
+                return (null, _databaseCacheRepository.GetKeysOfEntityTypes([key], entityTypes).Count == 0);
+            }
+
+            return (node, true);
         }
     }
 
@@ -545,12 +565,97 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         scope.Complete();
     }
 
+    /// <inheritdoc />
+    public void RefreshMemoryCache(Guid key)
+    {
+        // Waiting for the distributed cache write needs a thread-pool thread. Under the element tree lock that wait
+        // can starve on a busy pool and hold the lock for seconds, so the writes are issued under the lock and only
+        // waited for once the scope is disposed. HybridCache updates the in-process cache and sends the distributed
+        // write before its first await, so both still happen under the lock; only the wait for the acknowledgement
+        // moves out. The per-element lock makes the next refresh or removal of the same element on this node wait
+        // for these writes, so a slow write cannot land on top of a newer one from this node.
+        // TODO (V20): await the cache writes directly once the refresh pipeline is asynchronous.
+        using (_refreshLocks.Enter(key))
+        {
+            ValueTask draftWrite;
+            ValueTask publishedWrite;
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+            {
+                scope.ReadLock(Constants.Locks.ElementTree);
+
+                (ContentCacheNode? draftNode, ContentCacheNode? publishedNode) = _databaseCacheRepository.GetElementSourceForPublishStates(key);
+
+                draftWrite = draftNode is not null
+                    ? _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(draftNode))
+                    : _hybridCache.RemoveAsync(GetCacheKey(key, true));
+
+                var cacheKey = GetCacheKey(key, false);
+                publishedWrite = publishedNode is not null
+                    ? _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode))
+                    : _hybridCache.RemoveAsync(cacheKey);
+                _publishedElementCache.Remove(cacheKey);
+                InvalidateMemoryCacheGeneration();
+
+                scope.Complete();
+            }
+
+            // Both writes settle before the lock is released, even when one of them fails.
+            Task.WhenAll(draftWrite.AsTask(), publishedWrite.AsTask()).GetAwaiter().GetResult();
+        }
+    }
+
+    /// <inheritdoc />
     public async Task RemoveFromMemoryCacheAsync(Guid key)
+    {
+        // Ordered after a pending refresh of the same element, so a slow write from that refresh cannot bring the
+        // entries back. Not for callers holding the element tree lock: a refresh waiting for that lock holds this one.
+        using (await _refreshLocks.EnterAsync(key))
+        {
+            await RemoveFromMemoryCacheUnorderedAsync(key);
+        }
+    }
+
+    // Removes both entries of an element without waiting for a pending refresh of it, for callers that hold the
+    // element tree lock. The refresh that follows their commit removes the entries again, in order.
+    private async Task RemoveFromMemoryCacheUnorderedAsync(Guid key)
     {
         await _hybridCache.RemoveAsync(GetCacheKey(key, true));
         await ClearPublishedCacheAsync(key);
     }
 
+    /// <inheritdoc />
+    public void RefreshElement(IElement element)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        if (element.Trashed)
+        {
+            _databaseCacheRepository.DeleteContentItem(element.Id);
+
+            // TODO (V20): await the memory-cache removals once the notification pipeline is asynchronous.
+            RemoveFromMemoryCacheUnorderedAsync(element.Key).GetAwaiter().GetResult();
+            scope.Complete();
+            return;
+        }
+
+        var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(element, true);
+        _databaseCacheRepository.RefreshElement(draftCacheNode);
+
+        if (element.PublishedState is PublishedState.Publishing)
+        {
+            var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(element, false);
+            _databaseCacheRepository.RefreshElement(publishedCacheNode);
+        }
+        else if (element.PublishedState is PublishedState.Unpublishing)
+        {
+            _databaseCacheRepository.RemovePublishedElement(element.Id);
+            ClearPublishedCacheAsync(element.Key).GetAwaiter().GetResult();
+        }
+
+        scope.Complete();
+    }
+
+    /// <inheritdoc />
     public async Task RefreshElementAsync(IElement element)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -558,7 +663,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         if (element.Trashed)
         {
             await _databaseCacheRepository.DeleteContentItemAsync(element.Id);
-            await RemoveFromMemoryCacheAsync(element.Key);
+            await RemoveFromMemoryCacheUnorderedAsync(element.Key);
             scope.Complete();
             return;
         }

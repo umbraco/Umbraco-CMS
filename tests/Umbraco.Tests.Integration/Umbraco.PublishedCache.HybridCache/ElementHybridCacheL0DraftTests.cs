@@ -13,6 +13,7 @@ using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -75,6 +76,9 @@ internal sealed class ElementHybridCacheL0DraftTests : UmbracoIntegrationTest
         GetRequiredService<IElementService>().Save(_element);
 
         _databaseCacheRepository = new Mock<IDatabaseCacheRepository>();
+        _databaseCacheRepository
+            .Setup(r => r.GetKeysOfEntityTypes(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<ContentCacheDataSerializerEntityType>()))
+            .Returns(new HashSet<Guid>());
 
         _elementCacheService = new ElementCacheService(
             _databaseCacheRepository.Object,
