@@ -7,7 +7,8 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbDocumentServerDataSource } from '../../repository/detail/document-detail.server.data-source.js';
 import { UmbDocumentPublishingServerDataSource } from './document-publishing.server.data-source.js';
-import { resetMockHandlers } from '../../../../../../mocks/index.js';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import { resetMockHandlers, useMockHandlers } from '../../../../../../mocks/index.js';
 import { useServerAssignedDocumentKey } from '../../../../../../mocks/msw-handlers/document/server-assigned-key.js';
 
 const SERVER_ASSIGNED_KEY = 'a0000000-0000-4000-8000-000000000001';
@@ -189,9 +190,8 @@ describe('UmbDocumentPublishingServerDataSource (ancestorVariantStates)', () => 
 	});
 });
 
-
 describe('UmbDocumentPublishingServerDataSource (publishWithDescendants)', () => {
-	const originalPublish = DocumentService.putDocumentByIdPublishWithDescendants;
+	const { http, HttpResponse } = window.MockServiceWorker;
 	let hostElement: UmbTestHostElement;
 
 	beforeEach(() => {
@@ -200,25 +200,31 @@ describe('UmbDocumentPublishingServerDataSource (publishWithDescendants)', () =>
 	});
 
 	afterEach(() => {
-		DocumentService.putDocumentByIdPublishWithDescendants = originalPublish;
+		resetMockHandlers();
 		hostElement.remove();
 	});
 
 	for (const culture of [null, 'en-US']) {
 		it(`sends culture ${culture ?? 'invariant'} only once for multiple segments`, async () => {
 			let requestBody: unknown;
-			DocumentService.putDocumentByIdPublishWithDescendants = (options) => {
-				requestBody = options.body;
-				return Promise.resolve({ data: undefined }) as ReturnType<typeof originalPublish>;
-			};
+			useMockHandlers(
+				http.put(umbracoPath('/document/:id/publish-with-descendants'), async ({ request }) => {
+					requestBody = await request.json();
+					return HttpResponse.json({ taskId: 'publish-task', isComplete: false });
+				}),
+				http.get(umbracoPath('/document/:id/publish-with-descendants/result/:taskId'), () =>
+					HttpResponse.json({ taskId: 'publish-task', isComplete: true }),
+				),
+			);
 
 			const source = new UmbDocumentPublishingServerDataSource(hostElement);
-			await source.publishWithDescendants(
+			const { error } = await source.publishWithDescendants(
 				'document-id',
 				[new UmbVariantId(culture, null), new UmbVariantId(culture, 'VIP members')],
 				true,
 			);
 
+			expect(error).to.be.undefined;
 			expect(requestBody).to.deep.equal({
 				cultures: [culture ?? 'invariant'],
 				includeUnpublishedDescendants: true,
