@@ -77,6 +77,9 @@ export abstract class UmbBlockEntryContext<
 	readonly hasExpose = this.#hasExpose.asObservable();
 
 	#variesByVariant = new UmbBooleanState(undefined);
+	/**
+	 * Whether the content type of the block varies by culture or segment.
+	 */
 	readonly variesByVariant = this.#variesByVariant.asObservable();
 
 	#actionsVisibility = new UmbBooleanState(true);

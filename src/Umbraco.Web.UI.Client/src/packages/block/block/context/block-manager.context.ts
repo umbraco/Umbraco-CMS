@@ -439,6 +439,11 @@ export abstract class UmbBlockManagerContext<
 		this.#settings.remove(settingsKeys);
 	}
 
+	/**
+	 * Removes the expose of a block for a single variant, leaving its content and the exposes of other variants untouched.
+	 * @param {string} contentKey - The content key of the block.
+	 * @param {UmbVariantId} variantId - The variant to remove the expose for.
+	 */
 	removeOneExpose(contentKey: string, variantId: UmbVariantId) {
 		if (!variantId) return;
 		this.#exposes.filter((x) => !(x.contentKey === contentKey && variantId.compare(x)));

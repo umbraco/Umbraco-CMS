@@ -92,6 +92,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#exposed = new UmbBooleanState<undefined>(undefined);
 	readonly exposed = this.#exposed.asObservable();
 
+	/**
+	 * Whether the content type of the block varies by culture or segment.
+	 */
 	readonly variesByVariant = observeMultiple([
 		this.content.structure.variesByCulture,
 		this.content.structure.variesBySegment,
@@ -635,6 +638,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		if (!variantId) throw new Error('Failed to unexpose block, missing variant id.');
 		this.#blockManager?.removeOneExpose(layoutData.contentKey, variantId);
 		this.#clearVariantValidationMessages();
+		this.#reportValidation();
 		this.setIsNew(false);
 		this._closeModal();
 	}
