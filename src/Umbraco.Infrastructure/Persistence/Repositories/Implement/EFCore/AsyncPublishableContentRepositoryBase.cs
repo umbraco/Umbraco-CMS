@@ -1986,12 +1986,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             IContentType? contentType = await ContentTypeRepository.GetAsync(contentTypeId, cancellationToken);
             if (contentType is null)
             {
-                IEnumerable<Guid> nodeKeys = rows
-                    .Where(row => row.Content.ContentTypeId == contentTypeId)
-                    .Select(row => row.Node.UniqueId)
-                    .Distinct();
-                throw new InvalidOperationException(
-                    $"Content type {contentTypeId} was not found; it is referenced by node(s) {string.Join(", ", nodeKeys)}.");
+                throw new InvalidOperationException($"Content type {contentTypeId} was not found.");
             }
 
             contentTypeMap[contentTypeId] = contentType;

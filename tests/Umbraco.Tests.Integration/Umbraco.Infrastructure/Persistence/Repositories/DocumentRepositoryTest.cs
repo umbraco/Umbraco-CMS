@@ -277,7 +277,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetAsync_WhenContentTypeCannotBeResolved_FailsNamingNodeAndContentType()
+    public void GetAsync_WhenContentTypeCannotBeResolved_FailsNamingContentType()
     {
         using var scope = NewScopeProvider.CreateScope();
         var contentTypeRepository = new Mock<IContentTypeRepository>();
@@ -289,7 +289,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         InvalidOperationException? exception = Assert.ThrowsAsync<InvalidOperationException>(
             () => repository.GetAsync(_textpage.Key, CancellationToken.None));
 
-        Assert.That(exception!.Message, Does.Contain(_textpage.Key.ToString()).And.Contain(_textpage.ContentTypeId.ToString()));
+        Assert.That(exception!.Message, Does.Contain(_textpage.ContentTypeId.ToString()));
         scope.Complete();
     }
 
