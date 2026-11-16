@@ -105,6 +105,20 @@ public interface IElementCacheService : IContentCacheService
     Task RefreshElementAsync(IElement element);
 
     /// <summary>
+    /// Refreshes the cache for the specified element without leaving the calling thread.
+    /// </summary>
+    /// <param name="element">The element to refresh.</param>
+    /// <remarks>
+    /// Runs inside the transaction that persists the element, under the element tree lock. Until the lock wait and
+    /// the notification pipeline are asynchronous, awaiting there needs a second thread-pool thread while the first
+    /// is blocked, which under load stretches the time the lock is held. Implementations should avoid awaiting here
+    /// wherever their backing store allows it.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void RefreshElement(IElement element)
+        => RefreshElementAsync(element).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Gets all published elements of the specified content type.
     /// </summary>
     /// <param name="contentType">The published content type to filter by.</param>
