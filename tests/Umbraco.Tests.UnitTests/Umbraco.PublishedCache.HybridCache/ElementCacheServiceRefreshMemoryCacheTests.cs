@@ -390,7 +390,7 @@ public class ElementCacheServiceRefreshMemoryCacheTests
             cacheNodeFactory ?? Mock.Of<ICacheNodeFactory>(),
             [],
             Mock.Of<IPublishedModelFactory>(),
-            Mock.Of<IPreviewService>(),
+            Mock.Of<IPreviewSessionService>(),
             new OptionsWrapper<CacheSettings>(new CacheSettings()),
             NullLogger<ElementCacheService>.Instance,
             cacheFactory.Object,
