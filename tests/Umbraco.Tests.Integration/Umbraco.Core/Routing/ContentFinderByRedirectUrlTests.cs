@@ -130,7 +130,7 @@ internal sealed class ContentFinderByRedirectUrlTests : UmbracoIntegrationTest
         UmbracoContextAccessor.Clear();
         UmbracoContextFactory.EnsureUmbracoContext();
 
-        var request = new PublishedRequestBuilder(oldUrl, GetRequiredService<IFileService>());
+        var request = new PublishedRequestBuilder(oldUrl, GetRequiredService<ITemplateService>());
         GetRequiredService<IPublishedRouter>().RouteDomain(request);
 
         var finder = ActivatorUtilities.CreateInstance<ContentFinderByRedirectUrl>(Services);
