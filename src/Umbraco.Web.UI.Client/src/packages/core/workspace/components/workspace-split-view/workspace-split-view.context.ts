@@ -77,8 +77,8 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase {
 				this.#datasetContext?.destroy();
 
 				if (!activeVariantInfo) return;
-
 				const variantId = UmbVariantId.Create(activeVariantInfo);
+
 				this.#variantId.setValue(variantId);
 				this.getHostElement().setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'workspace-split-view:' + variantId.toString());
 			},
@@ -93,7 +93,7 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase {
 			this.observe(
 				this.#workspaceContext && variantId
 					? createObservablePart(this.#workspaceContext.variantOptions, (variants) =>
-							variants.some((v) => v.unique === variantId.toString()),
+							variants?.some((v) => v.unique === variantId.toString()),
 						)
 					: undefined,
 				(variantExists) => {

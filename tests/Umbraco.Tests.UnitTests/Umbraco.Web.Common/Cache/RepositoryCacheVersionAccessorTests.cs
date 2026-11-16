@@ -313,26 +313,6 @@ public class RepositoryCacheVersionAccessorTests
         _repository.Verify(x => x.GetAsync(CacheKey), Times.Once);
     }
 
-    [Test]
-    public async Task CachesSynced_Obsolete_ClearsBothScopeCacheAndRequestCache()
-    {
-        var guid1 = Guid.NewGuid();
-        _sut.VersionChanged(CacheKey, guid1);
-        // VersionChanged removed the request cache key, so Set succeeds.
-        _requestCache.Set(CacheKey, new RepositoryCacheVersion { Identifier = CacheKey, Version = guid1.ToString() });
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        _sut.CachesSynced();
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        // Both caches cleared: next GetAsync must fall through to the DB.
-        _repository
-            .Setup(x => x.GetAsync(CacheKey))
-            .ReturnsAsync(new RepositoryCacheVersion { Identifier = CacheKey, Version = Guid.NewGuid().ToString() });
-        await _sut.GetAsync(CacheKey);
-        _repository.Verify(x => x.GetAsync(CacheKey), Times.Once);
-    }
-
     private sealed class FakeScopeContext : IScopeContext
     {
         private readonly Dictionary<string, Action<bool>> _actions = new();

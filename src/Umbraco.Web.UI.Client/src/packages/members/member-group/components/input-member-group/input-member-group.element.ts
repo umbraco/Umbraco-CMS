@@ -1,23 +1,10 @@
 import type { UmbMemberGroupItemModel } from '../../types.js';
-import { UMB_EDIT_MEMBER_GROUP_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UmbMemberGroupPickerInputContext } from './input-member-group.context.js';
-import {
-	css,
-	customElement,
-	html,
-	ifDefined,
-	nothing,
-	property,
-	repeat,
-	state,
-	when,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UMB_WORKSPACE_MODAL, umbGenerateWorkspaceLink } from '@umbraco-cms/backoffice/workspace';
 import {
 	isAboveZeroAndBelowMinimum,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
@@ -39,7 +26,7 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 			return modelEntry;
 		},
 		identifier: 'Umb.SorterIdentifier.InputMemberGroup',
-		itemSelector: 'uui-ref-node',
+		itemSelector: 'umb-entity-item-ref',
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
@@ -149,9 +136,6 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 	requiredMessage?: string;
 
 	@state()
-	private _editMemberGroupPath = '';
-
-	@state()
 	private _items?: Array<UmbMemberGroupItemModel>;
 
 	@state()
@@ -161,15 +145,6 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 
 	constructor() {
 		super();
-
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('member-group')
-			.onSetup(() => {
-				return { data: { entityType: 'member-group', preset: {} } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._editMemberGroupPath = routeBuilder({});
-			});
 
 		this.addValidator(
 			'valueMissing',
@@ -216,7 +191,7 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 		});
 	}
 
-	#removeItem(unique: string) {
+	#onRemove(unique: string) {
 		this.#pickerContext.requestRemoveItem(unique);
 	}
 
@@ -235,56 +210,26 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 						const unique = status.unique;
 						const item = this._items?.find((x) => x.unique === unique);
 						const isError = status.state.type === 'error';
-
-						// For error state, use umb-entity-item-ref
-						if (isError) {
-							return html`
-								<umb-entity-item-ref
-									id=${unique}
-									?error=${true}
-									.errorMessage=${status.state.error}
-									.errorDetail=${unique}
-									readonly
-									?standalone=${this.max === 1}>
-									${when(
-										!this.readonly,
-										() => html`
-											<uui-action-bar slot="actions">
-												<uui-button
-													label=${this.localize.term('general_remove')}
-													@click=${() => this.#removeItem(unique)}></uui-button>
-											</uui-action-bar>
-										`,
-									)}
-								</umb-entity-item-ref>
-							`;
-						}
-
-						// For successful items, use uui-ref-node
-						if (!item) return nothing;
-						const link = umbGenerateWorkspaceLink({
-							pattern: UMB_EDIT_MEMBER_GROUP_WORKSPACE_PATH_PATTERN,
-							params: { unique },
-							routePath: this._editMemberGroupPath,
-						});
 						return html`
-							<uui-ref-node
-								name=${item.name}
+							<umb-entity-item-ref
 								id=${unique}
-								href=${link.href}
-								target=${ifDefined(link.target)}
-								?readonly=${this.readonly}>
-								<uui-action-bar slot="actions">
-									${when(
-										!this.readonly,
-										() =>
-											html`<uui-button
-												@click=${() => this.#removeItem(unique)}
-												label=${this.localize.term('general_remove')}></uui-button>`,
-									)}
-								</uui-action-bar>
-								<umb-icon slot="icon" name="icon-users"></umb-icon>
-							</uui-ref-node>
+								.item=${item}
+								?error=${isError}
+								.errorMessage=${status.state.error}
+								.errorDetail=${unique}
+								?readonly=${this.readonly}
+								?standalone=${this.max === 1}>
+								${when(
+									!this.readonly,
+									() => html`
+										<uui-action-bar slot="actions">
+											<uui-button
+												label=${this.localize.term('general_remove')}
+												@click=${() => this.#onRemove(unique)}></uui-button>
+										</uui-action-bar>
+									`,
+								)}
+							</umb-entity-item-ref>
 						`;
 					},
 				)}
@@ -310,10 +255,6 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 		css`
 			#btn-add {
 				width: 100%;
-			}
-
-			uui-ref-node[drag-placeholder] {
-				opacity: 0.2;
 			}
 		`,
 	];

@@ -32,6 +32,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     private string _name;
     private string? _description;
     private bool _hasAccessToAllLanguages;
+    private bool _hasAccessToInvariantForVariant;
     private ISet<string> _permissions;
     private ISet<IGranularPermission> _granularPermissions;
     private List<string> _sectionCollection;
@@ -39,6 +40,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     private int? _startContentId;
     private int? _startMediaId;
     private int? _startElementId;
+    private int? _startDocumentBlueprintId;
 
     /// <summary>
     ///     Constructor to create a new user group
@@ -93,6 +95,14 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         set => SetPropertyValueAndDetectChanges(value, ref _startElementId, nameof(StartElementId));
     }
 
+    /// <inheritdoc />
+    [DataMember]
+    public int? StartDocumentBlueprintId
+    {
+        get => _startDocumentBlueprintId;
+        set => SetPropertyValueAndDetectChanges(value, ref _startDocumentBlueprintId, nameof(StartDocumentBlueprintId));
+    }
+
     [DataMember]
     public int? StartContentId
     {
@@ -141,6 +151,14 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     {
         get => _hasAccessToAllLanguages;
         set => SetPropertyValueAndDetectChanges(value, ref _hasAccessToAllLanguages, nameof(HasAccessToAllLanguages));
+    }
+
+    /// <inheritdoc />
+    [DataMember]
+    public bool HasAccessToInvariantForVariant
+    {
+        get => _hasAccessToInvariantForVariant;
+        set => SetPropertyValueAndDetectChanges(value, ref _hasAccessToInvariantForVariant, nameof(HasAccessToInvariantForVariant));
     }
 
     /// <inheritdoc />

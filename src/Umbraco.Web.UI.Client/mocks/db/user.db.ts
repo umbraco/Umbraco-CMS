@@ -56,9 +56,11 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			id: user.id,
 			documentStartNodeIds: user.documentStartNodeIds,
 			mediaStartNodeIds: user.mediaStartNodeIds,
+			documentBlueprintStartNodeIds: user.documentBlueprintStartNodeIds,
 			elementStartNodeIds: user.elementStartNodeIds,
 			hasDocumentRootAccess: user.hasDocumentRootAccess,
 			hasMediaRootAccess: user.hasMediaRootAccess,
+			hasDocumentBlueprintRootAccess: user.hasDocumentBlueprintRootAccess,
 			hasElementRootAccess: user.hasElementRootAccess,
 		};
 	}
@@ -132,6 +134,9 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 		const hasAccessToAllLanguages = currentUser.userGroupIds?.length
 			? umbUserGroupMockDb.getHasAccessToAllLanguages(currentUser.userGroupIds)
 			: false;
+		const hasAccessToInvariantForVariant = currentUser.userGroupIds?.length
+			? umbUserGroupMockDb.getHasAccessToInvariantForVariant(currentUser.userGroupIds)
+			: false;
 		const languages = currentUser.userGroupIds?.length
 			? umbUserGroupMockDb.getAllowedLanguages(currentUser.userGroupIds)
 			: [];
@@ -144,13 +149,16 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			hasAccessToSensitiveData: true,
 			avatarUrls: [],
 			hasAccessToAllLanguages,
+			hasAccessToInvariantForVariant,
 			languageIsoCode: currentUser.languageIsoCode || null,
 			languages,
 			documentStartNodeIds: currentUser.documentStartNodeIds,
 			mediaStartNodeIds: currentUser.mediaStartNodeIds,
+			documentBlueprintStartNodeIds: currentUser.documentBlueprintStartNodeIds,
 			elementStartNodeIds: currentUser.elementStartNodeIds,
 			hasDocumentRootAccess: currentUser.hasDocumentRootAccess,
 			hasMediaRootAccess: currentUser.hasMediaRootAccess,
+			hasDocumentBlueprintRootAccess: currentUser.hasDocumentBlueprintRootAccess,
 			hasElementRootAccess: currentUser.hasElementRootAccess,
 			fallbackPermissions,
 			permissions,
@@ -286,9 +294,11 @@ const createMockMapper = (item: CreateUserRequestModel): UmbMockUserModel => {
 		languageIsoCode: null,
 		documentStartNodeIds: [],
 		mediaStartNodeIds: [],
+		documentBlueprintStartNodeIds: [],
 		elementStartNodeIds: [],
 		hasDocumentRootAccess: false,
 		hasMediaRootAccess: false,
+		hasDocumentBlueprintRootAccess: false,
 		hasElementRootAccess: false,
 		avatarUrls: [],
 		state: UserStateModel.INACTIVE,
@@ -309,11 +319,13 @@ const detailResponseMapper = (item: UmbMockUserModel): UserResponseModel => {
 		avatarUrls: item.avatarUrls,
 		createDate: item.createDate,
 		documentStartNodeIds: item.documentStartNodeIds,
+		documentBlueprintStartNodeIds: item.documentBlueprintStartNodeIds,
 		elementStartNodeIds: item.elementStartNodeIds,
 		email: item.email,
 		failedLoginAttempts: item.failedLoginAttempts,
 		hasDocumentRootAccess: item.hasDocumentRootAccess,
 		hasMediaRootAccess: item.hasMediaRootAccess,
+		hasDocumentBlueprintRootAccess: item.hasDocumentBlueprintRootAccess,
 		hasElementRootAccess: item.hasElementRootAccess,
 		id: item.id,
 		isAdmin: item.isAdmin,

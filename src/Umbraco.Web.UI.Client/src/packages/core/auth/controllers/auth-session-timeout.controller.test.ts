@@ -1,7 +1,7 @@
 import { UmbAuthContext } from '../auth.context.js';
 import type { UmbModalAuthTimeoutConfig } from '../modals/umb-auth-timeout-modal.token.js';
 import { UmbAuthSessionTimeoutController } from './auth-session-timeout.controller.js';
-import { aTimeout, expect, waitUntil } from '@open-wc/testing';
+import { aTimeout, expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
@@ -67,23 +67,18 @@ describe('UmbAuthSessionTimeoutController', () => {
 
 	/**
 	 * Injects a session into the auth context via the cross-tab BroadcastChannel,
-	 * the same way a peer tab would share a refreshed session.
-	 * @param accessTokenExpiresInSeconds Seconds until the access token expires.
-	 * @param sessionExpiresInSeconds Seconds until the full session (refresh token) expires.
+	 * the same way a peer tab would share a newly-established session.
+	 * @param expiresInSeconds Seconds until the session expires.
 	 */
-	async function injectSession(accessTokenExpiresInSeconds: number, sessionExpiresInSeconds: number) {
+	async function injectSession(expiresInSeconds: number) {
 		const now = Math.floor(Date.now() / 1000);
-		channel.postMessage({
-			type: 'sessionUpdate',
-			accessTokenExpiresAt: now + accessTokenExpiresInSeconds,
-			expiresAt: now + sessionExpiresInSeconds,
-		});
+		channel.postMessage({ type: 'authorized', expiresIn: expiresInSeconds, issuedAt: now });
 		// Wait for the BroadcastChannel message to be delivered and observed
 		await aTimeout(50);
 	}
 
 	it('opens the timeout modal when the session enters the warning zone', async () => {
-		await injectSession(5, 10);
+		await injectSession(10);
 
 		expect(openedModals).to.have.lengthOf(1);
 		expect(openedModals[0].remainingTimeInSeconds).to.be.greaterThan(0);
@@ -91,9 +86,9 @@ describe('UmbAuthSessionTimeoutController', () => {
 		expect(timeOutCalls).to.equal(0);
 	});
 
-	it('does not time out when "Stay logged in" successfully refreshes the session', async () => {
-		context.validateToken = async () => true;
-		await injectSession(5, 10);
+	it('does not time out when "Stay logged in" successfully renews the session', async () => {
+		context.keepAlive = async () => true;
+		await injectSession(10);
 
 		expect(openedModals).to.have.lengthOf(1);
 		openedModals[0].onContinue();
@@ -102,9 +97,9 @@ describe('UmbAuthSessionTimeoutController', () => {
 		expect(timeOutCalls).to.equal(0);
 	});
 
-	it('times out when "Stay logged in" fails to refresh the session', async () => {
-		context.validateToken = async () => false;
-		await injectSession(5, 10);
+	it('times out when "Stay logged in" fails to renew the session', async () => {
+		context.keepAlive = async () => false;
+		await injectSession(10);
 
 		expect(openedModals).to.have.lengthOf(1);
 		openedModals[0].onContinue();
@@ -113,11 +108,23 @@ describe('UmbAuthSessionTimeoutController', () => {
 		expect(timeOutCalls).to.equal(1);
 	});
 
+	// A missing expiry means the server did not say when the session ends. Scheduling a warning
+	// against a guessed lifetime fires at the wrong time in whichever direction the guess is wrong,
+	// and an over-long guess is the dangerous one: no warning until well after the cookie died.
+	it('does not schedule a countdown when the session has no known expiry', async () => {
+		const now = Math.floor(Date.now() / 1000);
+		channel.postMessage({ type: 'authorized', expiresIn: undefined, issuedAt: now });
+		await aTimeout(50);
+
+		expect(openedModals).to.have.lengthOf(0);
+		expect(timeOutCalls).to.equal(0);
+	});
+
 	it('times out instead of opening the modal when the warning timer fires after the session expired (e.g. after system sleep)', async function () {
 		this.timeout(5000);
 
 		// Session expires in 17s, warning buffer is 15s, so the warning timer is scheduled 2s out.
-		await injectSession(5, 17);
+		await injectSession(17);
 		expect(openedModals).to.have.lengthOf(0);
 
 		// Simulate system sleep / background-tab throttling: the wall clock jumps past the
@@ -129,125 +136,5 @@ describe('UmbAuthSessionTimeoutController', () => {
 
 		expect(openedModals).to.have.lengthOf(0);
 		expect(timeOutCalls).to.equal(1);
-	});
-});
-
-describe('UmbAuthSessionTimeoutController with keepUserLoggedIn', () => {
-	let hostElement: UmbTestAuthSessionTimeoutHostElement;
-	let context: UmbAuthContext;
-	let controller: UmbAuthSessionTimeoutController;
-	let channel: BroadcastChannel;
-	let timeOutCalls: number;
-	let tokenCalls: number;
-	// What the token endpoint does on each call, in order. The last entry repeats.
-	let tokenOutcomes: Array<'network-error' | 'invalid-grant' | 'ok'>;
-	const realFetch = window.fetch;
-
-	beforeEach(() => {
-		hostElement = new UmbTestAuthSessionTimeoutHostElement();
-		document.body.appendChild(hostElement);
-		timeOutCalls = 0;
-		tokenCalls = 0;
-
-		const mockModalManager = {
-			getHostElement: () => hostElement,
-			open: () => ({ onSubmit: () => new Promise(() => {}) }),
-			close: () => {},
-		};
-		new UmbContextProvider(
-			hostElement,
-			UMB_MODAL_MANAGER_CONTEXT,
-			mockModalManager as unknown as typeof UMB_MODAL_MANAGER_CONTEXT.TYPE,
-		).hostConnected();
-
-		window.fetch = ((input: RequestInfo | URL) => {
-			const url = input instanceof Request ? input.url : input.toString();
-			if (!url.endsWith('/token')) return Promise.resolve(new Response(null, { status: 404 }));
-			const outcome = tokenOutcomes[Math.min(tokenCalls, tokenOutcomes.length - 1)];
-			tokenCalls++;
-			if (outcome === 'network-error') return Promise.reject(new TypeError('Failed to fetch'));
-			if (outcome === 'invalid-grant') {
-				return Promise.resolve(
-					new Response(JSON.stringify({ error: 'invalid_grant' }), {
-						status: 400,
-						headers: { 'Content-Type': 'application/json' },
-					}),
-				);
-			}
-			return Promise.resolve(
-				new Response(JSON.stringify({ access_token: '[redacted]', expires_in: 300, token_type: 'Bearer' }), {
-					status: 200,
-					headers: { 'Content-Type': 'application/json' },
-				}),
-			);
-		}) as typeof window.fetch;
-
-		context = new UmbAuthContext(hostElement, 'http://localhost', '/umbraco', false, true);
-		const timeOut = context.timeOut.bind(context);
-		context.timeOut = () => {
-			timeOutCalls++;
-			timeOut();
-		};
-		controller = new UmbAuthSessionTimeoutController(context);
-		channel = new BroadcastChannel('umb:auth');
-	});
-
-	afterEach(() => {
-		window.fetch = realFetch;
-		channel.close();
-		controller.destroy();
-		context.destroy();
-		document.body.innerHTML = '';
-	});
-
-	/**
-	 * Shares a session the way a peer tab would. Its access token enters the 15s warning buffer
-	 * within 1-2s, so the keep-alive refresh runs then.
-	 * @param sessionExpiresInSeconds Seconds until the full session (refresh token) expires.
-	 */
-	async function injectSession(sessionExpiresInSeconds: number) {
-		const now = Math.floor(Date.now() / 1000);
-		channel.postMessage({
-			type: 'sessionUpdate',
-			accessTokenExpiresAt: now + 17,
-			expiresAt: now + sessionExpiresInSeconds,
-		});
-		await aTimeout(50);
-	}
-
-	it('keeps the session after a transient refresh failure and retries until the refresh succeeds', async function () {
-		this.timeout(8000);
-		tokenOutcomes = ['network-error', 'ok'];
-		await injectSession(9);
-
-		await waitUntil(() => tokenCalls === 1, 'the keep-alive refresh did not run', { timeout: 3000 });
-		await aTimeout(50);
-		expect(timeOutCalls).to.equal(0);
-		expect(context.getIsAuthorized()).to.be.true;
-
-		await waitUntil(() => tokenCalls === 2, 'the refresh was not retried', { timeout: 4000 });
-		await aTimeout(50);
-		expect(timeOutCalls).to.equal(0);
-		expect(context.getIsAuthorized()).to.be.true;
-	});
-
-	it('times out once the session has expired while the refresh keeps failing transiently', async function () {
-		this.timeout(8000);
-		tokenOutcomes = ['network-error'];
-		await injectSession(8);
-
-		await waitUntil(() => timeOutCalls === 1, 'the session did not time out', { timeout: 5000 });
-		expect(context.getIsAuthorized()).to.be.false;
-	});
-
-	it('does not retry after the refresh was definitively rejected', async function () {
-		this.timeout(8000);
-		tokenOutcomes = ['invalid-grant', 'ok'];
-		await injectSession(9);
-
-		await waitUntil(() => timeOutCalls > 0, 'the session did not time out', { timeout: 3000 });
-		await aTimeout(3000);
-		expect(tokenCalls).to.equal(1);
-		expect(context.getIsAuthorized()).to.be.false;
 	});
 });

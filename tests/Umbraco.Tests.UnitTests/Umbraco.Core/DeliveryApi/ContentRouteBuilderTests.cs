@@ -473,7 +473,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
             var publishedContentStatusFilteringService = new PublishedContentStatusFilteringService(
                 variantContextAccessor,
                 PublishStatusQueryService,
-                Mock.Of<IPreviewService>(),
+                Mock.Of<IPreviewSessionService>(),
                 contentCache,
                 Mock.Of<IDocumentCacheService>());
             var ancestorsOrSelf = content.AncestorsOrSelf(navigationQueryService, publishedContentStatusFilteringService).ToArray();

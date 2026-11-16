@@ -54,12 +54,16 @@ export class UmbBlockListManagerContext<
 	 */
 	async createWithPresets(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey' | 'key'>,
 		// This property is used by some implementations, but not used in this. Do not remove. [NL]
 
 		_originData?: UmbBlockListWorkspaceOriginData,
 	) {
 		return await super._createBlockData(contentElementTypeKey, partialLayoutEntry);
+	}
+
+	override setOneLayout(layoutEntry: BlockLayoutType, originData?: UmbBlockListWorkspaceOriginData) {
+		this._layouts.appendOneAt(layoutEntry, originData?.index ?? -1);
 	}
 
 	insert(
@@ -68,7 +72,7 @@ export class UmbBlockListManagerContext<
 		settings: UmbBlockDataModel | undefined,
 		originData: UmbBlockListWorkspaceOriginData,
 	) {
-		this._layouts.appendOneAt(layoutEntry, originData.index ?? -1);
+		this.setOneLayout(layoutEntry, originData);
 		this.insertBlockData(layoutEntry, content, settings, originData);
 		this.notifyBlockInserted(layoutEntry, originData);
 

@@ -56,7 +56,7 @@ public interface IPublishStatusRepository
     /// <param name="culture">The culture code.</param>
     /// <param name="cancellationToken">A cancellation token to observe.</param>
     /// <returns>The keys of the documents published in the culture, including invariant published documents.</returns>
-    // TODO (V19): Remove the default implementation.
+    // TODO (V20): Remove the default implementation.
     async Task<IEnumerable<Guid>> GetPublishedKeysAsync(string culture, CancellationToken cancellationToken)
         => (await GetAllPublishStatusAsync(cancellationToken))
             .Where(x => x.Value.Contains(culture, StringComparer.InvariantCultureIgnoreCase))
@@ -84,7 +84,7 @@ public interface IPublishStatusRepository
     /// <param name="culture">The culture code.</param>
     /// <param name="cancellationToken">A cancellation token to observe.</param>
     /// <returns>The keys of the elements published in the culture, including invariant published elements.</returns>
-    // TODO (V19): Remove the default implementation.
+    // TODO (V20): Remove the default implementation.
     async Task<IEnumerable<Guid>> GetPublishedElementKeysAsync(string culture, CancellationToken cancellationToken)
         => (await GetAllElementPublishStatusAsync(cancellationToken))
             .Where(x => x.Value.Contains(culture, StringComparer.InvariantCultureIgnoreCase))

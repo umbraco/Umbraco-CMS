@@ -352,7 +352,7 @@ public class DocumentCacheServiceRefreshMemoryCacheTests
             [],
             new OptionsWrapper<CacheSettings>(new CacheSettings()),
             Mock.Of<IPublishedModelFactory>(),
-            Mock.Of<IPreviewService>(),
+            Mock.Of<IPreviewSessionService>(),
             publishStatus.Object,
             NullLogger<DocumentCacheService>.Instance,
             cacheFactory.Object,

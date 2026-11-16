@@ -65,10 +65,10 @@ public class MediaReferencesStartNodeAccessTests : StartNodeAccessTestBase<Refer
     }
 
     private string ReferencedByUrl(Guid id) =>
-        GetManagementApiUrl<ReferencedByMediaController>(x => x.ReferencedBy2(CancellationToken.None, id, 0, 20));
+        GetManagementApiUrl<ReferencedByMediaController>(x => x.ReferencedBy(CancellationToken.None, id, 0, 20));
 
     private string ReferencedDescendantsUrl(Guid id) =>
-        GetManagementApiUrl<ReferencedDescendantsMediaController>(x => x.ReferencedDescendants2(CancellationToken.None, id, 0, 20));
+        GetManagementApiUrl<ReferencedDescendantsMediaController>(x => x.ReferencedDescendants(CancellationToken.None, id, 0, 20));
 
     private string AreReferencedUrl(params Guid[] ids) =>
         WithIds(GetManagementApiUrl<AreReferencedMediaController>(x => x.GetPagedReferencedItems(CancellationToken.None, new HashSet<Guid>(), 0, 20)), ids);

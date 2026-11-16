@@ -760,7 +760,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                         Constants.PropertyEditors.Aliases.BlockList,
                         new BlockListLayoutItem { ContentKey = outerBlockKey }),
                     ContentData = [outerBlock],
-                    Expose = [new BlockItemVariation(outerBlockKey, null, null)],
+                    Expose = [new BlockItemVariation(outerBlockKey, null)],
                 });
             case ContainerEditor.BlockGrid:
                 return JsonSerializer.Serialize(new BlockGridValue
@@ -769,7 +769,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                         Constants.PropertyEditors.Aliases.BlockGrid,
                         new BlockGridLayoutItem { ContentKey = outerBlockKey, ColumnSpan = 12, RowSpan = 1 }),
                     ContentData = [outerBlock],
-                    Expose = [new BlockItemVariation(outerBlockKey, null, null)],
+                    Expose = [new BlockItemVariation(outerBlockKey, null)],
                 });
             case ContainerEditor.RichText:
                 return JsonSerializer.Serialize(new RichTextEditorValue
@@ -781,7 +781,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                             Constants.PropertyEditors.Aliases.RichText,
                             new RichTextBlockLayoutItem { ContentKey = outerBlockKey }),
                         ContentData = [outerBlock],
-                        Expose = [new BlockItemVariation(outerBlockKey, null, null)],
+                        Expose = [new BlockItemVariation(outerBlockKey, null)],
                     },
                 });
             default:
@@ -800,7 +800,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                 Constants.PropertyEditors.Aliases.BlockList,
                 new BlockListLayoutItem { ContentKey = blockKey }),
             ContentData = [BuildBlockItemData(blockKey, elementType, propertyAlias, propertyValue)],
-            Expose = [new BlockItemVariation(blockKey, null, null)],
+            Expose = [new BlockItemVariation(blockKey, null)],
         };
 
     private static BlockItemData BuildBlockItemData(
@@ -1105,7 +1105,6 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
     /// Migrations are activated with <see cref="ActivatorUtilities" />, which cannot use an inherited constructor,
     /// hence the forwarding one. Only one is declared so the activation stays unambiguous.
     /// </remarks>
-#pragma warning disable CS0618 // Type or member is obsolete
     private sealed class PageSizeOfTwoMigrateSingleBlockList : MigrateSingleBlockList
     {
         public PageSizeOfTwoMigrateSingleBlockList(IMigrationContext context, IServiceProvider serviceProvider)
@@ -1124,7 +1123,6 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                 serviceProvider.GetRequiredService<SingleBlockListConfigurationCache>(),
                 serviceProvider.GetRequiredService<IDataValueEditorFactory>(),
                 serviceProvider.GetRequiredService<IIOHelper>(),
-                serviceProvider.GetRequiredService<IBlockValuePropertyIndexValueFactory>(),
                 serviceProvider.GetRequiredService<IBlockEditorElementTypeCache>(),
                 serviceProvider.GetRequiredService<AppCaches>(),
                 serviceProvider.GetRequiredService<IDataTypeConfigurationCache>())
@@ -1133,7 +1131,6 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
 
         internal override int PageSize => 2;
     }
-#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Captures what the migration logged, which is the only place some of its behaviour is observable - the page

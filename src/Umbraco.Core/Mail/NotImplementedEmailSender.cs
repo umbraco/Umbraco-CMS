@@ -17,10 +17,6 @@ internal sealed class NotImplementedEmailSender : IEmailSender
             "To send an Email ensure IEmailSender is implemented with a custom implementation");
 
     /// <inheritdoc />
-    [Obsolete("Please use IsEmailConfigured to check configuration only, or IsEmailAvailableAsync to also check that the transport can currently be reached. Scheduled for removal in Umbraco 19.")]
-    public bool CanSendRequiredEmail() => IsEmailConfigured();
-
-    /// <inheritdoc />
     public bool IsEmailConfigured()
         => throw new NotImplementedException(
             "To send an Email ensure IEmailSender is implemented with a custom implementation");

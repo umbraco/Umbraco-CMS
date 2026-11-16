@@ -83,10 +83,10 @@ describe('UmbEntityDataPickerSupportsTextFilterCondition', () => {
 			},
 		});
 
-		// permitted starts as false. Setting it to false does not trigger onChange.
+		// The data source is resolved as not supporting text filter, which is reported once.
 		await new Promise((resolve) => requestAnimationFrame(resolve));
 		expect(condition.permitted).to.be.false;
-		expect(callbackCount).to.equal(0);
+		expect(callbackCount).to.equal(1);
 		condition.hostDisconnected();
 	});
 
@@ -106,7 +106,7 @@ describe('UmbEntityDataPickerSupportsTextFilterCondition', () => {
 
 		await new Promise((resolve) => requestAnimationFrame(resolve));
 		expect(condition.permitted).to.be.false;
-		expect(callbackCount).to.equal(0);
+		expect(callbackCount).to.equal(1);
 		condition.hostDisconnected();
 	});
 
@@ -130,7 +130,7 @@ describe('UmbEntityDataPickerSupportsTextFilterCondition', () => {
 
 		await new Promise((resolve) => requestAnimationFrame(resolve));
 		expect(condition.permitted).to.be.false;
-		expect(callbackCount).to.equal(0);
+		expect(callbackCount).to.equal(1);
 		condition.hostDisconnected();
 	});
 
@@ -146,7 +146,7 @@ describe('UmbEntityDataPickerSupportsTextFilterCondition', () => {
 		});
 
 		await new Promise((resolve) => requestAnimationFrame(resolve));
-		expect(condition.permitted).to.be.false;
+		expect(condition.permitted).to.be.undefined;
 		expect(callbackCount).to.equal(0);
 		condition.hostDisconnected();
 	});

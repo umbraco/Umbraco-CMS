@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 internal sealed partial class PublishStatusServiceTests
 {
-    private IPublishStatusQueryService PublishStatusQueryService => GetRequiredService<IPublishStatusQueryService>();
+    private IDocumentPublishStatusQueryService PublishStatusQueryService => GetRequiredService<IDocumentPublishStatusQueryService>();
 
     [Test]
     public void When_Nothing_Is_Publised_All_Documents_Have_Unpublished_Status()
@@ -247,9 +247,9 @@ internal sealed partial class PublishStatusServiceTests
         Assert.IsEmpty(child.PublishedCultures);
         Assert.IsEmpty(child.PublishCultureInfos!);
 
-        Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(child.Key, "en-US"));
-        Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(child.Key, "da-DK"));
-        Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(child.Key, Constants.System.InvariantCulture));
+        Assert.IsFalse(PublishStatusQueryService.IsPublished(child.Key, "en-US"));
+        Assert.IsFalse(PublishStatusQueryService.IsPublished(child.Key, "da-DK"));
+        Assert.IsFalse(PublishStatusQueryService.IsPublished(child.Key, Constants.System.InvariantCulture));
 
         Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, "da-DK"));
         Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, "en-US"));

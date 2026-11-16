@@ -1,6 +1,5 @@
 import type { UmbMediaAuditLogModel } from '../types.js';
-import type { UmbMediaAuditLogType } from '../utils/index.js';
-import { getMediaHistoryTagStyleAndText } from '../info-app/utils.js';
+import { UmbMediaAuditLog, type UmbMediaAuditLogType } from '../utils/index.js';
 import { UmbMediaAuditLogServerDataSource } from './media-audit-log.server.data-source.js';
 import type {
 	UmbAuditLogRepository,
@@ -50,7 +49,50 @@ export class UmbMediaAuditLogRepository
 	 * @memberof UmbMediaAuditLogRepository
 	 */
 	getTagStyleAndText(logType: string): UmbAuditLogTagData {
-		return getMediaHistoryTagStyleAndText(logType as UmbMediaAuditLogType);
+		// TODO: Investigate why the repository is responsible for presentation (tag style) logic, and consider moving it out of the repository contract.
+		switch (logType as UmbMediaAuditLogType) {
+			case UmbMediaAuditLog.SAVE:
+				return {
+					style: { look: 'primary', color: 'default' },
+					text: { label: 'auditTrails_smallSave', desc: 'auditTrails_save' },
+				};
+
+			case UmbMediaAuditLog.COPY:
+				return {
+					style: { look: 'secondary', color: 'default' },
+					text: { label: 'auditTrails_smallCopy', desc: 'auditTrails_copy' },
+				};
+
+			case UmbMediaAuditLog.MOVE:
+				return {
+					style: { look: 'secondary', color: 'default' },
+					text: { label: 'auditTrails_smallMove', desc: 'auditTrails_move' },
+				};
+
+			case UmbMediaAuditLog.DELETE:
+				return {
+					style: { look: 'secondary', color: 'danger' },
+					text: { label: 'auditTrails_smallDelete', desc: 'auditTrails_delete' },
+				};
+
+			case UmbMediaAuditLog.SORT:
+				return {
+					style: { look: 'secondary', color: 'default' },
+					text: { label: 'auditTrails_smallSort', desc: 'auditTrails_sort' },
+				};
+
+			case UmbMediaAuditLog.CUSTOM:
+				return {
+					style: { look: 'placeholder', color: 'default' },
+					text: { label: 'auditTrails_smallCustom', desc: 'auditTrails_custom' },
+				};
+
+			default:
+				return {
+					style: { look: 'placeholder', color: 'danger' },
+					text: { label: logType, desc: 'TODO' },
+				};
+		}
 	}
 }
 

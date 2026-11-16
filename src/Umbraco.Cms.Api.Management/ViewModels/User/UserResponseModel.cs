@@ -48,6 +48,17 @@ public class UserResponseModel : UserPresentationBase
     public bool HasElementRootAccess { get; set; }
 
     /// <summary>
+    /// Gets or sets the collection of document blueprint start node identifiers assigned to the user.
+    /// Each identifier references a container that serves as a starting point for the user's blueprint access.
+    /// </summary>
+    public ISet<ReferenceByIdModel> DocumentBlueprintStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the user has access to the document blueprint root.
+    /// </summary>
+    public bool HasDocumentBlueprintRootAccess { get; set; }
+
+    /// <summary>
     /// Gets or sets a collection of URLs pointing to the user's avatar images.
     /// </summary>
     public IEnumerable<string> AvatarUrls { get; set; } = Enumerable.Empty<string>();

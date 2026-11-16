@@ -517,9 +517,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
                     }
                 ],
                 Variants = [
-                    new() { Name = "Test Document" },
-                    new() { Name = "Test Document", Segment = "seg-1" },
-                    new() { Name = "Test Document", Segment = "seg-2" }
+                    new() { Name = "Test Document" }
                 ]
             },
             contentType);
@@ -564,9 +562,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
                     }
                 ],
                 Variants = [
-                    new() { Name = "Test Document" },
-                    new() { Name = "Test Document", Segment = "seg-1" },
-                    new() { Name = "Test Document", Segment = "seg-2" }
+                    new() { Name = "Test Document" }
                 ]
             },
             contentType);
@@ -603,9 +599,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
                     }
                 ],
                 Variants = [
-                    new() { Name = "Test Document" },
-                    new() { Name = "Test Document", Segment = "seg-1" },
-                    new() { Name = "Test Document", Segment = "seg-2" }
+                    new() { Name = "Test Document" }
                 ]
             },
             contentType);
@@ -642,9 +636,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
                     }
                 ],
                 Variants = [
-                    new() { Name = "Test Document" },
-                    new() { Name = "Test Document", Segment = "seg-1" },
-                    new() { Name = "Test Document", Segment = "seg-2" }
+                    new() { Name = "Test Document" }
                 ]
             },
             contentType);
@@ -743,7 +735,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
             DatabaseType = ValueTypes.ToStorageType(dataEditor.GetValueEditor().ValueType),
             ConfigurationData = new Dictionary<string, object>
             {
-                { nameof(MultiUrlPickerConfiguration.MinNumber).ToFirstLowerInvariant(), 3 },
+                { nameof(MultiUrlPickerConfiguration.ValidationLimit).ToFirstLowerInvariant(), new NumberRange { Min = 3 } },
             },
         };
 

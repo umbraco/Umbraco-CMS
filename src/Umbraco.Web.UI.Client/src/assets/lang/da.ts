@@ -81,6 +81,17 @@ export default {
 		loadMore: 'Indlæs flere',
 		showMore: 'Vis flere',
 	},
+	actionGroups: {
+		clipboard: 'Udklipsholder',
+		create: 'Opret',
+		edit: 'Rediger',
+		importExport: 'Import og eksport',
+		notifications: 'Notificeringer',
+		other: 'Andet',
+		publishing: 'Udgivelse',
+		routing: 'Routing',
+		structure: 'Struktur',
+	},
 	actionCategories: {
 		content: 'Indhold',
 		administration: 'Administration',
@@ -682,39 +693,6 @@ export default {
 		displayName: 'Kulturnavn',
 		changeKeyError: "Navnet '%0%' eksisterer allerede.",
 		overviewTitle: 'Ordbogsoversigt',
-	},
-	examineManagement: {
-		configuredSearchers: 'Konfigurerede søgere',
-		configuredSearchersDescription:
-			'Viser egenskaber og værktøjer til enhver konfigureret søger (dvs. som en multi-indekssøger)',
-		fieldValues: 'Feltværdier',
-		healthStatus: 'Sundhedstilstand',
-		healthStatusDescription: 'Indeksets sundhedstilstand, og hvis det kan læses',
-		indexers: 'Indeksører',
-		indexInfo: 'Indeksinfo',
-		indexInfoDescription: 'Viser indeksets egenskaber',
-		manageIndexes: 'Administrer Examine indekserne',
-		manageIndexesDescription:
-			'Giver dig mulighed for at se detaljerne for hvert indeks og giver nogle værktøjer til styring af indeksørerne',
-		rebuildIndex: 'Genopbyg indeks',
-		rebuildIndexWarning:
-			'Dette vil medføre, at indekset genopbygges.<br /> Afhængigt af hvor meget indhold der er på dit website, kan det tage et stykke tid.<br /> Det anbefales ikke at genopbygge et indeks i perioder med høj websitetrafik eller når redaktører redigerer indhold.',
-		searchers: 'Søgere',
-		searchDescription: 'Søg i indekset og se resultaterne',
-		tools: 'Værktøjer',
-		toolsDescription: 'Værktøjer til at administrere indekset',
-		fields: 'felter',
-		indexCannotRead: 'Indekset skal bygges igen, for at kunne læses',
-		processIsTakingLonger:
-			'Processen tager længere tid end forventet. Kontrollér Umbraco loggen for at se om der er sket fejl under operationen',
-		indexCannotRebuild: 'Dette index kan ikke genbygges for det ikke har nogen',
-		iIndexPopulator: 'IIndexPopulator',
-		contentInIndex: 'Indhold i indeks',
-		noResults: 'Ingen resultater blev fundet',
-		searchNotAllowed: 'Du har ikke adgang til at søge i dette indeks.',
-		searchResultsFound: 'Viser %0% - %1% af %2% resultat(er) - Side %3% af %4%',
-		corruptStatus: 'Mulig korrupt indeks opdaget',
-		corruptErrorDescription: 'Fejl modtaget ved evaluering af indekset:',
 	},
 	placeholders: {
 		username: 'Indtast dit brugernavn',
@@ -1902,7 +1880,7 @@ export default {
 		allowVaryBySegment: 'Tillad segmentering',
 		elementType: 'Element-type',
 		elementHeading: 'Er en Element-type',
-		elementDescription: 'En Element-type er tiltænkt brug i andre Dokumenttyper, ikke i indholdstræet.\n    ',
+		elementDescription: 'Tiltænkt Block eller Genanvendeligt Element i Library sektionen.\n    ',
 		elementCannotToggle:
 			'En Dokumenttype kan ikke ændres til en Element-type efter den er blevet brugt til\n      at oprette en eller flere indholds elementer.\n    ',
 		elementDoesNotSupport: 'Dette benyttes ikke for en Element-type',
@@ -2212,6 +2190,8 @@ export default {
 		sectionsHelp: 'Tilføj sektioner for at give brugerne adgang',
 		allowAccessToAllLanguages: 'Tillad adgang til alle sprog',
 		allowAccessToAllDocuments: 'Tillad adgang til alle dokumenter',
+		allowAccessToInvariantForVariant: 'Tillad redigering af delt indhold',
+		invariantForVariantHelp: 'Tillader redigering af indhold delt på tværs af sprogvarianter. *Gælder ikke for indhold, der ikke varierer efter sprog.*',
 		allowAccessToAllMedia: 'Tillad adgang til alle medier',
 		selectUserGroup: (multiple: boolean) => {
 			return multiple ? 'Vælg brugergrupper' : 'Vælg brugergruppe';
@@ -2418,7 +2398,6 @@ export default {
 		contentRedirectManager: 'Redirects håndtering',
 		mediaFolderBrowser: 'Indhold',
 		settingsWelcome: 'Velkommen',
-		settingsExamine: 'Examine Management',
 		settingsPublishedStatus: 'Published Cache',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Health Check',
@@ -2723,9 +2702,18 @@ export default {
 		labelInlineMode: 'Indsæt på linje med tekst',
 		notExposedLabel: 'ikke oprettet',
 		notExposedDescription: 'Denne blok er endnu ikke oprettet for denne variant',
+		notPublishedLibraryElementDescription: 'Det bibliotekselement, som denne blok bruger, er ikke udgivet',
+		publishedPendingChangesLibraryElementDescription:
+			'Det bibliotekselement, som denne blok bruger, har ændringer, der endnu ikke er udgivet',
+		trashedLibraryElementDescription: 'Det bibliotekselement, som denne blok bruger, ligger i papirkurven',
 		unsupportedBlockName: 'Ugyldigt indhold',
 		unsupportedBlockDescription:
 			'Dette indhold er ikke længere understøttet. Hvis du mangler dette indhold bør du kontakte din administrator. Ellers bør du slette dette indhold.',
+		deletedLibraryElementName: 'Slettet bibliotekselement',
+		deletedLibraryElementDescription:
+			'Det bibliotekselement, som denne blok bruger, er slettet. Fjern denne blok.',
+		noAccessLibraryElementName: 'Utilgængeligt bibliotekselement',
+		noAccessLibraryElementDescription: 'Du har ikke adgang til det bibliotekselement, som denne blok bruger.',
 		blockVariantConfigurationNotSupported:
 			'En eller flere bloktyper i denne blokeditor bruger en elementtype, der er konfigureret til at variere efter kultur eller segment. Dette understøttes ikke på et indholdselement, som ikke varierer efter kultur eller segment.',
 		areaValidationEntriesNotAllowed: '<strong>%0%</strong> er ikke tilladt i dette område.',
@@ -3016,5 +3004,117 @@ export default {
 		browseTab: 'Gennemse',
 		searchTab: 'Søg',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'element' : 'elementer'} valgt`,
+	},
+	searchExamine: {
+	  showFields: 'Vis felter',
+	  headline: 'Søgedokumentfelter',
+	  filterPlaceholder: 'Filtrer felter efter navn eller v\u00E6rdi...',
+	  filterLabel: 'Filtrer felter efter navn eller v\u00E6rdi',
+	  fieldCount: (count: number) => {
+	    switch (count) {
+	      case 1:
+	        return '1 felt';
+	      default:
+	        return `${count} felter`;
+	    }
+	  },
+	  tableColumnName: 'Navn',
+	  tableColumnValue: 'V\u00E6rdi',
+	  copyValue: 'Kopi\u00E9r v\u00E6rdi',
+	  seeMore: 'Se mere',
+	  seeLess: 'Se mindre',
+	  noFieldsMatch: 'Ingen felter matcher dit filter.',
+	  noFields: 'Dette dokument har ingen indekserede felter.',
+	  loadError: 'Kunne ikke indl\u00E6se dokumentfelter. Pr\u00F8v venligst igen.',
+	  valueIndex: (index: number) => `V\u00E6rdi ${index}`,
+	  fieldType: (type: string) => {
+	    switch (type) {
+	      case 'keywords':
+	        return 'N\u00F8gleord (eksakt match)';
+	      case 'texts':
+	        return 'Fuldtekst';
+	      case 'textsr1':
+	        return 'Fuldtekst (Boost: H\u00F8j)';
+	      case 'textsr2':
+	        return 'Fuldtekst (Boost: Medium)';
+	      case 'textsr3':
+	        return 'Fuldtekst (Boost: Lav)';
+	      case 'integers':
+	        return 'Heltal';
+	      case 'decimals':
+	        return 'Decimal';
+	      case 'datetimeoffsets':
+	        return 'Dato/tid';
+	      default:
+	        return type;
+	    }
+	  },
+	},
+	searchManagement: {
+		treeHeader: 'Søgning',
+		tableColumnAlias: 'Alias',
+		tableColumnHealthStatus: 'Status',
+		tableColumnDocumentCount: 'Antal dokumenter',
+		healthStatus: (status: string) => {
+			switch (status) {
+				case 'Empty':
+					return 'Tom';
+				case 'Corrupted':
+					return 'Fejl: Korrupt';
+				case 'Rebuilding':
+					return 'Gen-indekserer';
+				case 'Healthy':
+					return 'God';
+				default:
+					return 'Fejl: Ukendt';
+			}
+		},
+		documentCount: (cnt: number | string) => {
+			switch (cnt) {
+				case 0:
+					return 'Tom';
+				case 1:
+					return '1 dokument';
+				default:
+					return `${cnt} dokumenter`;
+			}
+		},
+		collectionActionReload: 'Opdater',
+		entityActionRebuildIndex: 'Genopbyg',
+		rebuildConfirmHeadline: 'Genopbyg indeks',
+		rebuildConfirmMessage:
+			'<strong>{0}</strong> genopbygges fra bunden. Søgning i indekset kan give <i>ufuldstændige resultater</i>, indtil genopbygningen er færdig.',
+		rebuildConfirmLabel: 'Genopbyg',
+		rebuildStartedMessage: 'Genopbygger {0} i baggrunden.',
+		rebuildCompletedTitle: 'Genopbygning fuldført',
+		rebuildCompletedMessage: '{0} er færdig med at genopbygge.',
+		indexInfo: 'Indeksinformation',
+		indexAlias: 'Alias',
+		providerName: 'Udbyder',
+		searchBox: 'Søg',
+		searchPlaceholder: 'Søg',
+		searchButton: 'Søg',
+		noResults: 'Ingen resultater',
+		resultsCount: (count: number) => `Fandt ${count} resultat${count !== 1 ? 'er' : ''}`,
+		tableColumnName: 'Navn',
+		tableColumnEntityType: 'Type',
+		// Accessibility labels
+		searching: 'Søger...',
+		searchFailed: 'Søgning fejlede',
+		searchComplete: (count: number) => `Søgning færdig. Fandt ${count} resultat${count !== 1 ? 'er' : ''}`,
+		openEntity: (type: string, id: string) => `Åbn ${type} med ID ${id}`,
+		searchFormLabel: (indexAlias: string) => `Søg i ${indexAlias} indeks`,
+		searchInputLabel: 'Søgeforespørgsel',
+		searchInputAriaLabel: (indexAlias: string) => `Indtast søgeforespørgsel for ${indexAlias} indeks`,
+		searchButtonAriaLabel: 'Udfør søgning',
+		searchHint: 'Tryk Enter for at søge',
+		loading: 'Indlæser søgeresultater',
+		resultsRegion: 'Søgeresultater',
+		resultsTable: 'Tabel med søgeresultater',
+		paginationLabel: 'Sider med søgeresultater',
+		cultureSelectLabel: 'Kultur',
+		searchDisabled: 'Søgning utilgængelig. Indeksstatus:',
+		searchError: 'Søgningen fejlede. Prøv igen.',
+		searchNotAllowed: 'Du har ikke adgang til at søge i dette indeks.',
 	},
 } as UmbLocalizationDictionary;

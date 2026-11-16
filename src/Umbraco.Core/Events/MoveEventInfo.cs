@@ -12,19 +12,6 @@ public class MoveEventInfo<TEntity> : MoveEventInfoBase<TEntity>
     /// <param name="entity">The entity being moved.</param>
     /// <param name="originalPath">The original path of the entity.</param>
     /// <param name="newParentId">The identifier of the new parent.</param>
-    /// <param name="newParentKey">The unique identifier of the new parent.</param>
-    [Obsolete("Use the overload without the newParentId parameter instead. Scheduled for removal in v19.")]
-    public MoveEventInfo(TEntity entity, string originalPath, int newParentId, Guid? newParentKey)
-        : this(entity, originalPath, newParentKey)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="MoveEventInfo{TEntity}" /> class.
-    /// </summary>
-    /// <param name="entity">The entity being moved.</param>
-    /// <param name="originalPath">The original path of the entity.</param>
-    /// <param name="newParentId">The identifier of the new parent.</param>
     [Obsolete("Use the overload with the newParentKey parameter instead. Scheduled for removal in v19.")]
     public MoveEventInfo(TEntity entity, string originalPath, int newParentId)
         : this(entity, originalPath, null)

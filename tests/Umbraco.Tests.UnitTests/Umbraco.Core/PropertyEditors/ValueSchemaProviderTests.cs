@@ -1,4 +1,4 @@
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -7,6 +7,9 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+
+// The multi node tree picker is obsolete, but must keep working for the whole deprecation period.
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
@@ -51,8 +54,7 @@ public class ValueSchemaProviderTests
         var editor = CreateIntegerPropertyEditor();
         var config = new Dictionary<string, object>
         {
-            { "min", 10 },
-            { "max", 100 },
+            { "validationRange", new Dictionary<string, object> { { "min", 10 }, { "max", 100 } } },
         };
 
         // Act
@@ -71,7 +73,7 @@ public class ValueSchemaProviderTests
         var editor = CreateIntegerPropertyEditor();
         var config = new Dictionary<string, object>
         {
-            { "min", 0 },
+            { "validationRange", new Dictionary<string, object> { { "min", 0 } } },
             { "step", 5 },
         };
 
@@ -148,7 +150,7 @@ public class ValueSchemaProviderTests
                     Mock.Of<IIOHelper>(),
                     new DataEditorAttribute(Constants.PropertyEditors.Aliases.Integer)));
 
-        return new IntegerPropertyEditor(dataValueEditorFactory);
+        return new IntegerPropertyEditor(dataValueEditorFactory, Mock.Of<IIOHelper>());
     }
 
     private static ContentPickerPropertyEditor CreateContentPickerPropertyEditor()
@@ -181,3 +183,5 @@ public class ValueSchemaProviderTests
             Mock.Of<IIOHelper>());
     }
 }
+
+#pragma warning restore CS0618 // Type or member is obsolete

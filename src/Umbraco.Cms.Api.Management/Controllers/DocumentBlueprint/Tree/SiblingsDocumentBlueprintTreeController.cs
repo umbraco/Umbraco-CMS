@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -11,16 +12,19 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Tree;
 /// <summary>
 /// Controller responsible for managing the document blueprint tree for sibling nodes.
 /// </summary>
+[ApiVersion("1.0")]
 public class SiblingsDocumentBlueprintTreeController : DocumentBlueprintTreeControllerBase
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="SiblingsDocumentBlueprintTreeController"/> class.
     /// </summary>
     /// <param name="entityService">Service used for entity operations within the Umbraco CMS.</param>
+    /// <param name="entitySearchService">The <see cref="IEntitySearchService"/> used to search entities.</param>
+    /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> used to map between identifiers and keys.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for document blueprints.</param>
     /// <param name="documentPresentationFactory">Factory responsible for creating document presentation models.</param>
-    public SiblingsDocumentBlueprintTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDocumentPresentationFactory documentPresentationFactory)
-        : base(entityService, flagProviders, documentPresentationFactory)
+    public SiblingsDocumentBlueprintTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IEntitySearchService entitySearchService, IIdKeyMap idKeyMap, IDocumentPresentationFactory documentPresentationFactory)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap, documentPresentationFactory)
     {
     }
 
@@ -34,6 +38,7 @@ public class SiblingsDocumentBlueprintTreeController : DocumentBlueprintTreeCont
     /// <param name="foldersOnly">If true, only folder items are included in the results.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="ActionResult{T}"/> with a <see cref="SubsetViewModel{T}"/> of <see cref="DocumentBlueprintTreeItemResponseModel"/> representing the sibling items.</returns>
     [HttpGet("siblings")]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(SubsetViewModel<DocumentBlueprintTreeItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a collection of document blueprint tree sibling items.")]
     [EndpointDescription("Gets a collection of document blueprint tree items that are siblings of the provided Id.")]

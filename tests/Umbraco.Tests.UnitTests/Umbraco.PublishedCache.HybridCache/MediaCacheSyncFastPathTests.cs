@@ -68,8 +68,5 @@ public class MediaCacheSyncFastPathTests
     }
 
     private static MediaCache CreateCache(Mock<IMediaCacheService> cacheService)
-        => new(
-            cacheService.Object,
-            Mock.Of<IPublishedContentTypeCache>(),
-            Mock.Of<IMediaNavigationQueryService>());
+        => new(cacheService.Object, Mock.Of<IMediaNavigationQueryService>());
 }

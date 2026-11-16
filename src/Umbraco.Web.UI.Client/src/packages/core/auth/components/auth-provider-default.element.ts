@@ -13,7 +13,7 @@ export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbA
 	manifest!: ManifestAuthProvider;
 
 	@property({ attribute: false })
-	onSubmit!: (manifestOrProviderName: string | ManifestAuthProvider, loginHint?: string) => void;
+	onSubmit!: (manifestOrProviderName: ManifestAuthProvider) => void;
 
 	override connectedCallback(): void {
 		super.connectedCallback();

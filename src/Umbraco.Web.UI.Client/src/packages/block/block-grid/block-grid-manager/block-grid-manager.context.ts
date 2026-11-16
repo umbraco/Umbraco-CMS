@@ -154,14 +154,14 @@ export class UmbBlockGridManagerContext<
 		while (i--) {
 			const currentEntry = entries[i];
 			// Lets check if we found the right parent layout entry:
-			if (currentEntry.contentKey === parentId) {
+			if (currentEntry.key === parentId) {
 				// Append the layout entry to be inserted and unfreeze the rest of the data:
 				const areas =
 					currentEntry.areas?.map((x) =>
 						x.key === areaKey
 							? {
 									...x,
-									items: pushAtToUniqueArray([...x.items], insert, (x) => x.contentKey === insert.contentKey, index),
+									items: pushAtToUniqueArray([...x.items], insert, (x) => x.key === insert.key, index),
 								}
 							: x,
 					) ?? [];
@@ -171,7 +171,7 @@ export class UmbBlockGridManagerContext<
 						...currentEntry,
 						areas,
 					},
-					(x) => x.contentKey === currentEntry.contentKey,
+					(x) => x.key === currentEntry.key,
 				);
 			}
 			// Otherwise check if any items of the areas are the parent layout entry we are looking for. We do so based on parentId, recursively:
@@ -199,7 +199,7 @@ export class UmbBlockGridManagerContext<
 									(z) => z.key === area.key,
 								),
 							},
-							(x) => x.contentKey === currentEntry.contentKey,
+							(x) => x.key === currentEntry.key,
 						);
 					}
 				}
@@ -219,6 +219,14 @@ export class UmbBlockGridManagerContext<
 		this.notifyBlockInserted(layoutEntry, originData);
 
 		return true;
+	}
+
+	protected override _collectExternalContentKeys(layouts: Array<UmbBlockGridLayoutModel>): Array<string> {
+		const nested = layouts.flatMap((layout) => layout.areas?.flatMap((area) => area.items) ?? []);
+		return [
+			...super._collectExternalContentKeys(layouts),
+			...(nested.length ? this._collectExternalContentKeys(nested) : []),
+		];
 	}
 
 	override setOneLayout(layoutEntry: BlockLayoutType, originData?: UmbBlockGridWorkspaceOriginData) {

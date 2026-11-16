@@ -50,10 +50,5 @@ public class DocumentCacheSyncFastPathTests
     }
 
     private static DocumentCache CreateCache(Mock<IDocumentCacheService> cacheService)
-        => new(
-            cacheService.Object,
-            Mock.Of<IPublishedContentTypeCache>(),
-            Mock.Of<IDocumentNavigationQueryService>(),
-            Mock.Of<IDocumentUrlService>(),
-            new Lazy<IPublishedUrlProvider>(() => Mock.Of<IPublishedUrlProvider>()));
+        => new(cacheService.Object);
 }

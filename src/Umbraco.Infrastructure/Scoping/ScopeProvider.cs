@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
-using CoreDebugSettings = Umbraco.Cms.Core.Configuration.Models.CoreDebugSettings;
+using DebugSettings = Umbraco.Cms.Core.Configuration.Models.DebugSettings;
 
 #if DEBUG_SCOPES
 using System.Linq;
@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         private readonly IAmbientScopeContextStack _ambientContextStack;
 
         private readonly FileSystems _fileSystems;
-        private CoreDebugSettings _coreDebugSettings;
+        private DebugSettings _coreDebugSettings;
         private readonly MediaFileManager _mediaFileManager;
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
             IUmbracoDatabaseFactory databaseFactory,
             FileSystems fileSystems,
-            IOptionsMonitor<CoreDebugSettings> coreDebugSettings,
+            IOptionsMonitor<DebugSettings> coreDebugSettings,
             MediaFileManager mediaFileManager,
             ILoggerFactory loggerFactory,
             IEventAggregator eventAggregator)

@@ -11,7 +11,6 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -151,8 +150,8 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
                     .ToArray();
             });
 
-        var previewMock = new Mock<IPreviewService>();
-        previewMock.Setup(x => x.IsInPreview()).Returns(false);
+        var previewMock = new Mock<IPreviewSessionService>();
+        previewMock.Setup(x => x.IsActive()).Returns(false);
 
         var idKeyMapMock = new Mock<IIdKeyMap>();
         idKeyMapMock.Setup(x => x.GetKeyForId(It.IsAny<int>(), It.IsAny<UmbracoObjectTypes>()))
@@ -206,12 +205,7 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
             }
         }
 
-        var documentCache = new DocumentCache(
-            cacheService,
-            contentTypeCache,
-            navigationService,
-            Mock.Of<IDocumentUrlService>(),
-            new Lazy<IPublishedUrlProvider>(() => Mock.Of<IPublishedUrlProvider>()));
+        var documentCache = new DocumentCache(cacheService);
 
         PublishedContentCache = documentCache;
         NavigationQueryService = navigationService;

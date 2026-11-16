@@ -170,11 +170,6 @@ internal sealed class MediaEditingService
         => await HandleMoveAsync(key, parentKey, userKey);
 
     /// <inheritdoc />
-    [Obsolete("Use the overload that takes an includeDescendants parameter instead. Scheduled for removal in Umbraco 19.")]
-    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
-        => await RestoreAsync(key, parentKey, userKey, true);
-
-    /// <inheritdoc />
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants)
         => await HandleMoveAsync(key, parentKey, userKey, true, includeDescendants);
 

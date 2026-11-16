@@ -30,7 +30,7 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
     /// <param name="eventAggregator">The event aggregator.</param>
     /// <param name="domainCache">The domain cache service.</param>
     /// <param name="factory">The cache refresher notification factory.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
     public LanguageCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,

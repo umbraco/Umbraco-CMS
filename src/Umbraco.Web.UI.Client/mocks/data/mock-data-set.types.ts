@@ -3,6 +3,7 @@ import type {
 	DataTypeItemResponseModel,
 	DataTypeResponseModel,
 	DataTypeTreeItemResponseModel,
+	DatatypeConfigurationResponseModel,
 	// Dictionary
 	DictionaryItemItemResponseModel,
 	DictionaryItemResponseModel,
@@ -61,6 +62,8 @@ import type {
 	// Script
 	ScriptItemResponseModel,
 	ScriptResponseModel,
+	// Segment
+	SegmentResponseModel,
 	// Static File
 	StaticFileItemResponseModel,
 	// Stylesheet
@@ -90,10 +93,6 @@ import type {
 	// Health Check
 	HealthCheckGroupPresentationModel,
 	HealthCheckGroupWithResultResponseModel,
-	// Examine
-	IndexResponseModel,
-	PagedIndexResponseModel,
-	SearchResultResponseModel,
 	// Tracked Reference
 	IReferenceResponseModelDefaultReferenceResponseModel,
 	IReferenceResponseModelDocumentReferenceResponseModel,
@@ -129,9 +128,11 @@ export type UmbMockDocumentModel = DocumentResponseModel &
 		domains?: DomainsResponseModel;
 	};
 
-export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
-	DocumentBlueprintItemResponseModel &
-	Omit<DocumentBlueprintTreeItemResponseModel, 'parentIsFolder'>;
+export type UmbMockDocumentBlueprintModel = Omit<DocumentBlueprintResponseModel, 'documentType'> &
+	Omit<DocumentBlueprintItemResponseModel, 'documentType'> &
+	Omit<DocumentBlueprintTreeItemResponseModel, 'documentType' | 'parentIsFolder'> & {
+		documentType: DocumentTypeReferenceResponseModel | null;
+	};
 
 export type UmbMockDocumentTypeModel = DocumentTypeResponseModel &
 	Omit<DocumentTypeTreeItemResponseModel, 'parentIsFolder'> &
@@ -180,6 +181,8 @@ export type UmbMockRelationTypeModel = RelationTypeResponseModel & RelationTypeI
 export type UmbMockRelationTypeItemModel = RelationTypeItemResponseModel;
 
 export type UmbMockScriptModel = ScriptResponseModel & FileSystemTreeItemPresentationModel & ScriptItemResponseModel;
+
+export type UmbMockSegmentModel = SegmentResponseModel;
 
 export type UmbMockStaticFileModel = StaticFileItemResponseModel & FileSystemTreeItemPresentationModel;
 
@@ -231,6 +234,7 @@ export interface UmbMockLogLevelsModel {
 export interface UmbMockDataSet {
 	// Core entity data arrays (all optional, defaults to empty array)
 	dataType?: Array<UmbMockDataTypeModel>;
+	dataTypeConfiguration?: DatatypeConfigurationResponseModel;
 	dictionary?: Array<UmbMockDictionaryModel>;
 	document?: Array<UmbMockDocumentModel>;
 	documentBlueprint?: Array<UmbMockDocumentBlueprintModel>;
@@ -248,6 +252,7 @@ export interface UmbMockDataSet {
 	relation?: Array<UmbMockRelationModel>;
 	relationType?: Array<UmbMockRelationTypeModel>;
 	script?: Array<UmbMockScriptModel>;
+	segment?: Array<UmbMockSegmentModel>;
 	staticFile?: Array<UmbMockStaticFileModel>;
 	stylesheet?: Array<UmbMockStylesheetModel>;
 	template?: Array<UmbMockTemplateModel>;
@@ -270,11 +275,6 @@ export interface UmbMockDataSet {
 	// Health check data
 	healthGroups?: Array<HealthCheckGroupWithResultResponseModel & { name: string }>;
 	healthGroupsWithoutResult?: Array<HealthCheckGroupPresentationModel>;
-
-	// Examine/search data
-	examineIndexers?: Array<IndexResponseModel>;
-	examinePagedIndexers?: PagedIndexResponseModel;
-	examineSearchResults?: Array<SearchResultResponseModel>;
 
 	// Tracked references
 	trackedReferenceItems?: Array<UmbMockTrackedReferenceItemModel>;

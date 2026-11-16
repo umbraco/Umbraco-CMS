@@ -8,12 +8,14 @@ import type {
 	UmbElementScheduleSelectionModel,
 } from './element-schedule-modal.token.js';
 import { css, customElement, html, ref, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { umbBindToValidation, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import type { UmbEntityReferencesConfig } from '@umbraco-cms/backoffice/relations';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
 import type { UUIBooleanInputElement, UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+
+import '@umbraco-cms/backoffice/relations';
 
 @customElement('umb-element-schedule-modal')
 export class UmbElementScheduleModalElement extends UmbModalBaseElement<
@@ -39,6 +41,9 @@ export class UmbElementScheduleModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _submitButtonState?: UUIButtonState;
+
+	@state()
+	private _referencesConfig?: UmbEntityReferencesConfig;
 
 	#validation = new UmbValidationContext(this);
 
@@ -83,6 +88,17 @@ export class UmbElementScheduleModalElement extends UmbModalBaseElement<
 	override firstUpdated() {
 		this._internalValues = this.data?.prevalues ? [...this.data.prevalues] : [];
 		this.#configureSelectionManager();
+		this.#configureReferences();
+	}
+
+	#configureReferences() {
+		if (!this.data) return;
+		const { unique, itemRepositoryAlias, referenceRepositoryAlias } = this.data;
+		if (!unique) return;
+		if (!itemRepositoryAlias) return;
+		if (!referenceRepositoryAlias) return;
+
+		this._referencesConfig = { unique, itemRepositoryAlias, referenceRepositoryAlias };
 	}
 
 	async #configureSelectionManager() {
@@ -140,6 +156,11 @@ export class UmbElementScheduleModalElement extends UmbModalBaseElement<
 		return this._selection.some((s) => s.unique === unique);
 	}
 
+	#hasSelectableOption() {
+		const isAllowed = this.#selectionManager.getAllowLimitation();
+		return this._options.some((option) => isAllowed(option.unique));
+	}
+
 	#onSelectAllChange(event: Event) {
 		const allUniques = this._options.map((o) => o.unique);
 		const filter = this.#selectionManager.getAllowLimitation();
@@ -160,20 +181,28 @@ export class UmbElementScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html`<uui-dialog-layout headline=${this.localize.term('general_scheduledPublishing')}>
-			${this.#renderOptions()}
-
-			<div slot="actions">
-				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
-				<uui-button
-					.state=${this._submitButtonState}
-					label="${this.localize.term('buttons_schedulePublish')}"
-					look="primary"
-					color="positive"
-					?disabled=${!this._selection.length || this._hasNotSelectedMandatory}
-					@click=${this.#submit}></uui-button>
-			</div>
-		</uui-dialog-layout> `;
+		return html`
+			<uui-dialog-layout headline=${this.localize.term('general_scheduledPublishing')}>
+				${this.#renderOptions()}
+				${when(
+					this._referencesConfig,
+					() =>
+						html`<umb-entity-references-summary
+							.config=${this._referencesConfig}
+							.entitiesNeedingAttention=${this.data?.entitiesNeedingAttention}></umb-entity-references-summary>`,
+				)}
+				<div slot="actions">
+					<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
+					<uui-button
+						.state=${this._submitButtonState}
+						label="${this.localize.term('buttons_schedulePublish')}"
+						look="primary"
+						color="positive"
+						?disabled=${!this._selection.length || this._hasNotSelectedMandatory}
+						@click=${this.#submit}></uui-button>
+				</div>
+			</uui-dialog-layout>
+		`;
 	}
 
 	#renderOptions() {
@@ -184,7 +213,8 @@ export class UmbElementScheduleModalElement extends UmbModalBaseElement<
 					<uui-checkbox
 						@change=${this.#onSelectAllChange}
 						label=${this.localize.term('general_selectAll')}
-						.checked=${this._isAllSelected}></uui-checkbox>
+						.checked=${this._isAllSelected}
+						?disabled=${!this.#hasSelectableOption()}></uui-checkbox>
 				`,
 			)}
 			${repeat(
@@ -216,10 +246,9 @@ export class UmbElementScheduleModalElement extends UmbModalBaseElement<
 			${when(this.#isSelected(option.unique), () => this.#renderPublishDateInput(option, fromDate, toDate))}
 			${when(
 				isChanged,
-				() =>
-					html`<p>
-						${this.localize.term('content_scheduledPendingChanges', this.localize.term('buttons_schedulePublish'))}
-					</p>`,
+				() => html`
+					<p>${this.localize.term('content_scheduledPendingChanges', this.localize.term('buttons_schedulePublish'))}</p>
+				`,
 			)}
 		`;
 	}
@@ -425,7 +454,6 @@ export class UmbElementScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	static override readonly styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				display: block;

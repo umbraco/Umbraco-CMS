@@ -60,7 +60,6 @@ describe('UmbElementPublishedPendingChangesManager', () => {
 						state: UmbElementVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
 						culture: null,
-						segment: null,
 						name: 'Element 1',
 						createDate: '2023-02-06T15:32:05.350038',
 						updateDate: '2023-02-06T15:32:24.957009',
@@ -125,7 +124,6 @@ describe('UmbElementPublishedPendingChangesManager', () => {
 						state: UmbElementVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
 						culture: 'da-DK',
-						segment: null,
 						name: 'Element 1 (da-DK)',
 						createDate: '2023-02-06T15:32:05.350038',
 						updateDate: '2023-02-06T15:32:24.957009',
@@ -137,7 +135,6 @@ describe('UmbElementPublishedPendingChangesManager', () => {
 						state: UmbElementVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
 						culture: 'en-US',
-						segment: null,
 						name: 'Element 1 (en-US)',
 						createDate: '2023-02-06T15:32:05.350038',
 						updateDate: '2023-02-06T15:32:24.957009',
@@ -146,6 +143,7 @@ describe('UmbElementPublishedPendingChangesManager', () => {
 						flags: [],
 					},
 				],
+				// Culture-sorted (da-DK before en-US), matching the order values settle into once merged. [NL]
 				values: [
 					{
 						editorAlias: 'Umbraco.TextBox',

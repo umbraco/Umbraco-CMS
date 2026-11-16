@@ -1,4 +1,6 @@
 import {
+	UMB_BLOCK_RTE_DATA_CONTENT_KEY,
+	UMB_BLOCK_RTE_DATA_LAYOUT_KEY,
 	UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS,
 	type UmbPropertyEditorRteValueType,
 } from '@umbraco-cms/backoffice/rte';
@@ -22,6 +24,7 @@ export class UmbBlockRTEPropertyValueCloner implements UmbPropertyValueCloner<Um
 
 				const cloner = new UmbFlatLayoutBlockPropertyValueCloner(UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS, {
 					contentIdUpdatedCallback: this.#replaceContentKeyInMarkup,
+					layoutKeyUpdatedCallback: this.#replaceLayoutKeyInMarkup,
 				});
 				result.blocks = await cloner.cloneValue(value.blocks);
 				result.markup = this.#markup;
@@ -37,6 +40,21 @@ export class UmbBlockRTEPropertyValueCloner implements UmbPropertyValueCloner<Um
 
 		return result;
 	}
+
+	#replaceLayoutKeyInMarkup = (oldLayoutKey: string | undefined, newLayoutKey: string, contentKey: string) => {
+		if (!this.#markupDoc) throw new Error('Markup document is not initialized');
+		const block = ':is(umb-rte-block, umb-rte-block-inline)';
+		const selectors = [
+			`${block}[${UMB_BLOCK_RTE_DATA_CONTENT_KEY}='${contentKey}']:not([${UMB_BLOCK_RTE_DATA_LAYOUT_KEY}])`,
+		];
+		if (oldLayoutKey) {
+			selectors.push(`${block}[${UMB_BLOCK_RTE_DATA_LAYOUT_KEY}='${oldLayoutKey}']`);
+		}
+		this.#markupDoc.querySelectorAll(selectors.join(', ')).forEach((element) => {
+			element.setAttribute(UMB_BLOCK_RTE_DATA_LAYOUT_KEY, newLayoutKey);
+		});
+		this.#markup = this.#markupDoc.body.innerHTML ?? undefined;
+	};
 
 	#replaceContentKeyInMarkup = (contentKey: string, newContentKey: string) => {
 		if (!this.#markupDoc) throw new Error('Markup document is not initialized');

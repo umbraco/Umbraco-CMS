@@ -47,8 +47,11 @@ test('can insert preset value into textstring property that vary by culture and 
   await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeCreated();
 
   // Assert
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.values[0].value).toBe(presetValue);
+  const [defaultValue] = await umbracoApi.document.getValuesByCultureAndSegmentForDocument(contentName, [
+    {culture: 'en-US', segment: null},
+  ]);
+  expect(defaultValue).toBeTruthy();
+  expect(defaultValue.value).toBe(presetValue);
 });
 
 test('can insert preset value into textstring property that vary by culture and segment in segment of default language', async ({umbracoApi, umbracoUi}) => {
@@ -64,7 +67,7 @@ test('can insert preset value into textstring property that vary by culture and 
   await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeCreated();
   await umbracoUi.content.clickSelectVariantButton();
   await umbracoUi.content.clickExpandSegmentButton(contentName);
-  await umbracoUi.content.clickVariantAddModeButtonForLanguageName(vipMemberSegment);
+  await umbracoUi.content.clickSegmentVariantButton(vipMemberSegment);
 
   // Assert
   await umbracoUi.content.doesTextStringHaveExpectedValue(presetValue);
@@ -89,7 +92,7 @@ test('can insert preset value into textstring property that vary by culture and 
   await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeCreated();
   await umbracoUi.content.clickSelectVariantButton();
   await umbracoUi.content.clickExpandSegmentButton(contentName);
-  await umbracoUi.content.clickVariantAddModeButtonForLanguageName(vipMemberSegment);
+  await umbracoUi.content.clickSegmentVariantButton(vipMemberSegment);
 
   // Assert
   await umbracoUi.content.doesTextStringHaveExpectedValue(presetValue);

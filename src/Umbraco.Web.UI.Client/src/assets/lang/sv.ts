@@ -59,6 +59,17 @@ export default {
 		unpublish: 'Avpublicera',
 		update: 'Uppdatera',
 	},
+	actionGroups: {
+		clipboard: 'Urklipp',
+		create: 'Skapa',
+		edit: 'Redigera',
+		importExport: 'Import och export',
+		notifications: 'Meddelanden',
+		other: 'Övrigt',
+		publishing: 'Publicering',
+		routing: 'Routning',
+		structure: 'Struktur',
+	},
 	actionCategories: {
 		administration: 'Administration',
 		structure: 'Struktur',

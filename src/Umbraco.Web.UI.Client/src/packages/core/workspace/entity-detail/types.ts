@@ -16,3 +16,35 @@ export interface UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> {
 	parent: UmbEntityModel;
 	preset?: UmbDeepPartialObject<DetailModelType>;
 }
+
+/**
+ * The meta passed to the methods of an entity detail workspace's `initHook`.
+ */
+export interface UmbEntityDetailInitHookMeta {
+	/**
+	 * The entity type of the entity being loaded or scaffolded.
+	 */
+	entityType: string;
+	/**
+	 * The unique of the entity being loaded, or undefined when a new entity is being created and has no unique yet.
+	 */
+	unique: string | null | undefined;
+	/**
+	 * Whether the entity is being scaffolded, as opposed to loaded.
+	 */
+	isNew: boolean;
+}
+
+/**
+ * The meta passed to the methods of an entity detail workspace's `incomingDataHook`.
+ */
+export interface UmbEntityDetailIncomingDataHookMeta {
+	/**
+	 * The entity type of the incoming entity.
+	 */
+	entityType: string;
+	/**
+	 * The unique of the incoming entity.
+	 */
+	unique: string | null;
+}

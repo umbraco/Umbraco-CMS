@@ -40,10 +40,10 @@ import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockSingleLayoutModel, UmbBlockSingleEntryElement> = {
 	getUniqueOfElement: (element) => {
-		return element.contentKey!;
+		return element.key!;
 	},
 	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.contentKey;
+		return modelEntry.key;
 	},
 	//identifier: 'block-single-editor',
 	itemSelector: 'umb-block-single-entry',
@@ -148,6 +148,9 @@ export class UmbPropertyEditorUIBlockSingleElement
 
 	@state()
 	private _blocks?: Array<UmbBlockTypeBaseModel>;
+
+	@state()
+	private _hasLibraryElements = false;
 
 	@state()
 	private _layouts: Array<UmbBlockLayoutBaseModel> = [];
@@ -259,6 +262,8 @@ export class UmbPropertyEditorUIBlockSingleElement
 			null,
 		);
 
+		this.observe(this.#entriesContext.hasLibraryElements, (x) => (this._hasLibraryElements = x), null);
+
 		this.observe(
 			this.#entriesContext.catalogueRouteBuilder,
 			(routeBuilder) => {
@@ -362,13 +367,9 @@ export class UmbPropertyEditorUIBlockSingleElement
 		return html`
 			${repeat(
 				this._layouts,
-				(x) => x.contentKey,
+				(x) => x.key,
 				(layoutEntry) => html`
-					<umb-block-single-entry
-						.contentKey=${layoutEntry.contentKey}
-						.layout=${layoutEntry}
-						${umbDestroyOnDisconnect()}>
-					</umb-block-single-entry>
+					<umb-block-single-entry .layout=${layoutEntry} ${umbDestroyOnDisconnect()}></umb-block-single-entry>
 				`,
 			)}
 			${this.#renderCreateButtonGroup()}
@@ -380,12 +381,16 @@ export class UmbPropertyEditorUIBlockSingleElement
 		if ((this.readonly && this._layouts.length > 0) || this._layouts.length >= 1) {
 			return nothing;
 		} else {
-			return html` <uui-button-group> ${this.#renderCreateButton()} ${this.#renderPasteButton()} </uui-button-group> `;
+			const createPath = this.#entriesContext.getPathForCreateBlock(-1);
+			return html`
+				<uui-button-group>
+					${this.#renderCreateButton(createPath)}${this.#renderLibraryButton(createPath)}${this.#renderPasteButton()}
+				</uui-button-group>
+			`;
 		}
 	}
 
-	#renderCreateButton() {
-		const createPath = this.#entriesContext.getPathForCreateBlock(-1);
+	#renderCreateButton(createPath: string | undefined) {
 		return html`
 			<uui-button
 				look="placeholder"
@@ -410,9 +415,25 @@ export class UmbPropertyEditorUIBlockSingleElement
 		`;
 	}
 
+	#renderLibraryButton(createPath: string | undefined) {
+		if (!this._catalogueRouteBuilder || createPath || !this._hasLibraryElements) return nothing;
+		return html`
+			<uui-button
+				class="btnAction"
+				label=${this.localize.term('blockEditor_tabLibrary')}
+				look="placeholder"
+				href=${this._catalogueRouteBuilder?.({ view: 'library', index: -1 }) ?? ''}
+				?disabled=${this.readonly}
+				title=${this.localize.term('blockEditor_tabLibrary')}>
+				<uui-icon name="icon-link"></uui-icon>
+			</uui-button>
+		`;
+	}
+
 	#renderPasteButton() {
 		return html`
 			<uui-button
+				class="btnAction"
 				label=${this.localize.term('content_createFromClipboard')}
 				look="placeholder"
 				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}
@@ -432,8 +453,11 @@ export class UmbPropertyEditorUIBlockSingleElement
 
 			uui-button-group {
 				margin-top: 1px;
-				display: grid;
-				grid-template-columns: 1fr auto;
+				display: flex;
+
+				.btnAction {
+					flex: 0;
+				}
 			}
 		`,
 	];

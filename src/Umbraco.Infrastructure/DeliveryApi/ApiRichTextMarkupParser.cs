@@ -144,6 +144,9 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
         HtmlNode[] blocks = doc.DocumentNode.SelectNodes("//*[starts-with(local-name(),'umb-rte-block')]")?.ToArray() ?? Array.Empty<HtmlNode>();
         foreach (HtmlNode block in blocks)
         {
+            // The layout key is editor-internal bookkeeping and must not leak into Delivery API output.
+            block.Attributes.Remove(BlockLayoutKeyAttribute);
+
             var dataKey = block.GetAttributeValue(BlockContentKeyAttribute, string.Empty);
             if (Guid.TryParse(dataKey, out Guid key) is false)
             {

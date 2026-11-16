@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -272,6 +272,13 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
             return operationStatus;
         }
 
+        // verify that no property varies in a way the content type itself does not
+        operationStatus = ValidatePropertyVariations(model);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return operationStatus;
+        }
+
         // verify that no newly introduced property/composition alias collides with a property already effective on a descendant
         operationStatus = ValidateDescendantPropertyAliases(contentType, model, allContentTypeCompositions);
         if (operationStatus is not ContentTypeOperationStatus.Success)
@@ -284,12 +291,6 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
         if (operationStatus is not ContentTypeOperationStatus.Success)
         {
             return operationStatus;
-        }
-
-        // element types cannot vary by segment
-        if (model is { IsElement: true, VariesBySegment: true })
-        {
-            return ContentTypeOperationStatus.InvalidSegmentVariationForElementType;
         }
 
         return ContentTypeOperationStatus.Success;
@@ -467,6 +468,22 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
     /// <param name="model">The model to validate.</param>
     /// <param name="allContentTypeCompositions">All existing content type compositions.</param>
     /// <returns>The validation status.</returns>
+    /// <summary>
+    ///     Validates that no property type varies in a way the content type itself does not.
+    /// </summary>
+    /// <param name="model">The model to validate.</param>
+    /// <returns>The validation status.</returns>
+    /// <remarks>
+    ///     The persistence layer rejects this combination outright, so it has to be caught here to yield an
+    ///     operation status rather than an exception.
+    /// </remarks>
+    private static ContentTypeOperationStatus ValidatePropertyVariations(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+        => model.Properties.Any(property
+            => (property.VariesByCulture && model.VariesByCulture is false)
+               || (property.VariesBySegment && model.VariesBySegment is false))
+            ? ContentTypeOperationStatus.InvalidPropertyTypeVariation
+            : ContentTypeOperationStatus.Success;
+
     private static ContentTypeOperationStatus ValidateProperties(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, IContentTypeComposition[] allContentTypeCompositions)
     {
         // grab all content types used for composition and/or inheritance

@@ -31,7 +31,7 @@ internal sealed class BlockEditorInterchangeabilityTests : BlockEditorElementVar
         var storedValue = new BlockListValue([new BlockListLayoutItem(contentKey)])
         {
             ContentData = [CreateBlockItemData(elementType, contentKey, "The block")],
-            Expose = [new BlockItemVariation(contentKey, null, null)],
+            Expose = [new BlockItemVariation(contentKey, null)],
         };
 
         IContent content = CreateAndPublishContent(contentType, storedValue);
@@ -57,7 +57,7 @@ internal sealed class BlockEditorInterchangeabilityTests : BlockEditorElementVar
         var storedValue = new BlockListValue(contentKeys.Select(key => new BlockListLayoutItem(key)))
         {
             ContentData = contentKeys.Select((key, index) => CreateBlockItemData(elementType, key, $"Block {index + 1}")).ToList(),
-            Expose = contentKeys.Select(key => new BlockItemVariation(key, null, null)).ToList(),
+            Expose = contentKeys.Select(key => new BlockItemVariation(key, null)).ToList(),
         };
 
         // a value holding multiple blocks fails single block validation, so it can only be published as a single
@@ -85,7 +85,7 @@ internal sealed class BlockEditorInterchangeabilityTests : BlockEditorElementVar
         var storedValue = new SingleBlockValue(new SingleBlockLayoutItem { ContentKey = contentKey })
         {
             ContentData = [CreateBlockItemData(elementType, contentKey, "The block")],
-            Expose = [new BlockItemVariation(contentKey, null, null)],
+            Expose = [new BlockItemVariation(contentKey, null)],
         };
 
         IContent content = CreateAndPublishContent(contentType, storedValue);

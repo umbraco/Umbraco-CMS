@@ -16,7 +16,14 @@ export interface ManifestWorkspaceActionMenuItem<
 	 */
 	forWorkspaceActions: string | string[];
 	/**
-	 * Renders a separator above this action, unless it is the first action in the list.
+	 * The alias of the action group this action belongs to. The actions of a group render together, ordered by their
+	 * own weight, and the group's weight orders the group in the menu. Actions without a registered group render last.
+	 * @examples ["Umb.WorkspaceActionMenuItemGroup.Publishing"]
+	 */
+	group?: string;
+	/**
+	 * Renders a separator above this action inside its group. The first action of a group needs none, as a separator
+	 * already sits between groups.
 	 * The separator belongs to this action, so it is not rendered when the action is not.
 	 */
 	separatorBefore?: boolean;

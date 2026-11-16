@@ -4,6 +4,8 @@ import { UmbBlockRefNameSlotMixin } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockDataType, UmbBlockLabelUfmValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 
+import '../../../block/components/block-state-tag/block-state-tag.element.js';
+
 /**
  * @element umb-ref-rte-block
  * @slot name - Content rendered in the block's primary label area (the `name` slot of the inner `uui-ref-node`). The expected projection is a `<umb-ufm-render>` element owned by the parent block-rte entry.
@@ -39,6 +41,7 @@ export class UmbRefRteBlockElement extends UmbBlockRefNameSlotMixin(UmbLitElemen
 				<div class="selection-background" aria-hidden="true">&emsp;</div>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 				${this.renderNameSlot(blockValue, 'name')}
+				<umb-block-state-tag slot="name"></umb-block-state-tag>
 			</uui-ref-node>
 		`;
 	}

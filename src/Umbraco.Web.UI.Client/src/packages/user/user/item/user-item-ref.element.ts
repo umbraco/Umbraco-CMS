@@ -8,9 +8,10 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_WORKSPACE_MODAL, umbGenerateWorkspaceLink } from '@umbraco-cms/backoffice/workspace';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbEntityItemRefFrameMixin } from '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-user-item-ref')
-export class UmbUserItemRefElement extends UmbLitElement {
+export class UmbUserItemRefElement extends UmbEntityItemRefFrameMixin(UmbLitElement) {
 	#item?: UmbUserItemModel | undefined;
 
 	@property({ type: Object })
@@ -56,6 +57,10 @@ export class UmbUserItemRefElement extends UmbLitElement {
 			});
 	}
 
+	protected override get isEntityFrameNavigable() {
+		return !this.readonly && this._userHasSectionAccess && !!this.item?.unique;
+	}
+
 	#getLink(item: UmbUserItemModel) {
 		if (!item.unique) return;
 		return umbGenerateWorkspaceLink({
@@ -84,10 +89,12 @@ export class UmbUserItemRefElement extends UmbLitElement {
 					.imgUrls=${this.item.avatarUrls}></umb-user-avatar>
 				<slot name="actions" slot="actions"></slot>
 			</uui-ref-node-user>
+			${this.renderEntityFrame()}
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
+		...super.styles,
 		css`
 			umb-user-avatar {
 				font-size: var(--uui-size-4);

@@ -52,22 +52,6 @@ public interface IMediaTypeEditingService
         IEnumerable<string> currentPropertyAliases);
 
     /// <summary>
-    ///     Gets media types that support a specific file extension.
-    /// </summary>
-    /// <param name="fileExtension">The file extension to filter by (with or without the leading period).</param>
-    /// <param name="skip">The number of items to skip for pagination.</param>
-    /// <param name="take">The number of items to return for pagination.</param>
-    /// <returns>
-    ///     A <see cref="PagedModel{T}"/> containing media types that can handle the specified file extension.
-    /// </returns>
-    /// <remarks>
-    ///     This method checks media types with an <c>umbracoFile</c> property and filters based on
-    ///     the configured allowed file extensions in the file upload data type configuration.
-    /// </remarks>
-    [Obsolete("Use GetMediaTypesForFileExtensionWithMatchInfoAsync instead. Scheduled for removal in Umbraco 19.")]
-    Task<PagedModel<IMediaType>> GetMediaTypesForFileExtensionAsync(string fileExtension, int skip, int take);
-
-    /// <summary>
     ///     Gets media types that support a specific file extension, including information about
     ///     whether each match is a specific extension match or a catch-all fallback.
     /// </summary>

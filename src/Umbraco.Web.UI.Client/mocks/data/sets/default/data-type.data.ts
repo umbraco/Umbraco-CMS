@@ -165,7 +165,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		noAccess: false,
 	},
 	{
-		name: 'Content Picker',
+		name: 'Single Document Picker',
 		id: 'dt-contentPicker',
 		parent: null,
 		editorAlias: 'Umbraco.ContentPicker',
@@ -225,7 +225,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		noAccess: false,
 	},
 	{
-		name: 'Multi URL Picker',
+		name: 'URL Picker',
 		id: 'dt-multiUrlPicker',
 		parent: null,
 		editorAlias: 'Umbraco.MultiUrlPicker',
@@ -249,12 +249,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: false,
 			},
 			{
-				alias: 'maxNumber',
-				value: 2,
-			},
-			{
-				alias: 'minNumber',
-				value: 0,
+				alias: 'validationLimit',
+				value: { max: 2 },
 			},
 		],
 		noAccess: false,
@@ -288,12 +284,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				},
 			},
 			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 3,
+				alias: 'validationLimit',
+				value: { max: 3 },
 			},
 			{
 				alias: 'ignoreUserStartNodes',
@@ -411,32 +403,24 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'minNumber',
-				value: 2,
-			},
-			{
-				alias: 'maxNumber',
-				value: 4,
+				alias: 'validationLimit',
+				value: { min: 2, max: 4 },
 			},
 		],
 		noAccess: false,
 	},
 	{
-		name: 'Dropdown',
+		name: 'Single Select Dropdown',
 		id: 'dt-dropdown',
 		parent: null,
-		editorAlias: 'Umbraco.DropDown.Flexible',
-		editorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+		editorAlias: 'Umbraco.DropDown.Single',
+		editorUiAlias: 'Umb.PropertyEditorUi.Dropdown.Single',
 		hasChildren: false,
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [
-			{
-				alias: 'multiple',
-				value: false,
-			},
 			{
 				alias: 'items',
 				value: ['First Option', 'Second Option', 'I Am the third Option'],
@@ -445,7 +429,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		noAccess: false,
 	},
 	{
-		name: 'Dropdown (Multiple)',
+		name: 'Select List',
 		id: 'dt-dropdown-multiple',
 		parent: null,
 		editorAlias: 'Umbraco.DropDown.Flexible',
@@ -456,10 +440,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [
-			{
-				alias: 'multiple',
-				value: true,
-			},
 			{
 				alias: 'items',
 				value: ['First Option', 'Second Option', 'I Am the third Option'],
@@ -515,12 +495,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 40,
 			},
 			{
-				alias: 'maxVal',
-				value: 50,
-			},
-			{
-				alias: 'minVal',
-				value: 0,
+				alias: 'validationRange',
+				value: { min: 0, max: 50 },
 			},
 			{
 				alias: 'step',
@@ -670,7 +646,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 				alias: 'blocks',
 				value: [
 					{
-						label: 'Mocked Block Type for Block List',
+						label: 'Mocked Block Type for Block List: ${elementProperty}',
 						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 						settingsElementTypeKey: 'all-property-editors-document-type-id',
 						iconColor: '#F5C1BC',
@@ -913,8 +889,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 								alias: 'area1_alias',
 								columnSpan: 6,
 								rowSpan: 1,
-								minAllowed: 1,
-								maxAllowed: 2,
+								validationLimit: { min: 1, max: 2 },
 								specifiedAllowance: [
 									{
 										elementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
@@ -928,8 +903,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 								alias: 'area2_alias',
 								columnSpan: 6,
 								rowSpan: 1,
-								minAllowed: 1,
-								maxAllowed: 2,
+								validationLimit: { min: 1, max: 2 },
 								specifiedAllowance: [],
 							},
 						],
@@ -1248,7 +1222,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		noAccess: false,
 	},
 	{
-		name: 'Member Picker',
+		name: 'Single Member Picker',
 		id: 'dt-memberPicker',
 		parent: null,
 		editorAlias: 'Umbraco.MemberPicker',

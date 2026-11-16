@@ -3,7 +3,7 @@ import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
-const dataTypeName = 'Image Media Picker';
+const dataTypeName = 'Single Image Media Picker';
 const customDataTypeName = 'Custom Image Media Picker';
 const groupName = 'TestGroup';
 const mediaName = 'TestImage';

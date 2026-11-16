@@ -8,7 +8,7 @@ import type {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { umbVariantIdsToCultures, type UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A server data source for Element Validation
@@ -71,7 +71,7 @@ export class UmbElementValidationServerDataSource {
 	): Promise<UmbDataSourceResponse<string>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
-		const cultures = variantIds.map((id) => id.culture).filter((culture) => culture !== null) as Array<string>;
+		const cultures = umbVariantIdsToCultures(variantIds).filter((x): x is string => x !== null);
 
 		// TODO: make data mapper to prevent errors
 		const body: ValidateUpdateElementRequestModel = {

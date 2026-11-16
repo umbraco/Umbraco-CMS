@@ -26,12 +26,7 @@ public interface IAuditEntry : IEntity, IRememberBeingDirty
     /// <summary>
     ///     Gets or sets the key of the user triggering the audited event.
     /// </summary>
-    // TODO (V19): Remove the default implementations from this interface.
-    Guid? PerformingUserKey
-    {
-        get => null;
-        set { }
-    }
+    Guid? PerformingUserKey { get; set; }
 
     /// <summary>
     ///     Gets or sets free-form details about the user triggering the audited event.
@@ -58,12 +53,7 @@ public interface IAuditEntry : IEntity, IRememberBeingDirty
     ///     Gets or sets the key of the user affected by the audited event.
     /// </summary>
     /// <remarks>Not used when no single user is affected by the event.</remarks>
-    // TODO (V19): Remove the default implementations from this interface.
-    Guid? AffectedUserKey
-    {
-        get => null;
-        set { }
-    }
+    Guid? AffectedUserKey { get; set; }
 
     /// <summary>
     ///     Gets or sets free-form details about the entity affected by the audited event.

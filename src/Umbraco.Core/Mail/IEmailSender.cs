@@ -13,12 +13,6 @@ public interface IEmailSender
     Task SendAsync(EmailMessage message, string emailType, bool enableNotification = false, TimeSpan? expires = null);
 
     /// <summary>
-    /// Verifies if the email sender is configured to send emails.
-    /// </summary>
-    [Obsolete("Please use IsEmailConfigured to check configuration only, or IsEmailAvailableAsync to also check that the transport can currently be reached. Scheduled for removal in Umbraco 19.")]
-    bool CanSendRequiredEmail();
-
-    /// <summary>
     /// Determines whether the email sender is configured to send emails.
     /// </summary>
     /// <returns><c>true</c> if the email sender is configured; otherwise, <c>false</c>.</returns>
@@ -26,11 +20,7 @@ public interface IEmailSender
     /// This checks configuration only and performs no I/O, so it is suitable for deciding which features to offer.
     /// Use <see cref="IsEmailAvailableAsync"/> to check that the transport can be reached.
     /// </remarks>
-    // TODO (V19): Remove the default implementation when CanSendRequiredEmail is removed.
-    bool IsEmailConfigured()
-#pragma warning disable CS0618 // Type or member is obsolete
-        => CanSendRequiredEmail();
-#pragma warning restore CS0618 // Type or member is obsolete
+    bool IsEmailConfigured();
 
     /// <summary>
     /// Determines whether the email sender is configured to send emails and its transport can currently be reached.
@@ -41,7 +31,5 @@ public interface IEmailSender
     /// Implementations may perform network I/O, such as connecting to a mail server, so prefer
     /// <see cref="IsEmailConfigured"/> unless an email is about to be sent. Implementations may cache the result briefly.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    Task<bool> IsEmailAvailableAsync(CancellationToken cancellationToken = default)
-        => Task.FromResult(IsEmailConfigured());
+    Task<bool> IsEmailAvailableAsync(CancellationToken cancellationToken = default);
 }

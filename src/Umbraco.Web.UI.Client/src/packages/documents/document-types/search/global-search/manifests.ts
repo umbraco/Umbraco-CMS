@@ -8,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Document Type Global Search',
 		alias: UMB_DOCUMENT_TYPE_GLOBAL_SEARCH_ALIAS,
 		type: 'globalSearch',
-		weight: 600,
+		weight: 590,
 		meta: {
 			label: '#treeHeaders_documentTypes',
 			searchProviderAlias: UMB_DOCUMENT_TYPE_SEARCH_PROVIDER_ALIAS,

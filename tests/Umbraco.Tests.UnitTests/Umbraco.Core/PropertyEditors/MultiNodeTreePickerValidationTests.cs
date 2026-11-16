@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Data;
 using Moq;
 using NUnit.Framework;
@@ -13,6 +13,9 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Serialization;
+
+// The multi node tree picker is obsolete, but must keep working for the whole deprecation period.
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
@@ -30,7 +33,7 @@ public class MultiNodeTreePickerValidationTests
     public void Validates_Minimum_Entries(int min, bool shouldSucceed, string? value)
     {
         var (valueEditor, _, _, _, _) = CreateValueEditor();
-        valueEditor.ConfigurationObject = new MultiNodePickerConfiguration { MinNumber = min};
+        valueEditor.ConfigurationObject = new MultiNodePickerConfiguration { ValidationLimit = new NumberRange { Min = min } };
 
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
 
@@ -101,7 +104,7 @@ public class MultiNodeTreePickerValidationTests
     public void Validates_Maximum_Entries(int max, bool shouldSucceed, string value)
     {
         var (valueEditor, _, _, _, _) = CreateValueEditor();
-        valueEditor.ConfigurationObject = new MultiNodePickerConfiguration { MaxNumber = max };
+        valueEditor.ConfigurationObject = new MultiNodePickerConfiguration { ValidationLimit = new NumberRange { Max = max } };
 
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
 
@@ -258,3 +261,5 @@ public class MultiNodeTreePickerValidationTests
         return (valueEditor, entityServiceMock, contentServiceMock, mediaServiceMock, memberServiceMock);
     }
 }
+
+#pragma warning restore CS0618 // Type or member is obsolete

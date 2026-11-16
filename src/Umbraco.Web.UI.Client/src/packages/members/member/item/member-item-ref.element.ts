@@ -8,9 +8,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_WORKSPACE_MODAL, umbGenerateWorkspaceLink } from '@umbraco-cms/backoffice/workspace';
+import { UmbEntityItemRefFrameMixin } from '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-member-item-ref')
-export class UmbMemberItemRefElement extends UmbLitElement {
+export class UmbMemberItemRefElement extends UmbEntityItemRefFrameMixin(UmbLitElement) {
 	#item?: UmbMemberItemModel | undefined;
 
 	@property({ type: Object })
@@ -57,6 +58,10 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 			});
 	}
 
+	protected override get isEntityFrameNavigable() {
+		return !this.readonly && this._userHasSectionAccess && !!this.item?.unique;
+	}
+
 	#getLink(item: UmbMemberItemModel) {
 		if (!item.unique) return;
 		return umbGenerateWorkspaceLink({
@@ -81,6 +86,7 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon(this.item)}
 			</uui-ref-node-member>
+			${this.renderEntityFrame()}
 		`;
 	}
 

@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
@@ -13,6 +12,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -43,7 +43,7 @@ internal sealed class ElementHybridCachePreviewAccessTests : UmbracoIntegrationT
     private const string DraftTitle = "Draft";
     private const string PickerAlias = "picker";
 
-    private readonly TestPreviewService _previewService = new();
+    private readonly TestPreviewSession _previewSession = new();
 
     private IContentType _elementType = null!;
     private EntityContainer _allowedFolder = null!;
@@ -70,7 +70,8 @@ internal sealed class ElementHybridCachePreviewAccessTests : UmbracoIntegrationT
         // (the harness default is a no-op messenger — see tests/Umbraco.Tests.Integration/CLAUDE.md).
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
-        builder.Services.AddUnique<IPreviewService>(_previewService);
+        builder.Services.AddUnique<IPreviewSessionService>(_previewSession);
+        builder.Services.AddUnique<IBackOfficeSecurityAccessor>(_previewSession);
     }
 
     [SetUp]
@@ -259,24 +260,25 @@ internal sealed class ElementHybridCachePreviewAccessTests : UmbracoIntegrationT
             true);
         Assert.IsTrue(userAttempt.Success, $"Could not create the user: {userAttempt.Status}");
 
-        _previewService.UserKey = userAttempt.Result.CreatedUser!.Key;
+        _previewSession.User = await GetRequiredService<IUserService>().GetAsync(userAttempt.Result.CreatedUser!.Key);
     }
 
-    private sealed class TestPreviewService : IPreviewService
+    private sealed class TestPreviewSession : IPreviewSessionService, IBackOfficeSecurityAccessor, IBackOfficeSecurity
     {
-        public Guid? UserKey { get; set; }
+        public IUser? User { get; set; }
 
-        public Task<bool> TryEnterPreviewAsync(IUser user) => Task.FromResult(true);
+        public IBackOfficeSecurity? BackOfficeSecurity => this;
 
-        public Task EndPreviewAsync() => Task.CompletedTask;
+        public IUser? CurrentUser => User;
 
-        public bool IsInPreview() => UserKey.HasValue;
+        public void Start()
+        {
+        }
 
-        public Task<Attempt<ClaimsIdentity>> TryGetPreviewClaimsIdentityAsync()
-            => Task.FromResult(UserKey.HasValue
-                ? Attempt.Succeed(new ClaimsIdentity(
-                    [new Claim(Constants.Security.OpenIdDictSubClaimType, UserKey.Value.ToString())],
-                    Constants.Security.BackOfficeAuthenticationType))
-                : Attempt<ClaimsIdentity>.Fail());
+        public bool IsActive() => User is not null;
+
+        public bool UserHasSectionAccess(string section, IUser user) => user.AllowedSections.Contains(section);
+
+        public bool IsAuthenticated() => User is not null;
     }
 }

@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Net;
@@ -24,23 +22,6 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
     private readonly IEventAggregator _eventAggregator;
     private readonly IIpResolver _ipResolver;
     private readonly IMemberExternalLoginProviders _memberExternalLoginProviders;
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public MemberSignInManager(
-        UserManager<MemberIdentityUser> memberManager,
-        IHttpContextAccessor contextAccessor,
-        IUserClaimsPrincipalFactory<MemberIdentityUser> claimsFactory,
-        IOptions<IdentityOptions> optionsAccessor,
-        ILogger<SignInManager<MemberIdentityUser>> logger,
-        IAuthenticationSchemeProvider schemes,
-        IUserConfirmation<MemberIdentityUser> confirmation,
-        IMemberExternalLoginProviders memberExternalLoginProviders,
-        IEventAggregator eventAggregator,
-        IOptions<SecuritySettings> securitySettings,
-        IRequestCache requestCache)
-        : this(memberManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation, memberExternalLoginProviders, eventAggregator, securitySettings, requestCache, StaticServiceProvider.Instance.GetRequiredService<IIpResolver>())
-    {
-    }
 
     public MemberSignInManager(
         UserManager<MemberIdentityUser> memberManager,

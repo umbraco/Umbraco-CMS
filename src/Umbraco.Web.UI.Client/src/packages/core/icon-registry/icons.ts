@@ -1276,7 +1276,7 @@ groups: ["accessibility","medical"],
 path: () => import("./icons/icon-help.js"),
 },{
 name: "icon-history",
-groups: ["arrows","time"],
+keywords: ["history","time","redo","undo","rewind","timeline","version","time machine","backup","ccw"],
 path: () => import("./icons/icon-history.js"),
 },{
 name: "icon-home",
@@ -1456,8 +1456,9 @@ groups: ["weather","cloud"],
 path: () => import("./icons/icon-lightning.js"),
 },{
 name: "icon-link",
-keywords: ["chains","links","hyperlinks","chain","url"],
+keywords: ["chains","links","hyperlinks","reference","relation","chain","url"],
 groups: ["item","technology","text","account"],
+related: ["icon-unlink"],
 path: () => import("./icons/icon-link.js"),
 },{
 name: "icon-list",
@@ -2931,11 +2932,6 @@ keywords: ["text","format"],
 groups: ["text"],
 path: () => import("./icons/icon-underline.js"),
 },{
-name: "icon-unlink",
-keywords: ["url","unchain"],
-groups: ["text"],
-path: () => import("./icons/icon-unlink.js"),
-},{
 name: "icon-unlocked",
 keywords: ["padlock","insecure","security"],
 groups: ["item","security","lock"],
@@ -3619,6 +3615,12 @@ path: () => import("./icons/icon-trash-empty.js"),
 },{
 name: "icon-umbraco",
 path: () => import("./icons/icon-umbraco.js"),
+},{
+name: "icon-unlink",
+keywords: ["url","unchain","reference","relation","break"],
+groups: ["text"],
+related: ["icon-link"],
+path: () => import("./icons/icon-unlink.js"),
 },{
 name: "icon-azure",
 hidden: true,

@@ -135,11 +135,6 @@ internal sealed class ElementEditingService
     public async Task<Attempt<ElementCreateResult, ContentEditingAndPublishingStatus>> CreateAndPublishAsync(ElementCreateModel createModel, ISet<string> culturesToPublish, Guid userKey)
         => await HandleCreateAsync(createModel, culturesToPublish, userKey);
 
-    /// <inheritdoc />
-    [Obsolete("Use the overload taking an ISet<string> of cultures to publish, which reports the save and the publish outcome separately. Scheduled for removal in Umbraco 19.")]
-    public async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAndPublishAsync(ElementCreateModel createModel, string[] culturesToPublish, Guid userKey)
-        => ToEditingAttempt(await HandleCreateAsync(createModel, culturesToPublish.ToHashSet(), userKey));
-
     private async Task<Attempt<ElementCreateResult, ContentEditingAndPublishingStatus>> HandleCreateAsync(ElementCreateModel createModel, ISet<string>? culturesToPublish, Guid userKey)
     {
         if (await ValidateCulturesAsync(createModel) is false)
@@ -187,11 +182,6 @@ internal sealed class ElementEditingService
     /// <inheritdoc />
     public async Task<Attempt<ElementUpdateResult, ContentEditingAndPublishingStatus>> UpdateAndPublishAsync(Guid key, ElementUpdateModel updateModel, ISet<string> culturesToPublish, Guid userKey)
         => await HandleUpdateAsync(key, updateModel, culturesToPublish, userKey);
-
-    /// <inheritdoc />
-    [Obsolete("Use the overload taking an ISet<string> of cultures to publish, which reports the save and the publish outcome separately. Scheduled for removal in Umbraco 19.")]
-    public async Task<Attempt<ElementUpdateResult, ContentEditingOperationStatus>> UpdateAndPublishAsync(Guid key, ElementUpdateModel updateModel, string[] culturesToPublish, Guid userKey)
-        => ToEditingAttempt(await HandleUpdateAsync(key, updateModel, culturesToPublish.ToHashSet(), userKey));
 
     private async Task<Attempt<ElementUpdateResult, ContentEditingAndPublishingStatus>> HandleUpdateAsync(Guid key, ElementUpdateModel updateModel, ISet<string>? culturesToPublish, Guid userKey)
     {

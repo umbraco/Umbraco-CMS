@@ -1,4 +1,3 @@
-import { UmbImagingCropMode } from './types.js';
 import type { UmbImagingResizeModel } from './types.js';
 import { batchImagingRequest } from './imaging-request-batcher.js';
 import { UmbImagingServerDataSource } from './imaging.server.data.js';
@@ -45,26 +44,6 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 		}
 
 		return { data: urls };
-	}
-
-	/**
-	 * Requests the thumbnail URLs for the given uniques
-	 * @param {Array<string>} uniques - The unique identifiers for the media items
-	 * @param {number} height - The desired height in pixels of the thumbnail
-	 * @param {number} width - The desired width in pixels of the thumbnail
-	 * @param {UmbImagingCropMode} mode - The crop mode
-	 * @returns {Promise<{ data: UmbMediaUrlModel[] }>} - The resized absolute media URLs
-	 * @memberof UmbImagingRepository
-	 * @deprecated Use {@link UmbImagingRepository#requestResizedItems} instead for more flexibility and control over the imaging model. This will be removed in Umbraco 18.
-	 */
-	async requestThumbnailUrls(
-		uniques: Array<string>,
-		height: number,
-		width: number,
-		mode: UmbImagingCropMode = UmbImagingCropMode.MIN,
-	): Promise<{ data: UmbMediaUrlModel[] }> {
-		const imagingModel: UmbImagingResizeModel = { height, width, mode };
-		return this.requestResizedItems(uniques, imagingModel);
 	}
 }
 

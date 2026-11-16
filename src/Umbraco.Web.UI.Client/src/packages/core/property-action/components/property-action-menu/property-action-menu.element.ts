@@ -8,7 +8,6 @@ import {
 	nothing,
 	property,
 	query,
-	repeat,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -85,14 +84,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 				@toggle=${this.#onPopoverToggle}
 				@click=${this._onPopoverClickCapture}>
 				<umb-popover-layout>
-					${repeat(
-						this._actions,
-						(action) => action.alias,
-						(action, i) =>
-							html`${i > 0 && action.manifest?.separatorBefore
-								? html`<umb-separator></umb-separator>`
-								: nothing}${action.component}`,
-					)}
+					<umb-action-group-list group-type="propertyActionGroup" .actions=${this._actions}></umb-action-group-list>
 				</umb-popover-layout>
 			</uui-popover-container>
 		`;

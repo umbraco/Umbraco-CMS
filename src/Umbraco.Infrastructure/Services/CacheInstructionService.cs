@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -138,28 +138,6 @@ namespace Umbraco.Cms
                     }
 
                     scope.Complete();
-                }
-            }
-
-            /// <summary>
-            /// Processes cache instructions from the database using the provided cache refreshers.
-            /// </summary>
-            /// <param name="cacheRefreshers">A collection of cache refreshers used to process the instructions.</param>
-            /// <param name="cancellationToken">A token to observe while waiting for the task to complete.</param>
-            /// <param name="localIdentity">A string identifying the local instance or caller.</param>
-            /// <param name="lastId">The last processed instruction ID; this value is updated to reflect the most recent processed instruction.</param>
-            /// <returns>A <see cref="ProcessInstructionsResult"/> representing the result of the processing operation.</returns>
-            [Obsolete("Please use ProcessAllInstructions instead. Scheduled for removal in Umbraco 19.")]
-            public ProcessInstructionsResult ProcessInstructions(
-                CacheRefresherCollection cacheRefreshers,
-                CancellationToken cancellationToken,
-                string localIdentity,
-                int lastId)
-            {
-                using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
-                {
-                    var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, RefreshTarget.AllCaches, ref lastId, out _);
-                    return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
                 }
             }
 

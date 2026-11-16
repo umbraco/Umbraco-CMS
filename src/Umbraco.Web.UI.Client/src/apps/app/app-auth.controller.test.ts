@@ -1,80 +1,116 @@
 import { UmbAppAuthController } from './app-auth.controller.js';
 import { aTimeout, expect, waitUntil } from '@open-wc/testing';
-import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
-import type { UmbUserLoginState } from '@umbraco-cms/backoffice/auth';
-import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { BehaviorSubject, Subject } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
+import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('test-app-auth-controller-host')
 class UmbTestAppAuthControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
+/**
+ * Two providers, so the cold-boot guard cannot take the single-provider shortcut (which navigates
+ * away to the provider instead of opening the modal).
+ */
+const PROVIDER_ALIASES = ['Test.AuthProvider.One', 'Test.AuthProvider.Two'];
+
 describe('UmbAppAuthController', () => {
 	let hostElement: UmbTestAppAuthControllerHostElement;
-	let provider: UmbContextProvider;
-	let currentUserProvider: UmbContextProvider;
+	let context: UmbAuthContext;
 	let controller: UmbAppAuthController;
-	let timeoutSignal: Subject<void>;
-	let userChanged: Subject<void>;
-	let loadedUser: BehaviorSubject<string | undefined>;
-	let boundUsers: Array<string>;
-	let flows: Array<{ userLoginState: UmbUserLoginState; finish: (isAuthorized: boolean) => void }>;
+	let replaceStateCalls: number;
+	let openedLoginStates: Array<string>;
+	const realReplaceState = history.replaceState;
 
-	beforeEach(async () => {
-		timeoutSignal = new Subject<void>();
-		userChanged = new Subject<void>();
-		boundUsers = [];
-		provider = new UmbContextProvider(document.body, UMB_AUTH_CONTEXT, {
-			getHostElement: () => document.body,
-			timeoutSignal: timeoutSignal.asObservable(),
-			userChanged: userChanged.asObservable(),
-			bindUser: (unique: string) => boundUsers.push(unique),
-		} as never);
+	beforeEach(() => {
+		hostElement = new UmbTestAppAuthControllerHostElement();
+		document.body.appendChild(hostElement);
+
+		replaceStateCalls = 0;
+		openedLoginStates = [];
+		history.replaceState = () => {
+			replaceStateCalls++;
+		};
+
+		umbExtensionsRegistry.registerMany(
+			PROVIDER_ALIASES.map((alias) => ({
+				type: 'authProvider' as const,
+				alias,
+				name: alias,
+				forProviderName: alias,
+			})),
+		);
+
+		const mockModalManager = {
+			getHostElement: () => hostElement,
+			open: (_host: unknown, _token: unknown, args: { data: { userLoginState: string } }) => {
+				openedLoginStates.push(args.data.userLoginState);
+				return { onSubmit: () => Promise.resolve({ success: true }) };
+			},
+			close: () => {},
+		};
+		const provider = new UmbContextProvider(
+			hostElement,
+			UMB_MODAL_MANAGER_CONTEXT,
+			mockModalManager as unknown as typeof UMB_MODAL_MANAGER_CONTEXT.TYPE,
+		);
 		provider.hostConnected();
-		loadedUser = new BehaviorSubject<string | undefined>(undefined);
-		currentUserProvider = new UmbContextProvider(document.body, UMB_CURRENT_USER_CONTEXT, {
-			getHostElement: () => document.body,
+
+		context = new UmbAuthContext(hostElement, 'http://localhost', '/umbraco', false);
+		controller = new UmbAppAuthController(hostElement);
+	});
+
+	afterEach(() => {
+		history.replaceState = realReplaceState;
+		umbExtensionsRegistry.unregisterMany(PROVIDER_ALIASES);
+		controller.destroy();
+		context.destroy();
+		document.body.innerHTML = '';
+	});
+
+	it('nudges the router when a cold-boot login succeeds', async () => {
+		// The guard resolved false, so no route was rendered and the router slot is on its loading
+		// fallback. A session arriving from a peer tab produces no history change of its own, so
+		// without the nudge the tab sits on the spinner.
+		expect(await controller.isAuthorized()).to.be.false;
+		await aTimeout(50);
+
+		expect(openedLoginStates).to.eql(['loggedOut']);
+		expect(replaceStateCalls).to.equal(1);
+	});
+
+	// The timed-out route is already rendered behind the modal and may hold unsaved work, so it must
+	// be left strictly alone — re-running the guard risks re-rendering it. Closing the modal is
+	// enough, because the view was never taken away.
+	it('does not touch the router when a timed-out session is re-authenticated', async () => {
+		// Let the controller resolve the auth context and subscribe; timeoutSignal does not replay,
+		// so an emission before it subscribes would simply be lost.
+		await aTimeout(50);
+
+		context.timeOut();
+		// timeoutSignal is auditTime(1000), so the observer fires a beat later.
+		await aTimeout(1200);
+
+		expect(openedLoginStates).to.eql(['timedOut']);
+		expect(replaceStateCalls).to.equal(0);
+	});
+
+	it('binds the page to the user it loads', async () => {
+		const boundUsers: Array<string> = [];
+		context.bindUser = (unique: string) => {
+			boundUsers.push(unique);
+		};
+		const loadedUser = new BehaviorSubject<string | undefined>(undefined);
+		const currentUserProvider = new UmbContextProvider(hostElement, UMB_CURRENT_USER_CONTEXT, {
+			getHostElement: () => hostElement,
 			unique: loadedUser.asObservable(),
 		} as never);
 		currentUserProvider.hostConnected();
 
-		hostElement = new UmbTestAppAuthControllerHostElement();
-		document.body.appendChild(hostElement);
-		controller = new UmbAppAuthController(hostElement);
-
-		// Each sign-in flow stays open until the test finishes it, as the sign-in overlay does
-		flows = [];
-		controller.makeAuthorizationRequest = (userLoginState: UmbUserLoginState = 'loggingIn') =>
-			new Promise<boolean>((resolve) => flows.push({ userLoginState, finish: resolve }));
-
-		await waitUntil(() => timeoutSignal.observed);
-	});
-
-	afterEach(() => {
-		controller.destroy();
-		hostElement.remove();
-		provider.destroy();
-		currentUserProvider.destroy();
-	});
-
-	it('starts one timed-out sign-in flow per session end', async () => {
-		timeoutSignal.next();
-		timeoutSignal.next();
-
-		expect(flows).to.have.lengthOf(1);
-		expect(flows[0].userLoginState).to.equal('timedOut');
-
-		// Once the user has signed in again, the next session end starts a new flow
-		flows[0].finish(true);
-		await aTimeout(0);
-		timeoutSignal.next();
-
-		expect(flows).to.have.lengthOf(2);
-	});
-
-	it('binds the page to the user it loads', async () => {
 		loadedUser.next('admin');
 
 		await waitUntil(() => boundUsers.length > 0);
@@ -86,9 +122,10 @@ describe('UmbAppAuthController', () => {
 		controller.restartForNewUser = () => {
 			restarts++;
 		};
-		await waitUntil(() => userChanged.observed);
+		await aTimeout(50);
 
-		userChanged.next();
+		context.bindUser('admin');
+		context.bindUser('editor');
 
 		expect(restarts).to.equal(1);
 	});

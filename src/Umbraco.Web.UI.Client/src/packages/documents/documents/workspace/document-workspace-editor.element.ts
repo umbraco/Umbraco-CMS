@@ -57,7 +57,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		this.observe(
 			this.#workspaceContext
 				? createObservablePart(this.#workspaceContext.variantOptions, (variants) =>
-						variants.map((v) => ({
+						variants?.map((v) => ({
 							culture: v.culture,
 							segment: v.segment,
 							unique: v.unique,

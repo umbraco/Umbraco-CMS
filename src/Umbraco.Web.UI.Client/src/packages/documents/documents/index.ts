@@ -3,6 +3,7 @@ import './components/index.js';
 export * from './audit-log/index.js';
 export * from './components/index.js';
 export * from './constants.js';
+export * from './dynamic-root/index.js';
 export * from './user-start-node/value-type/constants.js';
 export * from './entity-actions/index.js';
 export * from './entity.js';

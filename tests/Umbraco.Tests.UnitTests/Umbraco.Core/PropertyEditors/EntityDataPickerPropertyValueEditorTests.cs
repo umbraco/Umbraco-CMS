@@ -119,7 +119,7 @@ public class EntityDataPickerPropertyValueEditorTests
             ConfigurationObject = new EntityDataPickerConfiguration
             {
                 DataSource = "testDataSource",
-                ValidationLimit = new EntityDataPickerConfiguration.NumberRange
+                ValidationLimit = new NumberRange
                 {
                     Min = 2,
                     Max = 4

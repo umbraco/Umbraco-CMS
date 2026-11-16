@@ -48,20 +48,11 @@ export interface MetaPropertyEditorUi {
 	 * @example ["text", "input", "string"]
 	 */
 	keywords?: string[];
-	// TODO: Remove supportsVariantChange in v.19. And make it the default. [NL]
 	/**
-	 * @deprecated Will be removed in a future version, as this will be enforced on all Property Editor UIs from v.19.
-	 * Declares that this Property Editor UI keeps itself up to date when the variant it is bound to changes —
-	 * for example, an editor that observes its own value and configuration and updates in place rather than
-	 * relying on being remounted.
-	 *
-	 * When not set to `true`, the property re-creates the Property Editor UI element whenever it detects a
-	 * variant switch, so the element always initializes fresh for the variant it is currently bound to. A
-	 * variant switch is detected via the data path the property is bound to changing, so this has no effect for
-	 * a property that does not vary by culture or segment, since its data path never changes on a variant switch.
+	 * Mark a Property Editor as `deprecated` when it should no longer be possible to create new DataTypes that use it.
 	 * @default false
 	 */
-	supportsVariantChange?: boolean;
+	deprecated?: boolean;
 }
 
 // Model

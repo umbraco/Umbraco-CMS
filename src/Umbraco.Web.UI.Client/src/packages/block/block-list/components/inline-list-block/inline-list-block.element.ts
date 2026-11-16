@@ -21,6 +21,7 @@ import type {
 	UmbBlockLabelUfmValueType,
 } from '@umbraco-cms/backoffice/block';
 
+import '../../../block/components/block-state-tag/block-state-tag.element.js';
 import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
@@ -203,14 +204,7 @@ export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEl
 				</span>
 				<div id="info">${this.renderNameSlot(blockValue)}</div>
 			</span>
-			${when(
-				this.unpublished,
-				() => html`
-					<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}>
-						<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
-					</uui-tag>
-				`,
-			)}
+			<umb-block-state-tag slot="name"></umb-block-state-tag>
 		`;
 	}
 
@@ -336,13 +330,6 @@ export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEl
 				justify-content: center;
 				height: 100%;
 				padding-left: var(--uui-size-2, 6px);
-			}
-
-			uui-tag {
-				margin-left: 0.5em;
-				margin-bottom: -0.3em;
-				margin-top: -0.3em;
-				vertical-align: text-top;
 			}
 
 			:host(:not([disabled])) #open-part:hover #icon {

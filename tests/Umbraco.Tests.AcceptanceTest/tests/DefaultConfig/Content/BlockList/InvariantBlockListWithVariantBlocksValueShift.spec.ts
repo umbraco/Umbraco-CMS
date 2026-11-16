@@ -72,10 +72,9 @@ test('does not move inner block values onto another block when deleting a block 
   await umbracoUi.content.doesBlockListPropertyHaveBlockAmount(documentTypeGroupName, blockListName, 2);
 
   // Act
-  // Everything below happens in the default language, which is the only one that may edit an
-  // invariant property under the default AllowEditInvariantFromNonDefault=false. The save
-  // therefore covers en-US only, and the Danish values have to be carried over from the
-  // persisted data - which is where the pairing goes wrong.
+  // Everything below happens in the default language, and the save covers en-US only, so the
+  // Danish values have to be carried over from the persisted data - which is where the pairing
+  // goes wrong.
 
   // Delete the first block. This shrinks the contentData array ahead of the second block, and
   // has to happen in the same session as the save below - a reload resyncs the two arrays.

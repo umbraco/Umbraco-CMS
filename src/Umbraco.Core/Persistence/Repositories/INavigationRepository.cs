@@ -41,6 +41,5 @@ public interface INavigationRepository
     /// <param name="key">The unique identifier of the node.</param>
     /// <param name="objectTypeKey">The unique identifier for the object type.</param>
     /// <returns>The navigation models of the ancestors and the node itself, or an empty collection when the node does not exist.</returns>
-    // TODO (V19): Remove the default implementation.
-    IEnumerable<INavigationModel> GetContentNodeWithAncestors(Guid key, Guid objectTypeKey) => [];
+    IEnumerable<INavigationModel> GetContentNodeWithAncestors(Guid key, Guid objectTypeKey);
 }

@@ -3,13 +3,11 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
@@ -35,7 +33,6 @@ public class AllDocumentVersionController : DocumentVersionControllerBase
     /// <param name="contentVersionService">The content version service.</param>
     /// <param name="documentVersionPresentationFactory">The document version presentation factory.</param>
     /// <param name="authorizationService">Service for handling authorization checks for the current user.</param>
-    [ActivatorUtilitiesConstructor]
     public AllDocumentVersionController(
         IContentVersionService contentVersionService,
         IDocumentVersionPresentationFactory documentVersionPresentationFactory,
@@ -44,22 +41,6 @@ public class AllDocumentVersionController : DocumentVersionControllerBase
         _contentVersionService = contentVersionService;
         _documentVersionPresentationFactory = documentVersionPresentationFactory;
         _authorizationService = authorizationService;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AllDocumentVersionController"/> class.
-    /// </summary>
-    /// <param name="contentVersionService">The content version service.</param>
-    /// <param name="documentVersionPresentationFactory">The document version presentation factory.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public AllDocumentVersionController(
-        IContentVersionService contentVersionService,
-        IDocumentVersionPresentationFactory documentVersionPresentationFactory)
-        : this(
-            contentVersionService,
-            documentVersionPresentationFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>())
-    {
     }
 
     /// <summary>

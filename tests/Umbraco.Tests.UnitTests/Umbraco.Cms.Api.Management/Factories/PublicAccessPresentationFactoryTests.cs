@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Factories;
 
@@ -18,7 +17,6 @@ public class PublicAccessPresentationFactoryTests
     private Mock<IEntityService> _entityService = null!;
     private Mock<IMemberService> _memberService = null!;
     private Mock<IUmbracoMapper> _mapper = null!;
-    private Mock<IMemberRoleManager> _memberRoleManager = null!;
     private Mock<IMemberPresentationFactory> _memberPresentationFactory = null!;
     private Mock<IMemberGroupService> _memberGroupService = null!;
     private PublicAccessPresentationFactory _factory = null!;
@@ -29,7 +27,6 @@ public class PublicAccessPresentationFactoryTests
         _entityService = new Mock<IEntityService>();
         _memberService = new Mock<IMemberService>();
         _mapper = new Mock<IUmbracoMapper>();
-        _memberRoleManager = new Mock<IMemberRoleManager>();
         _memberPresentationFactory = new Mock<IMemberPresentationFactory>();
         _memberGroupService = new Mock<IMemberGroupService>();
 
@@ -37,7 +34,6 @@ public class PublicAccessPresentationFactoryTests
             _entityService.Object,
             _memberService.Object,
             _mapper.Object,
-            _memberRoleManager.Object,
             _memberPresentationFactory.Object,
             _memberGroupService.Object);
     }

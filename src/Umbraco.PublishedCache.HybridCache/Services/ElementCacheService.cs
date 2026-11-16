@@ -27,7 +27,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
     private readonly ICacheNodeFactory _cacheNodeFactory;
     private readonly IEnumerable<IElementSeedKeyProvider> _seedKeyProviders;
     private readonly IPublishedModelFactory _publishedModelFactory;
-    private readonly IPreviewService _previewService;
+    private readonly IPreviewSessionService _previewSessionService;
     private readonly IPreviewAccessEvaluator _previewAccessEvaluator;
     private readonly CacheSettings _cacheSettings;
     private readonly ILogger<ElementCacheService> _logger;
@@ -82,7 +82,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         ICacheNodeFactory cacheNodeFactory,
         IEnumerable<IElementSeedKeyProvider> seedKeyProviders,
         IPublishedModelFactory publishedModelFactory,
-        IPreviewService previewService,
+        IPreviewSessionService previewSessionService,
         IOptions<CacheSettings> cacheSettings,
         ILogger<ElementCacheService> logger,
         IConvertedPublishedContentCacheFactory cacheFactory,
@@ -97,7 +97,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         _cacheNodeFactory = cacheNodeFactory;
         _seedKeyProviders = seedKeyProviders;
         _publishedModelFactory = publishedModelFactory;
-        _previewService = previewService;
+        _previewSessionService = previewSessionService;
         _previewAccessEvaluator = previewAccessEvaluator;
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
@@ -131,12 +131,12 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
     /// <inheritdoc />
     public Task<IPublishedElement?> GetByKeyAsync(Guid key, bool? preview = null)
-        => GetAccessibleNodeAsync(key, preview ?? _previewService.IsInPreview(), _readElementSourceAsync);
+        => GetAccessibleNodeAsync(key, preview ?? _previewSessionService.IsActive(), _readElementSourceAsync);
 
     /// <inheritdoc />
     public IPublishedElement? GetByKey(Guid key, bool? preview = null)
     {
-        bool calculatedPreview = preview ?? _previewService.IsInPreview();
+        bool calculatedPreview = preview ?? _previewSessionService.IsActive();
         return TryGetCached(key, calculatedPreview, out IPublishedElement? cached)
             ? cached
             : GetByKeyWithSynchronousReadsAsync(key, calculatedPreview).GetAwaiter().GetResult();
@@ -167,11 +167,11 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
     /// <inheritdoc />
     public Task<IReadOnlyList<IPublishedElement>> GetByKeysAsync(IReadOnlyCollection<Guid> keys, bool? preview = null)
-        => GetByKeysCoreAsync(keys, preview ?? _previewService.IsInPreview(), _readElementSourcesAsync);
+        => GetByKeysCoreAsync(keys, preview ?? _previewSessionService.IsActive(), _readElementSourcesAsync);
 
     /// <inheritdoc />
     public IReadOnlyList<IPublishedElement> GetByKeys(IReadOnlyCollection<Guid> keys, bool? preview = null)
-        => GetByKeysWithSynchronousReadsAsync(keys, preview ?? _previewService.IsInPreview()).GetAwaiter().GetResult();
+        => GetByKeysWithSynchronousReadsAsync(keys, preview ?? _previewSessionService.IsActive()).GetAwaiter().GetResult();
 
     /// <summary>
     /// Runs the read logic behind <see cref="GetByKeys"/>, reading the database synchronously on a cache miss.

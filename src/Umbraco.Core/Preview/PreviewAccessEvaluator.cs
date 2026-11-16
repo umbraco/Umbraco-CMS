@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Security.Claims;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -31,7 +30,8 @@ internal sealed class PreviewAccessEvaluator : IPreviewAccessEvaluator
         ActionElementBrowse.ActionLetter,
         (user, entityService, appCaches) => user.CalculateElementStartNodeIds(entityService, appCaches));
 
-    private readonly IPreviewService _previewService;
+    private readonly IPreviewSessionService _previewSessionService;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IUserService _userService;
     private readonly IEntityService _entityService;
     private readonly AppCaches _appCaches;
@@ -39,17 +39,20 @@ internal sealed class PreviewAccessEvaluator : IPreviewAccessEvaluator
     /// <summary>
     /// Initializes a new instance of the <see cref="PreviewAccessEvaluator"/> class.
     /// </summary>
-    /// <param name="previewService">The service that resolves the user the current preview session belongs to.</param>
-    /// <param name="userService">The service used to load the preview user and their permissions.</param>
+    /// <param name="previewSessionService">The service that reports whether the current request is in a preview session.</param>
+    /// <param name="backOfficeSecurityAccessor">The accessor for the back-office user the preview session belongs to.</param>
+    /// <param name="userService">The service used to load the preview user's permissions.</param>
     /// <param name="entityService">The service used to calculate the preview user's start nodes and to resolve element paths.</param>
     /// <param name="appCaches">The caches holding the per-request preview user and the user's start nodes.</param>
     public PreviewAccessEvaluator(
-        IPreviewService previewService,
+        IPreviewSessionService previewSessionService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUserService userService,
         IEntityService entityService,
         AppCaches appCaches)
     {
-        _previewService = previewService;
+        _previewSessionService = previewSessionService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _userService = userService;
         _entityService = entityService;
         _appCaches = appCaches;
@@ -59,16 +62,26 @@ internal sealed class PreviewAccessEvaluator : IPreviewAccessEvaluator
     public bool CanPreviewDocument(IPublishedContent content)
     {
         PreviewUser previewUser = GetPreviewUser();
-        return previewUser.User is null || CanPreview(previewUser, _documents, content.Path);
+        if (previewUser.IsInSession is false)
+        {
+            return true;
+        }
+
+        return previewUser.User is not null && CanPreview(previewUser, _documents, content.Path);
     }
 
     /// <inheritdoc />
     public bool CanPreviewElement(IPublishedElement element)
     {
         PreviewUser previewUser = GetPreviewUser();
-        if (previewUser.User is null)
+        if (previewUser.IsInSession is false)
         {
             return true;
+        }
+
+        if (previewUser.User is null)
+        {
+            return false;
         }
 
         // Published elements don't carry their tree path, so it is looked up (once per element per request).
@@ -98,11 +111,15 @@ internal sealed class PreviewAccessEvaluator : IPreviewAccessEvaluator
 
     private PreviewUser ResolvePreviewUser()
     {
-        Attempt<ClaimsIdentity> identityAttempt = _previewService.TryGetPreviewClaimsIdentityAsync().GetAwaiter().GetResult();
-        Guid? userKey = identityAttempt.Success ? identityAttempt.Result?.GetUserKey() : null;
-        IUser? user = userKey.HasValue ? _userService.GetAsync(userKey.Value).GetAwaiter().GetResult() : null;
+        if (_previewSessionService.IsActive() is false)
+        {
+            return PreviewUser.NoSession;
+        }
 
-        return user is null ? PreviewUser.None : new PreviewUser(user);
+        // The session rides on the back-office authentication cookie, which disabling or locking out a user does not
+        // invalidate, so the user's state is checked here.
+        IUser? user = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+        return new PreviewUser(true, user is { IsApproved: true, IsLockedOut: false } ? user : null);
     }
 
     private sealed record PreviewTree(
@@ -113,13 +130,19 @@ internal sealed class PreviewAccessEvaluator : IPreviewAccessEvaluator
 
     private sealed class PreviewUser
     {
-        // No preview user means no verified website preview session (no or invalid cookie, a Delivery API request,
-        // or no HTTP request at all), so a draft was requested explicitly by server-side code rather than by a
-        // previewing user, and is allowed.
-        public static readonly PreviewUser None = new(null);
+        // Outside a preview session a draft was requested explicitly by server-side code (for example a webhook or
+        // Delivery API preview) rather than by a previewing user, so it is allowed.
+        public static readonly PreviewUser NoSession = new(false, null);
 
-        public PreviewUser(IUser? user) => User = user;
+        public PreviewUser(bool isInSession, IUser? user)
+        {
+            IsInSession = isInSession;
+            User = user;
+        }
 
+        public bool IsInSession { get; }
+
+        // Null in a session whose user can't be resolved, or is disabled or locked out, which is refused every draft.
         public IUser? User { get; }
 
         public ConcurrentDictionary<(PreviewTree Tree, string Path), bool> PathAccess { get; } = new();

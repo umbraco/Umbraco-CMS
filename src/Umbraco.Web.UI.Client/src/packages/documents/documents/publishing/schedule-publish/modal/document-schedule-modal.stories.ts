@@ -21,7 +21,6 @@ const modalData: UmbDocumentScheduleModalData = {
 				createDate: '2021-08-25T14:00:00Z',
 				publishDate: null,
 				updateDate: null,
-				segment: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
 				flags: [],
@@ -46,7 +45,6 @@ const modalData: UmbDocumentScheduleModalData = {
 				createDate: '2021-08-25T14:00:00Z',
 				publishDate: null,
 				updateDate: null,
-				segment: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
 				flags: [],
@@ -100,7 +98,6 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 						createDate: '2021-08-25T14:00:00Z',
 						publishDate: null,
 						updateDate: null,
-						segment: null,
 						flags: [],
 					},
 					language: {
