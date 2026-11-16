@@ -158,8 +158,8 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     /// <param name="builder">The DbContext options builder.</param>
     /// <param name="serviceProvider">The service provider to resolve connection string settings from.</param>
     /// <remarks>
-    /// A registered <see cref="IEFCoreDatabaseProviderSetup" /> for the configured provider name takes precedence over
-    /// the providers supported by <see cref="UseDatabaseProvider" />.
+    /// Every registered <see cref="IDatabaseConfigurator" /> that can handle the configured provider name configures the
+    /// builder. When there is none, the providers supported by <see cref="UseDatabaseProvider" /> are used.
     /// </remarks>
     public static void UseUmbracoDatabaseProvider(this DbContextOptionsBuilder builder, IServiceProvider serviceProvider)
     {
@@ -184,11 +184,16 @@ public static class UmbracoEFCoreServiceCollectionExtensions
             return;
         }
 
-        IEFCoreDatabaseProviderSetup? providerSetup = serviceProvider.GetServices<IEFCoreDatabaseProviderSetup>()
-            .FirstOrDefault(x => x.ProviderName.CompareProviderNames(connectionStrings.ProviderName));
-        if (providerSetup is not null)
+        IDatabaseConfigurator[] configurators = serviceProvider.GetServices<IDatabaseConfigurator>()
+            .Where(x => x.CanHandle(connectionStrings.ProviderName))
+            .ToArray();
+        if (configurators.Length > 0)
         {
-            providerSetup.Setup(builder, connectionStrings.ConnectionString);
+            foreach (IDatabaseConfigurator configurator in configurators)
+            {
+                configurator.Configure(builder, connectionStrings.ConnectionString);
+            }
+
             return;
         }
 
