@@ -7,14 +7,14 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_4_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_1_0;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Upgrade.V_18_4_0;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Upgrade.V_19_1_0;
 
 /// <summary>
 /// Tests that <see cref="AddStartElementIdForeignKeyToUserGroup" /> gives the element start node column the same

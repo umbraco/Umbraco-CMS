@@ -138,7 +138,7 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_19_0_0.MigrateBlockGridAreaMinMaxToRange>("{17EA0D28-9FB3-40FE-B274-6D8FC1D0E72A}");
 
         // To 19.1.0
-        To<V_18_4_0.AddStartElementIdForeignKeyToUserGroup>("{367FFFC4-D0E5-4A6B-98E5-2BAE76743C87}");
+        To<V_19_1_0.AddStartElementIdForeignKeyToUserGroup>("{367FFFC4-D0E5-4A6B-98E5-2BAE76743C87}");
     }
 
     /// <summary>

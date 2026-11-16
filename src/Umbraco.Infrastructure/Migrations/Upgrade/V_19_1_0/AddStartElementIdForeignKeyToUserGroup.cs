@@ -3,7 +3,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_4_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_1_0;
 
 /// <summary>
 ///     Adds the foreign key from <c>umbracoUserGroup.startElementId</c> to <c>umbracoNode</c>.
