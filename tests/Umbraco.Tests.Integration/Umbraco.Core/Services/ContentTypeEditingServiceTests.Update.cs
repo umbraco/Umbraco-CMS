@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
@@ -997,6 +998,72 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         // expect RefreshMain when removing compositions (corresponds to removing properties)
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
+    }
+
+    [Test]
+    public async Task Updating_Compositions_Deletes_Only_The_Property_Data_Of_The_Removed_Composition()
+    {
+        async Task<IContentType> CreateComposition(string name, string propertyAlias)
+        {
+            var model = ContentTypeCreateModel(name, propertyTypes: [ContentTypePropertyTypeModel(name, propertyAlias)]);
+            return (await ContentTypeEditingService.CreateAsync(model, Constants.Security.SuperUserKey)).Result!;
+        }
+
+        var removedComposition = await CreateComposition("Removed", "removedProperty");
+        var keptComposition = await CreateComposition("Kept", "keptProperty");
+        var addedComposition = await CreateComposition("Added", "addedProperty");
+
+        var ownProperty = ContentTypePropertyTypeModel("Own Property", "ownProperty");
+        var createModel = ContentTypeCreateModel(
+            "Test",
+            "test",
+            propertyTypes: [ownProperty],
+            compositions:
+            [
+                new Composition { Key = removedComposition.Key, CompositionType = CompositionType.Composition },
+                new Composition { Key = keptComposition.Key, CompositionType = CompositionType.Composition },
+            ]);
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        for (var i = 0; i < 2; i++)
+        {
+            var content = ContentBuilder.CreateBasicContent(contentType);
+            content.Name = $"Content {i}";
+            content.SetValue("removedProperty", $"Removed value {i}");
+            content.SetValue("keptProperty", $"Kept value {i}");
+            content.SetValue("ownProperty", $"Own value {i}");
+            ContentService.Save(content);
+            ContentService.Publish(content, ["*"]);
+        }
+
+        var removedPropertyTypeIds = removedComposition.PropertyTypes.Select(x => x.Id).ToArray();
+        List<PropertyDataDto> before = FetchAllPropertyData();
+        Assert.That(before.Count(x => removedPropertyTypeIds.Contains(x.PropertyTypeId)), Is.GreaterThan(0));
+
+        // Swapping compositions in one save removes before it adds, so the added composition must be unaffected too.
+        var updateModel = ContentTypeUpdateModel(
+            "Test",
+            "test",
+            propertyTypes: [ownProperty],
+            compositions:
+            [
+                new Composition { Key = keptComposition.Key, CompositionType = CompositionType.Composition },
+                new Composition { Key = addedComposition.Key, CompositionType = CompositionType.Composition },
+            ]);
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        var expectedRemainingIds = before
+            .Where(x => removedPropertyTypeIds.Contains(x.PropertyTypeId) is false)
+            .Select(x => x.Id)
+            .ToArray();
+        Assert.That(FetchAllPropertyData().Select(x => x.Id), Is.EquivalentTo(expectedRemainingIds));
+    }
+
+    private List<PropertyDataDto> FetchAllPropertyData()
+    {
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        return scope.Database.Fetch<PropertyDataDto>();
     }
 
     [Test]
