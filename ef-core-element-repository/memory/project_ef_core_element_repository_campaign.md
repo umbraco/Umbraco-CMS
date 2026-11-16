@@ -92,3 +92,10 @@ folder on the shared integration branch; reverted (local only) because coworkers
 PR that lands them. Next after #24203 merges: PR 4 (`AsyncElementRepository`), cut from the integration branch. The
 integration branch has had no v19/dev merge-up since `95111fe68ac`.
 
+
+Update 16-11-2026: PR 4 (#24542) approved by Andy on 11-11; its two factory nits are applied (concrete `Element` return,
+name from the version row). His bigger point became PR 4b on the board: the `BuildEntity(ContentRow, IContentType?)`
+hook and both EF Core factory overloads accept null but cannot build from it, and the base hands an unresolved
+`TryGetValue` result to the hook unchecked. PR 4b makes the base throw a named `InvalidOperationException` and the hook
+and EF Core overloads non-nullable; it depends on PR 4 and runs alongside PR 5. The board now has PRs 0, 1, 2, 2b, 3, 4,
+4b, 5, 6.

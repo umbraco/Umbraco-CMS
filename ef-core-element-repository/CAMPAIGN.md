@@ -155,7 +155,7 @@ Checkpoint: PR 5's acceptance runs these four fixtures and records the result in
 
 Branch naming: `v20/feature/ef-core-element-repository-<n>-<slug>` (the `v20` prefix reflects the release the work ships in), cut from the latest `origin/v18/feature/ef-core-repositories`. PR target: `v18/feature/ef-core-repositories`. New EF Core migrations stay in the `V_19_0_0` folder like every other migration on the integration branch; that folder name is inherited convention, not something to fix here. PR title prefix: `EF Core:` (matches `EF Core: Migrate template repository and service (#24114)`). Squash-merge. Each PR must build clean and leave the full integration suite green on its own; nothing may depend on an unmerged sibling PR except where stated.
 
-Dependency graph: PR 1 is independent and can run in parallel with PR 2. PR 2b depends on PR 2. PR 3 depends on PR 2b. PR 4 depends on PR 1 and PR 3. PR 5 depends on PR 4. PR 6 depends on PR 5.
+Dependency graph: PR 1 is independent and can run in parallel with PR 2. PR 2b depends on PR 2. PR 3 depends on PR 2b. PR 4 depends on PR 1 and PR 3. PR 4b depends on PR 4 and can run alongside PR 5. PR 5 depends on PR 4. PR 6 depends on PR 5 and PR 4b.
 
 ### PR 0 (optional, independent): Relation parent and child entity lookups
 
@@ -237,6 +237,18 @@ Scope:
 
 Acceptance: new fixture green on SQLite and SQL Server; all Document fixtures still green; solution builds; `IAsyncElementRepository` and `AsyncElementRepository` expose no member that takes an `int` id, an `IQuery<T>`, an `out` parameter or lacks a trailing `CancellationToken` (check with `grep -nE 'int [a-z]*[iI]d\b|IQuery<|out long' <file>` on both files, expecting only version-id parameters).
 
+### PR 4b: Required content type on the generic read path
+
+Raised by the PR 4 review (Andy, 11-11-2026): the `BuildEntity(ContentRow, IContentType?)` hook and both EF Core `ContentBaseFactory` overloads accept a null content type, but neither can build an entity from one. The element overload throws `ArgumentNullException` immediately; the document overload passes the null into `Content`, whose base constructor throws the same exception. The null comes from `AssembleEntitiesAsync`: `contentTypeMap.TryGetValue(row.Content.ContentTypeId, out IContentType? contentType)` hands the result to the hook unchecked, so a row whose type cannot be resolved fails every read (`GetAsync`, `GetManyAsync`, `GetAllAsync`, paging) with a bare exception that names neither the node nor the type.
+
+Scope:
+- In `AsyncPublishableContentRepositoryBase.AssembleEntitiesAsync`, resolve the type before calling the hook and throw `InvalidOperationException` naming the node key and the content type id when the map has no entry. Throwing, not skipping: a content row pointing at an unknown type is a data fault the read must surface, and the NPoco repositories fail on it too, only less clearly.
+- Make the hook `BuildEntity(ContentRow<...> row, IContentType contentType)` non-nullable, and both EF Core factory overloads `BuildEntity(EFCoreDtos.DocumentDto|ElementDto, NodeDto, ContentVersionDto, ContentVersionDto?, IContentType contentType)` non-nullable; drop the `ThrowIfNull` in the element overload. The NPoco overloads keep their `IContentType?` until PR 5 and PR 6 delete them.
+- Update the two overrides (`DocumentRepository`, `AsyncElementRepository`) and the XML docs.
+- Test: one test on the document fixture (the element fixture inherits the behaviour through the base) proving that a row whose content type is missing from the map fails with the node key and content type id in the message. Red first against the current bare `ArgumentNullException`. If the harness cannot produce such a row through the public surface (the FK from `umbracoContent.contentTypeId` prevents an orphan), test `AssembleEntitiesAsync` through a derived test repository with a content type repository that returns an empty map.
+
+Acceptance: hook and EF Core factory overloads take a non-nullable `IContentType`; the new test is green and was red first; Document and element fixtures at unchanged counts. Independent of PR 5; can merge before or after it.
+
 ### PR 5: `ElementService` onto the async engine, consumers cut over, NPoco repository deleted
 
 Scope:
@@ -294,6 +306,7 @@ Steps 2 and 10 to 11 of §6 are the points in each PR where this must happen. A 
 
 | Date | Decision | Why |
 |---|---|---|
+| 16-11-2026 | New PR 4b after PR 4: the generic read path requires a resolved content type (named `InvalidOperationException` in the base, non-nullable hook and EF Core factory overloads). | PR 4 review found that the nullable `IContentType?` on the hook is a lie both EF Core builders throw on; fixing it touches the base and `DocumentRepository`, so it is its own small PR rather than a late change to PR 4. |
 | 08-10-2026 | Hoist generic logic into `AsyncPublishableContentRepositoryBase` (PR 2 and PR 3) before adding the element repository, instead of copy-adapting `DocumentRepository`. | Avoids a 2 000-line fork that goes stale on every merge-up; matches the NPoco design (#21637); makes `ElementRepository` as thin as its NPoco predecessor. User to confirm. |
 | 08-10-2026 | Keep the concrete joins and projection per repository (`BuildBaseQuery` hook) and make everything downstream of the row generic. | Removes EF Core translation risk around interface members on generic type parameters while still sharing all logic. |
 | 08-10-2026 | Deliver as six PRs into `v18/feature/ef-core-repositories`, with PR 1 and PR 2 parallelisable. | User asked for reviewable increments after the 433-file Document PR. |

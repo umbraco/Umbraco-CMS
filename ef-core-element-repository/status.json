@@ -2,7 +2,7 @@
   "campaign": "Element repository and service from NPoco to EF Core",
   "targetBranch": "v18/feature/ef-core-repositories",
   "planFile": ".claude/campaign/ef-core-element-repository/CAMPAIGN.md",
-  "updated": "11-11-2026",
+  "updated": "16-11-2026",
   "artifact": {
     "url": "https://claude.ai/artifact/Q5Bttu57VfLyS1ajt7nKtU",
     "title": "Element Repository Campaign"
@@ -262,7 +262,40 @@
         }
       ],
       "acceptance": "New fixture green on both providers; Document fixtures unchanged.",
-      "notes": "Merge-up note 09-11-2026: the write hooks on EntityTypeContainerService are now GetContainedEntityAsync(IEntitySlim)/SaveContainedEntityAsync (element container service wraps the NPoco repository); IPublishableContentService gained GetPagedOfTypesAsync(Guid[] keys, skip, take, ordering, ct) with a bridge on the sync PublishableContentServiceBase that PR 5 removes; ContentSchedule carries IncludeInvariantForVariant and the EF Core schedule DTO/mapping already handle it; upstream's library-element search indexing (DraftContentChangeStrategy, ContentTypeIndexingService) calls IElementService async members, so PR 5 must keep GetByIdsAsync/GetPagedOfTypesAsync/GetContentSchedulesByKeysAsync. Review 10-11-2026: production code approved as written; factory keeps the NPoco element builder's name source (node row, required) while the document builder reads the version row, matching each NPoco original. The local SQL Server run was skipped (no local server on this machine); the pipeline covers it. Committed as 496e203212c and opened as draft PR #24542 on 10-11-2026. Pipeline 11-11-2026 (build 300747) triaged: none of the 68 failures come from PR 4. All non-baseline failures reproduce on the base merge-up commit c6b0ec18aa5 and pass on the pre-merge commit f53d471a4dd. (A) 6 WebhookServiceTests.Can_Delete* cases on parts 3: the merge ported upstream #24441 into WebhookRepository.DeleteAsync as ExecuteSqlAsync with the table name in an interpolation hole, so it becomes DELETE FROM @p0 on every provider; inline the table name. (B) ThreadSafetyServiceTest content/media cases on parts 2: upstream #24302 made AppCacheExtensions.GetCacheItemAsync share one in-flight factory task across threads, and ContentTypeCommonRepository.GetAllTypesAsync (EF Core only; NPoco upstream uses the sync GetCacheItem) runs the factory on the first caller's scope, so a reader blocked by a writer's umbracoNode lock is awaited by that writer: 30 s command timeouts then 'database table is locked'. Fix in the repository (sync GetCacheItem or inline get/fetch/insert) and raise the cross-scope sharing upstream. (C) Search jobs: 26 relation-stub NotImplementedException failures, the known baseline (v19/dev added 3 ElementIndexingNotificationHandlerTests cases). (D) E2E part 1 BackofficeSearchDocument 'can find a document by name' timed out on the search endpoint on all three attempts; passed on both merge parents; not reproducible locally, possibly the same in-flight-cache lock; needs the Playwright trace. Also found: azure-pipelines.yml selects the integration filter with a compile-time expression on a non-empty variable, so LongRunning/NonCritical are never excluded on Linux/macOS, which is why the local Part 2 run with that exclusion was green. A and B fixed on the integration branch on 11-11-2026 (b62ac4c5bb4 webhook raw delete, 6d60c90c370 per-scope content-type read); WebhookServiceTests + ThreadSafetyServiceTest 18/18 green on SQLite. Integration branch merged into the PR 4 branch as 1e73004299b and pushed; pipeline re-run pending."
+      "notes": "Merge-up note 09-11-2026: the write hooks on EntityTypeContainerService are now GetContainedEntityAsync(IEntitySlim)/SaveContainedEntityAsync (element container service wraps the NPoco repository); IPublishableContentService gained GetPagedOfTypesAsync(Guid[] keys, skip, take, ordering, ct) with a bridge on the sync PublishableContentServiceBase that PR 5 removes; ContentSchedule carries IncludeInvariantForVariant and the EF Core schedule DTO/mapping already handle it; upstream's library-element search indexing (DraftContentChangeStrategy, ContentTypeIndexingService) calls IElementService async members, so PR 5 must keep GetByIdsAsync/GetPagedOfTypesAsync/GetContentSchedulesByKeysAsync. Review 10-11-2026: production code approved as written; factory keeps the NPoco element builder's name source (node row, required) while the document builder reads the version row, matching each NPoco original. The local SQL Server run was skipped (no local server on this machine); the pipeline covers it. Committed as 496e203212c and opened as draft PR #24542 on 10-11-2026. Pipeline 11-11-2026 (build 300747) triaged: none of the 68 failures come from PR 4. All non-baseline failures reproduce on the base merge-up commit c6b0ec18aa5 and pass on the pre-merge commit f53d471a4dd. (A) 6 WebhookServiceTests.Can_Delete* cases on parts 3: the merge ported upstream #24441 into WebhookRepository.DeleteAsync as ExecuteSqlAsync with the table name in an interpolation hole, so it becomes DELETE FROM @p0 on every provider; inline the table name. (B) ThreadSafetyServiceTest content/media cases on parts 2: upstream #24302 made AppCacheExtensions.GetCacheItemAsync share one in-flight factory task across threads, and ContentTypeCommonRepository.GetAllTypesAsync (EF Core only; NPoco upstream uses the sync GetCacheItem) runs the factory on the first caller's scope, so a reader blocked by a writer's umbracoNode lock is awaited by that writer: 30 s command timeouts then 'database table is locked'. Fix in the repository (sync GetCacheItem or inline get/fetch/insert) and raise the cross-scope sharing upstream. (C) Search jobs: 26 relation-stub NotImplementedException failures, the known baseline (v19/dev added 3 ElementIndexingNotificationHandlerTests cases). (D) E2E part 1 BackofficeSearchDocument 'can find a document by name' timed out on the search endpoint on all three attempts; passed on both merge parents; not reproducible locally, possibly the same in-flight-cache lock; needs the Playwright trace. Also found: azure-pipelines.yml selects the integration filter with a compile-time expression on a non-empty variable, so LongRunning/NonCritical are never excluded on Linux/macOS, which is why the local Part 2 run with that exclusion was green. A and B fixed on the integration branch on 11-11-2026 (b62ac4c5bb4 webhook raw delete, 6d60c90c370 per-scope content-type read); WebhookServiceTests + ThreadSafetyServiceTest 18/18 green on SQLite. Integration branch merged into the PR 4 branch as 1e73004299b and pushed; pipeline re-run pending. Review 11-11-2026 (Andy): approved; the two factory nits (concrete Element return, name from the version row with empty fallback) applied 16-11-2026; the nullable content type on the hook became PR 4b."
+    },
+    {
+      "id": "4b",
+      "slug": "required-content-type",
+      "title": "Required content type on the generic read path",
+      "status": "planned",
+      "branch": "v20/feature/ef-core-element-repository-4b-required-content-type",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [
+        4
+      ],
+      "summary": "From the PR 4 review: the BuildEntity hook and both EF Core ContentBaseFactory overloads accept IContentType? but neither can build from null, and the base hands an unresolved TryGetValue result to the hook unchecked, so a row with an unknown content type fails every read with a bare ArgumentNullException that names nothing. The base resolves the type first and throws an InvalidOperationException naming the node key and content type id; the hook and the EF Core factory overloads become non-nullable.",
+      "tasks": [
+        {
+          "text": "AssembleEntitiesAsync throws InvalidOperationException naming node key and content type id when the map has no entry",
+          "done": false
+        },
+        {
+          "text": "BuildEntity hook and both EF Core ContentBaseFactory overloads take non-nullable IContentType; ThrowIfNull dropped; DocumentRepository and AsyncElementRepository overrides updated",
+          "done": false
+        },
+        {
+          "text": "Test: unresolvable content type fails with node key and type id in the message, red first against the bare ArgumentNullException",
+          "done": false
+        },
+        {
+          "text": "Document and element fixtures at unchanged counts",
+          "done": false
+        }
+      ],
+      "acceptance": "Hook and EF Core factory overloads non-nullable; the new test green and red first; Document and element fixtures at unchanged counts.",
+      "notes": "Independent of PR 5; can merge before or after it. The NPoco overloads keep IContentType? until PR 5/PR 6 delete them."
     },
     {
       "id": 5,
@@ -326,7 +359,8 @@
       "pr": "",
       "prUrl": "",
       "dependsOn": [
-        5
+        5,
+        "4b"
       ],
       "summary": "Delete PublishableContentServiceBase, NPoco PublishableContentRepositoryBase and IPublishableContentRepository; rename AsyncElementRepository to ElementRepository; optional rename of the async base tier onto the freed names.",
       "tasks": [
@@ -359,6 +393,14 @@
     }
   ],
   "log": [
+    {
+      "date": "16-11-2026",
+      "text": "PR 4 approved by Andy on 11-11; the two ContentBaseFactory nits applied and pushed on 16-11 (concrete Element return, name from the version row). Fixture 31/31 green on SQLite."
+    },
+    {
+      "date": "16-11-2026",
+      "text": "PR 4b added from Andy's PR 4 review: the generic read path must require a resolved content type (named InvalidOperationException in the base, non-nullable hook and EF Core factory overloads). Planned, depends on PR 4, runs alongside PR 5."
+    },
     {
       "date": "11-11-2026",
       "text": "Both merge-up regressions fixed on v18/feature/ef-core-repositories (b62ac4c5bb4, 6d60c90c370): the webhook delete inlines the table name, and ContentTypeCommonRepository reads on the caller's own scope instead of sharing an in-flight cache factory. Integration branch merged into the PR 4 branch (1e73004299b) and pushed for a pipeline re-run."
