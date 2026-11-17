@@ -44,6 +44,7 @@ public class ScopedNotificationPublisher<TNotificationHandler> : IScopedNotifica
     }
 
     /// <inheritdoc />
+    [Obsolete("Use PublishCancelableAsync instead. Scheduled for removal in Umbraco 21.")]
     public bool PublishCancelable(ICancelableNotification notification)
     {
         ArgumentNullException.ThrowIfNull(notification);
@@ -139,7 +140,9 @@ public class ScopedNotificationPublisher<TNotificationHandler> : IScopedNotifica
     /// </summary>
     /// <param name="notifications">The notifications to publish.</param>
     protected virtual void PublishScopedNotifications(IList<INotification> notifications)
+#pragma warning disable CS0618 // Type or member is obsolete
         => _eventAggregator.Publish<INotification, TNotificationHandler>(notifications);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     A disposable class that suppresses notifications until disposed.
