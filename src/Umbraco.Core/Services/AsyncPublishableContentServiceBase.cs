@@ -776,9 +776,9 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
     // Takes the resolved int id directly so an internal caller that already holds one (e.g. a content
     // version's WriterId) doesn't have to round-trip it through a Guid lookup - that round trip is lossy
-    // for a writer id with no matching user (it has no Guid to resolve to or from). The invariant-for-variant
-    // decision is passed in because each caller reads it from a different user: the acting user, or the
-    // writer of a scheduled release.
+    // for a writer id with no matching user (it has no Guid to resolve to or from). For the same reason the
+    // invariant-for-variant decision is passed in rather than read from the user: scheduled publishing has
+    // no acting user to read it from.
     private async Task<PublishResult> PublishAsync(TContent content, string[] cultures, int userId, bool includeInvariantForVariant, CancellationToken cancellationToken)
     {
         if (content is null)
@@ -1317,10 +1317,8 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
                         // Uses the int-userId overload directly, matching the CommitContentChangesAsync calls
                         // elsewhere in this method: WriterId is passed through as-is, with no Guid round trip
-                        // that would be lossy for a writer id with no matching user. Such a writer has no
-                        // permission to read either, and that must not fail the release.
-                        var includeInvariantForVariant = _userService.Value.GetUserById(d.WriterId)?.HasAccessToInvariantForVariant() ?? true;
-                        result = await PublishAsync(d, [.. d.AvailableCultures], d.WriterId, includeInvariantForVariant, cancellationToken);
+                        // that would be lossy for a writer id with no matching user.
+                        result = await PublishAsync(d, [.. d.AvailableCultures], d.WriterId, includeInvariantForVariant: true, cancellationToken);
                     }
 
                     if (result is { Success: false })
