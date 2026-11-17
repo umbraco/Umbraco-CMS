@@ -36,7 +36,7 @@ const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest:
 export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitElement) {
 	#manager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
 	#blockContext?: typeof UMB_BLOCK_LIST_ENTRY_CONTEXT.TYPE;
-	#contentKey?: string;
+	#key?: string;
 
 	@property({ type: String, reflect: false })
 	icon?: string;
@@ -75,8 +75,8 @@ export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEl
 			this.#blockContext = blockContext;
 			this.observe(
 				this.#blockContext?.unique,
-				(contentKey) => {
-					this.#contentKey = contentKey;
+				(key) => {
+					this.#key = key;
 					this.#load();
 				},
 				'observeContentKey',
@@ -151,8 +151,8 @@ export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEl
 	}
 
 	#load() {
-		if (!this._workspaceContext || !this.#contentKey) return;
-		this._workspaceContext.load(this.#contentKey);
+		if (!this._workspaceContext || !this.#key) return;
+		this._workspaceContext.load(this.#key);
 	}
 
 	readonly #onClick = () => {
@@ -172,7 +172,7 @@ export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEl
 
 	readonly #onBlockInserted = (event: Event) => {
 		const blockEvent = event as UmbBlockInsertedEvent<UmbBlockListLayoutModel, UmbBlockListWorkspaceOriginData>;
-		if (blockEvent.detail.layout.contentKey === this.#contentKey) {
+		if (blockEvent.detail.layout.key === this.#key) {
 			this._isOpen = true;
 		}
 	};
