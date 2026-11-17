@@ -520,7 +520,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 _deferScopedNotifications = false;
             }
 
-            if (_scopedNotificationsDeferred is false)
+            if (!_scopedNotificationsDeferred)
             {
                 disposeException?.Throw();
                 return ValueTask.CompletedTask;
@@ -528,28 +528,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 
             _scopedNotificationsDeferred = false;
             return PublishDeferredScopedNotificationsAsync(disposeException);
-        }
-
-        private async ValueTask PublishDeferredScopedNotificationsAsync(ExceptionDispatchInfo? disposeException)
-        {
-            try
-            {
-                await HandleScopedNotificationsAsync();
-            }
-            catch (Exception ex)
-            {
-                // Collect the failures of every exit step, as the synchronous dispose does.
-                Exception[] exitExceptions = disposeException?.SourceException switch
-                {
-                    null => [],
-                    AggregateException aggregate => [.. aggregate.InnerExceptions],
-                    Exception exception => [exception],
-                };
-
-                throw new AggregateException([.. exitExceptions, ex]);
-            }
-
-            disposeException?.Throw();
         }
 
         /// <inheritdoc />
@@ -645,6 +623,28 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
 
             RobustExit(completed, false);
+        }
+
+        private async ValueTask PublishDeferredScopedNotificationsAsync(ExceptionDispatchInfo? disposeException)
+        {
+            try
+            {
+                await HandleScopedNotificationsAsync();
+            }
+            catch (Exception ex)
+            {
+                // Collect the failures of every exit step, as the synchronous dispose does.
+                Exception[] exitExceptions = disposeException?.SourceException switch
+                {
+                    null => [],
+                    AggregateException aggregate => [.. aggregate.InnerExceptions],
+                    { } exception => [exception],
+                };
+
+                throw new AggregateException(exitExceptions.Append(ex));
+            }
+
+            disposeException?.Throw();
         }
 
         // this chains some try/finally blocks to
