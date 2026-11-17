@@ -12,6 +12,9 @@ const Regex = /@\.culture == ('[^']*'|null) *&& *@\.segment == ('[^']*'|null)/g;
 
 /**
  * Filters a validation message by a given variantId.
+ * Every culture named in the path must match the culture of the variant.
+ * The segment of the message is the first segment named in the path, or the default segment if none is named,
+ * as a nested value can hold a segment within a value that does not vary by segment.
  * @param {UmbValidationMessage} msg - The validation message to filter.
  * @param {UmbVariantId} variantId - The variantId to filter by.
  * @returns {boolean} True if the message matches the variantId, false otherwise.
@@ -23,16 +26,16 @@ function filterMsgByVariantId(msg: UmbValidationMessage, variantId: UmbVariantId
 	// if not cultures, then we like to keep it:
 	if (variantMatches.length === 0) return true;
 
-	return (
-		// Find any bad matches:
-		!variantMatches.some((match) => {
-			const culture = match[1] === 'null' ? null : match[1].substring(1, match[1].length - 1);
-			const segment = match[2] === 'null' ? null : match[2].substring(1, match[2].length - 1);
+	let segment: string | null = null;
+	for (const match of variantMatches) {
+		const culture = match[1] === 'null' ? null : match[1].substring(1, match[1].length - 1);
+		if (culture !== null && culture !== variantId.culture) return false;
+		if (segment === null && match[2] !== 'null') {
+			segment = match[2].substring(1, match[2].length - 1);
+		}
+	}
 
-			const result = (culture !== null && culture !== variantId.culture) || segment !== variantId.segment;
-			return result;
-		})
-	);
+	return segment === variantId.segment;
 }
 
 /**
