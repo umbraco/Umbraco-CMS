@@ -607,6 +607,91 @@ public partial class ContentEditingServiceTests
         Assert.IsNull(result.Result.Content);
     }
 
+    [TestCase("")]
+    [TestCase(" ")]
+    public async Task Cannot_Create_Invariant_Content_With_Blank_Name(string name)
+    {
+        var contentType = ContentTypeBuilder.CreateContentMetaContentType();
+        contentType.AllowedTemplates = null;
+        contentType.AllowedAsRoot = true;
+        ContentTypeService.Save(contentType);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Name = name }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" }
+            ]
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
+    }
+
+    [TestCase("")]
+    [TestCase(" ")]
+    public async Task Cannot_Create_Culture_Variant_Content_With_Only_Blank_Names(string name)
+    {
+        var contentType = await CreateVariantContentType(variantTitleAsMandatory: false);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = name },
+                new VariantModel { Culture = "da-DK", Name = name }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" }
+            ]
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
+    }
+
+    [Test]
+    public async Task Can_Create_Culture_Variant_Content_With_A_Blank_Name_In_Some_Cultures()
+    {
+        var contentType = await CreateVariantContentType(variantTitleAsMandatory: false);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "The English Name" },
+                new VariantModel { Culture = "da-DK", Name = string.Empty }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" }
+            ]
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.IsNotNull(result.Result.Content);
+        Assert.AreEqual("The English Name", result.Result.Content!.GetCultureName("en-US"));
+        Assert.IsNull(result.Result.Content.GetCultureName("da-DK"));
+    }
+
     [Test]
     public async Task Cannot_Create_With_Culture_Variant_Property_Value_For_Invariant_Content()
     {
