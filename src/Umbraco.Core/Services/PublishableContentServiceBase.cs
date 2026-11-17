@@ -16,6 +16,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+// The synchronous content service API still publishes its notifications synchronously.
+#pragma warning disable CS0618 // Type or member is obsolete
+
 /// <summary>
 /// Base class for publishable content services.
 /// </summary>
@@ -311,9 +314,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             var rollingBackNotification = RollingBackNotification(content, evtMsgs);
-#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(rollingBackNotification))
-#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return OperationResult.Cancel(evtMsgs);
@@ -790,9 +791,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             scope.WriteLock(WriteLockIds);
 
             SavingNotification<TContent> savingNotification = SavingNotification(content, eventMessages);
-#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(savingNotification))
-#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return OperationResult.Cancel(eventMessages);
@@ -869,9 +868,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             scope.WriteLock(WriteLockIds);
 
             SavingNotification<TContent> savingNotification = SavingNotification(contentsA, eventMessages);
-#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(savingNotification))
-#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return OperationResult.Cancel(eventMessages);
@@ -1049,9 +1046,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
         SavingNotification<TContent> savingNotification = SavingNotification(content, evtMsgs);
-#pragma warning disable CS0618 // Type or member is obsolete
         if (scope.Notifications.PublishCancelable(savingNotification))
-#pragma warning restore CS0618 // Type or member is obsolete
         {
             return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
         }
@@ -1117,9 +1112,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         // Change state to publishing
         content.PublishedState = PublishedState.Publishing;
         SavingNotification<TContent> savingNotification = SavingNotification(content, evtMsgs);
-#pragma warning disable CS0618 // Type or member is obsolete
         if (scope.Notifications.PublishCancelable(savingNotification))
-#pragma warning restore CS0618 // Type or member is obsolete
         {
             return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
         }
@@ -1222,9 +1215,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             var allLangs = _languageRepository.GetMany().ToList();
 
             SavingNotification<TContent> savingNotification = SavingNotification(content, evtMsgs);
-#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(savingNotification))
-#pragma warning restore CS0618 // Type or member is obsolete
             {
                 return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
             }
@@ -1308,9 +1299,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     }
 
                     SavingNotification<TContent> savingNotification = SavingNotification(d, evtMsgs);
-#pragma warning disable CS0618 // Type or member is obsolete
                     if (scope.Notifications.PublishCancelable(savingNotification))
-#pragma warning restore CS0618 // Type or member is obsolete
                     {
                         results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
                         continue;
@@ -1387,9 +1376,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     // instead: the writer is the last user to save the content, not the user who scheduled it.
                     var includeInvariantForVariant = pendingReleases.Any(x => x.IncludeInvariantForVariant);
                     SavingNotification<TContent> savingNotification = SavingNotification(d, evtMsgs);
-#pragma warning disable CS0618 // Type or member is obsolete
                     if (scope.Notifications.PublishCancelable(savingNotification))
-#pragma warning restore CS0618 // Type or member is obsolete
                     {
                         results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
                         continue;
@@ -1562,7 +1549,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             raiseSavedNotification,
             includeInvariantForVariant: null);
 
-#pragma warning disable CS0618 // Type or member is obsolete
     /// <inheritdoc cref="CommitContentChangesInternal(ICoreScope, TContent, EventMessages, IReadOnlyCollection{ILanguage}, IDictionary{string, object}, int, bool, bool, bool)" />
     /// <param name="includeInvariantForVariant">
     ///     Whether publishing includes invariant properties of variant content. When <c>null</c>, it is determined by the
@@ -1942,7 +1928,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         scope.Notifications.Publish(TreeChangeNotification(content, changeType, eventMessages));
         return publishResult!;
     }
-#pragma warning restore CS0618 // Type or member is obsolete
 
     private IReadOnlyList<string>? GetCulturesPublishing(IPublishableContentBase content)
         => content.ContentType.VariesByCulture()
@@ -1962,9 +1947,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         {
             scope.WriteLock(WriteLockIds);
 
-#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(DeletingNotification(content, eventMessages)))
-#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return OperationResult.Cancel(eventMessages);
@@ -2014,9 +1997,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
             var deletingVersionsNotification =
                 new ContentDeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
-#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
-#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return;
@@ -2049,9 +2030,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         {
             scope.WriteLock(WriteLockIds);
             var deletingVersionsNotification = new ContentDeletingVersionsNotification(id, evtMsgs, versionId);
-#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
-#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return;
@@ -2509,9 +2488,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     {
         // raise Unpublishing notification
         CancelableEnumerableObjectNotification<TContent> notification = UnpublishingNotification(content, evtMsgs).WithState(notificationState);
-#pragma warning disable CS0618 // Type or member is obsolete
         var notificationResult = scope.Notifications.PublishCancelable(notification);
-#pragma warning restore CS0618 // Type or member is obsolete
 
         if (notificationResult)
         {
