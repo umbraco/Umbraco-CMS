@@ -1262,6 +1262,58 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Branch_Publish_Published_Notification_Carries_State_Written_By_Publishing_Handlers()
+    {
+        IContent root = new Content("root", -1, _contentType);
+        ContentService.Save(root);
+        ContentService.Publish(root, ["*"]);
+
+        IContent child = new Content("child", root.Id, _contentType);
+        ContentService.Save(child);
+        ContentService.Publish(child, ["*"]);
+
+        IContent grandchild = new Content("grandchild", child.Id, _contentType);
+        ContentService.Save(grandchild);
+        ContentService.Publish(grandchild, ["*"]);
+
+        // re-get - dirty properties need resetting
+        root = ContentService.GetById(root.Id);
+
+        const string stateKey = "test";
+        var publishedWasCalled = false;
+
+        ContentNotificationHandler.PublishingContent = notification =>
+        {
+            if (notification.State.TryGetValue(stateKey, out var value) is false || value is not List<Guid> keys)
+            {
+                keys = [];
+                notification.State[stateKey] = keys;
+            }
+
+            keys.AddRange(notification.PublishedEntities.Select(x => x.Key));
+        };
+
+        ContentNotificationHandler.PublishedContent = notification =>
+        {
+            Assert.IsTrue(notification.State.TryGetValue(stateKey, out var value), "state written by the publishing handlers is missing");
+            CollectionAssert.AreEquivalent(new[] { root.Key, child.Key, grandchild.Key }, (List<Guid>)value!);
+
+            publishedWasCalled = true;
+        };
+
+        try
+        {
+            ContentService.PublishBranch(root, PublishBranchFilter.ForceRepublish, ["*"]);
+            Assert.IsTrue(publishedWasCalled);
+        }
+        finally
+        {
+            ContentNotificationHandler.PublishingContent = null;
+            ContentNotificationHandler.PublishedContent = null;
+        }
+    }
+
+    [Test]
     public void Can_Read_Unpublished_Cultures_When_Deleting_Invariant()
     {
         IContent document = new Content("content", -1, _contentType);

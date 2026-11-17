@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -49,6 +50,7 @@ internal sealed class ContentFinderByRedirectUrlTests : UmbracoIntegrationTest
     public async Task SetUpTest()
     {
         await GetRequiredService<IDocumentUrlService>().InitAsync(false, CancellationToken.None);
+        await GetRequiredService<IPublishStatusManagementService>().InitializeAsync(CancellationToken.None);
 
         // The redirect tracker resolves URLs through the URL provider, which reads the current request.
         GetRequiredService<IHttpContextAccessor>().HttpContext = new DefaultHttpContext
@@ -88,6 +90,21 @@ internal sealed class ContentFinderByRedirectUrlTests : UmbracoIntegrationTest
         await AssertRedirectsAsync(new Uri("https://localhost/section/page"), page, "/section/renamed-page/");
     }
 
+    /// <summary>
+    /// Verifies that renaming a page and publishing it as part of a branch registers redirects for the old URLs of the
+    /// page and of its descendants, as publishing the page on its own does.
+    /// </summary>
+    [Test]
+    public async Task TryFindContent_Redirects_Renamed_Page_Published_With_Descendants()
+    {
+        (IContent root, IContent section, IContent page) = await CreateSiteAsync();
+
+        RenameAndPublishBranch(section, "Renamed Section", root);
+
+        await AssertRedirectsAsync(new Uri("https://localhost/section"), section, "/renamed-section/");
+        await AssertRedirectsAsync(new Uri("https://localhost/section/page"), page, "/renamed-section/page/");
+    }
+
     private async Task<(IContent Root, IContent Section, IContent Page)> CreateSiteAsync()
     {
         var contentType = new ContentTypeBuilder().WithAlias("page").Build();
@@ -123,6 +140,17 @@ internal sealed class ContentFinderByRedirectUrlTests : UmbracoIntegrationTest
         reloaded.Name = name;
         ContentService.Save(reloaded);
         ContentService.Publish(reloaded, ["*"]);
+    }
+
+    private void RenameAndPublishBranch(IContent content, string name, IContent branchRoot)
+    {
+        UmbracoContextAccessor.Clear();
+        UmbracoContextFactory.EnsureUmbracoContext();
+
+        IContent reloaded = ContentService.GetById(content.Key)!;
+        reloaded.Name = name;
+        ContentService.Save(reloaded);
+        ContentService.PublishBranch(ContentService.GetById(branchRoot.Key)!, PublishBranchFilter.Default, ["*"]);
     }
 
     private async Task AssertRedirectsAsync(Uri oldUrl, IContent expectedContent, string expectedRedirectUrl)
