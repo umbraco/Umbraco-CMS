@@ -1386,6 +1386,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// <param name="recursive">A value indicating whether to recursively copy children.</param>
     /// <param name="userId">Optional Id of the User copying the Content</param>
     /// <returns>The newly created <see cref="IContent" /> object</returns>
+#pragma warning disable CS0618 // Type or member is obsolete
     public IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1401,9 +1402,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             scope.WriteLock(Constants.Locks.ContentTree);
 
             TryGetParentKey(parentId, out Guid? parentKey);
-#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentKey, eventMessages)))
-#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return null;
@@ -1477,9 +1476,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                         IContent descendantCopy = descendant.DeepCloneWithResetIdentities();
                         descendantCopy.ParentId = parentId;
 
-#pragma warning disable CS0618 // Type or member is obsolete
                         if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(descendant, descendantCopy, parentKey, eventMessages)))
-#pragma warning restore CS0618 // Type or member is obsolete
                         {
                             continue;
                         }
@@ -1530,6 +1527,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
         return copy;
     }
+#pragma warning restore CS0618 // Type or member is obsolete
 
     private bool TryGetParentKey(int parentId, [NotNullWhen(true)] out Guid? parentKey)
     {

@@ -1567,6 +1567,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     ///     Whether publishing includes invariant properties of variant content. When <c>null</c>, it is determined by the
     ///     invariant-for-variant permission of the user identified by <paramref name="userId"/>.
     /// </param>
+#pragma warning disable CS0618 // Type or member is obsolete
     private PublishResult CommitContentChangesInternal(
         ICoreScope scope,
         TContent content,
@@ -1675,9 +1676,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             if (publishResult.Success)
             {
                 // raise Publishing notification
-#pragma warning disable CS0618 // Type or member is obsolete
                 if (scope.Notifications.PublishCancelable(
-#pragma warning restore CS0618 // Type or member is obsolete
                         PublishingNotification(content, eventMessages).WithState(notificationState)))
                 {
                     Logger.LogInformation("Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}", content.Name, content.Id, content.Key, "publishing was cancelled");
@@ -1943,6 +1942,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         scope.Notifications.Publish(TreeChangeNotification(content, changeType, eventMessages));
         return publishResult!;
     }
+#pragma warning restore CS0618 // Type or member is obsolete
 
     private IReadOnlyList<string>? GetCulturesPublishing(IPublishableContentBase content)
         => content.ContentType.VariesByCulture()
