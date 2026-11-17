@@ -262,6 +262,8 @@ Scope:
 
 Acceptance: every fixture in the test table of §4 green on SQLite; SQL Server run differs from the parent branch only by the known-flaky search jobs; `grep -r "IElementRepository\b" src tests` returns nothing; `grep -rn "PublishableContentServiceBase<IElement>" src` returns nothing; `grep -nE 'public (?!override|async|Task)' -P src/Umbraco.Core/Services/ElementService.cs` lists only the constructor (no sync public member remains on the concrete type); `grep -nE 'OperationResult|int userId|IQuery<|GetAwaiter\(\)\.GetResult\(\)|Task\.FromResult' src/Umbraco.Core/Services/ElementService.cs src/Umbraco.Core/Services/ElementContainerService.cs` returns nothing; `ElementDeletedVersionsNotification` is published on an element version delete (new test); unit tests green. The four §4a search fixtures are run and their result recorded in `status.json` (green if the relation stubs are implemented, otherwise the same `NotImplementedException` as the baseline and nothing else).
 
+Status 17-11-2026: PR 4b merged 16-11-2026 as `a2a288de44b` (#24624). PR 5 open as #24653 (`5edd50597e6`, `2069d626756`, `e528600414a`), ready for review. Deviations from the scope above are in §8 (17-11-2026 rows).
+
 ### PR 6: Retire the sync engine and drop the scaffolding names
 
 Scope:
@@ -306,6 +308,9 @@ Steps 2 and 10 to 11 of §6 are the points in each PR where this must happen. A 
 
 | Date | Decision | Why |
 |---|---|---|
+| 17-11-2026 | PR 5: `ElementService.DeleteOfTypesAsync` is not a straight mirror of `ContentService`: it returns `NotFound` for an unknown type key through `IContentTypeRepository.ExistsAsync`, and returns early when no element matches. | User decision; an id lookup whose ids go unused was rejected. Without the early return every content type delete wrote an element audit row and an empty tree-change notification. |
+| 17-11-2026 | PR 5 leaves scheduled publishing in the async engine untouched (invariant release keeps `includeInvariantForVariant: true`). | A writer-permission lookup for parity with the sync engine was tried and reverted: it changes documents too, has no observable effect on invariant content, and an existing test requires a release with no known writer to succeed. |
+| 17-11-2026 | PR 5 adds `RecycleBinElement` to the integrity-check root ids; elements inside containers are still reported and that is left alone. | Reviewer note from PR 4. The container case needs the walk to know container nodes; nothing calls the check for elements. |
 | 16-11-2026 | New PR 4b after PR 4: the generic read path requires a resolved content type (`InvalidOperationException` naming the content type id in the base, non-nullable hook and EF Core factory overloads). | PR 4 review found that the nullable `IContentType?` on the hook is a lie both EF Core builders throw on; fixing it touches the base and `DocumentRepository`, so it is its own small PR rather than a late change to PR 4. |
 | 08-10-2026 | Hoist generic logic into `AsyncPublishableContentRepositoryBase` (PR 2 and PR 3) before adding the element repository, instead of copy-adapting `DocumentRepository`. | Avoids a 2 000-line fork that goes stale on every merge-up; matches the NPoco design (#21637); makes `ElementRepository` as thin as its NPoco predecessor. User to confirm. |
 | 08-10-2026 | Keep the concrete joins and projection per repository (`BuildBaseQuery` hook) and make everything downstream of the row generic. | Removes EF Core translation risk around interface members on generic type parameters while still sharing all logic. |

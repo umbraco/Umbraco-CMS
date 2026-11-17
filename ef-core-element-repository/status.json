@@ -2,7 +2,7 @@
   "campaign": "Element repository and service from NPoco to EF Core",
   "targetBranch": "v18/feature/ef-core-repositories",
   "planFile": ".claude/campaign/ef-core-element-repository/CAMPAIGN.md",
-  "updated": "16-11-2026",
+  "updated": "17-11-2026",
   "artifact": {
     "url": "https://claude.ai/artifact/Q5Bttu57VfLyS1ajt7nKtU",
     "title": "Element Repository Campaign"
@@ -269,7 +269,8 @@
       "id": "4b",
       "slug": "required-content-type",
       "title": "Required content type on the generic read path",
-      "status": "in-review",
+      "status": "merged",
+      "mergeCommit": "a2a288de44b",
       "branch": "v20/feature/ef-core-element-repository-4b-required-content-type",
       "pr": "#24624",
       "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24624",
@@ -296,16 +297,16 @@
         }
       ],
       "acceptance": "Hook and EF Core factory overloads non-nullable; the new test green and red first; Document and element fixtures at unchanged counts.",
-      "notes": "Independent of PR 5; can merge before or after it. The NPoco overloads keep IContentType? until PR 5/PR 6 delete them. Implemented 16-11-2026 on the branch: the base throws naming the content type id; the new DocumentRepositoryTest case was red (bare ArgumentNullException) then green; DocumentRepositoryTest + AsyncElementRepositoryTest 223/223 on SQLite. Committed as 12857ebae14 and opened as draft PR #24624 on 16-11-2026; independent review had no must-fix findings. Review suggestion 16-11 (node-key list could reach thousands of keys on bulk reads): the key list was dropped from the message, commit on the PR branch."
+      "notes": "Independent of PR 5; can merge before or after it. The NPoco overloads keep IContentType? until PR 5/PR 6 delete them. Implemented 16-11-2026 on the branch: the base throws naming the content type id; the new DocumentRepositoryTest case was red (bare ArgumentNullException) then green; DocumentRepositoryTest + AsyncElementRepositoryTest 223/223 on SQLite. Committed as 12857ebae14 and opened as draft PR #24624 on 16-11-2026; independent review had no must-fix findings. Review suggestion 16-11 (node-key list could reach thousands of keys on bulk reads): the key list was dropped from the message, commit on the PR branch. Merged 16-11-2026 as a2a288de44b (squash, tree identical to the branch head 52a690cea85) into v18/feature/ef-core-repositories."
     },
     {
       "id": 5,
       "slug": "element-service-cutover",
       "title": "ElementService onto the async engine; consumers cut over; NPoco repository deleted",
-      "status": "planned",
-      "branch": "",
-      "pr": "",
-      "prUrl": "",
+      "status": "in-review",
+      "branch": "v20/feature/ef-core-element-repository-5-element-service-cutover",
+      "pr": "#24653",
+      "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24653",
       "dependsOn": [
         4
       ],
@@ -313,43 +314,43 @@
       "tasks": [
         {
           "text": "ElementService base swapped, bridges deleted, hooks implemented",
-          "done": false
+          "done": true
         },
         {
           "text": "Version-delete notification hooks on the async engine (ElementDeletedVersionsNotification proven to fire, red first)",
-          "done": false
+          "done": true
         },
         {
           "text": "IElementService aligned with IContentService (IContentServiceBase question settled)",
-          "done": false
+          "done": true
         },
         {
           "text": "ElementContainerService four call sites on the async repository",
-          "done": false
+          "done": true
         },
         {
           "text": "NPoco ElementRepository, IElementRepository, DI line and ElementRepositoryTest deleted",
-          "done": false
+          "done": true
         },
         {
           "text": "ElementServiceNotificationTests ported to the async surface",
-          "done": false
+          "done": true
         },
         {
-          "text": "All Element fixtures green on SQLite; SQL Server differs only by known-flaky search jobs",
-          "done": false
+          "text": "Element fixtures green on SQLite (360 across service, container, editing, publishing, version, cache and repository fixtures); SQL Server left to the pipeline",
+          "done": true
         },
         {
           "text": "Contract check: no public sync member, OperationResult, int userId, IQuery or Task.FromResult bridge left on ElementService or ElementContainerService",
-          "done": false
+          "done": true
         },
         {
           "text": "Checkpoint: run the four search fixtures from section 4a and record the result here (green, or baseline NotImplementedException only)",
-          "done": false
+          "done": true
         }
       ],
       "acceptance": "No reference to the NPoco IElementRepository remains; every Element fixture green; unit tests green.",
-      "notes": "Reviewer note 10-11-2026: CheckDataIntegrityAsync's root-id list lacks Constants.System.RecycleBinElement; add it when ElementService moves onto the async engine."
+      "notes": "Reviewer note 10-11-2026: CheckDataIntegrityAsync's root-id list lacks Constants.System.RecycleBinElement; add it when ElementService moves onto the async engine. Implemented 17-11-2026 (uncommitted, awaiting review and the commit/PR step): ElementService derives from AsyncPublishableContentServiceBase<IElement> with no bridging members; DeletingVersionsNotification/DeletedVersionsNotification hooks added to the async engine and implemented in ContentService and ElementService (two new tests, red against the hardcoded Content flavour); ElementContainerService on IAsyncElementRepository (bin-root elements via GetChildrenAsync with an explicit sortOrder ordering: a null ordering throws); NPoco ElementRepository, IElementRepository, the DI line and ElementRepositoryTest deleted; IElementService no longer extends IContentServiceBase; DeleteOfTypesAsync keeps the NotFound result for an unknown type key (pinned by an existing test, ContentService has no such check); RecycleBinElement added to the integrity-check root ids (red-first test). Known limit left alone: the integrity check still reports elements inside containers, because container nodes are not element nodes; same on the NPoco side, and nothing calls it for elements. Checkpoint: the four search fixtures fail 26 of 28, all on the baseline GetParentEntitiesByChildIds NotImplementedException. Full solution rebuild clean. Independent review 17-11-2026: no must-fix; one regression fixed (DeleteOfTypesAsync published an empty deleting and tree-change notification and wrote an audit row when no element matched, on every content type delete; early return restored, red-first test). Recorded, not changed: GetParentAsync in the async engine short-circuits on RecycleBinContent only (same as the sync twin; no element caller). After the user's review 17-11-2026: DeleteOfTypesAsync keeps NotFound for an unknown type key through IContentTypeRepository.ExistsAsync (no id lookup); the scheduled release of invariant content reads the writer's invariant-for-variant permission and falls back to true when the version has no known writer (an existing ContentService test pins that the release must succeed). Sync and async engines diffed method by method: same logic apart from result types. Committed as 5edd50597e6 and opened as draft PR #24653. Later on 17-11-2026: marked ready for review. The scheduled-release writer lookup was reverted at the user's request (2069d626756): scheduled publishing is byte-identical to the integration branch again, invariant changes always included. Review bot (approved with one suggestion, now moot) and Copilot answered: the two breaking-change comments declined (breaking changes are allowed on this branch), the paging comment met with a 501-element delete-of-types test including a trashed element and another type (e528600414a, fails when the loop reads only the first page). SonarCloud gate passed; CodeScene advisory fail as on earlier PRs; Azure pipeline not yet reported."
     },
     {
       "id": 6,
@@ -394,6 +395,30 @@
     }
   ],
   "log": [
+    {
+      "date": "17-11-2026",
+      "text": "PR 5 (#24653) ready for review. Scheduled-release change reverted (2069d626756), multi-page delete-of-types test added (e528600414a), review bot and Copilot comments answered. Awaiting human review and the Azure pipeline."
+    },
+    {
+      "date": "17-11-2026",
+      "text": "PR 5 committed as 5edd50597e6 and opened as draft #24653 against v18/feature/ef-core-repositories. Next: PR 6."
+    },
+    {
+      "date": "17-11-2026",
+      "text": "PR 5 independently reviewed: no must-fix findings; the empty-result early return in ElementService.DeleteOfTypesAsync restored with a red-first test."
+    },
+    {
+      "date": "17-11-2026",
+      "text": "PR 5 implemented on the branch: ElementService on the async engine, version-delete notification hooks, ElementContainerService on the EF Core repository, NPoco element repository deleted. 360 element tests green on SQLite; search checkpoint is the 26-test relation-stub baseline only. Awaiting review and the commit/PR step."
+    },
+    {
+      "date": "17-11-2026",
+      "text": "PR 5 started on v20/feature/ef-core-element-repository-5-element-service-cutover, cut from the integration branch at a2a288de44b."
+    },
+    {
+      "date": "17-11-2026",
+      "text": "PR 4b (#24624) recorded as merged (16-11, a2a288de44b). PRs 1, 2, 2b, 3, 4 and 4b are on the integration branch; no v19/dev merge-up since c6b0ec18aa5, so no merge audit is due."
+    },
     {
       "date": "16-11-2026",
       "text": "PR 4b: the unresolved-type exception now names only the content type id; listing referencing node keys was dropped after a review note about bulk reads."

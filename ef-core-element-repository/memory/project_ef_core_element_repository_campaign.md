@@ -110,3 +110,21 @@ Update 16-11-2026 (PR 4b): implemented and opened as draft #24624 (`12857ebae14`
 type is written against the public repository surface with a Moq `IContentTypeRepository` returning null, injected
 through a new `CreateRepository` overload on `DocumentRepositoryTest`; the FK on `umbracoContent.contentTypeId` means an
 orphan row cannot be produced through the public surface, so the mock is the only red-first route. Next: PR 5.
+
+Update 17-11-2026: PR 4b (#24624) merged 16-11 as `a2a288de44b`. PR 5 implemented (uncommitted at the time of writing) on
+`v20/feature/ef-core-element-repository-5-element-service-cutover`, cut from `a2a288de44b`. Traps worth keeping:
+- `GetChildrenAsync` on the EF Core content repositories throws `ArgumentNullException` on a null `ordering`; pass `Ordering.By("sortOrder")`.
+- `ElementService.DeleteOfTypesAsync` keeps two things `ContentService`'s version lacks, both confirmed by the user on 17-11: `NotFound` for
+  an unknown type key, done as an existence check (`IContentTypeRepository.ExistsAsync`), never as an id lookup whose ids go unused (the user
+  rejected that); and an early return when nothing matches (`ContentTypeService` calls it on every content type delete).
+- Scheduled release of invariant content stays as the async engine had it (`includeInvariantForVariant: true`, no writer lookup). A writer
+  lookup for NPoco parity was tried and reverted the same day at the user's request: it changes documents too, and
+  `Perform_Scheduled_Publishing_Does_Not_Silently_Reattribute_A_Version_With_No_Known_Writer` forbids failing on an unknown writer.
+- `DeleteVersionAsync`/`DeleteVersionsAsync` are declared on `IContentService`, not `IPublishableContentService`; for elements they are reachable
+  only through the concrete `ElementService`.
+- Known gaps left alone: the content integrity check reports every element inside a container (container nodes are not element nodes; NPoco did
+  the same, nothing calls it for elements); `AsyncPublishableContentServiceBase.GetParentAsync` short-circuits on `RecycleBinContent` only.
+- The Artifact publish of `status.json` was blocked by a Read permission rule in this session; the board was not republished on 17-11.
+Committed as `5edd50597e6`, PR #24653 opened 17-11-2026 and ready for review; follow-ups `2069d626756` (scheduled-release revert) and
+`e528600414a` (multi-page delete-of-types test, from Copilot). Bot reviews answered; breaking-change comments are declined on this branch.
+Next: PR 6 after #24653 merges; the user is also considering PR 0 (relation stubs) to turn the search jobs green.
