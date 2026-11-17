@@ -1,4 +1,7 @@
 import { UmbBlockGridEntryElement } from './block-grid-entry.element.js';
+import type { UmbBlockGridEntryContext } from './block-grid-entry.context.js';
+import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from './block-grid-entry.context-token.js';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { aTimeout, expect, fixture, html } from '@open-wc/testing';
 
 describe('UmbBlockGridEntryElement', () => {
@@ -12,6 +15,55 @@ describe('UmbBlockGridEntryElement', () => {
 
 	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbBlockGridEntryElement);
+	});
+
+	describe('when nested in another entry', () => {
+		let parent: UmbBlockGridEntryElement;
+		let child: UmbBlockGridEntryElement;
+		let parentContext: UmbBlockGridEntryContext;
+		let childContext: UmbBlockGridEntryContext;
+
+		const getEntryContext = (host: UmbBlockGridEntryElement) =>
+			new Promise<UmbBlockGridEntryContext>((resolve) => {
+				new UmbContextConsumerController(host, UMB_BLOCK_GRID_ENTRY_CONTEXT, (context) => {
+					if (context) resolve(context);
+				});
+			});
+
+		beforeEach(async () => {
+			const nested = await fixture(
+				html`<umb-block-grid-entry id="parent"><umb-block-grid-entry id="child"></umb-block-grid-entry></umb-block-grid-entry>`,
+			);
+			parent = nested as UmbBlockGridEntryElement;
+			child = parent.querySelector<UmbBlockGridEntryElement>('#child')!;
+			parentContext = await getEntryContext(parent);
+			childContext = await getEntryContext(child);
+		});
+
+		it('exposes the name of the containing entry', async () => {
+			let parentName: string | undefined;
+			childContext.parentName.subscribe((name) => (parentName = name));
+
+			parentContext.setName('Two columns');
+			await aTimeout(0);
+
+			expect(parentName).to.equal('Two columns');
+		});
+
+		it('exposes no containing entry name for the outermost entry', async () => {
+			let parentName: string | undefined = 'unset';
+			parentContext.parentName.subscribe((name) => (parentName = name));
+			await aTimeout(0);
+
+			expect(parentName).to.be.undefined;
+		});
+
+		it('moves focus to the containing entry', () => {
+			child.focus();
+			childContext.focusParentEntry();
+
+			expect(document.activeElement).to.equal(parent);
+		});
 	});
 
 	describe('when disconnected', () => {

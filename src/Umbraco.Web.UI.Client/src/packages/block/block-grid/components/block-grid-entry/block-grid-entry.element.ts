@@ -147,6 +147,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _isReadOnly = false;
 
+	@state()
+	private _parentName?: string;
+
 	constructor() {
 		super();
 		this.#init();
@@ -217,6 +220,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
 		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
 		this.observe(this.#context.name, (name) => (this._name = name), null);
+		this.observe(this.#context.parentName, (parentName) => (this._parentName = parentName), null);
 
 		// Data:
 		this.observe(
@@ -307,6 +311,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	override connectedCallback(): void {
 		super.connectedCallback();
+		this.tabIndex = -1;
 		// element styling:
 		this.observe(
 			this.#context.columnSpan,
@@ -493,7 +498,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						this._isSortMode,
 						() => this.#renderRefBlock(),
 						() => html`
-							<umb-entity-frame>${this._name}</umb-entity-frame>
+							<umb-entity-frame>${this.#renderFrameLabel()}</umb-entity-frame>
 							<umb-extension-slot
 								single
 								type="blockEditorCustomView"
@@ -532,6 +537,16 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				${this.#renderCreateAfterInlineButton()}
 			`,
 		);
+	}
+
+	#renderFrameLabel() {
+		if (!this._parentName) return this._name;
+		return html`<uui-button
+				compact
+				title=${this.localize.term('blockEditor_focusParentBlock')}
+				@click=${() => this.#context.focusParentEntry()}
+				>${this._parentName}</uui-button
+			><span aria-hidden="true">/</span>${this._name}`;
 	}
 
 	readonly #renderBuiltinBlockView = () => {
@@ -739,6 +754,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				--umb-entity-frame-opacity: 0;
 				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
 				--umb-entity-frame-contrast-color: var(--uui-color-interactive-contrast);
+				--umb-block-grid-entry-tab-pointer-events: none;
 
 				height: 100%;
 
@@ -746,7 +762,28 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				&:focus-within {
 					--umb-entity-frame-opacity: 1;
 					--umb-block-scale-handler-opacity: 1;
+					--umb-block-grid-entry-tab-pointer-events: auto;
 				}
+			}
+
+			umb-entity-frame uui-button {
+				--uui-button-background-color: transparent;
+				--uui-button-background-color-hover: transparent;
+				--uui-button-contrast: var(--umb-entity-frame-contrast-color);
+				--uui-button-contrast-hover: var(--umb-entity-frame-contrast-color);
+				--uui-button-padding-left-factor: 0;
+				--uui-button-padding-right-factor: 0;
+				--uui-button-height: auto;
+				font-size: inherit;
+				pointer-events: var(--umb-block-grid-entry-tab-pointer-events, none);
+			}
+
+			umb-entity-frame uui-button:hover {
+				text-decoration: underline;
+			}
+
+			:host(:focus) {
+				outline: none;
 			}
 		`,
 	];

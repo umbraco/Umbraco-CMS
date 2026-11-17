@@ -8,10 +8,12 @@ import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from '../../block-grid-manager/block-g
 import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from '../block-grid-entries/block-grid-entries.context-token.js';
 import { UmbBlockGridScaleManager } from '../../context/block-grid-scale-manager/block-grid-scale-manager.controller.js';
 import type { UmbBlockGridScalableContext } from '../../context/block-grid-scale-manager/block-grid-scale-manager.controller.js';
+import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from './block-grid-entry.context-token.js';
 import {
 	UmbArrayState,
 	UmbBooleanState,
 	UmbNumberState,
+	UmbStringState,
 	appendToFrozenArray,
 	mergeObservables,
 	observeMultiple,
@@ -79,8 +81,28 @@ export class UmbBlockGridEntryContext
 
 	readonly scaleManager = new UmbBlockGridScaleManager(this);
 
+	#parentEntry?: typeof UMB_BLOCK_GRID_ENTRY_CONTEXT.TYPE;
+
+	#parentName = new UmbStringState<string | undefined>(undefined);
+	readonly parentName = this.#parentName.asObservable();
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT, UMB_BLOCK_GRID_ENTRIES_CONTEXT);
+
+		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (parentEntry) => {
+			this.#parentEntry = parentEntry;
+			this.observe(parentEntry?.name, (name) => this.#parentName.setValue(name || undefined), 'observeParentName');
+		}).skipHost();
+	}
+
+	/**
+	 * Moves focus to the entry that contains this entry, and brings it into view.
+	 */
+	focusParentEntry() {
+		const parentHost = this.#parentEntry?.getHostElement() as HTMLElement | undefined;
+		if (!parentHost) return;
+		parentHost.focus({ preventScroll: true });
+		parentHost.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 	}
 
 	protected override _needsLegacyLabelRenderer(): boolean {
