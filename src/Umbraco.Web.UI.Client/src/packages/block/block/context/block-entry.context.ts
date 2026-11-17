@@ -223,11 +223,11 @@ export abstract class UmbBlockEntryContext<
 		this.#name.setValue(text);
 	}
 
-	#generateWorkspaceEditContentPath = (path?: string, contentKey?: string) =>
-		path && contentKey ? path + 'edit/' + encodeFilePath(contentKey) + '/view/content' : '';
+	#generateWorkspaceEditContentPath = (path?: string, key?: string) =>
+		path && key ? path + 'edit/' + encodeFilePath(key) + '/view/content' : '';
 
-	#generateWorkspaceEditSettingsPath = (path?: string, contentKey?: string) =>
-		path && contentKey ? path + 'edit/' + encodeFilePath(contentKey) + '/view/settings' : '';
+	#generateWorkspaceEditSettingsPath = (path?: string, key?: string) =>
+		path && key ? path + 'edit/' + encodeFilePath(key) + '/view/settings' : '';
 
 	#workspacePath = new UmbStringState(undefined);
 	public readonly workspacePath = this.#workspacePath.asObservable();
@@ -235,18 +235,23 @@ export abstract class UmbBlockEntryContext<
 	#externalContentWorkspacePath = new UmbStringState(undefined);
 
 	public readonly workspaceEditContentPath = mergeObservables(
-		[this.contentKey, this.workspacePath, this.isExternalContent, this.#externalContentWorkspacePath.asObservable()],
-		([contentKey, path, isExternalContent, externalContentPath]) => {
+		[
+			this.contentKey,
+			this.unique,
+			this.workspacePath,
+			this.isExternalContent,
+			this.#externalContentWorkspacePath.asObservable(),
+		],
+		([contentKey, key, path, isExternalContent, externalContentPath]) => {
 			if (!contentKey) return '';
 			if (isExternalContent && externalContentPath) {
 				return externalContentPath + UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: contentKey });
 			}
-			return this.#generateWorkspaceEditContentPath(path, contentKey);
+			return this.#generateWorkspaceEditContentPath(path, key);
 		},
 	);
-	public readonly workspaceEditSettingsPath = mergeObservables(
-		[this.contentKey, this.workspacePath],
-		([contentKey, path]) => this.#generateWorkspaceEditSettingsPath(path, contentKey),
+	public readonly workspaceEditSettingsPath = mergeObservables([this.unique, this.workspacePath], ([key, path]) =>
+		this.#generateWorkspaceEditSettingsPath(path, key),
 	);
 
 	#contentStructure?: UmbContentTypeStructureManager;
@@ -880,18 +885,10 @@ export abstract class UmbBlockEntryContext<
 
 	//activate
 	public edit() {
-		window.history.pushState(
-			{},
-			'',
-			this.#generateWorkspaceEditContentPath(this.#workspacePath.value, this.getContentKey()),
-		);
+		window.history.pushState({}, '', this.#generateWorkspaceEditContentPath(this.#workspacePath.value, this.getKey()));
 	}
 	public editSettings() {
-		window.history.pushState(
-			{},
-			'',
-			this.#generateWorkspaceEditSettingsPath(this.#workspacePath.value, this.getContentKey()),
-		);
+		window.history.pushState({}, '', this.#generateWorkspaceEditSettingsPath(this.#workspacePath.value, this.getKey()));
 	}
 
 	async requestDelete() {
