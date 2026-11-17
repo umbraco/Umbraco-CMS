@@ -2432,6 +2432,8 @@ public class ContentService : RepositoryService, IContentService
         return cultures.Select(x => x.EnsureCultureCode()!).ToArray();
     }
 
+    // An empty array means "publish all". "invariant" may also appear more than once, for example when a caller
+    // sends it once per segment. Duplicates are tolerated here as they are for actual culture codes.
     private static bool ProvidedCulturesIndicatePublishAll(string[] cultures) => cultures.All(culture => culture == "invariant");
 
     /// <summary>
