@@ -74,11 +74,11 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
                 .Append(") AS combined");
         }
 
-        // Apply ordering.
+        // Apply ordering, with ties ordered by key so that pages neither skip nor repeat members with equal values.
         var orderColumn = MapOrderByColumn(ordering.OrderBy);
         combinedSql = ordering.Direction == Direction.Ascending
-            ? combinedSql.Append($"ORDER BY {orderColumn} ASC")
-            : combinedSql.Append($"ORDER BY {orderColumn} DESC");
+            ? combinedSql.Append($"ORDER BY {orderColumn} ASC, {QCol("key")} ASC")
+            : combinedSql.Append($"ORDER BY {orderColumn} DESC, {QCol("key")} ASC");
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
         Page<MemberFilterItemDto> page = await Database.PageAsync<MemberFilterItemDto>(pageNumber + 1, pageSize, combinedSql);
