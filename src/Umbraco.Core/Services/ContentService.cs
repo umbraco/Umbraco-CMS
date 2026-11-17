@@ -2496,9 +2496,13 @@ public class ContentService : RepositoryService, IContentService
                 }
             }
 
+            // one state for the whole branch, as a single published notification is raised for every document in it,
+            // so it must carry what handlers stored while each document was saving and publishing
+            IDictionary<string, object?> notificationState = new Dictionary<string, object?>();
+
             // deal with the branch root - if it fails, abort
             HashSet<string>? culturesToPublish = shouldPublish(document);
-            PublishResult? result = PublishBranchItem(scope, document, culturesToPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, out IDictionary<string, object?>? notificationState);
+            PublishResult? result = PublishBranchItem(scope, document, culturesToPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, notificationState);
             if (result != null)
             {
                 results.Add(result);
@@ -2538,7 +2542,7 @@ public class ContentService : RepositoryService, IContentService
 
                     // no need to check path here, parent has to be published here
                     culturesToPublish = shouldPublish(d);
-                    result = PublishBranchItem(scope, d, culturesToPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs, out _);
+                    result = PublishBranchItem(scope, d, culturesToPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs, notificationState);
                     if (result != null)
                     {
                         results.Add(result);
@@ -2598,10 +2602,8 @@ public class ContentService : RepositoryService, IContentService
         EventMessages evtMsgs,
         int userId,
         IReadOnlyCollection<ILanguage> allLangs,
-        out IDictionary<string, object?>? initialNotificationState)
+        IDictionary<string, object?> notificationState)
     {
-        initialNotificationState = new Dictionary<string, object?>();
-
         // we need to guard against unsaved changes before proceeding; the document will be saved, but we're not firing any saved notifications
         if (HasUnsavedChanges(document))
         {
@@ -2620,7 +2622,7 @@ public class ContentService : RepositoryService, IContentService
             return new PublishResult(PublishResultType.SuccessPublishAlready, evtMsgs, document);
         }
 
-        var savingNotification = new ContentSavingNotification(document, evtMsgs);
+        var savingNotification = new ContentSavingNotification(document, evtMsgs).WithState(notificationState);
         if (scope.Notifications.PublishCancelable(savingNotification))
         {
             return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, document);
@@ -2633,7 +2635,7 @@ public class ContentService : RepositoryService, IContentService
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
         }
 
-        PublishResult result = CommitDocumentChangesInternal(scope, document, evtMsgs, allLangs, savingNotification.State, userId, true, isRoot);
+        PublishResult result = CommitDocumentChangesInternal(scope, document, evtMsgs, allLangs, notificationState, userId, true, isRoot);
         if (result.Success)
         {
             publishedDocuments.Add(document);
