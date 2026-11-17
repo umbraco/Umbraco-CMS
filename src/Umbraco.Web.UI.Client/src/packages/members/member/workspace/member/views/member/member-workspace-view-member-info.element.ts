@@ -150,11 +150,6 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 				margin: 0;
 			}
 
-			uui-ref-node[readonly] {
-				padding-top: 7px;
-				padding-bottom: 7px;
-			}
-
 			uui-button-copy-text.opaque {
 				text-align: left;
 				--uui-button-content-align: left;

@@ -224,11 +224,6 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 				margin-bottom: var(--uui-size-space-6);
 			}
 
-			uui-ref-node-document-type[readonly] {
-				padding-top: 7px;
-				padding-bottom: 7px;
-			}
-
 			uui-button-copy-text.opaque {
 				text-align: left;
 				--uui-button-content-align: left;

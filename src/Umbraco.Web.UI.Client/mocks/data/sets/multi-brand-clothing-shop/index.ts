@@ -10,8 +10,11 @@ import { data as mediaType } from './media-type.data.js';
 import { data as news } from './umbraco-news.data.js';
 import { data as user } from './user.data.js';
 import { data as userGroup } from './user-group.data.js';
+import { buildReferencedByMap } from '../../utils/build-referenced-by-map.js';
 
 export { dataType, document, documentType, language, media, mediaType, news, user, userGroup };
+
+export const referencedBy = buildReferencedByMap({ document, media, documentType, mediaType });
 
 export const documentTypeConfiguration = {
 	dataTypesCanBeChanged: DataTypeChangeModeModel.TRUE,
@@ -30,6 +33,7 @@ export const documentTypeConfiguration = {
 	media,
 	mediaType,
 	news,
+	referencedBy,
 	user,
 	userGroup,
 }) satisfies UmbMockDataSet;

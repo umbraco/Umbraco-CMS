@@ -2,6 +2,8 @@ import { UmbDocumentItemRefElement } from './document-item-ref.element.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { UmbDocumentVariantState } from '../variant-state.js';
+import type { UmbDocumentItemModel } from './types.js';
+import type { UmbDocumentSearchItemModel } from '../search/types.js';
 import { expect, waitUntil } from '@open-wc/testing';
 import { customElement } from 'lit/decorators.js';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
@@ -28,6 +30,7 @@ class UmbTestSectionUserPermissionCondition extends UmbConditionBase<UmbConditio
 
 describe('UmbDocumentItemRefElement', () => {
 	let hostElement: UmbTestDocumentItemRefHostElement;
+	let variantContext: UmbVariantContext;
 
 	async function renderRef() {
 		const element = document.createElement('umb-document-item-ref');
@@ -65,7 +68,7 @@ describe('UmbDocumentItemRefElement', () => {
 		hostElement = new UmbTestDocumentItemRefHostElement();
 		document.body.appendChild(hostElement);
 
-		const variantContext = new UmbVariantContext(hostElement);
+		variantContext = new UmbVariantContext(hostElement);
 		await variantContext.setCulture('en-US');
 		await variantContext.setFallbackCulture('en-US');
 		await variantContext.setAppCulture('en-US');
@@ -108,5 +111,84 @@ describe('UmbDocumentItemRefElement', () => {
 		const element = await renderRef();
 
 		expect(element.shadowRoot?.querySelector('uui-ref-node')?.hasAttribute('readonly')).to.be.true;
+	});
+
+	describe('ancestor path', () => {
+		const createAncestor = (unique: string, variants: Array<{ culture: string | null; name: string }>) => ({
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
+			unique,
+			documentType: { unique: 'dt-1', icon: 'icon-document', collection: null },
+			hasChildren: true,
+			isProtected: false,
+			isTrashed: false,
+			parent: null,
+			flags: [],
+			variants: variants.map((variant) => ({ ...variant, state: UmbDocumentVariantState.PUBLISHED, flags: [] })),
+		});
+
+		const multilingualAncestors = () => [
+			createAncestor('root', [
+				{ culture: 'en-US', name: 'EN' },
+				{ culture: 'da-DK', name: 'DA' },
+			]),
+			createAncestor('folder', [
+				{ culture: 'en-US', name: 'People' },
+				{ culture: 'da-DK', name: 'Personer' },
+			]),
+		];
+
+		async function renderRefWithAncestors(ancestors: Array<UmbDocumentItemModel>) {
+			const element = document.createElement('umb-document-item-ref');
+			const item: UmbDocumentSearchItemModel = {
+				entityType: UMB_DOCUMENT_ENTITY_TYPE,
+				unique: 'test-123',
+				name: 'English Title',
+				href: '',
+				documentType: { unique: 'dt-1', icon: 'icon-document', collection: null },
+				hasChildren: false,
+				isProtected: false,
+				isTrashed: false,
+				parent: null,
+				flags: [],
+				variants: [{ culture: 'en-US', name: 'English Title', state: UmbDocumentVariantState.PUBLISHED, flags: [] }],
+				ancestors,
+			};
+			element.item = item;
+			hostElement.appendChild(element);
+			await element.updateComplete;
+			return element;
+		}
+
+		const getAncestorPath = (element: UmbDocumentItemRefElement) =>
+			element.shadowRoot?.querySelector('.ancestor-path')?.textContent;
+
+		it('uses the ancestor names for the current culture rather than the first variant', async () => {
+			await variantContext.setCulture('da-DK');
+
+			const element = await renderRefWithAncestors(multilingualAncestors());
+
+			await waitUntil(() => getAncestorPath(element) === 'DA / Personer', 'expected the da-DK ancestor names');
+		});
+
+		it('updates the ancestor names when the current culture changes', async () => {
+			const element = await renderRefWithAncestors(multilingualAncestors());
+			await waitUntil(() => getAncestorPath(element) === 'EN / People', 'expected the en-US ancestor names');
+
+			await variantContext.setCulture('da-DK');
+
+			await waitUntil(() => getAncestorPath(element) === 'DA / Personer', 'expected the da-DK ancestor names');
+		});
+
+		it('uses the name of invariant ancestors', async () => {
+			const element = await renderRefWithAncestors([createAncestor('root', [{ culture: null, name: 'Home' }])]);
+
+			await waitUntil(() => getAncestorPath(element) === 'Home', 'expected the invariant ancestor name');
+		});
+
+		it('renders no ancestor path when there are no ancestors', async () => {
+			const element = await renderRefWithAncestors([]);
+
+			expect(getAncestorPath(element)).to.be.undefined;
+		});
 	});
 });

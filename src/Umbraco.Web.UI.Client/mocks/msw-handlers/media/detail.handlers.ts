@@ -9,6 +9,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import type { UmbMediaDetailModel } from '@umbraco-cms/backoffice/media';
+import { getAreReferencedPage, getReferencedByPage, getReferencedDescendantsPage } from '../referenced-by.utils.js';
 
 /**
  *
@@ -33,7 +34,11 @@ export const detailHandlers = [
 		});
 	}),
 
-	http.get(umbracoPath(`${UMB_SLUG}/:id/referenced-by`), ({ params }) => {
+	http.get(umbracoPath(`${UMB_SLUG}/are-referenced`), ({ request }) => {
+		return HttpResponse.json(getAreReferencedPage(request));
+	}),
+
+	http.get(umbracoPath(`${UMB_SLUG}/:id/referenced-by`), ({ request, params }) => {
 		const id = params.id as string;
 		if (!id) return;
 		if (id === 'forbidden') {
@@ -41,13 +46,18 @@ export const detailHandlers = [
 			return new HttpResponse(null, { status: 403 });
 		}
 
-		const referenceData = getReferenceData();
-		const PagedTrackedReference = {
-			total: referenceData.length,
-			items: referenceData,
-		};
+		return HttpResponse.json<PagedIReferenceResponseModel>(getReferencedByPage(id, request, getReferenceData));
+	}),
 
-		return HttpResponse.json<PagedIReferenceResponseModel>(PagedTrackedReference);
+	http.get(umbracoPath(`${UMB_SLUG}/:id/referenced-descendants`), ({ request, params }) => {
+		const id = params.id as string;
+		if (!id) return;
+		if (id === 'forbidden') {
+			// Simulate a forbidden response
+			return new HttpResponse(null, { status: 403 });
+		}
+
+		return HttpResponse.json(getReferencedDescendantsPage(id, request, umbMediaMockDb.getAll()));
 	}),
 
 	http.get(umbracoPath(`${UMB_SLUG}/:id`), ({ params }) => {

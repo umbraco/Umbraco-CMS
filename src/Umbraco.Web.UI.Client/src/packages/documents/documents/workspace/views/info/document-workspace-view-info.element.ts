@@ -400,11 +400,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 				color: var(--uui-color-divider-emphasis);
 			}
 
-			uui-ref-node-document-type[readonly] {
-				padding-top: 7px;
-				padding-bottom: 7px;
-			}
-
 			uui-button-copy-text.opaque {
 				text-align: left;
 				--uui-button-content-align: left;
