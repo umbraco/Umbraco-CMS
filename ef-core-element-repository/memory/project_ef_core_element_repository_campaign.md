@@ -124,7 +124,10 @@ Update 17-11-2026: PR 4b (#24624) merged 16-11 as `a2a288de44b`. PR 5 implemente
   only through the concrete `ElementService`.
 - Known gaps left alone: the content integrity check reports every element inside a container (container nodes are not element nodes; NPoco did
   the same, nothing calls it for elements); `AsyncPublishableContentServiceBase.GetParentAsync` short-circuits on `RecycleBinContent` only.
-- The Artifact publish of `status.json` was blocked by a Read permission rule in this session; the board was not republished on 17-11.
+- Board publish trap (17-11-2026): passing `status.json` as an absolute path in `files` is refused with "blocked by a Read permission rule".
+  What worked: `root` = `.claude/campaign/ef-core-element-repository` and `files` = {"status.json": "status.json"}, after an Artifact `read` of the
+  published `status.json` (`path`), with `Read(.claude/campaign/**)` allowed in `.claude/settings.local.json` (added the same day, with the user's
+  approval; not established which of the two made the difference). Board republished as version 51.
 Committed as `5edd50597e6`, PR #24653 opened 17-11-2026 and ready for review; follow-ups `2069d626756` (scheduled-release revert) and
 `e528600414a` (multi-page delete-of-types test, from Copilot). Bot reviews answered; breaking-change comments are declined on this branch.
 Next: PR 6 after #24653 merges; the user is also considering PR 0 (relation stubs) to turn the search jobs green.

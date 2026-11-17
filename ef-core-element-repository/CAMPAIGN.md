@@ -299,6 +299,7 @@ To update:
 
 1. Edit `status.json`. Allowed `status` values per PR: `planned`, `in-progress`, `in-review`, `merged`, `blocked`. Set `done: true` on tasks as they land. Set the top-level `updated` field to today (DD-MM-YYYY). Add a line to `log` (newest first) for anything a teammate would want to see on the board: PR opened, PR merged, blocker found, decision taken.
 2. Republish with the Artifact tool: `publish` with `file_path` = the absolute path of `progress.html`, `url` = the value of `artifact.url` in `status.json`, and `files` = `{"status.json": "<absolute path of status.json>"}`. Pass no `icon` (keep the existing one). If this session has not read or published that artifact yet, do `Artifact read` on the URL first; a refused publish hands back the live version to merge against.
+   If the publish is refused with "blocked by a Read permission rule", pass `root` = `.claude/campaign/ef-core-element-repository` and `files` = `{"status.json": "status.json"}` instead of an absolute path, and `Artifact read` the published `status.json` (`path`) first; `.claude/settings.local.json` needs `Read(.claude/campaign/**)` in its allow list.
 3. Only change `progress.html` when the page itself needs a change (new column, new section). A status change never requires touching it.
 4. If the artifact URL is ever lost, `Artifact list` shows it under the title "Element Repository Campaign".
 
