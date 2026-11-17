@@ -1,6 +1,9 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Search.Core.Persistence;
@@ -33,6 +36,9 @@ public class MemberTypeSensitivePropertyIndexingTests : ContentBaseTestBase
         builder.Services.AddUnique<IIndexDocumentRepository, IndexDocumentRepository>();
     }
 
+    [SetUp]
+    public void SetupTest() => IndexerAndSearcher.Reset();
+
     [Test]
     public async Task Existing_Property_Made_Sensitive_Is_Removed_From_Index()
     {
@@ -52,6 +58,22 @@ public class MemberTypeSensitivePropertyIndexingTests : ContentBaseTestBase
 
         await SetSensitive(true);
         ContentIndexingService.Rebuild(IndexAliases.Member, DefaultOrigin);
+
+        Assert.That(IndexerAndSearcher.Dump(IndexAliases.Member), Has.Count.EqualTo(2));
+        Assert.That(IndexedValues(), Is.Empty);
+    }
+
+    [Test]
+    public async Task Existing_Property_Made_Sensitive_Is_Removed_From_Index_With_Distributed_Cache_Only_Publisher()
+    {
+        await CreateMemberTypeWithMembers(isSensitive: false);
+
+        var publisher = new ScopedNotificationPublisher<IDistributedCacheNotificationHandler>(GetRequiredService<IEventAggregator>());
+        using (ICoreScope scope = GetRequiredService<ICoreScopeProvider>().CreateCoreScope(scopedNotificationPublisher: publisher))
+        {
+            await SetSensitive(true);
+            scope.Complete();
+        }
 
         Assert.That(IndexerAndSearcher.Dump(IndexAliases.Member), Has.Count.EqualTo(2));
         Assert.That(IndexedValues(), Is.Empty);

@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Search.Core.Cache.MemberType;
 /// </remarks>
 internal sealed class MemberTypeSensitivePropertyNotificationHandler : ContentNotificationHandlerBase<MemberTypeCacheRefresher.JsonPayload>,
     INotificationHandler<MemberTypeSavingNotification>,
-    INotificationHandler<MemberTypeSavedNotification>
+    IDistributedCacheNotificationHandler<MemberTypeSavedNotification>
 {
     private const string ChangedSensitivePropertyAliasesStateKey = "ChangedSensitivePropertyAliases";
 
