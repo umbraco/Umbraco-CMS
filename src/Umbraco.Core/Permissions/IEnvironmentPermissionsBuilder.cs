@@ -1,0 +1,22 @@
+namespace Umbraco.Cms.Core.Permissions;
+
+/// <summary>
+/// Builds the environment permissions. Each <see cref="IEnvironmentPermissionsConfigurator"/> receives it at start-up.
+/// </summary>
+/// <remarks>
+/// Everything is permitted until a configurator denies it, and a denial can't be lifted, so the order configurators
+/// run in doesn't matter. A configurator can read what earlier ones denied through <see cref="IEnvironmentPermissions"/>.
+/// </remarks>
+public interface IEnvironmentPermissionsBuilder : IEnvironmentPermissions
+{
+    /// <summary>
+    /// Denies the supplied permission verbs.
+    /// </summary>
+    /// <remarks>
+    /// A denial is enforced on the Management API endpoints whose changes need the denied verb. Environment permissions
+    /// govern only changes; reads are always permitted.
+    /// </remarks>
+    /// <param name="permissions">The permission verbs, for example one of <see cref="Constants.Permissions.Entities"/>. Matched case-sensitively.</param>
+    /// <exception cref="ArgumentException">A permission verb is empty.</exception>
+    void Deny(params string[] permissions);
+}

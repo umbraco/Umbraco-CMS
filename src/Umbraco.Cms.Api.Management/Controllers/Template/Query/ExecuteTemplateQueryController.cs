@@ -5,12 +5,11 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Api.Management.ViewModels.Template.Query;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.TemplateQuery;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
@@ -56,6 +55,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
 
     [HttpPost("execute")]
     [MapToApiVersion("1.0")]
+    [RequiresPermissions([])]
     [ProducesResponseType(typeof(TemplateQueryResultResponseModel), StatusCodes.Status200OK)]
     [EndpointSummary("Executes a template query.")]
     [EndpointDescription("Executes a template query with the provided parameters and returns the matching content results with execution metrics.")]
