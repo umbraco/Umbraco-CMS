@@ -566,9 +566,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		if (!this._parentName) return this._name;
 		return html`<uui-button
 				compact
+				label=${this._parentName}
 				title=${this.localize.term('blockEditor_focusParentBlock')}
-				@click=${() => this.#context.focusParentEntry()}
-				>${this._parentName}</uui-button
+				@click=${() => this.#context.focusParentEntry()}></uui-button
 			><span aria-hidden="true">/</span>${this._name}`;
 	}
 
@@ -801,6 +801,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 			umb-entity-frame uui-button:hover {
 				text-decoration: underline;
+			}
+
+			umb-entity-frame > span {
+				margin: 0 var(--uui-size-1);
 			}
 
 			:host(:focus) {
