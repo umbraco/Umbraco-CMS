@@ -64,18 +64,18 @@ public class UnattendedInstaller : INotificationAsyncHandler<RuntimeUnattendedIn
     /// <param name="notification">The notification instance for the unattended install event.</param>
     /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public Task HandleAsync(RuntimeUnattendedInstallNotification notification, CancellationToken cancellationToken)
+    public async Task HandleAsync(RuntimeUnattendedInstallNotification notification, CancellationToken cancellationToken)
     {
         // unattended install is not enabled
         if (_unattendedSettings.Value.InstallUnattended == false)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         // no connection string set
         if (_databaseFactory.Configured == false)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         _runtimeState.DetermineRuntimeLevel();
@@ -110,13 +110,13 @@ public class UnattendedInstaller : INotificationAsyncHandler<RuntimeUnattendedIn
 
             var innerException = new UnattendedInstallException("Unattended installation failed.", ex);
             _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, innerException);
-            return Task.CompletedTask;
+            return;
         }
 
         // could not connect to the database
         if (connect == false)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         IUmbracoDatabase? database = null;
@@ -129,7 +129,7 @@ public class UnattendedInstaller : INotificationAsyncHandler<RuntimeUnattendedIn
                 // database has umbraco tables, assume Umbraco is already installed
                 if (hasUmbracoTables)
                 {
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 // all conditions fulfilled, do the install
@@ -143,7 +143,7 @@ public class UnattendedInstaller : INotificationAsyncHandler<RuntimeUnattendedIn
 
                 // Emit an event with EventAggregator that unattended install completed
                 // Then this event can be listened for and create an unattended user
-                _eventAggregator.Publish(new UnattendedInstallNotification());
+                await _eventAggregator.PublishAsync(new UnattendedInstallNotification(), cancellationToken);
             }
         }
         catch (Exception ex)
@@ -158,7 +158,5 @@ public class UnattendedInstaller : INotificationAsyncHandler<RuntimeUnattendedIn
 
             _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, innerException);
         }
-
-        return Task.CompletedTask;
     }
 }
