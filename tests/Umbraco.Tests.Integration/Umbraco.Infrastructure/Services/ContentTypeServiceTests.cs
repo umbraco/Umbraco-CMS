@@ -829,6 +829,57 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         AssertOnlyPropertyDataDeleted(before, compositionPropertyTypeIds, [content.Id]);
     }
 
+    [Test]
+    public async Task Removing_Composition_Deletes_The_Composition_Property_Data_Of_The_Composing_Elements()
+    {
+        var composition = ContentTypeBuilder.CreateBasicContentType("composition", "composition");
+        composition.AddPropertyType(
+            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "compositionText")
+            {
+                Name = "compositionText",
+                DataTypeId = Constants.DataTypes.Textbox,
+            },
+            "composition",
+            "composition");
+        await ContentTypeService.CreateAsync(composition, Constants.Security.SuperUserKey);
+        var compositionPropertyTypeIds = composition.PropertyTypes.Select(x => x.Id).ToArray();
+
+        var composingType = (ContentType)ContentTypeBuilder.CreateSimpleElementType("composing", "Composing");
+        composingType.AddContentType(composition);
+        await ContentTypeService.CreateAsync(composingType, Constants.Security.SuperUserKey);
+
+        var otherComposingType = (ContentType)ContentTypeBuilder.CreateSimpleElementType("otherComposing", "Other composing");
+        otherComposingType.AddContentType(composition);
+        await ContentTypeService.CreateAsync(otherComposingType, Constants.Security.SuperUserKey);
+
+        var elementService = GetRequiredService<IElementService>();
+        IElement CreateElement(IContentType contentType, string name)
+        {
+            Element element = ElementBuilder.CreateSimpleElement(contentType, name);
+            element.SetValue("compositionText", $"{name} compositionText");
+            elementService.Save(element);
+            return element;
+        }
+
+        IElement[] composingElements = Enumerable.Range(0, 3).Select(i => CreateElement(composingType, $"Composing {i}")).ToArray();
+        IElement[] otherComposingElements = Enumerable.Range(0, 2).Select(i => CreateElement(otherComposingType, $"Other composing {i}")).ToArray();
+
+        List<PropertyDataDto> before = FetchAllPropertyData();
+
+        await RemoveComposition(composingType, composition);
+
+        AssertOnlyPropertyDataDeleted(before, compositionPropertyTypeIds, composingElements.Select(x => x.Id).ToArray());
+        foreach (IElement element in composingElements)
+        {
+            Assert.That(elementService.GetById(element.Key)!.Properties.Contains("compositionText"), Is.False);
+        }
+
+        foreach (IElement element in otherComposingElements)
+        {
+            Assert.That(elementService.GetById(element.Key)!.GetValue<string>("compositionText"), Is.Not.Empty);
+        }
+    }
+
     private async Task<ITemplate> CreateTextPageTemplate()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
