@@ -150,14 +150,17 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         return result;
     }
 
+    [Obsolete("Use NotifyForgotPasswordRequestedAsync instead. Scheduled for removal in Umbraco 21.")]
     public void NotifyForgotPasswordRequested(IPrincipal currentUser, string userId) => Notify(
         currentUser,
         (currentUserId, ip) => new UserForgotPasswordRequestedNotification(ip, userId, currentUserId));
 
+    [Obsolete("Use NotifyForgotPasswordChangedAsync instead. Scheduled for removal in Umbraco 21.")]
     public void NotifyForgotPasswordChanged(IPrincipal currentUser, string userId) => Notify(
         currentUser,
         (currentUserId, ip) => new UserForgotPasswordChangedNotification(ip, userId, currentUserId));
 
+    [Obsolete("Use NotifyLogoutSuccessAsync instead. Scheduled for removal in Umbraco 21.")]
     public SignOutSuccessResult NotifyLogoutSuccess(IPrincipal currentUser, string? userId)
     {
         UserLogoutSuccessNotification notification = Notify(
@@ -167,6 +170,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         return new SignOutSuccessResult { SignOutRedirectUrl = notification.SignOutRedirectUrl };
     }
 
+    [Obsolete("Use NotifyAccountLockedAsync instead. Scheduled for removal in Umbraco 21.")]
     public void NotifyAccountLocked(IPrincipal? currentUser, string? userId) => Notify(
         currentUser,
         (currentUserId, ip) => new UserLockedNotification(ip, userId, currentUserId));
@@ -209,30 +213,37 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         return currentUserId;
     }
 
+    [Obsolete("Use NotifyAccountUnlockedAsync instead. Scheduled for removal in Umbraco 21.")]
     public void NotifyAccountUnlocked(IPrincipal? currentUser, string userId) => Notify(
         currentUser,
         (currentUserId, ip) => new UserUnlockedNotification(ip, userId, currentUserId));
 
+    [Obsolete("Use NotifyLoginFailedAsync instead. Scheduled for removal in Umbraco 21.")]
     public void NotifyLoginFailed(IPrincipal? currentUser, string userId) => Notify(
         currentUser,
         (currentUserId, ip) => new UserLoginFailedNotification(ip, userId, currentUserId));
 
+    [Obsolete("Use NotifyLoginRequiresVerificationAsync instead. Scheduled for removal in Umbraco 21.")]
     public void NotifyLoginRequiresVerification(IPrincipal currentUser, string? userId) => Notify(
         currentUser,
         (currentUserId, ip) => new UserLoginRequiresVerificationNotification(ip, userId, currentUserId));
 
+    [Obsolete("Use NotifyLoginSuccessAsync instead. Scheduled for removal in Umbraco 21.")]
     public void NotifyLoginSuccess(IPrincipal currentUser, string userId) => Notify(
         currentUser,
         (currentUserId, ip) => new UserLoginSuccessNotification(ip, userId, currentUserId));
 
+    [Obsolete("Use NotifyPasswordChangedAsync instead. Scheduled for removal in Umbraco 21.")]
     public void NotifyPasswordChanged(IPrincipal? currentUser, string userId) => Notify(
         currentUser,
         (currentUserId, ip) => new UserPasswordChangedNotification(ip, userId, currentUserId));
 
+    [Obsolete("Use NotifyPasswordResetAsync instead. Scheduled for removal in Umbraco 21.")]
     public void NotifyPasswordReset(IPrincipal? currentUser, string userId) => Notify(
         currentUser,
         (currentUserId, ip) => new UserPasswordResetNotification(ip, userId, currentUserId));
 
+    [Obsolete("Use NotifyResetAccessFailedCountAsync instead. Scheduled for removal in Umbraco 21.")]
     public void NotifyResetAccessFailedCount(IPrincipal? currentUser, string userId) => Notify(
         currentUser,
         (currentUserId, ip) => new UserResetAccessFailedCountNotification(ip, userId, currentUserId));
@@ -344,7 +355,9 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         var ip = IpResolver.GetCurrentRequestIpAddress();
 
         T notification = createNotification(currentUserId, ip);
+#pragma warning disable CS0618 // Type or member is obsolete
         _eventAggregator.Publish(notification);
+#pragma warning restore CS0618 // Type or member is obsolete
         return notification;
     }
 

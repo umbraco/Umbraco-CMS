@@ -73,6 +73,7 @@ public interface ICoreBackOfficeUserManager
     /// </summary>
     /// <param name="user">The principal of the user who requested the password reset.</param>
     /// <param name="toString">Additional information about the request.</param>
+    [Obsolete("Use NotifyForgotPasswordRequestedAsync instead. Scheduled for removal in Umbraco 21.")]
     void NotifyForgotPasswordRequested(IPrincipal user, string toString);
 
     /// <summary>
@@ -84,7 +85,9 @@ public interface ICoreBackOfficeUserManager
     // TODO (V19): Remove the default implementation.
     Task NotifyForgotPasswordRequestedAsync(IPrincipal user, string toString)
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         NotifyForgotPasswordRequested(user, toString);
+#pragma warning restore CS0618 // Type or member is obsolete
         return Task.CompletedTask;
     }
 
