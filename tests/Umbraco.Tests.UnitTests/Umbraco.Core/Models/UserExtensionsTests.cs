@@ -7,6 +7,8 @@ using System.Globalization;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -193,5 +195,44 @@ public class UserExtensionsTests
 
         Assert.That(result, Is.EquivalentTo(new[] { 1, 2, 3 }));
         languageService.Verify(x => x.GetAllAsync(), Times.Never);
+    }
+
+    [Test]
+    public void HasAccessToSensitiveData_SensitiveDataGroup_ReturnsTrue()
+    {
+        var user = CreateUserWithGroups(
+            CreateGroup(Guid.NewGuid()),
+            CreateGroup(Constants.Security.SensitiveDataGroupKey));
+
+        Assert.That(user.HasAccessToSensitiveData(), Is.True);
+    }
+
+    [Test]
+    public void HasAccessToSensitiveData_GroupWithSensitiveDataPermission_ReturnsTrue()
+    {
+        var user = CreateUserWithGroups(
+            CreateGroup(Guid.NewGuid(), ActionBrowse.ActionLetter),
+            CreateGroup(Guid.NewGuid(), ActionBrowse.ActionLetter, ActionMemberSensitiveData.ActionLetter));
+
+        Assert.That(user.HasAccessToSensitiveData(), Is.True);
+    }
+
+    [Test]
+    public void HasAccessToSensitiveData_NoGroupGrantsAccess_ReturnsFalse()
+    {
+        var user = CreateUserWithGroups(
+            CreateGroup(Guid.NewGuid()),
+            CreateGroup(Constants.Security.AdminGroupKey, ActionBrowse.ActionLetter));
+
+        Assert.That(user.HasAccessToSensitiveData(), Is.False);
+    }
+
+    private static IUser CreateUserWithGroups(params IReadOnlyUserGroup[] groups)
+        => Mock.Of<IUser>(u => u.Groups == groups);
+
+    private static IReadOnlyUserGroup CreateGroup(Guid key, params string[] permissions)
+    {
+        ISet<string> permissionSet = new HashSet<string>(permissions);
+        return Mock.Of<IReadOnlyUserGroup>(g => g.Key == key && g.Permissions == permissionSet);
     }
 }

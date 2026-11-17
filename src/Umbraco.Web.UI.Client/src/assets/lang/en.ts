@@ -2457,6 +2457,8 @@ export default {
 		read_element_folder: 'Allow access to read an element folder',
 		rollback: 'Rollback',
 		rollback_element: 'Allow access to rollback an element to a previous state',
+		sensitiveData: 'Sensitive data',
+		sensitiveData_member: 'Allow access to view and edit sensitive member data',
 		unpublish: 'Unpublish',
 		unpublish_element: 'Allow access to unpublish an element',
 		update: 'Update',

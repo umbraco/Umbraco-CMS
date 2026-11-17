@@ -11,6 +11,7 @@ export * from './item/constants.js';
 export * from './reference/constants.js';
 export * from './repository/constants.js';
 export * from './search/constants.js';
+export * from './user-permissions/constants.js';
 export * from './workspace/constants.js';
 export * from './property-editor/member-picker/value-type/constants.js';
 export * from './property-editor/multiple-member-picker/value-type/constants.js';
