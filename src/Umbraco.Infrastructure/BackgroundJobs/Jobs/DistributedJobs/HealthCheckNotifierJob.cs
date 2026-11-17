@@ -92,7 +92,7 @@ internal class HealthCheckNotifierJob : IDistributedBackgroundJob
             HealthCheckResults results = await HealthCheckResults.Create(checks);
             results.LogResults();
 
-            _eventAggregator.Publish(new HealthCheckCompletedNotification(results));
+            await _eventAggregator.PublishAsync(new HealthCheckCompletedNotification(results));
 
             // Send using registered notification methods that are enabled.
             foreach (IHealthCheckNotificationMethod notificationMethod in _notifications.Where(x => x.Enabled))
