@@ -23,11 +23,12 @@ describe('UmbInputMediaTypeElement', () => {
 
 		after(() => unregisterRepository());
 
-		const setup = async (max: number) => {
+		const setup = async (max: number, readonly = false) => {
 			const host = await fixture<HTMLElement>(html`<div></div>`);
 			const opened = provideTestModalManager(host, { selection: ['b'] });
 			const input = document.createElement('umb-input-media-type');
 			input.max = max;
+			input.readonly = readonly;
 			input.selection = ['a'];
 			host.appendChild(input);
 			await waitUntil(() => input.shadowRoot?.querySelector('uui-action-bar'), 'the picked item was not rendered');
@@ -52,6 +53,11 @@ describe('UmbInputMediaTypeElement', () => {
 
 		it('does not offer replace when more than one item is allowed', async () => {
 			const { input } = await setup(2);
+			expect(replaceButton(input)).to.be.null;
+		});
+
+		it('does not offer replace when read-only', async () => {
+			const { input } = await setup(1, true);
 			expect(replaceButton(input)).to.be.null;
 		});
 	});
