@@ -163,6 +163,8 @@ Scope: implement `GetParentEntitiesByChildIds`, `GetPagedParentEntitiesByChildId
 
 Acceptance: the four §4a fixtures and the un-ignored relation tests green on SQLite; `grep -n NotImplementedException RelationRepository.cs` returns nothing. Skip this PR if the `EntityRepository` migration has already removed the stubs; then only the checkpoint in PR 5 applies.
 
+Status 17-11-2026: implemented and in review as draft #24657 (`34672930fc0`). The bulk lookup became `GetParentEntitiesByChildIdsAsync`; the paged lookups order by sort order then node id, as upstream does. The four §4a fixtures pass locally.
+
 ### PR 1: EF Core Element DTOs and the no-op migration
 
 Scope:

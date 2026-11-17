@@ -131,3 +131,10 @@ Update 17-11-2026: PR 4b (#24624) merged 16-11 as `a2a288de44b`. PR 5 implemente
 Committed as `5edd50597e6`, PR #24653 opened 17-11-2026 and ready for review; follow-ups `2069d626756` (scheduled-release revert) and
 `e528600414a` (multi-page delete-of-types test, from Copilot). Bot reviews answered; breaking-change comments are declined on this branch.
 Next: PR 6 after #24653 merges; the user is also considering PR 0 (relation stubs) to turn the search jobs green.
+
+Update 17-11-2026 (PR 0): implemented and opened as draft #24657 (`34672930fc0`, branch
+`v20/feature/ef-core-element-repository-0-relation-entity-lookups`). Ids via EF Core, hydration via `IEntityRepository.GetAll(objectType, ids)`
+per object type (never call it with an empty id list: it then returns every entity of the type). Paged lookups order by sortOrder then id to
+match upstream. The four baseline search fixtures pass 28/28 locally, so the "known failing tests" caveat goes away once #24657 merges.
+Two traps: a `Contains` on an array inside an EF Core lambda breaks the Infrastructure CLAUDE.md rule (copy to `List<T>` first), and Git Bash
+heredocs with long Python bodies fail with "unexpected EOF" here; write scripts to the scratchpad with the Write tool instead.

@@ -12,31 +12,32 @@
       "id": 0,
       "slug": "relation-entity-lookups",
       "title": "Relation parent and child entity lookups (optional, unblocks four search fixtures)",
-      "status": "planned",
-      "branch": "",
-      "pr": "",
-      "prUrl": "",
+      "status": "in-review",
+      "branch": "v20/feature/ef-core-element-repository-0-relation-entity-lookups",
+      "pr": "#24657",
+      "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24657",
       "dependsOn": [],
-      "summary": "Implement the three NotImplementedException stubs on the EF Core RelationRepository (ids via EF Core, hydration via IEntityRepository.GetAll) so ElementIndexingNotificationHandlerTests, ExternalBlockElementIndexingTests, ExternalBlockElementVarianceTests and ExternalElementReindexOnRepublishTests (25 tests) can pass. Skip if the EntityRepository migration lands first.",
+      "summary": "Implement the three NotImplementedException stubs on the EF Core RelationRepository (ids via EF Core, hydration via IEntityRepository.GetAll) so ElementIndexingNotificationHandlerTests, ExternalBlockElementIndexingTests, ExternalBlockElementVarianceTests and ExternalElementReindexOnRepublishTests (28 tests) can pass. Skip if the EntityRepository migration lands first.",
       "tasks": [
         {
-          "text": "GetParentEntitiesByChildIds implemented, batched and de-duplicated",
-          "done": false
+          "text": "GetParentEntitiesByChildIdsAsync implemented (was the sync GetParentEntitiesByChildIds), batched and de-duplicated",
+          "done": true
         },
         {
           "text": "GetPagedParentEntitiesByChildIdAsync and GetPagedChildEntitiesByParentIdAsync implemented",
-          "done": false
+          "done": true
         },
         {
           "text": "Ignored relation repository and service tests un-ignored, red first then green",
-          "done": false
+          "done": true
         },
         {
           "text": "Four search fixtures green on SQLite",
-          "done": false
+          "done": true
         }
       ],
-      "acceptance": "No NotImplementedException left in RelationRepository.cs; the four search fixtures and the un-ignored relation tests green."
+      "acceptance": "No NotImplementedException left in RelationRepository.cs; the four search fixtures and the un-ignored relation tests green.",
+      "notes": "Implemented 17-11-2026, cut from a2a288de44b. Related node ids resolved with EF Core (db.Relations, db.Nodes), entities built by IEntityRepository.GetAll(objectType, ids) per object type, batched under the parameter limit; RelationRepository takes IEntityRepository in its constructor. Paged lookups order by sortOrder then node id, as upstream does. The sync GetParentEntitiesByChildIds became GetParentEntitiesByChildIdsAsync with a cancellation token. Four ignored tests enabled (red on NotImplementedException first), two added (paging order with de-duplication across relation types, proven red against node-id ordering; shared parent returned once with both filters). The four search fixtures pass 28 of 28 on SQLite. Independent review: no must-fix; list-based Contains and the sort-order parity applied. Committed as 34672930fc0, draft PR #24657. Touches one line of ElementRepositoryTest, which PR 5 deletes: whichever merges second takes the deletion."
     },
     {
       "id": 1,
@@ -395,6 +396,10 @@
     }
   ],
   "log": [
+    {
+      "date": "17-11-2026",
+      "text": "PR 0 implemented and opened as draft #24657 (34672930fc0): the three relation lookups work on the EF Core repository and the four baseline search fixtures pass 28 of 28 locally. Once it merges the search jobs should go green."
+    },
     {
       "date": "17-11-2026",
       "text": "PR 5 (#24653) ready for review. Scheduled-release change reverted (2069d626756), multi-page delete-of-types test added (e528600414a), review bot and Copilot comments answered. Awaiting human review and the Azure pipeline."
