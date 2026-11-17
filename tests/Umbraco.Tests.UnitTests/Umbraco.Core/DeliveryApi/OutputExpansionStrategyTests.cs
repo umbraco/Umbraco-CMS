@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Delivery.Rendering;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
@@ -161,7 +162,21 @@ public class OutputExpansionStrategyTests : OutputExpansionStrategyTestBase
         httpContextMock.SetupGet(c => c.Request).Returns(httpRequestMock.Object);
         httpContextAccessorMock.SetupGet(a => a.HttpContext).Returns(httpContextMock.Object);
 
-        IOutputExpansionStrategy outputExpansionStrategy = new RequestContextOutputExpansionStrategy(httpContextAccessorMock.Object, new ApiPropertyRenderer(new NoopPublishedValueFallback()));
+        var apiPublishedContentCacheMock = new Mock<IApiPublishedContentCache>();
+        apiPublishedContentCacheMock
+            .Setup(m => m.GetById(It.IsAny<Guid>()))
+            .Returns((Guid id) => Mock.Of<IPublishedContent>(c => c.Key == id));
+
+        var requestMemberAccessServiceMock = new Mock<IRequestMemberAccessService>();
+        requestMemberAccessServiceMock
+            .Setup(m => m.MemberHasAccessToAsync(It.IsAny<IPublishedContent>()))
+            .Returns(Task.FromResult(PublicAccessStatus.AccessAccepted));
+
+        IOutputExpansionStrategy outputExpansionStrategy = new RequestContextOutputExpansionStrategy(
+            httpContextAccessorMock.Object,
+            new ApiPropertyRenderer(new NoopPublishedValueFallback()),
+            apiPublishedContentCacheMock.Object,
+            requestMemberAccessServiceMock.Object);
         var outputExpansionStrategyAccessorMock = new Mock<IOutputExpansionStrategyAccessor>();
         outputExpansionStrategyAccessorMock.Setup(s => s.TryGetValue(out outputExpansionStrategy)).Returns(true);
 

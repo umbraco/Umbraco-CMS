@@ -70,12 +70,12 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
         builder.AddDeliveryApi();
 
-        if (TestContext.CurrentContext.Test.Name is (nameof(ContentPicker_Disallowed_Reference_Content_Type_Is_Rendered_As_Null) or nameof(MultiNodeTreePicker_Disallowed_Reference_Content_Type_Is_Excluded)))
+        if (TestContext.CurrentContext.Test.MethodName is (nameof(ContentPicker_Disallowed_Reference_Content_Type_Is_Rendered_As_Null) or nameof(MultiNodeTreePicker_Disallowed_Reference_Content_Type_Is_Excluded)))
         {
             builder.Services.Configure<DeliveryApiSettings>(settings => settings.DisallowedContentTypeAliases = [TargetContentTypeAlias]);
         }
 
-        if (TestContext.CurrentContext.Test.Name is (nameof(ContentPicker_Protected_Reference_Retains_Properties_When_Member_Has_Access) or nameof(MultiNodeTreePicker_Protected_Reference_Retains_Properties_When_Member_Has_Access)))
+        if (TestContext.CurrentContext.Test.MethodName is (nameof(ContentPicker_Protected_Reference_Retains_Properties_When_Member_Has_Access) or nameof(MultiNodeTreePicker_Protected_Reference_Retains_Properties_When_Member_Has_Access)))
         {
             var mock = new Mock<IRequestMemberAccessService>();
             mock
@@ -120,13 +120,14 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
         Assert.AreEqual(target.Key, reference!.Id);
     }
 
-    [Test]
-    public void ContentPicker_Protected_Reference_Has_Properties_Cleared_When_Member_Has_No_Access()
+    [TestCase("properties[$all]")]
+    [TestCase("properties[contentPicker]")]
+    public void ContentPicker_Protected_Reference_Has_Properties_Cleared_When_Member_Has_No_Access(string expand)
     {
         (IContent target, IContent host) = ArrangeContentPickerScenario();
         ProtectContent(target);
 
-        IApiContentResponse? response = BuildHostResponse(host, expand: "properties[$all]");
+        IApiContentResponse? response = BuildHostResponse(host, expand: expand);
 
         Assert.IsNotNull(response);
         var reference = response!.Properties["contentPicker"] as IApiContent;
@@ -134,13 +135,14 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
         Assert.IsEmpty(reference!.Properties, "Property values of protected content must not leak when the request has no access.");
     }
 
-    [Test]
-    public void ContentPicker_Protected_Reference_Retains_Properties_When_Member_Has_Access()
+    [TestCase("properties[$all]")]
+    [TestCase("properties[contentPicker]")]
+    public void ContentPicker_Protected_Reference_Retains_Properties_When_Member_Has_Access(string expand)
     {
         (IContent target, IContent host) = ArrangeContentPickerScenario();
         ProtectContent(target);
 
-        IApiContentResponse? response = BuildHostResponse(host, expand: "properties[$all]");
+        IApiContentResponse? response = BuildHostResponse(host, expand: expand);
 
         Assert.IsNotNull(response);
         var reference = response!.Properties["contentPicker"] as IApiContent;
