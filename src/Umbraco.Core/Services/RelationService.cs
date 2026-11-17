@@ -440,7 +440,9 @@ public class RelationService : RepositoryService, IRelationService
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         EventMessages eventMessages = EventMessagesFactory.Get();
         var savingNotification = new RelationSavingNotification(relation, eventMessages);
+#pragma warning disable CS0618 // Type or member is obsolete
         if (scope.Notifications.PublishCancelable(savingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             scope.Complete();
             return relation; // TODO: returning sth that does not exist here?!
@@ -551,7 +553,9 @@ public class RelationService : RepositoryService, IRelationService
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         EventMessages eventMessages = EventMessagesFactory.Get();
         var savingNotification = new RelationSavingNotification(relation, eventMessages);
+#pragma warning disable CS0618 // Type or member is obsolete
         if (scope.Notifications.PublishCancelable(savingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             scope.Complete();
             return;
@@ -571,7 +575,9 @@ public class RelationService : RepositoryService, IRelationService
 
         EventMessages messages = EventMessagesFactory.Get();
         var savingNotification = new RelationSavingNotification(relationsA, messages);
+#pragma warning disable CS0618 // Type or member is obsolete
         if (scope.Notifications.PublishCancelable(savingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             scope.Complete();
             return;
@@ -589,7 +595,9 @@ public class RelationService : RepositoryService, IRelationService
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         EventMessages eventMessages = EventMessagesFactory.Get();
         var savingNotification = new RelationTypeSavingNotification(relationType, eventMessages);
+#pragma warning disable CS0618 // Type or member is obsolete
         if (scope.Notifications.PublishCancelable(savingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             scope.Complete();
             return;
@@ -667,7 +675,9 @@ public class RelationService : RepositoryService, IRelationService
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         EventMessages eventMessages = EventMessagesFactory.Get();
         var deletingNotification = new RelationDeletingNotification(relation, eventMessages);
+#pragma warning disable CS0618 // Type or member is obsolete
         if (scope.Notifications.PublishCancelable(deletingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             scope.Complete();
             return;
@@ -685,7 +695,9 @@ public class RelationService : RepositoryService, IRelationService
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         EventMessages eventMessages = EventMessagesFactory.Get();
         var deletingNotification = new RelationTypeDeletingNotification(relationType, eventMessages);
+#pragma warning disable CS0618 // Type or member is obsolete
         if (scope.Notifications.PublishCancelable(deletingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             scope.Complete();
             return;

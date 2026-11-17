@@ -1084,9 +1084,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <summary>
         /// Publishes a notification, used to publish <see cref="EntityRefreshNotification{T}"/> for caching purposes.
         /// </summary>
+#pragma warning disable CS0618 // Type or member is obsolete
         protected void OnUowRefreshedEntity(INotification notification) => _eventAggregator.Publish(notification);
+#pragma warning restore CS0618 // Type or member is obsolete
 
+#pragma warning disable CS0618 // Type or member is obsolete
         protected void OnUowRemovingEntity(IContentBase entity) => _eventAggregator.Publish(new ScopedEntityRemoveNotification(entity, new EventMessages()));
+#pragma warning restore CS0618 // Type or member is obsolete
         #endregion
 
         #region Classes

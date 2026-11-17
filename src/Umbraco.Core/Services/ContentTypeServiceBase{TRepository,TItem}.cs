@@ -956,7 +956,9 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
             DeletingNotification<TItem> deletingNotification = GetDeletingNotification(item, eventMessages);
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(deletingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return;
@@ -973,7 +975,9 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         (TItem[] descendantsAndSelf, ContentTypeChange<TItem>[] changes) = DeleteLocked(scope, item, eventMessages);
 
         // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
+#pragma warning disable CS0618 // Type or member is obsolete
         _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
+#pragma warning restore CS0618 // Type or member is obsolete
 
         PublishDeleted(scope, item, descendantsAndSelf, changes, deletingNotification, eventMessages, userId);
     }
@@ -1052,7 +1056,9 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
             DeletingNotification<TItem> deletingNotification = GetDeletingNotification(itemsA, eventMessages);
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(deletingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return;
@@ -1087,7 +1093,9 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 .ToArray();
 
             // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
+#pragma warning disable CS0618 // Type or member is obsolete
             _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
+#pragma warning restore CS0618 // Type or member is obsolete
 
             scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 

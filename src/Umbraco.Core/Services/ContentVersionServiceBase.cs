@@ -268,7 +268,9 @@ internal abstract class ContentVersionServiceBase<TContent>
             {
                 EventMessages messages = _eventMessagesFactory.Get();
 
+#pragma warning disable CS0618 // Type or member is obsolete
                 if (scope.Notifications.PublishCancelable(DeletingVersionsNotification(version.ContentId, messages, version.VersionId)))
+#pragma warning restore CS0618 // Type or member is obsolete
                 {
                     if (_logger.IsEnabled(LogLevel.Debug))
                     {

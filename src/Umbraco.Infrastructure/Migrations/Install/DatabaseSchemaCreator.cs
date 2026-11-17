@@ -455,14 +455,18 @@ public class DatabaseSchemaCreator
     /// </summary>
     /// <param name="notification">Cancelable notification marking the creation having begun.</param>
     internal virtual void FireBeforeCreation(DatabaseSchemaCreatingNotification notification) =>
+#pragma warning disable CS0618 // Type or member is obsolete
         _eventAggregator.Publish(notification);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Publishes the <see cref="DatabaseSchemaCreatedNotification" /> notification.
     /// </summary>
     /// <param name="notification">Notification marking the creation having completed.</param>
     internal virtual void FireAfterCreation(DatabaseSchemaCreatedNotification notification) =>
+#pragma warning disable CS0618 // Type or member is obsolete
         _eventAggregator.Publish(notification);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     #endregion
 

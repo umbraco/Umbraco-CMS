@@ -101,7 +101,9 @@ public class PackagingService : IPackagingService
 
         // Trigger the Importing Package Notification and stop execution if event/user is cancelling it
         var importingPackageNotification = new ImportingPackageNotification(compiledPackage.Name);
+#pragma warning disable CS0618 // Type or member is obsolete
         if (_eventAggregator.PublishCancelable(importingPackageNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             return new InstallationSummary(compiledPackage.Name);
         }
@@ -117,7 +119,9 @@ public class PackagingService : IPackagingService
             $"Package data installed for package '{compiledPackage.Name}'.").GetAwaiter().GetResult();
 
         // trigger the ImportedPackage event
+#pragma warning disable CS0618 // Type or member is obsolete
         _eventAggregator.Publish(new ImportedPackageNotification(summary).WithStateFrom(importingPackageNotification));
+#pragma warning restore CS0618 // Type or member is obsolete
 
         return summary;
     }

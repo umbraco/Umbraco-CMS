@@ -152,7 +152,9 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
             }
 
             var savingNotifiation = new PublicAccessEntrySavingNotification(entry, evtMsgs);
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(savingNotifiation))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return OperationResult.Attempt.Cancel(evtMsgs, entry);
@@ -197,7 +199,9 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
             entry.RemoveRule(existingRule);
 
             var savingNotifiation = new PublicAccessEntrySavingNotification(entry, evtMsgs);
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(savingNotifiation))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return OperationResult.Attempt.Cancel(evtMsgs);
@@ -224,7 +228,9 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             var savingNotifiation = new PublicAccessEntrySavingNotification(entry, evtMsgs);
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(savingNotifiation))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return OperationResult.Attempt.Cancel(evtMsgs);
@@ -369,7 +375,9 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             var deletingNotification = new PublicAccessEntryDeletingNotification(entry, evtMsgs);
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(deletingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return OperationResult.Attempt.Cancel(evtMsgs);

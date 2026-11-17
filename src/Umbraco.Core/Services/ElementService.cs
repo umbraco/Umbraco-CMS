@@ -124,7 +124,9 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
             return;
         }
 
+#pragma warning disable CS0618 // Type or member is obsolete
         if (scope.Notifications.PublishCancelable(new ElementDeletingNotification(elements, eventMessages)))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             scope.Complete();
             return;

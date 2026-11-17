@@ -378,7 +378,9 @@ namespace Umbraco.Cms.Core.Services
             if (withIdentity)
             {
                 var savingNotification = new MediaSavingNotification(media, eventMessages);
+#pragma warning disable CS0618 // Type or member is obsolete
                 if (scope.Notifications.PublishCancelable(savingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
                 {
                     return;
                 }
@@ -819,7 +821,9 @@ namespace Umbraco.Cms.Core.Services
                 scope.WriteLock(Constants.Locks.MediaTree);
 
                 var savingNotification = new MediaSavingNotification(media, eventMessages);
+#pragma warning disable CS0618 // Type or member is obsolete
                 if (scope.Notifications.PublishCancelable(savingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(eventMessages);
@@ -887,7 +891,9 @@ namespace Umbraco.Cms.Core.Services
                 scope.WriteLock(Constants.Locks.MediaTree);
 
                 var savingNotification = new MediaSavingNotification(mediasA, messages);
+#pragma warning disable CS0618 // Type or member is obsolete
                 if (scope.Notifications.PublishCancelable(savingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(messages);
@@ -932,7 +938,9 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.WriteLock(Constants.Locks.MediaTree);
 
+#pragma warning disable CS0618 // Type or member is obsolete
                 if (scope.Notifications.PublishCancelable(new MediaDeletingNotification(media, messages)))
+#pragma warning restore CS0618 // Type or member is obsolete
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(messages);
@@ -1018,7 +1026,9 @@ namespace Umbraco.Cms.Core.Services
             }
 
             var deletingVersionsNotification = new MediaDeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 return;
             }
@@ -1045,7 +1055,9 @@ namespace Umbraco.Cms.Core.Services
             scope.WriteLock(Constants.Locks.MediaTree);
 
             var deletingVersionsNotification = new MediaDeletingVersionsNotification(id, evtMsgs, specificVersion: versionId);
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return;
@@ -1094,7 +1106,9 @@ namespace Umbraco.Cms.Core.Services
                 var moveEventInfo = new MoveToRecycleBinEventInfo<IMedia>(media, originalPath);
 
                 var movingToRecycleBinNotification = new MediaMovingToRecycleBinNotification(moveEventInfo, messages);
+#pragma warning disable CS0618 // Type or member is obsolete
                 if (scope.Notifications.PublishCancelable(movingToRecycleBinNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(messages);
@@ -1164,7 +1178,9 @@ namespace Umbraco.Cms.Core.Services
                 // FIXME: Use MoveEventInfo that also takes a parent key when implementing move with parentKey.
                 var moveEventInfo = new MoveEventInfo<IMedia>(media, media.Path, parentId);
                 var movingNotification = new MediaMovingNotification(moveEventInfo, messages);
+#pragma warning disable CS0618 // Type or member is obsolete
                 if (scope.Notifications.PublishCancelable(movingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(messages);
@@ -1365,7 +1381,9 @@ namespace Umbraco.Cms.Core.Services
                 IMedia[] medias = _mediaRepository.Get(query)?.ToArray() ?? Array.Empty<IMedia>();
 
                 var emptyingRecycleBinNotification = new MediaEmptyingRecycleBinNotification(medias, messages);
+#pragma warning disable CS0618 // Type or member is obsolete
                 if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
                 {
                     scope.Complete();
                     return OperationResult.Cancel(messages);
@@ -1431,7 +1449,9 @@ namespace Umbraco.Cms.Core.Services
                     .ToArray();
 
                 var savingNotification = new MediaSavingNotification(itemsA, messages);
+#pragma warning disable CS0618 // Type or member is obsolete
                 if (scope.Notifications.PublishCancelable(savingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
                 {
                     scope.Complete();
                     return false;
@@ -1656,7 +1676,9 @@ namespace Umbraco.Cms.Core.Services
                 IQuery<IMedia>? query = Query<IMedia>().WhereIn(x => x.ContentTypeId, mediaTypeIdsA);
                 IMedia[] medias = _mediaRepository.Get(query)?.ToArray() ?? Array.Empty<IMedia>();
 
+#pragma warning disable CS0618 // Type or member is obsolete
                 if (scope.Notifications.PublishCancelable(new MediaDeletingNotification(medias, messages)))
+#pragma warning restore CS0618 // Type or member is obsolete
                 {
                     scope.Complete();
                     return;

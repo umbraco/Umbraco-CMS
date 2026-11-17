@@ -198,7 +198,9 @@ public class UnattendedUpgradeBackgroundServiceTests
         SetupPublishAsync(eventAggregator);
 
         eventAggregator
+#pragma warning disable CS0618 // Type or member is obsolete
             .Setup(x => x.Publish(It.IsAny<UmbracoApplicationStartedNotification>()))
+#pragma warning restore CS0618 // Type or member is obsolete
             .Throws(new BootFailedException("a started handler failed"));
 
         var sut = CreateSut(
@@ -209,7 +211,9 @@ public class UnattendedUpgradeBackgroundServiceTests
         await sut.StartAsync(CancellationToken.None);
         await sut.ExecuteTask!;
 
+#pragma warning disable CS0618 // Type or member is obsolete
         eventAggregator.Verify(x => x.Publish(It.IsAny<UmbracoApplicationStartedNotification>()), Times.Once);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         runtimeState.Verify(
             x => x.Configure(RuntimeLevel.BootFailed, It.IsAny<RuntimeLevelReason>(), It.IsAny<Exception?>()),
