@@ -2432,7 +2432,7 @@ public class ContentService : RepositoryService, IContentService
         return cultures.Select(x => x.EnsureCultureCode()!).ToArray();
     }
 
-    private static bool ProvidedCulturesIndicatePublishAll(string[] cultures) => cultures.Length == 0 || (cultures.Length == 1 && cultures[0] == "invariant");
+    private static bool ProvidedCulturesIndicatePublishAll(string[] cultures) => cultures.All(culture => culture == "invariant");
 
     /// <summary>
     /// Publishes a branch of content items starting from the specified document.
