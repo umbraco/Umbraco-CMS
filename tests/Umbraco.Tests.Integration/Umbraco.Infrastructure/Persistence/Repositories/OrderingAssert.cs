@@ -12,6 +12,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 /// <summary>
 /// Asserts how repositories order rows in the statements they execute.
 /// </summary>
+/// <remarks>
+/// The assertions inspect the executed SQL rather than the returned rows: SQLite and SQL Server both happen to return
+/// rows with equal ordering values in id order, so asserting on the results would pass whether or not the statement
+/// breaks ties.
+/// </remarks>
 internal static class OrderingAssert
 {
     /// <summary>
