@@ -1,0 +1,163 @@
+parameters:
+  - name: pipeline # pipeline resource alias to download the artifacts from
+    type: string
+  - name: environment # environment whose approvals and checks gate the jobs
+    type: string
+  - name: runTag # tag added to the release run when the stage starts
+    type: string
+    default: ''
+
+  - name: publishNuGet
+    type: boolean
+    default: true
+  - name: nuGetTarget # where the packages go, e.g. NuGet
+    type: string
+    default: ''
+  - name: nuGetConnection # NuGet service connection to push with
+    type: string
+    default: ''
+
+  - name: publishBackofficeToNpm
+    type: boolean
+    default: true
+  - name: publishTestHelpersToNpm
+    type: boolean
+    default: true
+  - name: npmTarget # where the packages go, e.g. npm
+    type: string
+    default: ''
+  - name: npmRegistry # scoped-registry URL to publish to
+    type: string
+    default: ''
+  - name: npmEndpoint # npmAuthenticate service connection(s)
+    type: string
+    default: ''
+  - name: npmDistTag # dist-tag to publish under
+    type: string
+    default: latest
+
+  - name: uploadDocs
+    type: boolean
+    default: false
+  - name: umbracoMajorVersion
+    type: string
+    default: ''
+  - name: docs # one upload job each; the name is the job name, so letters, digits and underscores only
+    type: object
+    default:
+      - name: UploadCSharpDocs
+        displayName: C# API docs
+        artifactName: csharp-docs
+        blobPrefix: csharp
+      - name: UploadUiApiDocs
+        displayName: UI API docs
+        artifactName: ui-api-docs
+        blobPrefix: ui-api
+      - name: UploadStorybook
+        displayName: Storybook
+        artifactName: ui-docs
+        blobPrefix: ui
+
+jobs:
+  - ${{ if and(ne(parameters.runTag, ''), or(parameters.publishNuGet, parameters.publishBackofficeToNpm, parameters.publishTestHelpersToNpm, parameters.uploadDocs)) }}:
+      - job: TagRun
+        displayName: Tag run ${{ parameters.runTag }}
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - checkout: none
+          - script: echo "##vso[build.addbuildtag]${{ parameters.runTag }}"
+            displayName: Tag the run
+
+  - ${{ if parameters.publishNuGet }}:
+      - deployment: PushNuGet
+        displayName: Push NuGet packages to ${{ parameters.nuGetTarget }}
+        environment: ${{ parameters.environment }}
+        pool:
+          vmImage: "windows-latest" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so we'll use windows until an alternative is available.
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: none
+                - download: ${{ parameters.pipeline }}
+                  artifact: nupkg
+                  displayName: Download nupkg
+                - task: NuGetCommand@2
+                  displayName: Push packages
+                  inputs:
+                    command: "push"
+                    packagesToPush: $(Pipeline.Workspace)/${{ parameters.pipeline }}/nupkg/**/*.nupkg
+                    nuGetFeedType: "external"
+                    publishFeedCredentials: ${{ parameters.nuGetConnection }}
+
+  - ${{ if parameters.publishBackofficeToNpm }}:
+      - deployment: PushBackofficeToNpm
+        displayName: Push Backoffice to ${{ parameters.npmTarget }}
+        environment: ${{ parameters.environment }}
+        pool:
+          vmImage: "ubuntu-latest"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: none
+                - template: npm-publish.yml
+                  parameters:
+                    pipeline: ${{ parameters.pipeline }}
+                    artifactName: npm
+                    registry: ${{ parameters.npmRegistry }}
+                    customEndpoint: ${{ parameters.npmEndpoint }}
+                    displayName: Push package
+                    npmTag: ${{ parameters.npmDistTag }}
+
+  - ${{ if parameters.publishTestHelpersToNpm }}:
+      - deployment: PushTestHelpersToNpm
+        displayName: Push Test Helpers to ${{ parameters.npmTarget }}
+        environment: ${{ parameters.environment }}
+        pool:
+          vmImage: "ubuntu-latest"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: none
+                - template: npm-publish.yml
+                  parameters:
+                    pipeline: ${{ parameters.pipeline }}
+                    artifactName: npm-testhelpers
+                    registry: ${{ parameters.npmRegistry }}
+                    customEndpoint: ${{ parameters.npmEndpoint }}
+                    displayName: Push package
+                    npmTag: ${{ parameters.npmDistTag }}
+
+  - ${{ if parameters.uploadDocs }}:
+      - ${{ each doc in parameters.docs }}:
+          - deployment: ${{ doc.name }}
+            displayName: Upload ${{ doc.displayName }}
+            environment: ${{ parameters.environment }}
+            pool:
+              vmImage: "windows-latest" # AzureFileCopy is Windows only
+            strategy:
+              runOnce:
+                deploy:
+                  steps:
+                    - download: none
+                    - download: ${{ parameters.pipeline }}
+                      artifact: ${{ doc.artifactName }}
+                      displayName: Download artifact
+                    - task: ExtractFiles@1
+                      inputs:
+                        archiveFilePatterns: $(Pipeline.Workspace)/${{ parameters.pipeline }}/${{ doc.artifactName }}/${{ doc.artifactName }}.zip
+                        destinationFolder: $(Build.ArtifactStagingDirectory)/${{ doc.artifactName }}
+                        overwriteExistingFiles: true
+                    - task: AzureFileCopy@6
+                      displayName: "Copy ${{ doc.displayName }} to blob storage"
+                      inputs:
+                        SourcePath: "$(Build.ArtifactStagingDirectory)/${{ doc.artifactName }}/*"
+                        azureSubscription: umbraco-storage-wif
+                        Destination: AzureBlob
+                        storage: umbracoapidocs
+                        ContainerName: "$web"
+                        BlobPrefix: v${{ parameters.umbracoMajorVersion }}/${{ doc.blobPrefix }}
+                        CleanTargetBeforeCopy: true

@@ -1,0 +1,179 @@
+name: $(TeamProject)_$(Build.DefinitionName)_$(Date:yyyyMMdd)$(Rev:.r)
+
+trigger: none
+pr: none
+
+resources:
+  pipelines:
+    - pipeline: build
+      source: "Umbraco CMS 9+"
+      trigger:
+        branches:
+          include:
+            # Only these refs start a release by themselves. Other branches, tags and pull request runs (refs/pull/*) never match.
+            - refs/heads/release/*
+            - refs/tags/release-*
+            - refs/heads/main
+            - refs/heads/v*/dev
+        tags:
+          - release
+
+parameters:
+  - name: skipNuGetPush
+    displayName: Skip the push to NuGet
+    type: boolean
+    default: false
+  - name: skipBackofficeNpmPush
+    displayName: Skip the push of the backoffice package to npm
+    type: boolean
+    default: false
+  - name: skipTestHelpersNpmPush
+    displayName: Skip the push of the test helpers to npm
+    type: boolean
+    default: false
+  - name: skipApiDocsUpload
+    displayName: Skip the API docs upload
+    type: boolean
+    default: false
+  - name: skipDependencyTrackUpload
+    displayName: Skip the Dependency Track upload
+    type: boolean
+    default: false
+
+stages:
+  ###############################################
+  ## Resolve release
+  ###############################################
+  - stage: Resolve_Release
+    displayName: Resolve release
+    jobs:
+      - job: Resolve
+        displayName: Validate release metadata
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - checkout: none
+          - download: build
+            artifact: release-metadata
+            displayName: Download release metadata
+          - pwsh: |
+              function Fail($message) {
+                Write-Host "##vso[task.logissue type=error]$message"
+                exit 1
+              }
+
+              $metadata = Get-Content -Raw -Path "$(Pipeline.Workspace)/build/release-metadata/release-metadata.json" | ConvertFrom-Json
+              $kind = $metadata.kind
+              $version = $metadata.version
+              $versionMajor = $metadata.versionMajor
+              $isPrerelease = $metadata.isPrerelease
+
+              if ($kind -cnotmatch '\A(nightly|public)\z') { Fail 'Unexpected kind in the release metadata.' }
+              if ($version -cnotmatch '\A[0-9]+\.[0-9]+\.[0-9]+[0-9A-Za-z.+-]*\z') { Fail 'Unexpected version in the release metadata.' }
+              if ($versionMajor -cnotmatch '\A[0-9]+\z') { Fail 'Unexpected major version in the release metadata.' }
+              if ($isPrerelease -isnot [bool]) { Fail 'Unexpected isPrerelease in the release metadata.' }
+
+              $npmDistTag = if ($isPrerelease) { 'next' } else { 'latest' }
+
+              Write-Host "Version $version ($kind release), npm dist-tag $npmDistTag"
+
+              Write-Host "##vso[build.updatebuildnumber]$version"
+
+              Write-Host "##vso[task.setvariable variable=kind;isOutput=true]$kind"
+              Write-Host "##vso[task.setvariable variable=npmDistTag;isOutput=true]$npmDistTag"
+              Write-Host "##vso[task.setvariable variable=versionMajor;isOutput=true]$versionMajor"
+            name: resolve
+            displayName: Parse release metadata
+
+  ###############################################
+  ## Release
+  ###############################################
+  - stage: Publish_Nightly
+    displayName: Nightly feed
+    dependsOn: Resolve_Release
+    condition: and(in(dependencies.Resolve_Release.result, 'Succeeded', 'SucceededWithIssues'), eq(dependencies.Resolve_Release.outputs['Resolve.resolve.kind'], 'nightly'))
+    jobs:
+      - template: templates/publish-to-feed.yml
+        parameters:
+          pipeline: build
+          environment: Nightly Feed
+          runTag: release-nightly
+          nuGetTarget: MyGet
+          nuGetConnection: "MyGet - Umbraco Nightly"
+          npmTarget: MyGet
+          npmRegistry: https://www.myget.org/F/umbraconightly/npm/
+          npmEndpoint: "MyGet (npm) - Umbraconightly"
+
+  - stage: Publish_Prerelease
+    displayName: Pre-release feed
+    dependsOn: Resolve_Release
+    condition: and(in(dependencies.Resolve_Release.result, 'Succeeded', 'SucceededWithIssues'), eq(dependencies.Resolve_Release.outputs['Resolve.resolve.kind'], 'public'))
+    jobs:
+      - template: templates/publish-to-feed.yml
+        parameters:
+          pipeline: build
+          environment: Pre-release Feed
+          runTag: release-internal
+          nuGetTarget: MyGet
+          nuGetConnection: "MyGet - Pre-releases"
+          npmTarget: MyGet
+          npmRegistry: https://www.myget.org/F/umbracoprereleases/npm/
+          npmEndpoint: "MyGet (npm) - Umbracoprereleases"
+
+  - ${{ if or(not(parameters.skipNuGetPush), not(parameters.skipBackofficeNpmPush), not(parameters.skipTestHelpersNpmPush), not(parameters.skipApiDocsUpload)) }}:
+      - stage: Publish_Public
+        displayName: Public feed
+        dependsOn: Resolve_Release
+        condition: and(in(dependencies.Resolve_Release.result, 'Succeeded', 'SucceededWithIssues'), eq(dependencies.Resolve_Release.outputs['Resolve.resolve.kind'], 'public'))
+        variables:
+          # `latest` for stable releases, `next` for prereleases.
+          npmDistTag: $[ stageDependencies.Resolve_Release.Resolve.outputs['resolve.npmDistTag'] ]
+          umbracoMajorVersion: $[ stageDependencies.Resolve_Release.Resolve.outputs['resolve.versionMajor'] ]
+        jobs:
+          - template: templates/publish-to-feed.yml
+            parameters:
+              pipeline: build
+              environment: Public Feed
+              runTag: release-public
+              publishNuGet: ${{ not(parameters.skipNuGetPush) }}
+              nuGetTarget: NuGet
+              nuGetConnection: "NuGet - Umbraco.*"
+              publishBackofficeToNpm: ${{ not(parameters.skipBackofficeNpmPush) }}
+              publishTestHelpersToNpm: ${{ not(parameters.skipTestHelpersNpmPush) }}
+              npmTarget: npm
+              npmRegistry: https://registry.npmjs.org/
+              npmEndpoint: "NPM - Umbraco Backoffice"
+              npmDistTag: $(npmDistTag)
+              uploadDocs: ${{ not(parameters.skipApiDocsUpload) }}
+              umbracoMajorVersion: $(umbracoMajorVersion)
+
+  - stage: Upload_Dependency_Track
+    displayName: Dependency Track
+    dependsOn: Resolve_Release
+    condition: and(in(dependencies.Resolve_Release.result, 'Succeeded', 'SucceededWithIssues'), eq(dependencies.Resolve_Release.outputs['Resolve.resolve.kind'], 'public'), ${{ not(parameters.skipDependencyTrackUpload) }})
+    variables:
+      # Public releases are tracked per major version.
+      umbracoVersion: $[ stageDependencies.Resolve_Release.Resolve.outputs['resolve.versionMajor'] ]
+      # A stable release may become the latest version; the template confirms it is a release of main's major.
+      isStableRelease: $[ eq(stageDependencies.Resolve_Release.Resolve.outputs['resolve.npmDistTag'], 'latest') ]
+    jobs:
+      - template: templates/dependency-track.yml
+        parameters:
+          pipeline: build
+          projectName: "Umbraco-CMS"
+          umbracoVersion: $(umbracoVersion)
+          isLatestCandidate: $(isStableRelease)
+          latestVersionFileUrl: "https://raw.githubusercontent.com/umbraco/Umbraco-CMS/main/version.json"
+          projects:
+            - name: "Backend"
+              artifact: "bom-backend"
+              bomFilePath: "bom-dotnet.xml"
+            - name: "Login"
+              artifact: "bom-login"
+              bomFilePath: "bom-login.xml"
+            - name: "Backoffice"
+              artifact: "bom-backoffice"
+              bomFilePath: "bom-backoffice.xml"
+            - name: "E2E"
+              artifact: "bom-e2e"
+              bomFilePath: "bom-e2e.xml"
