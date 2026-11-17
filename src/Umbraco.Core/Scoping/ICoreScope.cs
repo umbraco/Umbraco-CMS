@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Scoping;
 /// <summary>
 ///     Represents a scope.
 /// </summary>
-public interface ICoreScope : IDisposable, IInstanceIdentifiable
+public interface ICoreScope : IDisposable, IAsyncDisposable, IInstanceIdentifiable
 {
     /// <summary>
     /// Gets the distance from the root scope.
@@ -94,4 +94,15 @@ public interface ICoreScope : IDisposable, IInstanceIdentifiable
     /// </summary>
     /// <param name="lockIds">Array of lock object identifiers.</param>
     void EagerReadLock(params int[] lockIds);
+
+    /// <summary>
+    ///     Disposes the scope, publishing any pending scoped notifications asynchronously when the implementation supports it.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous dispose operation.</returns>
+    // TODO (V19): Remove the default implementation.
+    ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        Dispose();
+        return ValueTask.CompletedTask;
+    }
 }

@@ -289,6 +289,20 @@ public class CoreScope : ICoreScope
     ///     Called when a child scope has completed, to update the parent's completion status.
     /// </summary>
     /// <param name="completed">A value indicating whether the child completed successfully.</param>
+    /// <summary>
+    ///     Disposes the scope asynchronously.
+    /// </summary>
+    /// <remarks>
+    ///     The default implementation disposes synchronously; implementations override it to publish the pending
+    ///     scoped notifications asynchronously.
+    /// </remarks>
+    /// <returns>A task that represents the asynchronous dispose operation.</returns>
+    public virtual ValueTask DisposeAsync()
+    {
+        Dispose();
+        return ValueTask.CompletedTask;
+    }
+
     protected virtual void ChildCompleted(bool? completed)
     {
         // if child did not complete we cannot complete
@@ -333,6 +347,9 @@ public class CoreScope : ICoreScope
     ///     Handles the scoped notifications when the scope exits.
     /// </summary>
     protected void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(Completed.HasValue && Completed.Value);
+
+    protected Task HandleScopedNotificationsAsync()
+        => _notificationPublisher?.ScopeExitAsync(Completed.HasValue && Completed.Value) ?? Task.CompletedTask;
 
     /// <summary>
     ///     Ensures that this scope and all ancestor scopes have not been disposed.
