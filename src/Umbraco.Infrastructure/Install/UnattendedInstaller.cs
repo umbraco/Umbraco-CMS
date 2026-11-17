@@ -143,7 +143,7 @@ public class UnattendedInstaller : INotificationAsyncHandler<RuntimeUnattendedIn
 
                 // Emit an event with EventAggregator that unattended install completed
                 // Then this event can be listened for and create an unattended user
-                await _eventAggregator.PublishAsync(new UnattendedInstallNotification());
+                await _eventAggregator.PublishAsync(new UnattendedInstallNotification(), CancellationToken.None);
             }
         }
         catch (Exception ex)
