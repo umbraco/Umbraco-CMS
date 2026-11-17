@@ -44,7 +44,7 @@ internal class LongRunningOperationsCleanupJob : IDistributedBackgroundJob
     /// <inheritdoc />
     public async Task ExecuteAsync()
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
         await _longRunningOperationRepository.CleanOperationsAsync(_timeProvider.GetUtcNow() - _maxEntryAge);
         scope.Complete();
     }

@@ -119,7 +119,7 @@ public sealed class RelateOnTrashNotificationHandler :
     /// <inheritdoc />
     public async Task HandleAsync(ContentMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
             IRelationType? relationType = _relationService.GetRelationTypeByAlias(relationTypeAlias);
@@ -199,7 +199,7 @@ public sealed class RelateOnTrashNotificationHandler :
     /// <inheritdoc />
     public async Task HandleAsync(MediaMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
             IRelationType? relationType = _relationService.GetRelationTypeByAlias(relationTypeAlias);

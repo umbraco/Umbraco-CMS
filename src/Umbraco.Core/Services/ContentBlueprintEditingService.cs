@@ -186,7 +186,7 @@ internal sealed class ContentBlueprintEditingService
     /// <inheritdoc />
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey)
     {
-        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         IContent? blueprint = await GetAsync(key);
         if (blueprint is null)
         {
@@ -204,7 +204,7 @@ internal sealed class ContentBlueprintEditingService
     /// <inheritdoc />
     public async Task<Attempt<ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? containerKey, Guid userKey)
     {
-        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         IContent? toMove = await GetAsync(key);
         if (toMove is null)
         {

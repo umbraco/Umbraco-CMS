@@ -84,7 +84,7 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
     /// <inheritdoc/>
     public async Task<IRedirectUrl?> GetMostRecentRedirectUrlAsync(string url)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         return await _redirectUrlRepository.GetMostRecentUrlAsync(url);
     }
 
@@ -136,7 +136,7 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
             return await GetMostRecentRedirectUrlAsync(url);
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         return await _redirectUrlRepository.GetMostRecentUrlAsync(url, culture);
     }
 }

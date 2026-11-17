@@ -52,28 +52,28 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     /// <inheritdoc />
     public async Task<ExternalMemberIdentity?> GetByKeyAsync(Guid key)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         return await _repository.GetByKeyAsync(key);
     }
 
     /// <inheritdoc />
     public async Task<ExternalMemberIdentity?> GetByEmailAsync(string email)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         return await _repository.GetByEmailAsync(email);
     }
 
     /// <inheritdoc />
     public async Task<ExternalMemberIdentity?> GetByUsernameAsync(string username)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         return await _repository.GetByUsernameAsync(username);
     }
 
     /// <inheritdoc />
     public async Task<PagedModel<ExternalMemberIdentity>> GetAllAsync(int skip, int take)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         return await _repository.GetPagedAsync(skip, take);
     }
 
@@ -83,7 +83,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
         // Cross-store uniqueness checks run in a separate read-only scope so they don't hold
         // SHARED table locks that would deadlock with concurrent write transactions on SQLite.
         // The unique indexes on the table are the ultimate guard against duplicates.
-        using (ICoreScope readScope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        await using (ICoreScope readScope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             ExternalMemberOperationStatus? uniquenessResult = await ValidateUsernameUniqueAsync(member.UserName, null);
             if (uniquenessResult is not null)
@@ -103,7 +103,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
 
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         // Publish cancelable saving notification.
         var savingNotification = new ExternalMemberSavingNotification(member, evtMsgs);
@@ -151,7 +151,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     {
         // Cross-store uniqueness checks run in a separate read-only scope so they don't hold
         // SHARED table locks that would deadlock with concurrent write transactions on SQLite.
-        using (ICoreScope readScope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        await using (ICoreScope readScope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             ExternalMemberOperationStatus? uniquenessResult = await ValidateUsernameUniqueAsync(member.UserName, member.Key);
             if (uniquenessResult is not null)
@@ -171,7 +171,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
 
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         // Publish cancelable saving notification.
         var savingNotification = new ExternalMemberSavingNotification(member, evtMsgs);
@@ -204,7 +204,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
@@ -241,7 +241,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         ExternalMemberIdentity? member = await _repository.GetByKeyAsync(key);
         if (member is null)
@@ -273,14 +273,14 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     /// <inheritdoc />
     public async Task<IEnumerable<string>> GetRolesAsync(Guid memberKey)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         return await _repository.GetRolesAsync(memberKey);
     }
 
     /// <inheritdoc />
     public async Task<Attempt<ExternalMemberIdentity?, ExternalMemberOperationStatus>> AssignRolesAsync(Guid memberKey, string[] roleNames)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         ExternalMemberIdentity? member = await _repository.GetByKeyAsync(memberKey);
         if (member is null)
@@ -301,7 +301,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     /// <inheritdoc />
     public async Task<Attempt<ExternalMemberIdentity?, ExternalMemberOperationStatus>> RemoveRolesAsync(Guid memberKey, string[] roleNames)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         ExternalMemberIdentity? member = await _repository.GetByKeyAsync(memberKey);
         if (member is null)
@@ -322,7 +322,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     /// <inheritdoc />
     public async Task<Attempt<IMember?, ExternalMemberOperationStatus>> ConvertToContentMemberAsync(Guid memberKey, string memberTypeAlias, Action<IMember, string?>? mapProfileData = null)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         // Load the external member.
         ExternalMemberIdentity? externalMember = await _repository.GetByKeyAsync(memberKey);

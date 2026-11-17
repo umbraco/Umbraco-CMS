@@ -52,7 +52,7 @@ internal class LogScrubberJob : IDistributedBackgroundJob
     public async Task ExecuteAsync()
     {
         // Ensure we use an explicit scope since we are running on a background thread.
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
         using (_profilingLogger.DebugDuration<LogScrubberJob>("Log scrubbing executing", "Log scrubbing complete"))
         {
             await _auditService.CleanLogsAsync((int)_settings.MaxLogAge.TotalMinutes);

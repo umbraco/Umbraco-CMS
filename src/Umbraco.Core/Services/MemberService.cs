@@ -207,7 +207,7 @@ namespace Umbraco.Cms.Core.Services
             int skip = 0,
             int take = 100)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            await using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTypes);
             scope.ReadLock(Constants.Locks.MemberTree);
 
@@ -993,7 +993,7 @@ namespace Umbraco.Cms.Core.Services
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
-            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
             if (_logger.IsEnabled(LogLevel.Debug))
             {

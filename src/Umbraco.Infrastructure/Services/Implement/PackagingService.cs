@@ -146,7 +146,7 @@ public class PackagingService : IPackagingService
     /// <inheritdoc/>
     public async Task<Attempt<PackageDefinition?, PackageOperationStatus>> DeleteCreatedPackageAsync(Guid key, Guid userKey)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         PackageDefinition? package = await GetCreatedPackageByKeyAsync(key);
         if (package == null)
         {
@@ -199,7 +199,7 @@ public class PackagingService : IPackagingService
     /// <inheritdoc/>
     public async Task<Attempt<PackageDefinition, PackageOperationStatus>> CreateCreatedPackageAsync(PackageDefinition package, Guid userKey)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         if (_createdPackages.SavePackage(package) == false)
         {
             if (string.IsNullOrEmpty(package.Name))
@@ -224,7 +224,7 @@ public class PackagingService : IPackagingService
     /// <inheritdoc/>
     public async Task<Attempt<PackageDefinition, PackageOperationStatus>> UpdateCreatedPackageAsync(PackageDefinition package, Guid userKey)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         if (_createdPackages.SavePackage(package) == false)
         {
             return Attempt.FailWithStatus(PackageOperationStatus.NotFound, package);
@@ -268,7 +268,7 @@ public class PackagingService : IPackagingService
     /// <returns>A task that represents the asynchronous operation. The task result contains a collection of <see cref="InstalledPackage"/> objects representing all installed packages.</returns>
     public async Task<IEnumerable<InstalledPackage>> GetAllInstalledPackagesAsync()
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
 
         IReadOnlyDictionary<string, string?>? keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
 

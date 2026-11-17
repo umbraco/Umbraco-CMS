@@ -209,7 +209,7 @@ public class DomainService : RepositoryService, IDomainService
             return Attempt.FailWithStatus(DomainOperationStatus.ContentNotFound, new DomainUpdateResult());
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         IEnumerable<ILanguage> allLanguages = await _languageService.GetAllAsync();
         var languageIdByIsoCode = allLanguages.ToDictionary(l => l.IsoCode, l => l.Id);

@@ -50,7 +50,7 @@ internal class WebhookLoggingCleanup : IDistributedBackgroundJob
         }
 
         IEnumerable<WebhookLog> webhookLogs;
-        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
         {
             scope.ReadLock(Constants.Locks.WebhookLogs);
             webhookLogs = await _webhookLogRepository.GetOlderThanDate(DateTime.UtcNow - TimeSpan.FromDays(_webhookSettings.KeepLogsForDays));
@@ -59,7 +59,7 @@ internal class WebhookLoggingCleanup : IDistributedBackgroundJob
 
         foreach (IEnumerable<WebhookLog> group in webhookLogs.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
-            using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+            await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
             scope.WriteLock(Constants.Locks.WebhookLogs);
             await _webhookLogRepository.DeleteByIds(group.Select(x => x.Id).ToArray());
 

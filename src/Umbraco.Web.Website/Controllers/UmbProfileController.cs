@@ -114,7 +114,7 @@ public class UmbProfileController : SurfaceController
 
     private async Task<IdentityResult> UpdateMemberAsync(ProfileModel model, MemberIdentityUser currentMember)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         currentMember.Email = model.Email;
         currentMember.Name = model.Name;

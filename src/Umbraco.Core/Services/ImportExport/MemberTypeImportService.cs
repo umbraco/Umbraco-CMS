@@ -45,7 +45,7 @@ public class MemberTypeImportService : IMemberTypeImportService
         Guid userKey,
         Guid? memberTypeId = null)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         _temporaryFileToXmlImportService.CleanupFileIfScopeCompletes(temporaryFileId);
         Attempt<XElement?, TemporaryFileXmlImportOperationStatus> loadXmlAttempt =

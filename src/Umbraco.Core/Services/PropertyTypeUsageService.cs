@@ -29,7 +29,7 @@ public class PropertyTypeUsageService : IPropertyTypeUsageService
     /// <inheritdoc/>
     public async Task<Attempt<bool, PropertyTypeOperationStatus>> HasSavedPropertyValuesAsync(Guid contentTypeKey, string propertyAlias)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
         var contentTypeExists = await _propertyTypeUsageRepository.ContentTypeExistAsync(contentTypeKey);
 

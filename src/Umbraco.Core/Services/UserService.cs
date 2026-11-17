@@ -531,7 +531,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <inheritdoc/>
     public async Task<Attempt<UserCreationResult, UserOperationStatus>> CreateAsync(Guid performingUserKey, UserCreateModel model, bool approveUser = false)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
 
         IUser? performingUser = await GetAsync(performingUserKey);
@@ -639,7 +639,7 @@ internal partial class UserService : RepositoryService, IUserService
             return Attempt.Fail(UserOperationStatus.PasswordResetUnavailable);
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
 
         ICoreBackOfficeUserManager userManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
@@ -695,7 +695,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <inheritdoc/>
     public async Task<Attempt<UserInvitationResult, UserOperationStatus>> InviteAsync(Guid performingUserKey, UserInviteModel model)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
 
         IUser? performingUser = await GetAsync(performingUserKey);
@@ -776,7 +776,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <inheritdoc/>
     public async Task<Attempt<UserInvitationResult, UserOperationStatus>> ResendInvitationAsync(Guid performingUserKey, UserResendInviteModel model)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
 
         IUser? performingUser = await GetAsync(performingUserKey);
@@ -878,7 +878,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <inheritdoc/>
     public async Task<Attempt<IUser?, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
         IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
@@ -1000,7 +1000,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <inheritdoc/>
     public async Task<Attempt<IUser?, UserOperationStatus>> UpdateProfileAsync(Guid userKey, UserUpdateProfileModel model)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
         IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
@@ -1033,7 +1033,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <inheritdoc/>
     public async Task<UserOperationStatus> SetAvatarAsync(Guid userKey, Guid temporaryFileKey)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         IUser? user = await GetAsync(userKey);
         if (user is null)
@@ -1226,7 +1226,7 @@ internal partial class UserService : RepositoryService, IUserService
     private async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(IUser performingUser, ChangeUserPasswordModel model)
     {
         IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
         IUser? user = await userStore.GetAsync(model.UserKey);
@@ -1283,7 +1283,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <inheritdoc/>
     public async Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(Guid performingUserKey, int skip, int take)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         IUser? requestingUser = await GetAsync(performingUserKey);
 
@@ -1336,7 +1336,7 @@ internal partial class UserService : RepositoryService, IUserService
         UserOrder orderBy = UserOrder.UserName,
         Direction orderDirection = Direction.Ascending)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         IUser? requestingUser = await GetAsync(userKey);
 
@@ -1520,7 +1520,7 @@ internal partial class UserService : RepositoryService, IUserService
             return UserOperationStatus.Success;
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IUser? performingUser = await GetAsync(performingUserKey);
 
         if (performingUser is null)
@@ -1569,7 +1569,7 @@ internal partial class UserService : RepositoryService, IUserService
             return UserOperationStatus.Success;
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IUser? performingUser = await GetAsync(performingUserKey);
 
         if (performingUser is null)
@@ -1616,7 +1616,7 @@ internal partial class UserService : RepositoryService, IUserService
             return UserOperationStatus.Success;
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IUser? performingUser = await GetAsync(performingUserKey);
 
         if (performingUser is null)
@@ -1688,7 +1688,7 @@ internal partial class UserService : RepositoryService, IUserService
             return Attempt.SucceedWithStatus(UserOperationStatus.Success, new UserUnlockResult());
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IUser? performingUser = await GetAsync(performingUserKey);
 
         if (performingUser is null)
@@ -1979,7 +1979,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <inheritdoc/>
     public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> CreateInitialPasswordAsync(Guid userKey, string token, string password)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         Attempt<UserOperationStatus> verifyInviteAttempt = await VerifyInviteAsync(userKey, token);
         if (verifyInviteAttempt.Result != UserOperationStatus.Success)
@@ -2003,7 +2003,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <inheritdoc/>
     public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ResetPasswordAsync(Guid userKey, string token, string password)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
 
         EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -2042,7 +2042,7 @@ internal partial class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.SelfPasswordResetNotAllowed, new PasswordChangedModel());
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
 
         ICoreBackOfficeUserManager backOfficeUserManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
@@ -2092,7 +2092,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <inheritdoc/>
     public async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetMediaPermissionsAsync(Guid userKey, IEnumerable<Guid> mediaKeys)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         Attempt<Dictionary<Guid, int>?> idAttempt = CreateIdKeyMap(mediaKeys, UmbracoObjectTypes.Media);
 
         if (idAttempt.Success is false || idAttempt.Result is null)
@@ -2110,7 +2110,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <inheritdoc/>
     public async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetDocumentPermissionsAsync(Guid userKey, IEnumerable<Guid> contentKeys)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         Attempt<Dictionary<Guid, int>?> idAttempt = CreateIdKeyMap(contentKeys, UmbracoObjectTypes.Document);
 
         if (idAttempt.Success is false || idAttempt.Result is null)
@@ -2219,7 +2219,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <inheritdoc />
     public async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetPermissionsAsync(Guid userKey, params Guid[] nodeKeys)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         IUser? user = await GetAsync(userKey);
 
@@ -2351,7 +2351,7 @@ internal partial class UserService : RepositoryService, IUserService
             return UserClientCredentialsOperationStatus.InvalidClientId;
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         IEnumerable<string> currentClientIds = _userRepository.GetAllClientIds();
         if (currentClientIds.InvariantContains(clientId))
@@ -2373,7 +2373,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <inheritdoc/>
     public async Task<bool> RemoveClientIdAsync(Guid userKey, string clientId)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         var userId = await _userIdKeyResolver.GetAsync(userKey);
         return _userRepository.RemoveClientId(userId, clientId);
@@ -2391,7 +2391,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <inheritdoc/>
     public async Task<IEnumerable<string>> GetClientIdsAsync(Guid userKey)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         var userId = await _userIdKeyResolver.GetAsync(userKey);
         return _userRepository.GetClientIds(userId);

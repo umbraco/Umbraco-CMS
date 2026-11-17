@@ -152,7 +152,7 @@ public class BackOfficeUserStore :
             return false;
         }
 
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         // We need to resolve the id from the key here...
         var id = await ResolveEntityIdFromIdentityId(userId);

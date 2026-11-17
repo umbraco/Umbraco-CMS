@@ -58,7 +58,7 @@ public class ContentTypeImportService : IContentTypeImportService
         Guid userKey,
         Guid? contentTypeId = null)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         _temporaryFileToXmlImportService.CleanupFileIfScopeCompletes(temporaryFileId);
         Attempt<XElement?, TemporaryFileXmlImportOperationStatus> loadXmlAttempt =

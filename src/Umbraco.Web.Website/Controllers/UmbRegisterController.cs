@@ -125,7 +125,7 @@ public class UmbRegisterController : SurfaceController
 
     private async Task<IdentityResult> RegisterMemberAsync(RegisterModel model)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         // U4-10762 Server error with "Register Member" snippet (Cannot save member with empty name)
         // If name field is empty, add the email address instead.

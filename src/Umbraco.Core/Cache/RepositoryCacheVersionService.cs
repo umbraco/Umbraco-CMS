@@ -48,7 +48,7 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     {
         _logger.LogDebug("Checking if cache for {EntityType} is synced", typeof(TEntity).Name);
 
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
         var cacheKey = GetCacheKey<TEntity>();
         RepositoryCacheVersion? databaseVersion = await _repositoryCacheVersionAccessor.GetAsync(cacheKey);
@@ -80,7 +80,7 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
             return;
         }
 
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.CacheVersion);
         await WriteVersionAsync(cacheKey);
         scope.Complete();
@@ -110,7 +110,7 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
             return;
         }
 
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.CacheVersion);
 
         foreach (var cacheKey in pendingCacheKeys)
@@ -144,7 +144,7 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     /// <inheritdoc />
     public async Task<IReadOnlyCollection<RepositoryCacheVersion>> GetCacheVersionsAsync()
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
         return (await _repositoryCacheVersionRepository.GetAllAsync()).ToList();
     }
 

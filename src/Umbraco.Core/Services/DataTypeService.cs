@@ -563,7 +563,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
 
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+            await using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 EntityContainer? container = null;
                 var parentId = Constants.System.Root;
@@ -704,7 +704,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return Attempt.FailWithStatus(DataTypeOperationStatus.InvalidId, dataType);
             }
 
-            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
             if (_dataTypeRepository.Get(dataType.Key) is not null)
             {
@@ -784,7 +784,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public async Task<Attempt<IDataType?, DataTypeOperationStatus>> DeleteAsync(Guid id, Guid userKey)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
-            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
             IDataType? dataType = _dataTypeRepository.Get(id);
             if (dataType == null)
@@ -1005,7 +1005,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
             dataType.CreatorId = currentUserId;
 
-            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
             DataTypeOperationStatus status = operationValidation();
             if (status != DataTypeOperationStatus.Success)

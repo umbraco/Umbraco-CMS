@@ -40,7 +40,7 @@ public class UserDataService : RepositoryService, IUserDataService
     /// <inheritdoc />
     public async Task<IUserData?> GetAsync(Guid key)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IUserData? userData = await _userDataRepository.GetAsync(key);
         scope.Complete();
         return userData;
@@ -49,7 +49,7 @@ public class UserDataService : RepositoryService, IUserDataService
     /// <inheritdoc />
     public async Task<PagedModel<IUserData>> GetAsync(int skip, int take, IUserDataFilter? filter = null)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         PagedModel<IUserData> pagedUserData = await _userDataRepository.GetAsync(skip, take, filter);
         scope.Complete();
         return pagedUserData;
@@ -58,7 +58,7 @@ public class UserDataService : RepositoryService, IUserDataService
     /// <inheritdoc />
     public async Task<Attempt<IUserData, UserDataOperationStatus>> CreateAsync(IUserData userData)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IUserData? existingUserData = await _userDataRepository.GetAsync(userData.Key);
         if (existingUserData is not null)
         {
@@ -79,7 +79,7 @@ public class UserDataService : RepositoryService, IUserDataService
     /// <inheritdoc />
     public async Task<Attempt<IUserData, UserDataOperationStatus>> UpdateAsync(IUserData userData)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IUserData? existingUserData = await _userDataRepository.GetAsync(userData.Key);
         if (existingUserData is null)
         {
@@ -100,7 +100,7 @@ public class UserDataService : RepositoryService, IUserDataService
     /// <inheritdoc />
     public async Task<Attempt<UserDataOperationStatus>> DeleteAsync(Guid key)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IUserData? existingUserData = await _userDataRepository.GetAsync(key);
         if (existingUserData is null)
         {
