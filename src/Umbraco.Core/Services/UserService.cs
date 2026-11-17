@@ -702,7 +702,7 @@ internal partial class UserService : RepositoryService, IUserService
             return Attempt.Fail(UserOperationStatus.UnknownFailure);
         }
 
-        userManager.NotifyForgotPasswordRequested(new ClaimsPrincipal(), user.Id.ToString()); //A bit of a hack, but since this method will be used without a signed in user, there is no real principal anyway.
+        await userManager.NotifyForgotPasswordRequestedAsync(new ClaimsPrincipal(), user.Id.ToString()); //A bit of a hack, but since this method will be used without a signed in user, there is no real principal anyway.
 
         scope.Complete();
 

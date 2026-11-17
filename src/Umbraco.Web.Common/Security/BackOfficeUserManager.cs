@@ -69,7 +69,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         // Slightly confusing: this will return a Success if we successfully update the AccessFailed count
         if (result.Succeeded)
         {
-            NotifyLoginFailed(_httpContextAccessor.HttpContext?.User, user.Id);
+            await NotifyLoginFailedAsync(_httpContextAccessor.HttpContext?.User, user.Id);
         }
 
         return result;
@@ -80,7 +80,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         IdentityResult result = await base.ChangePasswordWithResetAsync(userId, token, newPassword);
         if (result.Succeeded)
         {
-            NotifyPasswordReset(_httpContextAccessor.HttpContext?.User, userId);
+            await NotifyPasswordResetAsync(_httpContextAccessor.HttpContext?.User, userId);
         }
 
         return result;
@@ -91,7 +91,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         IdentityResult result = await base.ChangePasswordAsync(user, currentPassword, newPassword);
         if (result.Succeeded)
         {
-            NotifyPasswordChanged(_httpContextAccessor.HttpContext?.User, user.Id);
+            await NotifyPasswordChangedAsync(_httpContextAccessor.HttpContext?.User, user.Id);
         }
 
         return result;
@@ -111,11 +111,11 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         // The way we unlock is by setting the lockoutEnd date to the current datetime
         if (result.Succeeded && lockoutEnd > DateTimeOffset.UtcNow)
         {
-            NotifyAccountLocked(_httpContextAccessor.HttpContext?.User, user.Id);
+            await NotifyAccountLockedAsync(_httpContextAccessor.HttpContext?.User, user.Id);
         }
         else
         {
-            NotifyAccountUnlocked(_httpContextAccessor.HttpContext?.User, user.Id);
+            await NotifyAccountUnlockedAsync(_httpContextAccessor.HttpContext?.User, user.Id);
 
             // Resets the login attempt fails back to 0 when unlock is clicked
             await ResetAccessFailedCountAsync(user);
@@ -145,7 +145,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         IdentityResult result = await base.ResetAccessFailedCountAsync(user);
 
         // notify now that it's reset
-        NotifyResetAccessFailedCount(_httpContextAccessor.HttpContext?.User, user.Id);
+        await NotifyResetAccessFailedCountAsync(_httpContextAccessor.HttpContext?.User, user.Id);
 
         return result;
     }
@@ -237,6 +237,106 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         currentUser,
         (currentUserId, ip) => new UserResetAccessFailedCountNotification(ip, userId, currentUserId));
 
+    /// <inheritdoc />
+    public Task NotifyForgotPasswordRequestedAsync(IPrincipal currentUser, string userId) => NotifyAsync(
+        currentUser,
+        (currentUserId, ip) => new UserForgotPasswordRequestedNotification(ip, userId, currentUserId));
+
+    /// <inheritdoc />
+    public Task NotifyForgotPasswordChangedAsync(IPrincipal currentUser, string userId) => NotifyAsync(
+        currentUser,
+        (currentUserId, ip) => new UserForgotPasswordChangedNotification(ip, userId, currentUserId));
+
+    /// <inheritdoc />
+    public async Task<SignOutSuccessResult> NotifyLogoutSuccessAsync(IPrincipal currentUser, string? userId)
+    {
+        UserLogoutSuccessNotification notification = await NotifyAsync(
+            currentUser,
+            (currentUserId, ip) => new UserLogoutSuccessNotification(ip, userId, currentUserId));
+
+        return new SignOutSuccessResult { SignOutRedirectUrl = notification.SignOutRedirectUrl };
+    }
+
+    /// <summary>
+    ///     Publishes a <see cref="UserLockedNotification" /> for the specified user.
+    /// </summary>
+    /// <param name="currentUser">The principal of the user performing the action.</param>
+    /// <param name="userId">The identifier of the user that was locked.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public Task NotifyAccountLockedAsync(IPrincipal? currentUser, string? userId) => NotifyAsync(
+        currentUser,
+        (currentUserId, ip) => new UserLockedNotification(ip, userId, currentUserId));
+
+    /// <summary>
+    ///     Publishes a <see cref="UserUnlockedNotification" /> for the specified user.
+    /// </summary>
+    /// <param name="currentUser">The principal of the user performing the action.</param>
+    /// <param name="userId">The identifier of the user that was unlocked.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public Task NotifyAccountUnlockedAsync(IPrincipal? currentUser, string userId) => NotifyAsync(
+        currentUser,
+        (currentUserId, ip) => new UserUnlockedNotification(ip, userId, currentUserId));
+
+    /// <summary>
+    ///     Publishes a <see cref="UserLoginFailedNotification" /> for the specified user.
+    /// </summary>
+    /// <param name="currentUser">The principal of the user performing the action.</param>
+    /// <param name="userId">The identifier of the user whose login failed.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public Task NotifyLoginFailedAsync(IPrincipal? currentUser, string userId) => NotifyAsync(
+        currentUser,
+        (currentUserId, ip) => new UserLoginFailedNotification(ip, userId, currentUserId));
+
+    /// <summary>
+    ///     Publishes a <see cref="UserLoginRequiresVerificationNotification" /> for the specified user.
+    /// </summary>
+    /// <param name="currentUser">The principal of the user performing the action.</param>
+    /// <param name="userId">The identifier of the user whose login requires verification.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public Task NotifyLoginRequiresVerificationAsync(IPrincipal currentUser, string? userId) => NotifyAsync(
+        currentUser,
+        (currentUserId, ip) => new UserLoginRequiresVerificationNotification(ip, userId, currentUserId));
+
+    /// <summary>
+    ///     Publishes a <see cref="UserLoginSuccessNotification" /> for the specified user.
+    /// </summary>
+    /// <param name="currentUser">The principal of the user performing the action.</param>
+    /// <param name="userId">The identifier of the user that logged in.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public Task NotifyLoginSuccessAsync(IPrincipal currentUser, string userId) => NotifyAsync(
+        currentUser,
+        (currentUserId, ip) => new UserLoginSuccessNotification(ip, userId, currentUserId));
+
+    /// <summary>
+    ///     Publishes a <see cref="UserPasswordChangedNotification" /> for the specified user.
+    /// </summary>
+    /// <param name="currentUser">The principal of the user performing the action.</param>
+    /// <param name="userId">The identifier of the user whose password was changed.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public Task NotifyPasswordChangedAsync(IPrincipal? currentUser, string userId) => NotifyAsync(
+        currentUser,
+        (currentUserId, ip) => new UserPasswordChangedNotification(ip, userId, currentUserId));
+
+    /// <summary>
+    ///     Publishes a <see cref="UserPasswordResetNotification" /> for the specified user.
+    /// </summary>
+    /// <param name="currentUser">The principal of the user performing the action.</param>
+    /// <param name="userId">The identifier of the user whose password was reset.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public Task NotifyPasswordResetAsync(IPrincipal? currentUser, string userId) => NotifyAsync(
+        currentUser,
+        (currentUserId, ip) => new UserPasswordResetNotification(ip, userId, currentUserId));
+
+    /// <summary>
+    ///     Publishes a <see cref="UserResetAccessFailedCountNotification" /> for the specified user.
+    /// </summary>
+    /// <param name="currentUser">The principal of the user performing the action.</param>
+    /// <param name="userId">The identifier of the user whose failed access count was reset.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public Task NotifyResetAccessFailedCountAsync(IPrincipal? currentUser, string userId) => NotifyAsync(
+        currentUser,
+        (currentUserId, ip) => new UserResetAccessFailedCountNotification(ip, userId, currentUserId));
+
     private T Notify<T>(IPrincipal? currentUser, Func<string, string, T> createNotification)
         where T : INotification
     {
@@ -245,6 +345,17 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
 
         T notification = createNotification(currentUserId, ip);
         _eventAggregator.Publish(notification);
+        return notification;
+    }
+
+    private async Task<T> NotifyAsync<T>(IPrincipal? currentUser, Func<string, string, T> createNotification)
+        where T : INotification
+    {
+        var currentUserId = GetCurrentUserId(currentUser);
+        var ip = IpResolver.GetCurrentRequestIpAddress();
+
+        T notification = createNotification(currentUserId, ip);
+        await _eventAggregator.PublishAsync(notification);
         return notification;
     }
 
