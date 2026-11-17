@@ -286,10 +286,6 @@ public class CoreScope : ICoreScope
     }
 
     /// <summary>
-    ///     Called when a child scope has completed, to update the parent's completion status.
-    /// </summary>
-    /// <param name="completed">A value indicating whether the child completed successfully.</param>
-    /// <summary>
     ///     Disposes the scope asynchronously.
     /// </summary>
     /// <remarks>
@@ -303,6 +299,10 @@ public class CoreScope : ICoreScope
         return ValueTask.CompletedTask;
     }
 
+    /// <summary>
+    ///     Called when a child scope has completed, to update the parent's completion status.
+    /// </summary>
+    /// <param name="completed">A value indicating whether the child completed successfully.</param>
     protected virtual void ChildCompleted(bool? completed)
     {
         // if child did not complete we cannot complete
@@ -348,6 +348,11 @@ public class CoreScope : ICoreScope
     /// </summary>
     protected void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(Completed.HasValue && Completed.Value);
 
+    /// <summary>
+    ///     Asynchronously handles the scoped notifications when the scope exits, publishing them when the scope
+    ///     completed and discarding them otherwise.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     protected Task HandleScopedNotificationsAsync()
         => _notificationPublisher?.ScopeExitAsync(Completed.HasValue && Completed.Value) ?? Task.CompletedTask;
 

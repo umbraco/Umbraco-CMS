@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Collections.Concurrent;
 using System.Reflection;
 using Umbraco.Cms.Core.Notifications;
 
@@ -27,6 +28,8 @@ public class ScopedNotificationPublisher : ScopedNotificationPublisher<INotifica
 public class ScopedNotificationPublisher<TNotificationHandler> : IScopedNotificationPublisher
     where TNotificationHandler : INotificationHandler
 {
+    private static readonly ConcurrentDictionary<Type, bool> _publishScopedNotificationsIsOverriddenByType = new();
+
     private readonly IEventAggregator _eventAggregator;
     private readonly List<INotification> _notificationOnScopeCompleted = new List<INotification>();
     private readonly bool _publishCancelableNotificationOnScopeExit;
@@ -45,9 +48,9 @@ public class ScopedNotificationPublisher<TNotificationHandler> : IScopedNotifica
         _publishCancelableNotificationOnScopeExit |= publishCancelableNotificationOnScopeExit;
 
         // A subclass that customizes the synchronous publishing keeps getting called when the scope exits asynchronously.
-        _publishScopedNotificationsIsOverridden = GetType()
+        _publishScopedNotificationsIsOverridden = _publishScopedNotificationsIsOverriddenByType.GetOrAdd(GetType(), static type => type
             .GetMethod(nameof(PublishScopedNotifications), BindingFlags.Instance | BindingFlags.NonPublic, [typeof(IList<INotification>)])?
-            .DeclaringType != typeof(ScopedNotificationPublisher<TNotificationHandler>);
+            .DeclaringType != typeof(ScopedNotificationPublisher<TNotificationHandler>));
     }
 
     /// <inheritdoc />
