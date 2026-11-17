@@ -133,6 +133,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_settingsInvalid?: boolean;
 
+	// 'ui-active' attribute is used for styling purpose.
+	@property({ type: Boolean, attribute: 'ui-active', reflect: true })
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	_uiActive?: boolean;
+
 	@state()
 	private _blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel> = {
 		contentKey: undefined!,
@@ -221,6 +226,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
 		this.observe(this.#context.name, (name) => (this._name = name), null);
 		this.observe(this.#context.parentName, (parentName) => (this._parentName = parentName), null);
+		this.observe(this.#context.isUiActive, (isUiActive) => (this._uiActive = isUiActive), null);
 
 		// Data:
 		this.observe(
@@ -312,6 +318,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	override connectedCallback(): void {
 		super.connectedCallback();
 		this.tabIndex = -1;
+		this.addEventListener('pointerenter', this.#onPointerEnter);
+		this.addEventListener('pointerleave', this.#onPointerLeave);
+		this.addEventListener('focusin', this.#onFocusIn);
+		this.addEventListener('focusout', this.#onFocusOut);
 		// element styling:
 		this.observe(
 			this.#context.columnSpan,
@@ -364,8 +374,21 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		}
 	}
 
+	readonly #onPointerEnter = () => this.#context.setHovered(true);
+	readonly #onPointerLeave = () => this.#context.setHovered(false);
+	readonly #onFocusIn = () => this.#context.setFocusWithin(true);
+	readonly #onFocusOut = (event: FocusEvent) => {
+		const next = event.relatedTarget as Node | null;
+		const focusStaysWithin = !!next && (next === this || this.contains(next));
+		if (!focusStaysWithin) this.#context.setFocusWithin(false);
+	};
+
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
+		this.removeEventListener('pointerenter', this.#onPointerEnter);
+		this.removeEventListener('pointerleave', this.#onPointerLeave);
+		this.removeEventListener('focusin', this.#onFocusIn);
+		this.removeEventListener('focusout', this.#onFocusOut);
 		clearTimeout(this.#renderTimeout);
 		this.#layoutContainerResizeObserver.disconnect();
 	}
@@ -650,8 +673,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 			:host([settings-invalid]),
 			:host([content-invalid]),
-			:host(:hover),
-			:host(:focus-within) {
+			:host([ui-active]) {
 				--umb-block-grid-entry-actions-opacity: 1;
 			}
 
@@ -757,13 +779,12 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				--umb-block-grid-entry-tab-pointer-events: none;
 
 				height: 100%;
+			}
 
-				&:hover,
-				&:focus-within {
-					--umb-entity-frame-opacity: 1;
-					--umb-block-scale-handler-opacity: 1;
-					--umb-block-grid-entry-tab-pointer-events: auto;
-				}
+			:host([ui-active]) .umb-block-grid__block {
+				--umb-entity-frame-opacity: 1;
+				--umb-block-scale-handler-opacity: 1;
+				--umb-block-grid-entry-tab-pointer-events: auto;
 			}
 
 			umb-entity-frame uui-button {
