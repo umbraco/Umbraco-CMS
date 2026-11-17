@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.Controllers.Document;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 
@@ -84,5 +85,29 @@ public class CreateDocumentControllerTests : ManagementApiUserGroupTestBase<Crea
         };
 
         return await Client.PostAsync(Url, JsonContent.Create(createDocumentRequestModel));
+    }
+
+    [Test]
+    public async Task Cannot_Create_Culture_Variant_Document_Without_Variants()
+    {
+        await AuthenticateClientAsync(Client, "test@umbraco.com", UserPassword, isAdmin: true);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+        contentType.Variations = ContentVariation.Culture;
+        contentType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        CreateDocumentRequestModel createDocumentRequestModel = new()
+        {
+            Template = null,
+            DocumentType = new ReferenceByIdModel(contentType.Key),
+            Parent = null,
+            Values = new DocumentValueModel[] { },
+            Variants = new DocumentVariantRequestModel[] { },
+        };
+
+        var response = await Client.PostAsync(Url, JsonContent.Create(createDocumentRequestModel));
+
+        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 }

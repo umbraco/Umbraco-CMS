@@ -582,6 +582,31 @@ public partial class ContentEditingServiceTests
         Assert.IsNull(result.Result.Content);
     }
 
+    [TestCase(ContentVariation.Culture, ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch)]
+    [TestCase(ContentVariation.Segment, ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch)]
+    [TestCase(ContentVariation.CultureAndSegment, ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch)]
+    public async Task Cannot_Create_Variant_Content_Without_Name(ContentVariation variation, ContentEditingOperationStatus expectedStatus)
+    {
+        var contentType = await CreateVariantContentType(variation, variantTitleAsMandatory: false);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" }
+            ]
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(expectedStatus, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
+    }
+
     [Test]
     public async Task Cannot_Create_With_Culture_Variant_Property_Value_For_Invariant_Content()
     {

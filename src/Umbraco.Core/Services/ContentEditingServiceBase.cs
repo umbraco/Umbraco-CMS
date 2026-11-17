@@ -183,6 +183,13 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return Attempt.FailWithStatus(validationOperationStatus, new TContentCreateResult());
         }
 
+        // new culture variant content must be named in at least one culture. this is checked on create only, because
+        // an update may leave out the variants to keep the existing names.
+        if (contentType.VariesByCulture() && contentCreationModelBase.Variants.Any(v => v.Culture is not null) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, new TContentCreateResult());
+        }
+
         (int? ParentId, ContentEditingOperationStatus OperationStatus) parent = await TryGetAndValidateParentIdAsync(contentCreationModelBase.ParentKey, contentType);
         if (parent.OperationStatus != ContentEditingOperationStatus.Success)
         {
