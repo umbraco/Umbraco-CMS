@@ -23,8 +23,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <remarks>
 /// Implements the shared save, publish, unpublish, rollback, schedule and query behaviour of
 /// <see cref="IPublishableContentService{TContent}"/>, leaving the content-type specific parts (object type, lock ids,
-/// notifications) to the derived service. <see cref="ElementService"/> still derives from
-/// <see cref="PublishableContentServiceBase{TContent}"/> until an async element repository exists.
+/// notifications) to the derived service.
 /// </remarks>
 public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryService, IPublishableContentService<TContent>
     where TContent : class, IPublishableContentBase
@@ -159,6 +158,26 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     protected abstract RollingBackNotification<TContent> RollingBackNotification(TContent target, EventMessages messages);
 
     protected abstract RolledBackNotification<TContent> RolledBackNotification(TContent target, EventMessages messages);
+
+    /// <summary>
+    ///     Creates the cancelable notification published before versions of a content item are deleted.
+    /// </summary>
+    /// <param name="key">The key of the content item whose versions are deleted.</param>
+    /// <param name="eventMessages">The event messages collection.</param>
+    /// <param name="specificVersion">The identifier of the version to delete, or <c>default</c> when deleting by date.</param>
+    /// <param name="dateToRetain">The date before which versions are deleted, or <c>default</c> when deleting a specific version.</param>
+    /// <returns>The notification to publish.</returns>
+    protected abstract DeletingVersionsNotification<TContent> DeletingVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain);
+
+    /// <summary>
+    ///     Creates the notification published after versions of a content item have been deleted.
+    /// </summary>
+    /// <param name="key">The key of the content item whose versions were deleted.</param>
+    /// <param name="eventMessages">The event messages collection.</param>
+    /// <param name="specificVersion">The identifier of the deleted version, or <c>default</c> when deleted by date.</param>
+    /// <param name="dateToRetain">The date before which versions were deleted, or <c>default</c> when a specific version was deleted.</param>
+    /// <returns>The notification to publish.</returns>
+    protected abstract DeletedVersionsNotification<TContent> DeletedVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain);
 
     /// <summary>
     ///     Creates the "saved" notification for a single item, carrying the cultures that were saved.
@@ -757,9 +776,9 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
     // Takes the resolved int id directly so an internal caller that already holds one (e.g. a content
     // version's WriterId) doesn't have to round-trip it through a Guid lookup - that round trip is lossy
-    // for a writer id with no matching user (it has no Guid to resolve to or from). For the same reason the
-    // invariant-for-variant decision is passed in rather than read from the user: scheduled publishing has
-    // no acting user to read it from.
+    // for a writer id with no matching user (it has no Guid to resolve to or from). The invariant-for-variant
+    // decision is passed in because each caller reads it from a different user: the acting user, or the
+    // writer of a scheduled release.
     private async Task<PublishResult> PublishAsync(TContent content, string[] cultures, int userId, bool includeInvariantForVariant, CancellationToken cancellationToken)
     {
         if (content is null)
@@ -1298,8 +1317,10 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
                         // Uses the int-userId overload directly, matching the CommitContentChangesAsync calls
                         // elsewhere in this method: WriterId is passed through as-is, with no Guid round trip
-                        // that would be lossy for a writer id with no matching user.
-                        result = await PublishAsync(d, [.. d.AvailableCultures], d.WriterId, includeInvariantForVariant: true, cancellationToken);
+                        // that would be lossy for a writer id with no matching user. Such a writer has no
+                        // permission to read either, and that must not fail the release.
+                        var includeInvariantForVariant = _userService.Value.GetUserById(d.WriterId)?.HasAccessToInvariantForVariant() ?? true;
+                        result = await PublishAsync(d, [.. d.AvailableCultures], d.WriterId, includeInvariantForVariant, cancellationToken);
                     }
 
                     if (result is { Success: false })
@@ -1780,8 +1801,8 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
 
-        var deletingVersionsNotification =
-            new ContentDeletingVersionsNotification(key, evtMsgs, dateToRetain: versionDate);
+        DeletingVersionsNotification<TContent> deletingVersionsNotification =
+            DeletingVersionsNotification(key, evtMsgs, specificVersion: default, dateToRetain: versionDate);
         if (await scope.Notifications.PublishCancelableAsync(deletingVersionsNotification))
         {
             scope.Complete();
@@ -1791,7 +1812,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         await _asyncContentRepository.DeleteVersionsAsync(key, versionDate, cancellationToken);
 
         scope.Notifications.Publish(
-            new ContentDeletedVersionsNotification(key, evtMsgs, dateToRetain: versionDate).WithStateFrom(
+            DeletedVersionsNotification(key, evtMsgs, specificVersion: default, dateToRetain: versionDate).WithStateFrom(
                 deletingVersionsNotification));
         await AuditAsync(AuditType.Delete, userId, Constants.System.Root, "Delete (by version date)");
 
@@ -1816,7 +1837,8 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
-        var deletingVersionsNotification = new ContentDeletingVersionsNotification(key, evtMsgs, versionId);
+        DeletingVersionsNotification<TContent> deletingVersionsNotification =
+            DeletingVersionsNotification(key, evtMsgs, versionId, dateToRetain: default);
         if (await scope.Notifications.PublishCancelableAsync(deletingVersionsNotification))
         {
             scope.Complete();
@@ -1839,7 +1861,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         }
 
         scope.Notifications.Publish(
-            new ContentDeletedVersionsNotification(key, evtMsgs, versionId).WithStateFrom(
+            DeletedVersionsNotification(key, evtMsgs, versionId, dateToRetain: default).WithStateFrom(
                 deletingVersionsNotification));
         await AuditAsync(AuditType.Delete, userId, Constants.System.Root, "Delete (by version)");
 

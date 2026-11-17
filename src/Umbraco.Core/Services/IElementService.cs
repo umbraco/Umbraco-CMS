@@ -10,6 +10,6 @@ namespace Umbraco.Cms.Core.Services;
 ///     <see cref="IPublishableContentService{TContent}" />. It remains as the Element-facing contract
 ///     that <see cref="ElementService" /> is registered and resolved as.
 /// </remarks>
-public interface IElementService : IContentServiceBase, IPublishableContentService<IElement>
+public interface IElementService : IPublishableContentService<IElement>
 {
 }

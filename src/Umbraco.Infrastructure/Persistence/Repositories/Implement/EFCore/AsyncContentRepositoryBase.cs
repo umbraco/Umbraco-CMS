@@ -595,7 +595,7 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
             var nodesToRebuild = new Dictionary<int, List<NodeDto>>();
             var validNodes = new Dictionary<int, NodeDto>();
 
-            int[] rootIds = [Constants.System.Root, Constants.System.RecycleBinContent, Constants.System.RecycleBinMedia];
+            int[] rootIds = [Constants.System.Root, Constants.System.RecycleBinContent, Constants.System.RecycleBinMedia, Constants.System.RecycleBinElement];
             var currentParentIds = new HashSet<int>(rootIds);
             HashSet<int> prevParentIds = currentParentIds;
             var lastLevel = -1;

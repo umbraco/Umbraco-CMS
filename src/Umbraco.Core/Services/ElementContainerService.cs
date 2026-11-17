@@ -1,4 +1,3 @@
-using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -19,7 +18,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
 {
     private readonly IElementContainerRepository _entityContainerRepository;
     private readonly IEntityRepository _entityRepository;
-    private readonly IElementRepository _elementRepository;
+    private readonly IAsyncElementRepository _elementRepository;
     private readonly IElementService _elementService;
     private readonly IOptionsMonitor<ContentSettings> _contentSettingsOptions;
     private readonly IRelationService _relationService;
@@ -35,7 +34,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         IEntityRepository entityRepository,
         IUserIdKeyResolver userIdKeyResolver,
         IEntityService entityService,
-        IElementRepository elementRepository,
+        IAsyncElementRepository elementRepository,
         IElementService elementService,
         IOptionsMonitor<ContentSettings> contentSettingsOptions,
         IRelationService relationService,
@@ -157,8 +156,9 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         }
 
         // query root elements in recycle bin and fire deleting notification (cancelable)
-        IQuery<IElement> rootQuery = Query<IElement>().Where(x => x.ParentId == Constants.System.RecycleBinElement);
-        IElement[] rootElements = _elementRepository.Get(rootQuery)?.ToArray() ?? Array.Empty<IElement>();
+        PagedModel<IElement> rootElementsPage = await _elementRepository.GetChildrenAsync(
+            Constants.System.RecycleBinElementKey, 0, int.MaxValue, propertyAliases: null, Ordering.By("sortOrder"), CancellationToken.None);
+        IElement[] rootElements = [.. rootElementsPage.Items];
 
         var deletingNotification = new ElementDeletingNotification(rootElements, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
@@ -180,14 +180,10 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
     }
 
     /// <inheritdoc />
-    protected override Task<IElement?> GetContainedEntityAsync(IEntitySlim descendant) => Task.FromResult(_elementRepository.Get(descendant.Id));
+    protected override Task<IElement?> GetContainedEntityAsync(IEntitySlim descendant) => _elementRepository.GetAsync(descendant.Key, CancellationToken.None);
 
     /// <inheritdoc />
-    protected override Task SaveContainedEntityAsync(IElement entity)
-    {
-        _elementRepository.Save(entity);
-        return Task.CompletedTask;
-    }
+    protected override Task SaveContainedEntityAsync(IElement entity) => _elementRepository.SaveAsync(entity, CancellationToken.None);
 
     /// <inheritdoc />
     protected override async Task<EntityContainerOperationStatus> PrepareContainedEntityForMoveAsync(IElement entity, bool trash, Guid userKey)
@@ -343,9 +339,9 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             return descendantContainer;
         }
 
-        IElement descendantElement = _elementRepository.Get(descendant.Id)
+        IElement descendantElement = await _elementRepository.GetAsync(descendant.Key, CancellationToken.None)
                                      ?? throw new InvalidOperationException($"Descendant element with ID {descendant.Id} was not found.");
-        _elementRepository.Delete(descendantElement);
+        await _elementRepository.DeleteAsync(descendantElement, CancellationToken.None);
         scope.Notifications.Publish(new ElementDeletedNotification(descendantElement, eventMessages));
         return descendantElement;
     }

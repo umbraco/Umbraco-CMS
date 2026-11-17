@@ -1914,5 +1914,11 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     protected override RolledBackNotification<IContent> RolledBackNotification(IContent target, EventMessages messages)
         => new ContentRolledBackNotification(target, messages);
 
+    protected override DeletingVersionsNotification<IContent> DeletingVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain)
+        => new ContentDeletingVersionsNotification(key, eventMessages, specificVersion, dateToRetain: dateToRetain);
+
+    protected override DeletedVersionsNotification<IContent> DeletedVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain)
+        => new ContentDeletedVersionsNotification(key, eventMessages, specificVersion, dateToRetain: dateToRetain);
+
     #endregion
 }
