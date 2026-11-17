@@ -421,6 +421,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 	}
 
+	/**
+	 * Load the block placement identified by its layout key.
+	 * @param {string} unique The key of the layout entry, not the content key: a content key can be referenced by several placements.
+	 * @returns {Promise<void>}
+	 * @memberof UmbBlockWorkspaceContext
+	 */
 	async load(unique: string) {
 		await this.#retrieveBlockManager;
 		await this.#retrieveBlockEntries;
