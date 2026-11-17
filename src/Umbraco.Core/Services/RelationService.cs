@@ -334,10 +334,11 @@ public class RelationService : AsyncRepositoryService, IRelationService
             return [];
         }
 
-        IEnumerable<IUmbracoEntity> result = _relationRepository.GetParentEntitiesByChildIds(
+        IEnumerable<IUmbracoEntity> result = await _relationRepository.GetParentEntitiesByChildIdsAsync(
             childIdsArray,
             relationTypeIds ?? [],
-            entityType.GetGuid());
+            entityType.GetGuid(),
+            cancellationToken);
 
         scope.Complete();
         return result;

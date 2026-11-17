@@ -79,11 +79,13 @@ public interface IRelationRepository : IAsyncReadWriteRepository<int, IRelation>
     /// <param name="childIds">The identifiers of the child entities.</param>
     /// <param name="relationTypes">Relation type IDs to filter by. Pass an empty array to include all relation types.</param>
     /// <param name="entityType">The entity type (node object type) to filter by.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The distinct parent entities of the given type related to any of the specified children.</returns>
-    IEnumerable<IUmbracoEntity> GetParentEntitiesByChildIds(
+    Task<IEnumerable<IUmbracoEntity>> GetParentEntitiesByChildIdsAsync(
         int[] childIds,
         int[] relationTypes,
-        Guid entityType);
+        Guid entityType,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Returns whether two entities are related, optionally filtered by relation type.
