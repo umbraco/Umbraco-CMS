@@ -181,11 +181,6 @@ export class UmbDocumentBlueprintWorkspaceViewInfoElement extends UmbLitElement 
 			.general-item:not(:last-child) {
 				margin-bottom: var(--uui-size-space-6);
 			}
-
-			uui-ref-node-document-type[readonly] {
-				padding-top: 7px;
-				padding-bottom: 7px;
-			}
 		`,
 	];
 }

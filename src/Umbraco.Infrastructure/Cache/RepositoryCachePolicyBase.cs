@@ -93,18 +93,11 @@ public abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCache
     /// Ensures that the cache is synced with the database.
     /// </summary>
     protected void EnsureCacheIsSynced()
-    {
-        var synced = _cacheVersionService.IsCacheSyncedAsync<TEntity>().GetAwaiter().GetResult();
-        if (synced)
-        {
-            return;
-        }
-
-        _cacheSyncService.SyncInternal(CancellationToken.None);
-    }
+        => _cacheVersionService.EnsureCacheIsSynced<TEntity>(_cacheSyncService);
 
     /// <summary>
     /// Registers a change in the cache.
     /// </summary>
-    protected void RegisterCacheChange() => _cacheVersionService.SetCacheUpdatedAsync<TEntity>().GetAwaiter().GetResult();
+    // TODO (V20): call SetCacheUpdatedAsync once locks and notification publishing are asynchronous.
+    protected void RegisterCacheChange() => _cacheVersionService.SetCacheUpdated<TEntity>();
 }

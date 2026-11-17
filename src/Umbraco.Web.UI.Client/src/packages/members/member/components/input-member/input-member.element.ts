@@ -50,13 +50,13 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	/**
-	 * Min validation message.
+	 * Min validation message. When not set, a localized message stating the minimum and how many more items are needed is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field needs more items';
+	minMessage?: string;
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -74,13 +74,13 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	/**
-	 * Max validation message.
+	 * Max validation message. When not set, a localized message stating the maximum and how many items are over it is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'max-message' })
-	maxMessage = 'This field exceeds the allowed amount of items';
+	maxMessage?: string;
 
 	public set selection(ids: Array<string>) {
 		this.#pickerContext.setSelection(ids);
@@ -158,13 +158,17 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 
 		this.addValidator(
 			'rangeUnderflow',
-			() => this.minMessage,
+			() =>
+				this.minMessage ||
+				this.localize.term('validation_entriesShort', this.min, (this.min ?? 0) - this.selection.length),
 			() => !this.readonly && isAboveZeroAndBelowMinimum(this.selection.length, this.min),
 		);
 
 		this.addValidator(
 			'rangeOverflow',
-			() => this.maxMessage,
+			() =>
+				this.maxMessage ||
+				this.localize.term('validation_entriesExceed', this.max, this.selection.length - (this.max ?? 0)),
 			() => !this.readonly && !!this.max && this.selection.length > this.max,
 		);
 

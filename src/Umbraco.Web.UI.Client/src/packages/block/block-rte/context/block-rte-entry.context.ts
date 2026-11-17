@@ -79,6 +79,7 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 
 		clipboardContext.write({
 			icon: this.getContentElementTypeIcon(),
+			thumbnail: this.getThumbnailUrl(),
 			name: entryName,
 			propertyValue: this.#buildPropertyValue(),
 			propertyEditorUiAlias: editorUiAlias,

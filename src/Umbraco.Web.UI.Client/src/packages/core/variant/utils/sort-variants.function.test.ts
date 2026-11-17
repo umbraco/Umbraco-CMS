@@ -1,7 +1,7 @@
 import { expect } from '@open-wc/testing';
 import { sortVariants } from './sort-variants.function.js';
-import { UmbPublishableVariantState } from './constants.js';
-import type { UmbEntityVariantOptionModel } from './types.js';
+import { UmbPublishableVariantState } from '../constants.js';
+import type { UmbEntityVariantOptionModel } from '../types.js';
 
 function makeVariant(
 	name: string,

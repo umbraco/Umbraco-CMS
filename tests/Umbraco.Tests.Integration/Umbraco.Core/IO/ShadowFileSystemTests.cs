@@ -212,6 +212,31 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
     }
 
     /// <summary>
+    /// Moving a file that exists only in the inner file system renames it in the shadow's view,
+    /// leaves the inner file system unchanged, and applies the move to the inner file system on complete.
+    /// </summary>
+    [Test]
+    public void Can_Move_Inner_File_In_Shadow_Without_Affecting_Inner_Until_Complete()
+    {
+        var (fs, _, ss, path) = CreateShadowFileSystem();
+
+        Directory.CreateDirectory(path + "/ShadowTests/sub");
+        File.WriteAllText(path + "/ShadowTests/sub/f1.txt", "foo");
+
+        ss.MoveFile("sub/f1.txt", "sub/f2.txt");
+
+        Assert.IsTrue(fs.FileExists("sub/f1.txt"));
+        Assert.IsFalse(fs.FileExists("sub/f2.txt"));
+        Assert.IsFalse(ss.FileExists("sub/f1.txt"));
+        Assert.IsTrue(ss.FileExists("sub/f2.txt"));
+
+        ss.Complete();
+
+        Assert.IsFalse(File.Exists(path + "/ShadowTests/sub/f1.txt"));
+        Assert.AreEqual("foo", File.ReadAllText(path + "/ShadowTests/sub/f2.txt"));
+    }
+
+    /// <summary>
     /// Deleting a file inside a subdirectory through the shadow hides only the targeted file
     /// and leaves siblings and the inner file system untouched.
     /// </summary>

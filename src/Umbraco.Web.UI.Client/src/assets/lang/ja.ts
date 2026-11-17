@@ -1169,6 +1169,9 @@ export default {
 		invalidFalse: 'このフィールドはオンにする必要があります',
 		invalidPattern: '値が無効です。正しいパターンと一致しません',
 		customValidation: 'カスタム検証',
+		entriesShort: '最低 %0% 件の項目が必要です。あと <strong>%1%</strong> 件追加してください。',
+		entriesExceed: '最大 %0% 件までです。<strong>%1%</strong> 件多すぎます。',
+		itemMissingValueMessage: '項目 %0% に値がありません',
 	},
 	recycleBin: {
 		restoreItemTo: (from: string, to: string) => `<strong>${from}</strong> を<strong>${to}</strong> に復元します`,
