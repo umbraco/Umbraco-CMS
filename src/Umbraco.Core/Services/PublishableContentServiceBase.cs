@@ -1562,12 +1562,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             raiseSavedNotification,
             includeInvariantForVariant: null);
 
+#pragma warning disable CS0618 // Type or member is obsolete
     /// <inheritdoc cref="CommitContentChangesInternal(ICoreScope, TContent, EventMessages, IReadOnlyCollection{ILanguage}, IDictionary{string, object}, int, bool, bool, bool)" />
     /// <param name="includeInvariantForVariant">
     ///     Whether publishing includes invariant properties of variant content. When <c>null</c>, it is determined by the
     ///     invariant-for-variant permission of the user identified by <paramref name="userId"/>.
     /// </param>
-#pragma warning disable CS0618 // Type or member is obsolete
     private PublishResult CommitContentChangesInternal(
         ICoreScope scope,
         TContent content,
