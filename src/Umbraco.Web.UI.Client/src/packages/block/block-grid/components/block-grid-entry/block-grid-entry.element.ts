@@ -103,7 +103,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _isSortMode?: boolean;
 
-	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR; add `@state()` when used in render [LK]
+	@state()
 	private _name?: string;
 
 	@state()
@@ -493,6 +493,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						this._isSortMode,
 						() => this.#renderRefBlock(),
 						() => html`
+							<umb-entity-frame>${this._name}</umb-entity-frame>
 							<umb-extension-slot
 								single
 								type="blockEditorCustomView"
@@ -699,10 +700,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				right: calc(1px - (var(--umb-block-grid--column-gap, 0px) * 0.5));
 			}
 
-			.umb-block-grid__block {
-				height: 100%;
-			}
-
 			:host(:hover):not(:drop)::after {
 				display: block;
 				border-color: var(--uui-color-interactive-emphasis);
@@ -739,9 +736,15 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 			.umb-block-grid__block {
 				--umb-block-scale-handler-opacity: 0;
+				--umb-entity-frame-opacity: 0;
+				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
+				--umb-entity-frame-contrast-color: var(--uui-color-interactive-contrast);
+
+				height: 100%;
 
 				&:hover,
 				&:focus-within {
+					--umb-entity-frame-opacity: 1;
 					--umb-block-scale-handler-opacity: 1;
 				}
 			}
