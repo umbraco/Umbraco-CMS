@@ -52,7 +52,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	setOriginData(data: UmbBlockWorkspaceOriginData) {
 		this.#originData = data;
 	}
-	// Cached index of this block in its parent layout list, recomputed only when layouts or key change.
+	// Cached index of this block in its parent layout list, recomputed only when layouts or the layout key change.
 	#index: number | undefined;
 	#modalContext?: typeof UMB_MODAL_CONTEXT.TYPE;
 	#retrieveModalContext;

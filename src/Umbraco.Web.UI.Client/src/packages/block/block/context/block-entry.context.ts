@@ -242,12 +242,12 @@ export abstract class UmbBlockEntryContext<
 			this.isExternalContent,
 			this.#externalContentWorkspacePath.asObservable(),
 		],
-		([contentKey, key, path, isExternalContent, externalContentPath]) => {
+		([contentKey, layoutKey, path, isExternalContent, externalContentPath]) => {
 			if (!contentKey) return '';
 			if (isExternalContent && externalContentPath) {
 				return externalContentPath + UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: contentKey });
 			}
-			return this.#generateWorkspaceEditContentPath(path, key);
+			return this.#generateWorkspaceEditContentPath(path, layoutKey);
 		},
 	);
 	public readonly workspaceEditSettingsPath = mergeObservables([this.unique, this.workspacePath], ([key, path]) =>
