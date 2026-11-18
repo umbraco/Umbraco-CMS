@@ -35,8 +35,8 @@ class UmbCurrentUserContextStub extends UmbContextBase {
 		super(host, UMB_CURRENT_USER_CONTEXT.toString());
 	}
 
-	setFallbackPermissions(fallbackPermissions: Array<string>) {
-		this.#currentUser.setValue({ permissions: [], fallbackPermissions, hasElementRootAccess: true });
+	setFallbackPermissions(fallbackPermissions: Array<string>, hasElementRootAccess = true) {
+		this.#currentUser.setValue({ permissions: [], fallbackPermissions, hasElementRootAccess });
 	}
 }
 
@@ -116,5 +116,13 @@ describe('UmbBlockTransferToElementLibraryModalElement', () => {
 		expect(getLocationError()).to.be.undefined;
 
 		expect(requestedIds).to.be.empty;
+	});
+
+	it('refuses the library root when the user has no element root access', async () => {
+		host.currentUserContext.setFallbackPermissions([CREATE, PUBLISH], false);
+		await selectLocation(null);
+
+		expect(getLocationError()).to.not.be.undefined;
+		expect(getTransferButton().disabled).to.be.true;
 	});
 });
