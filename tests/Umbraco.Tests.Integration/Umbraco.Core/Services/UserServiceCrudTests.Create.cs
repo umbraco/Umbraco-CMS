@@ -15,7 +15,9 @@ internal sealed partial class UserServiceCrudTests
     private const string CancelledUserEmailDomain = "@saveblocked.com";
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.AddNotificationHandler<UserSavingNotification, CancelUserSavingNotificationHandler>();
+        => builder
+            .AddNotificationHandler<UserSavingNotification, CancelUserSavingNotificationHandler>()
+            .AddNotificationHandler<UserForgotPasswordRequestedNotification, ForgotPasswordRequestedRecorder>();
 
     [Test]
     public async Task Cannot_Create_User_When_Cancelled_By_Notification()

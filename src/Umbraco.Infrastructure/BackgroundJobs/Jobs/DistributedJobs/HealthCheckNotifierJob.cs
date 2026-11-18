@@ -72,26 +72,32 @@ internal class HealthCheckNotifierJob : IDistributedBackgroundJob
             return;
         }
 
-        // Ensure we use an explicit scope since we are running on a background thread and plugin health
-        // checks can be making service/database calls so we want to ensure the CallContext/Ambient scope
-        // isn't used since that can be problematic.
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
         using (_profilingLogger.DebugDuration<HealthCheckNotifierJob>("Health checks executing", "Health checks complete"))
         {
-            // Don't notify for any checks that are disabled, nor for any disabled just for notifications.
-            Guid[] disabledCheckIds = _healthChecksSettings.Notification.DisabledChecks
-                .Select(x => x.Id)
-                .Union(_healthChecksSettings.DisabledChecks
-                    .Select(x => x.Id))
-                .Distinct()
-                .ToArray();
+            HealthCheckResults results;
 
-            IEnumerable<HealthCheck> checks = _healthChecks
-                .Where(x => disabledCheckIds.Contains(x.Id) == false);
+            // Ensure we use an explicit scope since we are running on a background thread and plugin health
+            // checks can be making service/database calls so we want to ensure the CallContext/Ambient scope
+            // isn't used since that can be problematic.
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                // Don't notify for any checks that are disabled, nor for any disabled just for notifications.
+                Guid[] disabledCheckIds = _healthChecksSettings.Notification.DisabledChecks
+                    .Select(x => x.Id)
+                    .Union(_healthChecksSettings.DisabledChecks
+                        .Select(x => x.Id))
+                    .Distinct()
+                    .ToArray();
 
-            HealthCheckResults results = await HealthCheckResults.Create(checks);
-            results.LogResults();
+                IEnumerable<HealthCheck> checks = _healthChecks
+                    .Where(x => disabledCheckIds.Contains(x.Id) == false);
 
+                results = await HealthCheckResults.Create(checks);
+                results.LogResults();
+            }
+
+            // Published and sent once the checks' transaction has ended: handlers write (for example, webhook
+            // requests) and sending can be slow, so neither should run inside a transaction that has already read.
             _eventAggregator.Publish(new HealthCheckCompletedNotification(results));
 
             // Send using registered notification methods that are enabled.

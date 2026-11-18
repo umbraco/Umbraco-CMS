@@ -2,11 +2,14 @@ using System.Net.Sockets;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -61,6 +64,27 @@ internal sealed partial class UserServiceCrudTests
         Assert.AreEqual(UserOperationStatus.UnknownFailure, result.Result);
     }
 
+    [Test]
+    public async Task Reset_Password_Message_Is_Sent_And_Notification_Handled_Outside_A_Transaction()
+    {
+        bool? sentWithinTransaction = null;
+        var senderMock = CreateForgotPasswordSenderMock(canSendNow: true);
+        senderMock
+            .Setup(x => x.SendForgotPassword(It.IsAny<UserForgotPasswordMessage>()))
+            .Callback(() => sentWithinTransaction = ScopeAccessor.AmbientScope is not null)
+            .Returns(Task.CompletedTask);
+        var userService = CreateUserService(forgotPasswordSender: senderMock.Object);
+        await CreateResetPasswordUser(userService);
+        ForgotPasswordRequestedRecorder.Reset();
+
+        var result = await userService.SendResetPasswordEmailAsync(ResetPasswordUserEmail, CancellationToken.None);
+
+        Assert.IsTrue(result.Success);
+        Assert.IsFalse(sentWithinTransaction);
+        Assert.AreEqual(1, ForgotPasswordRequestedRecorder.HandledWithinTransaction.Count);
+        Assert.IsFalse(ForgotPasswordRequestedRecorder.HandledWithinTransaction[0]);
+    }
+
     private static Mock<IUserForgotPasswordSender> CreateForgotPasswordSenderMock(bool canSendNow)
     {
         var senderMock = new Mock<IUserForgotPasswordSender>();
@@ -82,5 +106,19 @@ internal sealed partial class UserServiceCrudTests
 
         var createResult = await userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);
         Assert.IsTrue(createResult.Success);
+    }
+
+    private sealed class ForgotPasswordRequestedRecorder : INotificationHandler<UserForgotPasswordRequestedNotification>
+    {
+        private readonly IScopeAccessor _scopeAccessor;
+
+        public ForgotPasswordRequestedRecorder(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
+
+        public static List<bool> HandledWithinTransaction { get; } = [];
+
+        public static void Reset() => HandledWithinTransaction.Clear();
+
+        public void Handle(UserForgotPasswordRequestedNotification notification)
+            => HandledWithinTransaction.Add(_scopeAccessor.AmbientScope is not null);
     }
 }

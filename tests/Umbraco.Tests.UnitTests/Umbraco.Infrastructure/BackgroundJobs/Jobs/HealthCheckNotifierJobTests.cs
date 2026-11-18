@@ -1,17 +1,17 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.Logging;
+using System.Data;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs;
@@ -20,6 +20,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs
 public class HealthCheckNotifierJobTests
 {
     private Mock<IHealthCheckNotificationMethod> _mockNotificationMethod;
+    private Mock<IEventAggregator> _mockEventAggregator;
+    private bool _scopeDisposed;
 
     private const string Check1Id = "00000000-0000-0000-0000-000000000001";
     private const string Check2Id = "00000000-0000-0000-0000-000000000002";
@@ -61,6 +63,26 @@ public class HealthCheckNotifierJobTests
             Times.Once);
     }
 
+    [Test]
+    public async Task Publishes_And_Sends_Results_After_The_Checks_Scope_Has_Ended()
+    {
+        var sut = CreateHealthCheckNotifier();
+        bool? publishedAfterScopeEnded = null;
+        bool? sentAfterScopeEnded = null;
+        _mockEventAggregator
+            .Setup(x => x.Publish(It.IsAny<HealthCheckCompletedNotification>()))
+            .Callback(() => publishedAfterScopeEnded = _scopeDisposed);
+        _mockNotificationMethod
+            .Setup(x => x.SendAsync(It.IsAny<HealthCheckResults>()))
+            .Callback(() => sentAfterScopeEnded = _scopeDisposed)
+            .Returns(Task.CompletedTask);
+
+        await sut.ExecuteAsync();
+
+        Assert.IsTrue(publishedAfterScopeEnded);
+        Assert.IsTrue(sentAfterScopeEnded);
+    }
+
     private HealthCheckNotifierJob CreateHealthCheckNotifier(
         bool enabled = true,
         bool notificationEnabled = true)
@@ -87,8 +109,22 @@ public class HealthCheckNotifierJobTests
             new List<IHealthCheckNotificationMethod> { _mockNotificationMethod.Object });
 
 
-        var mockScopeProvider = new Mock<IScopeProvider>();
+        _scopeDisposed = false;
+        var mockScope = new Mock<ICoreScope>();
+        mockScope.Setup(x => x.Dispose()).Callback(() => _scopeDisposed = true);
+        var mockScopeProvider = new Mock<ICoreScopeProvider>();
+        mockScopeProvider
+            .Setup(x => x.CreateCoreScope(
+                It.IsAny<IsolationLevel>(),
+                It.IsAny<RepositoryCacheMode>(),
+                It.IsAny<IEventDispatcher?>(),
+                It.IsAny<IScopedNotificationPublisher?>(),
+                It.IsAny<bool?>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>()))
+            .Returns(mockScope.Object);
         var mockProfilingLogger = new Mock<IProfilingLogger>();
+        _mockEventAggregator = new Mock<IEventAggregator>();
 
         return new HealthCheckNotifierJob(
             new TestOptionsMonitor<HealthChecksSettings>(settings),
@@ -96,7 +132,7 @@ public class HealthCheckNotifierJobTests
             notifications,
             mockScopeProvider.Object,
             mockProfilingLogger.Object,
-            Mock.Of<IEventAggregator>());
+            _mockEventAggregator.Object);
     }
 
     private void VerifyNotificationsNotSent() => VerifyNotificationsSentTimes(Times.Never());
