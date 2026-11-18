@@ -1,7 +1,10 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
@@ -74,6 +77,7 @@ internal sealed class ElementHybridCachePreviewAccessTests : UmbracoIntegrationT
         builder.AddNotificationHandler<ElementTreeChangeNotification, ElementTreeChangeDistributedCacheNotificationHandler>();
         builder.Services.AddUnique<IPreviewSessionService>(_previewSession);
         builder.Services.AddUnique<IBackOfficeSecurityAccessor>(_previewSession);
+        builder.AddDeliveryApi();
     }
 
     [SetUp]
@@ -142,7 +146,7 @@ internal sealed class ElementHybridCachePreviewAccessTests : UmbracoIntegrationT
     [Test]
     public async Task Preview_Values_Resolved_For_One_Preview_User_Are_Not_Served_To_Another()
     {
-        Guid pickingElementKey = await CreateElementAsync(_allowedFolder.Key, true, _restrictedElementKey);
+        Guid pickingElementKey = await CreateElementAsync(_allowedFolder.Key, publish: true, _restrictedElementKey);
 
         await StartPreviewAsync(startElementId: null);
         Assert.AreEqual(DraftTitle, GetTitle(await GetPickedElementAsync(pickingElementKey)));
@@ -162,7 +166,7 @@ internal sealed class ElementHybridCachePreviewAccessTests : UmbracoIntegrationT
         await PublishVariantsAsync(missing, English);
         await PublishVariantsAsync(published, English, Danish);
 
-        Guid ownerKey = await CreateElementAsync(_allowedFolder.Key, true, draft, missing, _allowedElementKey, published);
+        Guid ownerKey = await CreateElementAsync(_allowedFolder.Key, publish: true, draft, missing, _allowedElementKey, published);
         GetRequiredService<IVariationContextAccessor>().VariationContext = new VariationContext(Danish);
 
         IPublishedElement? previewDraft = await PublishedElementCache.GetByIdAsync(draft, preview: true);
@@ -170,20 +174,56 @@ internal sealed class ElementHybridCachePreviewAccessTests : UmbracoIntegrationT
         Assert.That(previewDraft!.IsInvariantOrHasCulture(Danish), Is.True);
         Assert.That(publishedDraft!.IsInvariantOrHasCulture(Danish), Is.False);
 
-        IPublishedProperty previewPicker = (await PublishedElementCache.GetByIdAsync(ownerKey, preview: true))!.GetProperty(PickerAlias)!;
-        IPublishedProperty publicPicker = (await PublishedElementCache.GetByIdAsync(ownerKey, preview: false))!.GetProperty(PickerAlias)!;
+        IPublishedElement previewOwner = (await PublishedElementCache.GetByIdAsync(ownerKey, preview: true))!;
+        IPublishedElement publicOwner = (await PublishedElementCache.GetByIdAsync(ownerKey, preview: false))!;
 
-        AssertPickedKeys(previewPicker, draft, _allowedElementKey, published);
-        AssertPickedKeys(publicPicker, _allowedElementKey, published);
+        AssertPickedKeys(previewOwner, draft, _allowedElementKey, published);
+        AssertPickedKeys(publicOwner, _allowedElementKey, published);
 
-        var pickedDraft = ((IEnumerable<IPublishedElement>)previewPicker.GetValue()!).First();
+        IPublishedElement pickedDraft = previewOwner.Value<IEnumerable<IPublishedElement>>(PickerAlias)!.First();
         Assert.That(pickedDraft.Name, Is.EqualTo($"Draft {Danish}"));
         Assert.That(pickedDraft.GetProperty(VariantTitleAlias)!.GetValue(), Is.EqualTo($"Draft title {Danish}"));
     }
 
-    [TestCase(Danish)]
-    [TestCase("DA-dk")]
-    public async Task Picker_Preview_Uses_Published_Variant_When_It_Is_Absent_From_The_Draft_Snapshot(string requestedCulture)
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task Picker_Preview_Prefers_Draft_Value_For_A_Published_Culture(bool expand)
+    {
+        const string editedTitle = "New Danish draft title";
+        var publishedTitle = $"Published title {Danish}";
+        Guid typeKey = await CreateVariantElementTypeAsync();
+        Guid elementKey = await CreateVariantElementAsync(typeKey, "Published", English, Danish);
+        await PublishVariantsAsync(elementKey, English, Danish);
+
+        IElementService elementService = GetRequiredService<IElementService>();
+        IElement element = elementService.GetById(elementKey)!;
+        element.SetValue(VariantTitleAlias, editedTitle, Danish);
+        Assert.That(elementService.Save(element).Success, Is.True);
+
+        Guid ownerKey = await CreateElementAsync(_allowedFolder.Key, publish: true, elementKey);
+        GetRequiredService<IVariationContextAccessor>().VariationContext = new VariationContext(Danish);
+        IPublishedElement previewOwner = (await PublishedElementCache.GetByIdAsync(ownerKey, preview: true))!;
+        IPublishedElement publicOwner = (await PublishedElementCache.GetByIdAsync(ownerKey, preview: false))!;
+
+        IPublishedElement previewPick = previewOwner.Value<IEnumerable<IPublishedElement>>(PickerAlias)!.Single();
+        IPublishedElement publicPick = publicOwner.Value<IEnumerable<IPublishedElement>>(PickerAlias)!.Single();
+        IApiElement previewApiPick = RenderPicker(previewOwner, expand).Single();
+        IApiElement publicApiPick = RenderPicker(publicOwner, expand).Single();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(previewPick.GetProperty(VariantTitleAlias)!.GetValue(), Is.EqualTo(editedTitle));
+            Assert.That(publicPick.GetProperty(VariantTitleAlias)!.GetValue(), Is.EqualTo(publishedTitle));
+            Assert.That(previewApiPick.Properties[VariantTitleAlias], Is.EqualTo(editedTitle));
+            Assert.That(publicApiPick.Properties[VariantTitleAlias], Is.EqualTo(publishedTitle));
+        });
+    }
+
+    [TestCase(Danish, false)]
+    [TestCase(Danish, true)]
+    [TestCase("DA-dk", false)]
+    [TestCase("DA-dk", true)]
+    public async Task Picker_Preview_Uses_Published_Variant_When_It_Is_Absent_From_The_Draft_Snapshot(string requestedCulture, bool expand)
     {
         Guid typeKey = await CreateVariantElementTypeAsync();
         Guid elementKey = await CreateVariantElementAsync(typeKey, "Published", English, Danish);
@@ -191,10 +231,11 @@ internal sealed class ElementHybridCachePreviewAccessTests : UmbracoIntegrationT
 
         IElementService elementService = GetRequiredService<IElementService>();
         IElement element = elementService.GetById(elementKey)!;
+        element.SetValue(VariantTitleAlias, "Unpublished Danish title", Danish);
         element.SetCultureName(null, Danish);
         Assert.That(elementService.Save(element).Success, Is.True);
 
-        Guid ownerKey = await CreateElementAsync(_allowedFolder.Key, true, _allowedElementKey, elementKey, _restrictedElementKey);
+        Guid ownerKey = await CreateElementAsync(_allowedFolder.Key, publish: true, _allowedElementKey, elementKey, _restrictedElementKey);
         GetRequiredService<IVariationContextAccessor>().VariationContext = new VariationContext(requestedCulture);
 
         IPublishedElement? preview = await PublishedElementCache.GetByIdAsync(elementKey, preview: true);
@@ -202,21 +243,55 @@ internal sealed class ElementHybridCachePreviewAccessTests : UmbracoIntegrationT
         Assert.That(preview!.IsInvariantOrHasCulture(requestedCulture), Is.False);
         Assert.That(published!.IsInvariantOrHasCulture(requestedCulture), Is.True);
 
-        IPublishedProperty picker = (await PublishedElementCache.GetByIdAsync(ownerKey, preview: true))!.GetProperty(PickerAlias)!;
+        IPublishedElement owner = (await PublishedElementCache.GetByIdAsync(ownerKey, preview: true))!;
+        var picks = owner.Value<IEnumerable<IPublishedElement>>(PickerAlias)!.ToArray();
+        IApiElement[] apiPicks = RenderPicker(owner, expand);
+        Guid[] expectedKeys = [_allowedElementKey, elementKey, _restrictedElementKey];
 
-        AssertPickedKeys(picker, _allowedElementKey, elementKey, _restrictedElementKey);
-        var picked = ((IEnumerable<IPublishedElement>)picker.GetValue()!).Single(item => item.Key == elementKey);
-        var apiElement = ((IEnumerable<IApiElement>)picker.GetDeliveryApiValue(expanding: false)!).Single(item => item.Id == elementKey);
-        Assert.That(picked.Name, Is.EqualTo($"Published {Danish}"));
-        Assert.That(picked.GetProperty(VariantTitleAlias)!.GetValue(), Is.EqualTo($"Published title {Danish}"));
-        Assert.That(apiElement.Name, Is.EqualTo($"Published {Danish}"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(picks.Select(item => item.Key), Is.EqualTo(expectedKeys));
+            Assert.That(apiPicks.Select(item => item.Id), Is.EqualTo(expectedKeys));
+            IPublishedElement pick = picks.Single(item => item.Key == elementKey);
+            IApiElement apiPick = apiPicks.Single(item => item.Id == elementKey);
+            Assert.That(pick.Name, Is.EqualTo($"Published {Danish}"));
+            Assert.That(pick.GetProperty(VariantTitleAlias)!.GetValue(), Is.EqualTo($"Published title {Danish}"));
+            Assert.That(apiPick.Name, Is.EqualTo($"Published {Danish}"));
+            Assert.That(apiPick.Properties[VariantTitleAlias], Is.EqualTo($"Published title {Danish}"));
+        });
     }
 
-    private static void AssertPickedKeys(IPublishedProperty picker, params Guid[] expectedKeys)
+    private IApiElement[] RenderPicker(IPublishedElement owner, bool expand)
     {
-        var elements = (IEnumerable<IPublishedElement>)picker.GetValue()!;
-        var apiElements = (IEnumerable<IApiElement>)picker.GetDeliveryApiValue(expanding: false)!;
-        var expandedApiElements = (IEnumerable<IApiElement>)picker.GetDeliveryApiValue(expanding: true)!;
+        using IServiceScope requestScope = Services.CreateScope();
+        var httpContextAccessor = GetRequiredService<IHttpContextAccessor>();
+        HttpContext? previousContext = httpContextAccessor.HttpContext;
+        var variationContextAccessor = GetRequiredService<IVariationContextAccessor>();
+        VariationContext? variationContext = variationContextAccessor.VariationContext;
+        httpContextAccessor.HttpContext = new DefaultHttpContext
+        {
+            RequestServices = requestScope.ServiceProvider,
+            Request = { QueryString = expand ? new QueryString("?expand=properties[$all]") : QueryString.Empty },
+        };
+
+        try
+        {
+            // Switching to an HTTP context moves variation storage from ambient to request scope.
+            variationContextAccessor.VariationContext = variationContext;
+            var strategy = requestScope.ServiceProvider.GetRequiredService<IOutputExpansionStrategy>();
+            return ((IEnumerable<IApiElement>)strategy.MapElementProperties(owner)[PickerAlias]!).ToArray();
+        }
+        finally
+        {
+            httpContextAccessor.HttpContext = previousContext;
+        }
+    }
+
+    private void AssertPickedKeys(IPublishedElement owner, params Guid[] expectedKeys)
+    {
+        var elements = owner.Value<IEnumerable<IPublishedElement>>(PickerAlias)!;
+        IApiElement[] apiElements = RenderPicker(owner, expand: false);
+        IApiElement[] expandedApiElements = RenderPicker(owner, expand: true);
 
         Assert.Multiple(() =>
         {
