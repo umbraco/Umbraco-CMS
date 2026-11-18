@@ -249,13 +249,15 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             return dtos;
         });
 
-    private Sql<ISqlContext> GetContentSourceSql(Guid key)
+    // internal so tests can reach it
+    internal Sql<ISqlContext> GetContentSourceSql(Guid key)
         => SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Document))
             .Append(SqlWhereNodeKey(ScopelessSqlContext, key))
             .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
 
-    private Sql<ISqlContext> GetContentSourcesSql(IEnumerable<Guid> keys)
+    // internal so tests can reach it
+    internal Sql<ISqlContext> GetContentSourcesSql(IEnumerable<Guid> keys)
         => SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Document))
             .WhereIn<NodeDto>(x => x.UniqueId, keys)
@@ -438,13 +440,15 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     public ContentCacheNode? GetMediaSource(Guid key)
         => CreateMediaSourceNode(Read(database => database.FirstOrDefault<ContentSourceDto>(GetMediaSourceSql(key))));
 
-    private Sql<ISqlContext> GetMediaSourceSql(Guid key)
+    // internal so tests can reach it
+    internal Sql<ISqlContext> GetMediaSourceSql(Guid key)
         => SqlMediaSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Media))
             .Append(SqlWhereNodeKey(ScopelessSqlContext, key))
             .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
 
-    private Sql<ISqlContext> GetMediaSourcesSql(IEnumerable<Guid> keys)
+    // internal so tests can reach it
+    internal Sql<ISqlContext> GetMediaSourcesSql(IEnumerable<Guid> keys)
         => SqlMediaSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Media))
             .WhereIn<NodeDto>(x => x.UniqueId, keys)
