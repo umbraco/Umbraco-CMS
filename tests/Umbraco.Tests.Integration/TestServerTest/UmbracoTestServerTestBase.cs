@@ -123,18 +123,14 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
              * However we need to separate the testing framework we provide for downstream projects from our own tests.
              * We cannot use the Umbraco.Web.UI startup yet as that is not available downstream.
              *
-             * - The WebApplicationFactory has been abstracted away per feb. 26 (v17.x?), which should help both downstream and separation.
+             * The factory is created for the concrete fixture type rather than this base class, as WebApplicationFactory
+             * requires the entry point assembly's .deps.json file, which a downstream test project only has for its own assembly.
              *
              * See https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests
              */
-
-            var adapterType = typeof(WebApplicationFactoryAdapter<>);
-            var genericAdapterType = adapterType.MakeGenericType(GetType());
-            var factoryCtor = genericAdapterType.GetConstructor([typeof(Func<IHostBuilder>), typeof(Action<IWebHostBuilder>)])!;
-
             Func<IHostBuilder> createHostBuilder = CreateHostBuilder;
 
-            Action<IWebHostBuilder> webHostConfig = builder =>
+            Action<IWebHostBuilder> configureWebHost = builder =>
             {
                 builder.UseContentRoot(Assembly.GetExecutingAssembly().GetRootDirectorySafe());
                 builder.ConfigureTestServices(services =>
@@ -144,7 +140,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 });
             };
 
-            return (IWebApplicationFactoryAdapter)factoryCtor.Invoke([createHostBuilder, webHostConfig]);
+            Type adapterType = typeof(WebApplicationFactoryAdapter<>).MakeGenericType(GetType());
+            return (IWebApplicationFactoryAdapter)Activator.CreateInstance(adapterType, createHostBuilder, configureWebHost)!;
         }
 
         [TearDown]
