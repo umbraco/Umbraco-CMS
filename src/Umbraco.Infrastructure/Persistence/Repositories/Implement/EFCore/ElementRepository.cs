@@ -21,19 +21,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 ///     on <see cref="AsyncPublishableContentRepositoryBase{TEntity,TRepository,TEntityDto,TContentVersionDto,TContentCultureVariationDto}" />;
 ///     this class supplies the element tables, keys, rows and delete clauses.
 /// </summary>
-internal sealed class AsyncElementRepository
+internal sealed class ElementRepository
     : AsyncPublishableContentRepositoryBase<
         IElement,
-        AsyncElementRepository,
+        ElementRepository,
         ElementDto,
         ElementVersionDto,
         ElementCultureVariationDto>,
-      IAsyncElementRepository
+      IElementRepository
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="AsyncElementRepository" /> class.
+    ///     Initializes a new instance of the <see cref="ElementRepository" /> class.
     /// </summary>
-    public AsyncElementRepository(
+    public ElementRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
         ILoggerFactory loggerFactory,
@@ -77,7 +77,7 @@ internal sealed class AsyncElementRepository
     protected override Guid NodeObjectTypeKey => Constants.ObjectTypes.Element;
 
     /// <inheritdoc />
-    protected override AsyncElementRepository This => this;
+    protected override ElementRepository This => this;
 
     /// <inheritdoc />
     protected override string RecycleBinCacheKey => CacheKeys.ElementRecycleBinCacheKey;

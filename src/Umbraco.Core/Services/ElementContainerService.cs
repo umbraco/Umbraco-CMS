@@ -18,7 +18,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
 {
     private readonly IElementContainerRepository _entityContainerRepository;
     private readonly IEntityRepository _entityRepository;
-    private readonly IAsyncElementRepository _elementRepository;
+    private readonly IElementRepository _elementRepository;
     private readonly IElementService _elementService;
     private readonly IOptionsMonitor<ContentSettings> _contentSettingsOptions;
     private readonly IRelationService _relationService;
@@ -34,7 +34,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         IEntityRepository entityRepository,
         IUserIdKeyResolver userIdKeyResolver,
         IEntityService entityService,
-        IAsyncElementRepository elementRepository,
+        IElementRepository elementRepository,
         IElementService elementService,
         IOptionsMonitor<ContentSettings> contentSettingsOptions,
         IRelationService relationService,
