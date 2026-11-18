@@ -159,18 +159,17 @@ public class PropertyCacheLevelTests
 
         // The property is invariant, so its value is read with an empty culture. A converter may still depend on
         // the ambient culture, so a preview value must be converted once per ambient culture and then reused.
-        variationContextAccessor.VariationContext = new VariationContext("en-US");
-        Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
-        Assert.AreEqual(1, converter.InterConverts);
+        (string Culture, int ExpectedConversions)[] reads = [("en-US", 1), ("nl-NL", 2), ("en-US", 2)];
+        IPublishedValueFallback valueFallback = Mock.Of<IPublishedValueFallback>();
 
-        variationContextAccessor.VariationContext = new VariationContext("nl-NL");
-        Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
-        Assert.AreEqual(2, converter.InterConverts);
+        foreach (var (culture, expectedConversions) in reads)
+        {
+            variationContextAccessor.VariationContext = new VariationContext(culture);
+            Assert.That(set1.Value(valueFallback, "prop1"), Is.EqualTo(1234), $"Value in {culture}");
+            Assert.That(converter.InterConverts, Is.EqualTo(expectedConversions), $"Conversion count after reading {culture}");
+        }
 
-        variationContextAccessor.VariationContext = new VariationContext("en-US");
-        Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
-        Assert.AreEqual(2, converter.InterConverts);
-        Assert.AreEqual(1, converter.SourceConverts);
+        Assert.That(converter.SourceConverts, Is.EqualTo(1));
     }
 
     [Test]
