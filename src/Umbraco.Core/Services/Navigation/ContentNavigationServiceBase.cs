@@ -1058,6 +1058,8 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             }
             else if (count == keys.Length)
             {
+                // Overflowing the stack buffer means an unusually deep tree, so reserve several times its size
+                // (a headroom heuristic) instead of regrowing the list as the remaining ancestors are added.
                 overflow = new List<Guid>(MaxStackAllocatedAncestors * 4);
                 overflow.AddRange(keys);
                 overflow.Add(node.Key);
