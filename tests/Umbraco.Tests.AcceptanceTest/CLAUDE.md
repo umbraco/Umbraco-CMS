@@ -30,7 +30,7 @@ ApiHelpers          lib/helpers/ApiHelpers.ts      HTTP transport (get/post/put/
 ```
 
 - Tests reach these via the `umbracoUi.*` and `umbracoApi.*` fixtures.
-- `lib/` is published to npm as `@umbraco/acceptance-test-helpers`. Treat exported helper signatures as a **public contract** — prefer adding optional parameters or new overloads over changing/removing existing ones.
+- `lib/` is published to npm as `@umbraco-cms/acceptance-test-helpers`. Treat exported helper signatures as a **public contract** — prefer adding optional parameters or new overloads over changing/removing existing ones.
 
 ---
 
