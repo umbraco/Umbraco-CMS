@@ -185,6 +185,41 @@ internal sealed class ElementHybridCachePreviewAccessTests : UmbracoIntegrationT
         Assert.That(pickedDraft.GetProperty(VariantTitleAlias)!.GetValue(), Is.EqualTo($"Draft title {Danish}"));
     }
 
+    [TestCase(Danish, English)]
+    [TestCase(English, Danish)]
+    public async Task Picker_Preview_Uses_The_Current_Culture_When_Reusing_An_Invariant_Owner(string firstCulture, string secondCulture)
+    {
+        Guid typeKey = await CreateVariantElementTypeAsync();
+        Guid elementKey = await CreateVariantElementAsync(typeKey, "English draft", English);
+        Guid ownerKey = await CreateElementAsync(_allowedFolder.Key, publish: true, elementKey);
+        IPublishedElement owner = (await PublishedElementCache.GetByIdAsync(ownerKey, preview: true))!;
+        var variationContextAccessor = GetRequiredService<IVariationContextAccessor>();
+
+        var first = ReadPicker(firstCulture);
+        var second = ReadPicker(secondCulture);
+
+        Assert.Multiple(() =>
+        {
+            foreach (var (culture, property, standard, expanded) in new[] { first, second })
+            {
+                Guid[] expectedKeys = culture == English ? [elementKey] : [];
+                Assert.That(property, Is.EqualTo(expectedKeys), $"Property conversion in {culture}");
+                Assert.That(standard, Is.EqualTo(expectedKeys), $"Standard Delivery API in {culture}");
+                Assert.That(expanded, Is.EqualTo(expectedKeys), $"Expanded Delivery API in {culture}");
+            }
+        });
+
+        (string Culture, Guid[] Property, Guid[] Standard, Guid[] Expanded) ReadPicker(string culture)
+        {
+            variationContextAccessor.VariationContext = new VariationContext(culture);
+            return (
+                culture,
+                owner.Value<IEnumerable<IPublishedElement>>(PickerAlias)!.Select(element => element.Key).ToArray(),
+                RenderPicker(owner, expand: false).Select(element => element.Id).ToArray(),
+                RenderPicker(owner, expand: true).Select(element => element.Id).ToArray());
+        }
+    }
+
     [TestCase(false)]
     [TestCase(true)]
     public async Task Picker_Preview_Prefers_Draft_Value_For_A_Published_Culture(bool expand)
