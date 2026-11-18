@@ -37,12 +37,8 @@ internal sealed partial class ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Change_Property_Alias_Via_EditingService_Emits_PropertyRemoved()
+    public async Task Change_Property_Alias_Via_EditingService_Emits_PropertyAliasChanged()
     {
-        // NOTE: The editing service looks up existing properties by alias, so changing a property alias
-        // results in the old property being removed and a new one being created. This triggers
-        // PropertyRemoved rather than PropertyAliasChanged. The PropertyAliasChanged flag would fire
-        // when a property type's alias is changed in-place via the lower-level ContentTypeService.
         var container = ContentTypePropertyContainerModel();
         var propertyType = ContentTypePropertyTypeModel("Title", "title", containerKey: container.Key);
         var contentType = (await ContentTypeEditingService.CreateAsync(
@@ -53,8 +49,6 @@ internal sealed partial class ContentTypeEditingServiceTests
         ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
             => refreshedPayloads = payloads;
 
-        // Update the property with a different alias but same key — the editing service treats this
-        // as removing the old property and adding a new one
         var updatedPropertyType = ContentTypePropertyTypeModel("Title", "titleRenamed", key: propertyType.Key, containerKey: container.Key);
         var updateModel = ContentTypeUpdateModel("Test", "test", propertyTypes: [updatedPropertyType], containers: [container]);
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
@@ -62,12 +56,7 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.IsNotNull(refreshedPayloads);
         Assert.AreEqual(1, refreshedPayloads!.Length);
-        var payload = refreshedPayloads.First();
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(payload.ChangeTypes.HasTypesAll(ContentTypeChangeTypes.PropertyRemoved), "Expected PropertyRemoved flag (old property removed)");
-            Assert.IsTrue(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain), "PropertyRemoved should include RefreshMain");
-        });
+        Assert.AreEqual(ContentTypeChangeTypes.PropertyAliasChanged, refreshedPayloads.First().ChangeTypes);
     }
 
     [Test]
