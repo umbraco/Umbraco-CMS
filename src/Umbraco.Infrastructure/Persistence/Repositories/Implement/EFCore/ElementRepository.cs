@@ -18,11 +18,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 
 /// <summary>
 ///     The EF Core repository for <see cref="IElement" /> entities. Everything generic to publishable content lives
-///     on <see cref="AsyncPublishableContentRepositoryBase{TEntity,TRepository,TEntityDto,TContentVersionDto,TContentCultureVariationDto}" />;
+///     on <see cref="PublishableContentRepositoryBase{TEntity,TRepository,TEntityDto,TContentVersionDto,TContentCultureVariationDto}" />;
 ///     this class supplies the element tables, keys, rows and delete clauses.
 /// </summary>
 internal sealed class ElementRepository
-    : AsyncPublishableContentRepositoryBase<
+    : PublishableContentRepositoryBase<
         IElement,
         ElementRepository,
         ElementDto,

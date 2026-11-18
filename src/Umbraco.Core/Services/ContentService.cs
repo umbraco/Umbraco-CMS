@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Implements the content service.
 /// </summary>
-public class ContentService : AsyncPublishableContentServiceBase<IContent>, IContentService
+public class ContentService : PublishableContentServiceBase<IContent>, IContentService
 {
     private readonly IDocumentRepository _documentRepository;
     private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
@@ -1832,7 +1832,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
     protected override ILogger<ContentService> Logger => _logger;
 
-    /// <inheritdoc cref="AsyncPublishableContentServiceBase{TContent}.DeleteLockedAsync" />
+    /// <inheritdoc cref="PublishableContentServiceBase{TContent}.DeleteLockedAsync" />
     protected override async Task DeleteLockedAsync(ICoreScope scope, IContent content, EventMessages evtMsgs, CancellationToken cancellationToken)
     {
         async Task DoDeleteAsync(IContent c)

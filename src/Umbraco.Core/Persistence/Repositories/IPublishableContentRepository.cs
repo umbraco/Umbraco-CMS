@@ -4,9 +4,9 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
 /// <summary>
-///     Defines the async repository contract for publishable content items, adding publishing and scheduling operations.
+///     Defines the repository contract for publishable content items, adding publishing and scheduling operations.
 /// </summary>
-public interface IAsyncPublishableContentRepository<TContent> : IAsyncContentRepository<TContent>
+public interface IPublishableContentRepository<TContent> : IAsyncContentRepository<TContent>
     where TContent : IPublishableContentBase
 {
     /// <summary>

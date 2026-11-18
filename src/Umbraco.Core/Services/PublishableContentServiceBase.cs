@@ -16,8 +16,8 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
-/// Asynchronous base class for services that manage publishable content through an
-/// <see cref="IAsyncPublishableContentRepository{TContent}"/>.
+/// Base class for services that manage publishable content through an
+/// <see cref="IPublishableContentRepository{TContent}"/>.
 /// </summary>
 /// <typeparam name="TContent">The type of content managed by the concrete implementation.</typeparam>
 /// <remarks>
@@ -25,12 +25,12 @@ namespace Umbraco.Cms.Core.Services;
 /// <see cref="IPublishableContentService{TContent}"/>, leaving the content-type specific parts (object type, lock ids,
 /// notifications) to the derived service.
 /// </remarks>
-public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryService, IPublishableContentService<TContent>
+public abstract class PublishableContentServiceBase<TContent> : RepositoryService, IPublishableContentService<TContent>
     where TContent : class, IPublishableContentBase
 {
     private readonly IAuditService _auditService;
     private readonly IContentTypeRepository _contentTypeRepository;
-    private readonly IAsyncPublishableContentRepository<TContent> _asyncContentRepository;
+    private readonly IPublishableContentRepository<TContent> _contentRepository;
     private readonly ILanguageRepository _languageRepository;
     private readonly Lazy<IPropertyValidationService> _propertyValidationService;
     private readonly ICultureImpactFactory _cultureImpactFactory;
@@ -40,14 +40,14 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     private readonly Lazy<IUserService> _userService;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AsyncPublishableContentServiceBase{TContent}"/> class.
+    /// Initializes a new instance of the <see cref="PublishableContentServiceBase{TContent}"/> class.
     /// </summary>
     /// <param name="provider">The core scope provider.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     /// <param name="eventMessagesFactory">The event messages factory.</param>
     /// <param name="auditService">The audit service.</param>
     /// <param name="contentTypeRepository">The backing content type repository.</param>
-    /// <param name="asyncContentRepository">The backing content repository.</param>
+    /// <param name="contentRepository">The backing content repository.</param>
     /// <param name="languageRepository">The language repository.</param>
     /// <param name="propertyValidationService">The property validation service.</param>
     /// <param name="cultureImpactFactory">The culture impact factory.</param>
@@ -55,13 +55,13 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <param name="propertyEditorCollection">The property editor collection.</param>
     /// <param name="idKeyMap">The ID key map.</param>
     /// <param name="userService">The user service, resolved lazily to avoid a circular dependency.</param>
-    protected AsyncPublishableContentServiceBase(
+    protected PublishableContentServiceBase(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IAuditService auditService,
         IContentTypeRepository contentTypeRepository,
-        IAsyncPublishableContentRepository<TContent> asyncContentRepository,
+        IPublishableContentRepository<TContent> contentRepository,
         ILanguageRepository languageRepository,
         Lazy<IPropertyValidationService> propertyValidationService,
         ICultureImpactFactory cultureImpactFactory,
@@ -73,7 +73,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     {
         _auditService = auditService;
         _contentTypeRepository = contentTypeRepository;
-        _asyncContentRepository = asyncContentRepository;
+        _contentRepository = contentRepository;
         _languageRepository = languageRepository;
         _propertyValidationService = propertyValidationService;
         _cultureImpactFactory = cultureImpactFactory;
@@ -93,7 +93,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
     protected abstract bool SupportsBranchPublishing { get; }
 
-    protected abstract ILogger<AsyncPublishableContentServiceBase<TContent>> Logger { get; }
+    protected abstract ILogger<PublishableContentServiceBase<TContent>> Logger { get; }
 
     /// <summary>
     ///     Persists the pending changes of a content item, publishing or unpublishing it as its published state dictates.
@@ -330,7 +330,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.ReadLock(ReadLockIds);
-            int result = await _asyncContentRepository.CountPublishedAsync(contentTypeAlias, cancellationToken);
+            int result = await _contentRepository.CountPublishedAsync(contentTypeAlias, cancellationToken);
             scope.Complete();
             return result;
         }
@@ -347,8 +347,8 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
         int result = contentTypeAlias is null
-            ? await _asyncContentRepository.CountAsync(cancellationToken)
-            : await _asyncContentRepository.CountAsync(contentTypeAlias, cancellationToken);
+            ? await _contentRepository.CountAsync(cancellationToken)
+            : await _contentRepository.CountAsync(contentTypeAlias, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -365,8 +365,8 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
         int result = contentTypeAlias is null
-            ? await _asyncContentRepository.CountChildrenAsync(parentKey, cancellationToken)
-            : await _asyncContentRepository.CountChildrenAsync(parentKey, contentTypeAlias, cancellationToken);
+            ? await _contentRepository.CountChildrenAsync(parentKey, cancellationToken)
+            : await _contentRepository.CountChildrenAsync(parentKey, contentTypeAlias, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -383,8 +383,8 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
         int result = contentTypeAlias is null
-            ? await _asyncContentRepository.CountDescendantsAsync(parentKey, cancellationToken)
-            : await _asyncContentRepository.CountDescendantsAsync(parentKey, contentTypeAlias, cancellationToken);
+            ? await _contentRepository.CountDescendantsAsync(parentKey, cancellationToken)
+            : await _contentRepository.CountDescendantsAsync(parentKey, contentTypeAlias, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -399,7 +399,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.ReadLock(ReadLockIds);
-            TContent? result = await _asyncContentRepository.GetAsync(key, cancellationToken);
+            TContent? result = await _contentRepository.GetAsync(key, cancellationToken);
             scope.Complete();
             return result;
         }
@@ -417,7 +417,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.ReadLock(ReadLockIds);
-            IEnumerable<TContent> items = await _asyncContentRepository.GetManyAsync(idsA, cancellationToken);
+            IEnumerable<TContent> items = await _contentRepository.GetManyAsync(idsA, cancellationToken);
             var index = items.ToDictionary(x => x.Key, x => x);
             IEnumerable<TContent> result = idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
             scope.Complete();
@@ -437,7 +437,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.ReadLock(ReadLockIds);
-            IEnumerable<TContent> items = await _asyncContentRepository.GetManyAsync(idsA, propertyAliases, loadTemplates, cancellationToken);
+            IEnumerable<TContent> items = await _contentRepository.GetManyAsync(idsA, propertyAliases, loadTemplates, cancellationToken);
             var index = items.ToDictionary(x => x.Key, x => x);
             IEnumerable<TContent> result = idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
             scope.Complete();
@@ -450,7 +450,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        ContentScheduleCollection result = await _asyncContentRepository.GetContentScheduleAsync(contentId, cancellationToken);
+        ContentScheduleCollection result = await _contentRepository.GetContentScheduleAsync(contentId, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -465,7 +465,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        IDictionary<Guid, IEnumerable<ContentSchedule>> result = await _asyncContentRepository.GetContentSchedulesByKeysAsync(keys, cancellationToken);
+        IDictionary<Guid, IEnumerable<ContentSchedule>> result = await _contentRepository.GetContentSchedulesByKeysAsync(keys, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -477,7 +477,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        PagedModel<TContent> result = await _asyncContentRepository.GetPagedOfContentTypesAsync([contentTypeKey], skip, take, ordering, cancellationToken);
+        PagedModel<TContent> result = await _contentRepository.GetPagedOfContentTypesAsync([contentTypeKey], skip, take, ordering, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -487,7 +487,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
-        await _asyncContentRepository.PersistContentScheduleAsync(content, contentSchedule, cancellationToken);
+        await _contentRepository.PersistContentScheduleAsync(content, contentSchedule, cancellationToken);
         scope.Complete();
         return Attempt.Succeed(ContentScheduleOperationStatus.Success);
     }
@@ -499,7 +499,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        PagedModel<TContent> result = await _asyncContentRepository.GetPagedOfContentTypesAsync(contentTypeKeys, skip, take, ordering, cancellationToken);
+        PagedModel<TContent> result = await _contentRepository.GetPagedOfContentTypesAsync(contentTypeKeys, skip, take, ordering, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -509,7 +509,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        TContent? result = await _asyncContentRepository.GetVersionAsync(versionId, cancellationToken);
+        TContent? result = await _contentRepository.GetVersionAsync(versionId, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -519,7 +519,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        IEnumerable<TContent> result = await _asyncContentRepository.GetAllVersionsAsync(contentKey, cancellationToken);
+        IEnumerable<TContent> result = await _contentRepository.GetAllVersionsAsync(contentKey, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -529,7 +529,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        IEnumerable<TContent> result = await _asyncContentRepository.GetAllVersionsSlimAsync(contentKey, skip, take, cancellationToken);
+        IEnumerable<TContent> result = await _contentRepository.GetAllVersionsSlimAsync(contentKey, skip, take, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -539,7 +539,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        IEnumerable<int> result = await _asyncContentRepository.GetVersionIdsAsync(contentKey, skip, take, cancellationToken);
+        IEnumerable<int> result = await _contentRepository.GetVersionIdsAsync(contentKey, skip, take, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -558,7 +558,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        IEnumerable<TContent> result = await _asyncContentRepository.GetContentForExpirationAsync(date, cancellationToken);
+        IEnumerable<TContent> result = await _contentRepository.GetContentForExpirationAsync(date, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -577,7 +577,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        IEnumerable<TContent> result = await _asyncContentRepository.GetContentForReleaseAsync(date, cancellationToken);
+        IEnumerable<TContent> result = await _contentRepository.GetContentForReleaseAsync(date, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -596,7 +596,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        bool result = await _asyncContentRepository.IsPathPublishedAsync(content, cancellationToken);
+        bool result = await _contentRepository.IsPathPublishedAsync(content, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -676,11 +676,11 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             ? culturesChanging
             : content.IsDirty() ? ["*"] : [];
 
-        await _asyncContentRepository.SaveAsync(content, cancellationToken);
+        await _contentRepository.SaveAsync(content, cancellationToken);
 
         if (contentSchedule is not null)
         {
-            await _asyncContentRepository.PersistContentScheduleAsync(content, contentSchedule, cancellationToken);
+            await _contentRepository.PersistContentScheduleAsync(content, contentSchedule, cancellationToken);
         }
 
         scope.Notifications.Publish(
@@ -742,7 +742,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 savedCultures[content.Key] = culturesChanging;
             }
 
-            await _asyncContentRepository.SaveAsync(content, cancellationToken);
+            await _contentRepository.SaveAsync(content, cancellationToken);
         }
 
         scope.Notifications.Publish(
@@ -1137,14 +1137,14 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         // do a fast read without any locks since this executes often to see if we even need to proceed
-        if (await _asyncContentRepository.HasContentForExpirationAsync(date, cancellationToken))
+        if (await _contentRepository.HasContentForExpirationAsync(date, cancellationToken))
         {
             // now take a write lock since we'll be updating
             scope.WriteLock(WriteLockIds);
 
-            foreach (TContent d in await _asyncContentRepository.GetContentForExpirationAsync(date, cancellationToken))
+            foreach (TContent d in await _contentRepository.GetContentForExpirationAsync(date, cancellationToken))
             {
-                ContentScheduleCollection contentSchedule = await _asyncContentRepository.GetContentScheduleAsync(d.Key, cancellationToken);
+                ContentScheduleCollection contentSchedule = await _contentRepository.GetContentScheduleAsync(d.Key, cancellationToken);
                 if (d.ContentType.VariesByCulture())
                 {
                     // find which cultures have pending schedules
@@ -1174,7 +1174,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                         d.UnpublishCulture(c);
                     }
 
-                    await _asyncContentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
+                    await _contentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
                     PublishResult result = await CommitContentChangesAsync(scope, d, evtMsgs, await allLangs.Value, savingNotification.State, d.WriterId, includeInvariantForVariant: true, cancellationToken);
                     if (result is { Success: false })
                     {
@@ -1187,7 +1187,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 {
                     // Clear this schedule for this culture
                     contentSchedule.Clear(ContentScheduleAction.Expire, date);
-                    await _asyncContentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
+                    await _contentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
 
                     // Uses the int-userId overload directly: WriterId is passed through as-is, with no Guid
                     // round trip that would be lossy for a writer id with no matching user.
@@ -1201,7 +1201,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 }
             }
 
-            await _asyncContentRepository.ClearScheduleAsync(date, ContentScheduleAction.Expire, cancellationToken);
+            await _contentRepository.ClearScheduleAsync(date, ContentScheduleAction.Expire, cancellationToken);
         }
 
         scope.Complete();
@@ -1212,14 +1212,14 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         // do a fast read without any locks since this executes often to see if we even need to proceed
-        if (await _asyncContentRepository.HasContentForReleaseAsync(date, cancellationToken))
+        if (await _contentRepository.HasContentForReleaseAsync(date, cancellationToken))
         {
             // now take a write lock since we'll be updating
             scope.WriteLock(WriteLockIds);
 
-            foreach (TContent d in await _asyncContentRepository.GetContentForReleaseAsync(date, cancellationToken))
+            foreach (TContent d in await _contentRepository.GetContentForReleaseAsync(date, cancellationToken))
             {
-                ContentScheduleCollection contentSchedule = await _asyncContentRepository.GetContentScheduleAsync(d.Key, cancellationToken);
+                ContentScheduleCollection contentSchedule = await _contentRepository.GetContentScheduleAsync(d.Key, cancellationToken);
                 if (d.ContentType.VariesByCulture())
                 {
                     // find which cultures have pending schedules
@@ -1291,7 +1291,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                     }
                     else
                     {
-                        await _asyncContentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
+                        await _contentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
                         result = await CommitContentChangesAsync(scope, d, evtMsgs, await allLangs.Value, savingNotification.State, d.WriterId, includeInvariantForVariant, cancellationToken);
                     }
 
@@ -1315,7 +1315,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                     }
                     else
                     {
-                        await _asyncContentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
+                        await _contentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
 
                         // Uses the int-userId overload directly, matching the CommitContentChangesAsync calls
                         // elsewhere in this method: WriterId is passed through as-is, with no Guid round trip
@@ -1332,7 +1332,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 }
             }
 
-            await _asyncContentRepository.ClearScheduleAsync(date, ContentScheduleAction.Release, cancellationToken);
+            await _contentRepository.ClearScheduleAsync(date, ContentScheduleAction.Release, cancellationToken);
         }
 
         scope.Complete();
@@ -1446,7 +1446,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             c.WriterId = userId;
 
             // saving does NOT change the published version, unless PublishedState is Publishing or Unpublishing
-            await _asyncContentRepository.SaveAsync(c, cancellationToken);
+            await _contentRepository.SaveAsync(c, cancellationToken);
         }
 
         if (publishing)
@@ -1809,7 +1809,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             return Attempt.Fail(ContentVersionOperationStatus.CancelledByNotification);
         }
 
-        await _asyncContentRepository.DeleteVersionsAsync(key, versionDate, cancellationToken);
+        await _contentRepository.DeleteVersionsAsync(key, versionDate, cancellationToken);
 
         scope.Notifications.Publish(
             CreateDeletedVersionsNotification(key, evtMsgs, specificVersion: default, dateToRetain: versionDate).WithStateFrom(
@@ -1851,13 +1851,13 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             await DeleteVersionsAsync(key, content?.UpdateDate ?? DateTime.UtcNow, userKey, cancellationToken);
         }
 
-        TContent? c = await _asyncContentRepository.GetAsync(key, cancellationToken);
+        TContent? c = await _contentRepository.GetAsync(key, cancellationToken);
 
         // don't delete the current or published version
         if (c?.VersionId != versionId &&
             c?.PublishedVersionId != versionId)
         {
-            await _asyncContentRepository.DeleteVersionAsync(versionId, cancellationToken);
+            await _contentRepository.DeleteVersionAsync(versionId, cancellationToken);
         }
 
         scope.Notifications.Publish(
@@ -1894,7 +1894,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
         scope.WriteLock(WriteLockIds);
 
-        ContentDataIntegrityReport report = await _asyncContentRepository.CheckDataIntegrityAsync(options, cancellationToken);
+        ContentDataIntegrityReport report = await _contentRepository.CheckDataIntegrityAsync(options, cancellationToken);
 
         if (report.FixedIssues.Count > 0)
         {
@@ -1930,7 +1930,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         {
             count = 0;
 
-            PagedModel<TContent> descendantsPage = await _asyncContentRepository.GetDescendantsAsync(
+            PagedModel<TContent> descendantsPage = await _contentRepository.GetDescendantsAsync(
                 content.Key,
                 page * pageSize,
                 pageSize,
@@ -2113,7 +2113,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
         }
 
-        ContentScheduleCollection contentSchedule = await _asyncContentRepository.GetContentScheduleAsync(content.Key, cancellationToken);
+        ContentScheduleCollection contentSchedule = await _contentRepository.GetContentScheduleAsync(content.Key, cancellationToken);
 
         // loop over each culture publishing - or InvariantCulture for invariant
         foreach (var culture in culturesPublishing ?? new[] { Constants.System.InvariantCulture })
@@ -2300,7 +2300,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         // if the content has any release dates set to before now,
         // they should be removed so they don't interrupt an unpublish
         // otherwise it would remain released == published
-        ContentScheduleCollection contentSchedule = await _asyncContentRepository.GetContentScheduleAsync(content.Key, cancellationToken);
+        ContentScheduleCollection contentSchedule = await _contentRepository.GetContentScheduleAsync(content.Key, cancellationToken);
         IReadOnlyList<ContentSchedule> pastReleases =
             contentSchedule.GetPending(ContentScheduleAction.Expire, DateTime.UtcNow);
         foreach (ContentSchedule p in pastReleases)
@@ -2314,7 +2314,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 "Content {ContentName} (id={ContentId}, key={ContentKey}) had its release date removed, because it was unpublished.", content.Name, content.Id, content.Key);
         }
 
-        await _asyncContentRepository.PersistContentScheduleAsync(content, contentSchedule, cancellationToken);
+        await _contentRepository.PersistContentScheduleAsync(content, contentSchedule, cancellationToken);
 
         // change state to unpublishing
         content.PublishedState = PublishedState.Unpublishing;

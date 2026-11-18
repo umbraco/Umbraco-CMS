@@ -6,6 +6,6 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 ///     Defines the repository for <see cref="IElement" /> entities. Elements carry no members of their own beyond the
 ///     publishable content contract.
 /// </summary>
-public interface IElementRepository : IAsyncPublishableContentRepository<IElement>
+public interface IElementRepository : IPublishableContentRepository<IElement>
 {
 }

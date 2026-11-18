@@ -330,7 +330,7 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
 
     // Joins the given Nodes query onward through Content → ContentTypes filtered by content type
     // alias, projecting back to NodeDto. Protected (not folded into NodesFilteredByContentTypeAlias
-    // above) so AsyncPublishableContentRepositoryBase.CountPublishedAsync can reuse this tail on top
+    // above) so PublishableContentRepositoryBase.CountPublishedAsync can reuse this tail on top
     // of its own Published/Trashed-filtered query instead of duplicating the join inline.
     protected static IQueryable<NodeDto> FilterByContentTypeAlias(IQueryable<NodeDto> nodes, UmbracoDbContext db, string contentTypeAlias) =>
         nodes
