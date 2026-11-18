@@ -172,9 +172,14 @@ The environment configuration is set up by the npm installation script, creating
 UMBRACO_USER_LOGIN=email@example.com
 UMBRACO_USER_PASSWORD=yourpassword
 URL=https://localhost:44339
+STORAGE_STATE_PATH=<path to this folder>/playwright/.auth/user.json
+CONSOLE_ERRORS_PATH=<path to this folder>/console-errors.json
 ```
 
-To reconfigure:
+- `STORAGE_STATE_PATH` lets the `umbracoApi` fixture save the refreshed admin session after each test. Without it, every test starts from the session saved by `auth.setup.ts`. With concurrent logins disabled (the default), any later admin sign-in invalidates that session, so specs that open the back office before using `umbracoApi` land on the login screen.
+- `CONSOLE_ERRORS_PATH` is where console errors captured during a run are written.
+
+To reconfigure, or to add missing variables to an older `.env`:
 ```bash
 npm run config
 ```
@@ -219,6 +224,7 @@ The test suite is organized into multiple Playwright projects (see `playwright.c
 | `setup` | Authentication setup (runs first) |
 | `defaultConfig` | Main test suite (depends on setup) |
 | `extensionRegistry` | Extension registry tests |
+| `segments` | Segment variation tests, run with a custom segment service and no other extensions |
 | `entityDataPicker` | Entity data picker tests |
 | `deliveryApi` | Delivery API tests |
 | `externalLoginAzureADB2C` | Azure AD B2C authentication tests |
