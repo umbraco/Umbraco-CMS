@@ -138,3 +138,9 @@ per object type (never call it with an empty id list: it then returns every enti
 match upstream. The four baseline search fixtures pass 28/28 locally, so the "known failing tests" caveat goes away once #24657 merges.
 Two traps: a `Contains` on an array inside an EF Core lambda breaks the Infrastructure CLAUDE.md rule (copy to `List<T>` first), and Git Bash
 heredocs with long Python bodies fail with "unexpected EOF" here; write scripts to the scratchpad with the Write tool instead.
+
+Update 18-11-2026: PR 5 merged as `0b5b4c28bbe` (#24653). Its human review added `61ef39eb54f`: `protected abstract int RecycleBinId` on
+`AsyncPublishableContentServiceBase`, and all twelve notification hooks there renamed with a `Create` prefix (`CreateSavingNotification`, ...);
+other service bases keep the old names. PR 0 (#24657) is ready for review; TODOs on `EntityRepository` and
+`RelationRepository.GetPagedRelatedEntitiesAsync` mark the node paging and entity building for the entity repository's EF Core migration.
+User decisions on that: keep it EF Core, no new `IQuery` use, no new NPoco code. PR 6 is next and unblocked.

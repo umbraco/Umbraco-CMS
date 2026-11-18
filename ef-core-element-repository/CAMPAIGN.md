@@ -165,6 +165,8 @@ Acceptance: the four §4a fixtures and the un-ignored relation tests green on SQ
 
 Status 17-11-2026: implemented and in review as draft #24657 (`34672930fc0`). The bulk lookup became `GetParentEntitiesByChildIdsAsync`; the paged lookups order by sort order then node id, as upstream does. The four §4a fixtures pass locally.
 
+Status 18-11-2026: ready for review. `f08b1b70944` adds the TODOs for the entity repository follow-up (§8, 18-11-2026 row). The merge of PR 5 conflicts only on `ElementRepositoryTest`; take the deletion.
+
 ### PR 1: EF Core Element DTOs and the no-op migration
 
 Scope:
@@ -265,6 +267,8 @@ Scope:
 Acceptance: every fixture in the test table of §4 green on SQLite; SQL Server run differs from the parent branch only by the known-flaky search jobs; `grep -r "IElementRepository\b" src tests` returns nothing; `grep -rn "PublishableContentServiceBase<IElement>" src` returns nothing; `grep -nE 'public (?!override|async|Task)' -P src/Umbraco.Core/Services/ElementService.cs` lists only the constructor (no sync public member remains on the concrete type); `grep -nE 'OperationResult|int userId|IQuery<|GetAwaiter\(\)\.GetResult\(\)|Task\.FromResult' src/Umbraco.Core/Services/ElementService.cs src/Umbraco.Core/Services/ElementContainerService.cs` returns nothing; `ElementDeletedVersionsNotification` is published on an element version delete (new test); unit tests green. The four §4a search fixtures are run and their result recorded in `status.json` (green if the relation stubs are implemented, otherwise the same `NotImplementedException` as the baseline and nothing else).
 
 Status 17-11-2026: PR 4b merged 16-11-2026 as `a2a288de44b` (#24624). PR 5 open as #24653 (`5edd50597e6`, `2069d626756`, `e528600414a`), ready for review. Deviations from the scope above are in §8 (17-11-2026 rows).
+
+Status 18-11-2026: merged as `0b5b4c28bbe` (#24653). The review round added `61ef39eb54f`: a protected abstract `RecycleBinId` on the async publishing base, and every notification hook on that base renamed with a `Create` prefix. PR 6 must use the new hook names; the sync `PublishableContentServiceBase` it deletes still has the old ones.
 
 ### PR 6: Retire the sync engine and drop the scaffolding names
 
