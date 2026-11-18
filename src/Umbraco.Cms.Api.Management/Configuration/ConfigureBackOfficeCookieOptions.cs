@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -22,6 +23,8 @@ namespace Umbraco.Cms.Api.Management.Configuration;
 /// </summary>
 public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAuthenticationOptions>
 {
+    private const string LastStampValidationUtcKey = ".umb.stamp-validated";
+
     private readonly IDataProtectionProvider _dataProtection;
     private readonly GlobalSettings _globalSettings;
     private readonly IIpResolver _ipResolver;
@@ -152,31 +155,41 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                     Constants.Security.BackOfficeAuthenticationType,
                     backOfficeIdentity));
 
+                // The cookie middleware stamps IssuedUtc with the time of every renewal, and the
+                // SecurityStampValidator measures its ValidationInterval from IssuedUtc. The session is
+                // renewed on activity, so IssuedUtc can't serve as the time of the last stamp validation:
+                // a client making requests more often than the interval would never be re-validated.
+                // That time is tracked separately and presented to the validator as IssuedUtc.
+                DateTimeOffset? lastStampValidationUtc = GetLastStampValidationUtc(ctx.Properties);
+                if (lastStampValidationUtc is not null)
+                {
+                    ctx.Properties.IssuedUtc = lastStampValidationUtc;
+                }
+
                 await securityStampValidator.ValidateAsync(ctx);
 
                 // ctx.ShouldRenew is true here only when the SecurityStampValidator itself decided to
                 // refresh the principal, i.e. its ValidationInterval had elapsed and the stamp was still
-                // valid. That's a genuine re-validation, so it's safe to reset both timestamps: IssuedUtc
-                // starts a fresh validation interval, and ExpiresUtc is reset alongside it because the
-                // SecurityStampValidator's own renewal updates IssuedUtc without touching ExpiresUtc,
-                // which would otherwise shrink the effective cookie lifetime with each validation.
+                // valid. That's a genuine re-validation, so a fresh validation interval starts now.
                 if (ctx.ShouldRenew)
                 {
                     DateTimeOffset now = _timeProvider.GetUtcNow();
                     ctx.Properties.IssuedUtc = now;
                     ctx.Properties.ExpiresUtc = now.Add(_globalSettings.TimeOut);
+                    ctx.Properties.Items[LastStampValidationUtcKey] = now.ToString("o");
                 }
                 else if (ctx.Principal is not null)
                 {
-                    // No stamp re-validation happened this request (the ValidationInterval hasn't
-                    // elapsed yet), but any request bearing a valid principal should still refresh the
-                    // session on activity. Extend ExpiresUtc only - IssuedUtc must be left untouched, or
-                    // the SecurityStampValidator's interval clock would be reset on every request and the
-                    // stamp would never be re-checked again for the lifetime of an active session (this
-                    // matters most when AllowConcurrentLogins is true, where ValidationInterval stays at
-                    // its non-zero default instead of being forced to zero).
+                    // The stamp was not re-validated (the ValidationInterval hasn't elapsed yet), but any
+                    // request bearing a valid principal still refreshes the session on activity. The
+                    // cookie middleware re-issues a renewed ticket as now + (ExpiresUtc - IssuedUtc), so
+                    // that span is kept at the session timeout, and the time of the last stamp validation
+                    // is carried over so the interval keeps running.
+                    DateTimeOffset issuedUtc = ctx.Properties.IssuedUtc ?? _timeProvider.GetUtcNow();
                     ctx.ShouldRenew = true;
-                    ctx.Properties.ExpiresUtc = _timeProvider.GetUtcNow().Add(_globalSettings.TimeOut);
+                    ctx.Properties.IssuedUtc = issuedUtc;
+                    ctx.Properties.ExpiresUtc = issuedUtc.Add(_globalSettings.TimeOut);
+                    ctx.Properties.Items[LastStampValidationUtcKey] = issuedUtc.ToString("o");
                 }
             },
             OnSigningIn = ctx =>
@@ -252,6 +265,12 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
             },
         };
     }
+
+    private static DateTimeOffset? GetLastStampValidationUtc(AuthenticationProperties properties)
+        => properties.Items.TryGetValue(LastStampValidationUtcKey, out var value)
+            && DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTimeOffset parsed)
+                ? parsed
+                : properties.IssuedUtc;
 
     /// <summary>
     ///     Resolves the configured <see cref="SecuritySettings.AuthCookieSameSite" /> value.
