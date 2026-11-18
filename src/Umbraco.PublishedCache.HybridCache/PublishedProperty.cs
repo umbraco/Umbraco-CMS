@@ -315,7 +315,8 @@ internal sealed class PublishedProperty : PublishedPropertyBase
             culture ??= string.Empty;
             segment ??= string.Empty;
 
-            if (culture == string.Empty && segment == string.Empty && string.IsNullOrEmpty(contextCulture) && fallback.HasPolicies is false)
+            bool isInvariant = culture == string.Empty && segment == string.Empty;
+            if (isInvariant && string.IsNullOrEmpty(contextCulture) && fallback.HasPolicies is false)
             {
                 return this;
             }
