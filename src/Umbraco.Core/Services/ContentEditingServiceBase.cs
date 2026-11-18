@@ -276,7 +276,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// </remarks>
     private static bool HasName(TContent content, TContentType contentType)
         => contentType.VariesByCulture()
-            ? content.CultureInfos?.Count > 0
+            ? content.CultureInfos?.Values.Any(cultureInfo => cultureInfo.Name.IsNullOrWhiteSpace() is false) is true
             : content.Name.IsNullOrWhiteSpace() is false;
 
     /// <summary>
