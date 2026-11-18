@@ -604,8 +604,8 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual("The published value", updatedContent.GetValue("newAlias", published: true));
         });
 
-        // expect RefreshMain when changing a property alias
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType!.Id, ContentTypeChangeTypes.RefreshMain);
+        // expect PropertyAliasChanged (which includes RefreshMain) when changing a property alias
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType!.Id, ContentTypeChangeTypes.PropertyAliasChanged);
     }
 
     [Test]
