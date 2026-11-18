@@ -85,6 +85,8 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
     protected abstract UmbracoObjectTypes ContentObjectType { get; }
 
+    protected abstract int RecycleBinId { get; }
+
     protected abstract int[] ReadLockIds { get; }
 
     protected abstract int[] WriteLockIds { get; }
@@ -129,35 +131,35 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
     protected abstract Task DeleteLockedAsync(ICoreScope scope, TContent content, EventMessages evtMsgs, CancellationToken cancellationToken);
 
-    protected abstract SavingNotification<TContent> SavingNotification(TContent content, EventMessages eventMessages);
+    protected abstract SavingNotification<TContent> CreateSavingNotification(TContent content, EventMessages eventMessages);
 
-    protected abstract SavedNotification<TContent> SavedNotification(TContent content, EventMessages eventMessages);
+    protected abstract SavedNotification<TContent> CreateSavedNotification(TContent content, EventMessages eventMessages);
 
-    protected abstract SavingNotification<TContent> SavingNotification(IEnumerable<TContent> content, EventMessages eventMessages);
+    protected abstract SavingNotification<TContent> CreateSavingNotification(IEnumerable<TContent> content, EventMessages eventMessages);
 
-    protected abstract SavedNotification<TContent> SavedNotification(IEnumerable<TContent> content, EventMessages eventMessages);
+    protected abstract SavedNotification<TContent> CreateSavedNotification(IEnumerable<TContent> content, EventMessages eventMessages);
 
-    protected abstract TreeChangeNotification<TContent> TreeChangeNotification(TContent content, TreeChangeTypes changeTypes, EventMessages eventMessages);
+    protected abstract TreeChangeNotification<TContent> CreateTreeChangeNotification(TContent content, TreeChangeTypes changeTypes, EventMessages eventMessages);
 
-    protected abstract TreeChangeNotification<TContent> TreeChangeNotification(TContent content, TreeChangeTypes changeTypes, IEnumerable<string>? publishedCultures, IEnumerable<string>? unpublishedCultures, EventMessages eventMessages);
+    protected abstract TreeChangeNotification<TContent> CreateTreeChangeNotification(TContent content, TreeChangeTypes changeTypes, IEnumerable<string>? publishedCultures, IEnumerable<string>? unpublishedCultures, EventMessages eventMessages);
 
-    protected abstract TreeChangeNotification<TContent> TreeChangeNotification(IEnumerable<TContent> content, TreeChangeTypes changeTypes, EventMessages eventMessages);
+    protected abstract TreeChangeNotification<TContent> CreateTreeChangeNotification(IEnumerable<TContent> content, TreeChangeTypes changeTypes, EventMessages eventMessages);
 
-    protected abstract DeletingNotification<TContent> DeletingNotification(TContent content, EventMessages eventMessages);
+    protected abstract DeletingNotification<TContent> CreateDeletingNotification(TContent content, EventMessages eventMessages);
 
-    protected abstract CancelableEnumerableObjectNotification<TContent> PublishingNotification(TContent content, EventMessages eventMessages);
+    protected abstract CancelableEnumerableObjectNotification<TContent> CreatePublishingNotification(TContent content, EventMessages eventMessages);
 
-    protected abstract IStatefulNotification PublishedNotification(TContent content, EventMessages eventMessages);
+    protected abstract IStatefulNotification CreatePublishedNotification(TContent content, EventMessages eventMessages);
 
-    protected abstract IStatefulNotification PublishedNotification(IEnumerable<TContent> content, EventMessages eventMessages);
+    protected abstract IStatefulNotification CreatePublishedNotification(IEnumerable<TContent> content, EventMessages eventMessages);
 
-    protected abstract CancelableEnumerableObjectNotification<TContent> UnpublishingNotification(TContent content, EventMessages eventMessages);
+    protected abstract CancelableEnumerableObjectNotification<TContent> CreateUnpublishingNotification(TContent content, EventMessages eventMessages);
 
-    protected abstract IStatefulNotification UnpublishedNotification(TContent content, EventMessages eventMessages);
+    protected abstract IStatefulNotification CreateUnpublishedNotification(TContent content, EventMessages eventMessages);
 
-    protected abstract RollingBackNotification<TContent> RollingBackNotification(TContent target, EventMessages messages);
+    protected abstract RollingBackNotification<TContent> CreateRollingBackNotification(TContent target, EventMessages messages);
 
-    protected abstract RolledBackNotification<TContent> RolledBackNotification(TContent target, EventMessages messages);
+    protected abstract RolledBackNotification<TContent> CreateRolledBackNotification(TContent target, EventMessages messages);
 
     /// <summary>
     ///     Creates the cancelable notification published before versions of a content item are deleted.
@@ -167,7 +169,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <param name="specificVersion">The identifier of the version to delete, or <c>default</c> when deleting by date.</param>
     /// <param name="dateToRetain">The date before which versions are deleted, or <c>default</c> when deleting a specific version.</param>
     /// <returns>The notification to publish.</returns>
-    protected abstract DeletingVersionsNotification<TContent> DeletingVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain);
+    protected abstract DeletingVersionsNotification<TContent> CreateDeletingVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain);
 
     /// <summary>
     ///     Creates the notification published after versions of a content item have been deleted.
@@ -177,13 +179,13 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <param name="specificVersion">The identifier of the deleted version, or <c>default</c> when deleted by date.</param>
     /// <param name="dateToRetain">The date before which versions were deleted, or <c>default</c> when a specific version was deleted.</param>
     /// <returns>The notification to publish.</returns>
-    protected abstract DeletedVersionsNotification<TContent> DeletedVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain);
+    protected abstract DeletedVersionsNotification<TContent> CreateDeletedVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain);
 
     /// <summary>
     ///     Creates the "saved" notification for a single item, carrying the cultures that were saved.
     /// </summary>
     /// <remarks>
-    ///     Defaults to the culture-agnostic <see cref="SavedNotification(TContent, EventMessages)"/> overload so external
+    ///     Defaults to the culture-agnostic <see cref="CreateSavedNotification(TContent, EventMessages)"/> overload so external
     ///     subclasses keep working; <c>ContentService</c> and <c>ElementService</c> override this to carry the map on the
     ///     concrete notification. See <see cref="BuildCultureMap"/> for why the cultures are captured at raise-time.
     /// </remarks>
@@ -191,14 +193,14 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <param name="eventMessages">The event messages collection.</param>
     /// <param name="savedCultures">The cultures that were saved, keyed by item key, or <c>null</c> if not tracked.</param>
     /// <returns>The notification to publish.</returns>
-    protected virtual SavedNotification<TContent> SavedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
-        => SavedNotification(content, eventMessages);
+    protected virtual SavedNotification<TContent> CreateSavedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+        => CreateSavedNotification(content, eventMessages);
 
     /// <summary>
     ///     Creates the "saved" notification for multiple items, carrying the cultures that were saved per item.
     /// </summary>
     /// <remarks>
-    ///     Defaults to the culture-agnostic <see cref="SavedNotification(IEnumerable{TContent}, EventMessages)"/> overload
+    ///     Defaults to the culture-agnostic <see cref="CreateSavedNotification(IEnumerable{TContent}, EventMessages)"/> overload
     ///     so external subclasses keep working; <c>ContentService</c> and <c>ElementService</c> override this to carry the
     ///     map on the concrete notification.
     /// </remarks>
@@ -206,15 +208,15 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <param name="eventMessages">The event messages collection.</param>
     /// <param name="savedCultures">The cultures that were saved, keyed by item key.</param>
     /// <returns>The notification to publish.</returns>
-    protected virtual SavedNotification<TContent> SavedNotification(IEnumerable<TContent> content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
-        => SavedNotification(content, eventMessages);
+    protected virtual SavedNotification<TContent> CreateSavedNotification(IEnumerable<TContent> content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+        => CreateSavedNotification(content, eventMessages);
 
     /// <summary>
     ///     Creates the "published" notification for a single item, carrying the cultures that were published and
     ///     unpublished by the operation.
     /// </summary>
     /// <remarks>
-    ///     Defaults to the culture-agnostic <see cref="PublishedNotification(TContent, EventMessages)"/> overload so
+    ///     Defaults to the culture-agnostic <see cref="CreatePublishedNotification(TContent, EventMessages)"/> overload so
     ///     external subclasses keep working; <c>ContentService</c> and <c>ElementService</c> override this to carry the
     ///     maps on the concrete notification. Unpublishing an individual culture is performed as a publish, so the
     ///     unpublished cultures are reported here rather than on the "unpublished" notification.
@@ -224,14 +226,14 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <param name="publishedCultures">The cultures that were published, keyed by item key, or <c>null</c> if not tracked.</param>
     /// <param name="unpublishedCultures">The cultures that were unpublished as part of the publish, keyed by item key, or <c>null</c> if not applicable.</param>
     /// <returns>The notification to publish.</returns>
-    protected virtual IStatefulNotification PublishedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? publishedCultures, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
-        => PublishedNotification(content, eventMessages);
+    protected virtual IStatefulNotification CreatePublishedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? publishedCultures, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+        => CreatePublishedNotification(content, eventMessages);
 
     /// <summary>
     ///     Creates the "unpublished" notification for a single item, carrying the cultures that were unpublished.
     /// </summary>
     /// <remarks>
-    ///     Defaults to the culture-agnostic <see cref="UnpublishedNotification(TContent, EventMessages)"/> overload so
+    ///     Defaults to the culture-agnostic <see cref="CreateUnpublishedNotification(TContent, EventMessages)"/> overload so
     ///     external subclasses keep working; <c>ContentService</c> and <c>ElementService</c> override this to carry the map
     ///     on the concrete notification. This is only raised when the item is unpublished as a whole.
     /// </remarks>
@@ -239,8 +241,8 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <param name="eventMessages">The event messages collection.</param>
     /// <param name="unpublishedCultures">The cultures that were unpublished, keyed by item key, or <c>null</c> if not tracked.</param>
     /// <returns>The notification to publish.</returns>
-    protected virtual IStatefulNotification UnpublishedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
-        => UnpublishedNotification(content, eventMessages);
+    protected virtual IStatefulNotification CreateUnpublishedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+        => CreateUnpublishedNotification(content, eventMessages);
 
     /// <summary>
     ///     Builds the per-item culture map carried on the notifications, keyed by item <see cref="Umbraco.Cms.Core.Models.Entities.IEntity.Key"/>.
@@ -288,7 +290,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        var rollingBackNotification = RollingBackNotification(content, eventMessages);
+        var rollingBackNotification = CreateRollingBackNotification(content, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(rollingBackNotification))
         {
             scope.Complete();
@@ -302,7 +304,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
         if (saveResult.Success)
         {
-            scope.Notifications.Publish(RolledBackNotification(content, eventMessages).WithStateFrom(rollingBackNotification));
+            scope.Notifications.Publish(CreateRolledBackNotification(content, eventMessages).WithStateFrom(rollingBackNotification));
             await AuditAsync(AuditType.RollBack, userId, content.Id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
         }
         else
@@ -607,7 +609,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <returns>Parent <see cref="TContent" /> object</returns>
     public async Task<TContent?> GetParentAsync(TContent? content, CancellationToken cancellationToken)
     {
-        if (content?.ParentId == Constants.System.Root || content?.ParentId == Constants.System.RecycleBinContent ||
+        if (content?.ParentId == Constants.System.Root || content?.ParentId == RecycleBinId ||
             content is null)
         {
             return null;
@@ -650,7 +652,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
 
-        SavingNotification<TContent> savingNotification = SavingNotification(content, eventMessages);
+        SavingNotification<TContent> savingNotification = CreateSavingNotification(content, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             scope.Complete();
@@ -682,9 +684,9 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         }
 
         scope.Notifications.Publish(
-            SavedNotification(content, eventMessages, BuildCultureMap(content, savedCultures)).WithStateFrom(savingNotification));
+            CreateSavedNotification(content, eventMessages, BuildCultureMap(content, savedCultures)).WithStateFrom(savingNotification));
 
-        scope.Notifications.Publish(TreeChangeNotification(content, TreeChangeTypes.RefreshNode, eventMessages));
+        scope.Notifications.Publish(CreateTreeChangeNotification(content, TreeChangeTypes.RefreshNode, eventMessages));
 
         if (culturesChanging is not null)
         {
@@ -711,7 +713,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
 
-        SavingNotification<TContent> savingNotification = SavingNotification(contentsA, eventMessages);
+        SavingNotification<TContent> savingNotification = CreateSavingNotification(contentsA, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             scope.Complete();
@@ -744,10 +746,10 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         }
 
         scope.Notifications.Publish(
-            SavedNotification(contentsA, eventMessages, savedCultures).WithStateFrom(savingNotification));
+            CreateSavedNotification(contentsA, eventMessages, savedCultures).WithStateFrom(savingNotification));
 
         // TODO: See note above about supressing events
-        scope.Notifications.Publish(TreeChangeNotification(contentsA, TreeChangeTypes.RefreshNode, eventMessages));
+        scope.Notifications.Publish(CreateTreeChangeNotification(contentsA, TreeChangeTypes.RefreshNode, eventMessages));
 
         await AuditAsync(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items (#{contentsA.Length})");
 
@@ -911,7 +913,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        SavingNotification<TContent> savingNotification = SavingNotification(content, evtMsgs);
+        SavingNotification<TContent> savingNotification = CreateSavingNotification(content, evtMsgs);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
@@ -969,7 +971,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
         // Change state to publishing
         content.PublishedState = PublishedState.Publishing;
-        SavingNotification<TContent> savingNotification = SavingNotification(content, evtMsgs);
+        SavingNotification<TContent> savingNotification = CreateSavingNotification(content, evtMsgs);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
@@ -1070,7 +1072,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
             var allLangs = (await _languageRepository.GetAllAsync(cancellationToken)).ToList();
 
-            SavingNotification<TContent> savingNotification = SavingNotification(content, evtMsgs);
+            SavingNotification<TContent> savingNotification = CreateSavingNotification(content, evtMsgs);
             if (await scope.Notifications.PublishCancelableAsync(savingNotification))
             {
                 return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
@@ -1156,7 +1158,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                         continue; // shouldn't happen but no point in processing this content if there's nothing there
                     }
 
-                    SavingNotification<TContent> savingNotification = SavingNotification(d, evtMsgs);
+                    SavingNotification<TContent> savingNotification = CreateSavingNotification(d, evtMsgs);
                     if (await scope.Notifications.PublishCancelableAsync(savingNotification))
                     {
                         results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
@@ -1236,7 +1238,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                     // are released with the cultures if any of them was scheduled with that access. The writer's access can't be used
                     // instead: the writer is the last user to save the content, not the user who scheduled it.
                     var includeInvariantForVariant = pendingReleases.Any(x => x.IncludeInvariantForVariant);
-                    SavingNotification<TContent> savingNotification = SavingNotification(d, evtMsgs);
+                    SavingNotification<TContent> savingNotification = CreateSavingNotification(d, evtMsgs);
                     if (await scope.Notifications.PublishCancelableAsync(savingNotification))
                     {
                         results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
@@ -1471,7 +1473,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             {
                 // raise Publishing notification
                 if (await scope.Notifications.PublishCancelableAsync(
-                        PublishingNotification(content, eventMessages).WithState(notificationState)))
+                        CreatePublishingNotification(content, eventMessages).WithState(notificationState)))
                 {
                     Logger.LogInformation("Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}", content.Name, content.Id, content.Key, "publishing was cancelled");
                     return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, eventMessages, content);
@@ -1577,7 +1579,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         if (raiseSavedNotification)
         {
             scope.Notifications.Publish(
-                SavedNotification(
+                CreateSavedNotification(
                     content,
                     eventMessages,
                     BuildCultureMap(content, savedCultures))
@@ -1592,12 +1594,12 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             {
                 // events and audit
                 scope.Notifications.Publish(
-                    UnpublishedNotification(
+                    CreateUnpublishedNotification(
                         content,
                         eventMessages,
                         BuildCultureMap(content, variesByCulture ? culturesUnpublishing : ["*"]))
                     .WithState(notificationState));
-                scope.Notifications.Publish(TreeChangeNotification(
+                scope.Notifications.Publish(CreateTreeChangeNotification(
                     content,
                     SupportsBranchPublishing ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode,
                     variesByCulture ? culturesPublishing.IsCollectionEmpty() ? null : culturesPublishing : null,
@@ -1632,7 +1634,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             }
 
             // or, failed
-            scope.Notifications.Publish(TreeChangeNotification(content, changeType, eventMessages));
+            scope.Notifications.Publish(CreateTreeChangeNotification(content, changeType, eventMessages));
             return new PublishResult(PublishResultType.FailedUnpublish, eventMessages, content); // bah
         }
 
@@ -1656,14 +1658,14 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 if (!branchOne)
                 {
                     scope.Notifications.Publish(
-                        TreeChangeNotification(
+                        CreateTreeChangeNotification(
                             content,
                             changeType,
                             variesByCulture ? culturesPublishing.IsCollectionEmpty() ? null : culturesPublishing : ["*"],
                             variesByCulture ? culturesUnpublishing.IsCollectionEmpty() ? null : culturesUnpublishing : null,
                             eventMessages));
                     scope.Notifications.Publish(
-                        PublishedNotification(
+                        CreatePublishedNotification(
                             content,
                             eventMessages,
                             BuildCultureMap(content, variesByCulture ? culturesPublishing : ["*"]),
@@ -1678,7 +1680,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 {
                     IReadOnlyCollection<TContent> descendants = await GetPublishedDescendantsLockedAsync(content, cancellationToken);
                     scope.Notifications.Publish(
-                        PublishedNotification(descendants, eventMessages).WithState(notificationState));
+                        CreatePublishedNotification(descendants, eventMessages).WithState(notificationState));
                 }
 
                 switch (publishResult.Result)
@@ -1729,7 +1731,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         }
 
         // or, failed
-        scope.Notifications.Publish(TreeChangeNotification(content, changeType, eventMessages));
+        scope.Notifications.Publish(CreateTreeChangeNotification(content, changeType, eventMessages));
         return publishResult!;
     }
 
@@ -1751,7 +1753,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
 
-        if (await scope.Notifications.PublishCancelableAsync(DeletingNotification(content, eventMessages)))
+        if (await scope.Notifications.PublishCancelableAsync(CreateDeletingNotification(content, eventMessages)))
         {
             scope.Complete();
             return Attempt.Fail(ContentDeleteOperationStatus.CancelledByNotification);
@@ -1762,7 +1764,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         // just raise the event
         if (content is { Trashed: false, Published: true })
         {
-            scope.Notifications.Publish(UnpublishedNotification(
+            scope.Notifications.Publish(CreateUnpublishedNotification(
                 content,
                 eventMessages,
                 BuildCultureMap(content, content.ContentType.VariesByCulture() ? content.PublishedCultures : ["*"])));
@@ -1770,7 +1772,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
         await DeleteLockedAsync(scope, content, eventMessages, cancellationToken);
 
-        scope.Notifications.Publish(TreeChangeNotification(content, TreeChangeTypes.Remove, eventMessages));
+        scope.Notifications.Publish(CreateTreeChangeNotification(content, TreeChangeTypes.Remove, eventMessages));
         await AuditAsync(AuditType.Delete, userId, content.Id);
 
         scope.Complete();
@@ -1800,7 +1802,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         scope.WriteLock(WriteLockIds);
 
         DeletingVersionsNotification<TContent> deletingVersionsNotification =
-            DeletingVersionsNotification(key, evtMsgs, specificVersion: default, dateToRetain: versionDate);
+            CreateDeletingVersionsNotification(key, evtMsgs, specificVersion: default, dateToRetain: versionDate);
         if (await scope.Notifications.PublishCancelableAsync(deletingVersionsNotification))
         {
             scope.Complete();
@@ -1810,7 +1812,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         await _asyncContentRepository.DeleteVersionsAsync(key, versionDate, cancellationToken);
 
         scope.Notifications.Publish(
-            DeletedVersionsNotification(key, evtMsgs, specificVersion: default, dateToRetain: versionDate).WithStateFrom(
+            CreateDeletedVersionsNotification(key, evtMsgs, specificVersion: default, dateToRetain: versionDate).WithStateFrom(
                 deletingVersionsNotification));
         await AuditAsync(AuditType.Delete, userId, Constants.System.Root, "Delete (by version date)");
 
@@ -1836,7 +1838,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
         DeletingVersionsNotification<TContent> deletingVersionsNotification =
-            DeletingVersionsNotification(key, evtMsgs, versionId, dateToRetain: default);
+            CreateDeletingVersionsNotification(key, evtMsgs, versionId, dateToRetain: default);
         if (await scope.Notifications.PublishCancelableAsync(deletingVersionsNotification))
         {
             scope.Complete();
@@ -1859,7 +1861,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         }
 
         scope.Notifications.Publish(
-            DeletedVersionsNotification(key, evtMsgs, versionId, dateToRetain: default).WithStateFrom(
+            CreateDeletedVersionsNotification(key, evtMsgs, versionId, dateToRetain: default).WithStateFrom(
                 deletingVersionsNotification));
         await AuditAsync(AuditType.Delete, userId, Constants.System.Root, "Delete (by version)");
 
@@ -2278,7 +2280,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         CancellationToken cancellationToken)
     {
         // raise Unpublishing notification
-        CancelableEnumerableObjectNotification<TContent> notification = UnpublishingNotification(content, evtMsgs).WithState(notificationState);
+        CancelableEnumerableObjectNotification<TContent> notification = CreateUnpublishingNotification(content, evtMsgs).WithState(notificationState);
         var notificationResult = await scope.Notifications.PublishCancelableAsync(notification);
 
         if (notificationResult)

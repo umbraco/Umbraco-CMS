@@ -159,6 +159,8 @@ public class ElementService : AsyncPublishableContentServiceBase<IElement>, IEle
 
     protected override UmbracoObjectTypes ContentObjectType => UmbracoObjectTypes.Element;
 
+    protected override int RecycleBinId => Constants.System.RecycleBinElement;
+
     protected override int[] ReadLockIds => WriteLockIds;
 
     protected override int[] WriteLockIds => [Constants.Locks.ElementTree];
@@ -174,66 +176,66 @@ public class ElementService : AsyncPublishableContentServiceBase<IElement>, IEle
         scope.Notifications.Publish(new ElementDeletedNotification(content, evtMsgs));
     }
 
-    protected override SavingNotification<IElement> SavingNotification(IElement content, EventMessages eventMessages)
+    protected override SavingNotification<IElement> CreateSavingNotification(IElement content, EventMessages eventMessages)
         => new ElementSavingNotification(content, eventMessages);
 
-    protected override SavedNotification<IElement> SavedNotification(IElement content, EventMessages eventMessages)
+    protected override SavedNotification<IElement> CreateSavedNotification(IElement content, EventMessages eventMessages)
         => new ElementSavedNotification(content, eventMessages);
 
-    protected override SavedNotification<IElement> SavedNotification(IElement content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+    protected override SavedNotification<IElement> CreateSavedNotification(IElement content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
         => new ElementSavedNotification(content, eventMessages, savedCultures);
 
-    protected override SavingNotification<IElement> SavingNotification(IEnumerable<IElement> content, EventMessages eventMessages)
+    protected override SavingNotification<IElement> CreateSavingNotification(IEnumerable<IElement> content, EventMessages eventMessages)
         => new ElementSavingNotification(content, eventMessages);
 
-    protected override SavedNotification<IElement> SavedNotification(IEnumerable<IElement> content, EventMessages eventMessages)
+    protected override SavedNotification<IElement> CreateSavedNotification(IEnumerable<IElement> content, EventMessages eventMessages)
         => new ElementSavedNotification(content, eventMessages);
 
-    protected override SavedNotification<IElement> SavedNotification(IEnumerable<IElement> content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+    protected override SavedNotification<IElement> CreateSavedNotification(IEnumerable<IElement> content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
         => new ElementSavedNotification(content, eventMessages, savedCultures);
 
-    protected override TreeChangeNotification<IElement> TreeChangeNotification(IElement content, TreeChangeTypes changeTypes, EventMessages eventMessages)
+    protected override TreeChangeNotification<IElement> CreateTreeChangeNotification(IElement content, TreeChangeTypes changeTypes, EventMessages eventMessages)
         => new ElementTreeChangeNotification(content, changeTypes, eventMessages);
 
-    protected override TreeChangeNotification<IElement> TreeChangeNotification(IElement content, TreeChangeTypes changeTypes, IEnumerable<string>? publishedCultures, IEnumerable<string>? unpublishedCultures, EventMessages eventMessages)
+    protected override TreeChangeNotification<IElement> CreateTreeChangeNotification(IElement content, TreeChangeTypes changeTypes, IEnumerable<string>? publishedCultures, IEnumerable<string>? unpublishedCultures, EventMessages eventMessages)
         => new ElementTreeChangeNotification(content, changeTypes, publishedCultures, unpublishedCultures, eventMessages);
 
-    protected override TreeChangeNotification<IElement> TreeChangeNotification(IEnumerable<IElement> content, TreeChangeTypes changeTypes, EventMessages eventMessages)
+    protected override TreeChangeNotification<IElement> CreateTreeChangeNotification(IEnumerable<IElement> content, TreeChangeTypes changeTypes, EventMessages eventMessages)
         => new ElementTreeChangeNotification(content, changeTypes, eventMessages);
 
-    protected override DeletingNotification<IElement> DeletingNotification(IElement content, EventMessages eventMessages)
+    protected override DeletingNotification<IElement> CreateDeletingNotification(IElement content, EventMessages eventMessages)
         => new ElementDeletingNotification(content, eventMessages);
 
-    protected override CancelableEnumerableObjectNotification<IElement> PublishingNotification(IElement content, EventMessages eventMessages)
+    protected override CancelableEnumerableObjectNotification<IElement> CreatePublishingNotification(IElement content, EventMessages eventMessages)
         => new ElementPublishingNotification(content, eventMessages);
 
-    protected override IStatefulNotification PublishedNotification(IElement content, EventMessages eventMessages)
+    protected override IStatefulNotification CreatePublishedNotification(IElement content, EventMessages eventMessages)
         => new ElementPublishedNotification(content, eventMessages);
 
-    protected override IStatefulNotification PublishedNotification(IElement content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? publishedCultures, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+    protected override IStatefulNotification CreatePublishedNotification(IElement content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? publishedCultures, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
         => new ElementPublishedNotification(content, eventMessages, publishedCultures, unpublishedCultures);
 
-    protected override IStatefulNotification PublishedNotification(IEnumerable<IElement> content, EventMessages eventMessages)
+    protected override IStatefulNotification CreatePublishedNotification(IEnumerable<IElement> content, EventMessages eventMessages)
         => new ElementPublishedNotification(content, eventMessages);
 
-    protected override CancelableEnumerableObjectNotification<IElement> UnpublishingNotification(IElement content, EventMessages eventMessages)
+    protected override CancelableEnumerableObjectNotification<IElement> CreateUnpublishingNotification(IElement content, EventMessages eventMessages)
         => new ElementUnpublishingNotification(content, eventMessages);
 
-    protected override IStatefulNotification UnpublishedNotification(IElement content, EventMessages eventMessages)
+    protected override IStatefulNotification CreateUnpublishedNotification(IElement content, EventMessages eventMessages)
         => new ElementUnpublishedNotification(content, eventMessages);
 
-    protected override IStatefulNotification UnpublishedNotification(IElement content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+    protected override IStatefulNotification CreateUnpublishedNotification(IElement content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
         => new ElementUnpublishedNotification(content, eventMessages, unpublishedCultures);
 
-    protected override RollingBackNotification<IElement> RollingBackNotification(IElement target, EventMessages messages)
+    protected override RollingBackNotification<IElement> CreateRollingBackNotification(IElement target, EventMessages messages)
         => new ElementRollingBackNotification(target, messages);
 
-    protected override RolledBackNotification<IElement> RolledBackNotification(IElement target, EventMessages messages)
+    protected override RolledBackNotification<IElement> CreateRolledBackNotification(IElement target, EventMessages messages)
         => new ElementRolledBackNotification(target, messages);
 
-    protected override DeletingVersionsNotification<IElement> DeletingVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain)
+    protected override DeletingVersionsNotification<IElement> CreateDeletingVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain)
         => new ElementDeletingVersionsNotification(key, eventMessages, specificVersion, dateToRetain: dateToRetain);
 
-    protected override DeletedVersionsNotification<IElement> DeletedVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain)
+    protected override DeletedVersionsNotification<IElement> CreateDeletedVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain)
         => new ElementDeletedVersionsNotification(key, eventMessages, specificVersion, dateToRetain: dateToRetain);
 }

@@ -1822,6 +1822,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
     protected override UmbracoObjectTypes ContentObjectType => UmbracoObjectTypes.Document;
 
+    protected override int RecycleBinId => Constants.System.RecycleBinContent;
+
     protected override int[] ReadLockIds => WriteLockIds;
 
     protected override int[] WriteLockIds => [Constants.Locks.ContentTree];
@@ -1857,67 +1859,67 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         await DoDeleteAsync(content);
     }
 
-    protected override SavingNotification<IContent> SavingNotification(IContent content, EventMessages eventMessages)
+    protected override SavingNotification<IContent> CreateSavingNotification(IContent content, EventMessages eventMessages)
         => new ContentSavingNotification(content, eventMessages);
 
-    protected override SavedNotification<IContent> SavedNotification(IContent content, EventMessages eventMessages)
+    protected override SavedNotification<IContent> CreateSavedNotification(IContent content, EventMessages eventMessages)
         => new ContentSavedNotification(content, eventMessages);
 
-    protected override SavedNotification<IContent> SavedNotification(IContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+    protected override SavedNotification<IContent> CreateSavedNotification(IContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
         => new ContentSavedNotification(content, eventMessages, savedCultures);
 
-    protected override SavingNotification<IContent> SavingNotification(IEnumerable<IContent> content, EventMessages eventMessages)
+    protected override SavingNotification<IContent> CreateSavingNotification(IEnumerable<IContent> content, EventMessages eventMessages)
         => new ContentSavingNotification(content, eventMessages);
 
-    protected override SavedNotification<IContent> SavedNotification(IEnumerable<IContent> content, EventMessages eventMessages)
+    protected override SavedNotification<IContent> CreateSavedNotification(IEnumerable<IContent> content, EventMessages eventMessages)
         => new ContentSavedNotification(content, eventMessages);
 
-    protected override SavedNotification<IContent> SavedNotification(IEnumerable<IContent> content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+    protected override SavedNotification<IContent> CreateSavedNotification(IEnumerable<IContent> content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
         => new ContentSavedNotification(content, eventMessages, savedCultures);
 
-    protected override TreeChangeNotification<IContent> TreeChangeNotification(IContent content, TreeChangeTypes changeTypes, EventMessages eventMessages)
+    protected override TreeChangeNotification<IContent> CreateTreeChangeNotification(IContent content, TreeChangeTypes changeTypes, EventMessages eventMessages)
         => new ContentTreeChangeNotification(content, changeTypes, eventMessages);
 
-    protected override TreeChangeNotification<IContent> TreeChangeNotification(IContent content, TreeChangeTypes changeTypes, IEnumerable<string>? publishedCultures, IEnumerable<string>? unpublishedCultures, EventMessages eventMessages)
+    protected override TreeChangeNotification<IContent> CreateTreeChangeNotification(IContent content, TreeChangeTypes changeTypes, IEnumerable<string>? publishedCultures, IEnumerable<string>? unpublishedCultures, EventMessages eventMessages)
         => new ContentTreeChangeNotification(content, changeTypes, publishedCultures, unpublishedCultures, eventMessages);
 
-    protected override TreeChangeNotification<IContent> TreeChangeNotification(IEnumerable<IContent> content, TreeChangeTypes changeTypes, EventMessages eventMessages)
+    protected override TreeChangeNotification<IContent> CreateTreeChangeNotification(IEnumerable<IContent> content, TreeChangeTypes changeTypes, EventMessages eventMessages)
         => new ContentTreeChangeNotification(content, changeTypes, eventMessages);
 
-    protected override DeletingNotification<IContent> DeletingNotification(IContent content, EventMessages eventMessages)
+    protected override DeletingNotification<IContent> CreateDeletingNotification(IContent content, EventMessages eventMessages)
         => new ContentDeletingNotification(content, eventMessages);
 
-    protected override CancelableEnumerableObjectNotification<IContent> PublishingNotification(IContent content, EventMessages eventMessages)
+    protected override CancelableEnumerableObjectNotification<IContent> CreatePublishingNotification(IContent content, EventMessages eventMessages)
         => new ContentPublishingNotification(content, eventMessages);
 
-    protected override IStatefulNotification PublishedNotification(IContent content, EventMessages eventMessages)
+    protected override IStatefulNotification CreatePublishedNotification(IContent content, EventMessages eventMessages)
         => new ContentPublishedNotification(content, eventMessages);
 
-    protected override IStatefulNotification PublishedNotification(IContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? publishedCultures, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+    protected override IStatefulNotification CreatePublishedNotification(IContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? publishedCultures, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
         => new ContentPublishedNotification(content, eventMessages, publishedCultures, unpublishedCultures);
 
-    protected override IStatefulNotification PublishedNotification(IEnumerable<IContent> content, EventMessages eventMessages)
+    protected override IStatefulNotification CreatePublishedNotification(IEnumerable<IContent> content, EventMessages eventMessages)
         => new ContentPublishedNotification(content, eventMessages);
 
-    protected override CancelableEnumerableObjectNotification<IContent> UnpublishingNotification(IContent content, EventMessages eventMessages)
+    protected override CancelableEnumerableObjectNotification<IContent> CreateUnpublishingNotification(IContent content, EventMessages eventMessages)
         => new ContentUnpublishingNotification(content, eventMessages);
 
-    protected override IStatefulNotification UnpublishedNotification(IContent content, EventMessages eventMessages)
+    protected override IStatefulNotification CreateUnpublishedNotification(IContent content, EventMessages eventMessages)
         => new ContentUnpublishedNotification(content, eventMessages);
 
-    protected override IStatefulNotification UnpublishedNotification(IContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+    protected override IStatefulNotification CreateUnpublishedNotification(IContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
         => new ContentUnpublishedNotification(content, eventMessages, unpublishedCultures);
 
-    protected override RollingBackNotification<IContent> RollingBackNotification(IContent target, EventMessages messages)
+    protected override RollingBackNotification<IContent> CreateRollingBackNotification(IContent target, EventMessages messages)
         => new ContentRollingBackNotification(target, messages);
 
-    protected override RolledBackNotification<IContent> RolledBackNotification(IContent target, EventMessages messages)
+    protected override RolledBackNotification<IContent> CreateRolledBackNotification(IContent target, EventMessages messages)
         => new ContentRolledBackNotification(target, messages);
 
-    protected override DeletingVersionsNotification<IContent> DeletingVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain)
+    protected override DeletingVersionsNotification<IContent> CreateDeletingVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain)
         => new ContentDeletingVersionsNotification(key, eventMessages, specificVersion, dateToRetain: dateToRetain);
 
-    protected override DeletedVersionsNotification<IContent> DeletedVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain)
+    protected override DeletedVersionsNotification<IContent> CreateDeletedVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain)
         => new ContentDeletedVersionsNotification(key, eventMessages, specificVersion, dateToRetain: dateToRetain);
 
     #endregion
