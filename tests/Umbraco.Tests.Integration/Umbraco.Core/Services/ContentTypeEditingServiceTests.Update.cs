@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -770,6 +771,74 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         // expect RefreshOther when modifying container structure
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
+    }
+
+    [Test]
+    public async Task Removing_Composition_Deletes_The_Composition_Property_Data_Of_The_Composing_Elements()
+    {
+        var compositionProperty = ContentTypePropertyTypeModel("Composition text", "compositionText");
+        var compositionCreateModel = ContentTypeCreateModel("Composition", "composition", isElement: true, propertyTypes: [compositionProperty]);
+        var composition = (await ContentTypeEditingService.CreateAsync(compositionCreateModel, Constants.Security.SuperUserKey)).Result!;
+        var compositionPropertyTypeIds = composition.PropertyTypes.Select(x => x.Id).ToArray();
+        Composition[] compositions = [new() { Key = composition.Key, CompositionType = CompositionType.Composition }];
+
+        var composingProperty = ContentTypePropertyTypeModel("Composing text", "composingText");
+        var composingCreateModel = ContentTypeCreateModel("Composing", "composing", isElement: true, propertyTypes: [composingProperty], compositions: compositions);
+        composingCreateModel.AllowedInLibrary = true;
+        var composingType = (await ContentTypeEditingService.CreateAsync(composingCreateModel, Constants.Security.SuperUserKey)).Result!;
+
+        var otherComposingProperty = ContentTypePropertyTypeModel("Other composing text", "otherComposingText");
+        var otherComposingCreateModel = ContentTypeCreateModel("Other composing", "otherComposing", isElement: true, propertyTypes: [otherComposingProperty], compositions: compositions);
+        otherComposingCreateModel.AllowedInLibrary = true;
+        var otherComposingType = (await ContentTypeEditingService.CreateAsync(otherComposingCreateModel, Constants.Security.SuperUserKey)).Result!;
+
+        async Task<IElement> CreateElement(IContentType contentType, string ownAlias, string name)
+        {
+            var createModel = new ElementCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                ParentKey = Constants.System.RootKey,
+                Variants = [new VariantModel { Name = name }],
+                Properties =
+                [
+                    new PropertyValueModel { Alias = "compositionText", Value = $"{name} compositionText" },
+                    new PropertyValueModel { Alias = ownAlias, Value = $"{name} {ownAlias}" },
+                ],
+            };
+            var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+            Assert.That(result.Success, Is.True, result.Status.ToString());
+            return result.Result.Content!;
+        }
+
+        var composingElements = new List<IElement>();
+        for (var i = 0; i < 3; i++)
+        {
+            composingElements.Add(await CreateElement(composingType, "composingText", $"Composing {i}"));
+        }
+
+        var otherComposingElements = new List<IElement>();
+        for (var i = 0; i < 2; i++)
+        {
+            otherComposingElements.Add(await CreateElement(otherComposingType, "otherComposingText", $"Other composing {i}"));
+        }
+
+        List<PropertyDataDto> before = FetchAllPropertyData();
+
+        var updateModel = ContentTypeUpdateModel("Composing", "composing", isElement: true, propertyTypes: [composingProperty]);
+        updateModel.AllowedInLibrary = true;
+        var updateResult = await ContentTypeEditingService.UpdateAsync(composingType, updateModel, Constants.Security.SuperUserKey);
+        Assert.That(updateResult.Success, Is.True);
+
+        AssertOnlyPropertyDataDeleted(before, compositionPropertyTypeIds, composingElements.Select(x => x.Id).ToArray());
+        foreach (IElement element in composingElements)
+        {
+            Assert.That(ElementService.GetById(element.Key)!.Properties.Contains("compositionText"), Is.False);
+        }
+
+        foreach (IElement element in otherComposingElements)
+        {
+            Assert.That(ElementService.GetById(element.Key)!.GetValue<string>("compositionText"), Is.Not.Empty);
+        }
     }
 
     [Test]
