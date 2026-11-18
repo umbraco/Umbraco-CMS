@@ -30,8 +30,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureNameNotExists('French');
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/24415
-test.skip('can save content in culture without culture-specific segment', async ({umbracoApi, umbracoUi}) => {
+test('can save content in culture without culture-specific segment', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, englishDefaultValue, dataTypeName, true);
   await umbracoUi.content.goToContentWithName(contentName);
@@ -52,8 +51,7 @@ test.skip('can save content in culture without culture-specific segment', async 
   expect(daDefault.value).toBe(danishDefaultValue);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/24415
-test.skip('can publish content in culture without culture-specific segment', async ({umbracoApi, umbracoUi}) => {
+test('can publish content in culture without culture-specific segment', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, englishDefaultValue, dataTypeName, true);
   await umbracoUi.content.goToContentWithName(contentName);
