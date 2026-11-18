@@ -249,12 +249,20 @@ ASP.NET Core Identity sign-in manager for members.
 4. Add external login link
 5. Sign in or request 2FA
 
-**Result Types** (lines 320-348):
+**Result Types** — nested in `MemberSignInManager`, consumed by
+`UmbExternalLoginController.ExternalLoginCallback` (Umbraco.Web.Website), which maps each to a
+member-facing error message:
 - `ExternalLoginSignInResult.NotAllowed` - Login refused by callback
+- `AutoLinkSignInResult.FailedNotLinked` - Provider not linked to an account
 - `AutoLinkSignInResult.FailedNoEmail` - No email from provider
 - `AutoLinkSignInResult.FailedNoName` - No name from provider when creating a new account
 - `AutoLinkSignInResult.FailedCreatingUser` - User creation failed
 - `AutoLinkSignInResult.FailedLinkingUser` - Link creation failed
+- `AutoLinkSignInResult.FailedException` - An auto-link callback threw
+
+The back office has its own separate `AutoLinkSignInResult` / `ExternalLoginSignInResult` in
+`Umbraco.Cms.Api.Management.Security`, with an overlapping but not identical set of values — check
+which one you have before adding or handling a value.
 
 ### Middleware
 
