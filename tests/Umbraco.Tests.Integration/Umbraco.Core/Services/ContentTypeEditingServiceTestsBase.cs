@@ -3,6 +3,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -25,11 +26,44 @@ internal abstract class ContentTypeEditingServiceTestsBase : UmbracoIntegrationT
 
     protected IElementService ElementService => GetRequiredService<IElementService>();
 
+    protected IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
+
     protected ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     protected IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
     protected IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
+
+    protected List<PropertyDataDto> FetchAllPropertyData()
+    {
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        return scope.Database.Fetch<PropertyDataDto>();
+    }
+
+    protected void AssertOnlyPropertyDataDeleted(
+        List<PropertyDataDto> before,
+        IReadOnlyCollection<int> removedPropertyTypeIds,
+        IReadOnlyCollection<int> composingContentIds)
+    {
+        Dictionary<int, int> nodeIdByVersionId;
+        using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+        {
+            nodeIdByVersionId = scope.Database.Fetch<ContentVersionDto>().ToDictionary(x => x.Id, x => x.NodeId);
+        }
+
+        bool IsRemoved(PropertyDataDto row)
+            => removedPropertyTypeIds.Contains(row.PropertyTypeId)
+               && composingContentIds.Contains(nodeIdByVersionId[row.VersionId]);
+
+        var expectedRemainingIds = before.Where(x => IsRemoved(x) is false).Select(x => x.Id).ToArray();
+        List<PropertyDataDto> after = FetchAllPropertyData();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(before.Count(IsRemoved), Is.GreaterThan(0));
+            Assert.That(after.Select(x => x.Id), Is.EquivalentTo(expectedRemainingIds));
+        });
+    }
 
     protected const string TabContainerType = "Tab";
 
