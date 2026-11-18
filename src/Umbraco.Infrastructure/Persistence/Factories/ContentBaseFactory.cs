@@ -219,6 +219,7 @@ internal sealed class ContentBaseFactory
                     NodeId = entity.Id,
                     LanguageId = languageRepository.GetIdByIsoCode(x.Culture, false),
                     Id = x.Id,
+                    UserId = x.UserId,
                 }));
 
     /// <summary>

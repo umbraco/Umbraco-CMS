@@ -1,5 +1,4 @@
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
@@ -81,5 +80,9 @@ public class UmbracoPremigrationPlan : MigrationPlan
         To<V_17_0_0.AddCacheVersionDatabaseLock>("{1DC39DC7-A88A-4912-8E60-4FD36246E8D1}");
         To<V_17_0_0.AddRepositoryCacheVersionTable>("{A1B3F5D6-4C8B-4E7A-9F8C-1D2B3E4F5A6B}");
         To<V_17_0_0.AddLastSyncedTable>("{72894BCA-9FAD-4CC3-B0D0-D6CDA2FFA636}");
+
+        // To 17.10.0
+        // The content repository reads and writes this column when persisting content schedules.
+        To<V_17_10_0.AddUserIdColumnToContentSchedule>("{6F2C8B14-3A9D-4E57-B0C6-1D8E4F7A2B93}");
     }
 }

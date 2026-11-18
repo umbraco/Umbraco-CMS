@@ -228,6 +228,9 @@
     <Compile Update="Umbraco.Core\Services\ContentPublishingServiceTests.ClearSchedule.cs">
       <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentPublishingServiceTests.ScheduledActionAttribution.cs">
+      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Core\Services\DocumentNavigationServiceTests.Copy.cs">
       <DependentUpon>DocumentNavigationServiceTests.cs</DependentUpon>
     </Compile>
