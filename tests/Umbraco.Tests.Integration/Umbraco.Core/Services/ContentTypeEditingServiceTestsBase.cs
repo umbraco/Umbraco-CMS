@@ -34,6 +34,10 @@ internal abstract class ContentTypeEditingServiceTestsBase : UmbracoIntegrationT
 
     protected IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
+    protected IMediaEditingService MediaEditingService => GetRequiredService<IMediaEditingService>();
+
+    protected IContentBlueprintEditingService ContentBlueprintEditingService => GetRequiredService<IContentBlueprintEditingService>();
+
     protected List<PropertyDataDto> FetchAllPropertyData()
     {
         using var scope = ScopeProvider.CreateScope(autoComplete: true);
