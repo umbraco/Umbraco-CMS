@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -40,6 +41,8 @@ internal abstract class FilePropertyContentIndexerTestBase : UmbracoIntegrationT
 
     private MediaFileManager MediaFileManager => GetRequiredService<MediaFileManager>();
 
+    private MediaUrlGeneratorCollection MediaUrlGenerators => GetRequiredService<MediaUrlGeneratorCollection>();
+
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     [SetUp]
@@ -69,6 +72,20 @@ internal abstract class FilePropertyContentIndexerTestBase : UmbracoIntegrationT
         return await MediaEditingService.GetAsync(media.Key)
                ?? throw new InvalidOperationException("Could not find the trashed media.");
     }
+
+    protected string GetMediaFilePath(IMedia media)
+    {
+        IProperty property = media.Properties[CoreConstants.Conventions.Media.File]
+                             ?? throw new InvalidOperationException("Could not find the file property of the media.");
+        Assert.That(
+            MediaUrlGenerators.TryGetMediaPath(property.PropertyType.PropertyEditorAlias, property.GetValue(), out var filePath),
+            Is.True,
+            "Could not get the file path of the media.");
+
+        return filePath!;
+    }
+
+    protected bool MediaFileExists(string filePath) => MediaFileManager.FileSystem.FileExists(filePath);
 
     protected async Task CreateLanguage(string isoCode, string cultureName)
     {

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -19,21 +18,18 @@ internal sealed class FilePropertyContentIndexer : IContentIndexer
     private readonly IEnumerable<IFileValueHandler> _fileValueHandlers;
     private readonly ILogger<FilePropertyContentIndexer> _logger;
     private readonly IndexingOptions _indexingOptions;
-    private readonly IOptionsMonitor<ContentSettings> _contentSettings;
 
     public FilePropertyContentIndexer(
         MediaFileManager mediaFileManager,
         MediaUrlGeneratorCollection mediaUrlGenerators,
         IEnumerable<IFileValueHandler> fileValueHandlers,
         IOptions<IndexingOptions> indexingOptions,
-        IOptionsMonitor<ContentSettings> contentSettings,
         ILogger<FilePropertyContentIndexer> logger)
     {
         _mediaFileManager = mediaFileManager;
         _mediaUrlGenerators = mediaUrlGenerators;
         _fileValueHandlers = fileValueHandlers;
         _indexingOptions = indexingOptions.Value;
-        _contentSettings = contentSettings;
         _logger = logger;
     }
 
@@ -129,10 +125,11 @@ internal sealed class FilePropertyContentIndexer : IContentIndexer
     }
 
     // With media recycle bin protection, the files of trashed media are stored with a suffix, while the property
-    // value keeps the original path. Media trashed before the protection was enabled keep their original file name.
+    // value keeps the original path. Whether a file was suffixed depends on the setting at the time it was trashed,
+    // so the file system is checked rather than the current setting.
     private string ResolveStoredFilePath(IContentBase content, string filePath)
     {
-        if (content is not IMedia { Trashed: true } || _contentSettings.CurrentValue.EnableMediaRecycleBinProtection is false)
+        if (content is not IMedia { Trashed: true })
         {
             return filePath;
         }

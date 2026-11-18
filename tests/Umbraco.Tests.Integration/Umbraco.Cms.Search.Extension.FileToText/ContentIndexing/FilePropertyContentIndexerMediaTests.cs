@@ -47,7 +47,17 @@ internal class FilePropertyContentIndexerMediaTests : FilePropertyContentIndexer
     [TestCase(".md")]
     [TestCase(".pdf")]
     public async Task Can_Handle_Trashed_Media_With_Recycle_Bin_Protection(string extension)
-        => await AssertLoremIpsumAsync(extension, trash: true);
+    {
+        IMedia media = await AssertLoremIpsumAsync(extension, trash: true);
+
+        var filePath = GetMediaFilePath(media);
+        var suffixedFilePath = Path.ChangeExtension(filePath, CoreConstants.Conventions.Media.TrashedMediaSuffix + extension);
+        Assert.Multiple(() =>
+        {
+            Assert.That(MediaFileExists(suffixedFilePath), Is.True, "The file of the trashed media was not suffixed.");
+            Assert.That(MediaFileExists(filePath), Is.False, "The original file of the trashed media still exists.");
+        });
+    }
 
     [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureDisableRecycleBinProtection))]
@@ -57,7 +67,7 @@ internal class FilePropertyContentIndexerMediaTests : FilePropertyContentIndexer
     public static void ConfigureDisableRecycleBinProtection(IUmbracoBuilder builder)
         => builder.Services.Configure<ContentSettings>(config => config.EnableMediaRecycleBinProtection = false);
 
-    private async Task AssertLoremIpsumAsync(string extension, bool trash = false)
+    private async Task<IMedia> AssertLoremIpsumAsync(string extension, bool trash = false)
     {
         IMedia media = await CreateLoremIpsumFileMedia(extension);
 
@@ -81,5 +91,7 @@ internal class FilePropertyContentIndexerMediaTests : FilePropertyContentIndexer
         Assert.That(texts, Is.Not.Null);
         Assert.That(texts, Has.Length.EqualTo(1));
         Assert.That(texts.Single(), Does.StartWith(TestFileHelper.LoremIpsumStart));
+
+        return media;
     }
 }
