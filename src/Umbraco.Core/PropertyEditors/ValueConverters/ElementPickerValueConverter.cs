@@ -93,14 +93,42 @@ public class ElementPickerValueConverter : PropertyValueConverterBase, IDelivery
             return null;
         }
 
-        IEnumerable<IPublishedElement> elements = _publishedElementCache.GetByIds(preview, keys);
+        IReadOnlyList<IPublishedElement> elements = _publishedElementCache.GetByIds(preview, keys);
+        var culture = _variationContextAccessor.VariationContext?.Culture;
 
-        if (preview is false && _variationContextAccessor.VariationContext?.Culture is not null)
+        if (culture is null)
         {
-            elements = elements
-                .Where(element => element.IsPublished(_variationContextAccessor.VariationContext.Culture));
+            return elements.ToArray();
         }
 
-        return elements.ToArray();
+        if (preview is false)
+        {
+            return elements.Where(element => element.IsPublished(culture)).ToArray();
+        }
+
+        return culture.IsNullOrWhiteSpace() ? elements.ToArray() : GetPreviewElements(elements, culture);
+    }
+
+    private IPublishedElement[] GetPreviewElements(IReadOnlyList<IPublishedElement> elements, string culture)
+    {
+        var missingCultureKeys = elements
+            .Where(element => element.IsInvariantOrHasCulture(culture) is false)
+            .Select(element => element.Key)
+            .ToHashSet();
+
+        if (missingCultureKeys.Count == 0)
+        {
+            return elements.ToArray();
+        }
+
+        // A culture removed from the draft can still be available in the published version.
+        var publishedByKey = _publishedElementCache.GetByIds(false, missingCultureKeys)
+            .Where(element => element.IsInvariantOrHasCulture(culture))
+            .ToDictionary(element => element.Key);
+
+        return elements
+            .Select(element => missingCultureKeys.Contains(element.Key) ? publishedByKey.GetValueOrDefault(element.Key) : element)
+            .WhereNotNull()
+            .ToArray();
     }
 }
