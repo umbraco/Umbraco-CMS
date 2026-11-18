@@ -127,6 +127,52 @@ public class PropertyCacheLevelTests
         Assert.AreEqual(elementsCount2, oldElementsCache.Count);
     }
 
+    [TestCase(PropertyCacheLevel.Element)]
+    [TestCase(PropertyCacheLevel.Elements)]
+    public void Preview_Values_Are_Cached_Per_Ambient_Culture(PropertyCacheLevel cacheLevel)
+    {
+        var converter = new CacheConverter1(cacheLevel);
+
+        var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[] { converter });
+
+        var dataTypeServiceMock = new Mock<IDataTypeService>();
+        var dataType = new DataType(
+            new VoidEditor(Mock.Of<IDataValueEditorFactory>()), new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory()))
+        { Id = 1 };
+        dataTypeServiceMock.Setup(x => x.GetAllAsync(It.IsAny<Guid[]>())).ReturnsAsync(dataType.Yield());
+
+        var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object, Mock.Of<IIdKeyMap>());
+
+        IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
+        {
+            yield return publishedContentTypeFactory.CreatePropertyType(contentType, "prop1", 1);
+        }
+
+        var setType1 = publishedContentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "set1", CreatePropertyTypes);
+
+        var elementsCache = new ElementsDictionaryAppCache();
+        var variationContextAccessor = new TestVariationContextAccessor { VariationContext = new() };
+        var propertyRenderingContextAccessor = new TestPropertyRenderingContextAccessor { PropertyRenderingContext = new(default) };
+        var contentNode = CreateContentNode("Set 1", 1234, setType1, new Dictionary<string, object> { { "prop1", "1234" } });
+
+        var set1 = new PublishedElement(contentNode, true, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
+
+        // The property is invariant, so its value is read with an empty culture. A converter may still depend on
+        // the ambient culture, so a preview value must be converted once per ambient culture and then reused.
+        variationContextAccessor.VariationContext = new VariationContext("en-US");
+        Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
+        Assert.AreEqual(1, converter.InterConverts);
+
+        variationContextAccessor.VariationContext = new VariationContext("nl-NL");
+        Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
+        Assert.AreEqual(2, converter.InterConverts);
+
+        variationContextAccessor.VariationContext = new VariationContext("en-US");
+        Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
+        Assert.AreEqual(2, converter.InterConverts);
+        Assert.AreEqual(1, converter.SourceConverts);
+    }
+
     [Test]
     public void CacheUnknownTest()
     {
