@@ -596,12 +596,14 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		`;
 	}
 
+	#isDefaultRouteTab(tab: UmbPropertyTypeContainerMergedModel) {
+		if (tab !== this._tabs?.[0] || this._hasRootGroups || this._hasRootProperties) return false;
+		return this._routerPath + '/' === this._activePath;
+	}
+
 	renderTab(tab: UmbPropertyTypeContainerMergedModel) {
 		const path = this._routerPath + '/tab/' + encodeFolderName(tab.name && tab.name !== '' ? tab.name : '-');
-		let tabActive = path === this._activePath;
-		if (!tabActive && !this._hasRootGroups && !this._hasRootProperties) {
-			tabActive = this._routerPath + '/' === this._activePath;
-		}
+		const tabActive = path === this._activePath || this.#isDefaultRouteTab(tab);
 		const ownedTab = tab.ownerId ? true : false;
 
 		return html`<uui-tab
