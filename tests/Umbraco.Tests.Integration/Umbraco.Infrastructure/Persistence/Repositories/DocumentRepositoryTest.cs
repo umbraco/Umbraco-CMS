@@ -916,9 +916,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(result, Is.Not.Null);
         Assert.That(result!.TemplateId, Is.EqualTo(_template.Id),
             "TemplateId should reflect the current draft's template");
-        // PublishTemplateId comes from the published DocumentVersion join. The NPoco
-        // single-entity path (AddAdditionalContentMapping) skips this field; the NPoco
-        // bulk path and the EF Core path both set it from the published version's TemplateId.
+        // PublishTemplateId comes from the published DocumentVersion join.
         Assert.That(result.PublishTemplateId, Is.EqualTo(_template.Id),
             "PublishTemplateId should reflect the template that was active when the document was published");
     }

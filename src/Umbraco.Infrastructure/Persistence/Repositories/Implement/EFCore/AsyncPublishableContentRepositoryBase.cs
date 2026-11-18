@@ -333,8 +333,8 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     /// </summary>
     /// <remarks>
     ///     Every branching read query shares this path for culture-specific name ordering. The culture variations
-    ///     are LEFT JOINed filtered to the resolved language, so variantName = COALESCE(cultureVariation.Name, node.Text),
-    ///     mirroring NPoco's VariantNameSqlExpression. The whole
+    ///     are LEFT JOINed filtered to the resolved language, so variantName = COALESCE(cultureVariation.Name, node.Text).
+    ///     The whole
     ///     <see cref="ContentJoinRow{TEntityDto,TContentVersionDto}" /> is carried forward as one nested member
     ///     through the GroupJoin/SelectMany so it can be unwrapped again for ordering and fed straight into the
     ///     shared <see cref="ToContentRow" /> projection.
@@ -472,7 +472,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     /// </summary>
     protected override async Task PersistDeletedItemAsync(TEntity entity)
     {
-        // Raise event first else potential FK issues — mirrors PublishableContentRepositoryBase.PersistDeletedItem.
+        // Raise event first else potential FK issues.
         EventAggregator.Publish(new ScopedEntityRemoveNotification(entity, new EventMessages()));
 
         var nodeId = entity.Id;
@@ -760,8 +760,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
                 .SetProperty(entityDto => entityDto.Edited, edited));
 
             // If entity is publishing, update tags; else leave tags there. This means that implicitly
-            // unpublished, or trashed, entities *still* have tags in the database. Mirrors NPoco's
-            // PublishableContentRepositoryBase.PersistUpdatedItem, which calls SetEntityTags here (before
+            // unpublished, or trashed, entities *still* have tags in the database. Tags are set here (before
             // the refresh trigger) and again below (after the publish-state flip) — see
             // ApplyPostPublishFlagFlipsAsync for the second call.
             if (publishing)
@@ -1039,9 +1038,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
 
     // Builds ContentVersionCultureVariationDto rows for the 'current' (non-published) version, one per
     // culture with a name, plus — only when publishing — additional rows for the 'published' version's
-    // published cultures. Mirrors PublishableContentRepositoryBase.GetContentVariationDtos, but awaits
-    // LanguageRepository properly instead of that method's sync-over-async GetAwaiter().GetResult() calls,
-    // since this helper is genuinely async (no non-async NPoco caller to match).
+    // published cultures.
     private async Task<List<ContentVersionCultureVariationDto>> BuildContentVariationDtosAsync(TEntity entity, bool publishing)
     {
         var dtos = new List<ContentVersionCultureVariationDto>();
@@ -1090,9 +1087,8 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
         return dtos;
     }
 
-    // Builds one entity culture-variation row per culture the entity is available or published in. Mirrors
-    // PublishableContentRepositoryBase.GetEntityVariationDtos field-by-field — the EF Core DTO carries only
-    // LanguageId (no in-memory-only Culture convenience field like the NPoco DTO), so Culture is not set here.
+    // Builds one entity culture-variation row per culture the entity is available or published in. The row
+    // carries only LanguageId, so no culture name is set here.
     private async Task<List<TContentCultureVariationDto>> BuildEntityVariationDtosAsync(TEntity entity, HashSet<string>? editedCultures)
     {
         var dtos = new List<TContentCultureVariationDto>();
