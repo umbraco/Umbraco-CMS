@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -35,7 +36,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    private ElementService ElementService => (ElementService)GetRequiredService<IElementService>();
+    private IElementService ElementService => GetRequiredService<IElementService>();
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
@@ -44,7 +45,13 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
         .AddNotificationHandler<ElementSavedNotification, ElementNotificationHandler>()
         .AddNotificationHandler<ElementPublishedNotification, ElementNotificationHandler>()
-        .AddNotificationHandler<ElementUnpublishedNotification, ElementNotificationHandler>();
+        .AddNotificationHandler<ElementUnpublishedNotification, ElementNotificationHandler>()
+        .AddNotificationHandler<ElementDeletingNotification, ElementNotificationHandler>()
+        .AddNotificationHandler<ElementTreeChangeNotification, ElementNotificationHandler>()
+        .AddNotificationHandler<ElementDeletingVersionsNotification, ElementNotificationHandler>()
+        .AddNotificationHandler<ElementDeletedVersionsNotification, ElementNotificationHandler>()
+        .AddNotificationHandler<ContentDeletingVersionsNotification, ElementNotificationHandler>()
+        .AddNotificationHandler<ContentDeletedVersionsNotification, ElementNotificationHandler>();
 
     private async Task CreateTestData()
     {
@@ -104,7 +111,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // re-get - dirty properties need resetting
-        element = ElementService.GetById(element.Id);
+        element = await ElementService.GetByIdAsync(element.Key, CancellationToken.None);
 
         // only change the en-US culture
         element.SetValue("title", "title-en", "en-US");
@@ -136,7 +143,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Read_Saved_Notification_When_Save_And_Publishing_Invariant()
+    public async Task Can_Read_Saved_Notification_When_Save_And_Publishing_Invariant()
     {
         // A combined save-and-publish must still raise the paired Saved notification, just like a plain Save does
         // (https://github.com/umbraco/Umbraco-CMS/issues/23523).
@@ -160,7 +167,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            PublishResult result = ElementService.SaveAndPublish(element, []);
+            PublishResult result = await ElementService.SaveAndPublishAsync(element, [], Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.IsTrue(savedWasCalled, "ElementSavedNotification should fire when saving and publishing.");
             Assert.IsTrue(publishedWasCalled, "ElementPublishedNotification should fire when saving and publishing.");
@@ -199,7 +206,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            PublishResult result = ElementService.SaveAndPublish(element, ["en-US", "fr-FR"]);
+            PublishResult result = await ElementService.SaveAndPublishAsync(element, ["en-US", "fr-FR"], Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.IsTrue(savedWasCalled, "ElementSavedNotification should fire when saving and publishing.");
         }
@@ -248,7 +255,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            PublishResult result = ElementService.SaveAndPublish(element, ["en-US"]);
+            PublishResult result = await ElementService.SaveAndPublishAsync(element, ["en-US"], Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(result.Success);
             Assert.IsTrue(savedWasCalled, "ElementSavedNotification should fire when saving and publishing.");
             Assert.IsTrue(publishedWasCalled, "ElementPublishedNotification should fire when saving and publishing.");
@@ -281,7 +288,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ElementService.Publish(element, ["*"]);
+            await ElementService.PublishAsync(element, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(publishedWasCalled);
         }
         finally
@@ -302,7 +309,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // re-get - dirty properties need resetting
-        element = ElementService.GetById(element.Id);
+        element = await ElementService.GetByIdAsync(element.Key, CancellationToken.None);
 
         var publishedWasCalled = false;
 
@@ -319,7 +326,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ElementService.Publish(element, new[] { "fr-FR" });
+            await ElementService.PublishAsync(element, new[] { "fr-FR" }, Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(publishedWasCalled);
         }
         finally
@@ -333,7 +340,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
     {
         IElement element = new Element("content", -1, _elementType);
         await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
-        ElementService.Publish(element, ["*"]);
+        await ElementService.PublishAsync(element, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var unpublishedWasCalled = false;
 
@@ -350,7 +357,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ElementService.Unpublish(element);
+            await ElementService.UnpublishAsync(element, "*", Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(unpublishedWasCalled);
         }
         finally
@@ -370,10 +377,10 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         element.SetCultureName("hello", "en-US");
         element.SetCultureName("bonjour", "fr-FR");
         await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
-        ElementService.Publish(element, element.AvailableCultures.ToArray());
+        await ElementService.PublishAsync(element, element.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // re-get - dirty properties need resetting
-        element = ElementService.GetById(element.Id);
+        element = await ElementService.GetByIdAsync(element.Key, CancellationToken.None);
 
         var publishedWasCalled = false;
 
@@ -391,7 +398,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ElementService.Unpublish(element, "fr-FR");
+            await ElementService.UnpublishAsync(element, "fr-FR", Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(publishedWasCalled);
         }
         finally
@@ -411,10 +418,10 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         element.SetCultureName("hello", "en-US");
         element.SetCultureName("bonjour", "fr-FR");
         await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
-        ElementService.Publish(element, element.AvailableCultures.ToArray());
+        await ElementService.PublishAsync(element, element.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // re-get - dirty properties need resetting
-        element = ElementService.GetById(element.Id);
+        element = await ElementService.GetByIdAsync(element.Key, CancellationToken.None);
 
         var unpublishedWasCalled = false;
 
@@ -433,7 +440,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ElementService.Unpublish(element, "*");
+            await ElementService.UnpublishAsync(element, "*", Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(unpublishedWasCalled);
         }
         finally
@@ -491,7 +498,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // re-get so nothing is dirty, then re-save without changes
-        element = ElementService.GetById(element.Id);
+        element = await ElementService.GetByIdAsync(element.Key, CancellationToken.None);
 
         var savedWasCalled = false;
 
@@ -522,7 +529,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // re-get so nothing is dirty, then re-save without changes
-        element = ElementService.GetById(element.Id);
+        element = await ElementService.GetByIdAsync(element.Key, CancellationToken.None);
 
         var savedWasCalled = false;
 
@@ -553,7 +560,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
         // re-get so nothing is dirty, then make a genuine change before re-saving
-        element = ElementService.GetById(element.Id);
+        element = await ElementService.GetByIdAsync(element.Key, CancellationToken.None);
         element.SetValue("title", "changed");
 
         var savedWasCalled = false;
@@ -631,10 +638,10 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
     {
         IElement element = new Element("content", -1, _elementType);
         await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
-        ElementService.Publish(element, ["*"]);
+        await ElementService.PublishAsync(element, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
 
         // re-get - dirty properties need resetting
-        element = ElementService.GetById(element.Id);
+        element = await ElementService.GetByIdAsync(element.Key, CancellationToken.None);
 
         var unpublishedWasCalled = false;
 
@@ -651,7 +658,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ElementService.Delete(element);
+            await ElementService.DeleteAsync(element, Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(unpublishedWasCalled);
         }
         finally
@@ -671,10 +678,10 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         element.SetCultureName("hello", "en-US");
         element.SetCultureName("bonjour", "fr-FR");
         await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
-        ElementService.Publish(element, element.AvailableCultures.ToArray());
+        await ElementService.PublishAsync(element, element.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // re-get - dirty properties need resetting
-        element = ElementService.GetById(element.Id);
+        element = await ElementService.GetByIdAsync(element.Key, CancellationToken.None);
 
         var unpublishedWasCalled = false;
 
@@ -693,7 +700,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ElementService.Delete(element);
+            await ElementService.DeleteAsync(element, Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(unpublishedWasCalled);
         }
         finally
@@ -713,7 +720,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         element.SetCultureName("hello", "en-US");
         element.SetCultureName("bonjour", "fr-FR");
         await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
-        ElementService.Publish(element, element.AvailableCultures.ToArray());
+        await ElementService.PublishAsync(element, element.AvailableCultures.ToArray(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         var unpublishedWasCalled = false;
 
@@ -730,7 +737,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ElementService.DeleteOfTypes(new[] { _elementType.Id });
+            await ElementService.DeleteOfTypesAsync([_elementType.Key], Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.IsTrue(unpublishedWasCalled);
         }
         finally
@@ -739,11 +746,119 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         }
     }
 
+    [Test]
+    public async Task DeleteOfTypesAsync_WithNoElementsOfTheType_PublishesNoNotifications()
+    {
+        var notifications = new List<object>();
+        ElementNotificationHandler.DeleteOfTypesNotification = notifications.Add;
+
+        try
+        {
+            Attempt<ContentDeleteOfTypesOperationStatus> result = await ElementService.DeleteOfTypesAsync(
+                [_elementType.Key], Constants.Security.SuperUserKey, CancellationToken.None);
+
+            Assert.IsTrue(result.Success);
+            Assert.IsEmpty(notifications);
+        }
+        finally
+        {
+            ElementNotificationHandler.DeleteOfTypesNotification = null;
+        }
+    }
+
+    [Test]
+    public async Task DeleteVersionAsync_PublishesTheElementVersionNotifications()
+    {
+        IElement element = new Element("content", -1, _elementType);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        await ElementService.PublishAsync(element, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        int versionId = (await ElementService.GetVersionIdsAsync(element.Key, 0, int.MaxValue, CancellationToken.None)).Last();
+
+        var notifications = new List<object>();
+        ElementNotificationHandler.VersionsNotification = notifications.Add;
+
+        try
+        {
+            // Deleting versions is not part of the element service contract; the engine exposes it on the concrete service.
+            Attempt<ContentVersionOperationStatus> result = await ((ElementService)ElementService)
+                .DeleteVersionAsync(element.Key, versionId, false, Constants.Security.SuperUserKey, CancellationToken.None);
+
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(2, notifications.Count);
+            var deleting = notifications[0] as ElementDeletingVersionsNotification;
+            var deleted = notifications[1] as ElementDeletedVersionsNotification;
+            Assert.IsNotNull(deleting);
+            Assert.IsNotNull(deleted);
+            Assert.AreEqual(element.Key, deleting.Key);
+            Assert.AreEqual(versionId, deleting.SpecificVersion);
+            Assert.AreEqual(element.Key, deleted.Key);
+            Assert.AreEqual(versionId, deleted.SpecificVersion);
+        }
+        finally
+        {
+            ElementNotificationHandler.VersionsNotification = null;
+        }
+    }
+
+    [Test]
+    public async Task DeleteVersionsAsync_PublishesTheElementVersionNotifications()
+    {
+        IElement element = new Element("content", -1, _elementType);
+        await ElementService.SaveAsync(element, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        DateTime versionDate = DateTime.UtcNow.AddDays(-1);
+
+        var notifications = new List<object>();
+        ElementNotificationHandler.VersionsNotification = notifications.Add;
+
+        try
+        {
+            Attempt<ContentVersionOperationStatus> result = await ((ElementService)ElementService)
+                .DeleteVersionsAsync(element.Key, versionDate, Constants.Security.SuperUserKey, CancellationToken.None);
+
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(2, notifications.Count);
+            var deleting = notifications[0] as ElementDeletingVersionsNotification;
+            var deleted = notifications[1] as ElementDeletedVersionsNotification;
+            Assert.IsNotNull(deleting);
+            Assert.IsNotNull(deleted);
+            Assert.AreEqual(element.Key, deleting.Key);
+            Assert.AreEqual(versionDate, deleting.DateToRetain);
+            Assert.AreEqual(element.Key, deleted.Key);
+            Assert.AreEqual(versionDate, deleted.DateToRetain);
+        }
+        finally
+        {
+            ElementNotificationHandler.VersionsNotification = null;
+        }
+    }
+
     internal sealed class ElementNotificationHandler :
         INotificationHandler<ElementSavedNotification>,
         INotificationHandler<ElementPublishedNotification>,
-        INotificationHandler<ElementUnpublishedNotification>
+        INotificationHandler<ElementUnpublishedNotification>,
+        INotificationHandler<ElementDeletingNotification>,
+        INotificationHandler<ElementTreeChangeNotification>,
+        INotificationHandler<ElementDeletingVersionsNotification>,
+        INotificationHandler<ElementDeletedVersionsNotification>,
+        INotificationHandler<ContentDeletingVersionsNotification>,
+        INotificationHandler<ContentDeletedVersionsNotification>
     {
+        public static Action<object> VersionsNotification { get; set; }
+
+        public static Action<object> DeleteOfTypesNotification { get; set; }
+
+        public void Handle(ElementDeletingNotification notification) => DeleteOfTypesNotification?.Invoke(notification);
+
+        public void Handle(ElementTreeChangeNotification notification) => DeleteOfTypesNotification?.Invoke(notification);
+
+        public void Handle(ElementDeletingVersionsNotification notification) => VersionsNotification?.Invoke(notification);
+
+        public void Handle(ElementDeletedVersionsNotification notification) => VersionsNotification?.Invoke(notification);
+
+        public void Handle(ContentDeletingVersionsNotification notification) => VersionsNotification?.Invoke(notification);
+
+        public void Handle(ContentDeletedVersionsNotification notification) => VersionsNotification?.Invoke(notification);
+
         public static Action<ElementSavedNotification> SavedElement { get; set; }
 
         public static Action<ElementPublishedNotification> PublishedElement { get; set; }

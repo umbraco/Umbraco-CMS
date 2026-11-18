@@ -979,6 +979,23 @@ internal sealed class AsyncElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task CheckDataIntegrityAsync_WithAnElementAtTheRecycleBinRoot_ReportsOk()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        Element trashedAtRoot = ElementBuilder.CreateSimpleElement(_elementType, "Trashed");
+        trashedAtRoot.ParentId = Constants.System.RecycleBinElement;
+        trashedAtRoot.Trashed = true;
+        await repository.SaveAsync(trashedAtRoot, CancellationToken.None);
+
+        ContentDataIntegrityReport report = await repository.CheckDataIntegrityAsync(new ContentDataIntegrityReportOptions(), CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(report.Ok, Is.True, string.Join(", ", report.DetectedIssues.Select(issue => $"{issue.Key}: {issue.Value.IssueType}")));
+    }
+
+    [Test]
     public async Task GetAsync_SharesNeitherRowsNorCacheEntriesWithDocuments()
     {
         AppCaches appCaches = CreateRealAppCaches();
