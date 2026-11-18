@@ -1,4 +1,3 @@
-using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -18,8 +17,7 @@ namespace Umbraco.Tests.Benchmarks;
 
 /// <summary>
 /// Measures building the SQL of the published content and media reads of the database cache repository, which every
-/// cache miss does once per read. The queries are built through the repository's own private methods (found by name),
-/// so the same benchmark runs against the code before and after a change to how they are built.
+/// cache miss does once per read.
 /// </summary>
 /// <remarks>
 /// Run with: <c>dotnet run -c Release --project tests/Umbraco.Tests.Benchmarks -- --filter "*DatabaseCacheRepositorySql*" --inProcess</c>.
@@ -27,10 +25,7 @@ namespace Umbraco.Tests.Benchmarks;
 [QuickRunWithMemoryDiagnoserConfig]
 public class DatabaseCacheRepositorySqlBenchmarks
 {
-    private Func<Guid, Sql<ISqlContext>> _contentSourceSql = null!;
-    private Func<IEnumerable<Guid>, Sql<ISqlContext>> _contentSourcesSql = null!;
-    private Func<Guid, Sql<ISqlContext>> _mediaSourceSql = null!;
-    private Func<IEnumerable<Guid>, Sql<ISqlContext>> _mediaSourcesSql = null!;
+    private DatabaseCacheRepository _repository = null!;
     private readonly Guid _key = Guid.NewGuid();
     private Guid[] _keys = null!;
 
@@ -47,7 +42,7 @@ public class DatabaseCacheRepositorySqlBenchmarks
         var databaseFactory = new Mock<IUmbracoDatabaseFactory>();
         databaseFactory.SetupGet(x => x.SqlContext).Returns(sqlContext);
 
-        var repository = new DatabaseCacheRepository(
+        _repository = new DatabaseCacheRepository(
             Mock.Of<IScopeAccessor>(),
             databaseFactory.Object,
             AppCaches.NoCache,
@@ -56,11 +51,6 @@ public class DatabaseCacheRepositorySqlBenchmarks
             new UrlSegmentProviderCollection(() => []),
             Mock.Of<IContentCacheDataSerializerFactory>(),
             Options.Create(new NuCacheSettings()));
-
-        _contentSourceSql = CreateBuilder<Guid>(repository, "GetContentSourceSql");
-        _contentSourcesSql = CreateBuilder<IEnumerable<Guid>>(repository, "GetContentSourcesSql");
-        _mediaSourceSql = CreateBuilder<Guid>(repository, "GetMediaSourceSql");
-        _mediaSourcesSql = CreateBuilder<IEnumerable<Guid>>(repository, "GetMediaSourcesSql");
 
         _keys = Enumerable.Range(0, KeyCount).Select(_ => Guid.NewGuid()).ToArray();
 
@@ -72,19 +62,14 @@ public class DatabaseCacheRepositorySqlBenchmarks
     }
 
     [Benchmark]
-    public string ContentSource() => _contentSourceSql(_key).SQL;
+    public string ContentSource() => _repository.GetContentSourceSql(_key).SQL;
 
     [Benchmark]
-    public string ContentSources() => _contentSourcesSql(_keys).SQL;
+    public string ContentSources() => _repository.GetContentSourcesSql(_keys).SQL;
 
     [Benchmark]
-    public string MediaSource() => _mediaSourceSql(_key).SQL;
+    public string MediaSource() => _repository.GetMediaSourceSql(_key).SQL;
 
     [Benchmark]
-    public string MediaSources() => _mediaSourcesSql(_keys).SQL;
-
-    private static Func<TArg, Sql<ISqlContext>> CreateBuilder<TArg>(DatabaseCacheRepository repository, string methodName)
-        => typeof(DatabaseCacheRepository)
-            .GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic)!
-            .CreateDelegate<Func<TArg, Sql<ISqlContext>>>(repository);
+    public string MediaSources() => _repository.GetMediaSourcesSql(_keys).SQL;
 }
