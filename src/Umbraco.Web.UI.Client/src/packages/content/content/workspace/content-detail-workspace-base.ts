@@ -15,6 +15,7 @@ import type {
 import { _resolveIsWritableVariant } from './content-writable-variant.function.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
+import { UmbVariantValidationToHintsManager } from './variant-validation-to-hints.manager.js';
 import { UmbContentDetailWorkspaceTypeTransformController } from './content-detail-workspace-type-transform.controller.js';
 import { UmbContentTypeVarianceChangeRedirectController } from './content-type-variance-change-redirect.controller.js';
 import { mergeObservables, observeMultiple, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -334,6 +335,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.validationContext,
 			this.view.hints,
 		);
+
+		new UmbVariantValidationToHintsManager(this, this.validationContext, this.view.hints);
 
 		new UmbContentDetailWorkspaceTypeTransformController(this as any, this._data);
 		this.contentTypeVarianceChangeRedirect = new UmbContentTypeVarianceChangeRedirectController(this);
