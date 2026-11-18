@@ -391,6 +391,8 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
         return GetEntities(entityType, parentIds);
     }
 
+    // TODO: only the relation filter belongs here. Move the object type filter, count, ordering, paging and entity
+    // building to the entity repository when it moves to EF Core.
     private async Task<PagedModel<IUmbracoEntity>> GetPagedRelatedEntitiesAsync(
         Func<UmbracoDbContext, IQueryable<int>> relatedNodeIds,
         int skip,
