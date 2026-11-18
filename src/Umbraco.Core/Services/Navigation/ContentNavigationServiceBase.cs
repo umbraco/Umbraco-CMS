@@ -1020,7 +1020,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
-    private static bool TryGetAncestorsKeysFromStructure(
+    internal static bool TryGetAncestorsKeysFromStructure(
         ConcurrentDictionary<Guid, NavigationNode> structure,
         Guid childKey,
         out IEnumerable<Guid> ancestorsKeys,
@@ -1039,7 +1039,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         var count = 0;
         List<Guid>? overflow = null;
 
-        if (includeSelf)
+        if (includeSelf && (contentTypeKey.HasValue is false || node.ContentTypeKey == contentTypeKey.Value))
         {
             keys[count++] = childKey;
         }

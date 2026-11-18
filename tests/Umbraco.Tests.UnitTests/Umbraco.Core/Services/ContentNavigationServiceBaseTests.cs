@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Navigation;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -990,6 +991,41 @@ public class ContentNavigationServiceBaseTests
             Assert.IsTrue(ancestorsOrSelfResult);
             Assert.That(ancestorsKeys, Is.EqualTo(expectedAncestors));
             Assert.That(ancestorsOrSelfKeys, Is.EqualTo(new[] { leaf }.Concat(expectedAncestors)));
+        });
+    }
+
+    [Test]
+    public void Ancestors_Or_Self_Of_Type_Only_Include_Self_When_It_Is_Of_The_Type()
+    {
+        // Arrange
+        var matchingType = Guid.NewGuid();
+        var otherType = Guid.NewGuid();
+        var root = new NavigationNode(Guid.NewGuid(), matchingType);
+        var middle = new NavigationNode(Guid.NewGuid(), otherType);
+        var leaf = new NavigationNode(Guid.NewGuid(), otherType);
+        var structure = new ConcurrentDictionary<Guid, NavigationNode>();
+        foreach (NavigationNode node in new[] { root, middle, leaf })
+        {
+            structure[node.Key] = node;
+        }
+
+        root.AddChild(structure, middle.Key);
+        middle.AddChild(structure, leaf.Key);
+
+        // Act
+        ContentNavigationServiceBase<IContentType, IContentTypeService>.TryGetAncestorsKeysFromStructure(
+            structure, leaf.Key, out IEnumerable<Guid> ofMatchingType, matchingType, includeSelf: true);
+        ContentNavigationServiceBase<IContentType, IContentTypeService>.TryGetAncestorsKeysFromStructure(
+            structure, leaf.Key, out IEnumerable<Guid> ofOtherType, otherType, includeSelf: true);
+        ContentNavigationServiceBase<IContentType, IContentTypeService>.TryGetAncestorsKeysFromStructure(
+            structure, leaf.Key, out IEnumerable<Guid> ofAnyType, includeSelf: true);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(ofMatchingType, Is.EqualTo(new[] { root.Key }));
+            Assert.That(ofOtherType, Is.EqualTo(new[] { leaf.Key, middle.Key }));
+            Assert.That(ofAnyType, Is.EqualTo(new[] { leaf.Key, middle.Key, root.Key }));
         });
     }
 
