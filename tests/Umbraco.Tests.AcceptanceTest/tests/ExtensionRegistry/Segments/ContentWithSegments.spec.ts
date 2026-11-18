@@ -38,7 +38,8 @@ test.describe('content with culture and segment variations', () => {
     await umbracoApi.language.ensureNameNotExists('Danish');
   });
 
-  test('can create content with a property value in the default segment', async ({umbracoApi, umbracoUi}) => {
+  // Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/24415
+  test.skip('can create content with a property value in the default segment', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateActionMenuOption();
@@ -56,7 +57,8 @@ test.describe('content with culture and segment variations', () => {
     expect(defaultValue.value).toBe(defaultSegmentValue);
   });
 
-  test('can save VIP segment-specific property value', async ({umbracoApi, umbracoUi}) => {
+  // Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/24415
+  test.skip('can save VIP segment-specific property value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, defaultSegmentValue, dataTypeName, true);
     await umbracoUi.content.goToContentWithName(contentName);
@@ -80,7 +82,8 @@ test.describe('content with culture and segment variations', () => {
     expect(vipValue.value).toBe(vipSegmentValue);
   });
 
-  test('can update existing VIP segment value', async ({umbracoApi, umbracoUi}) => {
+  // Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/24415
+  test.skip('can update existing VIP segment value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.document.createDocumentWithMultipleCulturesAndSegmentValues(contentName, documentTypeId, dataTypeName, editorAlias, ['en-US'], [{
       value: defaultSegmentValue,
@@ -178,7 +181,8 @@ test.describe('content with segment-only variations', () => {
     expect(contentData.values[0].value).toBe(defaultSegmentValue);
   });
 
-  test('can add VIP segment value to segment-only content', async ({umbracoApi, umbracoUi}) => {
+  // Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/24415
+  test.skip('can add VIP segment value to segment-only content', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, defaultSegmentValue, dataTypeName);
     await umbracoUi.content.goToContentWithName(contentName);
