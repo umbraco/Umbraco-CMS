@@ -1240,6 +1240,20 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         }
     }
 
+    [Test]
+    public void Querying_Content_Breaks_Sort_Order_Ties_By_Id()
+    {
+        using (ScopeProvider.CreateScope())
+        {
+            var repository = CreateRepository((IScopeAccessor)ScopeProvider, out _);
+            var query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
+
+            OrderingAssert.BreaksSortOrderTiesById(ScopeAccessor, () => repository.Get(query).ToArray());
+            OrderingAssert.BreaksSortOrderTiesById(ScopeAccessor, () => repository.GetContentForRelease(DateTime.Now).ToArray());
+            OrderingAssert.BreaksSortOrderTiesById(ScopeAccessor, () => repository.GetContentForExpiration(DateTime.Now).ToArray());
+        }
+    }
+
     /// <summary>
     /// Verifies that retrieving all documents from the GUID-based repository returns all items when the cache is
     /// populated.
