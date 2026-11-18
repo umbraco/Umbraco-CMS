@@ -30,6 +30,8 @@ internal abstract class FilePropertyContentIndexerTestBase : UmbracoIntegrationT
 
     private IMediaImportService MediaImportService => GetRequiredService<IMediaImportService>();
 
+    private IMediaEditingService MediaEditingService => GetRequiredService<IMediaEditingService>();
+
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
@@ -57,6 +59,15 @@ internal abstract class FilePropertyContentIndexerTestBase : UmbracoIntegrationT
         var file = new FileInfo(TestFileHelper.LoremIpsumFilePath(extension));
         await using FileStream stream = file.OpenRead();
         return await MediaImportService.ImportAsync(file.Name, stream, null, null, CoreConstants.Security.SuperUserKey);
+    }
+
+    protected async Task<IMedia> TrashMedia(IMedia media)
+    {
+        Attempt<IMedia?, ContentEditingOperationStatus> result = await MediaEditingService.MoveToRecycleBinAsync(media.Key, CoreConstants.Security.SuperUserKey);
+        Assert.That(result.Success, Is.True, $"Could not move the media to the recycle bin: {result.Status}");
+
+        return await MediaEditingService.GetAsync(media.Key)
+               ?? throw new InvalidOperationException("Could not find the trashed media.");
     }
 
     protected async Task CreateLanguage(string isoCode, string cultureName)

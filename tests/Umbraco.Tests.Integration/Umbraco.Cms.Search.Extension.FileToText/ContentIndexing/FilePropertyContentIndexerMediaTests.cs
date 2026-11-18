@@ -1,7 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Search.Indexing;
+using Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 using Umbraco.Cms.Search.Extension.FileToText;
 using Umbraco.Cms.Search.Extension.FileToText.Configuration;
 using Umbraco.Cms.Tests.Integration.Attributes;
@@ -11,6 +14,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Extension.FileToText.Test
 
 internal class FilePropertyContentIndexerMediaTests : FilePropertyContentIndexerTestBase
 {
+    // the harness does not register the core notification handlers, so the media files would not be renamed when trashed
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+        => builder.AddNotificationHandler<MediaMovedToRecycleBinNotification, FileUploadContentDeletedNotificationHandler>();
+
     public static void ConfigureOmitMedia(IUmbracoBuilder builder)
         => builder.Services.Configure<IndexingOptions>(config => config.IncludeMedia = false);
 
@@ -36,9 +43,28 @@ internal class FilePropertyContentIndexerMediaTests : FilePropertyContentIndexer
         Assert.That(fields, Has.Length.EqualTo(0));
     }
 
-    private async Task AssertLoremIpsumAsync(string extension)
+    [TestCase(".txt")]
+    [TestCase(".md")]
+    [TestCase(".pdf")]
+    public async Task Can_Handle_Trashed_Media_With_Recycle_Bin_Protection(string extension)
+        => await AssertLoremIpsumAsync(extension, trash: true);
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureDisableRecycleBinProtection))]
+    public async Task Can_Handle_Trashed_Media_Without_Recycle_Bin_Protection()
+        => await AssertLoremIpsumAsync(".txt", trash: true);
+
+    public static void ConfigureDisableRecycleBinProtection(IUmbracoBuilder builder)
+        => builder.Services.Configure<ContentSettings>(config => config.EnableMediaRecycleBinProtection = false);
+
+    private async Task AssertLoremIpsumAsync(string extension, bool trash = false)
     {
         IMedia media = await CreateLoremIpsumFileMedia(extension);
+
+        if (trash)
+        {
+            media = await TrashMedia(media);
+        }
 
         IndexField[] fields = (await FilePropertyContentIndexer.GetIndexFieldsAsync(media, [], false, CancellationToken.None)).ToArray();
         Assert.That(fields, Has.Length.EqualTo(1));
