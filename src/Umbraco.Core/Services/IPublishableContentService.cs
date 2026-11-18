@@ -10,10 +10,8 @@ namespace Umbraco.Cms.Core.Services;
 ///     Every member is asynchronous. This interface began as the async counterpart to a synchronous contract of
 ///     the same name, growing one member at a time as each was converted; that conversion is complete, the
 ///     synchronous contract is gone, and this has taken its name as the single publishable-content contract.
-///     It is implemented by <see cref="IContentService" /> and <see cref="IElementService" />. Only
-///     <see cref="IContentService" /> has an async EF Core repository behind it so far, so
-///     <see cref="Umbraco.Cms.Core.Services.ElementService" /> bridges its members onto a synchronous engine
-///     until an async element repository exists. Media and members are unrelated - they implement
+///     It is implemented by <see cref="IContentService" /> and <see cref="IElementService" />.
+///     Media and members are unrelated - they implement
 ///     <see cref="IContentServiceBase{TItem}" />, which remains synchronous.
 /// </remarks>
 /// <typeparam name="TContent">The type of content item managed by this service.</typeparam>

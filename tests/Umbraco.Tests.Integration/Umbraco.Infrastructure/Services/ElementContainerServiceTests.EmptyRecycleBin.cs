@@ -1,7 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Attributes;
@@ -43,6 +41,36 @@ public partial class ElementContainerServiceTests
 
         Assert.IsTrue(emptyResult);
         Assert.AreEqual(0, EntityService.GetDescendants(Constants.System.RecycleBinElement).Count());
+    }
+
+    [Test]
+    public async Task Emptying_The_Recycle_Bin_Announces_Only_The_Elements_At_Its_Root_As_Deleting()
+    {
+        var elementType = await CreateElementType();
+
+        var elementAtBinRoot = await CreateElement(elementType.Key, null);
+        await ElementEditingService.MoveToRecycleBinAsync(elementAtBinRoot.Key, Constants.Security.SuperUserKey);
+
+        var containerKey = Guid.NewGuid();
+        await ElementContainerService.CreateAsync(containerKey, "Trashed Container", null, Constants.Security.SuperUserKey);
+        await CreateElement(elementType.Key, containerKey);
+        await ElementContainerService.MoveToRecycleBinAsync(containerKey, Constants.Security.SuperUserKey);
+
+        Guid[]? announcedKeys = null;
+        ElementNotificationHandler.DeletingElement = notification => announcedKeys = [.. notification.DeletedEntities.Select(element => element.Key)];
+
+        try
+        {
+            var emptyResult = await ElementContainerService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
+
+            Assert.IsTrue(emptyResult);
+            CollectionAssert.AreEqual(new[] { elementAtBinRoot.Key }, announcedKeys);
+            Assert.AreEqual(0, EntityService.GetDescendants(Constants.System.RecycleBinElement).Count());
+        }
+        finally
+        {
+            ElementNotificationHandler.DeletingElement = null;
+        }
     }
 
     [Test]

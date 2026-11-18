@@ -40,6 +40,7 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
         .AddNotificationHandler<EntityContainerDeletingNotification, EntityContainerNotificationHandler>()
         .AddNotificationHandler<EntityContainerDeletedNotification, EntityContainerNotificationHandler>()
         .AddNotificationHandler<ElementDeletedNotification, ElementNotificationHandler>()
+        .AddNotificationHandler<ElementDeletingNotification, ElementNotificationHandler>()
         .AddNotificationHandler<ElementMovedNotification, RelateOnTrashNotificationHandler>()
         .AddNotificationAsyncHandler<ElementMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
 
@@ -214,10 +215,16 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
         public void Handle(EntityContainerDeletedNotification notification) => DeletedContainer?.Invoke(notification);
     }
 
-    private sealed class ElementNotificationHandler : INotificationHandler<ElementDeletedNotification>
+    private sealed class ElementNotificationHandler :
+        INotificationHandler<ElementDeletedNotification>,
+        INotificationHandler<ElementDeletingNotification>
     {
         public static Action<ElementDeletedNotification>? DeletedElement { get; set; }
 
+        public static Action<ElementDeletingNotification>? DeletingElement { get; set; }
+
         public void Handle(ElementDeletedNotification notification) => DeletedElement?.Invoke(notification);
+
+        public void Handle(ElementDeletingNotification notification) => DeletingElement?.Invoke(notification);
     }
 }

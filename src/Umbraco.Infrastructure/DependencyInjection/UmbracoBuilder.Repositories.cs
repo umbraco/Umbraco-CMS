@@ -92,7 +92,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IDatabaseReadOnlyAccessor, DatabaseReadOnlyAccessor>();
         builder.Services.AddUnique<ILastSyncedRepository, ServerRoleAwareLastSyncedRepository>();
         builder.Services.AddUnique<IDistributedJobRepository, DistributedJobRepository>();
-        builder.Services.AddUnique<IElementRepository, ElementRepository>();
         builder.Services.AddUnique<IAsyncElementRepository, AsyncElementRepository>();
         builder.Services.AddUnique<IElementContainerRepository, ElementContainerRepository>();
         builder.Services.AddUnique<IElementVersionRepository, ElementVersionRepository>();
