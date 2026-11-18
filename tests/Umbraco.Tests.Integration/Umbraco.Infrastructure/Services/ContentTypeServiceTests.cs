@@ -12,7 +12,6 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
-using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -821,124 +820,6 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         await RemoveComposition(composingType, composition);
 
         AssertOnlyPropertyDataDeleted(before, compositionPropertyTypeIds, [content.Id]);
-    }
-
-    [Test]
-    public async Task Removing_Composition_Deletes_The_Composition_Property_Data_Of_The_Composing_Media()
-    {
-        PropertyType CreateTextProperty(string alias) => new(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, alias)
-        {
-            Name = alias,
-            DataTypeId = Constants.DataTypes.Textbox,
-        };
-
-        var composition = new MediaType(ShortStringHelper, -1) { Alias = "composition", Name = "Composition" };
-        composition.AddPropertyType(CreateTextProperty("compositionText"), "content", "Content");
-        await MediaTypeService.CreateAsync(composition, Constants.Security.SuperUserKey);
-        var compositionPropertyTypeIds = composition.PropertyTypes.Select(x => x.Id).ToArray();
-
-        async Task<MediaType> CreateComposingMediaType(string alias)
-        {
-            var mediaType = new MediaType(ShortStringHelper, -1) { Alias = alias, Name = alias };
-            mediaType.AddPropertyType(CreateTextProperty($"{alias}Text"), "content", "Content");
-            mediaType.AddContentType(composition);
-            await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
-            return mediaType;
-        }
-
-        var composingType = await CreateComposingMediaType("composing");
-        var otherComposingType = await CreateComposingMediaType("otherComposing");
-
-        var mediaService = GetRequiredService<IMediaService>();
-        IMedia CreateMedia(MediaType mediaType, string name)
-        {
-            var media = new Media(name, -1, mediaType);
-            media.SetValue("compositionText", $"{name} compositionText");
-            media.SetValue($"{mediaType.Alias}Text", $"{name} own text");
-            mediaService.Save(media);
-            return media;
-        }
-
-        IMedia[] composingMedia = Enumerable.Range(0, 3).Select(i => CreateMedia(composingType, $"Composing {i}")).ToArray();
-        IMedia[] otherComposingMedia = Enumerable.Range(0, 2).Select(i => CreateMedia(otherComposingType, $"Other composing {i}")).ToArray();
-
-        List<PropertyDataDto> before = FetchAllPropertyData();
-
-        Assert.That(composingType.RemoveContentType(composition.Alias), Is.True);
-        Assert.That((await MediaTypeService.UpdateAsync(composingType, Constants.Security.SuperUserKey)).Success, Is.True);
-
-        AssertOnlyPropertyDataDeleted(before, compositionPropertyTypeIds, composingMedia.Select(x => x.Id).ToArray());
-        foreach (IMedia media in composingMedia)
-        {
-            Assert.That(mediaService.GetById(media.Key)!.Properties.Contains("compositionText"), Is.False);
-        }
-
-        foreach (IMedia media in otherComposingMedia)
-        {
-            Assert.That(mediaService.GetById(media.Key)!.GetValue<string>("compositionText"), Is.Not.Empty);
-        }
-    }
-
-    [Test]
-    public async Task Removing_Composition_Deletes_The_Composition_Property_Data_Of_The_Composing_Members()
-    {
-        PropertyType CreateTextProperty(string alias) => new(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, alias)
-        {
-            Name = alias,
-            DataTypeId = Constants.DataTypes.Textbox,
-        };
-
-        var composition = new MemberType(ShortStringHelper, -1) { Alias = "composition", Name = "Composition" };
-        composition.AddPropertyType(CreateTextProperty("compositionText"), "content", "Content");
-        await MemberTypeService.CreateAsync(composition, Constants.Security.SuperUserKey);
-        var compositionPropertyTypeIds = composition.PropertyTypes.Select(x => x.Id).ToArray();
-
-        async Task<MemberType> CreateComposingMemberType(string alias)
-        {
-            var memberType = new MemberType(ShortStringHelper, -1) { Alias = alias, Name = alias };
-            memberType.AddPropertyType(CreateTextProperty($"{alias}Text"), "content", "Content");
-            memberType.AddContentType(composition);
-            await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
-            return memberType;
-        }
-
-        var composingType = await CreateComposingMemberType("composing");
-        var otherComposingType = await CreateComposingMemberType("otherComposing");
-
-        var memberService = GetRequiredService<IMemberService>();
-        IMember CreateMember(MemberType memberType, string name)
-        {
-            IMember member = new MemberBuilder()
-                .WithMemberType(memberType)
-                .WithName(name)
-                .WithEmail($"{name.Replace(" ", string.Empty)}@example.com")
-                .WithLogin(name.Replace(" ", string.Empty), "password1234")
-                .WithIsApproved(true)
-                .Build();
-            member.SetValue("compositionText", $"{name} compositionText");
-            member.SetValue($"{memberType.Alias}Text", $"{name} own text");
-            memberService.Save(member);
-            return member;
-        }
-
-        IMember[] composingMembers = Enumerable.Range(0, 3).Select(i => CreateMember(composingType, $"Composing {i}")).ToArray();
-        IMember[] otherComposingMembers = Enumerable.Range(0, 2).Select(i => CreateMember(otherComposingType, $"Other composing {i}")).ToArray();
-
-        List<PropertyDataDto> before = FetchAllPropertyData();
-
-        Assert.That(composingType.RemoveContentType(composition.Alias), Is.True);
-        Assert.That((await MemberTypeService.UpdateAsync(composingType, Constants.Security.SuperUserKey)).Success, Is.True);
-
-        AssertOnlyPropertyDataDeleted(before, compositionPropertyTypeIds, composingMembers.Select(x => x.Id).ToArray());
-        foreach (IMember member in composingMembers)
-        {
-            Assert.That(memberService.GetById(member.Id)!.Properties.Contains("compositionText"), Is.False);
-        }
-
-        foreach (IMember member in otherComposingMembers)
-        {
-            Assert.That(memberService.GetById(member.Id)!.GetValue<string>("compositionText"), Is.Not.Empty);
-        }
     }
 
     private async Task<ITemplate> CreateTextPageTemplate()

@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -766,6 +767,70 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         // expect RefreshOther when changing moving properties (containers) around internally on the content type
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
+    }
+
+    [Test]
+    public async Task Removing_Composition_Deletes_The_Composition_Property_Data_Of_The_Composing_Blueprints()
+    {
+        var compositionProperty = ContentTypePropertyTypeModel("Composition text", "compositionText");
+        var compositionCreateModel = ContentTypeCreateModel("Composition", "composition", propertyTypes: [compositionProperty]);
+        var composition = (await ContentTypeEditingService.CreateAsync(compositionCreateModel, Constants.Security.SuperUserKey)).Result!;
+        var compositionPropertyTypeIds = composition.PropertyTypes.Select(x => x.Id).ToArray();
+        Composition[] compositions = [new() { Key = composition.Key, CompositionType = CompositionType.Composition }];
+
+        var composingProperty = ContentTypePropertyTypeModel("Composing text", "composingText");
+        var composingCreateModel = ContentTypeCreateModel("Composing", "composing", propertyTypes: [composingProperty], compositions: compositions);
+        var composingType = (await ContentTypeEditingService.CreateAsync(composingCreateModel, Constants.Security.SuperUserKey)).Result!;
+
+        var otherComposingProperty = ContentTypePropertyTypeModel("Other composing text", "otherComposingText");
+        var otherComposingCreateModel = ContentTypeCreateModel("Other composing", "otherComposing", propertyTypes: [otherComposingProperty], compositions: compositions);
+        var otherComposingType = (await ContentTypeEditingService.CreateAsync(otherComposingCreateModel, Constants.Security.SuperUserKey)).Result!;
+
+        async Task<IContent> CreateBlueprint(IContentType contentType, string ownAlias, string name)
+        {
+            var createModel = new ContentBlueprintCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Variants = [new VariantModel { Name = name }],
+                Properties =
+                [
+                    new PropertyValueModel { Alias = "compositionText", Value = $"{name} compositionText" },
+                    new PropertyValueModel { Alias = ownAlias, Value = $"{name} {ownAlias}" },
+                ],
+            };
+            var result = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+            Assert.That(result.Success, Is.True, result.Status.ToString());
+            return result.Result.Content!;
+        }
+
+        var composingBlueprints = new List<IContent>();
+        for (var i = 0; i < 3; i++)
+        {
+            composingBlueprints.Add(await CreateBlueprint(composingType, "composingText", $"Composing {i}"));
+        }
+
+        var otherComposingBlueprints = new List<IContent>();
+        for (var i = 0; i < 2; i++)
+        {
+            otherComposingBlueprints.Add(await CreateBlueprint(otherComposingType, "otherComposingText", $"Other composing {i}"));
+        }
+
+        List<PropertyDataDto> before = FetchAllPropertyData();
+
+        var updateModel = ContentTypeUpdateModel("Composing", "composing", propertyTypes: [composingProperty]);
+        var updateResult = await ContentTypeEditingService.UpdateAsync(composingType, updateModel, Constants.Security.SuperUserKey);
+        Assert.That(updateResult.Success, Is.True);
+
+        AssertOnlyPropertyDataDeleted(before, compositionPropertyTypeIds, composingBlueprints.Select(x => x.Id).ToArray());
+        foreach (IContent blueprint in composingBlueprints)
+        {
+            Assert.That(ContentService.GetBlueprintById(blueprint.Key)!.Properties.Contains("compositionText"), Is.False);
+        }
+
+        foreach (IContent blueprint in otherComposingBlueprints)
+        {
+            Assert.That(ContentService.GetBlueprintById(blueprint.Key)!.GetValue<string>("compositionText"), Is.Not.Empty);
+        }
     }
 
     [Test]
