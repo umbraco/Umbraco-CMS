@@ -713,7 +713,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     protected void AddGetByQueryOrderBy(Sql<ISqlContext> sql) =>
         sql
             .OrderBy<NodeDto>(x => x.Level)
-            .OrderBy<NodeDto>(x => x.SortOrder);
+            .OrderBy<NodeDto>(x => x.SortOrder, x => x.NodeId);
 
     /// <inheritdoc />
     protected override Sql<ISqlContext> GetBaseQuery(QueryType queryType) => GetBaseQuery(queryType, true);

@@ -352,55 +352,59 @@ public class ContentTypeCacheRefresherTests
         return mock.Object;
     }
 
-    [Test]
-    public void Auto_Factory_Non_Structural_Change_Clears_All_Converted_Content()
+    private void SetupAllConvertedContentCacheClears()
     {
-        // In auto models builder mode, the factory reset invalidates ALL compiled model types.
-        // A single full clear is used instead of a selective clear.
+        _documentCacheService.Setup(x => x.ClearConvertedContentCache());
+        _elementCacheService.Setup(x => x.ClearConvertedContentCache());
+        _mediaCacheService.Setup(x => x.ClearConvertedContentCache());
+    }
+
+    private void VerifyAllConvertedContentCachesClearedOnce()
+    {
+        _documentCacheService.Verify(x => x.ClearConvertedContentCache(), Times.Once);
+        _elementCacheService.Verify(x => x.ClearConvertedContentCache(), Times.Once);
+        _mediaCacheService.Verify(x => x.ClearConvertedContentCache(), Times.Once);
+    }
+
+    [TestCase(nameof(IContentType), ContentTypeChangeTypes.RefreshOther, false)]
+    [TestCase(nameof(IContentType), ContentTypeChangeTypes.RefreshMain, false)]
+    [TestCase(nameof(IContentType), ContentTypeChangeTypes.RefreshOther, true)]
+    [TestCase(nameof(IContentType), ContentTypeChangeTypes.RefreshMain, true)]
+    [TestCase(nameof(IMediaType), ContentTypeChangeTypes.RefreshOther, false)]
+    [TestCase(nameof(IMediaType), ContentTypeChangeTypes.RefreshMain, false)]
+    [TestCase(nameof(IMemberType), ContentTypeChangeTypes.RefreshOther, false)]
+    [TestCase(nameof(IContentType), ContentTypeChangeTypes.Remove, true)]
+    public void Auto_Factory_Clears_Every_Converted_Content_Cache_Whatever_Kind_Of_Type_Changed(
+        string itemType,
+        ContentTypeChangeTypes changeTypes,
+        bool isElement)
+    {
+        // The auto factory reset discards every generated model type, so converted items of any kind can hold
+        // discarded models: for example, a cached document whose block items were built from an element type.
         var refresher = CreateRefresher(CreateAutoFactory());
         var payloads = new[]
         {
-            new ContentTypeCacheRefresher.JsonPayload(nameof(IContentType), 100, ContentTypeChangeTypes.RefreshOther),
+            new ContentTypeCacheRefresher.JsonPayload(itemType, 100, changeTypes, isElement),
         };
 
         _documentCacheService
-            .Setup(x => x.ClearConvertedContentCache());
-
-        // Act
-        refresher.Refresh(payloads);
-
-        // Assert — full clear called (not selective) for Document due to auto factory reset.
-        _documentCacheService.Verify(
-            x => x.ClearConvertedContentCache(),
-            Times.Once);
-    }
-
-    [Test]
-    public void Auto_Factory_Element_Change_Clears_All_Converted_Content()
-    {
-        // In auto models builder mode, the factory reset invalidates ALL compiled model types.
-        // A single full clear is used instead of a selective clear.
-        var refresher = CreateRefresher(CreateAutoFactory());
-        var payloads = new[]
-        {
-            new ContentTypeCacheRefresher.JsonPayload(nameof(IContentType), 100, ContentTypeChangeTypes.RefreshOther, true),
-        };
-
+            .Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>()))
+            .Returns(Task.CompletedTask);
         _elementCacheService
-            .Setup(x => x.ClearConvertedContentCache());
+            .Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>()))
+            .Returns(Task.CompletedTask);
+        _mediaCacheService
+            .Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>()))
+            .Returns(Task.CompletedTask);
+        SetupAllConvertedContentCacheClears();
 
-        // Act
         refresher.Refresh(payloads);
 
-        // Assert — full clear called (not selective) for Element due to auto factory reset;
-        // the Document cache is untouched entirely since this payload isn't a Document type.
-        _elementCacheService.Verify(
-            x => x.ClearConvertedContentCache(),
-            Times.Once);
+        VerifyAllConvertedContentCachesClearedOnce();
     }
 
     [Test]
-    public void Auto_Factory_Structural_Change_Clears_All_Converted_Content()
+    public void Auto_Factory_Structural_Change_Rebuilds_Memory_Cache_And_Clears_All_Converted_Content()
     {
         // In auto models builder mode, even structural changes need a full converted cache clear
         // because the factory reset invalidates all model types, not just the changed ones.
@@ -413,23 +417,20 @@ public class ContentTypeCacheRefresherTests
         _documentCacheService
             .Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)))
             .Returns(Task.CompletedTask);
-        _documentCacheService
-            .Setup(x => x.ClearConvertedContentCache());
+        SetupAllConvertedContentCacheClears();
 
         // Act
         refresher.Refresh(payloads);
 
-        // Assert — rebuild and full clear for Document.
+        // Assert — rebuild for Document, full clear for every kind.
         _documentCacheService.Verify(
             x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)),
             Times.Once);
-        _documentCacheService.Verify(
-            x => x.ClearConvertedContentCache(),
-            Times.Once);
+        VerifyAllConvertedContentCachesClearedOnce();
     }
 
     [Test]
-    public void Auto_Factory_Structural_Element_Change_Clears_All_Converted_Content()
+    public void Auto_Factory_Structural_Element_Change_Rebuilds_Memory_Cache_And_Clears_All_Converted_Content()
     {
         // As above, but for an Element type: the factory reset invalidates all model types, so a structural
         // Element change needs both the memory rebuild and a full converted cache clear.
@@ -442,18 +443,15 @@ public class ContentTypeCacheRefresherTests
         _elementCacheService
             .Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)))
             .Returns(Task.CompletedTask);
-        _elementCacheService
-            .Setup(x => x.ClearConvertedContentCache());
+        SetupAllConvertedContentCacheClears();
 
         // Act
         refresher.Refresh(payloads);
 
-        // Assert — rebuild and full clear for Element.
+        // Assert — rebuild for Element, full clear for every kind.
         _elementCacheService.Verify(
             x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)),
             Times.Once);
-        _elementCacheService.Verify(
-            x => x.ClearConvertedContentCache(),
-            Times.Once);
+        VerifyAllConvertedContentCachesClearedOnce();
     }
 }
