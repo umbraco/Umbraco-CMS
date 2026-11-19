@@ -286,6 +286,8 @@ Status 18-11-2026: implemented and in review as draft #24678 (`a6bcee41781`, `e7
 
 Status 19-11-2026: after PR 0 merged, the three commits were rebased onto the integration branch (`5f641d8a99e`, `ab315b63f8d`, `a4a9bae5387`) and force pushed. #24678 is ready for review and shows only its own changes.
 
+Status 19-11-2026: merged as `cfaf78790e7` (#24678). The campaign is complete.
+
 ## 6. Per-PR checklist (do all of it, in order, every PR)
 
 0. On a machine that may be behind: `git -C .claude/campaign pull`, then `.claude/campaign/ef-core-element-repository/sync-memory.sh pull` (Windows: `sync-memory.ps1 pull`) so the local Claude memory matches the committed snapshot. Read this file again if the decisions log (§8) has new rows.
@@ -379,4 +381,4 @@ Routine: `git -C .claude/campaign pull` and `sync-memory.sh pull` at the start o
 
 Agents: when a tool reports the working directory as `.claude/campaign`, you are inside this worktree. Code work happens in the main checkout one level up; only plan, status and memory files are committed here.
 
-Cleanup: after PR 6 is merged, `git worktree remove .claude/campaign` on each machine and delete the branch locally and on origin.
+Cleanup (changed 19-11-2026): the branch and worktree are kept after PR 6. The next campaign (media) reuses them in its own folder, and `LEARNINGS.md` at the branch root carries what this campaign taught.

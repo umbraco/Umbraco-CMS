@@ -359,7 +359,7 @@
       "id": 6,
       "slug": "retire-sync-engine",
       "title": "Retire the sync engine and drop the scaffolding names",
-      "status": "in-review",
+      "status": "merged",
       "branch": "v20/feature/ef-core-element-repository-6-retire-sync-engine",
       "pr": "#24678",
       "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24678",
@@ -395,10 +395,15 @@
         }
       ],
       "acceptance": "Solution builds; full suites green; only the agreed Async-prefixed names remain.",
-      "notes": "Started 18-11-2026. Branch cut on top of PR 0 (2379bcb833c) so the search fixtures pass; the PR shows PR 0's changes until #24657 merges. Decision 18-11-2026: the three base-tier renames (AsyncPublishableContentServiceBase, AsyncPublishableContentRepositoryBase, IAsyncPublishableContentRepository onto the freed names) happen in this PR. Implemented 18-11-2026 as three commits (a6bcee41781 deletions, e7428aa4ec4 Element repository rename, a1e4a9b9ade base renames), draft PR #24678. Beyond the plan: the unused NPoco document, element and schedule builders in ContentBaseFactory are gone, the service base field and constructor parameter are _contentRepository/contentRepository, and summaries and comments no longer say async or cite the deleted NPoco base. The protected SortorderExists on the public NPoco ContentRepositoryBase was removed by mistake and restored after review: it is public API. 380 integration tests green on SQLite (element, document repository, content notification, search fixtures). 19-11-2026: PR 0 merged as 695e5f90a34 with one extra review commit, which conflicted with this branch on the two TODO comments. The three commits were rebased onto the integration branch (5f641d8a99e, ab315b63f8d, a4a9bae5387) and force pushed, so the PR shows only its own 20 files; the tree equals the tested one apart from those comment lines. Ready for review, mergeable."
+      "notes": "Started 18-11-2026. Branch cut on top of PR 0 (2379bcb833c) so the search fixtures pass; the PR shows PR 0's changes until #24657 merges. Decision 18-11-2026: the three base-tier renames (AsyncPublishableContentServiceBase, AsyncPublishableContentRepositoryBase, IAsyncPublishableContentRepository onto the freed names) happen in this PR. Implemented 18-11-2026 as three commits (a6bcee41781 deletions, e7428aa4ec4 Element repository rename, a1e4a9b9ade base renames), draft PR #24678. Beyond the plan: the unused NPoco document, element and schedule builders in ContentBaseFactory are gone, the service base field and constructor parameter are _contentRepository/contentRepository, and summaries and comments no longer say async or cite the deleted NPoco base. The protected SortorderExists on the public NPoco ContentRepositoryBase was removed by mistake and restored after review: it is public API. 380 integration tests green on SQLite (element, document repository, content notification, search fixtures). 19-11-2026: PR 0 merged as 695e5f90a34 with one extra review commit, which conflicted with this branch on the two TODO comments. The three commits were rebased onto the integration branch (5f641d8a99e, ab315b63f8d, a4a9bae5387) and force pushed, so the PR shows only its own 20 files; the tree equals the tested one apart from those comment lines. Ready for review, mergeable. Merged 19-11-2026 as cfaf78790e7; the squash equals the branch head a4a9bae5387.",
+      "mergeCommit": "cfaf78790e7"
     }
   ],
   "log": [
+    {
+      "date": "19-11-2026",
+      "text": "PR 6 merged as cfaf78790e7 (#24678). All campaign PRs are merged; what remains is the cleanup of the campaign worktree and branch."
+    },
     {
       "date": "19-11-2026",
       "text": "PR 0 merged as 695e5f90a34 (#24657). PR 6 (#24678) rebased onto the integration branch as three commits (head a4a9bae5387) and force pushed; ready for review. PR 6 is the only PR left."
