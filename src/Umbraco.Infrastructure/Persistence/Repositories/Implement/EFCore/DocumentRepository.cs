@@ -21,10 +21,10 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 
 /// <summary>
-///     Provides an EF Core backed async repository for <see cref="IContent" /> document entities.
+///     Provides an EF Core backed repository for <see cref="IContent" /> document entities.
 /// </summary>
 internal class DocumentRepository
-    : AsyncPublishableContentRepositoryBase<
+    : PublishableContentRepositoryBase<
         IContent,
         DocumentRepository,
         DocumentDto,
@@ -432,7 +432,7 @@ internal class DocumentRepository
             return;
         }
 
-        // Resolve valid template IDs once for the whole batch (mirrors NPoco AddAdditionalTempContentMapping).
+        // Resolve valid template IDs once for the whole batch.
         HashSet<int> validTemplateIds = await ResolveValidTemplateIdsAsync(rows, cancellationToken);
 
         for (var i = 0; i < entities.Count; i++)

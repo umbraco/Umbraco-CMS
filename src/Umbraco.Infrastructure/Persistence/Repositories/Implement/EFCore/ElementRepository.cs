@@ -18,22 +18,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 
 /// <summary>
 ///     The EF Core repository for <see cref="IElement" /> entities. Everything generic to publishable content lives
-///     on <see cref="AsyncPublishableContentRepositoryBase{TEntity,TRepository,TEntityDto,TContentVersionDto,TContentCultureVariationDto}" />;
+///     on <see cref="PublishableContentRepositoryBase{TEntity,TRepository,TEntityDto,TContentVersionDto,TContentCultureVariationDto}" />;
 ///     this class supplies the element tables, keys, rows and delete clauses.
 /// </summary>
-internal sealed class AsyncElementRepository
-    : AsyncPublishableContentRepositoryBase<
+internal sealed class ElementRepository
+    : PublishableContentRepositoryBase<
         IElement,
-        AsyncElementRepository,
+        ElementRepository,
         ElementDto,
         ElementVersionDto,
         ElementCultureVariationDto>,
-      IAsyncElementRepository
+      IElementRepository
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="AsyncElementRepository" /> class.
+    ///     Initializes a new instance of the <see cref="ElementRepository" /> class.
     /// </summary>
-    public AsyncElementRepository(
+    public ElementRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
         ILoggerFactory loggerFactory,
@@ -77,7 +77,7 @@ internal sealed class AsyncElementRepository
     protected override Guid NodeObjectTypeKey => Constants.ObjectTypes.Element;
 
     /// <inheritdoc />
-    protected override AsyncElementRepository This => this;
+    protected override ElementRepository This => this;
 
     /// <inheritdoc />
     protected override string RecycleBinCacheKey => CacheKeys.ElementRecycleBinCacheKey;

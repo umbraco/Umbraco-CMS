@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-internal sealed class AsyncElementRepositoryTest : UmbracoIntegrationTest
+internal sealed class ElementRepositoryTest : UmbracoIntegrationTest
 {
     private IContentType _elementType = null!;
     private IContentType _otherElementType = null!;
@@ -71,12 +71,12 @@ internal sealed class AsyncElementRepositoryTest : UmbracoIntegrationTest
         new DictionaryAppCache(),
         new IsolatedCaches(_ => new DeepCloneAppCache(new ObjectCacheAppCache())));
 
-    private AsyncElementRepository CreateRepository() => CreateRepository(AppCaches.Disabled);
+    private ElementRepository CreateRepository() => CreateRepository(AppCaches.Disabled);
 
-    private AsyncElementRepository CreateRepository(AppCaches appCaches) =>
+    private ElementRepository CreateRepository(AppCaches appCaches) =>
         CreateRepository(appCaches, Mock.Of<IEventAggregator>());
 
-    private AsyncElementRepository CreateRepository(AppCaches appCaches, IEventAggregator eventAggregator) => new(
+    private ElementRepository CreateRepository(AppCaches appCaches, IEventAggregator eventAggregator) => new(
         ScopeAccessor,
         appCaches,
         LoggerFactory,
@@ -139,7 +139,7 @@ internal sealed class AsyncElementRepositoryTest : UmbracoIntegrationTest
 
     [Test]
     public void Repository_IsResolvableFromTheContainer() =>
-        Assert.That(GetRequiredService<IAsyncElementRepository>(), Is.InstanceOf<AsyncElementRepository>());
+        Assert.That(GetRequiredService<IElementRepository>(), Is.InstanceOf<ElementRepository>());
 
     [Test]
     public async Task SaveAsync_ThenGetAsync_ReturnsTheElementWithItsStructuralDataAndProperties()
@@ -619,7 +619,7 @@ internal sealed class AsyncElementRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    private async Task<(Element One, Element Two)> CreateTwoElementsAndOneOfAnotherTypeAsync(AsyncElementRepository repository)
+    private async Task<(Element One, Element Two)> CreateTwoElementsAndOneOfAnotherTypeAsync(ElementRepository repository)
     {
         Element element1 = ElementBuilder.CreateSimpleElement(_elementType, "Element One");
         Element element2 = ElementBuilder.CreateSimpleElement(_elementType, "Element Two");

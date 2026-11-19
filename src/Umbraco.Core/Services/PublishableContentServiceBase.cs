@@ -2,32 +2,30 @@ using System.Collections.Immutable;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
-/// Base class for publishable content services.
+/// Base class for services that manage publishable content through an
+/// <see cref="IPublishableContentRepository{TContent}"/>.
 /// </summary>
 /// <typeparam name="TContent">The type of content managed by the concrete implementation.</typeparam>
 /// <remarks>
-/// A few methods here are currently only used by the <see cref="ContentService"/>, not by the <see cref="ElementService"/>.
-/// We will keep them here all the same for two reasons:
-///
-/// 1. As the Elements feature evolves, they might be needed eventually.
-/// 2. The more this base class aligns with the previous versions of the <see cref="ContentService"/>, the easier forward merging will be.
-///
-/// The service interfaces do not expose these methods unless they're needed, so they're only visible on the concrete implementations.
+/// Implements the shared save, publish, unpublish, rollback, schedule and query behaviour of
+/// <see cref="IPublishableContentService{TContent}"/>, leaving the content-type specific parts (object type, lock ids,
+/// notifications) to the derived service.
 /// </remarks>
-public abstract class PublishableContentServiceBase<TContent> : RepositoryService
+public abstract class PublishableContentServiceBase<TContent> : RepositoryService, IPublishableContentService<TContent>
     where TContent : class, IPublishableContentBase
 {
     private readonly IAuditService _auditService;
@@ -40,11 +38,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IIdKeyMap _idKeyMap;
     private readonly Lazy<IUserService> _userService;
-
-    /// <summary>
-    ///     Gets the id/key map used to resolve between int ids and Guid keys.
-    /// </summary>
-    protected IIdKeyMap IdKeyMap => _idKeyMap;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PublishableContentServiceBase{TContent}"/> class.
@@ -92,6 +85,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     protected abstract UmbracoObjectTypes ContentObjectType { get; }
 
+    protected abstract int RecycleBinId { get; }
+
     protected abstract int[] ReadLockIds { get; }
 
     protected abstract int[] WriteLockIds { get; }
@@ -113,64 +108,84 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     ///     Whether publishing includes invariant properties of variant content. When <c>null</c>, it is determined by the
     ///     invariant-for-variant permission of the user identified by <paramref name="userId"/>.
     /// </param>
+    /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>The result of the operation.</returns>
-    protected virtual PublishResult CommitContentChanges(
+    protected virtual Task<PublishResult> CommitContentChangesAsync(
         ICoreScope scope,
         TContent content,
         EventMessages eventMessages,
         IReadOnlyCollection<ILanguage> allLangs,
         IDictionary<string, object?>? notificationState,
         int userId,
-        bool? includeInvariantForVariant)
-        => CommitContentChangesInternal(
+        bool? includeInvariantForVariant,
+        CancellationToken cancellationToken)
+        => CommitContentChangesInternalAsync(
             scope,
             content,
             eventMessages,
             allLangs,
             notificationState,
             userId,
-            branchOne: false,
-            branchRoot: false,
-            raiseSavedNotification: false,
-            includeInvariantForVariant);
+            cancellationToken,
+            includeInvariantForVariant: includeInvariantForVariant);
 
-    protected abstract void DeleteLocked(ICoreScope scope, TContent content, EventMessages evtMsgs);
+    protected abstract Task DeleteLockedAsync(ICoreScope scope, TContent content, EventMessages evtMsgs, CancellationToken cancellationToken);
 
-    protected abstract SavingNotification<TContent> SavingNotification(TContent content, EventMessages eventMessages);
+    protected abstract SavingNotification<TContent> CreateSavingNotification(TContent content, EventMessages eventMessages);
 
-    protected abstract SavedNotification<TContent> SavedNotification(TContent content, EventMessages eventMessages);
+    protected abstract SavedNotification<TContent> CreateSavedNotification(TContent content, EventMessages eventMessages);
 
-    protected abstract SavingNotification<TContent> SavingNotification(IEnumerable<TContent> content, EventMessages eventMessages);
+    protected abstract SavingNotification<TContent> CreateSavingNotification(IEnumerable<TContent> content, EventMessages eventMessages);
 
-    protected abstract SavedNotification<TContent> SavedNotification(IEnumerable<TContent> content, EventMessages eventMessages);
+    protected abstract SavedNotification<TContent> CreateSavedNotification(IEnumerable<TContent> content, EventMessages eventMessages);
 
-    protected abstract TreeChangeNotification<TContent> TreeChangeNotification(TContent content, TreeChangeTypes changeTypes, EventMessages eventMessages);
+    protected abstract TreeChangeNotification<TContent> CreateTreeChangeNotification(TContent content, TreeChangeTypes changeTypes, EventMessages eventMessages);
 
-    protected abstract TreeChangeNotification<TContent> TreeChangeNotification(TContent content, TreeChangeTypes changeTypes, IEnumerable<string>? publishedCultures, IEnumerable<string>? unpublishedCultures, EventMessages eventMessages);
+    protected abstract TreeChangeNotification<TContent> CreateTreeChangeNotification(TContent content, TreeChangeTypes changeTypes, IEnumerable<string>? publishedCultures, IEnumerable<string>? unpublishedCultures, EventMessages eventMessages);
 
-    protected abstract TreeChangeNotification<TContent> TreeChangeNotification(IEnumerable<TContent> content, TreeChangeTypes changeTypes, EventMessages eventMessages);
+    protected abstract TreeChangeNotification<TContent> CreateTreeChangeNotification(IEnumerable<TContent> content, TreeChangeTypes changeTypes, EventMessages eventMessages);
 
-    protected abstract DeletingNotification<TContent> DeletingNotification(TContent content, EventMessages eventMessages);
+    protected abstract DeletingNotification<TContent> CreateDeletingNotification(TContent content, EventMessages eventMessages);
 
-    protected abstract CancelableEnumerableObjectNotification<TContent> PublishingNotification(TContent content, EventMessages eventMessages);
+    protected abstract CancelableEnumerableObjectNotification<TContent> CreatePublishingNotification(TContent content, EventMessages eventMessages);
 
-    protected abstract IStatefulNotification PublishedNotification(TContent content, EventMessages eventMessages);
+    protected abstract IStatefulNotification CreatePublishedNotification(TContent content, EventMessages eventMessages);
 
-    protected abstract IStatefulNotification PublishedNotification(IEnumerable<TContent> content, EventMessages eventMessages);
+    protected abstract IStatefulNotification CreatePublishedNotification(IEnumerable<TContent> content, EventMessages eventMessages);
 
-    protected abstract CancelableEnumerableObjectNotification<TContent> UnpublishingNotification(TContent content, EventMessages eventMessages);
+    protected abstract CancelableEnumerableObjectNotification<TContent> CreateUnpublishingNotification(TContent content, EventMessages eventMessages);
 
-    protected abstract IStatefulNotification UnpublishedNotification(TContent content, EventMessages eventMessages);
+    protected abstract IStatefulNotification CreateUnpublishedNotification(TContent content, EventMessages eventMessages);
 
-    protected abstract RollingBackNotification<TContent> RollingBackNotification(TContent target, EventMessages messages);
+    protected abstract RollingBackNotification<TContent> CreateRollingBackNotification(TContent target, EventMessages messages);
 
-    protected abstract RolledBackNotification<TContent> RolledBackNotification(TContent target, EventMessages messages);
+    protected abstract RolledBackNotification<TContent> CreateRolledBackNotification(TContent target, EventMessages messages);
+
+    /// <summary>
+    ///     Creates the cancelable notification published before versions of a content item are deleted.
+    /// </summary>
+    /// <param name="key">The key of the content item whose versions are deleted.</param>
+    /// <param name="eventMessages">The event messages collection.</param>
+    /// <param name="specificVersion">The identifier of the version to delete, or <c>default</c> when deleting by date.</param>
+    /// <param name="dateToRetain">The date before which versions are deleted, or <c>default</c> when deleting a specific version.</param>
+    /// <returns>The notification to publish.</returns>
+    protected abstract DeletingVersionsNotification<TContent> CreateDeletingVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain);
+
+    /// <summary>
+    ///     Creates the notification published after versions of a content item have been deleted.
+    /// </summary>
+    /// <param name="key">The key of the content item whose versions were deleted.</param>
+    /// <param name="eventMessages">The event messages collection.</param>
+    /// <param name="specificVersion">The identifier of the deleted version, or <c>default</c> when deleted by date.</param>
+    /// <param name="dateToRetain">The date before which versions were deleted, or <c>default</c> when a specific version was deleted.</param>
+    /// <returns>The notification to publish.</returns>
+    protected abstract DeletedVersionsNotification<TContent> CreateDeletedVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain);
 
     /// <summary>
     ///     Creates the "saved" notification for a single item, carrying the cultures that were saved.
     /// </summary>
     /// <remarks>
-    ///     Defaults to the culture-agnostic <see cref="SavedNotification(TContent, EventMessages)"/> overload so external
+    ///     Defaults to the culture-agnostic <see cref="CreateSavedNotification(TContent, EventMessages)"/> overload so external
     ///     subclasses keep working; <c>ContentService</c> and <c>ElementService</c> override this to carry the map on the
     ///     concrete notification. See <see cref="BuildCultureMap"/> for why the cultures are captured at raise-time.
     /// </remarks>
@@ -178,14 +193,14 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <param name="eventMessages">The event messages collection.</param>
     /// <param name="savedCultures">The cultures that were saved, keyed by item key, or <c>null</c> if not tracked.</param>
     /// <returns>The notification to publish.</returns>
-    protected virtual SavedNotification<TContent> SavedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
-        => SavedNotification(content, eventMessages);
+    protected virtual SavedNotification<TContent> CreateSavedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+        => CreateSavedNotification(content, eventMessages);
 
     /// <summary>
     ///     Creates the "saved" notification for multiple items, carrying the cultures that were saved per item.
     /// </summary>
     /// <remarks>
-    ///     Defaults to the culture-agnostic <see cref="SavedNotification(IEnumerable{TContent}, EventMessages)"/> overload
+    ///     Defaults to the culture-agnostic <see cref="CreateSavedNotification(IEnumerable{TContent}, EventMessages)"/> overload
     ///     so external subclasses keep working; <c>ContentService</c> and <c>ElementService</c> override this to carry the
     ///     map on the concrete notification.
     /// </remarks>
@@ -193,15 +208,15 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <param name="eventMessages">The event messages collection.</param>
     /// <param name="savedCultures">The cultures that were saved, keyed by item key.</param>
     /// <returns>The notification to publish.</returns>
-    protected virtual SavedNotification<TContent> SavedNotification(IEnumerable<TContent> content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
-        => SavedNotification(content, eventMessages);
+    protected virtual SavedNotification<TContent> CreateSavedNotification(IEnumerable<TContent> content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+        => CreateSavedNotification(content, eventMessages);
 
     /// <summary>
     ///     Creates the "published" notification for a single item, carrying the cultures that were published and
     ///     unpublished by the operation.
     /// </summary>
     /// <remarks>
-    ///     Defaults to the culture-agnostic <see cref="PublishedNotification(TContent, EventMessages)"/> overload so
+    ///     Defaults to the culture-agnostic <see cref="CreatePublishedNotification(TContent, EventMessages)"/> overload so
     ///     external subclasses keep working; <c>ContentService</c> and <c>ElementService</c> override this to carry the
     ///     maps on the concrete notification. Unpublishing an individual culture is performed as a publish, so the
     ///     unpublished cultures are reported here rather than on the "unpublished" notification.
@@ -211,14 +226,14 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <param name="publishedCultures">The cultures that were published, keyed by item key, or <c>null</c> if not tracked.</param>
     /// <param name="unpublishedCultures">The cultures that were unpublished as part of the publish, keyed by item key, or <c>null</c> if not applicable.</param>
     /// <returns>The notification to publish.</returns>
-    protected virtual IStatefulNotification PublishedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? publishedCultures, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
-        => PublishedNotification(content, eventMessages);
+    protected virtual IStatefulNotification CreatePublishedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? publishedCultures, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+        => CreatePublishedNotification(content, eventMessages);
 
     /// <summary>
     ///     Creates the "unpublished" notification for a single item, carrying the cultures that were unpublished.
     /// </summary>
     /// <remarks>
-    ///     Defaults to the culture-agnostic <see cref="UnpublishedNotification(TContent, EventMessages)"/> overload so
+    ///     Defaults to the culture-agnostic <see cref="CreateUnpublishedNotification(TContent, EventMessages)"/> overload so
     ///     external subclasses keep working; <c>ContentService</c> and <c>ElementService</c> override this to carry the map
     ///     on the concrete notification. This is only raised when the item is unpublished as a whole.
     /// </remarks>
@@ -226,8 +241,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <param name="eventMessages">The event messages collection.</param>
     /// <param name="unpublishedCultures">The cultures that were unpublished, keyed by item key, or <c>null</c> if not tracked.</param>
     /// <returns>The notification to publish.</returns>
-    protected virtual IStatefulNotification UnpublishedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
-        => UnpublishedNotification(content, eventMessages);
+    protected virtual IStatefulNotification CreateUnpublishedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+        => CreateUnpublishedNotification(content, eventMessages);
 
     /// <summary>
     ///     Builds the per-item culture map carried on the notifications, keyed by item <see cref="Umbraco.Cms.Core.Models.Entities.IEntity.Key"/>.
@@ -252,7 +267,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             return null;
         }
 
-        string[] cultureList = cultures.ToArray();
+        string[] cultureList = [.. cultures];
         return cultureList.Length == 0
             ? new Dictionary<Guid, IReadOnlyCollection<string>>()
             : new Dictionary<Guid, IReadOnlyCollection<string>> { [content.Key] = cultureList };
@@ -260,78 +275,64 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     #region Rollback
 
-    // Bridges ElementService.RollbackAsync until elements have an async repository.
-    public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId)
+    /// <inheritdoc />
+    public async Task<Attempt<ContentRollbackOperationStatus>> RollbackAsync(Guid key, int versionId, string culture, Guid userKey, CancellationToken cancellationToken)
     {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
+        EventMessages eventMessages = EventMessagesFactory.Get();
 
-        // Get the current copy of the node
-        TContent? content = GetById(id);
+        TContent? content = await GetByIdAsync(key, cancellationToken);
+        TContent? version = await GetVersionAsync(versionId, cancellationToken);
 
-        // Get the version
-        TContent? version = GetVersion(versionId);
-
-        // Good old null checks
-        if (content == null || version == null || content.Trashed)
+        if (content is null || version is null || content.Trashed)
         {
-            return new OperationResult(OperationResultType.FailedCannot, evtMsgs);
+            return Attempt.Fail(ContentRollbackOperationStatus.ContentNotFound);
         }
 
-        // Store the result of doing the save of content for the rollback
-        OperationResult rollbackSaveResult;
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        var rollingBackNotification = CreateRollingBackNotification(content, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(rollingBackNotification))
         {
-            var rollingBackNotification = RollingBackNotification(content, evtMsgs);
-            if (scope.Notifications.PublishCancelable(rollingBackNotification))
-            {
-                scope.Complete();
-                return OperationResult.Cancel(evtMsgs);
-            }
-
-            // Copy the changes from the version
-            content.CopyFrom(version, culture);
-
-            // Save the content for the rollback
-            rollbackSaveResult = Save(content, userId);
-
-            // Depending on the save result - is what we log & audit along with what we return
-            if (rollbackSaveResult.Success == false)
-            {
-                // Log the error/warning
-                Logger.LogError(
-                    "User '{UserId}' was unable to rollback content '{ContentId}' (key '{ContentKey}') to version '{VersionId}'", userId, id, content.Key, versionId);
-            }
-            else
-            {
-                scope.Notifications.Publish(RolledBackNotification(content, evtMsgs).WithStateFrom(rollingBackNotification));
-
-                // Logging & Audit message
-                Logger.LogInformation("User '{UserId}' rolled back content '{ContentId}' (key '{ContentKey}') to version '{VersionId}'", userId, id, content.Key, versionId);
-                Audit(AuditType.RollBack, userId, id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
-            }
-
             scope.Complete();
+            return Attempt.Fail(ContentRollbackOperationStatus.CancelledByNotification);
         }
 
-        return rollbackSaveResult;
+        content.CopyFrom(version, culture);
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        Attempt<ContentSaveOperationStatus> saveResult = await SaveAsync(content, userKey, null, cancellationToken);
+
+        if (saveResult.Success)
+        {
+            scope.Notifications.Publish(CreateRolledBackNotification(content, eventMessages).WithStateFrom(rollingBackNotification));
+            await AuditAsync(AuditType.RollBack, userId, content.Id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
+        }
+        else
+        {
+            Logger.LogError(
+                "User '{UserId}' was unable to rollback content '{ContentId}' (key '{ContentKey}') to version '{VersionId}'", userId, content.Id, content.Key, versionId);
+        }
+
+        scope.Complete();
+
+        return saveResult.Success
+            ? Attempt.Succeed(ContentRollbackOperationStatus.Success)
+            : Attempt.Fail(ContentRollbackOperationStatus.SaveFailed);
     }
 
     #endregion
 
     #region Count
 
-    /// <summary>
-    /// Gets the count of published <see cref="IContent"/> items.
-    /// </summary>
-    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
-    /// <returns>The count of published content items.</returns>
-    public int CountPublished(string? contentTypeAlias = null)
+    /// <inheritdoc/>
+    public async Task<int> CountPublishedAsync(string? contentTypeAlias, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.ReadLock(ReadLockIds);
-            return _contentRepository.CountPublished(contentTypeAlias);
+            int result = await _contentRepository.CountPublishedAsync(contentTypeAlias, cancellationToken);
+            scope.Complete();
+            return result;
         }
     }
 
@@ -339,415 +340,206 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// Gets the count of all <see cref="TContent"/> items.
     /// </summary>
     /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The count of content items.</returns>
-    public int Count(string? contentTypeAlias = null)
+    public async Task<int> CountAsync(string? contentTypeAlias, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.Count(contentTypeAlias);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        int result = contentTypeAlias is null
+            ? await _contentRepository.CountAsync(cancellationToken)
+            : await _contentRepository.CountAsync(contentTypeAlias, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <summary>
     /// Gets the count of child <see cref="TContent"/> items under a specified parent.
     /// </summary>
-    /// <param name="parentId">The ID of the parent content.</param>
+    /// <param name="parentKey">The Guid key of the parent content.</param>
     /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The count of child content items.</returns>
-    public int CountChildren(int parentId, string? contentTypeAlias = null)
+    public async Task<int> CountChildrenAsync(Guid? parentKey, string? contentTypeAlias, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.CountChildren(parentId, contentTypeAlias);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        int result = contentTypeAlias is null
+            ? await _contentRepository.CountChildrenAsync(parentKey, cancellationToken)
+            : await _contentRepository.CountChildrenAsync(parentKey, contentTypeAlias, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <summary>
     /// Gets the count of descendant <see cref="TContent"/> items under a specified parent.
     /// </summary>
-    /// <param name="parentId">The ID of the parent content.</param>
+    /// <param name="parentKey">The Guid key of the parent content.</param>
     /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The count of descendant content items.</returns>
-    public int CountDescendants(int parentId, string? contentTypeAlias = null)
+    public async Task<int> CountDescendantsAsync(Guid? parentKey, string? contentTypeAlias, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.CountDescendants(parentId, contentTypeAlias);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        int result = contentTypeAlias is null
+            ? await _contentRepository.CountDescendantsAsync(parentKey, cancellationToken)
+            : await _contentRepository.CountDescendantsAsync(parentKey, contentTypeAlias, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     #endregion
 
     #region Get, Has, Is
 
-    /// <summary>
-    ///     Gets an <see cref="TContent" /> object by Id
-    /// </summary>
-    /// <param name="id">Id of the Content to retrieve</param>
-    /// <returns>
-    ///     <see cref="TContent" />
-    /// </returns>
-    public TContent? GetById(int id)
+    /// <inheritdoc/>
+    public async Task<TContent?> GetByIdAsync(Guid key, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.ReadLock(ReadLockIds);
-            return _contentRepository.Get(id);
-        }
-    }
-
-    /// <summary>
-    ///     Gets an <see cref="TContent" /> object by Id
-    /// </summary>
-    /// <param name="ids">Ids of the Content to retrieve</param>
-    /// <returns>
-    ///     <see cref="TContent" />
-    /// </returns>
-    public IEnumerable<TContent> GetByIds(IEnumerable<int> ids)
-    {
-        var idsA = ids.ToArray();
-        if (idsA.Length == 0)
-        {
-            return Enumerable.Empty<TContent>();
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            IEnumerable<TContent> items = _contentRepository.GetMany(idsA);
-            var index = items.ToDictionary(x => x.Id, x => x);
-            return idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
+            TContent? result = await _contentRepository.GetAsync(key, cancellationToken);
+            scope.Complete();
+            return result;
         }
     }
 
     /// <inheritdoc/>
-    public TContent? GetById(Guid key)
+    public async Task<IEnumerable<TContent>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        Guid[] idsA = [.. ids];
+        if (idsA.Length == 0)
         {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.Get(key);
-        }
-    }
-
-    /// <inheritdoc />
-    public ContentScheduleCollection GetContentScheduleByContentId(Guid contentId)
-    {
-        Attempt<int> idAttempt = _idKeyMap.GetIdForKeyAsync(contentId, ContentObjectType).GetAwaiter().GetResult();
-        if (idAttempt.Success is false)
-        {
-            return new ContentScheduleCollection();
+            return [];
         }
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.ReadLock(ReadLockIds);
-            ContentScheduleCollection schedule = _contentRepository.GetContentSchedule(idAttempt.Result);
+            IEnumerable<TContent> items = await _contentRepository.GetManyAsync(idsA, cancellationToken);
+            var index = items.ToDictionary(x => x.Key, x => x);
+            IEnumerable<TContent> result = idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
             scope.Complete();
-            return schedule;
+            return result;
+        }
+    }
+
+    /// <inheritdoc/>
+    public async Task<IEnumerable<TContent>> GetByIdsAsync(IEnumerable<Guid> ids, string[]? propertyAliases, bool loadTemplates, CancellationToken cancellationToken)
+    {
+        Guid[] idsA = [.. ids.Distinct()];
+        if (idsA.Length == 0)
+        {
+            return [];
+        }
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            scope.ReadLock(ReadLockIds);
+            IEnumerable<TContent> items = await _contentRepository.GetManyAsync(idsA, propertyAliases, loadTemplates, cancellationToken);
+            var index = items.ToDictionary(x => x.Key, x => x);
+            IEnumerable<TContent> result = idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
+            scope.Complete();
+            return result;
         }
     }
 
     /// <inheritdoc />
-    public IDictionary<Guid, IEnumerable<ContentSchedule>> GetContentSchedulesByKeys(Guid[] keys)
+    public async Task<ContentScheduleCollection> GetContentScheduleByContentIdAsync(Guid contentId, CancellationToken cancellationToken)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        ContentScheduleCollection result = await _contentRepository.GetContentScheduleAsync(contentId, cancellationToken);
+        scope.Complete();
+        return result;
+    }
+
+    /// <inheritdoc />
+    public async Task<IDictionary<Guid, IEnumerable<ContentSchedule>>> GetContentSchedulesByKeysAsync(Guid[] keys, CancellationToken cancellationToken)
     {
         if (keys.Length == 0)
         {
             return ImmutableDictionary<Guid, IEnumerable<ContentSchedule>>.Empty;
         }
 
-        Dictionary<int, Guid> intToKeyMap = new(keys.Length);
-        foreach (Guid key in keys)
-        {
-            Attempt<int> contentId = _idKeyMap.GetIdForKeyAsync(key, ContentObjectType).GetAwaiter().GetResult();
-            if (contentId.Success is false)
-            {
-                continue;
-            }
-
-            intToKeyMap[contentId.Result] = key;
-        }
-
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-
-        IDictionary<int, IEnumerable<ContentSchedule>> intKeyedResults =
-            _contentRepository.GetContentSchedulesByIds(intToKeyMap.Keys.ToArray());
-
-        var guidKeyedResults = new Dictionary<Guid, IEnumerable<ContentSchedule>>(intKeyedResults.Count);
-        foreach (KeyValuePair<int, IEnumerable<ContentSchedule>> entry in intKeyedResults)
-        {
-            if (intToKeyMap.TryGetValue(entry.Key, out Guid guidKey))
-            {
-                guidKeyedResults[guidKey] = entry.Value;
-            }
-        }
-
-        return guidKeyedResults;
-    }
-
-    // Bridges ElementService.PersistContentScheduleAsync until elements have an async repository.
-    public void PersistContentSchedule(IPublishableContentBase content, ContentScheduleCollection contentSchedule)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(WriteLockIds);
-            _contentRepository.PersistContentSchedule(content, contentSchedule);
-            scope.Complete();
-        }
-    }
-
-    // Bridges ElementService.GetByIdsAsync until elements have an async repository.
-    public IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids)
-    {
-        Guid[] idsA = ids.ToArray();
-        if (idsA.Length == 0)
-        {
-            return Enumerable.Empty<TContent>();
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            IEnumerable<TContent>? items = _contentRepository.GetMany(idsA);
-
-            if (items is not null)
-            {
-                var index = items.ToDictionary(x => x.Key, x => x);
-
-                return idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
-            }
-
-            return Enumerable.Empty<TContent>();
-        }
-    }
-
-    /// <inheritdoc/>
-    public IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids, string[]? propertyAliases, bool loadTemplates = true)
-    {
-        Guid[] idsA = ids.Distinct().ToArray();
-        if (idsA.Length == 0)
-        {
-            return Enumerable.Empty<TContent>();
-        }
-
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        scope.ReadLock(ReadLockIds);
-
-        var index = new Dictionary<Guid, TContent>(idsA.Length);
-        foreach (IEnumerable<Guid> group in idsA.InGroupsOf(Constants.Sql.MaxParameterCount))
-        {
-            List<Guid> groupKeys = group.ToList();
-            IQuery<TContent>? query = Query<TContent>()?.Where(x => groupKeys.Contains(x.Key));
-            foreach (TContent item in _contentRepository.GetPage(query, 0, groupKeys.Count, out _, propertyAliases, null, Ordering.By("sortOrder"), loadTemplates))
-            {
-                index[item.Key] = item;
-            }
-        }
-
-        return idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
+        IDictionary<Guid, IEnumerable<ContentSchedule>> result = await _contentRepository.GetContentSchedulesByKeysAsync(keys, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
-    public IEnumerable<TContent> GetPagedOfType(
-        int contentTypeId,
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        IQuery<TContent>? filter = null,
-        Ordering? ordering = null)
+    public async Task<PagedModel<TContent>> GetPagedOfTypeAsync(Guid contentTypeKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
     {
-        if (pageIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageIndex));
-        }
-
-        if (pageSize <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageSize));
-        }
-
         ordering ??= Ordering.By("sortOrder");
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetPage(
-                Query<TContent>()?.Where(x => x.ContentTypeId == contentTypeId),
-                pageIndex,
-                pageSize,
-                out totalRecords,
-                null,
-                filter,
-                ordering);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        PagedModel<TContent> result = await _contentRepository.GetPagedOfContentTypesAsync([contentTypeKey], skip, take, ordering, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
-    public IEnumerable<TContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords, IQuery<TContent>? filter, Ordering? ordering = null)
+    public async Task<Attempt<ContentScheduleOperationStatus>> PersistContentScheduleAsync(IPublishableContentBase content, ContentScheduleCollection contentSchedule, CancellationToken cancellationToken)
     {
-        if (pageIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageIndex));
-        }
-
-        if (pageSize <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageSize));
-        }
-
-        ordering ??= Ordering.By("sortOrder");
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            // Need to use a List here because the expression tree cannot convert the array when used in Contains.
-            // See ExpressionTests.Sql_In().
-            List<int> contentTypeIdsAsList = [.. contentTypeIds];
-
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetPage(
-                Query<TContent>()?.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId)),
-                pageIndex,
-                pageSize,
-                out totalRecords,
-                null,
-                filter,
-                ordering);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockIds);
+        await _contentRepository.PersistContentScheduleAsync(content, contentSchedule, cancellationToken);
+        scope.Complete();
+        return Attempt.Succeed(ContentScheduleOperationStatus.Success);
     }
 
     /// <inheritdoc />
-    /// <remarks>
-    ///     Bridges onto the page-indexed repository read, so <paramref name="skip" /> has to be a multiple of
-    ///     <paramref name="take" />.
-    /// </remarks>
     public async Task<PagedModel<TContent>> GetPagedOfTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
     {
-        if (skip < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(skip));
-        }
-
-        if (take <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(take));
-        }
-
-        if (skip % take != 0)
-        {
-            throw new ArgumentException("Skip must be a multiple of take.", nameof(skip));
-        }
-
         ordering ??= Ordering.By("sortOrder");
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-
-        List<int> contentTypeIds = (await _contentTypeRepository.GetManyAsync(contentTypeKeys, cancellationToken))
-            .Select(contentType => contentType.Id)
-            .ToList();
-
-        IEnumerable<TContent> items = _contentRepository.GetPage(
-            Query<TContent>()?.Where(x => contentTypeIds.Contains(x.ContentTypeId)),
-            skip / take,
-            take,
-            out long totalRecords,
-            null,
-            null,
-            ordering);
-
+        PagedModel<TContent> result = await _contentRepository.GetPagedOfContentTypesAsync(contentTypeKeys, skip, take, ordering, cancellationToken);
         scope.Complete();
-        return new PagedModel<TContent> { Items = items, Total = totalRecords };
+        return result;
     }
 
-    /// <summary>
-    ///     Gets a single version of a content item.
-    /// </summary>
-    /// <param name="versionId">Id of the version to get.</param>
-    /// <param name="cancellationToken">A cancellation token.</param>
-    /// <returns>The version, or <c>null</c> when it does not exist.</returns>
-    public Task<TContent?> GetVersionAsync(int versionId, CancellationToken cancellationToken)
-        => Task.FromResult(GetVersion(versionId));
+    /// <inheritdoc />
+    public async Task<TContent?> GetVersionAsync(int versionId, CancellationToken cancellationToken)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        TContent? result = await _contentRepository.GetVersionAsync(versionId, cancellationToken);
+        scope.Complete();
+        return result;
+    }
 
-    /// <summary>
-    ///     Gets every version of a content item, newest first.
-    /// </summary>
-    /// <param name="contentKey">Key of the content item.</param>
-    /// <param name="cancellationToken">A cancellation token.</param>
-    /// <returns>The versions, or an empty collection when the content item does not exist.</returns>
+    /// <inheritdoc />
     public async Task<IEnumerable<TContent>> GetVersionsAsync(Guid contentKey, CancellationToken cancellationToken)
     {
-        Attempt<int> idAttempt = await IdKeyMap.GetIdForKeyAsync(contentKey, ContentObjectType);
-        if (idAttempt.Success is false)
-        {
-            return Enumerable.Empty<TContent>();
-        }
-
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        IEnumerable<TContent> result = _contentRepository.GetAllVersions(idAttempt.Result);
+        IEnumerable<TContent> result = await _contentRepository.GetAllVersionsAsync(contentKey, cancellationToken);
         scope.Complete();
         return result;
     }
 
-    /// <summary>
-    ///     Gets a page of versions of a content item, newest first, without their property data.
-    /// </summary>
-    /// <param name="contentKey">Key of the content item.</param>
-    /// <param name="skip">Number of versions to skip.</param>
-    /// <param name="take">Number of versions to take.</param>
-    /// <param name="cancellationToken">A cancellation token.</param>
-    /// <returns>The versions, or an empty collection when the content item does not exist.</returns>
+    /// <inheritdoc />
     public async Task<IEnumerable<TContent>> GetVersionsSlimAsync(Guid contentKey, int skip, int take, CancellationToken cancellationToken)
     {
-        Attempt<int> idAttempt = await IdKeyMap.GetIdForKeyAsync(contentKey, ContentObjectType);
-        if (idAttempt.Success is false)
-        {
-            return Enumerable.Empty<TContent>();
-        }
-
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        IEnumerable<TContent> result = _contentRepository.GetAllVersionsSlim(idAttempt.Result, skip, take);
+        IEnumerable<TContent> result = await _contentRepository.GetAllVersionsSlimAsync(contentKey, skip, take, cancellationToken);
         scope.Complete();
         return result;
     }
 
-    /// <summary>
-    ///     Gets a page of version ids of a content item, newest first.
-    /// </summary>
-    /// <param name="contentKey">Key of the content item.</param>
-    /// <param name="skip">Number of version ids to skip.</param>
-    /// <param name="take">Number of version ids to take.</param>
-    /// <param name="cancellationToken">A cancellation token.</param>
-    /// <returns>The version ids, or an empty collection when the content item does not exist.</returns>
+    /// <inheritdoc />
     public async Task<IEnumerable<int>> GetVersionIdsAsync(Guid contentKey, int skip, int take, CancellationToken cancellationToken)
     {
-        Attempt<int> idAttempt = await IdKeyMap.GetIdForKeyAsync(contentKey, ContentObjectType);
-        if (idAttempt.Success is false)
-        {
-            return Enumerable.Empty<int>();
-        }
-
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-
-        // The underlying NPoco query only supports a maximum row count, not an offset, so over-fetch
-        // and skip in memory - version counts per node are small, this never approaches query-size limits.
-        int maxRows = skip > int.MaxValue - take ? int.MaxValue : skip + take;
-        IEnumerable<int> result = _contentRepository.GetVersionIds(idAttempt.Result, maxRows).Skip(skip);
-        scope.Complete();
-        return result;
-    }
-
-    private TContent? GetVersion(int versionId)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        scope.ReadLock(ReadLockIds);
-        TContent? result = _contentRepository.GetVersion(versionId);
+        IEnumerable<int> result = await _contentRepository.GetVersionIdsAsync(contentKey, skip, take, cancellationToken);
         scope.Complete();
         return result;
     }
@@ -755,72 +547,86 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <summary>
     ///     Gets content having an expiration date before (lower than, or equal to) a specified date.
     /// </summary>
+    /// <param name="date">The date to check expiration against.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An Enumerable list of <see cref="TContent" /> objects</returns>
     /// <remarks>
     ///     The content returned from this method may be culture variant, in which case you can use
     ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IPublishableContentBase, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
-    public IEnumerable<TContent> GetContentForExpiration(DateTime date)
+    public async Task<IEnumerable<TContent>> GetContentForExpirationAsync(DateTime date, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetContentForExpiration(date);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        IEnumerable<TContent> result = await _contentRepository.GetContentForExpirationAsync(date, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <summary>
     ///     Gets content having a release date before (lower than, or equal to) a specified date.
     /// </summary>
+    /// <param name="date">The date to check release against.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An Enumerable list of <see cref="TContent" /> objects.</returns>
     /// <remarks>
     ///     The content returned from this method may be culture variant, in which case you can use
     ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IPublishableContentBase, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
-    public IEnumerable<TContent> GetContentForRelease(DateTime date)
+    public async Task<IEnumerable<TContent>> GetContentForReleaseAsync(DateTime date, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetContentForRelease(date);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        IEnumerable<TContent> result = await _contentRepository.GetContentForReleaseAsync(date, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <summary>
     ///     Checks whether an <see cref="TContent" /> item has any children
     /// </summary>
-    /// <param name="id">Id of the <see cref="TContent" /></param>
+    /// <param name="key">Guid key of the <see cref="TContent" /></param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>True if the content has any children otherwise False</returns>
-    public bool HasChildren(int id) => CountChildren(id) > 0;
+    public async Task<bool> HasChildrenAsync(Guid key, CancellationToken cancellationToken) =>
+        await CountChildrenAsync(key, null, cancellationToken) > 0;
 
-    /// <summary>
-    /// Checks if the <see cref="TContent"/> and all its ancestors are published.
-    /// </summary>
-    /// <param name="content">The content to check.</param>
-    /// <returns><c>true</c> if the content and all its ancestors are published; otherwise, <c>false</c>.</returns>
-    public bool IsPathPublished(TContent? content)
+    /// <inheritdoc />
+    public async Task<bool> IsPathPublishedAsync(TContent? content, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.IsPathPublished(content);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        bool result = await _contentRepository.IsPathPublishedAsync(content, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <summary>
     ///     Gets the parent of the current content as an <see cref="TContent" /> item.
     /// </summary>
     /// <param name="content"><see cref="TContent" /> to retrieve the parent from</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>Parent <see cref="TContent" /> object</returns>
-    public TContent? GetParent(TContent? content)
+    public async Task<TContent?> GetParentAsync(TContent? content, CancellationToken cancellationToken)
     {
-        if (content?.ParentId == Constants.System.Root || content?.ParentId == Constants.System.RecycleBinContent ||
+        if (content?.ParentId == Constants.System.Root || content?.ParentId == RecycleBinId ||
             content is null)
         {
             return null;
         }
 
-        return GetById(content.ParentId);
+        // content is caller-supplied and not guaranteed to have gone through a read path that populated
+        // ParentKey (e.g. a freshly constructed, unsaved entity), so resolve it here when it is unknown.
+        // Everywhere else ParentKey is expected to already be populated.
+        if (content.TryGetParentKey(out Guid? parentKey) is false)
+        {
+            Attempt<Guid> parentKeyAttempt = await _idKeyMap.GetKeyForIdAsync(content.ParentId, ContentObjectType);
+            parentKey = parentKeyAttempt.Success ? parentKeyAttempt.Result : null;
+        }
+
+        return parentKey is null
+            ? null
+            : await GetByIdAsync(parentKey.Value, cancellationToken);
     }
 
     #endregion
@@ -828,158 +634,156 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     #region Save, Publish, Unpublish
 
     /// <inheritdoc />
-    public OperationResult Save(TContent content, int? userId = null, ContentScheduleCollection? contentSchedule = null)
+    public async Task<Attempt<ContentSaveOperationStatus>> SaveAsync(TContent content, Guid userKey, ContentScheduleCollection? contentSchedule, CancellationToken cancellationToken)
     {
         PublishedState publishedState = content.PublishedState;
-        if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
+        if (publishedState is not (PublishedState.Published or PublishedState.Unpublished))
         {
-            throw new InvalidOperationException(
-                $"Cannot save (un)publishing content with name: {content.Name} - and state: {content.PublishedState}, use the dedicated SavePublished method.");
+            return Attempt.Fail(ContentSaveOperationStatus.InvalidPublishedState);
         }
 
-        if (content.Name != null && content.Name.Length > Constants.Validation.MaxNameLength)
+        if (content.Name is { Length: > Constants.Validation.MaxNameLength })
         {
-            throw new InvalidOperationException(
-                $"Content with the name {content.Name} cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
+            return Attempt.Fail(ContentSaveOperationStatus.InvalidName);
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockIds);
+
+        SavingNotification<TContent> savingNotification = CreateSavingNotification(content, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
-            scope.WriteLock(WriteLockIds);
+            scope.Complete();
+            return Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification);
+        }
 
-            SavingNotification<TContent> savingNotification = SavingNotification(content, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+
+        if (content.HasIdentity is false)
+        {
+            content.CreatorId = userId;
+        }
+
+        content.WriterId = userId;
+
+        List<string>? culturesChanging = content.ContentType.VariesByCulture()
+            ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
+            : null;
+
+        IReadOnlyCollection<string>? savedCultures = content.ContentType.VariesByCulture()
+            ? culturesChanging
+            : content.IsDirty() ? ["*"] : [];
+
+        await _contentRepository.SaveAsync(content, cancellationToken);
+
+        if (contentSchedule is not null)
+        {
+            await _contentRepository.PersistContentScheduleAsync(content, contentSchedule, cancellationToken);
+        }
+
+        scope.Notifications.Publish(
+            CreateSavedNotification(content, eventMessages, BuildCultureMap(content, savedCultures)).WithStateFrom(savingNotification));
+
+        scope.Notifications.Publish(CreateTreeChangeNotification(content, TreeChangeTypes.RefreshNode, eventMessages));
+
+        if (culturesChanging is not null)
+        {
+            IEnumerable<ILanguage> allLangs = await _languageRepository.GetAllAsync(cancellationToken);
+            var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesChanging);
+            await AuditAsync(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
+        }
+        else
+        {
+            await AuditAsync(AuditType.Save, userId, content.Id);
+        }
+
+        scope.Complete();
+
+        return Attempt.Succeed(ContentSaveOperationStatus.Success);
+    }
+
+    /// <inheritdoc />
+    public async Task<Attempt<ContentSaveOperationStatus>> SaveAsync(IEnumerable<TContent> contents, Guid userKey, CancellationToken cancellationToken)
+    {
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        TContent[] contentsA = [.. contents];
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockIds);
+
+        SavingNotification<TContent> savingNotification = CreateSavingNotification(contentsA, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+        {
+            scope.Complete();
+            return Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification);
+        }
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+
+        var savedCultures = new Dictionary<Guid, IReadOnlyCollection<string>>();
+        foreach (TContent content in contentsA)
+        {
+            if (content.HasIdentity is false)
             {
-                scope.Complete();
-                return OperationResult.Cancel(eventMessages);
+                content.CreatorId = userId;
             }
 
-            userId ??= Constants.Security.SuperUserId;
+            content.WriterId = userId;
 
-            if (content.HasIdentity == false)
-            {
-                content.CreatorId = userId.Value;
-            }
-
-            content.WriterId = userId.Value;
-
-            // track the cultures that have changed
-            List<string>? culturesChanging = content.ContentType.VariesByCulture()
-                ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
-                : null;
-
-            // the saved notification reports the changed cultures for variant content, or the "*" marker for invariant
-            // content - but only when something actually changed. Captured here before saving resets change tracking.
-            IReadOnlyCollection<string>? savedCultures = content.ContentType.VariesByCulture()
-                ? culturesChanging
+            // capture the changing cultures before saving resets change tracking on the entity. Invariant content
+            // reports the "*" marker, but only when something actually changed (mirroring the variant delta).
+            IReadOnlyCollection<string>? culturesChanging = content.ContentType.VariesByCulture()
+                ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToArray()
                 : content.IsDirty() ? ["*"] : [];
-
-            // TODO: Currently there's no way to change track which variant properties have changed, we only have change
-            // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
-            // in this particular case, determining which cultures have changed works with the above with names since it will
-            // have always changed if it's been saved in the back office but that's not really fail safe.
-            _contentRepository.Save(content);
-
-            if (contentSchedule != null)
+            if (culturesChanging is { Count: > 0 })
             {
-                _contentRepository.PersistContentSchedule(content, contentSchedule);
+                savedCultures[content.Key] = culturesChanging;
             }
 
-            scope.Notifications.Publish(
-                SavedNotification(content, eventMessages, BuildCultureMap(content, savedCultures)).WithStateFrom(savingNotification));
-
-            // TODO: we had code here to FORCE that this event can never be suppressed. But that just doesn't make a ton of sense?!
-            // I understand that if its suppressed that the caches aren't updated, but that would be expected. If someone
-            // is supressing events then I think it's expected that nothing will happen. They are probably doing it for perf
-            // reasons like bulk import and in those cases we don't want this occuring.
-            scope.Notifications.Publish(TreeChangeNotification(content, TreeChangeTypes.RefreshNode, eventMessages));
-
-            if (culturesChanging != null)
-            {
-                var langs = GetLanguageDetailsForAuditEntry(culturesChanging);
-                Audit(AuditType.SaveVariant, userId.Value, content.Id, $"Saved languages: {langs}", langs);
-            }
-            else
-            {
-                Audit(AuditType.Save, userId.Value, content.Id);
-            }
-
-            scope.Complete();
+            await _contentRepository.SaveAsync(content, cancellationToken);
         }
 
-        return OperationResult.Succeed(eventMessages);
+        scope.Notifications.Publish(
+            CreateSavedNotification(contentsA, eventMessages, savedCultures).WithStateFrom(savingNotification));
+
+        // TODO: See note above about supressing events
+        scope.Notifications.Publish(CreateTreeChangeNotification(contentsA, TreeChangeTypes.RefreshNode, eventMessages));
+
+        await AuditAsync(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items (#{contentsA.Length})");
+
+        scope.Complete();
+
+        return Attempt.Succeed(ContentSaveOperationStatus.Success);
     }
 
-    // Bridges ElementService.SaveAsync until elements have an async repository.
-    public OperationResult Save(IEnumerable<TContent> contents, int userId = Constants.Security.SuperUserId)
+    /// <inheritdoc/>
+    public async Task<PublishResult> PublishAsync(TContent content, string[] cultures, Guid userKey, CancellationToken cancellationToken)
     {
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        TContent[] contentsA = contents.ToArray();
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        if (content is null)
         {
-            scope.WriteLock(WriteLockIds);
-
-            SavingNotification<TContent> savingNotification = SavingNotification(contentsA, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return OperationResult.Cancel(eventMessages);
-            }
-
-            var savedCultures = new Dictionary<Guid, IReadOnlyCollection<string>>();
-            foreach (TContent content in contentsA)
-            {
-                if (content.HasIdentity == false)
-                {
-                    content.CreatorId = userId;
-                }
-
-                content.WriterId = userId;
-
-                // capture the changing cultures before saving resets change tracking on the entity. Invariant content
-                // reports the "*" marker, but only when something actually changed (mirroring the variant delta).
-                IReadOnlyCollection<string>? culturesChanging = content.ContentType.VariesByCulture()
-                    ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToArray()
-                    : content.IsDirty() ? ["*"] : [];
-                if (culturesChanging is { Count: > 0 })
-                {
-                    savedCultures[content.Key] = culturesChanging;
-                }
-
-                _contentRepository.Save(content);
-            }
-
-            scope.Notifications.Publish(
-                SavedNotification(contentsA, eventMessages, savedCultures).WithStateFrom(savingNotification));
-
-            // TODO: See note above about supressing events
-            scope.Notifications.Publish(TreeChangeNotification(contentsA, TreeChangeTypes.RefreshNode, eventMessages));
-
-            Audit(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items (#{contentsA.Length})");
-
-            scope.Complete();
+            throw new ArgumentNullException(nameof(content));
         }
 
-        return OperationResult.Succeed(eventMessages);
+        if (cultures is null)
+        {
+            throw new ArgumentNullException(nameof(cultures));
+        }
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        IUser user = await _userService.Value.GetRequiredUserAsync(userKey);
+        return await PublishAsync(content, cultures, userId, user.HasAccessToInvariantForVariant(), cancellationToken);
     }
 
-    /// <summary>
-    ///     Publishes content.
-    /// </summary>
-    /// <remarks>
-    ///     <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
-    ///     <para>Wildcards (*) can be used as culture identifier to publish all cultures.</para>
-    ///     <para>An empty array (or a wildcard) can be passed for culture invariant content.</para>
-    /// </remarks>
-    /// <param name="content">The content to publish.</param>
-    /// <param name="cultures">The cultures to publish.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    public PublishResult Publish(TContent content, string[] cultures, int userId = Constants.Security.SuperUserId)
+    // Takes the resolved int id directly so an internal caller that already holds one (e.g. a content
+    // version's WriterId) doesn't have to round-trip it through a Guid lookup - that round trip is lossy
+    // for a writer id with no matching user (it has no Guid to resolve to or from). For the same reason the
+    // invariant-for-variant decision is passed in rather than read from the user: scheduled publishing has
+    // no acting user to read it from.
+    private async Task<PublishResult> PublishAsync(TContent content, string[] cultures, int userId, bool includeInvariantForVariant, CancellationToken cancellationToken)
     {
-        if (content == null)
+        if (content is null)
         {
             throw new ArgumentNullException(nameof(content));
         }
@@ -994,7 +798,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             throw new ArgumentException("Cultures cannot be null or whitespace", nameof(cultures));
         }
 
-        cultures = cultures.Select(x => x.EnsureCultureCode()!).ToArray();
+        cultures = [.. cultures.Select(x => x.EnsureCultureCode()!)];
 
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
@@ -1004,16 +808,16 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             return new PublishResult(PublishResultType.FailedPublishUnsavedChanges, evtMsgs, content);
         }
 
-        if (content.Name != null && content.Name.Length > Constants.Validation.MaxNameLength)
+        if (content.Name is { Length: > Constants.Validation.MaxNameLength })
         {
             throw new InvalidOperationException($"Name cannot be more than {Constants.Validation.MaxNameLength} characters in length.");
         }
 
         PublishedState publishedState = content.PublishedState;
-        if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
+        if (publishedState is not (PublishedState.Published or PublishedState.Unpublished))
         {
             throw new InvalidOperationException(
-                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitContentChanges)} method.");
+                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitContentChangesAsync)} method.");
         }
 
         // cannot accept invariant (null or empty) culture for variant content type
@@ -1029,7 +833,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         {
             if (cultures.Length == 0)
             {
-                cultures = new[] { "*" };
+                cultures = ["*"];
             }
 
             if (cultures[0] != "*" || cultures.Length > 1)
@@ -1038,61 +842,39 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             }
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockIds);
+
+        IReadOnlyCollection<ILanguage> allLangs = (await _languageRepository.GetAllAsync(cancellationToken)).ToList();
+
+        // this will create the correct culture impact even if culture is * or null
+        IEnumerable<CultureImpact?> impacts =
+            cultures.Select(culture => _cultureImpactFactory.Create(culture, content, includeInvariantForVariant));
+
+        // publish the culture(s)
+        // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
+        var publishTime = DateTime.UtcNow;
+        foreach (CultureImpact? impact in impacts)
         {
-            IUser user = GetRequiredUser(userId);
-
-            scope.WriteLock(WriteLockIds);
-
-            // TODO: Await this properly when adjusting this service to our new EF Core approach.
-            var allLangs = _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList();
-
-            // this will create the correct culture impact even if culture is * or null
-            IEnumerable<CultureImpact?> impacts =
-                cultures.Select(culture => _cultureImpactFactory.Create(culture, content, includeInvariantForVariant: user.HasAccessToInvariantForVariant()));
-
-            // publish the culture(s)
-            // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
-            var publishTime = DateTime.UtcNow;
-            foreach (CultureImpact? impact in impacts)
-            {
-                content.PublishCulture(impact, publishTime, _propertyEditorCollection);
-            }
-
-            // Change state to publishing
-            content.PublishedState = PublishedState.Publishing;
-
-            PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, new Dictionary<string, object?>(), userId, includeInvariantForVariant: null);
-            scope.Complete();
-            return result;
+            content.PublishCulture(impact, publishTime, _propertyEditorCollection);
         }
+
+        // Change state to publishing
+        content.PublishedState = PublishedState.Publishing;
+
+        PublishResult result = await CommitContentChangesAsync(scope, content, evtMsgs, allLangs, new Dictionary<string, object?>(), userId, includeInvariantForVariant, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
-    /// <summary>
-    ///     Saves and publishes content in a single scope.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         For invariant content types, <paramref name="culturesToPublish" /> must be empty; the content is
-    ///         saved and the invariant culture is published.
-    ///     </para>
-    ///     <para>
-    ///         For variant content types, only the cultures listed in <paramref name="culturesToPublish" /> are
-    ///         published. Wildcards (<c>"*"</c>), nulls, whitespace and duplicate entries are not accepted. Passing
-    ///         an empty array saves the content without publishing any culture.
-    ///     </para>
-    /// </remarks>
-    /// <param name="content">The content to publish.</param>
-    /// <param name="culturesToPublish">The cultures to publish, or an empty array for invariant content.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <returns>The result of the publish operation, or a failure result if saving failed.</returns>
-    public PublishResult SaveAndPublish(TContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId)
+    /// <inheritdoc />
+    public async Task<PublishResult> SaveAndPublishAsync(TContent content, string[] culturesToPublish, Guid userKey, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(content);
         ArgumentNullException.ThrowIfNull(culturesToPublish);
 
         // wildcards and nulls are not accepted here; cultures must be explicit
-        if (culturesToPublish.Any(x => x == null || x == "*"))
+        if (culturesToPublish.Any(x => x is null or "*"))
         {
             throw new InvalidOperationException(
                 "Only valid cultures are allowed to be used in this method, wildcards or nulls are not allowed");
@@ -1100,7 +882,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
         EnsureCulturesAreValid(culturesToPublish, nameof(culturesToPublish));
 
-        culturesToPublish = culturesToPublish.Select(x => x.EnsureCultureCode()!).ToArray();
+        culturesToPublish = [.. culturesToPublish.Select(x => x.EnsureCultureCode()!)];
 
         EnsureNameLengthIsValid(content);
 
@@ -1117,27 +899,28 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             }
 
             // doesn't vary; publish the invariant culture in a single scope alongside the save
-            return SaveAndPublish(content, userId: userId);
+            return await SaveAndPublishAsync(content, "*", userKey, cancellationToken);
         }
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        IUser user = await _userService.Value.GetRequiredUserAsync(userKey);
+        var includeInvariantForVariant = user.HasAccessToInvariantForVariant();
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
 
-        var allLangs = _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList();
+        var allLangs = (await _languageRepository.GetAllAsync(cancellationToken)).ToList();
 
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        SavingNotification<TContent> savingNotification = SavingNotification(content, evtMsgs);
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        SavingNotification<TContent> savingNotification = CreateSavingNotification(content, evtMsgs);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
         }
 
-        IUser user = GetRequiredUser(userId);
-        IEnumerable<CultureImpact> impacts = culturesToPublish
-            .Select(x => _cultureImpactFactory.ImpactExplicit(
-                x,
-                includeInvariantForVariant: user.HasAccessToInvariantForVariant()));
+        IEnumerable<CultureImpact> impacts =
+            culturesToPublish.Select(x => _cultureImpactFactory.ImpactExplicit(x, includeInvariantForVariant));
 
         // publish the culture(s)
         // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -1146,21 +929,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
         }
 
-        PublishResult result = CommitContentChangesInternal(
-            scope,
-            content,
-            evtMsgs,
-            allLangs,
-            savingNotification.State,
-            userId,
-            branchOne: false,
-            branchRoot: false,
-            raiseSavedNotification: true);
+        PublishResult result = await CommitContentChangesInternalAsync(scope, content, evtMsgs, allLangs, savingNotification.State, userId, cancellationToken, raiseSavedNotification: true, includeInvariantForVariant: includeInvariantForVariant);
         scope.Complete();
         return result;
     }
 
-    private PublishResult SaveAndPublish(TContent content, string culture = "*", int userId = Constants.Security.SuperUserId)
+    private async Task<PublishResult> SaveAndPublishAsync(TContent content, string culture, Guid userKey, CancellationToken cancellationToken)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
@@ -1186,40 +960,31 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
         EnsureNameLengthIsValid(content);
 
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        IUser user = await _userService.Value.GetRequiredUserAsync(userKey);
+        var includeInvariantForVariant = user.HasAccessToInvariantForVariant();
+
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
 
-        var allLangs = _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList();
+        var allLangs = (await _languageRepository.GetAllAsync(cancellationToken)).ToList();
 
         // Change state to publishing
         content.PublishedState = PublishedState.Publishing;
-        SavingNotification<TContent> savingNotification = SavingNotification(content, evtMsgs);
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        SavingNotification<TContent> savingNotification = CreateSavingNotification(content, evtMsgs);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
         }
 
         // this will create the correct culture impact even if culture is * or null
-        IUser user = GetRequiredUser(userId);
-        var impact = _cultureImpactFactory.Create(
-            culture,
-            content,
-            includeInvariantForVariant: user.HasAccessToInvariantForVariant());
+        var impact = _cultureImpactFactory.Create(culture, content, includeInvariantForVariant);
 
         // publish the culture(s)
         // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
         content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
 
-        PublishResult result = CommitContentChangesInternal(
-            scope,
-            content,
-            evtMsgs,
-            allLangs,
-            savingNotification.State,
-            userId,
-            branchOne: false,
-            branchRoot: false,
-            raiseSavedNotification: true);
+        PublishResult result = await CommitContentChangesInternalAsync(scope, content, evtMsgs, allLangs, savingNotification.State, userId, cancellationToken, raiseSavedNotification: true, includeInvariantForVariant: includeInvariantForVariant);
         scope.Complete();
         return result;
     }
@@ -1243,31 +1008,26 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     private static void EnsurePublishedStateAllowsPublish(TContent content)
     {
         PublishedState publishedState = content.PublishedState;
-        if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
+        if (publishedState is not (PublishedState.Published or PublishedState.Unpublished))
         {
             throw new InvalidOperationException(
-                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitContentChanges)} method.");
+                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitContentChangesAsync)} method.");
         }
     }
 
-    /// <summary>
-    ///     Unpublishes content.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         By default, unpublishes the content as a whole, but it is possible to specify a culture to be
-    ///         unpublished. Depending on whether that culture is mandatory, and other cultures remain published,
-    ///         the content as a whole may or may not remain published.
-    ///     </para>
-    ///     <para>
-    ///         If the content type is variant, then culture can be either '*' or an actual culture, but neither null nor
-    ///         empty. If the content type is invariant, then culture can be either '*' or null or empty.
-    ///     </para>
-    /// </remarks>
-    /// <param name="content">The content to unpublish.</param>
-    /// <param name="culture">The culture to unpublish, or "*" for all cultures.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    public PublishResult Unpublish(TContent content, string? culture = "*", int userId = Constants.Security.SuperUserId)
+    /// <inheritdoc />
+    public async Task<PublishResult> UnpublishAsync(TContent content, string? culture, Guid userKey, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(content);
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        return await UnpublishAsync(content, culture, userId, cancellationToken);
+    }
+
+    // Takes the resolved int id directly so an internal caller that already holds one (e.g. a content
+    // version's WriterId) doesn't have to round-trip it through a Guid lookup - that round trip is lossy
+    // for a writer id with no matching user (it has no Guid to resolve to or from).
+    private async Task<PublishResult> UnpublishAsync(TContent content, string? culture, int userId, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(content);
 
@@ -1276,24 +1036,24 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         culture = culture?.NullOrWhiteSpaceAsNull().EnsureCultureCode();
 
         PublishedState publishedState = content.PublishedState;
-        if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
+        if (publishedState is not (PublishedState.Published or PublishedState.Unpublished))
         {
             throw new InvalidOperationException(
-                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitContentChanges)} method.");
+                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitContentChangesAsync)} method.");
         }
 
         // cannot accept invariant (null or empty) culture for variant content type
         // cannot accept a specific culture for invariant content type (but '*' is ok)
         if (content.ContentType.VariesByCulture())
         {
-            if (culture == null)
+            if (culture is null)
             {
                 throw new NotSupportedException("Invariant culture is not supported by variant content types.");
             }
         }
         else
         {
-            if (culture != null && culture != "*")
+            if (culture is not null and not "*")
             {
                 throw new NotSupportedException(
                     $"Culture \"{culture}\" is not supported by invariant content types.");
@@ -1310,24 +1070,23 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         {
             scope.WriteLock(WriteLockIds);
 
-            // TODO: Await this properly when adjusting this service to our new EF Core approach.
-            var allLangs = _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList();
+            var allLangs = (await _languageRepository.GetAllAsync(cancellationToken)).ToList();
 
-            SavingNotification<TContent> savingNotification = SavingNotification(content, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingNotification))
+            SavingNotification<TContent> savingNotification = CreateSavingNotification(content, evtMsgs);
+            if (await scope.Notifications.PublishCancelableAsync(savingNotification))
             {
                 return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
             }
 
             // all cultures = unpublish whole
-            if (culture == "*" || (!content.ContentType.VariesByCulture() && culture == null))
+            if (culture == "*" || (!content.ContentType.VariesByCulture() && culture is null))
             {
                 // Unpublish the culture, this will change the content state to Publishing! ... which is expected because this will
                 // essentially be re-publishing the content with the requested culture removed
                 // We are however unpublishing all cultures, so we will set this to unpublishing.
                 content.UnpublishCulture(culture);
                 content.PublishedState = PublishedState.Unpublishing;
-                PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, savingNotification.State, userId, includeInvariantForVariant: null);
+                PublishResult result = await CommitContentChangesAsync(scope, content, evtMsgs, allLangs, savingNotification.State, userId, includeInvariantForVariant: null, cancellationToken);
                 scope.Complete();
                 return result;
             }
@@ -1335,20 +1094,20 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             {
                 // Unpublish the culture, this will change the content state to Publishing! ... which is expected because this will
                 // essentially be re-publishing the content with the requested culture removed.
-                // The call to CommitContentChangesInternal will perform all the checks like if this is a mandatory culture or the last culture being unpublished
+                // The call to CommitContentChangesInternalAsync will perform all the checks like if this is a mandatory culture or the last culture being unpublished
                 // and will then unpublish the content accordingly.
                 // If the result of this is false it means there was no culture to unpublish (i.e. it was already unpublished or it did not exist)
                 var removed = content.UnpublishCulture(culture);
 
                 // Save and publish any changes
-                PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, savingNotification.State, userId, includeInvariantForVariant: null);
+                PublishResult result = await CommitContentChangesAsync(scope, content, evtMsgs, allLangs, savingNotification.State, userId, includeInvariantForVariant: null, cancellationToken);
 
                 scope.Complete();
 
                 // In one case the result will be PublishStatusType.FailedPublishNothingToPublish which means that no cultures
                 // were specified to be published which will be the case when removed is false. In that case
                 // we want to swap the result type to PublishResultType.SuccessUnpublishAlready (that was the expectation before).
-                if (result.Result == PublishResultType.FailedPublishNothingToPublish && !removed)
+                if (result is { Result: PublishResultType.FailedPublishNothingToPublish } && !removed)
                 {
                     return new PublishResult(PublishResultType.SuccessUnpublishAlready, evtMsgs, content);
                 }
@@ -1358,37 +1117,34 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <summary>
-    ///     Publishes and unpublishes scheduled content.
-    /// </summary>
-    /// <param name="date">The date to use for determining scheduled actions.</param>
-    /// <returns>The publish results.</returns>
-    public IEnumerable<PublishResult> PerformScheduledPublish(DateTime date)
+    /// <inheritdoc />
+    public async Task<IEnumerable<PublishResult>> PerformScheduledPublishAsync(DateTime date, CancellationToken cancellationToken)
     {
-        // TODO: Await this properly when adjusting this service to our new EF Core approach.
-        var allLangs = new Lazy<List<ILanguage>>(() => _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList());
+        // Lazy, and shared by both helpers: the languages are fetched at most once per call, and not at all
+        // when neither helper finds anything scheduled.
+        var allLangs = new Lazy<Task<List<ILanguage>>>(async () => [.. (await _languageRepository.GetAllAsync(cancellationToken))]);
         EventMessages evtMsgs = EventMessagesFactory.Get();
         var results = new List<PublishResult>();
 
-        PerformScheduledPublishingRelease(date, results, evtMsgs, allLangs);
-        PerformScheduledPublishingExpiration(date, results, evtMsgs, allLangs);
+        await PerformScheduledPublishingReleaseAsync(date, results, evtMsgs, allLangs, cancellationToken);
+        await PerformScheduledPublishingExpirationAsync(date, results, evtMsgs, allLangs, cancellationToken);
 
         return results;
     }
 
-    private void PerformScheduledPublishingExpiration(DateTime date, List<PublishResult> results, EventMessages evtMsgs, Lazy<List<ILanguage>> allLangs)
+    private async Task PerformScheduledPublishingExpirationAsync(DateTime date, List<PublishResult> results, EventMessages evtMsgs, Lazy<Task<List<ILanguage>>> allLangs, CancellationToken cancellationToken)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         // do a fast read without any locks since this executes often to see if we even need to proceed
-        if (_contentRepository.HasContentForExpiration(date))
+        if (await _contentRepository.HasContentForExpirationAsync(date, cancellationToken))
         {
             // now take a write lock since we'll be updating
             scope.WriteLock(WriteLockIds);
 
-            foreach (TContent d in _contentRepository.GetContentForExpiration(date))
+            foreach (TContent d in await _contentRepository.GetContentForExpirationAsync(date, cancellationToken))
             {
-                ContentScheduleCollection contentSchedule = _contentRepository.GetContentSchedule(d.Id);
+                ContentScheduleCollection contentSchedule = await _contentRepository.GetContentScheduleAsync(d.Key, cancellationToken);
                 if (d.ContentType.VariesByCulture())
                 {
                     // find which cultures have pending schedules
@@ -1402,8 +1158,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                         continue; // shouldn't happen but no point in processing this content if there's nothing there
                     }
 
-                    SavingNotification<TContent> savingNotification = SavingNotification(d, evtMsgs);
-                    if (scope.Notifications.PublishCancelable(savingNotification))
+                    SavingNotification<TContent> savingNotification = CreateSavingNotification(d, evtMsgs);
+                    if (await scope.Notifications.PublishCancelableAsync(savingNotification))
                     {
                         results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
                         continue;
@@ -1418,9 +1174,9 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                         d.UnpublishCulture(c);
                     }
 
-                    _contentRepository.PersistContentSchedule(d, contentSchedule);
-                    PublishResult result = CommitContentChanges(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId, includeInvariantForVariant: true);
-                    if (result.Success == false)
+                    await _contentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
+                    PublishResult result = await CommitContentChangesAsync(scope, d, evtMsgs, await allLangs.Value, savingNotification.State, d.WriterId, includeInvariantForVariant: true, cancellationToken);
+                    if (result is { Success: false })
                     {
                         Logger.LogError(null, "Failed to publish content id={ContentId}, key={ContentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
@@ -1431,9 +1187,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 {
                     // Clear this schedule for this culture
                     contentSchedule.Clear(ContentScheduleAction.Expire, date);
-                    _contentRepository.PersistContentSchedule(d, contentSchedule);
-                    PublishResult result = Unpublish(d, userId: d.WriterId);
-                    if (result.Success == false)
+                    await _contentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
+
+                    // Uses the int-userId overload directly: WriterId is passed through as-is, with no Guid
+                    // round trip that would be lossy for a writer id with no matching user.
+                    PublishResult result = await UnpublishAsync(d, "*", d.WriterId, cancellationToken);
+                    if (result is { Success: false })
                     {
                         Logger.LogError(null, "Failed to unpublish content id={ContentId}, key={ContentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
@@ -1442,25 +1201,25 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 }
             }
 
-            _contentRepository.ClearSchedule(date, ContentScheduleAction.Expire);
+            await _contentRepository.ClearScheduleAsync(date, ContentScheduleAction.Expire, cancellationToken);
         }
 
         scope.Complete();
     }
 
-    private void PerformScheduledPublishingRelease(DateTime date, List<PublishResult> results, EventMessages evtMsgs, Lazy<List<ILanguage>> allLangs)
+    private async Task PerformScheduledPublishingReleaseAsync(DateTime date, List<PublishResult> results, EventMessages evtMsgs, Lazy<Task<List<ILanguage>>> allLangs, CancellationToken cancellationToken)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         // do a fast read without any locks since this executes often to see if we even need to proceed
-        if (_contentRepository.HasContentForRelease(date))
+        if (await _contentRepository.HasContentForReleaseAsync(date, cancellationToken))
         {
             // now take a write lock since we'll be updating
             scope.WriteLock(WriteLockIds);
 
-            foreach (TContent d in _contentRepository.GetContentForRelease(date))
+            foreach (TContent d in await _contentRepository.GetContentForReleaseAsync(date, cancellationToken))
             {
-                ContentScheduleCollection contentSchedule = _contentRepository.GetContentSchedule(d.Id);
+                ContentScheduleCollection contentSchedule = await _contentRepository.GetContentScheduleAsync(d.Key, cancellationToken);
                 if (d.ContentType.VariesByCulture())
                 {
                     // find which cultures have pending schedules
@@ -1479,8 +1238,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     // are released with the cultures if any of them was scheduled with that access. The writer's access can't be used
                     // instead: the writer is the last user to save the content, not the user who scheduled it.
                     var includeInvariantForVariant = pendingReleases.Any(x => x.IncludeInvariantForVariant);
-                    SavingNotification<TContent> savingNotification = SavingNotification(d, evtMsgs);
-                    if (scope.Notifications.PublishCancelable(savingNotification))
+                    SavingNotification<TContent> savingNotification = CreateSavingNotification(d, evtMsgs);
+                    if (await scope.Notifications.PublishCancelableAsync(savingNotification))
                     {
                         results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
                         continue;
@@ -1504,7 +1263,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                         CultureImpact impact = _cultureImpactFactory.ImpactExplicit(culture, includeInvariantForVariant);
                         var tryPublish = d.PublishCulture(impact, date, _propertyEditorCollection) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
-                        if (invalidProperties != null && invalidProperties.Length > 0)
+                        if (invalidProperties is { Length: > 0 })
                         {
                             Logger.LogWarning(
                                 "Scheduled publishing will fail for content {ContentId} (key {ContentKey}) and culture {Culture} because of invalid properties {InvalidProperties}",
@@ -1532,18 +1291,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     }
                     else
                     {
-                        _contentRepository.PersistContentSchedule(d, contentSchedule);
-                        result = CommitContentChanges(
-                            scope,
-                            d,
-                            evtMsgs,
-                            allLangs.Value,
-                            savingNotification.State,
-                            d.WriterId,
-                            includeInvariantForVariant);
+                        await _contentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
+                        result = await CommitContentChangesAsync(scope, d, evtMsgs, await allLangs.Value, savingNotification.State, d.WriterId, includeInvariantForVariant, cancellationToken);
                     }
 
-                    if (result.Success == false)
+                    if (result is { Success: false })
                     {
                         Logger.LogError(null, "Failed to publish content id={ContentId}, key={ContentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
@@ -1563,11 +1315,15 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     }
                     else
                     {
-                        _contentRepository.PersistContentSchedule(d, contentSchedule);
-                        result = Publish(d, d.AvailableCultures.ToArray(), userId: d.WriterId);
+                        await _contentRepository.PersistContentScheduleAsync(d, contentSchedule, cancellationToken);
+
+                        // Uses the int-userId overload directly, matching the CommitContentChangesAsync calls
+                        // elsewhere in this method: WriterId is passed through as-is, with no Guid round trip
+                        // that would be lossy for a writer id with no matching user.
+                        result = await PublishAsync(d, [.. d.AvailableCultures], d.WriterId, includeInvariantForVariant: true, cancellationToken);
                     }
 
-                    if (result.Success == false)
+                    if (result is { Success: false })
                     {
                         Logger.LogError(null, "Failed to publish content id={ContentId}, key={ContentKey}, reason={Reason}.", d.Id, d.Key, result.Result);
                     }
@@ -1576,7 +1332,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 }
             }
 
-            _contentRepository.ClearSchedule(date, ContentScheduleAction.Release);
+            await _contentRepository.ClearScheduleAsync(date, ContentScheduleAction.Release, cancellationToken);
         }
 
         scope.Complete();
@@ -1590,9 +1346,19 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <param name="allLangs"></param>
     /// <param name="notificationState"></param>
     /// <param name="userId"></param>
+    /// <param name="cancellationToken"></param>
     /// <param name="branchOne"></param>
     /// <param name="branchRoot"></param>
     /// <param name="eventMessages"></param>
+    /// <param name="raiseSavedNotification">
+    ///     Whether to raise the "saved" notification once the content is persisted. The save-and-publish entry
+    ///     points enable it, because they combine a save and a publish and the paired "saved" notification still
+    ///     has to fire.
+    /// </param>
+    /// <param name="includeInvariantForVariant">
+    ///     Whether publishing includes invariant properties of variant content. When <c>null</c>, it is determined by the
+    ///     invariant-for-variant permission of the user identified by <paramref name="userId"/>.
+    /// </param>
     /// <returns></returns>
     /// <remarks>
     ///     <para>
@@ -1602,88 +1368,30 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     ///         saving/publishing, branch saving/publishing, etc...
     ///     </para>
     /// </remarks>
-    protected PublishResult CommitContentChangesInternal(
+    protected async Task<PublishResult> CommitContentChangesInternalAsync(
         ICoreScope scope,
         TContent content,
         EventMessages eventMessages,
         IReadOnlyCollection<ILanguage> allLangs,
         IDictionary<string, object?>? notificationState,
         int userId,
+        CancellationToken cancellationToken,
         bool branchOne = false,
-        bool branchRoot = false)
-        => CommitContentChangesInternal(
-            scope,
-            content,
-            eventMessages,
-            allLangs,
-            notificationState,
-            userId,
-            branchOne,
-            branchRoot,
-            raiseSavedNotification: false);
-
-    /// <inheritdoc cref="CommitContentChangesInternal(ICoreScope, TContent, EventMessages, IReadOnlyCollection{ILanguage}, IDictionary{string, object}, int, bool, bool)" />
-    /// <remarks>
-    ///     <para>
-    ///         <c>raiseSavedNotification</c> raises the "saved" notification once the content is persisted. The
-    ///         save-and-publish entry points enable it, because they combine a save and a publish and the paired
-    ///         "saved" notification still has to fire.
-    ///     </para>
-    ///     <para>
-    ///         A separate overload rather than an optional parameter on the one above, because adding a parameter to a
-    ///         protected member of a public class is a binary breaking change.
-    ///     </para>
-    /// </remarks>
-    protected PublishResult CommitContentChangesInternal(
-        ICoreScope scope,
-        TContent content,
-        EventMessages eventMessages,
-        IReadOnlyCollection<ILanguage> allLangs,
-        IDictionary<string, object?>? notificationState,
-        int userId,
-        bool branchOne,
-        bool branchRoot,
-        bool raiseSavedNotification)
-        => CommitContentChangesInternal(
-            scope,
-            content,
-            eventMessages,
-            allLangs,
-            notificationState,
-            userId,
-            branchOne,
-            branchRoot,
-            raiseSavedNotification,
-            includeInvariantForVariant: null);
-
-    /// <inheritdoc cref="CommitContentChangesInternal(ICoreScope, TContent, EventMessages, IReadOnlyCollection{ILanguage}, IDictionary{string, object}, int, bool, bool, bool)" />
-    /// <param name="includeInvariantForVariant">
-    ///     Whether publishing includes invariant properties of variant content. When <c>null</c>, it is determined by the
-    ///     invariant-for-variant permission of the user identified by <paramref name="userId"/>.
-    /// </param>
-    private PublishResult CommitContentChangesInternal(
-        ICoreScope scope,
-        TContent content,
-        EventMessages eventMessages,
-        IReadOnlyCollection<ILanguage> allLangs,
-        IDictionary<string, object?>? notificationState,
-        int userId,
-        bool branchOne,
-        bool branchRoot,
-        bool raiseSavedNotification,
-        bool? includeInvariantForVariant)
+        bool branchRoot = false,
+        bool raiseSavedNotification = false,
+        bool? includeInvariantForVariant = null)
     {
-        if (scope == null)
+        if (scope is null)
         {
             throw new ArgumentNullException(nameof(scope));
         }
 
-        if (content == null)
+        if (content is null)
         {
             throw new ArgumentNullException(nameof(content));
         }
 
-        if (eventMessages == null)
+        if (eventMessages is null)
         {
             throw new ArgumentNullException(nameof(eventMessages));
         }
@@ -1692,16 +1400,15 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         PublishResult? unpublishResult = null;
 
         // nothing set = republish it all
-        if (content.PublishedState != PublishedState.Publishing &&
-            content.PublishedState != PublishedState.Unpublishing)
+        if (content is not { PublishedState: PublishedState.Publishing or PublishedState.Unpublishing })
         {
             content.PublishedState = PublishedState.Publishing;
         }
 
         // State here is either Publishing or Unpublishing
         // Publishing to unpublish a culture may end up unpublishing everything so these flags can be flipped later
-        var publishing = content.PublishedState == PublishedState.Publishing;
-        var unpublishing = content.PublishedState == PublishedState.Unpublishing;
+        var publishing = content is { PublishedState: PublishedState.Publishing };
+        var unpublishing = content is { PublishedState: PublishedState.Unpublishing };
 
         var variesByCulture = content.ContentType.VariesByCulture();
 
@@ -1713,19 +1420,14 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             : null;
 
         // For a save-and-publish, capture the saved cultures the same way (and at the same point) as the standalone
-        // Save path - before persistence resets change tracking - so the "saved" notification honours the same
+        // SaveAsync path - before persistence resets change tracking - so the "saved" notification honours the same
         // SavedCultures contract: the changed cultures for variant content, or the "*" marker for changed invariant content.
         IReadOnlyCollection<string>? savedCultures = null;
         if (raiseSavedNotification)
         {
-            if (variesByCulture)
-            {
-                savedCultures = culturesChanging;
-            }
-            else
-            {
-                savedCultures = content.IsDirty() ? ["*"] : [];
-            }
+            savedCultures = variesByCulture
+                ? culturesChanging
+                : content.IsDirty() ? ["*"] : [];
         }
 
         var isNew = !content.HasIdentity;
@@ -1733,10 +1435,10 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         var previouslyPublished = content.HasIdentity && content.Published;
 
         // Inline method to persist the content with the contentRepository since this logic could be called a couple times below
-        void SaveContent(TContent c)
+        async Task SaveContentAsync(TContent c)
         {
             // save, always
-            if (c.HasIdentity == false)
+            if (c.HasIdentity is false)
             {
                 c.CreatorId = userId;
             }
@@ -1744,7 +1446,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             c.WriterId = userId;
 
             // saving does NOT change the published version, unless PublishedState is Publishing or Unpublishing
-            _contentRepository.Save(c);
+            await _contentRepository.SaveAsync(c, cancellationToken);
         }
 
         if (publishing)
@@ -1754,7 +1456,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             culturesPublishing = GetCulturesPublishing(content);
 
             // ensure that the content can be published, and publish handling events, business rules, etc
-            publishResult = StrategyCanPublish(
+            publishResult = await StrategyCanPublishAsync(
                 scope,
                 content, /*checkPath:*/
                 !branchOne || branchRoot,
@@ -1764,13 +1466,14 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 allLangs,
                 notificationState,
                 userId,
-                includeInvariantForVariant);
+                includeInvariantForVariant,
+                cancellationToken);
 
             if (publishResult.Success)
             {
                 // raise Publishing notification
-                if (scope.Notifications.PublishCancelable(
-                        PublishingNotification(content, eventMessages).WithState(notificationState)))
+                if (await scope.Notifications.PublishCancelableAsync(
+                        CreatePublishingNotification(content, eventMessages).WithState(notificationState)))
                 {
                     Logger.LogInformation("Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}", content.Name, content.Id, content.Key, "publishing was cancelled");
                     return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, eventMessages, content);
@@ -1780,15 +1483,15 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 publishResult = StrategyPublish(content, culturesPublishing, culturesUnpublishing, eventMessages);
 
                 // Check if a culture has been unpublished and if there are no cultures left, and then unpublish content as a whole
-                if (publishResult.Result == PublishResultType.SuccessUnpublishCulture &&
-                    content.PublishCultureInfos?.Count == 0)
+                if (publishResult is { Result: PublishResultType.SuccessUnpublishCulture } &&
+                    content.PublishCultureInfos is { Count: 0 })
                 {
                     // This is a special case! We are unpublishing the last culture and to persist that we need to re-publish without any cultures
                     // so the state needs to remain Publishing to do that. However, we then also need to unpublish the content and to do that
                     // the state needs to be Unpublishing and it cannot be both. This state is used within the contentRepository to know how to
                     // persist certain things. So before proceeding below, we need to save the Publishing state to publish no cultures, then we can
                     // mark the content for Unpublishing.
-                    SaveContent(content);
+                    await SaveContentAsync(content);
 
                     // Set the flag to unpublish and continue
                     unpublishing = content.Published; // if not published yet, nothing to do
@@ -1803,7 +1506,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 }
 
                 // Check for mandatory culture missing, and then unpublish content as a whole
-                if (publishResult.Result == PublishResultType.FailedPublishMandatoryCultureMissing)
+                if (publishResult is { Result: PublishResultType.FailedPublishMandatoryCultureMissing })
                 {
                     publishing = false;
                     unpublishing = content.Published; // if not published yet, nothing to do
@@ -1830,7 +1533,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 culturesPublishing = GetCulturesPublishing(content);
             }
 
-            TContent? newest = GetById(content.Id); // ensure we have the newest version - in scope
+            TContent? newest = await GetByIdAsync(content.Key, cancellationToken); // ensure we have the newest version - in scope
             if (content.VersionId != newest?.VersionId)
             {
                 return new PublishResult(PublishResultType.FailedPublishConcurrencyViolation, eventMessages, content);
@@ -1840,12 +1543,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             {
                 // ensure that the content can be unpublished, and unpublish
                 // handling events, business rules, etc
-                // note: StrategyUnpublish flips the PublishedState to Unpublishing!
+                // note: StrategyUnpublishAsync flips the PublishedState to Unpublishing!
                 // note: This unpublishes the entire content (not different variants)
-                unpublishResult = StrategyCanUnpublish(scope, content, eventMessages, notificationState);
+                unpublishResult = await StrategyCanUnpublishAsync(scope, content, eventMessages, notificationState, cancellationToken);
                 if (unpublishResult.Success)
                 {
-                    unpublishResult = StrategyUnpublish(content, eventMessages);
+                    unpublishResult = await StrategyUnpublishAsync(content, eventMessages, cancellationToken);
                 }
                 else
                 {
@@ -1868,7 +1571,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
 
         // Persist the content
-        SaveContent(content);
+        await SaveContentAsync(content);
 
         // A save-and-publish is also a save, so raise the paired "saved" notification (https://github.com/umbraco/Umbraco-CMS/issues/23523).
         // Positioned here, after the content is actually persisted, so it does not fire on the cancelled-publishing or
@@ -1876,7 +1579,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         if (raiseSavedNotification)
         {
             scope.Notifications.Publish(
-                SavedNotification(
+                CreateSavedNotification(
                     content,
                     eventMessages,
                     BuildCultureMap(content, savedCultures))
@@ -1891,29 +1594,25 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             {
                 // events and audit
                 scope.Notifications.Publish(
-                    UnpublishedNotification(
+                    CreateUnpublishedNotification(
                         content,
                         eventMessages,
                         BuildCultureMap(content, variesByCulture ? culturesUnpublishing : ["*"]))
                     .WithState(notificationState));
-                scope.Notifications.Publish(TreeChangeNotification(
+                scope.Notifications.Publish(CreateTreeChangeNotification(
                     content,
                     SupportsBranchPublishing ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode,
                     variesByCulture ? culturesPublishing.IsCollectionEmpty() ? null : culturesPublishing : null,
                     variesByCulture ? culturesUnpublishing.IsCollectionEmpty() ? null : culturesUnpublishing : ["*"],
                     eventMessages));
 
-                if (culturesUnpublishing != null)
+                if (culturesUnpublishing is not null)
                 {
                     // This will mean that that we unpublished a mandatory culture or we unpublished the last culture.
                     var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesUnpublishing);
-                    Audit(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
+                    await AuditAsync(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
 
-                    PublishResultType? publishResultType = publishResult?.Result ?? unpublishResult?.Result;
-                    if (publishResultType == null)
-                    {
-                        throw new PanicException("publishResultType == null - should not happen");
-                    }
+                    PublishResultType publishResultType = publishResult?.Result ?? unpublishResult?.Result ?? throw new PanicException("publishResultType is null - should not happen");
 
                     switch (publishResultType)
                     {
@@ -1921,21 +1620,21 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                             // Occurs when a mandatory culture was unpublished (which means we tried publishing the content without a mandatory culture)
 
                             // Log that the whole content item has been unpublished due to mandatory culture unpublished
-                            Audit(AuditType.Unpublish, userId, content.Id, "Unpublished (mandatory language unpublished)");
+                            await AuditAsync(AuditType.Unpublish, userId, content.Id, "Unpublished (mandatory language unpublished)");
                             return new PublishResult(PublishResultType.SuccessUnpublishMandatoryCulture, eventMessages, content);
                         case PublishResultType.SuccessUnpublishCulture:
                             // Occurs when the last culture is unpublished
-                            Audit(AuditType.Unpublish, userId, content.Id, "Unpublished (last language unpublished)");
+                            await AuditAsync(AuditType.Unpublish, userId, content.Id, "Unpublished (last language unpublished)");
                             return new PublishResult(PublishResultType.SuccessUnpublishLastCulture, eventMessages, content);
                     }
                 }
 
-                Audit(AuditType.Unpublish, userId, content.Id);
+                await AuditAsync(AuditType.Unpublish, userId, content.Id);
                 return new PublishResult(PublishResultType.SuccessUnpublish, eventMessages, content);
             }
 
             // or, failed
-            scope.Notifications.Publish(TreeChangeNotification(content, changeType, eventMessages));
+            scope.Notifications.Publish(CreateTreeChangeNotification(content, changeType, eventMessages));
             return new PublishResult(PublishResultType.FailedUnpublish, eventMessages, content); // bah
         }
 
@@ -1945,11 +1644,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             // and succeeded, trigger events
             if (publishResult?.Success ?? false)
             {
-                if (isNew == false && previouslyPublished == false && SupportsBranchPublishing)
+                if (isNew is false && previouslyPublished is false && SupportsBranchPublishing)
                 {
                     changeType = TreeChangeTypes.RefreshBranch; // whole branch
                 }
-                else if (isNew == false && previouslyPublished)
+                else if (isNew is false && previouslyPublished)
                 {
                     changeType = TreeChangeTypes.RefreshNode; // single node
                 }
@@ -1959,14 +1658,14 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 if (!branchOne)
                 {
                     scope.Notifications.Publish(
-                        TreeChangeNotification(
+                        CreateTreeChangeNotification(
                             content,
                             changeType,
                             variesByCulture ? culturesPublishing.IsCollectionEmpty() ? null : culturesPublishing : ["*"],
                             variesByCulture ? culturesUnpublishing.IsCollectionEmpty() ? null : culturesUnpublishing : null,
                             eventMessages));
                     scope.Notifications.Publish(
-                        PublishedNotification(
+                        CreatePublishedNotification(
                             content,
                             eventMessages,
                             BuildCultureMap(content, variesByCulture ? culturesPublishing : ["*"]),
@@ -1977,31 +1676,31 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 // it was not published and now is... descendants that were 'published' (but
                 // had an unpublished ancestor) are 're-published' ie not explicitly published
                 // but back as 'published' nevertheless
-                if (!branchOne && isNew == false && previouslyPublished == false && HasChildren(content.Id))
+                if (!branchOne && isNew is false && previouslyPublished is false && await HasChildrenAsync(content.Key, cancellationToken))
                 {
-                    TContent[] descendants = GetPublishedDescendantsLocked(content).ToArray();
+                    IReadOnlyCollection<TContent> descendants = await GetPublishedDescendantsLockedAsync(content, cancellationToken);
                     scope.Notifications.Publish(
-                        PublishedNotification(descendants, eventMessages).WithState(notificationState));
+                        CreatePublishedNotification(descendants, eventMessages).WithState(notificationState));
                 }
 
                 switch (publishResult.Result)
                 {
                     case PublishResultType.SuccessPublish:
-                        Audit(AuditType.Publish, userId, content.Id);
+                        await AuditAsync(AuditType.Publish, userId, content.Id);
                         break;
                     case PublishResultType.SuccessPublishCulture:
-                        if (culturesPublishing != null)
+                        if (culturesPublishing is not null)
                         {
                             var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesPublishing);
-                            Audit(AuditType.PublishVariant, userId, content.Id, $"Published languages: {langs}", langs);
+                            await AuditAsync(AuditType.PublishVariant, userId, content.Id, $"Published languages: {langs}", langs);
                         }
 
                         break;
                     case PublishResultType.SuccessUnpublishCulture:
-                        if (culturesUnpublishing != null)
+                        if (culturesUnpublishing is not null)
                         {
                             var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesUnpublishing);
-                            Audit(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
+                            await AuditAsync(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
                         }
 
                         break;
@@ -2018,21 +1717,21 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
 
         // if publishing didn't happen or if it has failed, we still need to log which cultures were saved
-        if (!branchOne && (publishResult == null || !publishResult.Success))
+        if (!branchOne && publishResult is not { Success: true })
         {
-            if (culturesChanging != null)
+            if (culturesChanging is not null)
             {
                 var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesChanging);
-                Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
+                await AuditAsync(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
             }
             else
             {
-                Audit(AuditType.Save, userId, content.Id);
+                await AuditAsync(AuditType.Save, userId, content.Id);
             }
         }
 
         // or, failed
-        scope.Notifications.Publish(TreeChangeNotification(content, changeType, eventMessages));
+        scope.Notifications.Publish(CreateTreeChangeNotification(content, changeType, eventMessages));
         return publishResult!;
     }
 
@@ -2046,40 +1745,39 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     #region Delete
 
     /// <inheritdoc />
-    public OperationResult Delete(TContent content, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(TContent content, Guid userKey, CancellationToken cancellationToken)
     {
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
         EventMessages eventMessages = EventMessagesFactory.Get();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockIds);
+
+        if (await scope.Notifications.PublishCancelableAsync(CreateDeletingNotification(content, eventMessages)))
         {
-            scope.WriteLock(WriteLockIds);
-
-            if (scope.Notifications.PublishCancelable(DeletingNotification(content, eventMessages)))
-            {
-                scope.Complete();
-                return OperationResult.Cancel(eventMessages);
-            }
-
-            // if it's not trashed yet, and published, we should unpublish
-            // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
-            // just raise the event
-            if (content.Trashed == false && content.Published)
-            {
-                scope.Notifications.Publish(UnpublishedNotification(
-                    content,
-                    eventMessages,
-                    BuildCultureMap(content, content.ContentType.VariesByCulture() ? content.PublishedCultures : ["*"])));
-            }
-
-            DeleteLocked(scope, content, eventMessages);
-
-            scope.Notifications.Publish(TreeChangeNotification(content, TreeChangeTypes.Remove, eventMessages));
-            Audit(AuditType.Delete, userId, content.Id);
-
             scope.Complete();
+            return Attempt.Fail(ContentDeleteOperationStatus.CancelledByNotification);
         }
 
-        return OperationResult.Succeed(eventMessages);
+        // if it's not trashed yet, and published, we should unpublish
+        // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
+        // just raise the event
+        if (content is { Trashed: false, Published: true })
+        {
+            scope.Notifications.Publish(CreateUnpublishedNotification(
+                content,
+                eventMessages,
+                BuildCultureMap(content, content.ContentType.VariesByCulture() ? content.PublishedCultures : ["*"])));
+        }
+
+        await DeleteLockedAsync(scope, content, eventMessages, cancellationToken);
+
+        scope.Notifications.Publish(CreateTreeChangeNotification(content, TreeChangeTypes.Remove, eventMessages));
+        await AuditAsync(AuditType.Delete, userId, content.Id);
+
+        scope.Complete();
+
+        return Attempt.Succeed(ContentDeleteOperationStatus.Success);
     }
 
     // TODO: both DeleteVersions methods below have an issue. Sort of. They do NOT take care of files the way
@@ -2091,96 +1789,84 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     ///     Permanently deletes versions from an <see cref="TContent" /> object prior to a specific date.
     ///     This method will never delete the latest version of a content item.
     /// </summary>
-    /// <param name="id">Id of the <see cref="TContent" /> object to delete versions from</param>
+    /// <param name="key">Guid key of the <see cref="TContent" /> object to delete versions from</param>
     /// <param name="versionDate">Latest version date</param>
-    /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-    public void DeleteVersions(int id, DateTime versionDate, int userId = Constants.Security.SuperUserId)
+    /// <param name="userKey">Guid key of the User deleting versions of a Content object</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    public async Task<Attempt<ContentVersionOperationStatus>> DeleteVersionsAsync(Guid key, DateTime versionDate, Guid userKey, CancellationToken cancellationToken)
     {
-        // TODO (V20): await this once an asynchronous element repository lets this engine go async.
-        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, ContentObjectType).GetAwaiter().GetResult();
-        if (keyAttempt.Success is false)
-        {
-            return;
-        }
-
-        Guid key = keyAttempt.Result;
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockIds);
+
+        DeletingVersionsNotification<TContent> deletingVersionsNotification =
+            CreateDeletingVersionsNotification(key, evtMsgs, specificVersion: default, dateToRetain: versionDate);
+        if (await scope.Notifications.PublishCancelableAsync(deletingVersionsNotification))
         {
-            scope.WriteLock(WriteLockIds);
-
-            var deletingVersionsNotification =
-                new ContentDeletingVersionsNotification(key, evtMsgs, dateToRetain: versionDate);
-            if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            _contentRepository.DeleteVersions(id, versionDate);
-
-            scope.Notifications.Publish(
-                new ContentDeletedVersionsNotification(key, evtMsgs, dateToRetain: versionDate).WithStateFrom(
-                    deletingVersionsNotification));
-            Audit(AuditType.Delete, userId, Constants.System.Root, "Delete (by version date)");
-
             scope.Complete();
+            return Attempt.Fail(ContentVersionOperationStatus.CancelledByNotification);
         }
+
+        await _contentRepository.DeleteVersionsAsync(key, versionDate, cancellationToken);
+
+        scope.Notifications.Publish(
+            CreateDeletedVersionsNotification(key, evtMsgs, specificVersion: default, dateToRetain: versionDate).WithStateFrom(
+                deletingVersionsNotification));
+        await AuditAsync(AuditType.Delete, userId, Constants.System.Root, "Delete (by version date)");
+
+        scope.Complete();
+        return Attempt.Succeed(ContentVersionOperationStatus.Success);
     }
 
     /// <summary>
     ///     Permanently deletes specific version(s) from an <see cref="TContent" /> object.
     ///     This method will never delete the latest version of a content item.
     /// </summary>
-    /// <param name="id">Id of the <see cref="TContent" /> object to delete a version from</param>
+    /// <param name="key">Guid key of the <see cref="TContent" /> object to delete a version from</param>
     /// <param name="versionId">Id of the version to delete</param>
     /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
-    /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-    public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId)
+    /// <param name="userKey">Guid key of the User deleting versions of a Content object</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status.</returns>
+    public async Task<Attempt<ContentVersionOperationStatus>> DeleteVersionAsync(Guid key, int versionId, bool deletePriorVersions, Guid userKey, CancellationToken cancellationToken)
     {
-        // TODO (V20): await this once an asynchronous element repository lets this engine go async.
-        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, ContentObjectType).GetAwaiter().GetResult();
-        if (keyAttempt.Success is false)
-        {
-            return;
-        }
-
-        Guid key = keyAttempt.Result;
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockIds);
+        DeletingVersionsNotification<TContent> deletingVersionsNotification =
+            CreateDeletingVersionsNotification(key, evtMsgs, versionId, dateToRetain: default);
+        if (await scope.Notifications.PublishCancelableAsync(deletingVersionsNotification))
         {
-            scope.WriteLock(WriteLockIds);
-            var deletingVersionsNotification = new ContentDeletingVersionsNotification(key, evtMsgs, versionId);
-            if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            if (deletePriorVersions)
-            {
-                TContent? content = GetVersion(versionId);
-                DeleteVersions(id, content?.UpdateDate ?? DateTime.UtcNow, userId);
-            }
-
-            TContent? c = _contentRepository.Get(id);
-
-            // don't delete the current or published version
-            if (c?.VersionId != versionId &&
-                c?.PublishedVersionId != versionId)
-            {
-                _contentRepository.DeleteVersion(versionId);
-            }
-
-            scope.Notifications.Publish(
-                new ContentDeletedVersionsNotification(key, evtMsgs, versionId).WithStateFrom(
-                    deletingVersionsNotification));
-            Audit(AuditType.Delete, userId, Constants.System.Root, "Delete (by version)");
-
             scope.Complete();
+            return Attempt.Fail(ContentVersionOperationStatus.CancelledByNotification);
         }
+
+        if (deletePriorVersions)
+        {
+            TContent? content = await GetVersionAsync(versionId, cancellationToken);
+            await DeleteVersionsAsync(key, content?.UpdateDate ?? DateTime.UtcNow, userKey, cancellationToken);
+        }
+
+        TContent? c = await _contentRepository.GetAsync(key, cancellationToken);
+
+        // don't delete the current or published version
+        if (c?.VersionId != versionId &&
+            c?.PublishedVersionId != versionId)
+        {
+            await _contentRepository.DeleteVersionAsync(versionId, cancellationToken);
+        }
+
+        scope.Notifications.Publish(
+            CreateDeletedVersionsNotification(key, evtMsgs, versionId, dateToRetain: default).WithStateFrom(
+                deletingVersionsNotification));
+        await AuditAsync(AuditType.Delete, userId, Constants.System.Root, "Delete (by version)");
+
+        scope.Complete();
+        return Attempt.Succeed(ContentVersionOperationStatus.Success);
     }
 
     #endregion
@@ -2188,27 +1874,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     #region Others
 
     protected static bool HasUnsavedChanges(TContent content) => content.HasIdentity is false || content.IsDirty();
-
-    /// <inheritdoc />
-    public abstract ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options);
-
-    protected ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options, Action<ICoreScope> notifyIssuesFixed)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-
-        scope.WriteLock(WriteLockIds);
-
-        ContentDataIntegrityReport report = _contentRepository.CheckDataIntegrity(options);
-
-        if (report.FixedIssues.Count > 0)
-        {
-            notifyIssuesFixed(scope);
-        }
-
-        scope.Complete();
-
-        return report;
-    }
 
     /// <summary>
     ///     Gets the user performing an operation, so that their permissions can be applied to it.
@@ -2220,40 +1885,79 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         => _userService.Value.GetUserById(userId)
            ?? throw new ArgumentException("Could not find the supplied user", nameof(userId));
 
+    /// <inheritdoc />
+    public abstract Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(ContentDataIntegrityReportOptions options, CancellationToken cancellationToken);
+
+    protected async Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(ContentDataIntegrityReportOptions options, Func<ICoreScope, Task> notifyIssuesFixed, CancellationToken cancellationToken)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        scope.WriteLock(WriteLockIds);
+
+        ContentDataIntegrityReport report = await _contentRepository.CheckDataIntegrityAsync(options, cancellationToken);
+
+        if (report.FixedIssues.Count > 0)
+        {
+            await notifyIssuesFixed(scope);
+        }
+
+        scope.Complete();
+
+        return report;
+    }
+
     #endregion
 
     #region Internal Methods
 
-    internal IEnumerable<TContent> GetPublishedDescendantsLocked(TContent content)
+    internal async Task<IReadOnlyCollection<TContent>> GetPublishedDescendantsLockedAsync(TContent content, CancellationToken cancellationToken)
     {
-        var pathMatch = content.Path + ",";
-        IQuery<TContent> query = Query<TContent>()
-            .Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch) /*&& culture.Trashed == false*/);
-        IEnumerable<TContent> contents = _contentRepository.Get(query);
+        // Every descendant is returned regardless of publish state - neither this call nor the repository
+        // filters on it - so the walk below only skips nodes whose Path and ParentId disagree. It depends on
+        // ordering by Path ascending: a node's path is a strict prefix of each of its descendants', so that
+        // ordering is a pre-order walk in which a parent is always seen before its children. Ordering by
+        // anything else breaks the walk silently, dropping whole branches rather than failing.
+        // TODO [NL]: the name and the caller both assume this is filtered to published descendants, but no
+        // filter has ever been applied - so the caller notifies 'published' for descendants that are not
+        // published. Decide whether to filter here or to stop notifying, rather than leaving both wrong.
+        var descendants = new List<TContent>();
+        var parents = new HashSet<int> { content.Id };
 
-        // beware! contents contains all published version below content
-        // including those that are not directly published because below an unpublished content
-        // these must be filtered out here
-        var parents = new List<int> { content.Id };
-        if (contents is not null)
+        int count;
+        var page = 0;
+        const int pageSize = 100;
+        do
         {
-            foreach (TContent c in contents)
+            count = 0;
+
+            PagedModel<TContent> descendantsPage = await _contentRepository.GetDescendantsAsync(
+                content.Key,
+                page * pageSize,
+                pageSize,
+                Ordering.By("Path", Direction.Ascending),
+                cancellationToken);
+
+            foreach (TContent c in descendantsPage.Items)
             {
+                count++;
+
                 if (parents.Contains(c.ParentId))
                 {
-                    yield return c;
+                    descendants.Add(c);
                     parents.Add(c.Id);
                 }
             }
+
+            page++;
         }
+        while (count > 0);
+
+        return descendants;
     }
 
     #endregion
 
     #region Auditing
-
-    protected void Audit(AuditType type, int userId, int objectId, string? message = null, string? parameters = null) =>
-        AuditAsync(type, userId, objectId, message, parameters).GetAwaiter().GetResult();
 
     protected async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
     {
@@ -2276,10 +1980,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             parameters);
     }
 
-    // TODO: Await this properly when adjusting this service to our new EF Core approach.
-    protected string GetLanguageDetailsForAuditEntry(IEnumerable<string> affectedCultures)
-        => GetLanguageDetailsForAuditEntry(_languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult(), affectedCultures);
-
     protected static string GetLanguageDetailsForAuditEntry(IEnumerable<ILanguage> languages, IEnumerable<string> affectedCultures)
     {
         IEnumerable<string> languageIsoCodes = languages
@@ -2293,11 +1993,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     #region Content Types
 
     /// <inheritdoc />
-    public abstract OperationResult DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
+    public abstract Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteOfTypesAsync(IEnumerable<Guid> contentTypeKeys, Guid userKey, CancellationToken cancellationToken);
 
-    private IContentType GetContentType(ICoreScope scope, string contentTypeAlias)
+    protected async Task<IContentType> GetContentTypeAsync(ICoreScope scope, string contentTypeAlias, CancellationToken cancellationToken)
     {
-        if (contentTypeAlias == null)
+        if (contentTypeAlias is null)
         {
             throw new ArgumentNullException(nameof(contentTypeAlias));
         }
@@ -2309,7 +2009,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
         scope.ReadLock(ReadLockIds);
 
-        IContentType? contentType = _contentTypeRepository.GetAsync(contentTypeAlias, CancellationToken.None).GetAwaiter().GetResult()
+        IContentType? contentType = await _contentTypeRepository.GetAsync(contentTypeAlias, cancellationToken)
                                     ??
                                     // causes rollback
                                     throw new Exception($"No ContentType matching the passed in Alias: '{contentTypeAlias}'" +
@@ -2318,41 +2018,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         return contentType;
     }
 
-    protected IContentType GetContentType(string contentTypeAlias)
-    {
-        if (contentTypeAlias == null)
-        {
-            throw new ArgumentNullException(nameof(contentTypeAlias));
-        }
-
-        if (string.IsNullOrWhiteSpace(contentTypeAlias))
-        {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(contentTypeAlias));
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return GetContentType(scope, contentTypeAlias);
-        }
-    }
-
     #endregion
 
     #region Publishing Strategies
 
-    /// <summary>
-    ///     Ensures that a content item can be published
-    /// </summary>
-    /// <param name="scope"></param>
-    /// <param name="content"></param>
-    /// <param name="checkPath"></param>
-    /// <param name="culturesUnpublishing"></param>
-    /// <param name="evtMsgs"></param>
-    /// <param name="culturesPublishing"></param>
-    /// <param name="allLangs"></param>
-    /// <param name="notificationState"></param>
-    /// <returns></returns>
-    private PublishResult StrategyCanPublish(
+    private async Task<PublishResult> StrategyCanPublishAsync(
         ICoreScope scope,
         TContent content,
         bool checkPath,
@@ -2362,22 +2032,21 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         IReadOnlyCollection<ILanguage> allLangs,
         IDictionary<string, object?>? notificationState,
         int userId,
-        bool? includeInvariantForVariant)
+        bool? includeInvariantForVariant,
+        CancellationToken cancellationToken)
     {
         var variesByCulture = content.ContentType.VariesByCulture();
 
         // If it's null it's invariant
         CultureImpact[] impactsToPublish;
-        if (culturesPublishing == null)
+        if (culturesPublishing is null)
         {
             impactsToPublish = [_cultureImpactFactory.ImpactInvariant()];
         }
         else
         {
             var includeInvariant = includeInvariantForVariant ?? GetRequiredUser(userId).HasAccessToInvariantForVariant();
-            impactsToPublish = culturesPublishing
-                .Select(x => _cultureImpactFactory.ImpactExplicit(x, includeInvariantForVariant: includeInvariant))
-                .ToArray();
+            impactsToPublish = [.. culturesPublishing.Select(x => _cultureImpactFactory.ImpactExplicit(x, includeInvariant))];
         }
 
         // publish the culture(s)
@@ -2402,7 +2071,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         // be changed to Unpublished and any culture currently published will not be visible.
         if (variesByCulture)
         {
-            if (culturesPublishing == null)
+            if (culturesPublishing is null)
             {
                 throw new InvalidOperationException(
                     "Internal error, variesByCulture but culturesPublishing is null.");
@@ -2433,7 +2102,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
         // ensure that the content has published values
         // either because it is 'publishing' or because it already has a published version
-        if (content.PublishedState != PublishedState.Publishing && content.PublishedVersionId == 0)
+        if (content is { PublishedState: not PublishedState.Publishing, PublishedVersionId: 0 })
         {
             Logger.LogInformation(
                 "Content {ContentName} (id={ContentId}, key={ContentKey}) cannot be published: {Reason}",
@@ -2444,7 +2113,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
         }
 
-        ContentScheduleCollection contentSchedule = _contentRepository.GetContentSchedule(content.Id);
+        ContentScheduleCollection contentSchedule = await _contentRepository.GetContentScheduleAsync(content.Key, cancellationToken);
 
         // loop over each culture publishing - or InvariantCulture for invariant
         foreach (var culture in culturesPublishing ?? new[] { Constants.System.InvariantCulture })
@@ -2515,7 +2184,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             // check if the content can be path-published
             // root content can be published
             // else check ancestors - we know we are not trashed
-            var pathIsOk = content.ParentId == Constants.System.Root || IsPathPublished(GetParent(content));
+            var pathIsOk = content.ParentId == Constants.System.Root || await IsPathPublishedAsync(await GetParentAsync(content, cancellationToken), cancellationToken);
             if (!pathIsOk)
             {
                 Logger.LogInformation(
@@ -2547,7 +2216,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <returns></returns>
     /// <remarks>
     ///     It is assumed that all publishing checks have passed before calling this method like
-    ///     <see cref="StrategyCanPublish" />
+    ///     <see cref="StrategyCanPublishAsync" />
     /// </remarks>
     private PublishResult StrategyPublish(
         TContent content,
@@ -2603,23 +2272,16 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         return new PublishResult(evtMsgs, content);
     }
 
-    /// <summary>
-    ///     Ensures that a content item can be unpublished
-    /// </summary>
-    /// <param name="scope"></param>
-    /// <param name="content"></param>
-    /// <param name="evtMsgs"></param>
-    /// <param name="notificationState"></param>
-    /// <returns></returns>
-    private PublishResult StrategyCanUnpublish(
+    private async Task<PublishResult> StrategyCanUnpublishAsync(
         ICoreScope scope,
         TContent content,
         EventMessages evtMsgs,
-        IDictionary<string, object?>? notificationState)
+        IDictionary<string, object?>? notificationState,
+        CancellationToken cancellationToken)
     {
         // raise Unpublishing notification
-        CancelableEnumerableObjectNotification<TContent> notification = UnpublishingNotification(content, evtMsgs).WithState(notificationState);
-        var notificationResult = scope.Notifications.PublishCancelable(notification);
+        CancelableEnumerableObjectNotification<TContent> notification = CreateUnpublishingNotification(content, evtMsgs).WithState(notificationState);
+        var notificationResult = await scope.Notifications.PublishCancelableAsync(notification);
 
         if (notificationResult)
         {
@@ -2631,30 +2293,14 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         return new PublishResult(PublishResultType.SuccessUnpublish, evtMsgs, content);
     }
 
-    /// <summary>
-    ///     Unpublishes a content item
-    /// </summary>
-    /// <param name="content"></param>
-    /// <param name="evtMsgs"></param>
-    /// <returns></returns>
-    /// <remarks>
-    ///     It is assumed that all unpublishing checks have passed before calling this method like
-    ///     <see cref="StrategyCanUnpublish" />
-    /// </remarks>
-    private PublishResult StrategyUnpublish(TContent content, EventMessages evtMsgs)
+    private async Task<PublishResult> StrategyUnpublishAsync(TContent content, EventMessages evtMsgs, CancellationToken cancellationToken)
     {
         var attempt = new PublishResult(PublishResultType.SuccessUnpublish, evtMsgs, content);
-
-        // TODO: What is this check?? we just created this attempt and of course it is Success?!
-        if (attempt.Success == false)
-        {
-            return attempt;
-        }
 
         // if the content has any release dates set to before now,
         // they should be removed so they don't interrupt an unpublish
         // otherwise it would remain released == published
-        ContentScheduleCollection contentSchedule = _contentRepository.GetContentSchedule(content.Id);
+        ContentScheduleCollection contentSchedule = await _contentRepository.GetContentScheduleAsync(content.Key, cancellationToken);
         IReadOnlyList<ContentSchedule> pastReleases =
             contentSchedule.GetPending(ContentScheduleAction.Expire, DateTime.UtcNow);
         foreach (ContentSchedule p in pastReleases)
@@ -2668,7 +2314,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 "Content {ContentName} (id={ContentId}, key={ContentKey}) had its release date removed, because it was unpublished.", content.Name, content.Id, content.Key);
         }
 
-        _contentRepository.PersistContentSchedule(content, contentSchedule);
+        await _contentRepository.PersistContentScheduleAsync(content, contentSchedule, cancellationToken);
 
         // change state to unpublishing
         content.PublishedState = PublishedState.Unpublishing;

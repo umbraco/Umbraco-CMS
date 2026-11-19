@@ -21,7 +21,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 
 /// <summary>
-///     Provides a base class for async repositories managing <see cref="IPublishableContentBase" /> entities,
+///     Provides a base class for repositories managing <see cref="IPublishableContentBase" /> entities,
 ///     adding publishing and scheduling operations on top of <see cref="AsyncContentRepositoryBase{TEntity,TRepository}" />.
 /// </summary>
 /// <typeparam name="TEntity">The publishable content entity type.</typeparam>
@@ -32,8 +32,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 ///     The EF Core DTO type for culture variation rows; must implement <see cref="ICultureVariationDto" /> and
 ///     have a parameterless constructor.
 /// </typeparam>
-internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TRepository, TEntityDto, TContentVersionDto, TContentCultureVariationDto>
-    : AsyncContentRepositoryBase<TEntity, TRepository>, IAsyncPublishableContentRepository<TEntity>
+internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, TEntityDto, TContentVersionDto, TContentCultureVariationDto>
+    : AsyncContentRepositoryBase<TEntity, TRepository>, IPublishableContentRepository<TEntity>
     where TEntity : class, IPublishableContentBase
     where TRepository : class, IRepository
     where TEntityDto : class, IPublishableContentDto
@@ -42,7 +42,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
 {
     /// <summary>
     ///     Initializes a new instance of the
-    ///     <see cref="AsyncPublishableContentRepositoryBase{TEntity,TRepository,TEntityDto,TContentVersionDto,TContentCultureVariationDto}" />
+    ///     <see cref="PublishableContentRepositoryBase{TEntity,TRepository,TEntityDto,TContentVersionDto,TContentCultureVariationDto}" />
     ///     class.
     /// </summary>
     /// <param name="scopeAccessor">The EF Core scope accessor.</param>
@@ -65,7 +65,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     /// <param name="idKeyMap">The id/key map, used to resolve data types for tag and sortable-value handling.</param>
     /// <param name="tagRepository">The tag repository, used to persist tag values for tag-enabled properties on publish.</param>
     /// <param name="jsonSerializer">The JSON serializer, used to parse legacy JSON-stored tag values.</param>
-    protected AsyncPublishableContentRepositoryBase(
+    protected PublishableContentRepositoryBase(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
         ILoggerFactory loggerFactory,
@@ -333,8 +333,8 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     /// </summary>
     /// <remarks>
     ///     Every branching read query shares this path for culture-specific name ordering. The culture variations
-    ///     are LEFT JOINed filtered to the resolved language, so variantName = COALESCE(cultureVariation.Name, node.Text),
-    ///     mirroring NPoco's VariantNameSqlExpression. The whole
+    ///     are LEFT JOINed filtered to the resolved language, so variantName = COALESCE(cultureVariation.Name, node.Text).
+    ///     The whole
     ///     <see cref="ContentJoinRow{TEntityDto,TContentVersionDto}" /> is carried forward as one nested member
     ///     through the GroupJoin/SelectMany so it can be unwrapped again for ordering and fed straight into the
     ///     shared <see cref="ToContentRow" /> projection.
@@ -472,7 +472,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     /// </summary>
     protected override async Task PersistDeletedItemAsync(TEntity entity)
     {
-        // Raise event first else potential FK issues — mirrors PublishableContentRepositoryBase.PersistDeletedItem.
+        // Raise event first else potential FK issues.
         EventAggregator.Publish(new ScopedEntityRemoveNotification(entity, new EventMessages()));
 
         var nodeId = entity.Id;
@@ -650,9 +650,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             if (isMoving)
             {
                 // Skip version/property/culture-variation/tag handling entirely, and skip the post-publish
-                // flag flips below (a move never changes PublishedState) — mirrors NPoco, which wraps its
-                // equivalent blocks (including both SetEntityTags/ClearEntityTags call sites) in the same
-                // isMoving guard.
+                // flag flips below (a move never changes PublishedState).
                 await OnUowRefreshedEntityAsync(item, CancellationToken.None);
                 item.ResetDirtyProperties();
                 IsolatedCache.Clear(EntityTypeCacheKeyPrefix + item.Key);
@@ -760,8 +758,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
                 .SetProperty(entityDto => entityDto.Edited, edited));
 
             // If entity is publishing, update tags; else leave tags there. This means that implicitly
-            // unpublished, or trashed, entities *still* have tags in the database. Mirrors NPoco's
-            // PublishableContentRepositoryBase.PersistUpdatedItem, which calls SetEntityTags here (before
+            // unpublished, or trashed, entities *still* have tags in the database. Tags are set here (before
             // the refresh trigger) and again below (after the publish-state flip) — see
             // ApplyPostPublishFlagFlipsAsync for the second call.
             if (publishing)
@@ -1004,8 +1001,8 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     // Shared culture-variation computation for PersistNewItemAsync/PersistUpdatedItemAsync: determines which
     // cultures have an edited name, updates SetCultureEdited/AdjustDates on the entity, and builds the DTOs
     // to persist. The DB-write strategy (plain AddRange vs. delete-then-reinsert) differs between callers and
-    // stays at each call site. The isNew flag mirrors a real NPoco asymmetry — PersistNewItem never feeds a
-    // culture-name mismatch into the enclosing method's own 'edited' flag, PersistUpdatedItem does — so the
+    // stays at each call site. The isNew flag reflects an asymmetry between the two callers — PersistNewItemAsync never
+    // feeds a culture-name mismatch into its own 'edited' flag, PersistUpdatedItemAsync does — so the
     // returned Edited is only meaningful when isNew is false; callers must preserve this, not merge it away.
     private async Task<(
         List<ContentVersionCultureVariationDto> ContentVariations,
@@ -1039,9 +1036,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
 
     // Builds ContentVersionCultureVariationDto rows for the 'current' (non-published) version, one per
     // culture with a name, plus — only when publishing — additional rows for the 'published' version's
-    // published cultures. Mirrors PublishableContentRepositoryBase.GetContentVariationDtos, but awaits
-    // LanguageRepository properly instead of that method's sync-over-async GetAwaiter().GetResult() calls,
-    // since this helper is genuinely async (no non-async NPoco caller to match).
+    // published cultures.
     private async Task<List<ContentVersionCultureVariationDto>> BuildContentVariationDtosAsync(TEntity entity, bool publishing)
     {
         var dtos = new List<ContentVersionCultureVariationDto>();
@@ -1090,9 +1085,8 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
         return dtos;
     }
 
-    // Builds one entity culture-variation row per culture the entity is available or published in. Mirrors
-    // PublishableContentRepositoryBase.GetEntityVariationDtos field-by-field — the EF Core DTO carries only
-    // LanguageId (no in-memory-only Culture convenience field like the NPoco DTO), so Culture is not set here.
+    // Builds one entity culture-variation row per culture the entity is available or published in. The row
+    // carries only LanguageId, so no culture name is set here.
     private async Task<List<TContentCultureVariationDto>> BuildEntityVariationDtosAsync(TEntity entity, HashSet<string>? editedCultures)
     {
         var dtos = new List<TContentCultureVariationDto>();
@@ -1121,7 +1115,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
 
     // Flips the entity's in-memory published state to match what was just persisted — shared by
     // PersistNewItemAsync and PersistUpdatedItemAsync. Templates are a capability of the entity, not of the
-    // repository kind, so they follow the ITemplatedContent cast exactly as in the NPoco base.
+    // repository kind, so they follow the ITemplatedContent cast.
     private async Task ApplyPostPublishFlagFlipsAsync(TEntity item)
     {
         if (item is { PublishedState: PublishedState.Publishing })
@@ -1397,7 +1391,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     public override Task<IEnumerable<TEntity>> GetAllVersionsAsync(Guid nodeKey, CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            // All versions for the node, no Current filter — mirrors NPoco GetBaseQuery(current: false).
+            // All versions for the node, no Current filter.
             List<ContentRow<TEntityDto, TContentVersionDto>> rows = await BuildBaseQuery(
                     db,
                     db.Nodes.Where(node => node.UniqueId == nodeKey && node.NodeObjectType == NodeObjectTypeKey),
@@ -1559,7 +1553,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             async Task<IReadOnlyList<ContentRow<TEntityDto, TContentVersionDto>>> FetchDefaultOrdered()
             {
                 // Invariant name ordering falls through here: ApplyOrdering's default "name"
-                // arm uses node.Text, equivalent to COALESCE(NULL, node.Text) in NPoco's invariant path.
+                // arm uses node.Text.
                 IOrderedQueryable<ContentJoinRow<TEntityDto, TContentVersionDto>> orderedQuery = ApplyOrdering(baseQuery, db.Users, ordering);
 
                 return await orderedQuery
@@ -1676,7 +1670,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             async Task<IReadOnlyList<ContentRow<TEntityDto, TContentVersionDto>>> FetchDefaultOrdered()
             {
                 // Invariant name ordering falls through here: ApplyOrdering's default "name"
-                // arm uses node.Text, equivalent to COALESCE(NULL, node.Text) in NPoco's invariant path.
+                // arm uses node.Text.
                 IOrderedQueryable<ContentJoinRow<TEntityDto, TContentVersionDto>> orderedQuery = ApplyOrdering(baseQuery, db.Users, ordering);
 
                 return await orderedQuery

@@ -14,7 +14,7 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 
 /// <summary>
-///     Provides an EF Core backed async repository for <see cref="IContent" /> document blueprint (content template) entities.
+///     Provides an EF Core backed repository for <see cref="IContent" /> document blueprint (content template) entities.
 /// </summary>
 internal sealed class DocumentBlueprintRepository : DocumentRepository, IDocumentBlueprintRepository
 {

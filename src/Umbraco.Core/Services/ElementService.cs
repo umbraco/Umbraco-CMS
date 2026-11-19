@@ -15,9 +15,9 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Manages elements.
 /// </summary>
-public class ElementService : AsyncPublishableContentServiceBase<IElement>, IElementService
+public class ElementService : PublishableContentServiceBase<IElement>, IElementService
 {
-    private readonly IAsyncElementRepository _elementRepository;
+    private readonly IElementRepository _elementRepository;
     private readonly IContentTypeRepository _contentTypeRepository;
     private readonly ILogger<ElementService> _logger;
     private readonly IShortStringHelper _shortStringHelper;
@@ -46,7 +46,7 @@ public class ElementService : AsyncPublishableContentServiceBase<IElement>, IEle
         IEventMessagesFactory eventMessagesFactory,
         IAuditService auditService,
         IContentTypeRepository contentTypeRepository,
-        IAsyncElementRepository elementRepository,
+        IElementRepository elementRepository,
         ILanguageRepository languageRepository,
         Lazy<IPropertyValidationService> propertyValidationService,
         ICultureImpactFactory cultureImpactFactory,
@@ -169,7 +169,7 @@ public class ElementService : AsyncPublishableContentServiceBase<IElement>, IEle
 
     protected override ILogger<ElementService> Logger => _logger;
 
-    /// <inheritdoc cref="AsyncPublishableContentServiceBase{TContent}.DeleteLockedAsync" />
+    /// <inheritdoc cref="PublishableContentServiceBase{TContent}.DeleteLockedAsync" />
     protected override async Task DeleteLockedAsync(ICoreScope scope, IElement content, EventMessages evtMsgs, CancellationToken cancellationToken)
     {
         await _elementRepository.DeleteAsync(content, cancellationToken);

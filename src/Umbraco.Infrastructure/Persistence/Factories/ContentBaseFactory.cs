@@ -1,7 +1,6 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using EFCoreDtos = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
@@ -11,27 +10,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 internal sealed class ContentBaseFactory
 {
     /// <summary>
-    ///     Creates a <see cref="Content"/> entity from the specified <see cref="DocumentDto"/> and <see cref="IContentType"/>.
-    /// </summary>
-    /// <param name="dto">The <see cref="DocumentDto"/> containing the data used to construct the content entity.</param>
-    /// <param name="contentType">The <see cref="IContentType"/> that defines the structure and properties of the content.</param>
-    /// <returns>A <see cref="Content"/> instance populated with data from the provided <paramref name="dto"/> and <paramref name="contentType"/>.</returns>
-    public static Content BuildEntity(DocumentDto dto, IContentType? contentType)
-    {
-        NodeDto nodeDto = dto.ContentDto.NodeDto;
-        return BuildPublishableEntity(
-            new Content(nodeDto.Text ?? throw new ArgumentException("The content did not have a name", nameof(dto)), nodeDto.ParentId, contentType),
-            dto);
-    }
-
-    /// <summary>
     ///     Creates a <see cref="Content"/> entity from the EF Core rows a read query returns for one version of a
-    ///     document (mirrors the NPoco <see cref="BuildEntity(DocumentDto, IContentType?)"/> overload).
+    ///     document.
     /// </summary>
     /// <remarks>
     ///     Template IDs are NOT set by this method — the repository is responsible for assigning
     ///     <see cref="ITemplatedContent.TemplateId"/> and <see cref="ITemplatedContent.PublishTemplateId"/>
-    ///     after calling this method, mirroring the NPoco <c>AddAdditionalTempContentMapping</c> pattern.
+    ///     after calling this method.
     /// </remarks>
     /// <param name="dto">The document row, read for its node id and its published and edited flags.</param>
     /// <param name="node">The node row.</param>
@@ -65,7 +50,7 @@ internal sealed class ContentBaseFactory
 
     /// <summary>
     ///     Creates an <see cref="IElement" /> entity from the EF Core rows a read query returns for one version of an
-    ///     element (mirrors the NPoco <see cref="BuildEntity(ElementDto, IContentType?)" /> overload).
+    ///     element.
     /// </summary>
     /// <param name="dto">The element row, read for its node id and its published and edited flags.</param>
     /// <param name="node">The node row.</param>
@@ -95,22 +80,6 @@ internal sealed class ContentBaseFactory
         {
             entity.EnableChangeTracking();
         }
-    }
-
-    /// <summary>
-    ///     Constructs an Element item entity from the provided data transfer object (DTO) and content type.
-    /// </summary>
-    /// <param name="dto">The <see cref="ElementDto"/> containing the data for the element.</param>
-    /// <param name="contentType">The <see cref="IContentType"/> representing the type of the element, or <c>null</c> if not specified.</param>
-    /// <returns>A <see cref="IElement"/> entity built from the specified DTO and content type.</returns>
-    public static IElement BuildEntity(ElementDto dto, IContentType? contentType)
-    {
-        ArgumentNullException.ThrowIfNull(contentType);
-
-        NodeDto nodeDto = dto.ContentDto.NodeDto;
-        return BuildPublishableEntity(
-            new Element(nodeDto.Text ?? throw new ArgumentException("The element did not have a name", nameof(dto)), contentType),
-            dto);
     }
 
     /// <summary>
@@ -225,71 +194,6 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
-    /// Creates a <see cref="DocumentDto"/> instance from the specified <see cref="IContent"/> entity and object type identifier.
-    /// </summary>
-    /// <param name="entity">The content entity to convert into a DTO.</param>
-    /// <param name="objectType">The unique identifier representing the object type.</param>
-    /// <returns>A <see cref="DocumentDto"/> representing the specified content entity.</returns>
-    public static DocumentDto BuildDto(IContent entity, Guid objectType)
-    {
-        ContentDto contentDto = BuildContentDto(entity, objectType);
-
-        var dto = new DocumentDto
-        {
-            NodeId = entity.Id,
-            Published = entity.Published,
-            ContentDto = contentDto,
-            ContentVersionDto = BuildDocumentVersionDto(entity, contentDto),
-        };
-
-        return dto;
-    }
-
-    /// <summary>
-    /// Creates an <see cref="ElementDto"/> instance from the specified <see cref="IElement"/> entity and object type identifier.
-    /// </summary>
-    /// <param name="entity">The content entity to convert into a DTO.</param>
-    /// <param name="objectType">The unique identifier representing the object type.</param>
-    /// <returns>An <see cref="ElementDto"/> representing the specified content entity.</returns>
-    public static ElementDto BuildDto(IElement entity, Guid objectType)
-    {
-        ContentDto contentDto = BuildContentDto(entity, objectType);
-
-        var dto = new ElementDto
-        {
-            NodeId = entity.Id,
-            Published = entity.Published,
-            ContentDto = contentDto,
-            ContentVersionDto = BuildElementVersionDto(entity, contentDto),
-        };
-
-        return dto;
-    }
-
-    /// <summary>
-    /// Creates a collection of tuples pairing each <see cref="ContentSchedule"/> in the provided schedule with its corresponding <see cref="ContentScheduleDto"/>.
-    /// </summary>
-    /// <param name="entity">The content entity associated with the schedules.</param>
-    /// <param name="contentSchedule">The collection of content schedules to convert.</param>
-    /// <param name="languageRepository">The repository used to resolve language identifiers for each schedule.</param>
-    /// <returns>An enumerable of tuples, each containing a <see cref="ContentSchedule"/> and its corresponding <see cref="ContentScheduleDto"/>.</returns>
-    public static IEnumerable<(ContentSchedule Model, ContentScheduleDto Dto)> BuildScheduleDto(
-        IPublishableContentBase entity,
-        ContentScheduleCollection contentSchedule,
-        ILanguageRepository languageRepository) =>
-        contentSchedule.FullSchedule.Select(x =>
-            (x,
-                new ContentScheduleDto
-                {
-                    Action = x.Action.ToString(),
-                    Date = x.Date,
-                    NodeId = entity.Id,
-                    LanguageId = languageRepository.GetIdByIsoCodeAsync(x.Culture, false).GetAwaiter().GetResult(),
-                    Id = x.Id,
-                    IncludeInvariantForVariant = x.IncludeInvariantForVariant,
-                }));
-
-    /// <summary>
     ///     Creates a <see cref="MediaDto"/> instance from the specified <see cref="IMedia"/> entity.
     /// </summary>
     /// <param name="mediaUrlGenerators">A collection of media URL generators used to resolve media URLs.</param>
@@ -387,26 +291,9 @@ internal sealed class ContentBaseFactory
         return dto;
     }
 
-    // always build the current / VersionPk dto
-    // we're never going to build / save old versions (which are immutable)
-    private static DocumentVersionDto BuildDocumentVersionDto(IContent entity, ContentDto contentDto)
-    {
-        var dto = new DocumentVersionDto
-        {
-            Id = entity.VersionId,
-            TemplateId = entity.TemplateId,
-            Published = false, // always building the current, unpublished one
-
-            ContentVersionDto = BuildContentVersionDto(entity, contentDto),
-        };
-
-        return dto;
-    }
-
     /// <summary>
-    ///     Builds the EF Core <see cref="EFCoreDtos.DocumentDto"/> row inserted for a new <see cref="IContent"/> entity
-    ///     (mirrors the entity part of <see cref="BuildDto(IContent, Guid)"/>). The node, content and version rows
-    ///     persisted alongside it are built separately.
+    ///     Builds the EF Core <see cref="EFCoreDtos.DocumentDto"/> row inserted for a new <see cref="IContent"/> entity.
+    ///     The node, content and version rows persisted alongside it are built separately.
     /// </summary>
     /// <param name="entity">The content entity, with its id assigned.</param>
     /// <param name="published">The published flag to persist.</param>
@@ -435,9 +322,8 @@ internal sealed class ContentBaseFactory
         };
 
     /// <summary>
-    ///     Builds the EF Core <see cref="EFCoreDtos.ElementDto"/> row inserted for a new <see cref="IElement"/> entity
-    ///     (mirrors the entity part of <see cref="BuildDto(IElement, Guid)"/>). The node, content and version rows
-    ///     persisted alongside it are built separately.
+    ///     Builds the EF Core <see cref="EFCoreDtos.ElementDto"/> row inserted for a new <see cref="IElement"/> entity.
+    ///     The node, content and version rows persisted alongside it are built separately.
     /// </summary>
     /// <param name="entity">The element entity, with its id assigned.</param>
     /// <param name="published">The published flag to persist.</param>
@@ -516,21 +402,6 @@ internal sealed class ContentBaseFactory
             Text = entity.Name,
         };
 
-    // always build the current / VersionPk dto
-    // we're never going to build / save old versions (which are immutable)
-    private static ElementVersionDto BuildElementVersionDto(IElement entity, ContentDto contentDto)
-    {
-        var dto = new ElementVersionDto
-        {
-            Id = entity.VersionId,
-            Published = false, // always building the current, unpublished one
-
-            ContentVersionDto = BuildContentVersionDto(entity, contentDto),
-        };
-
-        return dto;
-    }
-
     private static MediaVersionDto BuildMediaVersionDto(MediaUrlGeneratorCollection mediaUrlGenerators, IMedia entity, ContentDto contentDto)
     {
         // try to get a path from the string being stored for media
@@ -551,68 +422,10 @@ internal sealed class ContentBaseFactory
         return dto;
     }
 
-    private static TEntity BuildPublishableEntity<TEntity, TVersionDto>(TEntity content, IPublishableContentDto<TVersionDto> dto)
-        where TEntity : PublishableContentBase
-        where TVersionDto : class, IContentVersionDto
-    {
-        NodeDto nodeDto = dto.ContentDto.NodeDto;
-        ContentVersionDto contentVersionDto = dto.ContentVersionDto.ContentVersionDto;
-        TVersionDto? publishedVersionDto = dto.PublishedVersionDto;
-
-        try
-        {
-            content.DisableChangeTracking();
-
-            content.Id = dto.NodeId;
-            content.Key = nodeDto.UniqueId;
-            content.VersionId = contentVersionDto.Id;
-
-            content.Name = contentVersionDto.Text;
-
-            content.Path = nodeDto.Path;
-            content.Level = nodeDto.Level;
-            content.ParentId = nodeDto.ParentId;
-            content.SortOrder = nodeDto.SortOrder;
-            content.Trashed = nodeDto.Trashed;
-
-            content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
-            content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-
-            content.CreateDate = nodeDto.CreateDate.EnsureUtc();
-            content.UpdateDate = contentVersionDto.VersionDate.EnsureUtc();
-
-            content.Published = dto.Published;
-            content.Edited = dto.Edited;
-
-            if (publishedVersionDto != null)
-            {
-                // We need this to get the proper versionId to match to unpublished values.
-                // This is only needed if the content has been published before.
-                content.PublishedVersionId = publishedVersionDto.Id;
-                if (dto.Published)
-                {
-                    content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate.EnsureUtc();
-                    content.PublishName = publishedVersionDto.ContentVersionDto.Text;
-                    content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
-                }
-            }
-
-            // templates = ignored, managed by the repository
-
-            // reset dirty initial properties (U4-1946)
-            content.ResetDirtyProperties(false);
-            return content;
-        }
-        finally
-        {
-            content.EnableChangeTracking();
-        }
-    }
-
     /// <summary>
     ///     Populates <paramref name="content"/> from the EF Core rows a read query returns for one version of a
     ///     publishable entity. Does not manage change tracking — the calling <c>BuildEntity</c> method owns that
-    ///     lifecycle. This is the EF Core counterpart of <see cref="BuildPublishableEntity{TEntity,TVersionDto}"/>.
+    ///     lifecycle.
     /// </summary>
     private static void PopulatePublishableEntity<TEntity>(
         TEntity content,

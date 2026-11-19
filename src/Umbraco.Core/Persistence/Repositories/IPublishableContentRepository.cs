@@ -1,130 +1,139 @@
-using System.Collections.Immutable;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
 /// <summary>
-///     Defines the base implementation of a repository for publishable content items.
+///     Defines the repository contract for publishable content items, adding publishing and scheduling operations.
 /// </summary>
-public interface IPublishableContentRepository<TContent> : IContentRepository<int, TContent>,
-    IReadRepository<Guid, TContent>
+public interface IPublishableContentRepository<TContent> : IAsyncContentRepository<TContent>
     where TContent : IPublishableContentBase
 {
     /// <summary>
-    ///     Gets paged content items, loading only the requested properties and, optionally, templates.
+    ///     Gets the publish/unpublish schedule for a content node.
     /// </summary>
-    /// <param name="query">The base query for content items.</param>
-    /// <param name="pageIndex">The page index (zero-based).</param>
-    /// <param name="pageSize">The number of items per page.</param>
-    /// <param name="totalRecords">Output parameter with total record count.</param>
-    /// <param name="propertyAliases">
-    ///     Optional array of property aliases to load. If null, all properties are loaded.
-    ///     If empty array, no custom properties are loaded (only system properties).
-    /// </param>
-    /// <param name="filter">Optional filter query.</param>
-    /// <param name="ordering">The ordering specification.</param>
-    /// <param name="loadTemplates">
-    ///     Whether to load templates. Set to false for performance optimization when templates are not needed
-    ///     (e.g., collection views). Ignored for content that has no templates.
-    /// </param>
-    /// <returns>A collection of content items for the specified page.</returns>
-    /// <remarks>Here, <paramref name="filter" /> can be null but <paramref name="ordering" /> cannot.</remarks>
-    IEnumerable<TContent> GetPage(
-        IQuery<TContent>? query,
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        string[]? propertyAliases,
-        IQuery<TContent>? filter,
-        Ordering? ordering,
-        bool loadTemplates);
+    /// <param name="contentKey">The Guid key of the content node.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The schedule collection for the specified content node.</returns>
+    Task<ContentScheduleCollection> GetContentScheduleAsync(Guid contentKey, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets publish/unpublish schedule for a content node.
+    ///     Persists the publish/unpublish schedule for a content node.
     /// </summary>
-    /// <param name="contentId"></param>
-    /// <returns>
-    ///     <see cref="ContentScheduleCollection" />
-    /// </returns>
-    ContentScheduleCollection GetContentSchedule(int contentId);
+    /// <param name="content">The content node whose schedule is being persisted.</param>
+    /// <param name="schedule">The schedule collection to persist.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task PersistContentScheduleAsync(IPublishableContentBase content, ContentScheduleCollection schedule, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Persists publish/unpublish schedule for a content node.
+    ///     Clears all schedule entries with a date on or before the specified date.
     /// </summary>
-    /// <param name="content"></param>
-    /// <param name="schedule"></param>
-    void PersistContentSchedule(IPublishableContentBase content, ContentScheduleCollection schedule);
+    /// <param name="date">The cutoff date; all entries on or before this date are cleared.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task ClearScheduleAsync(DateTime date, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Clears the publishing schedule for all entries having a date before (lower than, or equal to) a specified date.
+    ///     Clears schedule entries matching the specified action with a date on or before the specified date.
     /// </summary>
-    /// <param name="date">The cutoff date.</param>
-    void ClearSchedule(DateTime date);
+    /// <param name="date">The cutoff date; matching entries on or before this date are cleared.</param>
+    /// <param name="action">The schedule action (<see cref="ContentScheduleAction.Release" /> or <see cref="ContentScheduleAction.Expire" />) to clear.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task ClearScheduleAsync(DateTime date, ContentScheduleAction action, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Clears the publishing schedule for entries matching the specified action and having a date before the specified date.
+    ///     Returns a value indicating whether any content is scheduled for expiration on or before the specified date.
     /// </summary>
-    /// <param name="date">The cutoff date.</param>
-    /// <param name="action">The schedule action to clear.</param>
-    void ClearSchedule(DateTime date, ContentScheduleAction action);
-
-    /// <summary>
-    ///     Checks whether there is content scheduled for expiration before the specified date.
-    /// </summary>
-    /// <param name="date">The date to check.</param>
+    /// <param name="date">The date to check against.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns><c>true</c> if there is content scheduled for expiration; otherwise, <c>false</c>.</returns>
-    bool HasContentForExpiration(DateTime date);
+    Task<bool> HasContentForExpirationAsync(DateTime date, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Checks whether there is content scheduled for release before the specified date.
+    ///     Returns a value indicating whether any content is scheduled for release on or before the specified date.
     /// </summary>
-    /// <param name="date">The date to check.</param>
+    /// <param name="date">The date to check against.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns><c>true</c> if there is content scheduled for release; otherwise, <c>false</c>.</returns>
-    bool HasContentForRelease(DateTime date);
+    Task<bool> HasContentForReleaseAsync(DateTime date, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets <see cref="TContent" /> objects having an expiration date before (lower than, or equal to) a specified date.
+    ///     Gets content items with an expiration date on or before the specified date.
     /// </summary>
-    /// <remarks>
-    ///     The content returned from this method may be culture variant, in which case you can use
-    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IPublishableContentBase, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
-    /// </remarks>
-    IEnumerable<TContent> GetContentForExpiration(DateTime date);
-
-    /// <summary>
-    ///     Gets <see cref="IContent" /> objects having a release date before (lower than, or equal to) a specified date.
-    /// </summary>
-    /// <remarks>
-    ///     The content returned from this method may be culture variant, in which case you can use
-    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IPublishableContentBase, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
-    /// </remarks>
-    IEnumerable<TContent> GetContentForRelease(DateTime date);
-
-    /// <summary>
-    ///     Get the count of published items
-    /// </summary>
-    /// <returns></returns>
-    /// <remarks>
-    ///     We require this on the repo because the IQuery{IContent} cannot supply the 'newest' parameter
-    /// </remarks>
-    int CountPublished(string? contentTypeAlias = null);
-
-    /// <summary>
-    ///     Checks whether the path to a content item is published.
-    /// </summary>
-    /// <param name="content">The content item.</param>
-    /// <returns><c>true</c> if the path is published; otherwise, <c>false</c>.</returns>
-    bool IsPathPublished(TContent? content);
-
-    /// <summary>
-    ///     Gets the content keys from the provided collection of keys that are scheduled for publishing.
-    /// </summary>
-    /// <param name="contentIds">The IDs of the content items.</param>
+    /// <param name="date">The cutoff date.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
-    ///     The provided collection of content keys filtered for those that are scheduled for publishing.
+    ///     Content items due for expiration. Items may be culture variant; use
+    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus" /> to get the status for a specific culture.
     /// </returns>
-    IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] contentIds) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
-}
+    Task<IEnumerable<TContent>> GetContentForExpirationAsync(DateTime date, CancellationToken cancellationToken);
 
+    /// <summary>
+    ///     Gets content items with a release date on or before the specified date.
+    /// </summary>
+    /// <param name="date">The cutoff date.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>
+    ///     Content items due for release. Items may be culture variant; use
+    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus" /> to get the status for a specific culture.
+    /// </returns>
+    Task<IEnumerable<TContent>> GetContentForReleaseAsync(DateTime date, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets the count of currently published content items, optionally filtered by content type alias.
+    /// </summary>
+    /// <param name="contentTypeAlias">
+    ///     The alias of the content type to filter by, or <c>null</c> to count all published items.
+    /// </param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The number of published items matching the filter.</returns>
+    Task<int> CountPublishedAsync(string? contentTypeAlias, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Returns a value indicating whether the complete path from the root to the specified content node is published.
+    /// </summary>
+    /// <param name="content">The content node to check, or <c>null</c>.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns><c>true</c> if every ancestor in the path is published; otherwise, <c>false</c>.</returns>
+    Task<bool> IsPathPublishedAsync(TContent? content, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets the publish/unpublish schedules for the specified content keys.
+    /// </summary>
+    /// <param name="contentKeys">The Guid keys of the content nodes to retrieve schedules for.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>
+    ///     A dictionary keyed by content Guid, where each value is the collection of schedules for that node.
+    /// </returns>
+    Task<IDictionary<Guid, IEnumerable<ContentSchedule>>> GetContentSchedulesByKeysAsync(Guid[] contentKeys, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets a paged list of content items whose content type is one of the specified content type keys.
+    /// </summary>
+    /// <remarks>
+    ///     Trashed items are included — callers that need to exclude them must filter the result.
+    /// </remarks>
+    /// <param name="contentTypeKeys">The Guid keys of the content types to filter by.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — callers that don't have an opinion should use a service-layer facade that applies a default.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the matching content items.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
+    Task<PagedModel<TContent>> GetPagedOfContentTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets content items by their keys, loading only the requested properties and, optionally, templates.
+    /// </summary>
+    /// <remarks>
+    ///     Partially loaded items bypass the repository cache, which only ever holds fully loaded items.
+    /// </remarks>
+    /// <param name="keys">The keys of the content items.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load. If <c>null</c>, all properties are loaded.
+    ///     If empty, no custom properties are loaded (only system properties).
+    /// </param>
+    /// <param name="loadTemplates">Whether to load templates. Ignored for content that has no templates.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The matching content items, in no particular order.</returns>
+    Task<IEnumerable<TContent>> GetManyAsync(Guid[] keys, string[]? propertyAliases, bool loadTemplates, CancellationToken cancellationToken);
+}
