@@ -146,7 +146,11 @@ test('can sort logs by timestamp', async ({umbracoUi}) => {
   }).toBe(true);
 });
 
-test('can use pagination', async ({umbracoUi, page}) => {
+test('can use pagination', async ({umbracoApi, umbracoUi, page}) => {
+  // Arrange
+  const logs = await umbracoApi.logViewer.getLog(0, 1, 'Descending');
+  expect(logs.total, 'Pagination needs more than one page (100 rows) of log entries').toBeGreaterThan(100);
+
   // Act
   await umbracoUi.logViewer.clickSearchButton();
   const newestOnFirstPage = Math.max(...(await umbracoUi.logViewer.getLogTimestamps()).map((timestamp) => new Date(timestamp).getTime()));

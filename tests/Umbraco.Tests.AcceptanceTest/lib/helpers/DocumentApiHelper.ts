@@ -437,8 +437,8 @@ export class DocumentApiHelper {
     );
   }
 
-  async doesImageMediaPickerContainImageWithCrop(id: string, propertyAlias: string, mediaKey: string, cropAlias: string) {
-    const contentData = await this.getByName(id);
+  async doesImageMediaPickerContainImageWithCrop(contentName: string, propertyAlias: string, mediaKey: string, cropAlias: string) {
+    const contentData = await this.getByName(contentName);
     return contentData.values.some(value =>
       value.alias === propertyAlias && value.value.some(item =>
         item.mediaKey === mediaKey && item.crops?.some(crop => crop.alias === cropAlias && crop.coordinates)
