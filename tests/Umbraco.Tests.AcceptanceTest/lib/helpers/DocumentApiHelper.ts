@@ -1640,6 +1640,10 @@ export class DocumentApiHelper {
     return await this.publish(id, publishScheduleData);
   }
 
+  /**
+   * Creates a culture-variant document with the given template and the same name in each of the given cultures,
+   * optionally under a parent document.
+   */
   async createVariantDocumentWithTemplateAndParent(name: string, documentTypeId: string, templateId: string, cultures: string[], parentId?: string) {
     await this.ensureNameNotExists(name);
 

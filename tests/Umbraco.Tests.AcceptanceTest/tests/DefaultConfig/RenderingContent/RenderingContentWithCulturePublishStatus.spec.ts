@@ -66,7 +66,7 @@ test('can see a descendant is rendered when its ancestor is published in the req
   await umbracoUi.contentRender.doesContentRenderValueContainText(grandchildContentName);
 });
 
-test('a descendant is not rendered when its ancestor is unpublished in the requested culture', async ({umbracoApi, umbracoUi}) => {
+test('cannot see a descendant rendered when its ancestor is unpublished in the requested culture', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.unpublish(childToUnpublishId, [englishIsoCode]);
 
@@ -75,7 +75,13 @@ test('a descendant is not rendered when its ancestor is unpublished in the reque
   await umbracoUi.contentRender.navigateToRenderedContentPage(rootEnglishUrl);
 
   // Assert
-  // In English the published child is a descendant, but the grandchild is excluded because its ancestor is unpublished in English
+  // In English the published child is a descendant, but the unpublished child and its grandchild are excluded
   await umbracoUi.contentRender.doesContentRenderValueContainText(publishedChildName);
+  await umbracoUi.contentRender.doesContentRenderValueNotContainText(childToUnpublishName);
   await umbracoUi.contentRender.doesContentRenderValueNotContainText(grandchildContentName);
+  // The child is still published in Danish, so both it and its grandchild still render there
+  const rootDanishUrl = await umbracoApi.document.getDocumentUrlByCulture(rootContentId, danishIsoCode);
+  await umbracoUi.contentRender.navigateToRenderedContentPage(rootDanishUrl);
+  await umbracoUi.contentRender.doesContentRenderValueContainText(childToUnpublishName);
+  await umbracoUi.contentRender.doesContentRenderValueContainText(grandchildContentName);
 });
