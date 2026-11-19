@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using OpenIddict.Server;
 using OpenIddict.Validation;
+using Umbraco.Cms.Api.Common.Configuration;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
 
@@ -28,7 +31,7 @@ public class ProcessRequestContextHandler
     public ProcessRequestContextHandler(IHttpContextAccessor httpContextAccessor)
         : this(
               httpContextAccessor,
-              StaticServiceProvider.Instance.GetRequiredService<IOpenIddictPathsToHandleProvider>())
+              StaticServiceProvider.Instance.GetRequiredService<IOptions<OpenIddictAdditionalPathsOptions>>())
     {
     }
 
@@ -36,13 +39,22 @@ public class ProcessRequestContextHandler
     ///     Initializes a new instance of the <see cref="ProcessRequestContextHandler"/> class.
     /// </summary>
     /// <param name="httpContextAccessor">The HTTP context accessor.</param>
-    /// <param name="pathsToHandleProvider">The provider for the request paths that OpenIddict should handle.</param>
+    /// <param name="additionalPathsOptions">The request paths that OpenIddict should handle in addition to the Umbraco ones.</param>
     public ProcessRequestContextHandler(
         IHttpContextAccessor httpContextAccessor,
-        IOpenIddictPathsToHandleProvider pathsToHandleProvider)
+        IOptions<OpenIddictAdditionalPathsOptions> additionalPathsOptions)
     {
         _httpContextAccessor = httpContextAccessor;
-        _pathsToHandle = pathsToHandleProvider.GetPathsToHandle().ToArray();
+        var backOfficePathSegment = Constants.System.DefaultUmbracoPath.TrimStart(Constants.CharArrays.Tilde)
+            .EnsureStartsWith('/')
+            .EnsureEndsWith('/');
+        _pathsToHandle =
+        [
+            backOfficePathSegment,
+            "/.well-known/openid-configuration",
+            "/.well-known/jwks",
+            .. additionalPathsOptions.Value.PathsToHandle.Where(path => string.IsNullOrEmpty(path) is false),
+        ];
     }
 
     /// <summary>
@@ -85,7 +97,7 @@ public class ProcessRequestContextHandler
 
         foreach (var path in _pathsToHandle)
         {
-            if (requestPath.StartsWith(path))
+            if (requestPath.StartsWith(path, StringComparison.Ordinal))
             {
                 return false;
             }
