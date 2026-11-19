@@ -27,7 +27,7 @@ const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest:
 @customElement('umb-inline-single-block')
 export class UmbInlineSingleBlockElement extends UmbBlockRefNameSlotMixin(UmbLitElement) {
 	#blockContext?: typeof UMB_BLOCK_SINGLE_ENTRY_CONTEXT.TYPE;
-	#contentKey?: string;
+	#key?: string;
 
 	@property({ type: String, reflect: false })
 	icon?: string;
@@ -63,11 +63,11 @@ export class UmbInlineSingleBlockElement extends UmbBlockRefNameSlotMixin(UmbLit
 			this.#blockContext = blockContext;
 			this.observe(
 				this.#blockContext?.unique,
-				(contentKey) => {
-					this.#contentKey = contentKey;
+				(key) => {
+					this.#key = key;
 					this.#load();
 				},
-				'observeContentKey',
+				'observeKey',
 			);
 		});
 
@@ -125,8 +125,8 @@ export class UmbInlineSingleBlockElement extends UmbBlockRefNameSlotMixin(UmbLit
 	}
 
 	#load() {
-		if (!this._workspaceContext || !this.#contentKey) return;
-		this._workspaceContext.load(this.#contentKey);
+		if (!this._workspaceContext || !this.#key) return;
+		this._workspaceContext.load(this.#key);
 	}
 
 	readonly #expose = () => {

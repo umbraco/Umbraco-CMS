@@ -79,7 +79,7 @@ export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEl
 					this.#key = key;
 					this.#load();
 				},
-				'observeContentKey',
+				'observeKey',
 			);
 		});
 

@@ -36,7 +36,7 @@ export class UmbBlockGridBlockInlineElement extends UmbBlockRefNameSlotMixin(Umb
 	#blockContext?: typeof UMB_BLOCK_GRID_ENTRY_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#variantId: UmbVariantId | undefined;
-	#contentKey?: string;
+	#key?: string;
 	#parentUnique?: string | null;
 	#areaKey?: string | null;
 
@@ -80,11 +80,11 @@ export class UmbBlockGridBlockInlineElement extends UmbBlockRefNameSlotMixin(Umb
 			this.#blockContext = blockContext;
 			this.observe(
 				this.#blockContext?.unique,
-				(contentKey) => {
-					this.#contentKey = contentKey;
+				(key) => {
+					this.#key = key;
 					this.#load();
 				},
-				'observeContentKey',
+				'observeKey',
 			);
 		});
 
@@ -179,8 +179,8 @@ export class UmbBlockGridBlockInlineElement extends UmbBlockRefNameSlotMixin(Umb
 	}
 
 	#load() {
-		if (!this.#workspaceContext || !this.#contentKey) return;
-		this.#workspaceContext.load(this.#contentKey);
+		if (!this.#workspaceContext || !this.#key) return;
+		this.#workspaceContext.load(this.#key);
 	}
 
 	#generatePropertyDataPath() {
