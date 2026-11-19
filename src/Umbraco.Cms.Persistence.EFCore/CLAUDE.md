@@ -240,6 +240,7 @@ Top-level dependency on `Microsoft.Extensions.Caching.Memory` overrides vulnerab
 | `IEFCoreScopeAccessor<TDbContext>` | Access ambient scope |
 | `IMigrationProvider` | Provider-specific migration execution |
 | `IMigrationProviderSetup` | DbContext options setup per provider |
+| `IDatabaseConfigurator` | Provider setup for any DbContext through `UseUmbracoDatabaseProvider`, without migrations |
 
 ### Provider Constants
 

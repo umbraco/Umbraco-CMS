@@ -14,6 +14,7 @@ export class UiBaseLocators extends BasePage {
   public readonly addBtn: Locator;
   public readonly updateBtn: Locator;
   public readonly changeBtn: Locator;
+  public readonly replaceBtn: Locator;
   public readonly deleteBtn: Locator;
   public readonly deleteExactBtn: Locator;
   public readonly removeExactBtn: Locator;
@@ -88,7 +89,7 @@ export class UiBaseLocators extends BasePage {
   public readonly property: Locator;
   public readonly addPropertyBtn: Locator;
   public readonly labelAboveBtn: Locator;
-  public readonly propertyEditorChangeBtn: Locator;
+  public readonly propertyEditorReplaceBtn: Locator;
 
   // Group & Tab Management
   public readonly addGroupBtn: Locator;
@@ -276,6 +277,7 @@ export class UiBaseLocators extends BasePage {
     this.addBtn = page.getByRole("button", { name: "Add", exact: true });
     this.updateBtn = page.getByLabel("Update");
     this.changeBtn = page.getByLabel("Change", { exact: true });
+    this.replaceBtn = page.getByLabel("Replace", { exact: true });
     this.deleteBtn = page.getByRole("button", { name: /^Delete(…)?$/ });
     this.deleteExactBtn = page.getByRole("button", {
       name: "Delete",
@@ -376,7 +378,7 @@ export class UiBaseLocators extends BasePage {
       .locator("uui-modal-sidebar")
       .getByTestId("input:propertytype-description")
       .locator("#textarea");
-    this.propertyEditorChangeBtn = page.locator('[label="Property editor"]').getByLabel('Change');
+    this.propertyEditorReplaceBtn = page.locator('[label="Property editor"]').getByLabel('Replace', { exact: true });
     this.property = page.locator("umb-property");
     this.addPropertyBtn = page.getByLabel("Add property", { exact: true });
     this.labelAboveBtn = page
@@ -803,6 +805,10 @@ export class UiBaseLocators extends BasePage {
 
   async clickChangeButton() {
     await this.click(this.changeBtn);
+  }
+
+  async clickReplaceButton() {
+    await this.click(this.replaceBtn);
   }
 
   async clickDeleteButton() {
@@ -1279,7 +1285,7 @@ export class UiBaseLocators extends BasePage {
 
   async updatePropertyEditor(propertyEditorName: string) {
     await this.clickEditorSettingsButton();
-    await this.click(this.propertyEditorChangeBtn);
+    await this.click(this.propertyEditorReplaceBtn);
     await this.searchForTypeToFilterValue(propertyEditorName);
     await this.click(this.page.getByText(propertyEditorName, { exact: true }));
     await this.enterAPropertyName(propertyEditorName);
