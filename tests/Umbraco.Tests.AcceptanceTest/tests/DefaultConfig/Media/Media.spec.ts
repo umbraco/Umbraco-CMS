@@ -262,9 +262,11 @@ test('can trash a media node with a relation', {tag: '@release'}, async ({umbrac
   await umbracoUi.media.clickActionsMenuForName(mediaFileName);
   await umbracoUi.media.clickTrashActionMenuOption();
   // Verify the references list
+  await umbracoUi.media.clickViewItemsThatDependOnThisButton();
   await umbracoUi.media.doesReferenceHeadlineHaveText(ConstantHelper.trashDeleteDialogMessage.referenceHeadline);
   await umbracoUi.media.doesReferenceItemsHaveCount(1);
   await umbracoUi.media.isReferenceItemNameVisible(documentPickerName[0]);
+  await umbracoUi.media.clickCloseEntityReferencesModalButton();
   await umbracoUi.media.clickConfirmTrashButtonAndWaitForMediaToBeTrashed();
 
   // Assert

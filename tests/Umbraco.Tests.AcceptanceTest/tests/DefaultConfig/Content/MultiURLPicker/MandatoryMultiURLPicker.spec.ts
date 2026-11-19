@@ -86,7 +86,7 @@ test('can see validation error clear when minimum number of links is met', async
   await umbracoUi.content.clickLinkPickerAddButton();
   // Try to save with only 1 link (min is 2)
   await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.needMoreItems);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.minimumTwoEntriesRequiresOneMore);
   // Add second link
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickManualLinkButton();
@@ -94,7 +94,7 @@ test('can see validation error clear when minimum number of links is met', async
   await umbracoUi.content.enterLinkTitle(secondLinkTitle);
   await umbracoUi.content.clickLinkPickerAddButton();
   // Validation should clear
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.needMoreItems, false);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.minimumTwoEntriesRequiresOneMore, false);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
@@ -130,7 +130,7 @@ test('can publish content with an empty non-mandatory multi url picker that has 
 
   // Assert
   // The minimum applies once links are added, so an empty optional picker is valid.
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.needMoreItems, false);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.minimumTwoEntriesRequiresOneMore, false);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
 

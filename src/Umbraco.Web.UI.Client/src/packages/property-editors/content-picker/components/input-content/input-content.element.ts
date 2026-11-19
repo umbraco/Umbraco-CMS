@@ -2,6 +2,8 @@ import type { UmbContentPickerSource } from '../../types.js';
 import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbClipboardCopyRequestEvent, UmbClipboardPasteRequestEvent } from '@umbraco-cms/backoffice/clipboard';
+import type { UmbMediaClipboardConfig } from '@umbraco-cms/backoffice/media';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -64,6 +66,24 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
+
+	/**
+	 * Multiple nodes to start the picker tree from. Takes precedence over `startNode`.
+	 */
+	@property({ type: Array, attribute: false })
+	startNodes?: Array<UmbTreeStartNode>;
+
+	/**
+	 * The clipboard affordances to offer when picking media, forwarded to the media input. Only the hosting
+	 * property editor owns the value a copy or paste translator works on, so this element passes it along in both
+	 * directions.
+	 *
+	 * Named for media because this element also renders document and member inputs, which would each need their
+	 * own configuration if they gained clipboard support.
+	 * @type {UmbMediaClipboardConfig}
+	 */
+	@property({ type: Object, attribute: false })
+	mediaClipboardConfig?: UmbMediaClipboardConfig;
 
 	@property()
 	public set allowedContentTypeIds(value: string | undefined) {
@@ -138,6 +158,17 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
+	// Neither event is composed, so both have to be re-dispatched from this component.
+	#onClipboardPasteRequest(event: UmbClipboardPasteRequestEvent) {
+		event.stopPropagation();
+		this.dispatchEvent(new UmbClipboardPasteRequestEvent(event.entryUniques));
+	}
+
+	#onClipboardCopyRequest(event: UmbClipboardCopyRequestEvent) {
+		event.stopPropagation();
+		this.dispatchEvent(new UmbClipboardCopyRequestEvent({ unique: event.unique, name: event.name, icon: event.icon }));
+	}
+
 	#onInteractionMemoriesChange(event: UmbInteractionMemoriesChangeEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputContentElement;
@@ -165,6 +196,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 			<umb-input-document
 				.selection=${this.#selection}
 				.startNode=${this.startNode}
+				.startNodes=${this.startNodes}
 				.allowedContentTypeIds=${this.#allowedContentTypeIds}
 				.min=${this.min}
 				.minMessage=${this.minMessage}
@@ -188,6 +220,9 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				.maxMessage=${this.maxMessage}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}
+				.clipboardConfig=${this.mediaClipboardConfig}
+				@clipboard-copy-request=${this.#onClipboardCopyRequest}
+				@clipboard-paste-request=${this.#onClipboardPasteRequest}
 				.interactionMemories=${this.#interactionMemories}
 				@interaction-memories-change=${this.#onInteractionMemoriesChange}></umb-input-media>
 		`;

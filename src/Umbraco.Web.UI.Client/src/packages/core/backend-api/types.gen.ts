@@ -670,6 +670,7 @@ export type DataTypeTreeItemResponseModel = {
     isDeletable: boolean;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;
@@ -738,6 +739,7 @@ export type DocumentBlueprintTreeItemResponseModel = {
     variants: Array<DocumentVariantItemResponseModel>;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;
@@ -932,6 +934,7 @@ export type DocumentTypeTreeItemResponseModel = {
     icon: string;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;
@@ -1095,6 +1098,7 @@ export type ElementTreeItemResponseModel = {
     variants: Array<ElementVariantItemResponseModel>;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;
@@ -1711,6 +1715,7 @@ export type MediaTypeTreeItemResponseModel = {
     isDeletable: boolean;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;
@@ -1884,6 +1889,7 @@ export type MemberTypeTreeItemResponseModel = {
     icon: string;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;
@@ -3542,8 +3548,17 @@ export type WebhookEventResponseModel = {
 export type WebhookItemResponseModel = {
     enabled: boolean;
     name: string;
+    /**
+     * @deprecated
+     */
     events: string;
+    /**
+     * @deprecated
+     */
     url: string;
+    /**
+     * @deprecated
+     */
     types: string;
     id: string;
     flags: Array<FlagModel>;
@@ -20187,6 +20202,10 @@ export type GetItemWebhookErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetItemWebhookResponses = {

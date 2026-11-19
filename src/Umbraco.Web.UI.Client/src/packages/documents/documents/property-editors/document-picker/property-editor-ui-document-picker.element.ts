@@ -62,6 +62,9 @@ export class UmbPropertyEditorUIDocumentPickerElement
 	@state()
 	private _startNodeId?: string;
 
+	@state()
+	private _startNodeIds?: Array<string>;
+
 	#dynamicRoot?: UmbDynamicRoot;
 
 	#dynamicRootResolver = new UmbDocumentDynamicRootResolver(this);
@@ -93,7 +96,9 @@ export class UmbPropertyEditorUIDocumentPickerElement
 
 		// A fixed start node wins; the dynamic root is only resolved when there is none.
 		if (!this._startNodeId) {
-			this._startNodeId = await this.#dynamicRootResolver.resolveStartNodeUnique(this.#dynamicRoot);
+			const resolved = await this.#dynamicRootResolver.resolveStartNodeUniques(this.#dynamicRoot);
+			this._startNodeId = resolved?.[0];
+			this._startNodeIds = resolved;
 		}
 	}
 
@@ -114,15 +119,22 @@ export class UmbPropertyEditorUIDocumentPickerElement
 	}
 
 	override render() {
-		const startNode: UmbTreeStartNode | undefined = this._startNodeId
-			? { unique: this._startNodeId, entityType: UMB_DOCUMENT_ENTITY_TYPE }
-			: undefined;
+		// A dynamic root query can resolve to more than one node, and all of them are made available to the picker.
+		const startNodes: Array<UmbTreeStartNode> | undefined =
+			this._startNodeIds && this._startNodeIds.length > 1
+				? this._startNodeIds.map((unique) => ({ unique, entityType: UMB_DOCUMENT_ENTITY_TYPE }))
+				: undefined;
+		const startNode: UmbTreeStartNode | undefined =
+			!startNodes && this._startNodeId
+				? { unique: this._startNodeId, entityType: UMB_DOCUMENT_ENTITY_TYPE }
+				: undefined;
 
 		return html`
 			<umb-input-document
 				.min=${this._min}
 				.max=${this._max}
 				.startNode=${startNode}
+				.startNodes=${startNodes}
 				.allowedContentTypeIds=${this._allowedContentTypes}
 				.value=${this.value}
 				@change=${this.#onChange}

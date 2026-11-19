@@ -1,6 +1,6 @@
 {
   "name": "@umbraco-cms/acceptance-test-helpers",
-  "version": "19.0.0-rc2",
+  "version": "19.1.0-rc",
   "description": "Test helpers and builders for making Playwright tests for Umbraco solutions",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -50,7 +50,7 @@
     "tslib": "^2.6.2"
   },
   "devDependencies": {
-    "@playwright/test": "1.56",
+    "@playwright/test": "1.61",
     "@types/node": "^20.9.0",
     "dotenv": "^16.3.1",
     "prompt": "^1.2.0",

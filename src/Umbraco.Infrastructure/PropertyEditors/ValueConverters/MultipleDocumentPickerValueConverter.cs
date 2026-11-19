@@ -86,12 +86,21 @@ public class MultipleDocumentPickerValueConverter : PropertyValueConverterBase, 
         }
 
         Guid[]? keys = _jsonSerializer.Deserialize<Guid[]>(value);
+        if (keys is null || keys.Length == 0)
+        {
+            return [];
+        }
 
-        return keys is null
-            ? []
-            : keys
-                .Select(key => _publishedContentCache.GetById(preview, key))
-                .WhereNotNull()
-                .ToArray();
+        // The documents are read in one batch rather than once per key.
+        var documentsByKey = new Dictionary<Guid, IPublishedContent>();
+        foreach (IPublishedContent document in _publishedContentCache.GetByIds(preview, keys.Distinct().ToArray()))
+        {
+            documentsByKey[document.Key] = document;
+        }
+
+        return keys
+            .Select(key => documentsByKey.GetValueOrDefault(key))
+            .WhereNotNull()
+            .ToArray();
     }
 }

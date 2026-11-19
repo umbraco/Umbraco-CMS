@@ -1,18 +1,25 @@
 using Asp.Versioning;
 using Examine;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
 using Umbraco.Cms.Search.Provider.Examine.Models.ViewModels;
 using Umbraco.Cms.Search.Provider.Examine.Services;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Controllers;
 
 /// <summary>
 /// Exposes the raw indexed field values for a single document, backing the backoffice "Show Fields" feature.
 /// </summary>
+/// <remarks>
+/// On top of the settings section access required by <see cref="ExamineApiControllerBase"/>, reading raw field values
+/// requires the <see cref="AuthorizationPolicies.SearcherQueryAccess"/> policy.
+/// </remarks>
 [ApiVersion("1.0")]
+[Authorize(Policy = AuthorizationPolicies.SearcherQueryAccess)]
 [ApiExplorerSettings(GroupName = "Umbraco Search (Examine Provider)")]
 public class ExamineApiController : ExamineApiControllerBase
 {

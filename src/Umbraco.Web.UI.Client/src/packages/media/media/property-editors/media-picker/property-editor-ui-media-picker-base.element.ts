@@ -3,6 +3,12 @@ import type { UmbCropModel, UmbMediaPickerValueModel } from '../types.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbMediaClipboardConfig } from '../../clipboard/types.js';
+import {
+	UMB_CLIPBOARD_PROPERTY_CONTEXT,
+	type UmbClipboardCopyRequestEvent,
+	type UmbClipboardPasteRequestEvent,
+} from '@umbraco-cms/backoffice/clipboard';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
@@ -94,9 +100,17 @@ export abstract class UmbMediaPickerPropertyEditorUIElementBase
 	@state()
 	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
 
+	@state()
+	private _clipboardConfig?: UmbMediaClipboardConfig;
+
 	#interactionMemoryManager = new UmbPropertyEditorUiInteractionMemoryManager(this, {
 		memoryUniquePrefix: 'UmbMediaPicker',
 	});
+
+	#clipboardContext?: typeof UMB_CLIPBOARD_PROPERTY_CONTEXT.TYPE;
+
+	#clipboardCopyAvailable = false;
+	#clipboardPasteTypes?: Array<string>;
 
 	constructor() {
 		super();
@@ -113,6 +127,44 @@ export abstract class UmbMediaPickerPropertyEditorUIElementBase
 			},
 			null,
 		);
+
+		this.consumeContext(UMB_CLIPBOARD_PROPERTY_CONTEXT, (context) => {
+			this.#clipboardContext = context;
+
+			this.observe(
+				context?.copyAvailable,
+				(available) => {
+					this.#clipboardCopyAvailable = available ?? false;
+					this.#updateClipboardConfig();
+				},
+				'observeClipboardCopyAvailable',
+			);
+
+			this.observe(
+				context?.pasteAvailable,
+				async (available) => {
+					this.#clipboardPasteTypes = available ? await context!.getSupportedPasteEntryValueTypes() : undefined;
+					this.#updateClipboardConfig();
+				},
+				'observeClipboardPasteAvailable',
+			);
+		});
+	}
+
+	#updateClipboardConfig() {
+		const clipboardContext = this.#clipboardContext;
+		const types = this.#clipboardPasteTypes;
+
+		this._clipboardConfig = clipboardContext
+			? {
+					copy: { enabled: this.#clipboardCopyAvailable },
+					paste: {
+						enabled: !!types?.length,
+						types: types ?? [],
+						pickableFilter: (entry) => clipboardContext.isEntryPastable(entry),
+					},
+				}
+			: undefined;
 	}
 
 	override firstUpdated() {
@@ -126,6 +178,47 @@ export abstract class UmbMediaPickerPropertyEditorUIElementBase
 	#onChange(event: CustomEvent & { target: UmbInputRichMediaElement }) {
 		const isEmpty = event.target.value?.length === 0;
 		this.value = isEmpty ? undefined : event.target.value;
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	async #onClipboardCopyRequest(event: UmbClipboardCopyRequestEvent) {
+		const entry = this.value?.find((item) => item.key === event.unique);
+
+		if (!entry) {
+			throw new Error(`Could not find a media picker value for the item with key: ${event.unique}`);
+		}
+
+		await this.#clipboardContext?.write({
+			propertyValue: [structuredClone(entry)],
+			itemName: event.name,
+			icon: event.icon,
+		});
+	}
+
+	async #onClipboardPasteRequest(event: UmbClipboardPasteRequestEvent) {
+		if (!this.#clipboardContext) return;
+
+		const propertyValues = await this.#clipboardContext.readMultiple<UmbMediaPickerValueModel>(event.entryUniques);
+		const pasted = propertyValues.flat();
+
+		if (!this.multiple) {
+			// An editor holding one item takes the first pasted item in place of its value.
+			const [first] = pasted;
+			if (!first) return;
+			this.value = [first];
+			this.dispatchEvent(new UmbChangeEvent());
+			return;
+		}
+
+		const currentValue = this.value ?? [];
+
+		// Not clamped to the configured limit: as when picking, an over-long selection is for validation to
+		// report and the user to trim.
+		const additions = pasted.filter((addition) => !currentValue.some((entry) => entry.mediaKey === addition.mediaKey));
+
+		if (!additions.length) return;
+
+		this.value = [...currentValue, ...additions];
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -157,6 +250,9 @@ export abstract class UmbMediaPickerPropertyEditorUIElementBase
 				?multiple=${this.multiple}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}
+				.clipboardConfig=${this._clipboardConfig}
+				@clipboard-copy-request=${this.#onClipboardCopyRequest}
+				@clipboard-paste-request=${this.#onClipboardPasteRequest}
 				.interactionMemories=${this._interactionMemories}
 				@interaction-memories-change=${this.#onInputInteractionMemoriesChange}>
 			</umb-input-rich-media>

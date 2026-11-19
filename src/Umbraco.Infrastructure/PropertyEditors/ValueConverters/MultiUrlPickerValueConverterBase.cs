@@ -122,11 +122,15 @@ public abstract class MultiUrlPickerValueConverterBase : PropertyValueConverterB
             }
 
             var links = new List<Link>();
-            IEnumerable<MultiUrlPickerValueEditor.LinkDto>? dtos = ParseLinkDtos(inter.ToString()!);
+            MultiUrlPickerValueEditor.LinkDto[]? dtos = ParseLinkDtos(inter.ToString()!)?.ToArray();
             if (dtos is null)
             {
                 return links;
             }
+
+            // The documents and the media are each read in one batch rather than once per link.
+            Dictionary<Guid, IPublishedContent> documents = ReadLinkedItems(dtos, false, keys => _contentCache.GetByIds(preview, keys));
+            Dictionary<Guid, IPublishedContent> media = ReadLinkedItems(dtos, true, _mediaCache.GetByIds);
 
             foreach (MultiUrlPickerValueEditor.LinkDto dto in dtos)
             {
@@ -140,8 +144,8 @@ public abstract class MultiUrlPickerValueConverterBase : PropertyValueConverterB
                         : LinkType.Content;
 
                     IPublishedContent? content = type == LinkType.Media
-                        ? _mediaCache.GetById(preview, dto.Udi.Guid)
-                        : _contentCache.GetById(preview, dto.Udi.Guid);
+                        ? media.GetValueOrDefault(dto.Udi.Guid)
+                        : documents.GetValueOrDefault(dto.Udi.Guid);
 
                     if (content == null || content.ContentType.ItemType == PublishedItemType.Element)
                     {
@@ -248,6 +252,31 @@ public abstract class MultiUrlPickerValueConverterBase : PropertyValueConverterB
         }
 
         return dtos.Select(ToLink).WhereNotNull().ToArray();
+    }
+
+    private static Dictionary<Guid, IPublishedContent> ReadLinkedItems(
+        IEnumerable<MultiUrlPickerValueEditor.LinkDto> dtos,
+        bool media,
+        Func<IReadOnlyCollection<Guid>, IReadOnlyList<IPublishedContent>> read)
+    {
+        Guid[] keys = dtos
+            .Where(dto => dto.Udi is not null && (dto.Udi.EntityType == Constants.UdiEntityType.Media) == media)
+            .Select(dto => dto.Udi!.Guid)
+            .Distinct()
+            .ToArray();
+
+        var items = new Dictionary<Guid, IPublishedContent>(keys.Length);
+        if (keys.Length == 0)
+        {
+            return items;
+        }
+
+        foreach (IPublishedContent item in read(keys))
+        {
+            items[item.Key] = item;
+        }
+
+        return items;
     }
 
     private IEnumerable<MultiUrlPickerValueEditor.LinkDto>? ParseLinkDtos(string inter)

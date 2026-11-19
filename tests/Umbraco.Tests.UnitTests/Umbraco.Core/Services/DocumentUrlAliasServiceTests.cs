@@ -6,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -35,7 +36,6 @@ public class DocumentUrlAliasServiceTests
 
         var languageServiceMock = new Mock<ILanguageService>();
         languageServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(effectiveLanguages);
-        languageServiceMock.Setup(x => x.GetDefaultIsoCodeAsync()).ReturnsAsync("en-US");
 
         // Return "1" (the service's CurrentRebuildValue constant) so ShouldRebuildAliases() returns false and
         // InitAsync skips the rebuild side-effect in tests that call InitAsync.
@@ -78,7 +78,8 @@ public class DocumentUrlAliasServiceTests
             keyValueServiceMock.Object,
             contentServiceMock.Object,
             documentNavigationQueryServiceMock,
-            serverRoleAccessorMock.Object);
+            serverRoleAccessorMock.Object,
+            Mock.Of<IDefaultCultureAccessor>(x => x.DefaultCulture == "en-US"));
 
         return (service, aliasRepositoryMock, contentServiceMock);
     }

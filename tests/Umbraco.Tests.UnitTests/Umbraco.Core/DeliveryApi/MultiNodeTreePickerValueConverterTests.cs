@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 [TestFixture]
 public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTests
 {
-    private MultiNodeTreePickerValueConverter MultiNodeTreePickerValueConverter(IApiContentRouteBuilder? routeBuilder = null)
+    private MultiNodeTreePickerValueConverter MultiNodeTreePickerValueConverter(IApiContentRouteBuilder? routeBuilder = null, IUmbracoContextAccessor? umbracoContextAccessor = null)
     {
         var expansionStrategyAccessor = CreateOutputExpansionStrategyAccessor();
 
@@ -26,7 +26,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         var apiUrProvider = new ApiMediaUrlProvider(PublishedUrlProvider);
         routeBuilder ??= CreateContentRouteBuilder(ApiContentPathProvider, CreateGlobalSettings());
         return new MultiNodeTreePickerValueConverter(
-            Mock.Of<IUmbracoContextAccessor>(),
+            umbracoContextAccessor ?? Mock.Of<IUmbracoContextAccessor>(),
             Mock.Of<IMemberService>(),
             new ApiContentBuilder(contentNameProvider, routeBuilder, expansionStrategyAccessor, CreateVariationContextAccessor()),
             new ApiMediaBuilder(contentNameProvider, apiUrProvider, Mock.Of<IPublishedValueFallback>(), expansionStrategyAccessor),
@@ -326,6 +326,191 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiContent>;
         Assert.NotNull(result);
         Assert.IsEmpty(result);
+    }
+
+    [Test]
+    public void MultiNodeTreePickerValueConverter_InMultiMode_ReadsContentForTheDeliveryApiInOneBatch()
+    {
+        var publishedDataType = MultiNodePickerPublishedDataType(true, Constants.UdiEntityType.Document);
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+
+        var otherContentKey = Guid.NewGuid();
+        var otherContent = SetupPublishedContent("The other page", otherContentKey, PublishedItemType.Content, PublishedContentType);
+        RegisterContentWithProviders(otherContent.Object, false);
+
+        var valueConverter = MultiNodeTreePickerValueConverter();
+
+        Guid[] keys = [PublishedContent.Key, otherContentKey];
+        PublishedContentCacheMock
+            .Setup(c => c.GetByIds(false, It.IsAny<IReadOnlyCollection<Guid>>()))
+            .Returns([PublishedContent, otherContent.Object]);
+        var inter = keys.Select(key => new GuidUdi(Constants.UdiEntityType.Document, key)).ToArray<Udi>();
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiContent>;
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, result?.Count());
+            PublishedContentCacheMock.Verify(c => c.GetByIds(false, It.Is<IReadOnlyCollection<Guid>>(k => k.SequenceEqual(keys))), Times.Once);
+            PublishedContentCacheMock.Verify(c => c.GetById(It.IsAny<bool>(), It.IsAny<Guid>()), Times.Never);
+        });
+    }
+
+    [Test]
+    public void MultiNodeTreePickerValueConverter_InMultiMediaMode_ReadsMediaForTheDeliveryApiInOneBatch()
+    {
+        var publishedDataType = MultiNodePickerPublishedDataType(true, Constants.UdiEntityType.Media);
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+
+        var valueConverter = MultiNodeTreePickerValueConverter();
+
+        Guid[] keys = [PublishedMedia.Key, PublishedMedia.Key];
+        PublishedMediaCacheMock
+            .Setup(c => c.GetByIds(It.IsAny<IReadOnlyCollection<Guid>>()))
+            .Returns([PublishedMedia, PublishedMedia]);
+        var inter = keys.Select(key => new GuidUdi(Constants.UdiEntityType.Media, key)).ToArray<Udi>();
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMedia>;
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, result?.Count());
+            PublishedMediaCacheMock.Verify(c => c.GetByIds(It.Is<IReadOnlyCollection<Guid>>(k => k.SequenceEqual(keys))), Times.Once);
+            PublishedMediaCacheMock.Verify(c => c.GetById(It.IsAny<Guid>()), Times.Never);
+        });
+    }
+
+    [Test]
+    public void MultiNodeTreePickerValueConverter_ReadsDocumentsInOneBatch()
+    {
+        Guid[] keys = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
+        IPublishedContent[] documents = keys.Select(key => CreatePublishedItem(key, PublishedItemType.Content)).ToArray();
+        PublishedContentCacheMock
+            .Setup(c => c.GetByIds(false, It.IsAny<IReadOnlyCollection<Guid>>()))
+            .Returns(documents);
+
+        var result = ConvertToObject(Constants.UdiEntityType.Document, true, keys.Select(key => new GuidUdi(Constants.UdiEntityType.Document, key))) as IEnumerable<IPublishedContent>;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo(documents));
+            PublishedContentCacheMock.Verify(c => c.GetByIds(false, It.Is<IReadOnlyCollection<Guid>>(k => k.SequenceEqual(keys))), Times.Once);
+            PublishedContentCacheMock.Verify(c => c.GetById(It.IsAny<bool>(), It.IsAny<Guid>()), Times.Never);
+        });
+    }
+
+    [Test]
+    public void MultiNodeTreePickerValueConverter_ReadsMediaInOneBatch()
+    {
+        Guid[] keys = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
+        IPublishedContent[] media = keys.Select(key => CreatePublishedItem(key, PublishedItemType.Media)).ToArray();
+        PublishedMediaCacheMock
+            .Setup(c => c.GetByIds(It.IsAny<IReadOnlyCollection<Guid>>()))
+            .Returns(media);
+
+        var result = ConvertToObject(Constants.UdiEntityType.Media, true, keys.Select(key => new GuidUdi(Constants.UdiEntityType.Media, key))) as IEnumerable<IPublishedContent>;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo(media));
+            PublishedMediaCacheMock.Verify(c => c.GetByIds(It.Is<IReadOnlyCollection<Guid>>(k => k.SequenceEqual(keys))), Times.Once);
+            PublishedMediaCacheMock.Verify(c => c.GetById(It.IsAny<Guid>()), Times.Never);
+        });
+    }
+
+    [Test]
+    public void MultiNodeTreePickerValueConverter_ConvertsDocumentsInTheOrderOfTheValueAndSkipsMissingOnes()
+    {
+        Guid[] keys = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
+        IPublishedContent first = CreatePublishedItem(keys[0], PublishedItemType.Content);
+        IPublishedContent third = CreatePublishedItem(keys[2], PublishedItemType.Content);
+        PublishedContentCacheMock.Setup(c => c.GetById(false, keys[0])).Returns(first);
+        PublishedContentCacheMock.Setup(c => c.GetById(false, keys[2])).Returns(third);
+
+        var result = ConvertToObject(Constants.UdiEntityType.Document, true, keys.Select(key => new GuidUdi(Constants.UdiEntityType.Document, key))) as IEnumerable<IPublishedContent>;
+
+        Assert.That(result, Is.EqualTo(new[] { first, third }));
+    }
+
+    [Test]
+    public void MultiNodeTreePickerValueConverter_InSingleMode_ConvertsTheFirstDocumentThatExists()
+    {
+        Guid[] keys = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
+        IPublishedContent second = CreatePublishedItem(keys[1], PublishedItemType.Content);
+        IPublishedContent third = CreatePublishedItem(keys[2], PublishedItemType.Content);
+        PublishedContentCacheMock.Setup(c => c.GetById(false, keys[1])).Returns(second);
+        PublishedContentCacheMock.Setup(c => c.GetById(false, keys[2])).Returns(third);
+
+        var result = ConvertToObject(Constants.UdiEntityType.Document, false, keys.Select(key => new GuidUdi(Constants.UdiEntityType.Document, key)));
+
+        Assert.AreSame(second, result);
+    }
+
+    [Test]
+    public void MultiNodeTreePickerValueConverter_ConvertsOnlyTheEntityTypeOfTheFirstItemThatExists()
+    {
+        // The first document does not exist, so the media is the first item found and decides the type; the document
+        // that does exist after it is then left out.
+        var missingDocumentKey = Guid.NewGuid();
+        var mediaKey = Guid.NewGuid();
+        var documentKey = Guid.NewGuid();
+        IPublishedContent media = CreatePublishedItem(mediaKey, PublishedItemType.Media);
+        PublishedMediaCacheMock.Setup(c => c.GetById(mediaKey)).Returns(media);
+        PublishedContentCacheMock.Setup(c => c.GetById(false, documentKey)).Returns(CreatePublishedItem(documentKey, PublishedItemType.Content));
+
+        GuidUdi[] udis =
+        [
+            new(Constants.UdiEntityType.Document, missingDocumentKey),
+            new(Constants.UdiEntityType.Media, mediaKey),
+            new(Constants.UdiEntityType.Document, documentKey),
+        ];
+        var result = ConvertToObject(Constants.UdiEntityType.Document, true, udis) as IEnumerable<IPublishedContent>;
+
+        Assert.That(result, Is.EqualTo(new[] { media }));
+    }
+
+    [Test]
+    public void MultiNodeTreePickerValueConverter_DoesNotReadMediaWhenTheDocumentsDecideTheEntityType()
+    {
+        var documentKey = Guid.NewGuid();
+        var mediaKey = Guid.NewGuid();
+        IPublishedContent document = CreatePublishedItem(documentKey, PublishedItemType.Content);
+        PublishedContentCacheMock.Setup(c => c.GetById(false, documentKey)).Returns(document);
+
+        GuidUdi[] udis = [new(Constants.UdiEntityType.Document, documentKey), new(Constants.UdiEntityType.Media, mediaKey)];
+        var result = ConvertToObject(Constants.UdiEntityType.Document, true, udis) as IEnumerable<IPublishedContent>;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo(new[] { document }));
+            PublishedMediaCacheMock.Verify(c => c.GetByIds(It.IsAny<IReadOnlyCollection<Guid>>()), Times.Never);
+            PublishedMediaCacheMock.Verify(c => c.GetById(It.IsAny<Guid>()), Times.Never);
+        });
+    }
+
+    private object? ConvertToObject(string entityType, bool multiSelect, IEnumerable<GuidUdi> udis)
+    {
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.DataType).Returns(MultiNodePickerPublishedDataType(multiSelect, entityType));
+        publishedPropertyType.SetupGet(p => p.EditorAlias).Returns(Constants.PropertyEditors.Aliases.MultiNodeTreePicker);
+        publishedPropertyType.SetupGet(p => p.Alias).Returns("pickedPages");
+
+        IUmbracoContext? umbracoContext = Mock.Of<IUmbracoContext>();
+        var umbracoContextAccessor = new Mock<IUmbracoContextAccessor>();
+        umbracoContextAccessor.Setup(x => x.TryGetUmbracoContext(out umbracoContext)).Returns(true);
+
+        return MultiNodeTreePickerValueConverter(umbracoContextAccessor: umbracoContextAccessor.Object).ConvertIntermediateToObject(
+            Mock.Of<IPublishedElement>(),
+            publishedPropertyType.Object,
+            PropertyCacheLevel.Snapshot,
+            udis.ToArray<Udi>(),
+            false);
+    }
+
+    private static IPublishedContent CreatePublishedItem(Guid key, PublishedItemType itemType)
+    {
+        var contentType = Mock.Of<IPublishedContentType>(x => x.ItemType == itemType);
+        return Mock.Of<IPublishedContent>(x => x.Key == key && x.ContentType == contentType);
     }
 }
 

@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRepository
 {
     private readonly IContentCacheDataSerializerFactory _contentCacheDataSerializerFactory;
+    private readonly IUmbracoDatabaseFactory _databaseFactory;
     private readonly ILogger<DatabaseCacheRepository> _logger;
     private readonly IOptions<NuCacheSettings> _nucacheSettings;
     private readonly IShortStringHelper _shortStringHelper;
@@ -31,6 +32,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// </summary>
     public DatabaseCacheRepository(
         IScopeAccessor scopeAccessor,
+        IUmbracoDatabaseFactory databaseFactory,
         AppCaches appCaches,
         ILogger<DatabaseCacheRepository> logger,
         IShortStringHelper shortStringHelper,
@@ -39,6 +41,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         IOptions<NuCacheSettings> nucacheSettings)
         : base(scopeAccessor, appCaches)
     {
+        _databaseFactory = databaseFactory;
         _logger = logger;
         _shortStringHelper = shortStringHelper;
         _urlSegmentProviders = urlSegmentProviders;
@@ -97,35 +100,57 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetElementSourceAsync(Guid key, bool preview = false)
+        => CreateElementSourceNode(await GetElementSourceDto(key), preview);
+
+    /// <inheritdoc/>
+    public ContentCacheNode? GetElementSource(Guid key, bool preview = false)
+        => CreateElementSourceNode(Read(database => database.FirstOrDefault<ContentSourceDto>(GetElementSourceSql(key))), preview);
+
+    private ContentCacheNode? CreateElementSourceNode(ContentSourceDto? dto, bool preview)
     {
-        ContentSourceDto? dto = await GetElementSourceDto(key);
-
-        if (dto is null)
+        if (dto is null || HasUsableSource(dto, preview) is false)
         {
-            return null;
-        }
-
-        if (preview is false && dto.PubDataRaw is null && dto.PubData is null)
-        {
-            return null;
-        }
-
-        if (preview is false && dto.Published && dto.PubName is null)
-        {
-            _logger.LogWarning(
-                "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
-                key);
             return null;
         }
 
         return CreateElementNodeKit(preview, dto);
     }
 
+    // Whether a source row can be turned into a node for the requested version. A row that is flagged as published
+    // but has no published version name is an inconsistent database state, which is logged rather than silently dropped.
+    private bool HasUsableSource(ContentSourceDto dto, bool preview)
+    {
+        if (preview)
+        {
+            return true;
+        }
+
+        if (dto.PubDataRaw is null && dto.PubData is null)
+        {
+            return false;
+        }
+
+        if (dto.Published && dto.PubName is null)
+        {
+            _logger.LogWarning(
+                "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
+                dto.Key);
+            return false;
+        }
+
+        return true;
+    }
+
     /// <inheritdoc/>
     public async Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetElementSourceForPublishStatesAsync(Guid key)
-    {
-        ContentSourceDto? dto = await GetElementSourceDto(key);
+        => ToElementPublishStateNodes(key, await GetElementSourceDto(key));
 
+    /// <inheritdoc/>
+    public (ContentCacheNode? Draft, ContentCacheNode? Published) GetElementSourceForPublishStates(Guid key)
+        => ToElementPublishStateNodes(key, Read(database => database.FirstOrDefault<ContentSourceDto>(GetElementSourceSql(key))));
+
+    private (ContentCacheNode? Draft, ContentCacheNode? Published) ToElementPublishStateNodes(Guid key, ContentSourceDto? dto)
+    {
         if (dto is null)
         {
             return (null, null);
@@ -154,41 +179,51 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     private async Task<ContentSourceDto?> GetElementSourceDto(Guid key)
-    {
-        Sql<ISqlContext>? sql = SqlElementSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Element))
-            .Append(SqlWhereNodeKey(SqlContext, key))
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+        => await ReadAsync(database => database.FirstOrDefaultAsync<ContentSourceDto>(GetElementSourceSql(key)));
 
-        return await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
-    }
+    // internal so tests can reach it
+    internal Sql<ISqlContext> GetElementSourceSql(Guid key)
+        => SqlElementSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Element))
+            .Append(SqlWhereNodeKey(ScopelessSqlContext, key))
+            .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
 
     private ContentCacheNode? CreateElementNodeKit(bool preview, ContentSourceDto dto)
     {
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Element);
-        return CreateContentNodeKit(dto, serializer, preview);
+        return CreateContentNodeKit(dto, serializer, preview, ContentCacheDataSerializerEntityType.Element);
     }
 
     /// <inheritdoc/>
     public async Task<IEnumerable<ContentCacheNode>> GetElementSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
     {
-        Sql<ISqlContext>? sql = SqlElementSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Element))
-            .WhereIn<NodeDto>(x => x.UniqueId, keys)
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+        Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
+        List<ContentSourceDto> dtos = await FetchContentSourcesAsync(keysArray, GetElementSourcesSql);
 
-        List<ContentSourceDto> dtos = await Database.FetchAsync<ContentSourceDto>(sql);
+        return CreateElementSourceNodes(dtos, preview);
+    }
 
-        dtos = dtos
+    /// <inheritdoc/>
+    public IEnumerable<ContentCacheNode> GetElementSources(IEnumerable<Guid> keys, bool preview = false)
+    {
+        Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
+        List<ContentSourceDto> dtos = FetchContentSources(keysArray, GetElementSourcesSql);
+
+        return CreateElementSourceNodes(dtos, preview);
+    }
+
+    private IEnumerable<ContentCacheNode> CreateElementSourceNodes(List<ContentSourceDto> dtos, bool preview)
+    {
+        var filtered = dtos
             .Where(x => x is not null)
-            .Where(x => preview || ((x.PubDataRaw is not null || x.PubData is not null) && (!x.Published || x.PubName is not null)))
+            .Where(x => HasUsableSource(x, preview))
             .ToList();
 
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Element);
-        return dtos
-            .Select(x => CreateContentNodeKit(x, serializer, preview))
+        return filtered
+            .Select(x => CreateContentNodeKit(x, serializer, preview, ContentCacheDataSerializerEntityType.Element))
             .OfType<ContentCacheNode>();
     }
 
@@ -201,8 +236,20 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc/>
+    public void RefreshElement(ContentCacheNode contentCacheNode)
+    {
+        IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Element);
+
+        OnRepositoryRefreshedSync(serializer, contentCacheNode, contentCacheNode.IsDraft);
+    }
+
+    /// <inheritdoc/>
     public Task RemovePublishedElementAsync(int id)
         => RemovePublishedAsync(id);
+
+    /// <inheritdoc/>
+    public void RemovePublishedElement(int id)
+        => Database.Execute(RemovePublishedSql(id));
 
     /// <inheritdoc/>
     public void Rebuild(
@@ -241,9 +288,14 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetDocumentSourceAsync(Guid key, bool preview = false)
-    {
-        ContentSourceDto? dto = await GetDocumentSourceDto(key);
+        => CreateDocumentSourceNode(await ReadAsync(database => database.FirstOrDefaultAsync<ContentSourceDto>(GetDocumentSourceSql(key))), preview);
 
+    /// <inheritdoc/>
+    public ContentCacheNode? GetDocumentSource(Guid key, bool preview = false)
+        => CreateDocumentSourceNode(Read(database => database.FirstOrDefault<ContentSourceDto>(GetDocumentSourceSql(key))), preview);
+
+    private ContentCacheNode? CreateDocumentSourceNode(ContentSourceDto? dto, bool preview)
+    {
         if (dto is null)
         {
             return null;
@@ -258,21 +310,20 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         {
             _logger.LogWarning(
                 "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
-                key);
+                dto.Key);
             return null;
         }
 
         return CreateDocumentNodeKit(preview, dto);
-
     }
 
     /// <inheritdoc/>
     public async Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetDocumentSourceForPublishStatesAsync(Guid key)
-        => ToPublishStateNodes(key, await GetDocumentSourceDto(key));
+        => ToPublishStateNodes(key, await ReadAsync(database => database.FirstOrDefaultAsync<ContentSourceDto>(GetDocumentSourceSql(key))));
 
     /// <inheritdoc/>
     public (ContentCacheNode? Draft, ContentCacheNode? Published) GetDocumentSourceForPublishStates(Guid key)
-        => ToPublishStateNodes(key, Database.FirstOrDefault<ContentSourceDto>(GetDocumentSourceSql(key)));
+        => ToPublishStateNodes(key, Read(database => database.FirstOrDefault<ContentSourceDto>(GetDocumentSourceSql(key))));
 
     private (ContentCacheNode? Draft, ContentCacheNode? Published) ToPublishStateNodes(Guid key, ContentSourceDto? dto)
     {
@@ -303,39 +354,109 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return (draftNode, publishedNode);
     }
 
-    private Task<ContentSourceDto?> GetDocumentSourceDto(Guid key)
-        => Database.FirstOrDefaultAsync<ContentSourceDto>(GetDocumentSourceSql(key));
+    // The source reads can run without an ambient scope, where the base SqlContext and the helpers built on it (Sql(),
+    // SqlSyntax, QuoteTableName, Query<T>()) throw, so their SQL builders use only this. In a scope it is the same object.
+    private ISqlContext ScopelessSqlContext => _databaseFactory.SqlContext;
 
-    private Sql<ISqlContext> GetDocumentSourceSql(Guid key)
+    // A content source read without an ambient scope (a cache miss while rendering) runs on its own connection and
+    // commits on its own, one round trip instead of beginning and committing a transaction around it. Inside a scope
+    // it runs in the scope's transaction, so it sees what the scope has written.
+    private T Read<T>(Func<IUmbracoDatabase, T> read)
+    {
+        if (ScopeAccessor.AmbientScope is not null)
+        {
+            return read(Database);
+        }
+
+        using IUmbracoDatabase database = _databaseFactory.CreateDatabase();
+        return read(database);
+    }
+
+    private async Task<T> ReadAsync<T>(Func<IUmbracoDatabase, Task<T>> read)
+    {
+        if (ScopeAccessor.AmbientScope is not null)
+        {
+            return await read(Database);
+        }
+
+        using IUmbracoDatabase database = _databaseFactory.CreateDatabase();
+        return await read(database);
+    }
+
+    // Batches the WHERE IN to stay within SQL Server's parameter limit, which the configurable seed batch sizes
+    // applied upstream may exceed. Each batch selects different rows, so they need not see the same snapshot.
+    private Task<List<ContentSourceDto>> FetchContentSourcesAsync(Guid[] keys, Func<IEnumerable<Guid>, Sql<ISqlContext>> sql)
+        => ReadAsync(async database =>
+        {
+            var dtos = new List<ContentSourceDto>(keys.Length);
+            foreach (IEnumerable<Guid> group in keys.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                dtos.AddRange(await database.FetchAsync<ContentSourceDto>(sql(group)));
+            }
+
+            return dtos;
+        });
+
+    private List<ContentSourceDto> FetchContentSources(Guid[] keys, Func<IEnumerable<Guid>, Sql<ISqlContext>> sql)
+        => Read(database =>
+        {
+            var dtos = new List<ContentSourceDto>(keys.Length);
+            foreach (IEnumerable<Guid> group in keys.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                dtos.AddRange(database.Fetch<ContentSourceDto>(sql(group)));
+            }
+
+            return dtos;
+        });
+
+    // internal so tests can reach it
+    internal Sql<ISqlContext> GetDocumentSourceSql(Guid key)
         => SqlContentSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
-            .Append(SqlWhereNodeKey(SqlContext, key))
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+            .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Document))
+            .Append(SqlWhereNodeKey(ScopelessSqlContext, key))
+            .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
+
+    // internal so tests can reach it
+    internal Sql<ISqlContext> GetDocumentSourcesSql(IEnumerable<Guid> keys)
+        => SqlContentSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Document))
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
+
+    // internal so tests can reach it
+    internal Sql<ISqlContext> GetElementSourcesSql(IEnumerable<Guid> keys)
+        => SqlElementSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Element))
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
 
     private ContentCacheNode? CreateDocumentNodeKit(bool preview, ContentSourceDto dto)
     {
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
-        return CreateContentNodeKit(dto, serializer, preview);
+        return CreateContentNodeKit(dto, serializer, preview, ContentCacheDataSerializerEntityType.Document);
     }
 
     /// <inheritdoc/>
     public async Task<IEnumerable<ContentCacheNode>> GetDocumentSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
     {
-        // Batch the WHERE IN to stay within SQL Server's parameter limit.
-        // The configurable document seed batch size is applied upstream; this method only enforces MaxParameterCount.
         Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
-        var dtos = new List<ContentSourceDto>(keysArray.Length);
-        foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
-        {
-            Sql<ISqlContext>? sql = SqlContentSourcesSelect()
-                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
-                .WhereIn<NodeDto>(x => x.UniqueId, group)
-                .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+        List<ContentSourceDto> dtos = await FetchContentSourcesAsync(keysArray, GetDocumentSourcesSql);
 
-            dtos.AddRange(await Database.FetchAsync<ContentSourceDto>(sql));
-        }
+        return CreateDocumentSourceNodes(dtos, preview);
+    }
 
+    /// <inheritdoc/>
+    public IEnumerable<ContentCacheNode> GetDocumentSources(IEnumerable<Guid> keys, bool preview = false)
+    {
+        Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
+        List<ContentSourceDto> dtos = FetchContentSources(keysArray, GetDocumentSourcesSql);
+
+        return CreateDocumentSourceNodes(dtos, preview);
+    }
+
+    private IEnumerable<ContentCacheNode> CreateDocumentSourceNodes(List<ContentSourceDto> dtos, bool preview)
+    {
         var filtered = dtos
             .Where(x => x is not null)
             .Where(x => preview || ((x.PubDataRaw is not null || x.PubData is not null) && (!x.Published || x.PubName is not null)))
@@ -344,7 +465,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
         return filtered
-            .Select(x => CreateContentNodeKit(x, serializer, preview))
+            .Select(x => CreateContentNodeKit(x, serializer, preview, ContentCacheDataSerializerEntityType.Document))
             .OfType<ContentCacheNode>();
     }
 
@@ -376,15 +497,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// <inheritdoc/>
     public IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType)
     {
-        Guid objectType = entityType switch
-        {
-            ContentCacheDataSerializerEntityType.Document => Constants.ObjectTypes.Document,
-            ContentCacheDataSerializerEntityType.Media => Constants.ObjectTypes.Media,
-            ContentCacheDataSerializerEntityType.Element => Constants.ObjectTypes.Element,
-            _ => throw new ArgumentOutOfRangeException(nameof(entityType), entityType, null),
-        };
-
-        IEnumerable<ContentSourceDto> dtos = GetContentSourceByDocumentTypeKey(keys, objectType);
+        IEnumerable<ContentSourceDto> dtos = GetContentSourceByDocumentTypeKey(keys, GetObjectType(entityType));
 
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(entityType);
@@ -398,7 +511,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             }
             else
             {
-                ContentCacheNode? node = CreateContentNodeKit(row, serializer, row.Published is false);
+                ContentCacheNode? node = CreateContentNodeKit(row, serializer, row.Published is false, entityType);
                 if (node is not null)
                 {
                     yield return node;
@@ -406,6 +519,49 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             }
         }
     }
+
+    /// <inheritdoc />
+    public ISet<Guid> GetKeysOfEntityTypes(IReadOnlyCollection<Guid> keys, ContentCacheDataSerializerEntityType entityTypes)
+    {
+        var matchingKeys = new HashSet<Guid>();
+        Guid[] objectTypes = new[]
+            {
+                ContentCacheDataSerializerEntityType.Document,
+                ContentCacheDataSerializerEntityType.Media,
+                ContentCacheDataSerializerEntityType.Element,
+            }
+            .Where(entityType => entityTypes.HasFlag(entityType))
+            .Select(GetObjectType)
+            .ToArray();
+        if (keys.Count == 0 || objectTypes.Length == 0)
+        {
+            return matchingKeys;
+        }
+
+        return Read(database =>
+        {
+            foreach (IEnumerable<Guid> group in keys.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                Sql<ISqlContext> sql = ScopelessSqlContext.Sql()
+                    .Select<NodeDto>(x => x.UniqueId)
+                    .From<NodeDto>()
+                    .WhereIn<NodeDto>(x => x.UniqueId, group)
+                    .WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
+                matchingKeys.UnionWith(database.Fetch<Guid>(sql));
+            }
+
+            return matchingKeys;
+        });
+    }
+
+    private static Guid GetObjectType(ContentCacheDataSerializerEntityType entityType)
+        => entityType switch
+        {
+            ContentCacheDataSerializerEntityType.Document => Constants.ObjectTypes.Document,
+            ContentCacheDataSerializerEntityType.Media => Constants.ObjectTypes.Media,
+            ContentCacheDataSerializerEntityType.Element => Constants.ObjectTypes.Element,
+            _ => throw new ArgumentOutOfRangeException(nameof(entityType), entityType, null),
+        };
 
     /// <inheritdoc />
     public IEnumerable<Guid> GetDocumentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false)
@@ -487,14 +643,28 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetMediaSourceAsync(Guid key)
+        => CreateMediaSourceNode(await ReadAsync(database => database.FirstOrDefaultAsync<ContentSourceDto>(GetMediaSourceSql(key))));
+
+    /// <inheritdoc/>
+    public ContentCacheNode? GetMediaSource(Guid key)
+        => CreateMediaSourceNode(Read(database => database.FirstOrDefault<ContentSourceDto>(GetMediaSourceSql(key))));
+
+    // internal so tests can reach it
+    internal Sql<ISqlContext> GetMediaSourceSql(Guid key)
+        => SqlMediaSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Media))
+            .Append(SqlWhereNodeKey(ScopelessSqlContext, key))
+            .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
+
+    // internal so tests can reach it
+    internal Sql<ISqlContext> GetMediaSourcesSql(IEnumerable<Guid> keys)
+        => SqlMediaSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Media))
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
+
+    private ContentCacheNode? CreateMediaSourceNode(ContentSourceDto? dto)
     {
-        Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
-            .Append(SqlWhereNodeKey(SqlContext, key))
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
-
-        ContentSourceDto? dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
-
         if (dto is null)
         {
             return null;
@@ -508,20 +678,23 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// <inheritdoc/>
     public async Task<IEnumerable<ContentCacheNode>> GetMediaSourcesAsync(IEnumerable<Guid> keys)
     {
-        // Batch the WHERE IN by Constants.Sql.MaxParameterCount so callers configuring
-        // CacheSettings.MediaSeedBatchSize above that limit do not hit SQL Server's 2100 parameter limit.
         Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
-        var dtos = new List<ContentSourceDto>(keysArray.Length);
-        foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
-        {
-            Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
-                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
-                .WhereIn<NodeDto>(x => x.UniqueId, group)
-                .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+        List<ContentSourceDto> dtos = await FetchContentSourcesAsync(keysArray, GetMediaSourcesSql);
 
-            dtos.AddRange(await Database.FetchAsync<ContentSourceDto>(sql));
-        }
+        return CreateMediaSourceNodes(dtos);
+    }
 
+    /// <inheritdoc/>
+    public IEnumerable<ContentCacheNode> GetMediaSources(IEnumerable<Guid> keys)
+    {
+        Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
+        List<ContentSourceDto> dtos = FetchContentSources(keysArray, GetMediaSourcesSql);
+
+        return CreateMediaSourceNodes(dtos);
+    }
+
+    private IEnumerable<ContentCacheNode> CreateMediaSourceNodes(List<ContentSourceDto> dtos)
+    {
         var filtered = dtos
             .Where(x => x is not null)
             .ToList();
@@ -1707,7 +1880,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         try
         {
-            Database.BulkInsertRecords(items);
+            Database.ExecuteInSavepoint(() => Database.BulkInsertRecords(items));
         }
         catch (Exception ex) when (IsPrimaryKeyViolation(ex))
         {
@@ -1723,24 +1896,37 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     private void InsertNewRows(List<ContentNuDto> items)
     {
         string C(string s) => SqlSyntax.GetQuotedColumnName(s);
-        var tableName = ContentNuDto.TableName;
+        var tableName = QuoteTableName(ContentNuDto.TableName);
         var nodeId = C(ContentNuDto.NodeIdColumnName);
         var published = C("published");
 
         foreach (ContentNuDto dto in items)
         {
+            // Null values are left out rather than passed as untyped NULL parameters, which some providers
+            // cannot convert to the binary column type.
+            var columns = new List<string> { nodeId, published, C("rv") };
+            var values = new List<object> { dto.NodeId, dto.Published, dto.Rv };
+            if (dto.Data is not null)
+            {
+                columns.Add(C("data"));
+                values.Add(dto.Data);
+            }
+
+            if (dto.RawData is not null)
+            {
+                columns.Add(C("dataRaw"));
+                values.Add(dto.RawData);
+            }
+
+            var parameters = string.Join(", ", values.Select((_, i) => $"@{i}"));
             Database.Execute(
-                $@"INSERT INTO [{tableName}] ({nodeId}, {published}, {C("data")}, {C("dataRaw")}, {C("rv")})
-                SELECT @0, @1, @2, @3, @4
+                $@"INSERT INTO {tableName} ({string.Join(", ", columns)})
+                SELECT {parameters}
                 WHERE NOT EXISTS (
-                    SELECT 1 FROM [{tableName}]
+                    SELECT 1 FROM {tableName}
                     WHERE {nodeId} = @0 AND {published} = @1
                 )",
-                dto.NodeId,
-                dto.Published,
-                (object?)dto.Data ?? DBNull.Value,
-                (object?)dto.RawData ?? DBNull.Value,
-                dto.Rv);
+                values.ToArray());
         }
     }
 
@@ -1792,9 +1978,9 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return dto;
     }
 
-    private Sql<ISqlContext> SqlContentSourcesSelect(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
+    private Sql<ISqlContext> SqlContentSourcesSelect()
     {
-        SqlTemplate sqlTemplate = SqlContext.Templates.Get(
+        SqlTemplate sqlTemplate = ScopelessSqlContext.Templates.Get(
             Constants.SqlTemplates.NuCacheDatabaseDataSource.ContentSourcesSelect,
             tsql =>
                 tsql.Select<NodeDto>(
@@ -1825,36 +2011,28 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                     .AndSelect<ContentNuDto>("nuPub", x => Alias(x.Data, "PubData"))
                     .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.RawData, "EditDataRaw"))
                     .AndSelect<ContentNuDto>("nuPub", x => Alias(x.RawData, "PubDataRaw"))
-                    .From<NodeDto>());
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                    .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId)
+                    .InnerJoin<ContentVersionDto>()
+                    .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+                    .InnerJoin<DocumentVersionDto>()
+                    .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
+                    .LeftJoin<ContentVersionDto>(
+                        j =>
+                            j.InnerJoin<DocumentVersionDto>("pdver")
+                                .On<ContentVersionDto, DocumentVersionDto>(
+                                    (left, right) => left.Id == right.Id && right.Published == true, "pcver", "pdver"),
+                        "pcver")
+                    .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver")
+                    .LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>(
+                        (left, right) => left.NodeId == right.NodeId && right.Published == false, aliasRight: "nuEdit")
+                    .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>(
+                        (left, right) => left.NodeId == right.NodeId && right.Published == true, aliasRight: "nuPub"));
 
-        Sql<ISqlContext>? sql = sqlTemplate.Sql();
-
-        // TODO: I'm unsure how we can format the below into SQL templates also because right.Current and right.Published end up being parameters
-        if (joins != null)
-        {
-            sql = sql.Append(joins(sql.SqlContext));
-        }
-
-        sql = sql
-            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
-            .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId)
-            .InnerJoin<ContentVersionDto>()
-            .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
-            .InnerJoin<DocumentVersionDto>()
-            .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
-            .LeftJoin<ContentVersionDto>(
-                j =>
-                    j.InnerJoin<DocumentVersionDto>("pdver")
-                        .On<ContentVersionDto, DocumentVersionDto>(
-                            (left, right) => left.Id == right.Id && right.Published == true, "pcver", "pdver"),
-                "pcver")
-            .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver")
-            .LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>(
-                (left, right) => left.NodeId == right.NodeId && right.Published == false, aliasRight: "nuEdit")
-            .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>(
-                (left, right) => left.NodeId == right.NodeId && right.Published == true, aliasRight: "nuPub");
-
-        return sql;
+        // The constants in the joins become the template's arguments, which a template needs passed in order:
+        // right.Current, then Published of pdver, nuEdit and nuPub.
+        return sqlTemplate.Sql(true, true, false, true);
     }
 
     private Sql<ISqlContext> SqlWhereNodeKey(ISqlContext sqlContext, Guid key)
@@ -1924,9 +2102,9 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return sql;
     }
 
-    private Sql<ISqlContext> SqlMediaSourcesSelect(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
+    private Sql<ISqlContext> SqlMediaSourcesSelect()
     {
-        SqlTemplate sqlTemplate = SqlContext.Templates.Get(
+        SqlTemplate sqlTemplate = ScopelessSqlContext.Templates.Get(
             Constants.SqlTemplates.NuCacheDatabaseDataSource.MediaSourcesSelect, tsql =>
                 tsql.Select<NodeDto>(
                         x => Alias(x.NodeId, "Id"),
@@ -1945,31 +2123,23 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                         x => Alias(x.UserId, "EditWriterId"))
                     .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.Data, "EditData"))
                     .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.RawData, "EditDataRaw"))
-                    .From<NodeDto>());
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                    .InnerJoin<ContentVersionDto>()
+                    .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+                    .LeftJoin<ContentNuDto>("nuEdit")
+                    .On<NodeDto, ContentNuDto>(
+                        (left, right) => left.NodeId == right.NodeId && !right.Published,
+                        aliasRight: "nuEdit"));
 
-        Sql<ISqlContext>? sql = sqlTemplate.Sql();
-
-        if (joins != null)
-        {
-            sql = sql.Append(joins(sql.SqlContext));
-        }
-
-        // TODO: We can't use a template with this one because of the 'right.Published' ends up being a parameter so not sure how we can do that
-        sql = sql
-            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
-            .InnerJoin<ContentVersionDto>()
-            .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
-            .LeftJoin<ContentNuDto>("nuEdit")
-            .On<NodeDto, ContentNuDto>(
-                (left, right) => left.NodeId == right.NodeId && !right.Published,
-                aliasRight: "nuEdit");
-
-        return sql;
+        // The constants in the joins become the template's arguments, which a template needs passed in order:
+        // right.Current, then !right.Published of nuEdit.
+        return sqlTemplate.Sql(true, false);
     }
 
-    private Sql<ISqlContext> SqlElementSourcesSelect(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
+    private Sql<ISqlContext> SqlElementSourcesSelect()
     {
-        SqlTemplate sqlTemplate = SqlContext.Templates.Get(
+        SqlTemplate sqlTemplate = ScopelessSqlContext.Templates.Get(
             Constants.SqlTemplates.NuCacheDatabaseDataSource.ElementSourcesSelect,
             tsql =>
                 tsql.Select<NodeDto>(
@@ -1998,38 +2168,31 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                     .AndSelect<ContentNuDto>("nuPub", x => Alias(x.Data, "PubData"))
                     .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.RawData, "EditDataRaw"))
                     .AndSelect<ContentNuDto>("nuPub", x => Alias(x.RawData, "PubDataRaw"))
-                    .From<NodeDto>());
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                    .InnerJoin<ElementDto>().On<NodeDto, ElementDto>((left, right) => left.NodeId == right.NodeId)
+                    .InnerJoin<ContentVersionDto>()
+                    .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+                    .InnerJoin<ElementVersionDto>()
+                    .On<ContentVersionDto, ElementVersionDto>((left, right) => left.Id == right.Id)
+                    .LeftJoin<ContentVersionDto>(
+                        j =>
+                            j.InnerJoin<ElementVersionDto>("pdver")
+                                .On<ContentVersionDto, ElementVersionDto>(
+                                    (left, right) => left.Id == right.Id && right.Published == true, "pcver", "pdver"),
+                        "pcver")
+                    .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver")
+                    .LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>(
+                        (left, right) => left.NodeId == right.NodeId && right.Published == false, aliasRight: "nuEdit")
+                    .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>(
+                        (left, right) => left.NodeId == right.NodeId && right.Published == true, aliasRight: "nuPub"));
 
-        Sql<ISqlContext>? sql = sqlTemplate.Sql();
-
-        if (joins != null)
-        {
-            sql = sql.Append(joins(sql.SqlContext));
-        }
-
-        sql = sql
-            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
-            .InnerJoin<ElementDto>().On<NodeDto, ElementDto>((left, right) => left.NodeId == right.NodeId)
-            .InnerJoin<ContentVersionDto>()
-            .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
-            .InnerJoin<ElementVersionDto>()
-            .On<ContentVersionDto, ElementVersionDto>((left, right) => left.Id == right.Id)
-            .LeftJoin<ContentVersionDto>(
-                j =>
-                    j.InnerJoin<ElementVersionDto>("pdver")
-                        .On<ContentVersionDto, ElementVersionDto>(
-                            (left, right) => left.Id == right.Id && right.Published == true, "pcver", "pdver"),
-                "pcver")
-            .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver")
-            .LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>(
-                (left, right) => left.NodeId == right.NodeId && right.Published == false, aliasRight: "nuEdit")
-            .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>(
-                (left, right) => left.NodeId == right.NodeId && right.Published == true, aliasRight: "nuPub");
-
-        return sql;
+        // The constants in the joins become the template's arguments, which a template needs passed in order:
+        // right.Current, then Published of pdver, nuEdit and nuPub.
+        return sqlTemplate.Sql(true, true, false, true);
     }
 
-    private ContentCacheNode? CreateContentNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer, bool preview)
+    private ContentCacheNode? CreateContentNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer, bool preview, ContentCacheDataSerializerEntityType entityType)
     {
         if (preview)
         {
@@ -2081,6 +2244,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 ContentTypeId = dto.ContentTypeId,
                 Data = draftContentData,
                 IsDraft = true,
+                EntityType = entityType,
             };
         }
 
@@ -2130,6 +2294,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             ContentTypeId = dto.ContentTypeId,
             Data = publishedContentData,
             IsDraft = false,
+            EntityType = entityType,
         };
     }
 
@@ -2163,6 +2328,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             ContentTypeId = dto.ContentTypeId,
             Data = publishedContentData,
             IsDraft = false,
+            EntityType = ContentCacheDataSerializerEntityType.Media,
         };
     }
 

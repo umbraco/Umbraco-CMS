@@ -23,6 +23,7 @@ import {
 import {
 	encodeFilePath,
 	escapeHTML,
+	transformServerPathToClientPath,
 	UmbDeprecation,
 	UmbReadOnlyVariantGuardManager,
 } from '@umbraco-cms/backoffice/utils';
@@ -46,6 +47,7 @@ import type {
 	UmbPropertyTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,
@@ -64,6 +66,8 @@ export abstract class UmbBlockEntryContext<
 > extends UmbContextBase {
 	protected _manager?: BlockManagerContextType;
 	protected _entries?: BlockEntriesContextType;
+
+	#serverUrl = '';
 
 	#key?: string;
 	#contentKey?: string;
@@ -189,6 +193,25 @@ export abstract class UmbBlockEntryContext<
 	public readonly settingsElementTypeKey = this._blockType.asObservablePart((x) =>
 		x ? (x.settingsElementTypeKey ?? undefined) : null,
 	);
+
+	/**
+	 * Returns the thumbnail path as stored in the block type configuration.
+	 * Use {@link getThumbnailUrl} to get the resolved, client-usable URL.
+	 * @returns {string | undefined} The configured thumbnail path, or undefined when the block type has none.
+	 */
+	public getThumbnail(): string | undefined {
+		return this._blockType.getValue()?.thumbnail;
+	}
+
+	/**
+	 * Returns the thumbnail as a resolved, client-usable URL.
+	 * Use {@link getThumbnail} to get the raw path instead.
+	 * @returns {{ src: string } | undefined} The thumbnail URL, or undefined when the block type has no thumbnail.
+	 */
+	public getThumbnailUrl(): { src: string } | undefined {
+		const rawPath = this.getThumbnail();
+		return rawPath ? { src: new URL(transformServerPathToClientPath(rawPath), this.#serverUrl).href } : undefined;
+	}
 
 	protected _layout = new UmbObjectState<BlockLayoutType | undefined>(undefined);
 	public readonly layout = this._layout.asObservable();
@@ -411,6 +434,10 @@ export abstract class UmbBlockEntryContext<
 			this._entries = entries;
 			this._gotEntries();
 			this.#gotEntries();
+		});
+
+		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+			this.#serverUrl = instance?.getServerUrl() ?? '';
 		});
 
 		// Observe key:

@@ -120,6 +120,9 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
         // an optional per-call latency so the benchmark can model database round-trip cost — the single
         // vs batched read count is what distinguishes the cold per-key path from the batched one.
         var repoMock = new Mock<IDatabaseCacheRepository>();
+        repoMock
+            .Setup(r => r.GetKeysOfEntityTypes(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<ContentCacheDataSerializerEntityType>()))
+            .Returns(new HashSet<Guid>());
         repoMock.Setup(r => r.GetDocumentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .Returns(async (Guid key, bool _) =>
             {
@@ -180,7 +183,8 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
             publishStatusMock.Object,
             NullLogger<DocumentCacheService>.Instance,
             new ConvertedPublishedContentCacheFactory(null, NullLogger<ConvertedPublishedContentCacheFactory>.Instance),
-            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())));
+            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())),
+            Mock.Of<IContentCacheDataSerializerFactory>());
 
         _hybridCache = hybridCache;
         _cacheService = cacheService;

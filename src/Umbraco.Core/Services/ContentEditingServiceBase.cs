@@ -193,6 +193,14 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return Attempt.FailWithStatus(validationOperationStatus, new TContentCreateResult());
         }
 
+        // Culture variant content can't be saved without a name in at least one culture. New content has no names yet,
+        // so the create model must supply one. Update doesn't need this check: the content already has its culture
+        // names, and an update that leaves out the variants keeps them.
+        if (contentType.VariesByCulture() && contentCreationModelBase.Variants.Any(v => v.Culture is not null) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, new TContentCreateResult());
+        }
+
         (int? ParentId, ContentEditingOperationStatus OperationStatus) parent = await TryGetAndValidateParentIdAsync(contentCreationModelBase.ParentKey, contentType);
         if (parent.OperationStatus != ContentEditingOperationStatus.Success)
         {
@@ -210,6 +218,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         }
 
         UpdateNames(contentCreationModelBase, content, contentType);
+        if (HasName(content, contentType) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidName, new TContentCreateResult());
+        }
+
         await UpdateExistingProperties(contentCreationModelBase, content, contentType);
 
         return Attempt.SucceedWithStatus(validationResult.Status, new TContentCreateResult { Content = content, ValidationResult = validationResult.Result });
@@ -241,6 +254,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         Attempt<ContentValidationResult, ContentEditingOperationStatus> validationResult = await ValidatePropertiesAsync(contentEditingModelBase, contentType);
 
         UpdateNames(contentEditingModelBase, content, contentType);
+        if (HasName(content, contentType) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidName, new TContentUpdateResult { Content = content });
+        }
+
         await UpdateExistingProperties(contentEditingModelBase, content, contentType);
         RemoveMissingProperties(contentEditingModelBase, content, contentType);
 
@@ -257,6 +275,19 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// </remarks>
     private static bool HasValidNames(ContentEditingModelBase contentEditingModelBase)
         => contentEditingModelBase.Variants.All(variant => variant.Name.Length <= Constants.Validation.MaxNameLength);
+
+    /// <summary>
+    /// Determines whether mapped content has the name it needs to be saved: a name in at least one culture for
+    /// culture variant content, otherwise a non-blank name.
+    /// </summary>
+    /// <remarks>
+    /// A blank culture name clears that culture rather than setting it, so a model can supply a variant for every
+    /// culture and still leave the content without a name.
+    /// </remarks>
+    private static bool HasName(TContent content, TContentType contentType)
+        => contentType.VariesByCulture()
+            ? content.CultureInfos?.Values.Any(cultureInfo => cultureInfo.Name.IsNullOrWhiteSpace() is false) is true
+            : content.Name.IsNullOrWhiteSpace() is false;
 
     /// <summary>
     /// Validates the cultures in the content editing model.
@@ -570,9 +601,9 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return null;
         }
 
-        if (contentType.VariesByNothing() && contentEditingModelBase.Variants.Any(v => v.Culture is null) is false)
+        if (contentType.VariesByCulture() is false && contentEditingModelBase.Variants.Any(v => v.Culture is null) is false)
         {
-            // does not vary by anything and is missing the invariant name = invalid
+            // does not vary by culture and is missing the invariant name = invalid
             operationStatus = ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch;
             return null;
         }

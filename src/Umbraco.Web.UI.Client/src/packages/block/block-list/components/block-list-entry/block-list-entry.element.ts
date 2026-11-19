@@ -359,7 +359,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#expose = () => {
-		this.#context.expose();
+		if (this._showContentEdit) {
+			this.#context.edit();
+		} else {
+			this.#context.expose();
+		}
 	};
 
 	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
@@ -615,6 +619,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			.umb-block-list__block {
 				--umb-entity-frame-opacity: 0;
 				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
+				--umb-entity-frame-contrast-color: var(--uui-color-interactive-contrast);
 
 				&:hover,
 				&:focus-within {

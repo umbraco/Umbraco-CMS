@@ -40706,6 +40706,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -44181,6 +44184,7 @@
           "isDeletable",
           "isFolder",
           "noAccess",
+          "parentIsFolder",
           "name",
           "id",
           "flags",
@@ -44201,6 +44205,9 @@
             "type": "boolean"
           },
           "noAccess": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "name": {
@@ -44444,6 +44451,7 @@
           "variants",
           "isFolder",
           "noAccess",
+          "parentIsFolder",
           "name",
           "id",
           "flags",
@@ -44471,6 +44479,9 @@
             "type": "boolean"
           },
           "noAccess": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "name": {
@@ -45305,6 +45316,7 @@
           "icon",
           "isFolder",
           "noAccess",
+          "parentIsFolder",
           "name",
           "id",
           "flags",
@@ -45322,6 +45334,9 @@
             "type": "boolean"
           },
           "noAccess": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "name": {
@@ -45977,6 +45992,7 @@
           "variants",
           "isFolder",
           "noAccess",
+          "parentIsFolder",
           "name",
           "id",
           "flags",
@@ -46008,6 +46024,9 @@
             "type": "boolean"
           },
           "noAccess": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "name": {
@@ -48338,6 +48357,7 @@
           "isDeletable",
           "isFolder",
           "noAccess",
+          "parentIsFolder",
           "name",
           "id",
           "flags",
@@ -48355,6 +48375,9 @@
             "type": "boolean"
           },
           "noAccess": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "name": {
@@ -49042,6 +49065,7 @@
           "icon",
           "isFolder",
           "noAccess",
+          "parentIsFolder",
           "name",
           "id",
           "flags",
@@ -49056,6 +49080,9 @@
             "type": "boolean"
           },
           "noAccess": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "name": {
@@ -55298,13 +55325,16 @@
             "type": "string"
           },
           "events": {
-            "type": "string"
+            "type": "string",
+            "deprecated": true
           },
           "url": {
-            "type": "string"
+            "type": "string",
+            "deprecated": true
           },
           "types": {
-            "type": "string"
+            "type": "string",
+            "deprecated": true
           },
           "id": {
             "type": "string",

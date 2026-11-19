@@ -5,8 +5,10 @@ using Serilog;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
+using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Persistence.EFCore.Locking;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Extensions;
 
@@ -111,6 +113,10 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     /// </summary>
     /// <param name="builder">The DbContext options builder.</param>
     /// <param name="serviceProvider">The service provider to resolve connection string settings from.</param>
+    /// <remarks>
+    /// Every registered <see cref="IDatabaseConfigurator" /> that can handle the configured provider name configures the
+    /// builder. When there is none, the providers supported by <see cref="UseDatabaseProvider" /> are used.
+    /// </remarks>
     public static void UseUmbracoDatabaseProvider(this DbContextOptionsBuilder builder, IServiceProvider serviceProvider)
     {
         ConnectionStrings connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue;
@@ -131,6 +137,19 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         if (string.IsNullOrEmpty(connectionStrings.ConnectionString))
         {
             Log.Warning("No database provider was set. Connection string is null");
+            return;
+        }
+
+        IDatabaseConfigurator[] configurators = serviceProvider.GetServices<IDatabaseConfigurator>()
+            .Where(x => x.CanHandle(connectionStrings.ProviderName))
+            .ToArray();
+        if (configurators.Length > 0)
+        {
+            foreach (IDatabaseConfigurator configurator in configurators)
+            {
+                configurator.Configure(builder, connectionStrings.ConnectionString);
+            }
+
             return;
         }
 
