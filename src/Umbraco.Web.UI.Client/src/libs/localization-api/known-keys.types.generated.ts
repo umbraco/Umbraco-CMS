@@ -2800,6 +2800,7 @@ declare global {
 		validation_validationPattern: string;
 		validation_validationRegExp: string;
 		validation_validationRegExpMessage: string;
+		validation_valueMustBeUnique: string;
 		visuallyHiddenTexts_activeListLayout: string;
 		visuallyHiddenTexts_addImageCaption: string;
 		visuallyHiddenTexts_addNewRow: string;

@@ -2773,6 +2773,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'validation_validationPattern',
 	'validation_validationRegExp',
 	'validation_validationRegExpMessage',
+	'validation_valueMustBeUnique',
 	'visuallyHiddenTexts_activeListLayout',
 	'visuallyHiddenTexts_addImageCaption',
 	'visuallyHiddenTexts_addNewRow',

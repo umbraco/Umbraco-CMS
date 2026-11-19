@@ -12,7 +12,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 					alias: 'items',
 					label: 'Add option',
 					description: 'Add, remove or sort options for the list.',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ValueListOptions',
 				},
 			],
 		},
