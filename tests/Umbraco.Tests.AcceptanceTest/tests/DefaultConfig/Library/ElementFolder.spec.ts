@@ -46,7 +46,7 @@ test('can trash an element folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.library.clickConfirmTrashButtonAndWaitForElementFolderToBeTrashed();
 
   // Assert
-  expect(await umbracoApi.element.doesNameExist(elementFolderName)).toBeFalsy();
+  await expect.poll(() => umbracoApi.element.doesNameExist(elementFolderName)).toBeFalsy();
   await umbracoUi.library.isElementInTreeVisible(elementFolderName, false);
 });
 

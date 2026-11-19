@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -34,11 +35,49 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
 
     private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
 
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.AddNotificationHandler<ContentMovedToRecycleBinNotification, ContentNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeDeletedNotification, ContentTypeNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeDeletingNotification, ContentTypeDeletingNotificationHandler>();
+    }
+
+    [Test]
+    public async Task GetComposedOf_Distinguishes_Composition_From_Inheritance()
+    {
+        var parent = ContentTypeBuilder.CreateBasicContentType("parent", "Parent");
+        await ContentTypeService.CreateAsync(parent, Constants.Security.SuperUserKey);
+
+        // child inherits from parent (tree inheritance stores the parent in the child's ContentTypeComposition)
+        var child = ContentTypeBuilder.CreateBasicContentType("child", "Child", parent);
+        await ContentTypeService.CreateAsync(child, Constants.Security.SuperUserKey);
+
+        // composer uses parent as a true composition
+        var composer = ContentTypeBuilder.CreateBasicContentType("composer", "Composer");
+        composer.AddContentType(parent);
+        await ContentTypeService.CreateAsync(composer, Constants.Security.SuperUserKey);
+
+        var composedOfIds = ContentTypeService.GetComposedOf(parent.Id).Select(x => x.Id).ToArray();
+        var compositionIds = ContentTypeService.GetComposedOf(parent.Id, ComposedOfType.Composition).Select(x => x.Id).ToArray();
+        var inheritanceIds = ContentTypeService.GetComposedOf(parent.Id, ComposedOfType.Inheritance).Select(x => x.Id).ToArray();
+        var allIds = ContentTypeService.GetComposedOf(parent.Id, ComposedOfType.All).Select(x => x.Id).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            // the parameterless overload returns both axes
+            Assert.That(composedOfIds, Is.EquivalentTo(new[] { child.Id, composer.Id }));
+
+            // the composition axis excludes the inheriting child
+            Assert.That(compositionIds, Is.EquivalentTo(new[] { composer.Id }));
+
+            // the inheritance axis returns only the inheriting child
+            Assert.That(inheritanceIds, Is.EquivalentTo(new[] { child.Id }));
+
+            // All is equivalent to the parameterless overload
+            Assert.That(allIds, Is.EquivalentTo(new[] { child.Id, composer.Id }));
+        });
     }
 
     [Test]
@@ -666,6 +705,216 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(bannerStillExists, Is.False);
         Assert.That(bannerPropertyStillExists, Is.False);
         Assert.That(homepage.CompositionPropertyTypes.Count(), Is.EqualTo(4));
+    }
+
+    [Test]
+    public async Task Removing_Composition_Deletes_Only_The_Composition_Property_Data_Of_The_Composing_Content()
+    {
+        var template = await CreateTextPageTemplate();
+        var composition = await CreateComposition("composition", "compositionText");
+        var compositionPropertyTypeIds = composition.PropertyTypes.Select(x => x.Id).ToArray();
+
+        var unrelatedType = await CreateComposingContentType("unrelated", template);
+
+        // Create enough unrelated property data that rows exist whose primary key equals a composition property type id.
+        for (var i = 0; i < 20; i++)
+        {
+            CreateAndPublishContent(unrelatedType, $"Unrelated {i}");
+        }
+
+        var composingType = await CreateComposingContentType("composing", template, composition);
+        var composingContentIds = Enumerable.Range(0, 3)
+            .Select(i => CreateAndPublishContent(composingType, $"Composing {i}").Id)
+            .ToArray();
+
+        List<PropertyDataDto> before = FetchAllPropertyData();
+        Assert.That(before.Select(x => x.Id), Is.SupersetOf(compositionPropertyTypeIds));
+
+        await RemoveComposition(composingType, composition);
+
+        AssertOnlyPropertyDataDeleted(before, compositionPropertyTypeIds, composingContentIds);
+        foreach (var id in composingContentIds)
+        {
+            IContent content = ContentService.GetById(id)!;
+            Assert.That(content.Properties.Contains("compositionText"), Is.False);
+        }
+    }
+
+    [Test]
+    public async Task Removing_Composition_Keeps_The_Composition_Property_Data_Of_Other_Content_Types()
+    {
+        var template = await CreateTextPageTemplate();
+        var composition = await CreateComposition("composition", "compositionText");
+
+        var composingType = await CreateComposingContentType("composing", template, composition);
+        var composingContentIds = Enumerable.Range(0, 2)
+            .Select(i => CreateAndPublishContent(composingType, $"Composing {i}").Id)
+            .ToArray();
+
+        var otherComposingType = await CreateComposingContentType("otherComposing", template, composition);
+        var otherComposingContentIds = Enumerable.Range(0, 2)
+            .Select(i => CreateAndPublishContent(otherComposingType, $"Other composing {i}").Id)
+            .ToArray();
+
+        List<PropertyDataDto> before = FetchAllPropertyData();
+
+        await RemoveComposition(composingType, composition);
+
+        AssertOnlyPropertyDataDeleted(before, composition.PropertyTypes.Select(x => x.Id).ToArray(), composingContentIds);
+        foreach (var id in otherComposingContentIds)
+        {
+            Assert.That(ContentService.GetById(id)!.GetValue<string>("compositionText"), Is.Not.Empty);
+        }
+    }
+
+    [Test]
+    public async Task Removing_One_Composition_Keeps_The_Property_Data_Of_The_Other_Compositions()
+    {
+        var template = await CreateTextPageTemplate();
+        var removedComposition = await CreateComposition("removedComposition", "removedText");
+        var keptComposition = await CreateComposition("keptComposition", "keptText");
+
+        var composingType = await CreateComposingContentType("composing", template, removedComposition, keptComposition);
+        var composingContentIds = Enumerable.Range(0, 2)
+            .Select(i => CreateAndPublishContent(composingType, $"Composing {i}").Id)
+            .ToArray();
+
+        List<PropertyDataDto> before = FetchAllPropertyData();
+
+        await RemoveComposition(composingType, removedComposition);
+
+        AssertOnlyPropertyDataDeleted(before, removedComposition.PropertyTypes.Select(x => x.Id).ToArray(), composingContentIds);
+        foreach (var id in composingContentIds)
+        {
+            Assert.That(ContentService.GetById(id)!.GetValue<string>("keptText"), Is.Not.Empty);
+        }
+    }
+
+    [Test]
+    public async Task Removing_Composition_Deletes_The_Composition_Property_Data_Of_All_Cultures_And_Versions()
+    {
+        await LanguageService.CreateAsync(new Language("da-DK", "Danish"), Constants.Security.SuperUserKey);
+
+        var template = await CreateTextPageTemplate();
+        var composition = await CreateComposition("composition", "compositionText", ContentVariation.Culture);
+        var compositionPropertyTypeIds = composition.PropertyTypes.Select(x => x.Id).ToArray();
+
+        var composingType = ContentTypeBuilder.CreateSimpleContentType("composing", "Composing", randomizeAliases: true, defaultTemplateId: template.Id);
+        composingType.Variations = ContentVariation.Culture;
+        composingType.AddContentType(composition);
+        await ContentTypeService.CreateAsync(composingType, Constants.Security.SuperUserKey);
+
+        var content = ContentBuilder.CreateBasicContent(composingType);
+        content.SetCultureName("Variant", "en-US");
+        content.SetCultureName("Variant (da)", "da-DK");
+        content.SetValue("compositionText", "Published value", "en-US");
+        content.SetValue("compositionText", "Published value (da)", "da-DK");
+        ContentService.Save(content);
+        ContentService.Publish(content, ["*"]);
+
+        // A newer draft gives the content a current version distinct from its published version.
+        content.SetValue("compositionText", "Draft value", "en-US");
+        ContentService.Save(content);
+
+        List<PropertyDataDto> before = FetchAllPropertyData();
+        List<PropertyDataDto> compositionRows = before.Where(x => compositionPropertyTypeIds.Contains(x.PropertyTypeId)).ToList();
+        Assert.Multiple(() =>
+        {
+            Assert.That(compositionRows.Select(x => x.LanguageId).Distinct().Count(), Is.EqualTo(2));
+            Assert.That(compositionRows.Select(x => x.VersionId).Distinct().Count(), Is.GreaterThanOrEqualTo(2));
+        });
+
+        await RemoveComposition(composingType, composition);
+
+        AssertOnlyPropertyDataDeleted(before, compositionPropertyTypeIds, [content.Id]);
+    }
+
+    private async Task<ITemplate> CreateTextPageTemplate()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        return template;
+    }
+
+    private async Task<ContentType> CreateComposition(string alias, string propertyAlias, ContentVariation variations = ContentVariation.Nothing)
+    {
+        var composition = ContentTypeBuilder.CreateBasicContentType(alias, alias);
+        composition.Variations = variations;
+        composition.AddPropertyType(
+            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, propertyAlias)
+            {
+                Name = propertyAlias,
+                DataTypeId = Constants.DataTypes.Textbox,
+                Variations = variations,
+            },
+            alias,
+            alias);
+        await ContentTypeService.CreateAsync(composition, Constants.Security.SuperUserKey);
+        return composition;
+    }
+
+    private async Task<ContentType> CreateComposingContentType(string alias, ITemplate template, params IContentTypeComposition[] compositions)
+    {
+        var contentType = ContentTypeBuilder.CreateSimpleContentType(alias, alias, randomizeAliases: true, defaultTemplateId: template.Id);
+        foreach (IContentTypeComposition composition in compositions)
+        {
+            contentType.AddContentType(composition);
+        }
+
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        return contentType;
+    }
+
+    private IContent CreateAndPublishContent(IContentType contentType, string name)
+    {
+        var content = ContentBuilder.CreateBasicContent(contentType);
+        content.Name = name;
+        foreach (IPropertyType propertyType in contentType.CompositionPropertyTypes)
+        {
+            content.SetValue(propertyType.Alias, $"{name} {propertyType.Alias}");
+        }
+
+        ContentService.Save(content);
+        ContentService.Publish(content, ["*"]);
+        return content;
+    }
+
+    private async Task RemoveComposition(ContentType contentType, IContentTypeComposition composition)
+    {
+        Assert.That(contentType.RemoveContentType(composition.Alias), Is.True);
+        var result = await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+        Assert.That(result.Success, Is.True);
+    }
+
+    private void AssertOnlyPropertyDataDeleted(
+        List<PropertyDataDto> before,
+        IReadOnlyCollection<int> removedPropertyTypeIds,
+        IReadOnlyCollection<int> composingContentIds)
+    {
+        Dictionary<int, int> nodeIdByVersionId;
+        using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+        {
+            nodeIdByVersionId = scope.Database.Fetch<ContentVersionDto>().ToDictionary(x => x.Id, x => x.NodeId);
+        }
+
+        bool IsRemoved(PropertyDataDto row)
+            => removedPropertyTypeIds.Contains(row.PropertyTypeId)
+               && composingContentIds.Contains(nodeIdByVersionId[row.VersionId]);
+
+        var expectedRemainingIds = before.Where(x => IsRemoved(x) is false).Select(x => x.Id).ToArray();
+        List<PropertyDataDto> after = FetchAllPropertyData();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(before.Count(IsRemoved), Is.GreaterThan(0));
+            Assert.That(after.Select(x => x.Id), Is.EquivalentTo(expectedRemainingIds));
+        });
+    }
+
+    private List<PropertyDataDto> FetchAllPropertyData()
+    {
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        return scope.Database.Fetch<PropertyDataDto>();
     }
 
     [Test]
@@ -2099,6 +2348,112 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Move_PropertyType_To_No_Group()
+    {
+        IContentType basePage = await CreateContentTypeWithSingleGroupedProperty();
+
+        Assert.IsTrue(basePage.MovePropertyType("title", null));
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, basePage.PropertyTypes.Count(), "the property type should not be orphaned in memory");
+            Assert.AreEqual("title", basePage.NoGroupPropertyTypes.SingleOrDefault()?.Alias);
+            Assert.IsEmpty(basePage.PropertyGroups["content"].PropertyTypes!);
+        });
+
+        await ContentTypeService.UpdateAsync(basePage, Constants.Security.SuperUserKey);
+        basePage = ContentTypeService.Get(basePage.Id);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, basePage.PropertyTypes.Count(), "the property type should not be deleted on save");
+            Assert.AreEqual("title", basePage.NoGroupPropertyTypes.SingleOrDefault()?.Alias);
+            Assert.IsNull(basePage.NoGroupPropertyTypes.Single().PropertyGroupId);
+            Assert.IsEmpty(basePage.PropertyGroups["content"].PropertyTypes!);
+        });
+    }
+
+    [Test]
+    public async Task Can_Move_PropertyType_To_No_Group_Without_Losing_Content_Values()
+    {
+        IContentType basePage = await CreateContentTypeWithSingleGroupedProperty();
+
+        IContent contentItem = ContentBuilder.CreateBasicContent(basePage);
+        contentItem.SetValue("title", "The title");
+        ContentService.Save(contentItem);
+
+        basePage.MovePropertyType("title", null);
+        await ContentTypeService.UpdateAsync(basePage, Constants.Security.SuperUserKey);
+
+        contentItem = ContentService.GetById(contentItem.Id);
+
+        Assert.AreEqual("The title", contentItem.GetValue<string>("title"));
+    }
+
+    [Test]
+    public async Task Can_Move_PropertyType_From_No_Group_Into_Group()
+    {
+        IContentType basePage = await CreateContentTypeWithSingleUngroupedProperty();
+        Assert.AreEqual("title", basePage.NoGroupPropertyTypes.SingleOrDefault()?.Alias, "the property type should start un-grouped");
+
+        Assert.IsTrue(basePage.MovePropertyType("title", "content"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsEmpty(basePage.NoGroupPropertyTypes, "the property type should no longer be un-grouped in memory");
+            Assert.AreEqual("title", basePage.PropertyGroups["content"].PropertyTypes!.SingleOrDefault()?.Alias);
+        });
+
+        await ContentTypeService.UpdateAsync(basePage, Constants.Security.SuperUserKey);
+        basePage = ContentTypeService.Get(basePage.Id);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, basePage.PropertyTypes.Count());
+            Assert.IsEmpty(basePage.NoGroupPropertyTypes);
+            Assert.AreEqual("title", basePage.PropertyGroups["content"].PropertyTypes!.SingleOrDefault()?.Alias);
+        });
+    }
+
+    private async Task<IContentType> CreateContentTypeWithSingleGroupedProperty()
+    {
+        ContentType basePage = ContentTypeBuilder.CreateBasicContentType();
+        basePage.AddPropertyGroup("content", "Content");
+        Assert.IsTrue(basePage.AddPropertyType(CreateTitlePropertyType(), "content", "Content"));
+
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
+
+        return ContentTypeService.Get(basePage.Id);
+    }
+
+    private async Task<IContentType> CreateContentTypeWithSingleUngroupedProperty()
+    {
+        ContentType basePage = ContentTypeBuilder.CreateBasicContentType();
+        basePage.AddPropertyGroup("content", "Content");
+
+        // the single argument overload adds the property type without a group
+        Assert.IsTrue(basePage.AddPropertyType(CreateTitlePropertyType()));
+
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
+
+        return ContentTypeService.Get(basePage.Id);
+    }
+
+    private PropertyType CreateTitlePropertyType() =>
+        new(
+            ShortStringHelper,
+            Constants.PropertyEditors.Aliases.TextBox,
+            ValueStorageType.Nvarchar,
+            "title")
+        {
+            Name = "Title",
+            Description = string.Empty,
+            Mandatory = false,
+            SortOrder = 1,
+            DataTypeId = Constants.DataTypes.Textbox,
+        };
+
+    [Test]
     public async Task Can_Add_PropertyGroup_With_Same_Name_On_Parent_and_Child()
     {
         /*
@@ -2728,5 +3083,140 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
             Assert.IsTrue(result.Items.Any(x => x.Key == allowedAtRoot.Key));
             Assert.IsFalse(result.Items.Any(x => x.Key == notAllowedAtRoot.Key));
         });
+    }
+
+    [Test]
+    public async Task Can_Get_First_Page_Of_Allowed_Children()
+    {
+        IContentType[] children = await CreateContentTypesAllowedAsChildren();
+
+        Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> result =
+            await ContentTypeService.GetAllowedChildrenAsync(children[0].Key, skip: 0, take: 2);
+
+        Assert.IsTrue(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, result.Result!.Total);
+            Assert.AreEqual(new[] { children[0].Key, children[1].Key }, result.Result.Items.Select(x => x.Key).ToArray());
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Subsequent_Page_Of_Allowed_Children()
+    {
+        IContentType[] children = await CreateContentTypesAllowedAsChildren();
+
+        Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> result =
+            await ContentTypeService.GetAllowedChildrenAsync(children[0].Key, skip: 1, take: 2);
+
+        Assert.IsTrue(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, result.Result!.Total);
+            Assert.AreEqual(new[] { children[1].Key, children[2].Key }, result.Result.Items.Select(x => x.Key).ToArray());
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Last_Page_Of_Allowed_Children()
+    {
+        IContentType[] children = await CreateContentTypesAllowedAsChildren();
+
+        Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> result =
+            await ContentTypeService.GetAllowedChildrenAsync(children[0].Key, skip: 2, take: 2);
+
+        Assert.IsTrue(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, result.Result!.Total);
+            Assert.AreEqual(new[] { children[2].Key }, result.Result.Items.Select(x => x.Key).ToArray());
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Subsequent_Page_Of_ContentTypes_Allowed_At_Root()
+    {
+        foreach (var alias in new[] { "rootOne", "rootTwo", "rootThree" })
+        {
+            ContentType contentType = ContentTypeBuilder.CreateBasicContentType(alias, alias);
+            contentType.AllowedAsRoot = true;
+            await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        }
+
+        PagedModel<IContentType> all = await ContentTypeService.GetAllAllowedAsRootAsync(0, 1000);
+        Assert.GreaterOrEqual(all.Total, 3);
+        Guid[] expectedKeys = all.Items.Skip(1).Take(2).Select(x => x.Key).ToArray();
+
+        PagedModel<IContentType> result = await ContentTypeService.GetAllAllowedAsRootAsync(1, 2);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(all.Total, result.Total);
+            Assert.AreEqual(expectedKeys, result.Items.Select(x => x.Key).ToArray());
+        });
+    }
+
+    [Test]
+    public async Task GetAllAllowedAsRootAsync_Excludes_Element_Types()
+    {
+        foreach (var alias in new[] { "rootOne", "rootTwo", "rootThree" })
+        {
+            ContentType contentType = ContentTypeBuilder.CreateBasicContentType(alias, alias);
+            contentType.AllowedAsRoot = true;
+            contentType.IsElement = alias is "rootThree";
+            await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        }
+
+        PagedModel<IContentType> all = await ContentTypeService.GetAllAllowedAsRootAsync(0, 10);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, all.Total);
+            CollectionAssert.AreEquivalent(new[] { "rootOne", "rootTwo" }, all.Items.Select(item => item.Alias));
+        });
+    }
+
+    [Test]
+    public async Task GetAllowedChildrenAsync_Excludes_Element_Types()
+    {
+        IContentType[] children = await CreateContentTypesAllowedAsChildren();
+
+        var element = children.Last();
+        element.IsElement = true;
+        await ContentTypeService.UpdateAsync(element, Constants.Security.SuperUserKey);
+
+        Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> result =
+            await ContentTypeService.GetAllowedChildrenAsync(children[0].Key, skip: 0, take: 10);
+
+        Assert.IsTrue(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, result.Result!.Total);
+            Assert.AreEqual(new[] { children[0].Key, children[1].Key }, result.Result.Items.Select(x => x.Key).ToArray());
+        });
+    }
+
+    /// <summary>
+    /// Creates three content types, each allowed as a child of the first, in a known order.
+    /// </summary>
+    private async Task<IContentType[]> CreateContentTypesAllowedAsChildren()
+    {
+        IContentType[] children =
+        [
+            ContentTypeBuilder.CreateBasicContentType("childOne", "Child One"),
+            ContentTypeBuilder.CreateBasicContentType("childTwo", "Child Two"),
+            ContentTypeBuilder.CreateBasicContentType("childThree", "Child Three"),
+        ];
+
+        foreach (IContentType child in children)
+        {
+            await ContentTypeService.CreateAsync(child, Constants.Security.SuperUserKey);
+        }
+
+        children[0].AllowedContentTypes = children
+            .Select((child, index) => new ContentTypeSort(child.Key, index, child.Alias))
+            .ToArray();
+        await ContentTypeService.UpdateAsync(children[0], Constants.Security.SuperUserKey);
+
+        return children;
     }
 }

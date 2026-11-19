@@ -1,3 +1,4 @@
+import { getCharacterCountState, isCharacterLimitExceeded } from '../utils/character-count.js';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -11,7 +12,6 @@ import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import { getCharacterCountState, isCharacterLimitExceeded } from '../utils/character-count.js';
 
 @customElement('umb-property-editor-ui-text-box')
 export class UmbPropertyEditorUITextBoxElement

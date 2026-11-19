@@ -3,6 +3,7 @@ import {
 	LoginResponse,
 	MfaCodeResponse,
 	NewPasswordResponse,
+	PendingTwoFactorResponse,
 	ResetPasswordResponse,
 	ValidateInviteCodeResponse,
 	ValidatePasswordResetCodeResponse,
@@ -91,6 +92,35 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 		}
 	}
 
+	/**
+	 * Looks up a pending two-factor sign-in for the current browser session, driven by the two-factor
+	 * cookie a prior sign-in attempt (local or external) already set - not by a username. Used to
+	 * populate the MFA screen when it's reached other than as a direct continuation of `login()`
+	 * (e.g. after redirecting back from an external login provider).
+	 * @returns The provider options, or `undefined` when there is no pending two-factor sign-in.
+	 */
+	public async fetchPendingTwoFactorInfo(): Promise<PendingTwoFactorResponse | undefined> {
+		try {
+			const response = await fetch('/umbraco/management/api/v1/security/back-office/pending-2fa', {
+				headers: {
+					Accept: 'application/json',
+				},
+			});
+
+			if (!response.ok) {
+				return undefined;
+			}
+
+			const responseData = await response.json();
+			return {
+				twoFactorView: responseData.twoFactorLoginView ?? '',
+				twoFactorProviders: responseData.enabledTwoFactorProviderNames ?? [],
+			};
+		} catch {
+			return undefined;
+		}
+	}
+
 	public async resetPassword(email: string): Promise<ResetPasswordResponse> {
 		try {
 			await SecurityService.postSecurityForgotPassword({
@@ -100,9 +130,10 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 			});
 
 			return {};
-		} catch (error) {
+		} catch {
+			// The request is anonymous, so the reason for a failure is for the server log, not the user.
 			return {
-				error: this.#getApiErrorDetailText(error, 'Could not reset the password'),
+				error: this.#localize.term('login_passwordResetUnavailable'),
 			};
 		}
 	}
@@ -187,6 +218,11 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 
 	#getApiErrorDetailText(error: unknown, fallbackText?: string): string | undefined {
 		if (isProblemDetailsLike(error)) {
+			// Server errors can carry exception details, which must not be shown on the login screen.
+			if (error.status >= 500) {
+				return this.#localize.term('login_receivedErrorFromServer');
+			}
+
 			return error.detail ?? error.title ?? undefined;
 		}
 

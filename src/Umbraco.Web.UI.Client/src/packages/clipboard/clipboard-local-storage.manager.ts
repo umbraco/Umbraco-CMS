@@ -1,5 +1,4 @@
 import type { UmbClipboardEntryDetailModel } from './clipboard-entry/index.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
@@ -15,15 +14,6 @@ interface UmbClipboardLocalStorageFilterModel {
 export class UmbClipboardLocalStorageManager extends UmbControllerBase {
 	#currentUserUnique?: string;
 	#fingerprint?: string;
-
-	constructor(host: UmbControllerHost) {
-		super(host);
-
-		// TODO: look into encrypting the data
-		if (!window.isSecureContext && window.crypto) {
-			throw new Error('Clipboard local storage manager can only be used in a secure context');
-		}
-	}
 
 	// Gets all entries from local storage
 	async getEntries(): Promise<{
@@ -44,6 +34,7 @@ export class UmbClipboardLocalStorageManager extends UmbControllerBase {
 	}
 
 	// Sets all entries in local storage
+	// TODO: look into encrypting the data
 	async setEntries(entries: Array<UmbClipboardEntryDetailModel>) {
 		const currentUserUnique = await this.#requestCurrentUserUnique();
 
@@ -102,6 +93,13 @@ export class UmbClipboardLocalStorageManager extends UmbControllerBase {
 	}
 
 	async #fingerPrint(text: string) {
+		// crypto.subtle only exists in secure contexts (https or localhost). The hash only shapes
+		// the per-user localStorage key — it is not a security boundary — and localStorage is
+		// per-origin, so a raw-text key on an insecure origin never collides with hashed keys.
+		if (!window.crypto?.subtle) {
+			return text;
+		}
+
 		const encoder = new TextEncoder();
 		const data = encoder.encode(text);
 		const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);

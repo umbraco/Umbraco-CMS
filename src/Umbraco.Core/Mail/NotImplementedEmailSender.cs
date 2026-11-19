@@ -17,7 +17,12 @@ internal sealed class NotImplementedEmailSender : IEmailSender
             "To send an Email ensure IEmailSender is implemented with a custom implementation");
 
     /// <inheritdoc />
-    public bool CanSendRequiredEmail()
+    public bool IsEmailConfigured()
+        => throw new NotImplementedException(
+            "To send an Email ensure IEmailSender is implemented with a custom implementation");
+
+    /// <inheritdoc />
+    public Task<bool> IsEmailAvailableAsync(CancellationToken cancellationToken = default)
         => throw new NotImplementedException(
             "To send an Email ensure IEmailSender is implemented with a custom implementation");
 }

@@ -5,6 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Server data source for the Media audit log
@@ -24,11 +25,13 @@ export class UmbMediaAuditLogServerDataSource implements UmbAuditLogDataSource<U
 
 	/**
 	 * Get the audit log for a Media
-	 * @param {UmbAuditLogRequestArgs} args
-	 * @returns {*}
+	 * @param {UmbAuditLogRequestArgs} args - The audit log request arguments
+	 * @returns {UmbDataSourceResponse<UmbPagedModel<UmbMediaAuditLogModel>>} The audit log for the media
 	 * @memberof UmbMediaAuditLogServerDataSource
 	 */
-	async getAuditLog(args: UmbAuditLogRequestArgs) {
+	async getAuditLog(
+		args: UmbAuditLogRequestArgs,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbMediaAuditLogModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			MediaService.getMediaByIdAuditLog({

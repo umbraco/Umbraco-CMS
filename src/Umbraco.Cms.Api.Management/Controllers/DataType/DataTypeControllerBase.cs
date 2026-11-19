@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -16,6 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.DataType)]
 [ApiExplorerSettings(GroupName = "Data Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrElementsOrMediaOrMembersOrContentTypes)]
+[RequiresPermissionsFor(Constants.Permissions.Entities.DataType.Resource)]
 public abstract class DataTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult DataTypeOperationStatusResult(DataTypeOperationStatus status) =>
@@ -28,7 +30,7 @@ public abstract class DataTypeControllerBase : ManagementApiControllerBase
             DataTypeOperationStatus.NotFound => DataTypeNotFound(problemDetailsBuilder),
             DataTypeOperationStatus.InvalidName => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid data type name")
-                .WithDetail("The data type name must be non-empty and no longer than 255 characters.")
+                .WithDetail($"The data type name must be non-empty and no longer than {Constants.Validation.MaxNameLength} characters.")
                 .Build()),
             DataTypeOperationStatus.ParentNotContainer => BadRequest(problemDetailsBuilder
                 .WithTitle("parent id is not a container")

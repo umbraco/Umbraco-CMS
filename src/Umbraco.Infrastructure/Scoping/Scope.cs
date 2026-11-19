@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
     internal sealed class Scope : CoreScope, ICoreScope, IScope, Core.Scoping.IScope
     {
         private readonly bool _autoComplete;
-        private readonly CoreDebugSettings _coreDebugSettings;
+        private readonly DebugSettings _coreDebugSettings;
         private readonly IsolationLevel _isolationLevel;
         private readonly ILogger<Scope> _logger;
         private readonly MediaFileManager _mediaFileManager;
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         // initializes a new scope
         private Scope(
             ScopeProvider scopeProvider,
-            CoreDebugSettings coreDebugSettings,
+            DebugSettings coreDebugSettings,
             IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
             ILoggerFactory loggerFactory,
             MediaFileManager mediaFileManager,
@@ -138,7 +138,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <param name="autoComplete">If <c>true</c>, the scope will automatically complete when disposed.</param>
         public Scope(
             ScopeProvider scopeProvider,
-            CoreDebugSettings coreDebugSettings,
+            DebugSettings coreDebugSettings,
             MediaFileManager mediaFileManager,
             IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
             ILoggerFactory loggerFactory,
@@ -198,7 +198,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <param name="autoComplete">If <c>true</c>, the scope will automatically complete when disposed; otherwise, completion must be explicit.</param>
         public Scope(
             ScopeProvider scopeProvider,
-            CoreDebugSettings coreDebugSettings,
+            DebugSettings coreDebugSettings,
             MediaFileManager mediaFileManager,
             IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
             ILoggerFactory loggerFactory,
@@ -299,7 +299,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
         }
 
-        // true if Umbraco.CoreDebugSettings.LogUncompletedScope appSetting is set to "true"
         private bool LogUncompletedScopes => _coreDebugSettings.LogIncompletedScopes;
 
         /// <summary>
@@ -484,6 +483,17 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
 
             _disposed = true;
+        }
+
+        /// <inheritdoc />
+        protected override void ChildCompleted(bool? completed)
+        {
+            if (LogUncompletedScopes && completed is not true)
+            {
+                _logger.LogWarning("Uncompleted Child Scope at\r\n {StackTrace}", Environment.StackTrace);
+            }
+
+            base.ChildCompleted(completed);
         }
 
         /// <summary>

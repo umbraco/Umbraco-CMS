@@ -27,10 +27,11 @@ export class UmbOpenModalController extends UmbControllerBase {
 
 /**
  *
- * @param host {UmbControllerHost} - The host controller
- * @param modalAlias
- * @param args {UmbConfirmModalArgs} - The data to pass to the modal
- * @returns {UmbConfirmModalController} The modal controller instance
+ * @param {UmbControllerHost} host - The host controller
+ * @param {UmbModalToken | string} modalAlias - The alias or token of the modal to open
+ * @param {UmbModalContextClassArgs} args - The data to pass to the modal
+ * @template ModalValue
+ * @returns {Promise<ModalValue>} The value resolved from the modal.
  */
 export function umbOpenModal<
 	ModalData extends { [key: string]: any } = { [key: string]: any },

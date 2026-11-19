@@ -5,13 +5,13 @@ import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @class UmbPartialViewDetailStore
- * @augments {UmbStoreBase}
+ * @augments {UmbDetailStoreBase}
  * @description - Data Store for Partial View detail
  */
 export class UmbPartialViewDetailStore extends UmbDetailStoreBase<UmbPartialViewDetailModel> {
 	/**
 	 * Creates an instance of UmbPartialViewDetailStore.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbPartialViewDetailStore
 	 */
 	constructor(host: UmbControllerHost) {

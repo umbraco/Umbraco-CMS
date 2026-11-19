@@ -28,20 +28,6 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs
         /// <param name="firstRunTime">The configured time to first run the task in crontab format.</param>
         /// <param name="cronTabParser">An instance of <see cref="ICronTabParser" />.</param>
         /// <param name="logger">The logger.</param>
-        /// <param name="defaultDelay">The default delay to use when a first run time is not configured.</param>
-        /// <returns>
-        /// The delay before first running the recurring task.
-        /// </returns>
-        [Obsolete("Use the overload accepting TimeProvider. Scheduled for removal in Umbraco 19.")]
-        public static TimeSpan GetDelay(string firstRunTime, ICronTabParser cronTabParser, ILogger logger, TimeSpan defaultDelay)
-            => GetDelay(firstRunTime, cronTabParser, logger, DateTime.Now, defaultDelay);
-
-        /// <summary>
-        /// Determines the delay before the first run of a recurring task implemented as a hosted service when an optional configuration for the first run time is available.
-        /// </summary>
-        /// <param name="firstRunTime">The configured time to first run the task in crontab format.</param>
-        /// <param name="cronTabParser">An instance of <see cref="ICronTabParser" />.</param>
-        /// <param name="logger">The logger.</param>
         /// <param name="now">The current datetime.</param>
         /// <param name="defaultDelay">The default delay to use when a first run time is not configured.</param>
         /// <returns>

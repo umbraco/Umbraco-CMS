@@ -1,6 +1,9 @@
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS, UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS } from './constants.js';
 import { manifest as propertyEditorSchema } from './Umbraco.BlockList.js';
-import { UmbStandardBlockValueResolver } from '@umbraco-cms/backoffice/block';
+import {
+	UmbBlockPropertyValueEntityReferenceResolver,
+	UmbStandardBlockValueResolver,
+} from '@umbraco-cms/backoffice/block';
 import { UMB_PROPERTY_HAS_VALUE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/property';
 
 const propertyEditorUi: UmbExtensionManifest = {
@@ -20,21 +23,21 @@ const propertyEditorUi: UmbExtensionManifest = {
 				{
 					alias: 'useLiveEditing',
 					label: 'Live editing mode',
-					description:
-						'Live editing in editor overlays for live updated custom views or labels using custom expression.',
+					description: 'Instant updates',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'useInlineEditingAsDefault',
 					label: 'Inline editing mode',
-					description: 'Use the inline editor as the default block view.',
+					description: 'Expand to edit',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'maxPropertyWidth',
-					label: 'Property editor width',
-					description: 'Optional CSS override, example: 800px or 100%',
+					label: 'Property Editor width',
+					description: 'Example: `800px`',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+					config: [{ alias: 'placeholder', value: '100%' }],
 				},
 				{
 					alias: 'createModalSize',
@@ -58,6 +61,14 @@ const propertyValueResolver: UmbExtensionManifest = {
 	alias: 'Umb.PropertyValueResolver.BlockList',
 	name: 'Block List Value Resolver',
 	api: UmbStandardBlockValueResolver,
+	forEditorAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
+};
+
+const propertyValueEntityReference: UmbExtensionManifest = {
+	type: 'propertyValueEntityReference',
+	alias: 'Umb.PropertyValueEntityReference.BlockList',
+	name: 'Block List Entity Reference Resolver',
+	api: UmbBlockPropertyValueEntityReferenceResolver,
 	forEditorAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
 };
 
@@ -86,6 +97,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	propertyEditorSchema,
 	propertyEditorUi,
 	propertyValueResolver,
+	propertyValueEntityReference,
 	sortModePropertyContext,
 	sortModePropertyAction,
 ];

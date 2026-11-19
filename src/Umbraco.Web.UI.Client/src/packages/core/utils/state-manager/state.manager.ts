@@ -29,7 +29,7 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 
 	/**
 	 * Creates an instance of UmbStateManager.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host.
 	 * @memberof UmbStateManager
 	 */
 	constructor(host: UmbControllerHost) {
@@ -38,7 +38,7 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 
 	/**
 	 * Add a new state to the state manager
-	 * @param {StateType} state
+	 * @param {StateType} state - The state to add.
 	 * @memberof UmbStateManager
 	 */
 	addState(state: StateType) {
@@ -51,7 +51,7 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 
 	/**
 	 * Add multiple states to the state manager
-	 * @param {StateType[]} states
+	 * @param {StateType[]} states - The states to add.
 	 * @memberof UmbStateManager
 	 */
 	addStates(states: StateType[]) {
@@ -60,7 +60,7 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 
 	/**
 	 * Remove a state from the state manager
-	 * @param {StateType['unique']} unique
+	 * @param {StateType['unique']} unique - The unique property of the state to remove.
 	 * @memberof UmbStateManager
 	 */
 	removeState(unique: StateType['unique']) {
@@ -69,7 +69,7 @@ export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbC
 
 	/**
 	 * Remove multiple states from the state manager
-	 * @param {StateType['unique'][]} uniques
+	 * @param {StateType['unique'][]} uniques - The unique properties of the states to remove.
 	 * @memberof UmbStateManager
 	 */
 	removeStates(uniques: StateType['unique'][]) {

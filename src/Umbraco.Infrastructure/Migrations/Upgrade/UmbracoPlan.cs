@@ -62,6 +62,11 @@ public partial class UmbracoPlan : MigrationPlan
         //   .With()
         //     .To<ChangeB>("state-b")
         //   .As("state-2");
+        //
+        // Merging a migration UP into an already-released version line: it lands here in namespace order,
+        // BEFORE that line's own migrations, so sites already on that line skip it (they only walk forward).
+        // Re-apply it at the END of the plan as an empty subclass of the original, in the new version's
+        // namespace. See V_18_1_0.AddContentTypeIdIndexForContent and the Migration Edge Cases in CLAUDE.md.
 
         From(InitialState);
 
@@ -104,8 +109,33 @@ public partial class UmbracoPlan : MigrationPlan
 
         // To 18.0.0
         To<V_18_0_0.AddElementContainerPermissions>("{D00BB11A-DDF8-47C4-B58E-150C123BB3BB}");
-        To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
+        To<V_18_0_0.MigrateSingleBlockListDataTypes>("{74332C49-B279-4945-8943-F8F00B1F5949}");
         To<V_18_0_0.AddElementSectionForAdmins>("{6FE4656E-8B8D-452F-AE2A-438A615B61BC}");
+
+        // To 18.1.0
+        // Re-run of the 17.6 index migration: it sits earlier in the chain than the final 18.0 state,
+        // so sites already on 18.0.x skipped it. Idempotent, so other upgrade paths are unaffected.
+        To<V_18_1_0.AddContentTypeIdIndexForContent>("{AE533AF6-4611-4E25-AA4D-89AEFA468E79}");
+
+        // To 19.0.0
+        To<V_19_0_0.AddExternalBlockElementRelationType>("{2D8F1B6E-4C3A-4E7D-9A1B-5F0C7E2D8A93}");
+        To<V_19_0_0.AddIndexDocumentTable>("{8A5C1B2E-4F6D-4E1A-9C3B-D2E7F0A16C54}");
+        To<V_19_0_0.RemoveLegacyExamineIndexFiles>("{6F1A9C3D-2B4E-4F7A-8C1D-9E3F5A7B2C60}");
+        To<V_19_0_0.RemoveUserGroupDefaultPermissionsColumn>("{B7E3D2A1-6C4F-4A8E-9D2B-3F1C5E7A9B04}");
+        To<V_19_0_0.MigrateTypedLabelDataTypes>("{D5F54DD5-A01E-4CB9-A34D-D078BA571C17}");
+        To<V_19_0_0.MigrateRangeSliderDataTypes>("{97463AFC-D1AB-4D31-9001-2061DBEDE25D}");
+        To<V_19_0_0.MigrateSingleMediaPickerDataTypes>("{B84A1E90-9F3C-4C1F-9E51-3A2D7C4F8B16}");
+        To<V_19_0_0.MigrateSingleUrlPickerDataTypes>("{4E0B7D51-6C89-4A3F-B1D2-7F5A9E30C48B}");
+        To<V_19_0_0.MigrateSingleDropDownDataTypes>("{A21C6F84-3B5D-4E92-8C07-1D4F6B8A5E30}");
+        To<V_19_0_0.AddHasAccessToInvariantForVariantToUserGroup>("{B2C4E7A8-9F31-4D56-8E7B-C1A2F3D4E5F6}");
+        To<V_19_0_0.GrantDocumentBlueprintAccessToSettingsGroups>("{E973CB74-26BC-4092-AA46-01FE48301E29}");
+        To<V_19_0_0.MigrateMultiUrlPickerMinMaxToRange>("{B1E4A7C2-3F5D-4A98-9C1E-0D2F6B7A81C4}");
+        To<V_19_0_0.MigrateMultiNodeTreePickerMinMaxToRange>("{C2F5B8D3-4A6E-4BA9-8D2F-1E3A7C8B92D5}");
+        To<V_19_0_0.MigrateMultipleTextStringMinMaxToRange>("{D3A6C9E4-5B7F-4CBA-9E30-2F4B8D9CA3E6}");
+        To<V_19_0_0.MigrateIntegerMinMaxToRange>("{E4B7DAF5-6C80-4DCB-8F41-3A5C9EADB4F7}");
+        To<V_19_0_0.MigrateDecimalMinMaxToRange>("{F5C8EB06-7D91-4EDC-9052-4B6DAFBEC508}");
+        To<V_19_0_0.MigrateSliderMinMaxToRange>("{06D9FC17-8EA2-4FED-A163-5C7EB0CFD619}");
+        To<V_19_0_0.MigrateBlockGridAreaMinMaxToRange>("{17EA0D28-9FB3-40FE-B274-6D8FC1D0E72A}");
     }
 
     /// <summary>

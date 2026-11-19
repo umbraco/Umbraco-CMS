@@ -72,7 +72,11 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 			</uui-box>
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
-				<uui-button label=${this.localize.term('general_submit')} look="primary" color="positive" @click=${this.#submit}></uui-button>
+				<uui-button
+					label=${this.localize.term('general_submit')}
+					look="primary"
+					color="positive"
+					@click=${this.#submit}></uui-button>
 			</div>
 		</umb-body-layout> `;
 	}

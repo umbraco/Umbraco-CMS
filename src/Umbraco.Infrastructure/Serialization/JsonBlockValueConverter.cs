@@ -27,20 +27,9 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
             throw new JsonException("Expected start object");
         }
 
-        BlockValue? blockValue;
-        try
-        {
-            blockValue = (BlockValue?)Activator.CreateInstance(typeToConvert);
-        }
-        catch (Exception ex)
-        {
-            throw new JsonException($"Unable to create an instance of {nameof(BlockValue)} from type: {typeToConvert.FullName}. Please make sure the type has an default (parameterless) constructor. See the inner exception for more details.", ex);
-        }
+        BlockValue? blockValue = GetBlockValue(typeToConvert);
 
-        if (blockValue is null)
-        {
-            throw new JsonException($"Could not create an instance of {nameof(BlockValue)} from type: {typeToConvert.FullName}.");
-        }
+        var exposeSeen = false;
 
         while (reader.Read())
         {
@@ -70,9 +59,41 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
                         break;
                     case nameof(BlockValue.Expose):
                         blockValue.Expose = DeserializeBlockVariation(ref reader, options, typeToConvert, nameof(BlockValue.Expose));
+                        exposeSeen = true;
                         break;
                 }
             }
+        }
+
+        // Legacy (pre-variant) block values had no "expose" property. The current format always
+        // serializes one (see Write), so its absence marks legacy data whose blocks must be exposed
+        // to preserve their published state on upgrade (#23379). Property-less blocks are the case
+        // the downstream converted-flag heuristic in BlockEditorDataConverter misses.
+        if (exposeSeen is false && blockValue.ContentData.Count > 0)
+        {
+            blockValue.Expose = blockValue.ContentData
+                .Select(cd => new BlockItemVariation(cd.Key, null))
+                .ToList();
+        }
+
+        return blockValue;
+    }
+
+    private static BlockValue GetBlockValue(Type typeToConvert)
+    {
+        BlockValue? blockValue;
+        try
+        {
+            blockValue = (BlockValue?)Activator.CreateInstance(typeToConvert);
+        }
+        catch (Exception ex)
+        {
+            throw new JsonException($"Unable to create an instance of {nameof(BlockValue)} from type: {typeToConvert.FullName}. Please make sure the type has an default (parameterless) constructor. See the inner exception for more details.", ex);
+        }
+
+        if (blockValue is null)
+        {
+            throw new JsonException($"Could not create an instance of {nameof(BlockValue)} from type: {typeToConvert.FullName}.");
         }
 
         return blockValue;
@@ -270,8 +291,11 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
                     throw new JsonException($"Expected to find the beginning of an array of layout items for block editor alias: {blockEditorAlias}, got: {reader.TokenType}. This happened while attempting to deserialize type: {typeToConvert.FullName}.");
                 }
 
-                // did we encounter the concrete block value?
-                if (blockValue.SupportsBlockLayoutAlias(blockEditorAlias))
+                // did we encounter the concrete block value? a layout stored under the alias of the concrete block value
+                // takes precedence over one stored under any other supported alias, regardless of their order.
+                var isOwnLayout = blockEditorAlias.Equals(blockValue.PropertyEditorAlias);
+                if (blockValue.SupportsBlockLayoutAlias(blockEditorAlias)
+                    && (isOwnLayout || blockValue.Layout.ContainsKey(blockValue.PropertyEditorAlias) is false))
                 {
                     // yes, deserialize the block layout items as their concrete type (list of layoutItemType)
                     var layoutItems = JsonSerializer.Deserialize(ref reader, layoutItemsType, options);

@@ -85,7 +85,7 @@ public class MultipleTextStringPropertyValueEditorTests
     public void Can_Parse_More_Items_Than_Allowed_From_Editor()
     {
         var valueEditor = CreateValueEditor();
-        var fromEditor = valueEditor.FromEditor(new ContentPropertyData(new[] { "One", "Two", "Three", "Four", "Five" }, new MultipleTextStringConfiguration { Max = 4 }), null) as string;
+        var fromEditor = valueEditor.FromEditor(new ContentPropertyData(new[] { "One", "Two", "Three", "Four", "Five" }, new MultipleTextStringConfiguration { ValidationLimit = new NumberRange { Max = 4 } }), null) as string;
         Assert.AreEqual("One\nTwo\nThree\nFour\nFive", fromEditor);
 
         var validationResults = valueEditor.Validate(fromEditor, false, null, PropertyValidationContext.Empty());
@@ -131,17 +131,27 @@ public class MultipleTextStringPropertyValueEditorTests
     }
 
     [Test]
-    public void Validates_Null_As_Below_Configured_Min()
+    public void Can_Validate_Null_When_Minimum_Configured_And_Not_Mandatory()
     {
         var editor = CreateValueEditor();
-        var result = editor.Validate(null, false, null, PropertyValidationContext.Empty());
-        Assert.AreEqual(1, result.Count());
 
-        var validationResult = result.First();
-        Assert.AreEqual($"validation_outOfRangeMultipleItemsMinimum", validationResult.ErrorMessage);
+        var result = editor.Validate(null, false, null, PropertyValidationContext.Empty());
+
+        Assert.IsEmpty(result);
     }
 
-    [TestCase(0, false, "outOfRangeMultipleItemsMinimum")]
+    [Test]
+    public void Cannot_Validate_Null_When_Mandatory()
+    {
+        var editor = CreateValueEditor();
+
+        var result = editor.Validate(null, true, null, PropertyValidationContext.Empty());
+
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual(Constants.Validation.ErrorMessages.Properties.Missing, result.First().ErrorMessage);
+    }
+
+    [TestCase(0, true, "")]
     [TestCase(1, false, "outOfRangeSingleItemMinimum")]
     [TestCase(2, true, "")]
     [TestCase(3, true, "")]
@@ -163,7 +173,29 @@ public class MultipleTextStringPropertyValueEditorTests
         }
     }
 
-    [TestCase("", false, "outOfRangeMultipleItemsMinimum")]
+    [Test]
+    public void Minimum_Message_Is_Given_The_Tokens_Its_Template_Expects()
+    {
+        // The message templates place the item count in %0% and the configured limit in %1%, so both must be
+        // supplied even where the template only renders one of them.
+        var localizedTextServiceMock = new Mock<ILocalizedTextService>();
+        IDictionary<string, string>? tokens = null;
+        localizedTextServiceMock
+            .Setup(x => x.Localize("validation", "outOfRangeSingleItemMinimum", It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>()))
+            .Callback((string key, string alias, CultureInfo culture, IDictionary<string, string> args) => tokens = args)
+            .Returns("localized");
+
+        var editor = CreateValueEditor(localizedTextServiceMock.Object);
+
+        var result = editor.Validate(new[] { "one" }, false, null, PropertyValidationContext.Empty()).ToArray();
+
+        Assert.AreEqual(1, result.Length);
+        Assert.IsNotNull(tokens);
+        Assert.AreEqual(2, tokens!.Count);
+        Assert.AreEqual("2", tokens["1"]);
+    }
+
+    [TestCase("", true, "")]
     [TestCase("one", false, "outOfRangeSingleItemMinimum")]
     [TestCase("one\ntwo", true, "")]
     [TestCase("one\ntwo\nthree", true, "")]
@@ -305,7 +337,7 @@ public class MultipleTextStringPropertyValueEditorTests
     public void MinMax_Validator_Does_Not_Count_Empty_Strings()
     {
         var editor = CreateValueEditor();
-        editor.ConfigurationObject = new MultipleTextStringConfiguration { Min = 2, Max = 4 };
+        editor.ConfigurationObject = new MultipleTextStringConfiguration { ValidationLimit = new NumberRange { Min = 2, Max = 4 } };
 
         // 2 non-empty + 2 empty = should count as 2, meeting min=2
         var value = new[] { "one", string.Empty, "two", string.Empty };
@@ -317,7 +349,7 @@ public class MultipleTextStringPropertyValueEditorTests
     public void MinMax_Validator_Does_Not_Count_Empty_Strings_Below_Min()
     {
         var editor = CreateValueEditor();
-        editor.ConfigurationObject = new MultipleTextStringConfiguration { Min = 2, Max = 4 };
+        editor.ConfigurationObject = new MultipleTextStringConfiguration { ValidationLimit = new NumberRange { Min = 2, Max = 4 } };
 
         // 1 non-empty + 2 empty = should count as 1, failing min=2
         var value = new[] { "one", string.Empty, string.Empty };
@@ -349,7 +381,7 @@ public class MultipleTextStringPropertyValueEditorTests
     }
 
     private static object? FromEditor(object? value, int max = 0)
-        => CreateValueEditor().FromEditor(new ContentPropertyData(value, new MultipleTextStringConfiguration { Max = max }), null);
+        => CreateValueEditor().FromEditor(new ContentPropertyData(value, new MultipleTextStringConfiguration { ValidationLimit = new NumberRange { Max = max } }), null);
 
     private static object? ToEditor(object? value)
     {
@@ -361,7 +393,7 @@ public class MultipleTextStringPropertyValueEditorTests
         return CreateValueEditor().ToEditor(property.Object);
     }
 
-    private static MultipleTextStringPropertyEditor.MultipleTextStringPropertyValueEditor CreateValueEditor()
+    private static MultipleTextStringPropertyEditor.MultipleTextStringPropertyValueEditor CreateValueEditor(ILocalizedTextService? localizedTextService = null)
     {
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
         localizedTextServiceMock.Setup(x => x.Localize(
@@ -375,12 +407,11 @@ public class MultipleTextStringPropertyValueEditorTests
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>(),
             new DataEditorAttribute("alias"),
-            localizedTextServiceMock.Object)
+            localizedTextService ?? localizedTextServiceMock.Object)
         {
             ConfigurationObject = new MultipleTextStringConfiguration
             {
-                Min = 2,
-                Max = 4,
+                ValidationLimit = new NumberRange { Min = 2, Max = 4 },
             },
         };
     }

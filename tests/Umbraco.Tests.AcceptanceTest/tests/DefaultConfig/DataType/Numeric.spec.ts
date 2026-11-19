@@ -27,7 +27,7 @@ test('can update minimum value', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'min', minimumValue)).toBeTruthy();
+  await expect.poll(() => umbracoApi.dataType.doesDataTypeHaveRangeValue(customDataTypeName, 'validationRange', minimumValue)).toBeTruthy();
 });
 
 test('can update Maximum value', async ({umbracoApi, umbracoUi}) => {
@@ -41,7 +41,7 @@ test('can update Maximum value', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'max', maximumValue)).toBeTruthy();
+  await expect.poll(() => umbracoApi.dataType.doesDataTypeHaveRangeValue(customDataTypeName, 'validationRange', undefined, maximumValue)).toBeTruthy();
 });
 
 test('can update step size value', async ({umbracoApi, umbracoUi}) => {
@@ -55,7 +55,7 @@ test('can update step size value', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'step', stepSizeValue)).toBeTruthy();
+  await expect.poll(() => umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'step', stepSizeValue)).toBeTruthy();
 });
 
 // Skip this test as currently this setting is removed.
@@ -72,9 +72,7 @@ test.skip('can allow decimals', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'allowDecimals', true)).toBeTruthy();
 });
 
-// TODO: Remove skip when the front-end is ready. Currently you still can update the minimum greater than the maximum.
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17509
-test.skip('cannot update the minimum greater than the maximum', async ({umbracoApi, umbracoUi}) => {
+test('cannot update the minimum greater than the maximum', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minimumValue = 5;
   const maximumValue = 2;
@@ -88,7 +86,7 @@ test.skip('cannot update the minimum greater than the maximum', async ({umbracoA
 
   // Assert
   await umbracoUi.dataType.isFailedStateButtonVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible();
+  await umbracoUi.dataType.doesAmountContainErrorMessageWithText('The low value must not exceed the high value.');
 });
 
 test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {

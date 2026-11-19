@@ -4,9 +4,11 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
@@ -14,12 +16,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 internal sealed partial class BlockListElementLevelVariationTests : BlockEditorElementVariationTestBase
 {
-    public static void ConfigureAllowEditInvariantFromNonDefaultTrue(IUmbracoBuilder builder)
-    {
-        builder.Services.Configure<ContentSettings>(config =>
-            config.AllowEditInvariantFromNonDefault = true);
-    }
-
     private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
     private async Task<IDataType> CreateBlockListDataType(IContentType elementType)
@@ -88,15 +84,8 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
                 cultures = [null];
             }
 
-            var segments = elementType.VariesBySegment()
-                ? new[] { block.BlocksProperty.Segment }
-                    .Union(block.BlocksProperty.BlockContentValues.Select(value => value.Segment))
-                    .Distinct()
-                    .ToArray()
-                : [null];
-
-            expose.AddRange(cultures.SelectMany(culture => segments.Select(segment =>
-                new BlockItemVariation(block.contentElementKey, culture, segment))));
+            expose.AddRange(cultures.Select(culture =>
+                new BlockItemVariation(block.contentElementKey, culture)));
         }
 
         return new BlockListValue
@@ -130,12 +119,12 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
         };
     }
 
-    private void PublishContent(IContent content, IContentType contentType, string[]? culturesToPublish = null)
+    private void PublishContent(IContent content, IContentType contentType, string[]? culturesToPublish = null, int userId = Constants.Security.SuperUserId)
     {
         culturesToPublish ??= contentType.VariesByCulture()
             ? ["en-US", "da-DK"]
             : ["*"];
-        PublishContent(content, culturesToPublish);
+        PublishContent(content, culturesToPublish, userId);
     }
 
     private async Task<IPublishedContent> CreatePublishedContent(ContentVariation variation, IList<BlockPropertyValue> blockContentValues, IList<BlockPropertyValue> blockSettingsValues)
@@ -148,7 +137,7 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
         return GetPublishedContent(content.Key);
     }
 
-    private async Task<IContentType> CreateElementTypeWithValidation(ContentVariation contentVariation = ContentVariation.Culture)
+    private async Task<IContentType> CreateElementTypeWithValidationAsync(ContentVariation contentVariation = ContentVariation.Culture)
     {
         var elementType = await CreateElementType(contentVariation);
         foreach (var propertyType in elementType.PropertyTypes)
@@ -163,7 +152,7 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
 
     private async Task<(IContentType RootElementType, IContentType NestedElementType)> CreateElementTypeWithValidationAndNestedBlocksAsync()
     {
-        var nestedElementType = await CreateElementTypeWithValidation();
+        var nestedElementType = await CreateElementTypeWithValidationAsync();
         var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
 
         var rootElementType = new ContentTypeBuilder()
@@ -203,6 +192,28 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
         await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
 
         return (rootElementType, nestedElementType);
+    }
+
+    private async Task<IUser> CreateLimitedUser(bool hasAccessToInvariantForVariant)
+    {
+        var userGroupService = GetRequiredService<IUserGroupService>();
+        var userService = GetRequiredService<IUserService>();
+
+        var danish = await LanguageService.GetAsync("da-DK");
+        Assert.IsNotNull(danish);
+
+        var user = UserBuilder.CreateUser();
+        userService.Save(user);
+
+        var group = UserGroupBuilder.CreateUserGroup();
+        group.ClearAllowedLanguages();
+        group.AddAllowedLanguage(danish.Id);
+        group.HasAccessToInvariantForVariant = hasAccessToInvariantForVariant;
+
+        var userGroupResult = await userGroupService.CreateAsync(group, Constants.Security.SuperUserKey, [user.Key]);
+        Assert.IsTrue(userGroupResult.Success);
+
+        return user;
     }
 
     private class BlockProperty

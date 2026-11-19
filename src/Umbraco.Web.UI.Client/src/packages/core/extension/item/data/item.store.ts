@@ -5,7 +5,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @class UmbExtensionItemStore
- * @augments {UmbStoreBase}
+ * @augments {UmbItemStoreBase}
  * @description - Data Store for Extension items
  */
 export class UmbExtensionItemStore extends UmbItemStoreBase<UmbExtensionItemModel> {

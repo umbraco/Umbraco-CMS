@@ -9,7 +9,7 @@ import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/serve
 /**
  * A server data source for Static File items
  * @class UmbStaticFileItemServerDataSource
- * @implements {DocumentTreeDataSource}
+ * @implements {UmbItemServerDataSourceBase}
  */
 export class UmbStaticFileItemServerDataSource extends UmbItemServerDataSourceBase<
 	StaticFileItemResponseModel,

@@ -1,7 +1,11 @@
 import { UMB_PICKER_INPUT_CONTEXT } from './picker-input.context-token.js';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
+import {
+	UmbInteractionMemoryManager,
+	UmbInteractionMemoryScopeContext,
+} from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
@@ -15,6 +19,7 @@ import {
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import { UmbModalRouteRegistrationController, type UmbModalRouteSetupReturn } from '@umbraco-cms/backoffice/router';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class UmbPickerInputContext<
 	PickedItemType extends UmbItemModel = UmbItemModel,
@@ -22,6 +27,8 @@ export class UmbPickerInputContext<
 	PickerModalConfigType extends UmbPickerModalData<PickerItemType> = UmbPickerModalData<PickerItemType>,
 	PickerModalValueType extends UmbPickerModalValue = UmbPickerModalValue,
 > extends UmbContextBase {
+	protected readonly localize = new UmbLocalizationController(this);
+
 	modalAlias?: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>;
 	repository?: UmbItemRepository<PickedItemType>;
 
@@ -81,6 +88,10 @@ export class UmbPickerInputContext<
 		modalAlias?: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>,
 	) {
 		super(host, UMB_PICKER_INPUT_CONTEXT);
+
+		// Also act as the interaction-memory scope for the modals this input opens, so they can remember
+		// their state here between opens.
+		new UmbInteractionMemoryScopeContext(this, this.interactionMemory);
 
 		if (modalAlias) {
 			this.setModalAlias(modalAlias);
@@ -148,6 +159,23 @@ export class UmbPickerInputContext<
 	}
 
 	async openPicker(pickerData?: Partial<PickerModalConfigType>) {
+		await this.#openPicker(pickerData);
+	}
+
+	/**
+	 * Opens the picker modal and applies its selection to this context, like {@link openPicker}, but also
+	 * returns the submitted modal value. Use this when the picker modal returns more than a selection, so the
+	 * consumer can act on the rest of the value.
+	 * @param {Partial<PickerModalConfigType>} [pickerData] The modal data to merge on top of the stored modal data.
+	 * @returns {Promise<PickerModalValueType | undefined>} The submitted modal value, or undefined if the modal was rejected.
+	 * @memberof UmbPickerInputContext
+	 */
+	// TODO (V20): Fold into openPicker, whose return type cannot change before then.
+	async openPickerForValue(pickerData?: Partial<PickerModalConfigType>): Promise<PickerModalValueType | undefined> {
+		return this.#openPicker(pickerData);
+	}
+
+	async #openPicker(pickerData?: Partial<PickerModalConfigType>): Promise<PickerModalValueType | undefined> {
 		await this.#itemManager.init;
 
 		if (!this.modalAlias) {
@@ -160,6 +188,8 @@ export class UmbPickerInputContext<
 		}).catch(() => undefined);
 
 		this.#applyModalValue(modalValue);
+
+		return modalValue;
 	}
 
 	protected _combinePickableFilters<ItemType>(
@@ -179,7 +209,7 @@ export class UmbPickerInputContext<
 		await umbConfirmModal(this, {
 			color: 'danger',
 			headline: `#actions_remove?`,
-			content: `#defaultdialogs_confirmremove ${name}?`,
+			content: this.localize.term('defaultdialogs_confirmRemoveItem', escapeHTML(name)),
 			confirmLabel: '#actions_remove',
 		});
 

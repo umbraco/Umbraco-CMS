@@ -101,6 +101,42 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Create_Tag_Relations_With_Non_Latin_Text_And_Group()
+    {
+        var provider = ScopeProvider;
+        using (ScopeProvider.CreateScope())
+        {
+            // create data to relate to
+            // We have to create and save a template, otherwise we get an FK violation on contentType.
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+            var contentType =
+                ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+            ContentTypeRepository.Save(contentType);
+
+            var content = ContentBuilder.CreateSimpleContent(contentType);
+            DocumentRepository.Save(content);
+
+            // Characters outside a Latin1 code page must survive in both the tag and the group.
+            var repository = CreateRepository(provider);
+            Tag[] tags = { new Tag { Text = "тег-ł", Group = "γκρουπ-ł" } };
+            repository.Assign(
+                content.Id,
+                contentType.PropertyTypes.First().Id,
+                tags,
+                false);
+
+            ITag stored = repository.GetTagsForEntity(content.Id).Single();
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual("тег-ł", stored.Text);
+                Assert.AreEqual("γκρουπ-ł", stored.Group);
+            });
+        }
+    }
+
+    [Test]
     public async Task Can_Append_Tag_Relations()
     {
         var provider = ScopeProvider;

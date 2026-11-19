@@ -138,6 +138,151 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
         Assert.AreEqual(primed.PropertyTypes.Count(), after.PropertyTypes.Count());
     }
 
+    [Test]
+    public async Task Published_Child_Type_Exposes_Property_From_Composition_On_Inherited_Parent()
+    {
+        // A composition that carries a "title" property.
+        var composition = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeEditingBuilder.CreateSimpleContentType("composition", "Composition"),
+            Constants.Security.SuperUserKey)).Result;
+
+        // A parent that already has the composition applied, and a child that inherits from it.
+        var parentModel = ContentTypeEditingBuilder.CreateBasicContentType("parent", "Parent");
+        parentModel.Compositions = [new Composition { CompositionType = CompositionType.Composition, Key = composition.Key }];
+        var parent = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result!;
+
+        var childModel = ContentTypeEditingBuilder.CreateBasicContentType("child", "Child");
+        childModel.Compositions = [new Composition { CompositionType = CompositionType.Inheritance, Key = parent.Key }];
+        var child = (await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey)).Result!;
+
+        // The published child exposes the composition's "title" property, inherited through its parent.
+        var publishedChild = PublishedContentTypeCache.Get(PublishedItemType.Content, child.Key);
+        Assert.IsNotNull(publishedChild);
+        Assert.IsTrue(publishedChild.PropertyTypes.Any(p => p.Alias == "title"));
+    }
+
+    [Test]
+    public async Task Published_Child_Type_Reflects_Composition_Added_To_Inherited_Parent_After_Caching()
+    {
+        // A parent with no properties, inherited by a child.
+        var parent = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeEditingBuilder.CreateBasicContentType("parent", "Parent"),
+            Constants.Security.SuperUserKey)).Result;
+
+        var childModel = ContentTypeEditingBuilder.CreateBasicContentType("child", "Child");
+        childModel.Compositions = [new Composition { CompositionType = CompositionType.Inheritance, Key = parent.Key }];
+        var child = (await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey)).Result;
+
+        // Prime the published content type cache for the child; it does not expose "title" yet.
+        var before = PublishedContentTypeCache.Get(PublishedItemType.Content, child.Key);
+        Assert.IsFalse(before.PropertyTypes.Any(p => p.Alias == "title"), "precondition: child should not yet expose 'title'");
+
+        // Add a composition carrying "title" to the (already inherited-from) parent.
+        var composition = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeEditingBuilder.CreateSimpleContentType("composition", "Composition"),
+            Constants.Security.SuperUserKey)).Result;
+        var updateModel = ContentTypeUpdateHelper.CreateContentTypeUpdateModel(parent);
+        updateModel.Compositions = [new Composition { CompositionType = CompositionType.Composition, Key = composition.Key }];
+        var result = await ContentTypeEditingService.UpdateAsync(parent, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, result.Status.ToString());
+
+        // Adding the composition to the parent must invalidate the cached published content type of the
+        // inheriting child, so the child now exposes the property it inherits through the parent's composition.
+        var after = PublishedContentTypeCache.Get(PublishedItemType.Content, child.Key);
+        Assert.IsTrue(
+            after.PropertyTypes.Any(p => p.Alias == "title"),
+            "child published content type should pick up the property composed onto its inherited-from parent");
+    }
+
+    [Test]
+    public async Task Published_Composing_Type_Reflects_Property_Added_To_Composition_After_Caching()
+    {
+        // A composition, applied to a composing content type.
+        var composition = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeEditingBuilder.CreateSimpleContentType("composition", "Composition"),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var composingModel = ContentTypeEditingBuilder.CreateBasicContentType("composing", "Composing");
+        composingModel.Compositions = [new Composition { CompositionType = CompositionType.Composition, Key = composition.Key }];
+        var composing = (await ContentTypeEditingService.CreateAsync(composingModel, Constants.Security.SuperUserKey)).Result!;
+
+        // Prime the published content type cache for the composing type; it does not expose "subtitle" yet.
+        var before = PublishedContentTypeCache.Get(PublishedItemType.Content, composing.Key);
+        Assert.IsFalse(before.PropertyTypes.Any(p => p.Alias == "subtitle"), "precondition: composing type should not yet expose 'subtitle'");
+
+        // Add a "subtitle" property to the composition.
+        await AddPropertyAndSaveAsync(composition, "subtitle");
+
+        // Adding the property must invalidate the cached published content type of the composing type, so it
+        // now exposes the property it gains through the composition.
+        var after = PublishedContentTypeCache.Get(PublishedItemType.Content, composing.Key);
+        Assert.IsTrue(
+            after.PropertyTypes.Any(p => p.Alias == "subtitle"),
+            "composing published content type should pick up the property added to its composition");
+    }
+
+    [Test]
+    public async Task Published_Descendant_Type_Reflects_Property_Added_Further_Up_The_Inheritance_Chain_After_Caching()
+    {
+        // Root <- Middle <- Leaf, each inheriting from the one before.
+        var root = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeEditingBuilder.CreateSimpleContentType("root", "Root"),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var middleModel = ContentTypeEditingBuilder.CreateBasicContentType("middle", "Middle");
+        middleModel.Compositions = [new Composition { CompositionType = CompositionType.Inheritance, Key = root.Key }];
+        var middle = (await ContentTypeEditingService.CreateAsync(middleModel, Constants.Security.SuperUserKey)).Result!;
+
+        var leafModel = ContentTypeEditingBuilder.CreateBasicContentType("leaf", "Leaf");
+        leafModel.Compositions = [new Composition { CompositionType = CompositionType.Inheritance, Key = middle.Key }];
+        var leaf = (await ContentTypeEditingService.CreateAsync(leafModel, Constants.Security.SuperUserKey)).Result!;
+
+        // Prime the published content type cache for the leaf; it does not expose "subtitle" yet.
+        var before = PublishedContentTypeCache.Get(PublishedItemType.Content, leaf.Key);
+        Assert.IsFalse(before.PropertyTypes.Any(p => p.Alias == "subtitle"), "precondition: leaf should not yet expose 'subtitle'");
+
+        // Add a "subtitle" property two levels up.
+        await AddPropertyAndSaveAsync(root, "subtitle");
+
+        // The refresh has to reach the whole closure of deriving types, not just the direct one.
+        var after = PublishedContentTypeCache.Get(PublishedItemType.Content, leaf.Key);
+        Assert.IsTrue(
+            after.PropertyTypes.Any(p => p.Alias == "subtitle"),
+            "leaf published content type should pick up the property added to the root of its inheritance chain");
+    }
+
+    [Test]
+    public async Task Published_Composing_Type_Reflects_Alias_Changed_On_Composition_After_Caching()
+    {
+        // A composition, applied to a composing content type.
+        var composition = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeEditingBuilder.CreateSimpleContentType("composition", "Composition"),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var composingModel = ContentTypeEditingBuilder.CreateBasicContentType("composing", "Composing");
+        composingModel.Compositions = [new Composition { CompositionType = CompositionType.Composition, Key = composition.Key }];
+        var composing = (await ContentTypeEditingService.CreateAsync(composingModel, Constants.Security.SuperUserKey)).Result!;
+
+        // Prime the published content type cache for the composing type; it reports the composition's current alias.
+        var before = PublishedContentTypeCache.Get(PublishedItemType.Content, composing.Key);
+        Assert.IsTrue(before.CompositionAliases.Contains("composition"), "precondition: composing type should report the original composition alias");
+
+        // Rename the composition.
+        var updateModel = ContentTypeUpdateHelper.CreateContentTypeUpdateModel(composition);
+        updateModel.Alias = "renamedComposition";
+        var result = await ContentTypeEditingService.UpdateAsync(composition, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, result.Status.ToString());
+
+        // A published content type's composition aliases are resolved recursively from its compositions, so the
+        // composing type has to be refreshed for IPublishedContent.IsComposedOf to report the new alias.
+        var after = PublishedContentTypeCache.Get(PublishedItemType.Content, composing.Key);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(after.CompositionAliases.Contains("renamedComposition"), "composing published content type should report the new composition alias");
+            Assert.IsFalse(after.CompositionAliases.Contains("composition"), "composing published content type should no longer report the old composition alias");
+        });
+    }
+
     private async Task<IContentType> CreateElementTypeAsync(string alias)
     {
         ContentTypeCreateModel createModel = ContentTypeEditingBuilder.CreateElementType(alias, alias);

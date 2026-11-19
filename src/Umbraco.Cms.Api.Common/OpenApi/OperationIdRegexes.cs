@@ -3,15 +3,19 @@ using System.Text.RegularExpressions;
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
 /// <summary>
-/// This is the regexes used to generate the operation IDs, the benefit of this being partial with GeneratedRegex
-/// source generators is that it will be pre-compiled at startup
-/// See: https://devblogs.microsoft.com/dotnet/regular-expression-improvements-in-dotnet-7/#source-generation for more info.
+/// These are the regexes used to generate the operation IDs.
 /// </summary>
+/// <remarks>
+/// The benefit of this being partial with GeneratedRegex source generators is that they will be pre-compiled at startup
+/// See: https://devblogs.microsoft.com/dotnet/regular-expression-improvements-in-dotnet-7/#source-generation for more info.
+/// </remarks>
 internal static partial class OperationIdRegexes
 {
-    // Your IDE may be showing errors here, this is because it's a new dotnet 7 feature (it's fixed in the EAP of Rider)
-    [GeneratedRegex(".*?\\/v[1-9]+/")]
+    [GeneratedRegex(".*?\\/v[0-9]+(?:\\.[0-9]+)?/")]
     public static partial Regex VersionPrefixRegex();
+
+    [GeneratedRegex("[^A-Za-z0-9]")]
+    public static partial Regex NonAlphanumericRegex();
 
     [GeneratedRegex("\\{(.*?)\\:?\\}")]
     public static partial Regex TemplatePlaceholdersRegex();

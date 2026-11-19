@@ -25,7 +25,6 @@ export interface UmbTreeItemApi<
 	readonly isSelected: Observable<boolean>;
 	readonly isActive: Observable<boolean>;
 	readonly hasChildren: Observable<boolean>;
-	readonly hasActions: Observable<boolean>;
 	readonly noAccess: Observable<boolean>;
 	readonly path: Observable<string>;
 	setTreeItem(item: TreeItemType | undefined): void;

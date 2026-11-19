@@ -254,8 +254,7 @@ public class ResizeImageUrlFactoryTests
 
     private static ResizeImageUrlFactory CreateFactory(ISet<string>? trueImageFormats = null)
     {
-        var contentSettings = CreateContentSettings();
-        var imagingSettings = CreateImagingSettings(trueImageFormats);
+        var contentSettings = CreateContentSettings(trueImageFormats);
         var imageUrlGenerator = CreateImageUrlGenerator();
         var mediaUrlGenerators = CreateMediaUrlGeneratorCollection();
         var absoluteUrlBuilder = CreateAbsoluteUrlBuilder();
@@ -263,12 +262,11 @@ public class ResizeImageUrlFactoryTests
         return new ResizeImageUrlFactory(
             imageUrlGenerator,
             Options.Create(contentSettings),
-            Options.Create(imagingSettings),
             mediaUrlGenerators,
             absoluteUrlBuilder);
     }
 
-    private static ContentSettings CreateContentSettings()
+    private static ContentSettings CreateContentSettings(ISet<string>? trueImageFormats = null)
     {
         var autoFillProperties = new HashSet<ImagingAutoFillUploadField>
         {
@@ -280,16 +278,9 @@ public class ResizeImageUrlFactoryTests
             Imaging = new ContentImagingSettings
             {
                 AutoFillImageProperties = autoFillProperties,
+                ImageFileTypes = trueImageFormats ?? new HashSet<string>(
+                    ContentImagingSettings.StaticImageFileTypes.Split(Constants.CharArrays.Comma)),
             },
-        };
-    }
-
-    private static ContentImagingSettings CreateImagingSettings(ISet<string>? trueImageFormats = null)
-    {
-        return new ContentImagingSettings
-        {
-            ImageFileTypes = trueImageFormats ?? new HashSet<string>(
-                ContentImagingSettings.StaticImageFileTypes.Split(Constants.CharArrays.Comma)),
         };
     }
 

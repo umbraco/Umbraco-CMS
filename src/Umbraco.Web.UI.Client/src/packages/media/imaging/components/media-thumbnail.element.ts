@@ -5,12 +5,13 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 /**
  * Displays a thumbnail for a media item, with optional server-side cropping and transparency support.
  * This is the recommended component for rendering media images in the backoffice.
  * @element umb-media-thumbnail
- * @cssprop [--umb-media-thumbnail-background] - Background shown behind the image. Defaults to a checkerboard
+ * @cssprop --umb-media-thumbnail-background - Background shown behind the image. Defaults to a checkerboard
  * pattern that reveals transparency; set to `none` for a transparent background.
  * @csspart img - The underlying `<img>` element.
  */
@@ -65,6 +66,13 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 	icon = 'icon-picture';
 
 	/**
+	 * The file extension to label the fallback icon with, without the leading dot.
+	 * @description Rendered only when there is no preview image.
+	 */
+	@property({ type: String, attribute: 'file-ext' })
+	fileExt?: string;
+
+	/**
 	 * The `loading` state of the thumbnail.
 	 * @enum {'lazy' | 'eager'}
 	 * @default 'lazy'
@@ -89,6 +97,33 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 	#intersectionObserver?: IntersectionObserver;
 
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+
+	#dataTypeUnique?: string;
+
+	#hasRequestedThumbnail = false;
+
+	#latestRequest = 0;
+
+	constructor() {
+		super();
+
+		// A picker configured to ignore user start nodes may reference media outside them,
+		// which the server only resolves when told which data type the request originates from.
+		this.consumeContext(UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT, (context) => {
+			this.observe(
+				context?.dataType,
+				(dataType) => {
+					// The context is also lost when the element disconnects, which needs no new request.
+					if (!dataType?.unique) return;
+					this.#dataTypeUnique = dataType.unique;
+					if (this.#hasRequestedThumbnail) {
+						this.#generateThumbnailUrl();
+					}
+				},
+				'_observeDataType',
+			);
+		});
+	}
 
 	override render() {
 		return when(
@@ -154,27 +189,37 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 			this._thumbnailUrl,
 			(url) =>
 				html`<img
-					id="figure"
+					id="image"
 					part="img"
 					src=${url}
 					alt=${this.alt}
 					loading=${this.loading}
 					decoding="async"
 					draggable="false" />`,
-			() => html`<umb-icon id="icon" name=${this.icon}></umb-icon>`,
+			() =>
+				html`<umb-icon id="icon" name=${this.icon}></umb-icon> ${when(
+						this.fileExt,
+						(fileExt) => html`<small id="file-ext">${fileExt}</small>`,
+					)}`,
 		);
 	}
 
 	async #generateThumbnailUrl() {
 		if (!this.unique) return;
 		this._isLoading = true;
+		this.#hasRequestedThumbnail = true;
+		const request = ++this.#latestRequest;
 
 		const { data } = await this.#imagingRepository.requestResizedItems([this.unique], {
 			height: this.height,
 			width: this.width,
 			mode: this.mode,
 			format: this.format,
+			dataTypeUnique: this.#dataTypeUnique,
 		});
+
+		// A newer request (for example after the data type resolved) supersedes this one.
+		if (request !== this.#latestRequest) return;
 
 		this._thumbnailUrl = data?.[0]?.url ?? '';
 		this._isLoading = false;
@@ -188,6 +233,7 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 				position: relative;
 				overflow: hidden;
 				display: flex;
+				flex-direction: column;
 				justify-content: center;
 				align-items: center;
 				width: 100%;
@@ -199,7 +245,7 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 				margin-bottom: 1em;
 			}
 
-			#figure {
+			#image {
 				display: block;
 				width: 100%;
 				height: 100%;
@@ -218,6 +264,27 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 				width: 100%;
 				height: 100%;
 				font-size: var(--uui-size-8);
+			}
+
+			/* Filling the box is only right while the icon is alone in it. */
+			#icon:has(+ #file-ext) {
+				height: auto;
+			}
+
+			#file-ext {
+				flex: none;
+				max-width: 10ch;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				margin-top: var(--uui-size-space-2);
+				padding: 0 var(--uui-size-space-2);
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-surface-alt);
+				font-size: var(--uui-type-small-size);
+				font-weight: 700;
+				line-height: 1.5;
+				text-transform: uppercase;
+				white-space: nowrap;
 			}
 		`,
 	];

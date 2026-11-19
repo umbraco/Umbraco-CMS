@@ -68,7 +68,7 @@ export class UmbPickerSearchManager<
 
 	/**
 	 * Update the current configuration for the search manager.
-	 * @param {Partial<UmbPickerSearchManagerConfig>} partialConfig
+	 * @param {Partial<UmbPickerSearchManagerConfig>} partialConfig The configuration to merge into the current configuration.
 	 * @memberof UmbPickerSearchManager
 	 */
 	public updateConfig(partialConfig: Partial<UmbPickerSearchManagerConfig>) {
@@ -149,7 +149,7 @@ export class UmbPickerSearchManager<
 
 	/**
 	 * Update the current search query.
-	 * @param {Partial<SearchRequestArgsType>} query
+	 * @param {Partial<SearchRequestArgsType>} query The query to merge into the current search query.
 	 * @memberof UmbPickerSearchManager
 	 */
 	public updateQuery(query: Partial<SearchRequestArgsType>) {

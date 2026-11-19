@@ -1,9 +1,11 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Mapping;
@@ -19,7 +21,26 @@ namespace Umbraco.Cms.Api.Management.Mapping.Media;
 public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueResponseModel, MediaVariantResponseModel>, IMapDefinition
 {
     private readonly CommonMapper _commonMapper;
+    private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
     private ContentSettings _contentSettings;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Mapping.Media.MediaMapDefinition"/> class with the specified dependencies.
+    /// </summary>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
+    public MediaMapDefinition(
+        PropertyEditorCollection propertyEditorCollection,
+        CommonMapper commonMapper,
+        IDataValueEditorFactory dataValueEditorFactory,
+        IOptionsMonitor<ContentSettings> contentSettings)
+        : this(
+            propertyEditorCollection,
+            commonMapper,
+            dataValueEditorFactory,
+            contentSettings,
+            StaticServiceProvider.Instance.GetRequiredService<MediaUrlGeneratorCollection>())
+    {
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Mapping.Media.MediaMapDefinition"/> class with the specified dependencies.
@@ -28,14 +49,18 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
     /// <param name="commonMapper">The <see cref="CommonMapper"/> instance used for common mapping operations.</param>
     /// <param name="dataValueEditorFactory">The <see cref="IDataValueEditorFactory"/> used to create data value editors.</param>
     /// <param name="contentSettings">The <see cref="IOptionsMonitor{ContentSettings}"/> providing access to content settings options.</param>
+    /// <param name="mediaUrlGenerators">Used to resolve the path of a media item's stored file.</param>
+    [ActivatorUtilitiesConstructor]
     public MediaMapDefinition(
         PropertyEditorCollection propertyEditorCollection,
         CommonMapper commonMapper,
         IDataValueEditorFactory dataValueEditorFactory,
-        IOptionsMonitor<ContentSettings> contentSettings)
+        IOptionsMonitor<ContentSettings> contentSettings,
+        MediaUrlGeneratorCollection mediaUrlGenerators)
         : base(propertyEditorCollection, dataValueEditorFactory)
     {
         _commonMapper = commonMapper;
+        _mediaUrlGenerators = mediaUrlGenerators;
         _contentSettings = contentSettings.CurrentValue;
         contentSettings.OnChange(x => _contentSettings = x);
     }
@@ -93,11 +118,12 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
         return filePath[..lastDotIndex] + suffix + filePath[lastDotIndex..];
     }
 
-    // Umbraco.Code.MapAll -Flags
+    // Umbraco.Code.MapAll -Flags -HasChildren
     private void Map(IMedia source, MediaCollectionResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
         target.MediaType = context.Map<MediaTypeCollectionReferenceResponseModel>(source.ContentType)!;
+        target.Extension = source.GetFileExtension(_mediaUrlGenerators);
         target.SortOrder = source.SortOrder;
         target.Creator = _commonMapper.GetOwnerName(source, context);
 

@@ -41,7 +41,7 @@
     <key alias="parentNotPublished">該文檔不可見，因為其上級 '%0%' 未發佈。</key>
     <key alias="parentNotPublishedAnomaly">糟糕：該文檔已發佈，但是沒有更新至緩存（內部錯誤）</key>
     <key alias="getUrlException">糟糕：沒辦法連結到此網址（內部錯誤-請參見記錄）</key>
-    <key alias="routeError">糟糕：此文件已經發表，但是網址和其他內容相衝 %0%</key>
+    <key alias="routeError">糟糕：此文件已經發表，但是網址和其他內容相衝 '%0%'</key>
   </area>
   <area alias="member">
   </area>

@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -45,6 +46,10 @@ public class ImportNewDocumentTypeController : DocumentTypeControllerBase
     /// </returns>
     [HttpPost("import")]
     [MapToApiVersion("1.0")]
+    [RequiresPermissions([
+        Constants.Permissions.Entities.DocumentType.Create,
+        Constants.Permissions.Entities.DocumentType.Update,
+    ])]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

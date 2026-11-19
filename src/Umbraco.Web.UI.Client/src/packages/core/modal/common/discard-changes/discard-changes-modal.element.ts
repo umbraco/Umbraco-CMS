@@ -6,16 +6,21 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 export class UmbDiscardChangesModalElement extends UmbModalBaseElement {
 	override render() {
 		return html`
-			<uui-dialog-layout class="uui-text" headline=${this.localize.term('prompt_unsavedChanges')}>
+			<uui-dialog-layout
+				data-mark="discard-changes-modal"
+				class="uui-text"
+				headline=${this.localize.term('prompt_unsavedChanges')}>
 				<umb-localize key="prompt_unsavedChangesWarning"></umb-localize>
 				<uui-button
 					slot="actions"
 					id="cancel"
+					data-mark="action:stay"
 					label=${this.localize.term('prompt_stay')}
 					@click=${this._rejectModal}></uui-button>
 				<uui-button
 					slot="actions"
 					id="confirm"
+					data-mark="action:discard-changes"
 					color="danger"
 					look="primary"
 					label=${this.localize.term('prompt_discardChanges')}

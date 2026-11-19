@@ -1,3 +1,4 @@
+export * from './config-repository-base.js';
 export * from './constants.js';
 export * from './data-mapper/index.js';
 export * from './detail/index.js';

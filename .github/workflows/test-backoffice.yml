@@ -50,6 +50,11 @@ jobs:
       - run: npm run build:for:cms
       - run: npm run check:paths
       - run: npm run generate:jsonschema:dist
+      - name: Validate umbraco-package-schema.json
+        run: |
+          npm install --no-save --no-audit --no-fund --prefix "$RUNNER_TEMP/ajv" ajv@8
+          # Absolute path: a bare require('ajv') resolves eslint's ajv 6 from ./node_modules first.
+          node -e "const p = process.env.RUNNER_TEMP + '/ajv/node_modules/ajv'; console.log('ajv', require(p + '/package.json').version); new (require(p))({ strict: true }).compile(require('./umbraco-package-schema.json'))"
 
   test:
     runs-on: ubuntu-latest

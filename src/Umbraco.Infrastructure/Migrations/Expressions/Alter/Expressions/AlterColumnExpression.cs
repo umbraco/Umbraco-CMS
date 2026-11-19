@@ -31,9 +31,5 @@ public class AlterColumnExpression : MigrationExpressionBase
     /// </summary>
     public virtual ColumnDefinition Column { get; set; }
 
-    protected override string GetSql() =>
-        string.Format(
-            SqlSyntax.AlterColumn,
-            SqlSyntax.GetQuotedTableName(TableName),
-            SqlSyntax.Format(Column));
+    protected override string GetSql() => SqlSyntax.FormatAlterColumn(TableName, Column);
 }

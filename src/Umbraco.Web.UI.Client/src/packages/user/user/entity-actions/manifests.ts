@@ -31,8 +31,9 @@ const entityActions: Array<ManifestEntityAction> = [
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.User.Enable',
+		separatorBefore: true,
 		name: 'Enable User Entity Action',
-		weight: 800,
+		weight: 700,
 		api: () => import('./enable/enable-user.action.js'),
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
@@ -49,6 +50,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.User.Disable',
+		separatorBefore: true,
 		name: 'Disable User Entity Action',
 		weight: 700,
 		api: () => import('./disable/disable-user.action.js'),

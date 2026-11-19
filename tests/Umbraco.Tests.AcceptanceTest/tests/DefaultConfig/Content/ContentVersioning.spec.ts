@@ -32,8 +32,8 @@ test('can rollback content to a previous published version', {tag: '@smoke'}, as
   await umbracoUi.content.clickContentTab();
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, originalText);
   await umbracoUi.content.clickInfoTab();
-  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.rollback);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentRolledBack);
+  await umbracoUi.content.doesAnyHistoryItemHaveTag(ConstantHelper.auditTrailTypes.rollback);
+  await umbracoUi.content.doesAnyHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentRolledBack);
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });

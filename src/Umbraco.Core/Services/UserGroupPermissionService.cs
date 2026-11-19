@@ -1,6 +1,11 @@
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Extensions;
 
@@ -15,6 +20,8 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     private readonly IMediaService _mediaService;
     private readonly IEntityService _entityService;
     private readonly AppCaches _appCaches;
+    private readonly ICoreScopeProvider _scopeProvider;
+    private readonly IUserGroupRepository _userGroupRepository;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserGroupPermissionService" /> class.
@@ -23,16 +30,22 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     /// <param name="mediaService">The media service.</param>
     /// <param name="entityService">The entity service.</param>
     /// <param name="appCaches">The application caches.</param>
+    /// <param name="scopeProvider">The scope provider.</param>
+    /// <param name="userGroupRepository">The user group repository.</param>
     public UserGroupPermissionService(
         IContentService contentService,
         IMediaService mediaService,
         IEntityService entityService,
-        AppCaches appCaches)
+        AppCaches appCaches,
+        ICoreScopeProvider scopeProvider,
+        IUserGroupRepository userGroupRepository)
     {
         _contentService = contentService;
         _mediaService = mediaService;
         _entityService = entityService;
         _appCaches = appCaches;
+        _scopeProvider = scopeProvider;
+        _userGroupRepository = userGroupRepository;
     }
 
     /// <inheritdoc/>
@@ -74,6 +87,10 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     /// <param name="user"><see cref="IUser" /> to validate access.</param>
     /// <param name="userGroup">The user group to be validated.</param>
     /// <returns><see cref="UserGroupAuthorizationStatus"/>.</returns>
+    /// <remarks>
+    ///     Start nodes of an existing user group are only validated when they differ from the persisted user group, so a
+    ///     user can save a user group without being blocked by start nodes they did not change.
+    /// </remarks>
     private UserGroupAuthorizationStatus ValidateAccess(IUser user, IUserGroup userGroup)
     {
         var hasAccessToUsersSection = HasAccessToUsersSection(user);
@@ -90,19 +107,45 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
         }
 
         // Check that the user is not setting start nodes that they don't have access to.
-        var hasContentStartNodeAccess = HasAccessToContentStartNode(user, userGroup);
-        if (hasContentStartNodeAccess is false)
+        IUserGroup? persistedUserGroup = userGroup.HasIdentity ? GetPersistedUserGroup(userGroup.Key) : null;
+
+        if (persistedUserGroup?.StartContentId != userGroup.StartContentId
+            && HasAccessToContentStartNode(user, userGroup) is false)
         {
             return UserGroupAuthorizationStatus.UnauthorizedMissingContentStartNodeAccess;
         }
 
-        var hasMediaStartNodeAccess = HasAccessToMediaStartNode(user, userGroup);
-        if (hasMediaStartNodeAccess is false)
+        if (persistedUserGroup?.StartMediaId != userGroup.StartMediaId
+            && HasAccessToMediaStartNode(user, userGroup) is false)
         {
             return UserGroupAuthorizationStatus.UnauthorizedMissingMediaStartNodeAccess;
         }
 
+        if (persistedUserGroup?.StartElementId != userGroup.StartElementId
+            && HasAccessToElementStartNode(user, userGroup) is false)
+        {
+            return UserGroupAuthorizationStatus.UnauthorizedMissingElementStartNodeAccess;
+        }
+
+        if (persistedUserGroup?.StartDocumentBlueprintId != userGroup.StartDocumentBlueprintId
+            && HasAccessToDocumentBlueprintStartNode(user, userGroup) is false)
+        {
+            return UserGroupAuthorizationStatus.UnauthorizedMissingDocumentBlueprintStartNodeAccess;
+        }
+
         return UserGroupAuthorizationStatus.Success;
+    }
+
+    /// <summary>
+    ///     Gets the persisted state of a user group.
+    /// </summary>
+    /// <param name="key">The key of the user group.</param>
+    /// <returns>The persisted user group, or <c>null</c> if it does not exist.</returns>
+    private IUserGroup? GetPersistedUserGroup(Guid key)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        IQuery<IUserGroup> query = _scopeProvider.CreateQuery<IUserGroup>().Where(x => x.Key == key);
+        return _userGroupRepository.Get(query).FirstOrDefault();
     }
 
     /// <summary>
@@ -143,6 +186,11 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
             return true;
         }
 
+        if (userGroup.StartContentId == Constants.System.Root)
+        {
+            return user.HasContentRootAccess(_entityService, _appCaches);
+        }
+
         IContent? content = _contentService.GetById(userGroup.StartContentId.Value);
 
         if (content is null)
@@ -166,6 +214,11 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
             return true;
         }
 
+        if (userGroup.StartMediaId == Constants.System.Root)
+        {
+            return user.HasMediaRootAccess(_entityService, _appCaches);
+        }
+
         IMedia? media = _mediaService.GetById(userGroup.StartMediaId.Value);
 
         if (media is null)
@@ -174,5 +227,64 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
         }
 
         return user.HasPathAccess(media, _entityService, _appCaches);
+    }
+
+    /// <summary>
+    ///     Check that a user has access to the element start node.
+    /// </summary>
+    /// <param name="user"><see cref="IUser" /> to check for access.</param>
+    /// <param name="userGroup">The user group being created or updated.</param>
+    /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
+    private bool HasAccessToElementStartNode(IUser user, IUserGroup userGroup)
+    {
+        if (userGroup.StartElementId is null)
+        {
+            return true;
+        }
+
+        if (userGroup.StartElementId == Constants.System.Root)
+        {
+            return user.HasElementRootAccess(_entityService, _appCaches);
+        }
+
+        IEntitySlim? container = _entityService.Get(userGroup.StartElementId.Value, UmbracoObjectTypes.ElementContainer);
+
+        if (container is null)
+        {
+            return true;
+        }
+
+        return user.HasElementPathAccess(container, _entityService, _appCaches);
+    }
+
+    /// <summary>
+    ///     Check that a user has access to the document blueprint start node.
+    /// </summary>
+    /// <param name="user"><see cref="IUser" /> to check for access.</param>
+    /// <param name="userGroup">The user group being created or updated.</param>
+    /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
+    private bool HasAccessToDocumentBlueprintStartNode(IUser user, IUserGroup userGroup)
+    {
+        if (userGroup.StartDocumentBlueprintId is null)
+        {
+            return true;
+        }
+
+        // The root has no container to resolve a path from.
+        if (userGroup.StartDocumentBlueprintId == Constants.System.Root)
+        {
+            return user.HasDocumentBlueprintRootAccess(_entityService, _appCaches);
+        }
+
+        IEntitySlim? container = _entityService.Get(userGroup.StartDocumentBlueprintId.Value, UmbracoObjectTypes.DocumentBlueprintContainer);
+
+        if (container is null)
+        {
+            return true;
+        }
+
+        return ContentPermissions.HasPathAccessWithoutRecycleBin(
+            container.Path,
+            user.CalculateDocumentBlueprintStartNodeIds(_entityService, _appCaches));
     }
 }

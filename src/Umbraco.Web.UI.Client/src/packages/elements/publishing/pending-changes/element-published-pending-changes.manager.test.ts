@@ -60,7 +60,6 @@ describe('UmbElementPublishedPendingChangesManager', () => {
 						state: UmbElementVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
 						culture: null,
-						segment: null,
 						name: 'Element 1',
 						createDate: '2023-02-06T15:32:05.350038',
 						updateDate: '2023-02-06T15:32:24.957009',
@@ -124,9 +123,8 @@ describe('UmbElementPublishedPendingChangesManager', () => {
 					{
 						state: UmbElementVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
-						culture: 'en-US',
-						segment: null,
-						name: 'Element 1 (en-US)',
+						culture: 'da-DK',
+						name: 'Element 1 (da-DK)',
 						createDate: '2023-02-06T15:32:05.350038',
 						updateDate: '2023-02-06T15:32:24.957009',
 						scheduledPublishDate: null,
@@ -136,9 +134,8 @@ describe('UmbElementPublishedPendingChangesManager', () => {
 					{
 						state: UmbElementVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
-						culture: 'da-DK',
-						segment: null,
-						name: 'Element 1 (da-DK)',
+						culture: 'en-US',
+						name: 'Element 1 (en-US)',
 						createDate: '2023-02-06T15:32:05.350038',
 						updateDate: '2023-02-06T15:32:24.957009',
 						scheduledPublishDate: null,
@@ -146,18 +143,19 @@ describe('UmbElementPublishedPendingChangesManager', () => {
 						flags: [],
 					},
 				],
+				// Culture-sorted (da-DK before en-US), matching the order values settle into once merged. [NL]
 				values: [
 					{
 						editorAlias: 'Umbraco.TextBox',
 						alias: 'prop1',
-						culture: 'en-US',
+						culture: 'da-DK',
 						segment: null,
 						value: '',
 					},
 					{
 						editorAlias: 'Umbraco.TextBox',
 						alias: 'prop1',
-						culture: 'da-DK',
+						culture: 'en-US',
 						segment: null,
 						value: '',
 					},
@@ -175,7 +173,7 @@ describe('UmbElementPublishedPendingChangesManager', () => {
 			});
 
 			it('should have variants with changes when value is updated', async () => {
-				persistedElement.values[0].value = 'value (en-US)';
+				persistedElement.values[1].value = 'value (en-US)';
 				await manager.process({ persistedData: persistedElement, publishedData: publishedElement });
 				const variantsWithChanges = manager.getVariantsWithChanges();
 				expect(variantsWithChanges).to.have.lengthOf(1);
@@ -183,17 +181,17 @@ describe('UmbElementPublishedPendingChangesManager', () => {
 			});
 
 			it('should have variants with changes when multiple values are updated', async () => {
-				persistedElement.values[0].value = 'value (en-US)';
-				persistedElement.values[1].value = 'value (da-DK)';
+				persistedElement.values[0].value = 'value (da-DK)';
+				persistedElement.values[1].value = 'value (en-US)';
 				await manager.process({ persistedData: persistedElement, publishedData: publishedElement });
 				const variantsWithChanges = manager.getVariantsWithChanges();
 				expect(variantsWithChanges).to.have.lengthOf(2);
-				expect(variantsWithChanges[0].variantId.toString()).to.equal('en-US');
-				expect(variantsWithChanges[1].variantId.toString()).to.equal('da-DK');
+				expect(variantsWithChanges[0].variantId.toString()).to.equal('da-DK');
+				expect(variantsWithChanges[1].variantId.toString()).to.equal('en-US');
 			});
 
 			it('should have variants with changes when name of variant is updated', async () => {
-				persistedElement.variants[0].name = 'Element 1 (en-US) Updated';
+				persistedElement.variants[1].name = 'Element 1 (en-US) Updated';
 				await manager.process({ persistedData: persistedElement, publishedData: publishedElement });
 				const variantsWithChanges = manager.getVariantsWithChanges();
 				expect(variantsWithChanges).to.have.lengthOf(1);
@@ -201,13 +199,13 @@ describe('UmbElementPublishedPendingChangesManager', () => {
 			});
 
 			it('should have variants with changes when name of multiple variants are updated', async () => {
-				persistedElement.variants[0].name = 'Element 1 (en-US) Updated';
-				persistedElement.variants[1].name = 'Element 1 (da-DK) Updated';
+				persistedElement.variants[0].name = 'Element 1 (da-DK) Updated';
+				persistedElement.variants[1].name = 'Element 1 (en-US) Updated';
 				await manager.process({ persistedData: persistedElement, publishedData: publishedElement });
 				const variantsWithChanges = manager.getVariantsWithChanges();
 				expect(variantsWithChanges).to.have.lengthOf(2);
-				expect(variantsWithChanges[0].variantId.toString()).to.equal('en-US');
-				expect(variantsWithChanges[1].variantId.toString()).to.equal('da-DK');
+				expect(variantsWithChanges[0].variantId.toString()).to.equal('da-DK');
+				expect(variantsWithChanges[1].variantId.toString()).to.equal('en-US');
 			});
 		});
 	});

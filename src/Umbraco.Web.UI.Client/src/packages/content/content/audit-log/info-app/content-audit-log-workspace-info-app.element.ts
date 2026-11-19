@@ -51,8 +51,8 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 		super();
 
 		this.#pagination.setPageSize(10);
-		this.observe(this.#pagination.currentPage, (number) => (this._currentPageNumber = number));
-		this.observe(this.#pagination.totalPages, (number) => (this._totalPages = number));
+		this.observe(this.#pagination.currentPage, (number) => (this._currentPageNumber = number), null);
+		this.observe(this.#pagination.totalPages, (number) => (this._totalPages = number), null);
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
 			context?.addEventListener(UmbRequestReloadStructureForEntityEvent.TYPE, () => {
@@ -227,9 +227,6 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 			}
 
 			uui-pagination {
-				flex: 1;
-				display: flex;
-				justify-content: center;
 				margin-top: var(--uui-size-layout-1);
 			}
 		`,

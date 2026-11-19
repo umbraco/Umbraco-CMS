@@ -63,7 +63,7 @@ public abstract class FileServiceBase<TRepository, TEntity> : RepositoryService,
     /// <returns><c>true</c> if the file name is valid; otherwise, <c>false</c>.</returns>
     protected virtual bool HasValidFileName(string fileName)
     {
-        if (fileName.ContainsAny(Path.GetInvalidFileNameChars()))
+        if (fileName.ContainsAny(Constants.CharSearchValues.InvalidFileNameChars))
         {
             return false;
         }
@@ -106,8 +106,9 @@ public abstract class FileServiceBase<TRepository, TEntity> : RepositoryService,
     /// <inheritdoc />
     public Task SetContentStreamAsync(string path, Stream content)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         Repository.SetFileContent(path, content);
+        scope.Complete();
         return Task.CompletedTask;
     }
 

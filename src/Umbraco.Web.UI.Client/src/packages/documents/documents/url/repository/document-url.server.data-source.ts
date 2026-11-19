@@ -8,7 +8,7 @@ import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/enti
 /**
  * A server data source for Document URLs
  * @class UmbDocumentUrlServerDataSource
- * @implements {DocumentTreeDataSource}
+ * @augments {UmbItemServerDataSourceBase}
  */
 export class UmbDocumentUrlServerDataSource extends UmbItemServerDataSourceBase<
 	DocumentUrlInfoResponseModel,

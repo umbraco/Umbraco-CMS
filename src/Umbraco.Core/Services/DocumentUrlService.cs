@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
@@ -211,12 +212,15 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return;
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        // The rebuild runs in its own scope rather than inside the caching scope below, so that it can take its write
+        // lock before anything in its transaction reads (see RebuildAllUrlsAsync).
         if (SkipDatabaseWrites() is false && ShouldRebuildUrls())
         {
             _logger.LogInformation("Rebuilding all document URLs.");
             await RebuildAllUrlsAsync();
         }
+
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         _logger.LogInformation("Caching document URLs.");
 
@@ -278,6 +282,11 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
+        // Take the write lock before the first read, as the rebuild reads every document before it writes. Some
+        // providers (for example SQLite in WAL mode) cannot let a transaction that has already read become the
+        // writer once another connection has committed.
+        scope.WriteLock(Constants.Locks.DocumentUrls);
+
         IEnumerable<IContent> documents = _documentRepository.GetMany(Array.Empty<int>());
 
         await CreateOrUpdateUrlSegmentsAsync(documents);
@@ -288,12 +297,25 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     }
 
     /// <summary>
-    /// Indicates whether this instance should skip database writes for URL segments.
+    /// Indicates whether this instance should skip the database writes that are not tied to a local content change,
+    /// i.e. the start-up rebuild of URL segments.
     /// </summary>
     /// <remarks>
-    /// On a <see cref="ServerRole.Subscriber"/> the scheduling publisher has already persisted URL segments to
-    /// the database before issuing the cache-refresh instruction that routed us here. Re-writing them locally is
-    /// redundant at best, and blows up when the subscriber is configured against a read-only database connection.
+    /// The server role says which instance runs the scheduled jobs; it says nothing about which instance serves the
+    /// backoffice. Under the default election the publisher flag goes to whichever instance touches the server
+    /// registration first and moves whenever the holder is away for the stale timeout, so a front-end instance can be
+    /// the publisher while the only backoffice instance is a <see cref="ServerRole.Subscriber"/> for as long as that
+    /// front-end keeps running. The two only line up when roles are configured explicitly.
+    /// An explicitly configured subscriber is a dedicated front-end server that may run on a read-only database
+    /// connection; it never makes content changes, and the publisher maintains the persisted URL segments on its
+    /// behalf, so the rebuild is gated on the role. <see cref="CreateOrUpdateUrlSegmentsAsync(IEnumerable{IContent})"/>
+    /// and friends are not gated when they run for a change made on this server: reaching them means a content
+    /// write has already committed on this connection, so the connection is writable whatever the role reads, and no
+    /// other server persists the segments for that change (other servers receive a cache instruction and only
+    /// refresh their in-memory cache). Skipping the write there would leave the document unroutable on every server
+    /// after its next restart.
+    /// <see cref="ServerRole.Unknown"/> is deliberately not grouped with Subscriber, so a server whose role is not
+    /// yet resolved still rebuilds.
     /// The in-memory cache is updated via deferred scope-context enlistments regardless of this flag.
     /// </remarks>
     private bool SkipDatabaseWrites() => _serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber;
@@ -538,7 +560,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return;
         }
 
-        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
+        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _, propertyAliases: null, filter: null, ordering: null);
 
         await CreateOrUpdateUrlSegmentsAsync(new List<IContent>(descendants)
         {
@@ -571,7 +593,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return;
         }
 
-        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
+        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _, propertyAliases: null, filter: null, ordering: null);
         await CreateOrUpdateUrlSegmentsInternalAsync(new List<IContent>(descendants) { item }, skipDatabaseWrite: true);
     }
 
@@ -635,7 +657,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             }
         }
 
-        if (!skipDatabaseWrite && toSave.Count > 0 && SkipDatabaseWrites() is false)
+        if (skipDatabaseWrite is false && toSave.Count > 0)
         {
             scope.WriteLock(Constants.Locks.DocumentUrls);
             _documentUrlRepository.Save(toSave);
@@ -905,7 +927,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
         Guid? runnerKey = GetStartNodeKey(documentStartNodeId);
         var hideTopLevelNodeFromPath = _globalSettings.HideTopLevelNodeFromPath;
 
-        culture ??= _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+        culture ??= _defaultCultureAccessor.DefaultCulture;
 
         if (!_globalSettings.ForceCombineUrlPathLeftToRight
             && CultureInfo.GetCultureInfo(culture).TextInfo.IsRightToLeft)
@@ -1116,29 +1138,29 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return Constants.Routing.Unroutable;
         }
 
-        if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && _publishStatusQueryService.IsPublished(documentKey, culture) is false)
+        if (isDraft is false)
         {
-            return Constants.Routing.Unroutable;
+            if (string.IsNullOrWhiteSpace(culture))
+            {
+                if (_publishStatusQueryService.IsPublishedInAnyCulture(documentKey) is false
+                    || _publishStatusQueryService.HasPublishedAncestorPath(documentKey) is false)
+                {
+                    return Constants.Routing.Unroutable;
+                }
+            }
+            else
+            {
+                if (_publishStatusQueryService.IsPublished(documentKey, culture) is false
+                    || _publishStatusQueryService.HasPublishedAncestorPath(documentKey, culture) is false)
+                {
+                    return Constants.Routing.Unroutable;
+                }
+            }
         }
 
         string cultureOrDefault = GetCultureOrDefault(culture);
 
         Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
-        ILookup<Guid, Domain?> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToLookup(x => x, ancestorKey =>
-        {
-            Attempt<int> idAttempt = _idKeyMap.GetIdForKey(ancestorKey, UmbracoObjectTypes.Document);
-
-            if (idAttempt.Success is false)
-            {
-                return null;
-            }
-
-            IEnumerable<Domain> domains = _domainCacheService.GetAssigned(idAttempt.Result, false);
-
-            // If no culture is specified, we assume invariant and return the first domain.
-            // This is also only used to later to specify the node id in the route, so it does not matter what culture it is.
-            return GetDomainForCultureOrInvariant(domains, culture);
-        });
 
         var urlSegments = new List<string>();
 
@@ -1146,7 +1168,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
 
         foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeysArray)
         {
-            Domain? domain = ancestorOrSelfKeyToDomains[ancestorOrSelfKey].WhereNotNull().FirstOrDefault();
+            Domain? domain = GetDomain(ancestorOrSelfKey, culture);
             if (domain is not null)
             {
                 foundDomain = domain;
@@ -1177,15 +1199,34 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return foundDomain.ContentId + "/" + string.Join("/", urlSegments);
         }
 
-        var isRootFirstItem = GetTopMostRootKey(isDraft, cultureOrDefault) == ancestorsOrSelfKeysArray.Last();
+        // Whether the content is under the topmost root only matters for a single URL segment (see HideTopLevel), so
+        // skip looking the roots up for everything deeper.
+        var isRootFirstItem = _globalSettings.HideTopLevelNodeFromPath
+                              && urlSegments.Count == 1
+                              && GetTopMostRootKey(isDraft, cultureOrDefault) == ancestorsOrSelfKeysArray.Last();
         return GetFullUrl(isRootFirstItem, urlSegments, null, leftToRight);
+    }
+
+    private Domain? GetDomain(Guid documentKey, string? culture)
+    {
+        Attempt<int> idAttempt = _idKeyMap.GetIdForKey(documentKey, UmbracoObjectTypes.Document);
+        if (idAttempt.Success is false)
+        {
+            return null;
+        }
+
+        IEnumerable<Domain> domains = _domainCacheService.GetAssigned(idAttempt.Result, false);
+
+        // If no culture is specified, we assume invariant and return the first domain.
+        // This is also only used to later to specify the node id in the route, so it does not matter what culture it is.
+        return GetDomainForCultureOrInvariant(domains, culture);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private string GetCultureOrDefault(string? culture)
         => string.IsNullOrWhiteSpace(culture) is false
             ? culture
-            : _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+            : _defaultCultureAccessor.DefaultCulture;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool ArePathsLeftToRight(string cultureOrDefault)
@@ -1200,35 +1241,30 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
 
     private string GetFullUrl(bool isRootFirstItem, List<string> segments, Domain? foundDomain, bool leftToRight)
     {
-        var urlSegments = new List<string>(segments);
+        ReadOnlySpan<string> urlSegments = CollectionsMarshal.AsSpan(segments);
 
         if (foundDomain is not null)
         {
             return foundDomain.Name.EnsureEndsWith("/") + string.Join('/', urlSegments);
         }
 
-        var hideTopLevel = HideTopLevel(_globalSettings.HideTopLevelNodeFromPath, isRootFirstItem, urlSegments);
+        var hideTopLevel = HideTopLevel(_globalSettings.HideTopLevelNodeFromPath, isRootFirstItem, urlSegments.Length);
         if (leftToRight)
         {
-            return '/' + string.Join('/', urlSegments.Skip(hideTopLevel ? 1 : 0));
+            return '/' + string.Join('/', hideTopLevel ? urlSegments[1..] : urlSegments);
         }
 
-        if (hideTopLevel)
-        {
-            urlSegments.RemoveAt(urlSegments.Count - 1);
-        }
-
-        return '/' + string.Join('/', urlSegments);
+        return '/' + string.Join('/', hideTopLevel ? urlSegments[..^1] : urlSegments);
     }
 
-    private static bool HideTopLevel(bool hideTopLevelNodeFromPath, bool isRootFirstItem, List<string> urlSegments)
+    private static bool HideTopLevel(bool hideTopLevelNodeFromPath, bool isRootFirstItem, int urlSegmentCount)
     {
         if (hideTopLevelNodeFromPath is false)
         {
             return false;
         }
 
-        if (isRootFirstItem is false && urlSegments.Count == 1)
+        if (isRootFirstItem is false && urlSegmentCount == 1)
         {
             return false;
         }
@@ -1240,7 +1276,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     public bool HasAny()
     {
         ThrowIfNotInitialized();
-        return _documentUrlCache.Any();
+        return _documentUrlCache.IsEmpty is false;
     }
 
     private bool TryGetPrimaryUrlSegment(Guid documentKey, string culture, bool isDraft, [NotNullWhen(true)] out string? segment)

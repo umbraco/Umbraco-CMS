@@ -1,5 +1,6 @@
 // TODO: we need to figure out what components should be available for extensions and load them upfront
 // TODO: we need to move these files into their respective folders/silos. We then need a way for a silo to globally register a component
+export * from './action-group-list/index.js';
 export * from './backoffice-modal-container/backoffice-modal-container.element.js';
 export * from './backoffice-notification-container/backoffice-notification-container.element.js';
 export * from './badge/index.js';
@@ -30,7 +31,9 @@ export * from './multiple-color-picker-input/index.js';
 export * from './multiple-text-string-input/index.js';
 export * from './popover-layout/index.js';
 export * from './ref-item/index.js';
+export * from './entity-bar/index.js';
 export * from './scrollable-container/index.js';
+export * from './separator/index.js';
 export * from './split-panel/index.js';
 export * from './stack/index.js';
 export * from './table/index.js';

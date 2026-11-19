@@ -4,8 +4,8 @@ import type { MetaEntityCreateOptionAction } from './entity-create-option-action
 import { UmbActionBase } from '@umbraco-cms/backoffice/action';
 
 export abstract class UmbEntityCreateOptionActionBase<
-		ArgsMetaType extends MetaEntityCreateOptionAction = MetaEntityCreateOptionAction,
-	>
+	ArgsMetaType extends MetaEntityCreateOptionAction = MetaEntityCreateOptionAction,
+>
 	extends UmbActionBase<UmbEntityCreateOptionActionArgs<ArgsMetaType>>
 	implements UmbEntityCreateOptionAction<ArgsMetaType>
 {

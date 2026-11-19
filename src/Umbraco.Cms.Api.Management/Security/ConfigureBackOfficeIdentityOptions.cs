@@ -25,19 +25,6 @@ public sealed class ConfigureBackOfficeIdentityOptions : IConfigureOptions<BackO
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ConfigureBackOfficeIdentityOptions"/> class with the specified user password configuration and security settings.
-    /// </summary>
-    /// <param name="userPasswordConfiguration">The options containing user password configuration settings.</param>
-    /// <param name="securitySettings">The options containing security settings.</param>
-    [Obsolete("Use the constructor that only takes IOptions<SecuritySettings> instead. Scheduled for removal in Umbraco 19.")]
-    public ConfigureBackOfficeIdentityOptions(
-        IOptions<UserPasswordConfigurationSettings> userPasswordConfiguration,
-        IOptions<SecuritySettings> securitySettings)
-        : this(securitySettings)
-    {
-    }
-
-    /// <summary>
     /// Configures the specified <see cref="BackOfficeIdentityOptions"/> with security-related settings, including sign-in requirements, user validation, claims identity configuration, lockout policies, and password options for the Umbraco backoffice.
     /// </summary>
     /// <param name="options">The <see cref="BackOfficeIdentityOptions"/> instance to configure.</param>

@@ -15,6 +15,10 @@ export class ElementApiHelper {
     return await response.json();
   }
 
+  async waitUntilIndexed(query: string, id: string, culture?: string) {
+    await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.elementSearch, query, id, undefined, culture);
+  }
+
   async doesExist(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}${ConstantHelper.apiEndpoints.element}/${id}`);
     return response.status() === 200;
@@ -25,7 +29,7 @@ export class ElementApiHelper {
       return;
     }
     const response = await this.api.post(`${this.api.baseUrl}${ConstantHelper.apiEndpoints.element}`, element);
-    return response.headers().location.split("v1/element/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async delete(id: string) {
@@ -60,7 +64,7 @@ export class ElementApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}${ConstantHelper.apiEndpoints.treeElementChildren}?parentId=${id}&skip=0&take=10000`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async getChildrenAmount(id: string) {
@@ -118,10 +122,15 @@ export class ElementApiHelper {
     const rootElements = await this.getAllAtRoot();
     const jsonElements = await rootElements.json();
 
-    for (const element of jsonElements.items) {
+    for (const element of this.api.itemsOf(jsonElements)) {
       // Use root level 'name' property for both folders and elements
       if (element.name === name) {
-        return element.isFolder ? await this.getFolder(element.id) : await this.get(element.id);
+        const found = element.isFolder ? await this.getFolder(element.id) : await this.get(element.id);
+        // A trashed element can still be returned by the tree endpoint; it only "exists" in the
+        // recycle bin (checked separately), so don't report it as present.
+        if (found && !found.isTrashed) {
+          return found;
+        }
       }
 
       // Recursively search children
@@ -139,7 +148,7 @@ export class ElementApiHelper {
     const rootElements = await this.getAllAtRoot();
     const jsonElements = await rootElements.json();
 
-    for (const element of jsonElements.items) {
+    for (const element of this.api.itemsOf(jsonElements)) {
       // Use root level 'name' property for both folders and elements
       if (element.name === name) {
         if (element.hasChildren) {
@@ -182,7 +191,7 @@ export class ElementApiHelper {
   async doesItemExistInRecycleBin(elementName: string) {
     const recycleBin = await this.getAllRecycleBinItems();
     const jsonRecycleBin = await recycleBin.json();
-    for (const element of jsonRecycleBin.items) {
+    for (const element of this.api.itemsOf(jsonRecycleBin)) {
       if (element.name === elementName) {
         return true;
       }
@@ -193,6 +202,10 @@ export class ElementApiHelper {
   // Folder
   async getFolder(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}${ConstantHelper.apiEndpoints.elementFolder}/${id}`);
+    if (!response.ok()) {
+      return null;
+    }
+
     return await response.json();
   }
 
@@ -207,7 +220,7 @@ export class ElementApiHelper {
 
     }
     const response = await this.api.post(`${this.api.baseUrl}${ConstantHelper.apiEndpoints.elementFolder}`, folder);
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async createFolderResponse(name: string, parentId?: string) {
@@ -263,6 +276,53 @@ export class ElementApiHelper {
     return await this.create(element);
   }
 
+  async createElementWithMultipleSegmentValues(elementName: string, elementTypeId: string, dataTypeName: string, values: {value: string, segment: string | null}[]) {
+    await this.ensureNameNotExists(elementName);
+
+    const elementBuilder = new ElementBuilder()
+      .withDocumentTypeId(elementTypeId)
+      .addVariant()
+        .withName(elementName)
+        .done();
+
+    for (const value of values) {
+      const valueBuilder = elementBuilder.addValue()
+        .withAlias(AliasHelper.toAlias(dataTypeName))
+        .withValue(value.value);
+      if (value.segment !== null) {
+        valueBuilder.withSegment(value.segment);
+      }
+      valueBuilder.done();
+    }
+
+    return await this.create(elementBuilder.build());
+  }
+
+  async getPublished(id: string) {
+    const response = await this.api.get(`${this.api.baseUrl}${ConstantHelper.apiEndpoints.element}/${id}/published`);
+    return await response.json();
+  }
+
+  async getValuesByCultureAndSegmentForElement(elementName: string, culturesAndSegments: {culture: string | null, segment: string | null}[]) {
+    const elementData = await this.getByName(elementName);
+    if (!elementData) {
+      throw new Error(`Element '${elementName}' was not found`);
+    }
+    return culturesAndSegments.map(cs =>
+      elementData.values.find(v => v.culture === cs.culture && v.segment === cs.segment)
+    );
+  }
+
+  async getPublishedValuesByCultureAndSegmentForElement(elementId: string, culturesAndSegments: {culture: string | null, segment: string | null}[]) {
+    const publishedData = await this.getPublished(elementId);
+    if (!Array.isArray(publishedData?.values)) {
+      throw new Error(`Published element '${elementId}' was not found`);
+    }
+    return culturesAndSegments.map(cs =>
+      publishedData.values.find(v => v.culture === cs.culture && v.segment === cs.segment)
+    );
+  }
+
   async createDefaultElementWithParent(elementName: string, elementTypeId: string, parentId: string) {
     await this.ensureNameNotExists(elementName);
 
@@ -304,6 +364,30 @@ export class ElementApiHelper {
 
     // Create element
     return await this.create(element);
+  }
+
+  async createElementWithMultipleVariantsAndVaryingAndSharedValues(elementName: string, elementTypeId: string, varyingPropertyName: string, sharedPropertyName: string, cultureVariants: {isoCode: string, name: string, value: string}[], sharedValue: string) {
+    await this.ensureNameNotExists(elementName);
+
+    const builder = new ElementBuilder()
+      .withDocumentTypeId(elementTypeId);
+    for (const variant of cultureVariants) {
+      builder.addVariant()
+        .withName(variant.name)
+        .withCulture(variant.isoCode)
+        .done();
+      builder.addValue()
+        .withAlias(AliasHelper.toAlias(varyingPropertyName))
+        .withValue(variant.value)
+        .withCulture(variant.isoCode)
+        .done();
+    }
+    builder.addValue()
+      .withAlias(AliasHelper.toAlias(sharedPropertyName))
+      .withValue(sharedValue)
+      .done();
+
+    return await this.create(builder.build());
   }
 
   async createDefaultElementWithEnglishAndDanishVariants(elementTypeId: string, englishName: string, danishName: string, propertyName: string, englishTextContent: string, danishTextContent: string) {

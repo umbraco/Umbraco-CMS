@@ -11,7 +11,7 @@ const recycledElementName = 'BackofficeSearchElementRecycled';
 const unpublishedElementName = 'BackofficeSearchElementUnpublished';
 const folderName = 'BackofficeSearchElementFolder';
 const subFolderName = 'BackofficeSearchElementSubFolder';
-const folderedElementName = 'BackofficeSearchElementInFolder';
+const folderElementName = 'BackofficeSearchElementInFolder';
 const variantElementEN = 'BackofficeSearchElementVariantEN';
 const variantElementDA = 'BackofficeSearchElementVariantDA';
 // Data type
@@ -24,9 +24,9 @@ test.beforeEach(async ({umbracoUi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.element.ensureNameNotExists(recycledElementName);  
+  await umbracoApi.element.ensureNameNotExists(recycledElementName);
   await umbracoApi.element.ensureNameNotExists(unpublishedElementName);
-  await umbracoApi.element.ensureNameNotExists(folderedElementName);
+  await umbracoApi.element.ensureNameNotExists(folderElementName);
   await umbracoApi.element.ensureNameNotExists(folderName);
   await umbracoApi.element.ensureNameNotExists(subFolderName);
   await umbracoApi.element.ensureNameNotExists(variantElementEN);
@@ -51,20 +51,22 @@ test('can see Elements provider auto-selected when opening search from the Libra
   await umbracoUi.backofficeSearch.isSearchProviderActive('Elements');
 });
 
+// Search matches whole terms and term prefixes, not arbitrary substrings, so each keyword is a word or the start of one.
 const elementNameCases = [
   {label: 'a basic name', name: 'BackofficeSearchElementItem', searchKeyword: 'Back'},
   {label: 'a short name', name: 'Bse', searchKeyword: 'Bse'},
-  {label: 'a long name', name: 'BackofficeSearchElementWithAVeryLongNameToTestBoundaryHandlingOfElementNameFieldsInSearchResults', searchKeyword: 'VeryLongName'},
+  {label: 'a long name', name: 'BackofficeSearchElementWithAVeryLongNameToTestBoundaryHandlingOfElementNameFieldsInSearchResults', searchKeyword: 'BackofficeSearchElementWithAVeryLongName'},
   {label: 'a name with spaces', name: 'Backoffice Search Element With Spaces', searchKeyword: 'Spaces'},
-  {label: 'a name with numbers', name: 'BackofficeSearchElement1234567890', searchKeyword: '1234567890'},
-  {label: 'a name with special characters', name: 'BackofficeSearchElement , . ! ? # $ % & * @ é ü ă đ 漢字', searchKeyword: ', . ! ? # $ % & * @ é ü ă đ 漢字'},
+  {label: 'a name with numbers', name: 'BackofficeSearchElement1234567890', searchKeyword: 'BackofficeSearchElement12345'},
+  {label: 'a name with special characters', name: 'BackofficeSearchElement , . ! ? # $ % & * @ é ü ă đ 漢字', searchKeyword: 'é ü ă đ'},
   {label: 'a name with Unicode characters', name: 'BackofficeSearchElement Æøå', searchKeyword: 'Æøå'},
 ];
 for (const elementNameCase of elementNameCases) {
   test(`can find an element by ${elementNameCase.label}`, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
-    await umbracoApi.element.createDefaultElement(elementNameCase.name, elementTypeId);
+    const elementId = await umbracoApi.element.createDefaultElement(elementNameCase.name, elementTypeId);
+    await umbracoApi.element.waitUntilIndexed(elementNameCase.searchKeyword, elementId);
     await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
     // Act
@@ -104,6 +106,7 @@ test('can see a Trashed tag for a trashed element', async ({umbracoApi, umbracoU
   const recycledElementId = await umbracoApi.element.createDefaultElement(recycledElementName, elementTypeId);
   await umbracoApi.element.publish(recycledElementId);
   await umbracoApi.element.moveToRecycleBin(recycledElementId);
+  await umbracoApi.element.waitUntilIndexed(recycledElementName, recycledElementId);
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -118,7 +121,8 @@ test('can see a Trashed tag for a trashed element', async ({umbracoApi, umbracoU
 test('can see a Draft tag for an element with unpublished changes', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
-  await umbracoApi.element.createDefaultElement(unpublishedElementName, elementTypeId);
+  const unpublishedElementId = await umbracoApi.element.createDefaultElement(unpublishedElementName, elementTypeId);
+  await umbracoApi.element.waitUntilIndexed(unpublishedElementName, unpublishedElementId);
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
@@ -136,15 +140,16 @@ test('can see the folder path as breadcrumb for an element inside folders', asyn
   const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const folderId = await umbracoApi.element.createDefaultElementFolder(folderName);
   const subFolderId = await umbracoApi.element.createDefaultElementFolder(subFolderName, folderId);
-  await umbracoApi.element.createDefaultElementWithParent(folderedElementName, elementTypeId, subFolderId);
+  const folderElementId = await umbracoApi.element.createDefaultElementWithParent(folderElementName, elementTypeId, subFolderId);
+  await umbracoApi.element.waitUntilIndexed(folderElementName, folderElementId);
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act
   await umbracoUi.backofficeSearch.clickSearchHeaderButton();
-  await umbracoUi.backofficeSearch.searchForElement(folderedElementName);
+  await umbracoUi.backofficeSearch.searchForElement(folderElementName);
 
   // Assert
-  await umbracoUi.backofficeSearch.isSearchResultWithNameVisible(folderedElementName);
+  await umbracoUi.backofficeSearch.isSearchResultWithNameVisible(folderElementName);
   await umbracoUi.backofficeSearch.isSearchResultWithNameVisible(`${folderName} / ${subFolderName}`);
 });
 
@@ -160,7 +165,7 @@ test('can see the variant name matching the current app language', async ({umbra
     true,
     true,
   );
-  await umbracoApi.element.createDefaultElementWithEnglishAndDanishVariants(
+  const variantElementId = await umbracoApi.element.createDefaultElementWithEnglishAndDanishVariants(
     variantTypeId,
     variantElementEN,
     variantElementDA,
@@ -168,6 +173,7 @@ test('can see the variant name matching the current app language', async ({umbra
     'EN text',
     'DA text',
   );
+  await umbracoApi.element.waitUntilIndexed('BackofficeSearchElementVariant', variantElementId, 'en-US');
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
 
   // Act

@@ -30,6 +30,12 @@ public class AutoLinkSignInResult : SignInResult
     public static AutoLinkSignInResult FailedNoEmail { get; } = new() { Succeeded = false };
 
     /// <summary>
+    /// Gets a result indicating the auto-link sign-in failed because a new user could not be
+    /// created without a usable name resolved from the external login's claims.
+    /// </summary>
+    public static AutoLinkSignInResult FailedNoName { get; } = new() { Succeeded = false };
+
+    /// <summary>
     /// Gets the collection of error messages related to the auto-link sign-in process.
     /// </summary>
     public IReadOnlyCollection<string> Errors { get; } = Array.Empty<string>();

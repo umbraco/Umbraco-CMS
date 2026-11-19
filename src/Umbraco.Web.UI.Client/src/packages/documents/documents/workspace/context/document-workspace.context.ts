@@ -1,13 +1,14 @@
 import { UmbDocumentTypeDetailRepository } from '../../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentPropertyDatasetContext } from '../../property-dataset-context/document-property-dataset.context.js';
 import type { UmbDocumentDetailRepository } from '../../repository/index.js';
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UmbDocumentSegmentRepository } from '../../repository/index.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { UmbDocumentDetailModel, UmbDocumentVariantModel } from '../../types.js';
 import {
 	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_DOCUMENT_COLLECTION_ALIAS,
 	UMB_DOCUMENT_ENTITY_TYPE,
+	UMB_DOCUMENT_RECYCLE_BIN_ROOT_WORKSPACE_PATH,
 	UMB_DOCUMENT_SAVE_MODAL,
 	UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
@@ -15,25 +16,19 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 } from '../../constants.js';
 import { UmbDocumentValidationRepository } from '../../repository/validation/index.js';
-import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../index.js';
+import { UMB_DOCUMENTS_SECTION_PATH } from '../../../section/paths.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
-import { UmbDeprecation, type UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
-import {
-	UmbEntityRestoredFromRecycleBinEvent,
-	UmbEntityTrashedEvent,
-	UmbIsTrashedEntityContext,
-} from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbPreviewController } from '@umbraco-cms/backoffice/preview';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbExpandVariantIdsWithSegmentOptions } from '@umbraco-cms/backoffice/variant';
 import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import type { UmbWorkspaceActionExecutionOptions } from '@umbraco-cms/backoffice/workspace';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
@@ -60,11 +55,8 @@ export class UmbDocumentWorkspaceContext
 
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
-	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
-	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
 	#previewController = new UmbPreviewController(this);
-	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -79,37 +71,6 @@ export class UmbDocumentWorkspaceContext
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 			contentTypePropertyName: 'documentType',
 			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
-		});
-
-		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
-			const config = await context?.getDocumentConfiguration();
-			const allowSegmentCreation = config?.allowNonExistingSegmentsCreation ?? false;
-
-			// Deprecation warning for allowNonExistingSegmentsCreation (default from server is true, so we warn on false)
-			if (!allowSegmentCreation) {
-				new UmbDeprecation({
-					deprecated: 'The "AllowNonExistingSegmentsCreation" setting is deprecated.',
-					removeInVersion: '19.0.0',
-					solution: 'This functionality will be moved to a client-side extension.',
-				}).warn();
-			}
-
-			this._variantOptionsFilter = (variantOption) => {
-				const isNotCreatedSegmentVariant = variantOption.segment && !variantOption.variant;
-
-				// Do not allow creating a segment variant
-				if (!allowSegmentCreation && isNotCreatedSegmentVariant) {
-					return false;
-				}
-
-				return true;
-			};
-		});
-
-		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (actionEventContext) => {
-			this.#removeEventListeners();
-			this.#actionEventContext = actionEventContext;
-			this.#addEventListeners();
 		});
 
 		this.observe(
@@ -142,8 +103,6 @@ export class UmbDocumentWorkspaceContext
 			},
 			null,
 		);
-
-		this.observe(this.isTrashed, (isTrashed) => this.#onTrashStateChange(isTrashed));
 
 		this.routes.setRoutes([
 			{
@@ -196,11 +155,24 @@ export class UmbDocumentWorkspaceContext
 		]);
 	}
 
+	protected override _getNavigationParentItemPath(entity: UmbEntityModel | undefined): string | undefined {
+		if (!entity?.unique) {
+			return this._data.getCurrent()?.isTrashed
+				? UMB_DOCUMENT_RECYCLE_BIN_ROOT_WORKSPACE_PATH
+				: UMB_DOCUMENTS_SECTION_PATH;
+		}
+		return UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
+	}
+
+	#enforcedVerbs = new Map<string, Promise<UmbApi>>();
+
 	#enforceUserPermission(verb: string, message: string) {
+		if (this.#enforcedVerbs.has(verb)) return;
+
 		// We set the initial permission state to false because the condition is false by default and only execute the callback if it changes.
 		this.#handleUserPermissionChange(verb, false, message);
 
-		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
+		const condition = createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
 			{
 				config: {
 					allOf: [verb],
@@ -210,23 +182,13 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 		]);
+		this.#enforcedVerbs.set(verb, condition);
 	}
 
-	override resetState(): void {
+	override resetState() {
+		this.#enforcedVerbs.forEach((condition) => condition.then((api) => api.destroy()).catch(() => undefined));
+		this.#enforcedVerbs.clear();
 		super.resetState();
-		this.#isTrashedContext.setIsTrashed(false);
-	}
-
-	protected override async _loadSegmentsFor(unique: string): Promise<void> {
-		if (!unique) {
-			this._segments.setValue([]);
-			return;
-		}
-		const { data } = await this.#documentSegmentRepository.getDocumentByIdSegmentOptions(unique, {
-			skip: 0,
-			take: 9999,
-		});
-		this._segments.setValue(data?.items ?? []);
 	}
 
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
@@ -306,7 +268,11 @@ export class UmbDocumentWorkspaceContext
 		const { selected } = await this._determineVariantOptions();
 		if (selected.length > 0) {
 			firstVariantId = UmbVariantId.FromString(selected[0]);
-			const variantIds = [firstVariantId];
+			let variantIds = [firstVariantId];
+
+			if (this.getVariesBySegment()) {
+				variantIds = umbExpandVariantIdsWithSegmentOptions(variantIds, await this.getVariantOptions());
+			}
 			const saveData = await this._data.constructData(variantIds);
 
 			// Run mandatory validation (checks for name, etc.)
@@ -347,53 +313,6 @@ export class UmbDocumentWorkspaceContext
 			If the user does not have permission, we set it to true = permitted to be read-only. */
 			permitted: true,
 		});
-	}
-
-	#addEventListeners() {
-		this.#actionEventContext?.addEventListener(UmbEntityTrashedEvent.TYPE, this.#onRecycleBinEvent as EventListener);
-		this.#actionEventContext?.addEventListener(
-			UmbEntityRestoredFromRecycleBinEvent.TYPE,
-			this.#onRecycleBinEvent as EventListener,
-		);
-	}
-
-	#removeEventListeners() {
-		this.#actionEventContext?.removeEventListener(UmbEntityTrashedEvent.TYPE, this.#onRecycleBinEvent as EventListener);
-		this.#actionEventContext?.removeEventListener(
-			UmbEntityRestoredFromRecycleBinEvent.TYPE,
-			this.#onRecycleBinEvent as EventListener,
-		);
-	}
-
-	#onRecycleBinEvent = (event: UmbEntityTrashedEvent | UmbEntityRestoredFromRecycleBinEvent) => {
-		const unique = this.getUnique();
-		const entityType = this.getEntityType();
-		if (event.getUnique() !== unique || event.getEntityType() !== entityType) return;
-		this.reload();
-	};
-
-	#onTrashStateChange(isTrashed?: boolean) {
-		this.#isTrashedContext.setIsTrashed(isTrashed ?? false);
-
-		const guardUnique = `UMB_PREVENT_EDIT_TRASHED_ITEM`;
-
-		if (!isTrashed) {
-			this.readOnlyGuard.removeRule(guardUnique);
-			return;
-		}
-
-		const rule: UmbVariantGuardRule = {
-			unique: guardUnique,
-			permitted: true,
-		};
-
-		// TODO: Change to use property write guard when it supports making the name read-only.
-		this.readOnlyGuard.addRule(rule);
-	}
-
-	public override destroy(): void {
-		this.#removeEventListeners();
-		super.destroy();
 	}
 }
 

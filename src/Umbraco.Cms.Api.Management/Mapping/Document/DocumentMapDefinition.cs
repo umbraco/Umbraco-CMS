@@ -56,7 +56,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.Values = MapValueViewModels(source.Properties);
         target.Variants = MapVariantViewModels(
             source,
-            (culture, _, documentVariantViewModel) =>
+            (culture, documentVariantViewModel) =>
             {
                 documentVariantViewModel.State = PublishableVariantStateHelper.GetState(source, culture);
                 documentVariantViewModel.PublishDate = culture == null
@@ -74,7 +74,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.Values = MapValueViewModels(source.Properties, published: true);
         target.Variants = MapVariantViewModels(
             source,
-            (culture, _, documentVariantViewModel) =>
+            (culture, documentVariantViewModel) =>
             {
                 documentVariantViewModel.Name = source.GetPublishName(culture) ?? documentVariantViewModel.Name;
                 PublishableVariantState variantState = PublishableVariantStateHelper.GetState(source, culture);
@@ -88,7 +88,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.IsTrashed = source.Trashed;
     }
 
-    // Umbraco.Code.MapAll -IsProtected -Ancestors -Flags
+    // Umbraco.Code.MapAll -IsProtected -Ancestors -Flags -HasChildren
     private void Map(IContent source, DocumentCollectionResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -112,7 +112,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.Values = MapValueViewModels(properties);
         target.Variants = MapVariantViewModels(
             source,
-            (culture, _, documentVariantViewModel) =>
+            (culture, documentVariantViewModel) =>
             {
                 documentVariantViewModel.State = PublishableVariantStateHelper.GetState(source, culture);
                 documentVariantViewModel.PublishDate = culture == null
@@ -130,7 +130,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.Values = MapValueViewModels(source.Properties);
         target.Variants = MapVariantViewModels(
             source,
-            (culture, _, documentVariantViewModel) =>
+            (culture, documentVariantViewModel) =>
             {
                 documentVariantViewModel.State = PublishableVariantState.Draft;
             });

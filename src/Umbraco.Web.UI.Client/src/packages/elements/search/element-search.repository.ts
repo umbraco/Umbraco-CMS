@@ -1,6 +1,6 @@
 import { UmbElementSearchServerDataSource } from './element-search.server.data-source.js';
-import type { UmbElementSearchItemModel } from './types.js';
-import type { UmbSearchRepository, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbElementSearchItemModel, UmbElementSearchRequestArgs } from './types.js';
+import type { UmbSearchRepository } from '@umbraco-cms/backoffice/search';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -26,11 +26,11 @@ export class UmbElementSearchRepository
 
 	/**
 	 * Search for elements
-	 * @param {UmbSearchRequestArgs} args - The arguments for the search
+	 * @param {UmbElementSearchRequestArgs} args - The arguments for the search
 	 * @returns {Promise<UmbRepositoryResponse<UmbPagedModel<UmbElementSearchItemModel>>>} - The search results
 	 * @memberof UmbElementSearchRepository
 	 */
-	search(args: UmbSearchRequestArgs): Promise<UmbRepositoryResponse<UmbPagedModel<UmbElementSearchItemModel>>> {
+	search(args: UmbElementSearchRequestArgs): Promise<UmbRepositoryResponse<UmbPagedModel<UmbElementSearchItemModel>>> {
 		return this.#dataSource.search(args);
 	}
 }

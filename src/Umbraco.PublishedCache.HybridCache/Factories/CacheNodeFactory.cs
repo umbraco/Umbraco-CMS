@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Factories;
@@ -31,6 +32,7 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
             CreatorId = content.CreatorId,
             ContentTypeId = content.ContentTypeId,
             Data = contentData,
+            EntityType = ContentCacheDataSerializerEntityType.Document,
             IsDraft = preview,
         };
     }
@@ -63,6 +65,7 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
             CreatorId = media.CreatorId,
             ContentTypeId = media.ContentTypeId,
             Data = contentData,
+            EntityType = ContentCacheDataSerializerEntityType.Media,
             IsDraft = false,
         };
     }
@@ -83,6 +86,7 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
             CreatorId = element.CreatorId,
             ContentTypeId = element.ContentTypeId,
             Data = contentData,
+            EntityType = ContentCacheDataSerializerEntityType.Element,
             IsDraft = preview,
         };
     }

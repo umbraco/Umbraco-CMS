@@ -31,8 +31,8 @@ export class UmbRouterSlotElement extends UmbLitElement {
 		value ??= [];
 		const oldValue = this.#router.routes;
 		if (
-			value.length !== oldValue?.length ||
-			value.filter((route) => oldValue?.findIndex((r) => r.path === route.path) === -1).length > 0
+			value.length !== (oldValue?.length ?? 0) ||
+			value.some((route) => oldValue?.findIndex((r) => r.path === route.path && r.unique === route.unique) === -1)
 		) {
 			this.#router.routes = value;
 		}
@@ -69,13 +69,13 @@ export class UmbRouterSlotElement extends UmbLitElement {
 			this._routerPath = newAbsolutePath;
 			this.#routeContext._internal_routerGotBasePath(this._routerPath);
 			this.dispatchEvent(new UmbRouterSlotInitEvent());
+		}
 
-			const newActiveLocalPath = this._constructLocalRouterPath();
-			if (this._activeLocalPath !== newActiveLocalPath) {
-				this._activeLocalPath = newActiveLocalPath;
-				this.#routeContext._internal_routerGotActiveLocalPath(this._activeLocalPath);
-				this.dispatchEvent(new UmbRouterSlotChangeEvent());
-			}
+		const newActiveLocalPath = this._constructLocalRouterPath();
+		if (this._activeLocalPath !== newActiveLocalPath) {
+			this._activeLocalPath = newActiveLocalPath;
+			this.#routeContext._internal_routerGotActiveLocalPath(this._activeLocalPath);
+			this.dispatchEvent(new UmbRouterSlotChangeEvent());
 		}
 	};
 

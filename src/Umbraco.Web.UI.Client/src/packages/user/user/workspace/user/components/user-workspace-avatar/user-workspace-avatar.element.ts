@@ -38,8 +38,7 @@ export class UmbUserWorkspaceAvatarElement extends UmbLitElement {
 		return this._selectElement;
 	}
 
-	async #observeAllowedFileTypes() {
-		await this.#temporaryFileConfigRepository.initialized;
+	#observeAllowedFileTypes() {
 		this.observe(
 			this.#temporaryFileConfigRepository.part('imageFileTypes'),
 			(fileTypes) => {

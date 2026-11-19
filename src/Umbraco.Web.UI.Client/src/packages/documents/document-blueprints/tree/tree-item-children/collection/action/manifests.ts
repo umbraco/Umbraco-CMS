@@ -7,6 +7,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'create',
 		name: 'Document Blueprint Tree Item Children Collection Create Action',
 		alias: 'Umb.CollectionAction.DocumentBlueprintTreeItemChildren.Create',
-		conditions: [{ alias: UMB_COLLECTION_ALIAS_CONDITION, match: UMB_DOCUMENT_BLUEPRINT_TREE_ITEM_CHILDREN_COLLECTION_ALIAS }],
+		conditions: [
+			{ alias: UMB_COLLECTION_ALIAS_CONDITION, match: UMB_DOCUMENT_BLUEPRINT_TREE_ITEM_CHILDREN_COLLECTION_ALIAS },
+		],
 	},
 ];

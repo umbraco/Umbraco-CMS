@@ -13,7 +13,7 @@
 - **Rich Text**: **TipTap 3** — ProseMirror-based editor (see `src/packages/tiptap/`)
 - **Build**: Vite 7 (config in `vite.config.ts`)
 - **State**: RxJS 7 wrapped by UmbState classes — see [Core Primitives](./core-primitives.md)
-- **Context/DI**: DOM-event-based Context API — see [Core Primitives](./core-primitives.md)
+- **Context/DI**: DOM-event-based Context API — see [Context API](./context-api.md)
 - **Testing**: @web/test-runner + Playwright, @open-wc/testing — see [Testing](./testing.md)
 - **Mocking**: MSW 2 — see [Testing](./testing.md)
 - **Code Quality**: ESLint 9 (flat config), Prettier
@@ -48,6 +48,8 @@ src/
 **Extension-first architecture**: HQ builds extensions the same way third-party developers do. All UI (sections, dashboards, property editors, workspaces, trees, actions) is registered via manifests. Any default behavior can be replaced, overridden, or removed. Consumers can use any framework that outputs a Web Component.
 
 *Note: The extension-first mindset is the guiding principle, and the frontend fully embraces this by treating all features as manifest-registered, replaceable extensions.*
+
+Extension-first also constrains how shared code is written: it must serve any implementation of an extension point, not only the one that prompted the change. See [General-Purpose by Default](../../../CLAUDE.md#2-general-purpose-by-default).
 
 ---
 
@@ -148,7 +150,7 @@ export const manifest: UmbExtensionManifestKind = {
 
 ### Context API, Observable State & Controllers
 
-These core primitives are documented in detail in **[Core Primitives](./core-primitives.md)**. In brief:
+These core primitives are documented in detail in **[Core Primitives](./core-primitives.md)** (the Context API and Observable State go deeper in **[Context API](./context-api.md)** and **[State System](./state-system.md)**). In brief:
 
 - **Context API** — DOM-event-based dependency injection. Providers expose typed contexts to descendant elements via `provideContext()`, consumers access them via `consumeContext()` or `getContext()`.
 - **Observable State** — Reactive state containers (`UmbStringState`, `UmbArrayState`, `UmbObjectState`, etc.). Elements subscribe via `this.observe()` which handles lifecycle automatically.

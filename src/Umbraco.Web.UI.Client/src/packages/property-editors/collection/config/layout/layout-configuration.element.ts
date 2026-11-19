@@ -1,4 +1,5 @@
 import { css, customElement, html, ifDefined, property, when } from '@umbraco-cms/backoffice/external/lit';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
 import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
@@ -97,7 +98,7 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 		await umbConfirmModal(this, {
 			color: 'danger',
 			headline: `#actions_remove?`,
-			content: `#defaultdialogs_confirmremove ${layout.name ?? ''}?`,
+			content: this.localize.term('defaultdialogs_confirmRemoveItem', escapeHTML(layout.name ?? '')),
 			confirmLabel: '#actions_remove',
 		});
 

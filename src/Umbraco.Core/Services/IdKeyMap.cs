@@ -30,8 +30,11 @@ public class IdKeyMap : IIdKeyMap, IDisposable
     private readonly IIdKeyMapRepository _idKeyMapRepository;
     private readonly ReaderWriterLockSlim _locker = new();
 
-    private readonly Dictionary<int, TypedId<Guid>> _id2Key = new();
-    private readonly Dictionary<Guid, TypedId<int>> _key2Id = new();
+    // Both dictionaries are keyed by the identifier alone, with the object type carried on the value only as a
+    // discriminator. That is safe because umbracoNode.id is unique across all object types, so an id can never
+    // belong to two entries at once.
+    private readonly Dictionary<int, TypedId<Guid>> _id2Key = [];
+    private readonly Dictionary<Guid, TypedId<int>> _key2Id = [];
 
     // note - for pure read-only we might want to *not* enforce a transaction?
 
@@ -73,7 +76,16 @@ public class IdKeyMap : IIdKeyMap, IDisposable
 
     private bool _disposedValue;
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Registers an external source of ID/key mappings, consulted before falling back to the database.
+    /// </summary>
+    /// <param name="umbracoObjectType">The Umbraco object type the mappers apply to.</param>
+    /// <param name="id2key">Maps an integer identifier to a key.</param>
+    /// <param name="key2id">Maps a key to an integer identifier.</param>
+    /// <remarks>
+    ///     Prefer <see cref="PopulateCache(int, Guid, UmbracoObjectTypes)" />. A mapper is invoked on every miss,
+    ///     and one backed by the published cache re-enters this map when resolving by identifier.
+    /// </remarks>
     public void SetMapper(UmbracoObjectTypes umbracoObjectType, Func<int, Guid> id2key, Func<Guid, int> key2id) =>
         _dictionary[umbracoObjectType] = (id2key, key2id);
 
@@ -229,13 +241,18 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         return Attempt.Succeed(val.Value);
     }
 
-    /// <summary>
-    ///     Populates the cache with multiple ID/Key pairs for a specific object type.
-    /// </summary>
-    /// <param name="pairs">The collection of ID/Key pairs to cache.</param>
-    /// <param name="umbracoObjectType">The Umbraco object type for the pairs.</param>
-    internal void Populate(IEnumerable<(int id, Guid key)> pairs, UmbracoObjectTypes umbracoObjectType)
+    /// <inheritdoc />
+    /// <remarks>
+    ///     The write lock is held for the whole enumeration, hence the materialized collection: passing a lazy
+    ///     sequence would block every reader for as long as it takes to produce the pairs.
+    /// </remarks>
+    public void PopulateCache(IReadOnlyCollection<(int Id, Guid Key)> pairs, UmbracoObjectTypes umbracoObjectType)
     {
+        if (pairs.Count == 0)
+        {
+            return;
+        }
+
         try
         {
             _locker.EnterWriteLock();
@@ -244,6 +261,48 @@ public class IdKeyMap : IIdKeyMap, IDisposable
                 _id2Key[id] = new TypedId<Guid>(key, umbracoObjectType);
                 _key2Id[key] = new TypedId<int>(id, umbracoObjectType);
             }
+        }
+        finally
+        {
+            if (_locker.IsWriteLockHeld)
+            {
+                _locker.ExitWriteLock();
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    public void PopulateCache(int id, Guid key, UmbracoObjectTypes umbracoObjectType)
+    {
+        // Callers on the published cache read path re-supply pairs that are already mapped (content is
+        // re-converted after every publish and on every preview request), so check under the read lock
+        // first and only take the write lock when there is something to write.
+        try
+        {
+            _locker.EnterReadLock();
+            if (_id2Key.TryGetValue(id, out TypedId<Guid> existing)
+                && existing.Id == key
+                && existing.UmbracoObjectType == umbracoObjectType)
+            {
+                return;
+            }
+        }
+        finally
+        {
+            if (_locker.IsReadLockHeld)
+            {
+                _locker.ExitReadLock();
+            }
+        }
+
+        // The lock does not support recursion, so the read lock above must be released before taking the
+        // write lock - which means another thread may have written the same pair in between. That is
+        // harmless: the id/key mapping is unique, so both threads write the same values.
+        try
+        {
+            _locker.EnterWriteLock();
+            _id2Key[id] = new TypedId<Guid>(key, umbracoObjectType);
+            _key2Id[key] = new TypedId<int>(id, umbracoObjectType);
         }
         finally
         {

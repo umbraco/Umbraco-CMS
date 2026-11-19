@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 
@@ -15,19 +16,22 @@ internal sealed class BlockListPropertyValueCreator : BlockPropertyValueCreatorB
     /// </summary>
     /// <param name="blockEditorConverter">The service used to convert block editor data into strongly typed objects.</param>
     /// <param name="variationContextAccessor">Provides access to the current variation context, used for handling content variations.</param>
+    /// <param name="propertyRenderingContextAccessor">Provides access to the current rendering context.</param>
     /// <param name="blockEditorVarianceHandler">Handles variance logic for block editors, determining how values vary by culture or segment.</param>
     /// <param name="jsonSerializer">The serializer used for serializing and deserializing JSON data related to block list properties.</param>
     /// <param name="constructorCache">A cache that stores constructors for block list property values to improve performance.</param>
     /// <param name="languageService">Service used to retrieve language information for fallback resolution.</param>
+    /// <param name="elementCacheService">The cache for elements.</param>
     public BlockListPropertyValueCreator(
         BlockEditorConverter blockEditorConverter,
         IVariationContextAccessor variationContextAccessor,
         IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
         BlockEditorVarianceHandler blockEditorVarianceHandler,
+        IElementCacheService elementCacheService,
         IJsonSerializer jsonSerializer,
         BlockListPropertyValueConstructorCache constructorCache,
         ILanguageService languageService)
-        : base(blockEditorConverter, variationContextAccessor, propertyRenderingContextAccessor, blockEditorVarianceHandler, languageService)
+        : base(blockEditorConverter, variationContextAccessor, propertyRenderingContextAccessor, blockEditorVarianceHandler, languageService, elementCacheService)
     {
         _jsonSerializer = jsonSerializer;
         _constructorCache = constructorCache;
@@ -40,15 +44,16 @@ internal sealed class BlockListPropertyValueCreator : BlockPropertyValueCreatorB
     /// <param name="referenceCacheLevel">The cache level to use for property references during model creation.</param>
     /// <param name="intermediateBlockModelValue">A string containing the serialized intermediate value representing the block list.</param>
     /// <param name="preview">True if the model should be created in preview mode; otherwise, false.</param>
+    /// <param name="owningPropertyCulture">The culture of the stored property value the block value was loaded from, or <c>null</c> when the property does not vary by culture.</param>
     /// <param name="blockConfigurations">An array of <see cref="BlockListConfiguration.BlockConfiguration"/> objects used to configure the blocks.</param>
     /// <returns>A <see cref="BlockListModel"/> instance representing the constructed block list.</returns>
-    public async Task<BlockListModel> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, BlockListConfiguration.BlockConfiguration[] blockConfigurations)
+    public async Task<BlockListModel> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, string? owningPropertyCulture, BlockListConfiguration.BlockConfiguration[] blockConfigurations)
     {
         BlockListModel CreateEmptyModel() => BlockListModel.Empty;
 
         BlockListModel CreateModel(IList<BlockListItem> items) => new BlockListModel(items);
 
-        BlockListModel blockModel = await CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, blockConfigurations, CreateEmptyModel, CreateModel);
+        BlockListModel blockModel = await CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, owningPropertyCulture, blockConfigurations, CreateEmptyModel, CreateModel);
 
         return blockModel;
     }

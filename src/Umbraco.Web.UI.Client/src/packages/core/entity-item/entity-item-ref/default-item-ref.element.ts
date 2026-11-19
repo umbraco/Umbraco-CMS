@@ -1,5 +1,6 @@
 import type { UmbItemModel } from '../types.js';
 import { getItemFallbackIcon, getItemFallbackName } from '../utils.js';
+import { UmbEntityItemRefFrameMixin } from './entity-item-ref-frame.mixin.js';
 import { customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWithOptionalDescriptionModel } from '@umbraco-cms/backoffice/models';
@@ -7,7 +8,7 @@ import type { UmbWithOptionalDescriptionModel } from '@umbraco-cms/backoffice/mo
 type UmbDefaultItemRefItemModel = UmbItemModel & UmbWithOptionalDescriptionModel;
 
 @customElement('umb-default-item-ref')
-export class UmbDefaultItemRefElement extends UmbLitElement {
+export class UmbDefaultItemRefElement extends UmbEntityItemRefFrameMixin(UmbLitElement) {
 	@property({ type: Object })
 	item?: UmbDefaultItemRefItemModel;
 
@@ -20,9 +21,11 @@ export class UmbDefaultItemRefElement extends UmbLitElement {
 	override render() {
 		if (!this.item) return nothing;
 
+		const name = this.item.name ?? getItemFallbackName(this.item);
+
 		return html`
 			<uui-ref-node
-				name=${this.item.name ?? `${getItemFallbackName(this.item)}`}
+				name=${name}
 				detail=${ifDefined(this.item.description ?? undefined)}
 				?standalone=${this.standalone}
 				?selectable=${this.selectable}
@@ -30,6 +33,7 @@ export class UmbDefaultItemRefElement extends UmbLitElement {
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon(this.item)}
 			</uui-ref-node>
+			${this.renderEntityFrame()}
 		`;
 	}
 

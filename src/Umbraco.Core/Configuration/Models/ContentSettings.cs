@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel;
@@ -22,10 +22,15 @@ public class ContentSettings
     internal const bool StaticSortChildrenByFieldFiresNotifications = false;
 
     /// <summary>
+    ///     The placeholder in <see cref="PreviewBadge" /> that renders as the CSP nonce attribute.
+    /// </summary>
+    internal const string PreviewBadgeNoncePlaceholder = "{3}";
+
+    /// <summary>
     ///     The default preview badge markup template.
     /// </summary>
     internal const string StaticDefaultPreviewBadge = @"
-<script src=""{0}/website/preview.js""></script>
+<script{3} src=""{0}/website/preview.js""></script>
 <umb-website-preview path=""{0}"" url=""{1}"" unique=""{2}""></umb-website-preview>";
 
     /// <summary>
@@ -81,6 +86,7 @@ public class ContentSettings
     /// <summary>
     ///     The default value for allowing edit of invariant properties from non-default language.
     /// </summary>
+    [Obsolete("No longer used. Superseded by the HasAccessToInvariantForVariant user-group permission. Scheduled for removal in Umbraco 22.")]
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
 
     /// <summary>
@@ -134,12 +140,40 @@ public class ContentSettings
     /// <summary>
     ///     Gets or sets a value for the preview badge mark-up.
     /// </summary>
+    /// <remarks>
+    ///     The mark-up is used as a format string with the following placeholders:
+    ///     <list type="bullet">
+    ///         <item><description><c>{0}</c>: the back office path.</description></item>
+    ///         <item><description><c>{1}</c>: the URL of the previewed page.</description></item>
+    ///         <item><description><c>{2}</c>: the key of the previewed content item.</description></item>
+    ///         <item>
+    ///             <description>
+    ///                 <c>{3}</c>: a <c>nonce</c> attribute (including the leading space) for the current request,
+    ///                 or an empty string when no nonce is available. Required for sites using a nonce-based
+    ///                 Content Security Policy.
+    ///             </description>
+    ///         </item>
+    ///     </list>
+    ///     <para>
+    ///         The nonce rendered by <c>{3}</c> is the one provided by
+    ///         <see cref="Umbraco.Cms.Core.Security.ICspNonceService" />, so it only matches the policy when that
+    ///         same nonce reaches the <c>Content-Security-Policy</c> header — which is what
+    ///         <c>app.UseUmbracoCspNonceInjection()</c> does. A site whose own middleware generates a different
+    ///         nonce for the header needs to source its nonce from <c>ICspNonceService</c> as well, otherwise the
+    ///         values will not match and the badge stays blocked.
+    ///     </para>
+    /// </remarks>
     [DefaultValue(StaticDefaultPreviewBadge)]
     public string PreviewBadge { get; set; } = StaticDefaultPreviewBadge;
 
     /// <summary>
     ///     Gets or sets a value indicating whether deprecated property editors should be shown.
     /// </summary>
+    /// <remarks>
+    ///     No longer used. The setting moved to <see cref="DataTypesSettings.OfferDeprecatedPropertyEditors" />, and
+    ///     only that one is read.
+    /// </remarks>
+    [Obsolete("No longer used. Use DataTypesSettings.OfferDeprecatedPropertyEditors instead. Scheduled for removal in Umbraco 21.")]
     [DefaultValue(StaticShowDeprecatedPropertyEditors)]
     public bool ShowDeprecatedPropertyEditors { get; set; } = StaticShowDeprecatedPropertyEditors;
 
@@ -200,8 +234,16 @@ public class ContentSettings
     /// <summary>
     /// Gets or sets a value indicating whether to allow editing invariant properties from a non-default language variation.
     /// </summary>
+    /// <remarks>
+    ///     No longer consulted by the content editing pipeline. Invariant-property editing is gated by the
+    ///     <c>HasAccessToInvariantForVariant</c> user-group permission. The setting is read once during the
+    ///     v19 upgrade migration to backfill existing user groups — remove no earlier than Umbraco 22.
+    /// </remarks>
+#pragma warning disable CS0618 // Type or member is obsolete
     [DefaultValue(StaticAllowEditInvariantFromNonDefault)]
+    [Obsolete("No longer used. Superseded by the HasAccessToInvariantForVariant user-group permission. Scheduled for removal in Umbraco 22.")]
     public bool AllowEditInvariantFromNonDefault { get; set; } = StaticAllowEditInvariantFromNonDefault;
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Gets or sets a value for the collection of file extensions that are allowed for upload.

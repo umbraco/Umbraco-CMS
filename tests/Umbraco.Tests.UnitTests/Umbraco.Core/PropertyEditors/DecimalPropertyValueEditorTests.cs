@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
@@ -53,14 +54,18 @@ public class DecimalPropertyValueEditorTests
 
     [SetCulture("it-IT")]
     [SetUICulture("it-IT")]
-    [TestCase("123,45", 123.45)]
-    [TestCase("1.234,56", 1234.56)]
-    [TestCase("123.45", 12345)]
+    [TestCase("123,45", "123.45")]
+    [TestCase("1.234,56", "1234.56")]
+    [TestCase("123.45", "12345")]
     [TestCase("1,234.56", null)]
-    public void Can_Parse_Values_From_Editor_Using_Culture_With_Non_EnUs_Decimal_Separator(object value, decimal? expected)
+    public void Can_Parse_Values_From_Editor_Using_Culture_With_Non_EnUs_Decimal_Separator(object value, string? expected)
     {
+        // The expected value is parsed explicitly with the invariant culture so the test culture set above
+        // only applies to the value under test.
+        decimal? expectedDecimal = expected is null ? null : decimal.Parse(expected, CultureInfo.InvariantCulture);
+
         var fromEditor = FromEditor(value);
-        Assert.AreEqual(expected, fromEditor);
+        Assert.AreEqual(expectedDecimal, fromEditor);
     }
 
     [Test]
@@ -270,28 +275,21 @@ public class DecimalPropertyValueEditorTests
         // When configuration is populated from the deserialized JSON, whole number values are deserialized as integers.
         // So we want to replicate that in our tests.
         var configuration = new Dictionary<string, object>();
+
+        var range = new Dictionary<string, object>();
         if (min.HasValue)
         {
-            if (min.Value % 1 == 0)
-            {
-                configuration.Add("min", (int)min.Value);
-            }
-            else
-            {
-                configuration.Add("min", min.Value);
-            }
+            range.Add("min", min.Value % 1 == 0 ? (object)(int)min.Value : min.Value);
         }
 
         if (max.HasValue)
         {
-            if (max.Value % 1 == 0)
-            {
-                configuration.Add("max", (int)max.Value);
-            }
-            else
-            {
-                configuration.Add("max", max.Value);
-            }
+            range.Add("max", max.Value % 1 == 0 ? (object)(int)max.Value : max.Value);
+        }
+
+        if (range.Count > 0)
+        {
+            configuration.Add("validationRange", range);
         }
 
         if (step.HasValue)
@@ -313,7 +311,8 @@ public class DecimalPropertyValueEditorTests
             new DataEditorAttribute("alias"),
             localizedTextServiceMock.Object)
         {
-            ConfigurationObject = configuration
+            ConfigurationObject = new DecimalConfigurationEditor(Mock.Of<IIOHelper>())
+                .ToConfigurationObject(configuration, new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory())),
         };
     }
 }

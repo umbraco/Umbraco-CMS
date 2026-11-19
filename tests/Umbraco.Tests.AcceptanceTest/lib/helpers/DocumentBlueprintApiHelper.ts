@@ -24,7 +24,7 @@ export class DocumentBlueprintApiHelper {
       return;
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint', documentBlueprint);
-    return response.headers().location.split("v1/document-blueprint/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async delete(id: string) {
@@ -33,6 +33,18 @@ export class DocumentBlueprintApiHelper {
     }
     const response = await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint/' + id);
     return response.status();
+  }
+
+  async deleteFolder(id: string) {
+    if (id == null) {
+      return;
+    }
+    const response = await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint/folder/' + id);
+    return response.status();
+  }
+
+  private async deleteItem(item) {
+    return item.isFolder ? await this.deleteFolder(item.id) : await this.delete(item.id);
   }
 
   async update(id: string, documentBlueprint) {
@@ -49,7 +61,7 @@ export class DocumentBlueprintApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/document-blueprint/children?parentId=${id}&skip=0&take=10000&foldersOnly=false`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async doesNameExist(name: string) {
@@ -63,10 +75,11 @@ export class DocumentBlueprintApiHelper {
       if (child.hasChildren) {
         await this.recurseDeleteChildren(child.id);
       } else {
-        await this.delete(child.id);
+        await this.deleteItem(child);
       }
     }
-    return await this.delete(id);
+    // Only a folder is ever reported as having children, so the emptied node is always a folder.
+    return await this.deleteFolder(id);
   }
 
   private async recurseChildren(name: string, id: string, toDelete: boolean) {
@@ -80,10 +93,13 @@ export class DocumentBlueprintApiHelper {
         if (child.hasChildren) {
           return await this.recurseDeleteChildren(child.id);
         } else {
-          return await this.delete(child.id);
+          return await this.deleteItem(child);
         }
       } else if (child.hasChildren) {
-        await this.recurseChildren(name, child.id, toDelete);
+        const result = await this.recurseChildren(name, child.id, toDelete);
+        if (result) {
+          return result;
+        }
       }
     }
     return false;
@@ -93,7 +109,7 @@ export class DocumentBlueprintApiHelper {
     const rootDocumentBlueprints = await this.getAllAtRoot();
     const jsonDocumentBlueprints = await rootDocumentBlueprints.json();
 
-    for (const blueprint of jsonDocumentBlueprints.items) {
+    for (const blueprint of this.api.itemsOf(jsonDocumentBlueprints)) {
       if (blueprint.name === name) {
         return this.get(blueprint.id);
       } else if (blueprint.hasChildren) {
@@ -110,12 +126,12 @@ export class DocumentBlueprintApiHelper {
     const rootDocumentBlueprints = await this.getAllAtRoot();
     const jsonDocumentBlueprints = await rootDocumentBlueprints.json();
 
-    for (const blueprint of jsonDocumentBlueprints.items) {
+    for (const blueprint of this.api.itemsOf(jsonDocumentBlueprints)) {
       if (blueprint.name === name) {
         if (blueprint.hasChildren) {
-          await this.recurseDeleteChildren(blueprint.id);
+          return await this.recurseDeleteChildren(blueprint.id);
         }
-        return await this.delete(blueprint.id);
+        return await this.deleteItem(blueprint);
       } else if (blueprint.hasChildren) {
         await this.recurseChildren(name, blueprint.id, true);
       }
@@ -134,16 +150,37 @@ export class DocumentBlueprintApiHelper {
     return await this.create(documentBlueprint);
   }
 
+  async createDefaultDocumentBlueprintWithParent(documentBlueprintName: string, documentTypeId: string, parentId: string) {
+    await this.ensureNameNotExists(documentBlueprintName);
+    const documentBlueprint = new DocumentBlueprintsBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .withParentId(parentId)
+      .addVariant()
+        .withName(documentBlueprintName)
+        .done()
+      .build();
+    return await this.create(documentBlueprint);
+  }
+
   async createFromDocument(documentBlueprintName: string, documentId: string, parentId?: string) {
     const documentBlueprintData = {
       "name": documentBlueprintName,
-      "parent": parentId ? parentId : null,
+      "parent": parentId ? {"id": parentId} : null,
       "document": {
         "id": documentId
       }
     };
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint/from-document', documentBlueprintData);
-    return response.headers().location.split("v1/document-blueprint/").pop();
+    return this.api.getIdFromLocation(response);
+  }
+
+  async createFolder(name: string, parentId?: string) {
+    const folder = {
+      name: name,
+      parent: parentId ? {id: parentId} : null
+    };
+    const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint/folder', folder);
+    return this.api.getIdFromLocation(response);
   }
 
   async createDocumentBlueprintWithTextBoxValue(documentBlueprintName: string, documentTypeId: string, dataTypeName: string, text: string) {
@@ -162,6 +199,30 @@ export class DocumentBlueprintApiHelper {
       .build();
 
     return await this.create(documentBlueprint);
+  }
+
+  async createDocumentBlueprintWithMultipleSegmentValues(documentBlueprintName: string, documentTypeId: string, dataTypeName: string, editorAlias: string, values: {value: string, segment: string | null}[]) {
+    await this.ensureNameNotExists(documentBlueprintName);
+
+    const documentBlueprintBuilder = new DocumentBlueprintsBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .addVariant()
+        .withName(documentBlueprintName)
+        .done();
+
+    const alias = AliasHelper.toAlias(dataTypeName);
+    for (const value of values) {
+      const valueBuilder = documentBlueprintBuilder.addValue()
+        .withAlias(alias)
+        .withValue(value.value)
+        .withEditorAlias(editorAlias);
+      if (value.segment !== null) {
+        valueBuilder.withSegment(value.segment);
+      }
+      valueBuilder.done();
+    }
+
+    return await this.create(documentBlueprintBuilder.build());
   }
 
   async createDefaultDocumentBlueprintWithABlockListEditorAndBlockWithValue(documentBlueprintName: string, documentTypeName: string, blockListDataTypeName: string, elementTypeId: string, elementTypePropertyAlias: string, elementTypePropertyEditorAlias: string, elementTypePropertyValue: string, groupName: string) {
@@ -198,7 +259,7 @@ export class DocumentBlueprintApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.create(documentBlueprint);
   }
 
@@ -264,4 +325,4 @@ export class DocumentBlueprintApiHelper {
 
     return await this.create(documentBlueprint);
   }
-} 
+}

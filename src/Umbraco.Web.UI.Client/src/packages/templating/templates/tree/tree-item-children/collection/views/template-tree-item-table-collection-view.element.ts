@@ -7,6 +7,9 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
+/**
+ * @deprecated Deprecated since v17. Scheduled for removal in Umbraco 20.
+ */
 @customElement('umb-template-tree-item-table-collection-view')
 export class UmbTemplateTreeItemTableCollectionViewElement extends UmbLitElement {
 	@state()

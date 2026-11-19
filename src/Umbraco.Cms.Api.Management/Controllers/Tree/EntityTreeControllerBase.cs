@@ -129,7 +129,8 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             ? EntityService.GetKey(entity.ParentId, ItemObjectType).Result
             : Constants.System.RootKey;
 
-    protected virtual async Task<ActionResult<IEnumerable<TItem>>> GetAncestors(Guid descendantKey,
+    protected virtual async Task<ActionResult<IEnumerable<TItem>>> GetAncestors(
+        Guid descendantKey,
         bool includeSelf = true)
     {
         IEntitySlim[] ancestorEntities = await GetAncestorEntitiesAsync(descendantKey, includeSelf);

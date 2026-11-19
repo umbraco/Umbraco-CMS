@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Querying.RecycleBin;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -29,6 +30,8 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
 
     private IElementPublishingService ElementPublishingService => GetRequiredService<IElementPublishingService>();
 
+    private IElementRecycleBinQueryService ElementRecycleBinQueryService => GetRequiredService<IElementRecycleBinQueryService>();
+
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
         .AddNotificationHandler<EntityContainerMovingNotification, EntityContainerNotificationHandler>()
         .AddNotificationHandler<EntityContainerMovedNotification, EntityContainerNotificationHandler>()
@@ -36,7 +39,9 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
         .AddNotificationHandler<EntityContainerMovedToRecycleBinNotification, EntityContainerNotificationHandler>()
         .AddNotificationHandler<EntityContainerDeletingNotification, EntityContainerNotificationHandler>()
         .AddNotificationHandler<EntityContainerDeletedNotification, EntityContainerNotificationHandler>()
-        .AddNotificationHandler<ElementDeletedNotification, ElementNotificationHandler>();
+        .AddNotificationHandler<ElementDeletedNotification, ElementNotificationHandler>()
+        .AddNotificationHandler<ElementMovedNotification, RelateOnTrashNotificationHandler>()
+        .AddNotificationAsyncHandler<ElementMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
 
     private IEntitySlim[] GetAtRoot()
         => EntityService.GetRootEntities(UmbracoObjectTypes.ElementContainer).Union(EntityService.GetRootEntities(UmbracoObjectTypes.Element)).ToArray();

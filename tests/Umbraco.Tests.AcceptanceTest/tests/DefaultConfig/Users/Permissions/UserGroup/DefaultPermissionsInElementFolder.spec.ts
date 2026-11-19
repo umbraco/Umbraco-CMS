@@ -315,10 +315,8 @@ test.skip('cannot see an element inside a folder when read folder permission is 
   await umbracoUi.library.isElementInTreeVisible(folderName, false);
   await umbracoUi.library.isElementInTreeVisible(elementName, false);
   await umbracoUi.library.goToWorkspacePath(`/workspace/element-folder/edit/${folderId}`);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.minimal);
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
   await umbracoUi.library.goToWorkspacePath(`/workspace/element/edit/${innerElementId}`);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.minimal);
   await umbracoUi.library.isElementReadOnly();
 });
 

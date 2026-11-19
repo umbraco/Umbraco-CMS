@@ -29,7 +29,7 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 	suggestionQuery?: string;
 
 	/**
-	 * @param {string} dataTypeId
+	 * @param {string} dataTypeId - The unique id of the selected data type.
 	 * @default
 	 */
 	@property({ type: String, attribute: false })
@@ -96,7 +96,7 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 						}}
 						standalone>
 						<uui-action-bar slot="actions">
-							<uui-button label="Change" .href=${this._createRoute}></uui-button>
+							<uui-button label=${this.localize.term('actions_replace')} .href=${this._createRoute}></uui-button>
 						</uui-action-bar>
 					</umb-ref-data-type>
 				`

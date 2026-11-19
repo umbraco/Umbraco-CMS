@@ -16,6 +16,15 @@ export class DocumentApiHelper {
     return await response.json();
   }
 
+  async getPublished(id: string) {
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/' + id + '/published');
+    return await response.json();
+  }
+
+  async waitUntilIndexed(query: string, id: string) {
+    await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.documentSearch, query, id);
+  }
+
   async doesExist(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/' + id);
     return response.status() === 200;
@@ -26,7 +35,7 @@ export class DocumentApiHelper {
       return;
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document', document);
-    return response.headers().location.split("v1/document/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async delete(id: string) {
@@ -62,7 +71,7 @@ export class DocumentApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/document/children?parentId=${id}&skip=0&take=10000`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async getChildrenAmount(id: string) {
@@ -118,10 +127,15 @@ export class DocumentApiHelper {
     const rootDocuments = await this.getAllAtRoot();
     const jsonDocuments = await rootDocuments.json();
 
-    for (const document of jsonDocuments.items) {
+    for (const document of this.api.itemsOf(jsonDocuments)) {
       for (const variant of document.variants) {
         if (variant.name === name) {
-          return this.get(document.id);
+          const found = await this.get(document.id);
+          // A trashed document can still be returned by the tree endpoint; it only "exists" in the
+          // recycle bin (checked via doesItemExistInRecycleBin), so don't report it as present.
+          if (!found.isTrashed) {
+            return found;
+          }
         }
       }
       if (document.hasChildren) {
@@ -138,7 +152,7 @@ export class DocumentApiHelper {
     const rootDocuments = await this.getAllAtRoot();
     const jsonDocuments = await rootDocuments.json();
 
-    for (const document of jsonDocuments.items) {
+    for (const document of this.api.itemsOf(jsonDocuments)) {
       for (const variant of document.variants) {
         if (variant.name === name) {
           if (document.hasChildren) {
@@ -202,6 +216,13 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
+  async createPublishedDefaultDocument(documentName: string, documentTypeId: string) {
+    const documentId = await this.createDefaultDocument(documentName, documentTypeId) ?? '';
+    expect(documentId).toBeTruthy();
+    expect(await this.publish(documentId)).toBe(ConstantHelper.statusCodes.ok);
+    return documentId;
+  }
+
   async createDocumentWithTextContent(documentName: string, documentTypeId: string, textContent: string, dataTypeName: string) {
     await this.ensureNameNotExists(documentName);
 
@@ -213,6 +234,23 @@ export class DocumentApiHelper {
       .addValue()
         .withAlias(AliasHelper.toAlias(dataTypeName))
         .withValue(textContent)
+        .done()
+      .build();
+
+    return await this.create(document);
+  }
+
+  async createDocumentWithPropertyValue(documentName: string, documentTypeId: string, propertyAlias: string, value: any) {
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .addVariant()
+        .withName(documentName)
+        .done()
+      .addValue()
+        .withAlias(propertyAlias)
+        .withValue(value)
         .done()
       .build();
 
@@ -254,7 +292,7 @@ export class DocumentApiHelper {
     return documentId;
   }
 
-  async createDocumentWithContentPicker(documentName: string, documentTypeId: string, contentPickerId: string) {
+  async createDocumentWithContentPicker(documentName: string, documentTypeId: string, contentPickerId: string, alias: string = 'contentPicker') {
     await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
@@ -263,7 +301,7 @@ export class DocumentApiHelper {
         .withName(documentName)
         .done()
       .addValue()
-        .withAlias('contentPicker')
+        .withAlias(alias)
         .withValue(contentPickerId)
         .done()
       .build();
@@ -271,7 +309,7 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
-  async createDocumentWithOneMediaPicker(documentName: string, documentTypeId: string, mediaPickerId: string) {
+  async createDocumentWithOneMediaPicker(documentName: string, documentTypeId: string, mediaPickerId: string, alias: string = 'mediaPicker') {
     await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
@@ -280,7 +318,7 @@ export class DocumentApiHelper {
         .withName(documentName)
         .done()
       .addValue()
-        .withAlias('mediaPicker')
+        .withAlias(alias)
         .addMediaPickerValue()
           .withMediaKey(mediaPickerId)
           .done()
@@ -312,7 +350,7 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
-  async createDocumentWithMemberPicker(documentName: string, documentTypeId: string, memberId: string) {
+  async createDocumentWithMemberPicker(documentName: string, documentTypeId: string, memberId: string, alias: string = 'memberPicker') {
     await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
@@ -321,7 +359,7 @@ export class DocumentApiHelper {
         .withName(documentName)
         .done()
       .addValue()
-        .withAlias('memberPicker')
+        .withAlias(alias)
         .withValue(memberId)
         .done()
       .build();
@@ -562,6 +600,71 @@ export class DocumentApiHelper {
         name: variant.name,
         culture: variant.isoCode,
         segment: null,
+      });
+    }
+
+    return await this.create(document);
+  }
+
+  async createDocumentWithMultipleVariantsAndVaryingAndSharedValues(documentName: string, documentTypeId: string, varyingPropertyName: string, sharedPropertyName: string, cultureVariants: {isoCode: string, name: string, value: string}[], sharedValue: string) {
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .build();
+
+    for (const variant of cultureVariants) {
+      document.variants.push({
+        name: variant.name,
+        culture: variant.isoCode,
+        segment: null
+      });
+
+      document.values.push({
+        alias: AliasHelper.toAlias(varyingPropertyName),
+        value: variant.value,
+        culture: variant.isoCode,
+        segment: null,
+        editorAlias: 'Umbraco.TextBox',
+        entityType: 'document-property-value'
+      });
+    }
+
+    document.values.push({
+      alias: AliasHelper.toAlias(sharedPropertyName),
+      value: sharedValue,
+      culture: null,
+      segment: null,
+      editorAlias: 'Umbraco.TextBox',
+      entityType: 'document-property-value'
+    });
+
+    return await this.create(document);
+  }
+
+  async createDocumentWithMultipleVariantsAndTextValues(documentName: string, documentTypeId: string, cultureVariants: {isoCode: string, name: string}[], values: {propertyName: string, culture: string | null, value: string}[]) {
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .build();
+
+    for (const variant of cultureVariants) {
+      document.variants.push({
+        name: variant.name,
+        culture: variant.isoCode,
+        segment: null
+      });
+    }
+
+    for (const value of values) {
+      document.values.push({
+        alias: AliasHelper.toAlias(value.propertyName),
+        value: value.value,
+        culture: value.culture,
+        segment: null,
+        editorAlias: 'Umbraco.TextBox',
+        entityType: 'document-property-value'
       });
     }
 
@@ -1142,6 +1245,44 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
+  async createDefaultDocumentWithASingleBlockEditorAndBlockWithValue(documentName: string, documentTypeName: string, singleBlockDataTypeName: string, elementTypeId: string, elementTypePropertyAlias: string, elementTypePropertyValue: string, elementTypePropertyEditorAlias: string, groupName: string) {
+    const crypto = require('crypto');
+    const blockContentKey = crypto.randomUUID();
+    const singleBlockDataTypeId = await this.api.dataType.createSingleBlockDataTypeWithABlock(singleBlockDataTypeName, elementTypeId) || '';
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, singleBlockDataTypeName, singleBlockDataTypeId, groupName) || '';
+
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .addVariant()
+        .withName(documentName)
+        .done()
+      .addValue()
+        .withAlias(AliasHelper.toAlias(singleBlockDataTypeName))
+        .addSingleBlockValue()
+          .addContentData()
+            .withContentTypeKey(elementTypeId)
+            .withKey(blockContentKey)
+            .addContentDataValue()
+              .withAlias(elementTypePropertyAlias)
+              .withEditorAlias(elementTypePropertyEditorAlias)
+              .withValue(elementTypePropertyValue)
+              .done()
+            .done()
+          .addExpose()
+            .withContentKey(blockContentKey)
+            .done()
+          .addLayout()
+            .withContentKey(blockContentKey)
+            .done()
+          .done()
+        .done()
+      .build();
+
+    return await this.create(document);
+  }
+
   async createDefaultDocumentWithABlockListEditor(documentName: string, elementTypeId: string, documentTypeName: string, blockListDataTypeName: string) {
     const crypto = require('crypto');
     const blockContentKey = crypto.randomUUID();
@@ -1550,7 +1691,7 @@ export class DocumentApiHelper {
         .withValue(value.value)
         .withCulture(value.culture)
         .withEditorAlias(editorAlias);
-      if (value.segment) {
+      if (value.segment !== null) {
         valueBuilder.withSegment(value.segment);
       }
       valueBuilder.done();
@@ -1575,7 +1716,7 @@ export class DocumentApiHelper {
         .withAlias(alias)
         .withValue(value.value)
         .withEditorAlias(editorAlias);
-      if (value.segment) {
+      if (value.segment !== null) {
         valueBuilder.withSegment(value.segment);
       }
       valueBuilder.done();
@@ -1663,7 +1804,7 @@ export class DocumentApiHelper {
   async doesItemExistInRecycleBin(documentItemName: string) {
     const recycleBin = await this.getRecycleBinItems();
     const jsonRecycleBin = await recycleBin.json();
-    for (const document of jsonRecycleBin.items) {
+    for (const document of this.api.itemsOf(jsonRecycleBin)) {
       if (document.variants[0].name === documentItemName) {
         return true;
       }
@@ -1706,12 +1847,12 @@ export class DocumentApiHelper {
   }
 
   async createDefaultDocumentWithOneDocumentLink(documentName: string, linkedDocumentName: string, linkedDocumentId: string, documentTypeName: string = 'Test Document Type') {
-    const multiURLPickerDataTypeName = 'Multi URL Picker';
     // Get the url of the linked document
     const linkedDocumentData = await this.getByName(linkedDocumentName);
     const linkedDocumentUrl = await this.getDocumentUrl(linkedDocumentData.id);
-    // Get datatype
-    const dataTypeData = await this.api.dataType.getByName(multiURLPickerDataTypeName);
+    // Look the built-in URL picker data type up by key, as its name differs between new installs and upgraded sites
+    const dataTypeData = await this.api.dataType.get('b4e3535a-1753-47e2-8568-602cf8cfee6f');
+    const multiURLPickerDataTypeName = dataTypeData.name;
     // Create document type
     let documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, multiURLPickerDataTypeName, dataTypeData.id);
     documentTypeId = documentTypeId === undefined ? '' : documentTypeId;
@@ -1739,11 +1880,11 @@ export class DocumentApiHelper {
   }
 
   async createDefaultDocumentWithOneMediaLink(documentName: string, linkedMediaName: string, documentTypeName: string = 'Test Document Type') {
-    const multiURLPickerDataTypeName = 'Multi URL Picker';
     // Get the url of the linked document
     const linkedMediaData = await this.api.media.getByName(linkedMediaName);
-    // Get datatype
-    const dataTypeData = await this.api.dataType.getByName(multiURLPickerDataTypeName);
+    // Look the built-in URL picker data type up by key, as its name differs between new installs and upgraded sites
+    const dataTypeData = await this.api.dataType.get('b4e3535a-1753-47e2-8568-602cf8cfee6f');
+    const multiURLPickerDataTypeName = dataTypeData.name;
     // Create document type
     let documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, multiURLPickerDataTypeName, dataTypeData.id);
     documentTypeId = documentTypeId === undefined ? '' : documentTypeId;
@@ -1900,8 +2041,21 @@ export class DocumentApiHelper {
 
   async getValuesByCultureAndSegmentForDocument(documentName: string, culturesAndSegments: {culture: string | null, segment: string | null}[]) {
     const documentData = await this.getByName(documentName);
+    if (!documentData) {
+      throw new Error(`Document '${documentName}' was not found`);
+    }
     return culturesAndSegments.map(cs =>
       documentData.values.find(v => v.culture === cs.culture && v.segment === cs.segment)
+    );
+  }
+
+  async getPublishedValuesByCultureAndSegmentForDocument(documentId: string, culturesAndSegments: {culture: string | null, segment: string | null}[]) {
+    const publishedData = await this.getPublished(documentId);
+    if (!Array.isArray(publishedData?.values)) {
+      throw new Error(`Published document '${documentId}' was not found`);
+    }
+    return culturesAndSegments.map(cs =>
+      publishedData.values.find(v => v.culture === cs.culture && v.segment === cs.segment)
     );
   }
 
@@ -1929,5 +2083,194 @@ export class DocumentApiHelper {
     const documentData = await this.get(documentId);
     const variantEntry = documentData.variants.find(v => v.culture === culture);
     expect(variantEntry?.name).toBe(expectedName);
+  }
+
+  /**
+   * Creates a culture-variant document whose invariant Block List property already holds blocks with
+   * a value per culture, plus a matching expose entry per block and culture.
+   * @param documentName - name given to every variant
+   * @param documentTypeId - the document type, expected to vary by culture
+   * @param blockListPropertyAlias - alias of the (invariant) block list property
+   * @param elementTypeId - content element type of every block, expected to vary by culture
+   * @param blockPropertyAlias - alias of the variant property inside the element type
+   * @param blockPropertyEditorAlias - property editor alias of that property
+   * @param cultures - the cultures to create variants for
+   * @param blockValuesPerCulture - one entry per block, mapping culture to that block's value
+   */
+  async createDocumentWithBlockListBlocksInCultures(
+    documentName: string,
+    documentTypeId: string,
+    blockListPropertyAlias: string,
+    elementTypeId: string,
+    blockPropertyAlias: string,
+    blockPropertyEditorAlias: string,
+    cultures: Array<string>,
+    blockValuesPerCulture: Array<Record<string, string>>) {
+    await this.ensureNameNotExists(documentName);
+
+    const crypto = require('crypto');
+    const blockKeys = blockValuesPerCulture.map(() => crypto.randomUUID());
+
+    const documentBuilder = new DocumentBuilder().withDocumentTypeId(documentTypeId);
+
+    for (const culture of cultures) {
+      documentBuilder.addVariant().withName(documentName).withCulture(culture).done();
+    }
+
+    const blockListBuilder = documentBuilder.addValue().withAlias(blockListPropertyAlias).addBlockListValue();
+
+    blockValuesPerCulture.forEach((valuesByCulture, index) => {
+      const contentDataBuilder = blockListBuilder
+        .addContentData()
+        .withContentTypeKey(elementTypeId)
+        .withKey(blockKeys[index]);
+
+      for (const [culture, value] of Object.entries(valuesByCulture)) {
+        contentDataBuilder
+          .addContentDataValue()
+          .withAlias(blockPropertyAlias)
+          .withEditorAlias(blockPropertyEditorAlias)
+          .withCulture(culture)
+          .withValue(value)
+          .done();
+      }
+
+      contentDataBuilder.done();
+
+      for (const culture of Object.keys(valuesByCulture)) {
+        blockListBuilder.addExpose().withContentKey(blockKeys[index]).withCulture(culture).done();
+      }
+
+      blockListBuilder.addLayout().withContentKey(blockKeys[index]).done();
+    });
+
+    const document = blockListBuilder.done().done().build();
+
+    return await this.create(document);
+  }
+
+  /**
+   * Creates a segment-variant document whose segment-invariant Block List property already holds blocks with
+   * a value per segment, plus an expose entry per block.
+   * @param documentName - name of the document
+   * @param documentTypeId - the document type, expected to vary by segment
+   * @param blockListPropertyAlias - alias of the (segment-invariant) block list property
+   * @param elementTypeId - content element type of every block, expected to vary by segment
+   * @param blockPropertyAlias - alias of the segment-variant property inside the element type
+   * @param blockPropertyEditorAlias - property editor alias of that property
+   * @param blockValuesPerSegment - one entry per block, listing that block's value per segment (null for the default segment)
+   */
+  async createDocumentWithBlockListBlocksInSegments(
+    documentName: string,
+    documentTypeId: string,
+    blockListPropertyAlias: string,
+    elementTypeId: string,
+    blockPropertyAlias: string,
+    blockPropertyEditorAlias: string,
+    blockValuesPerSegment: Array<{value: string, segment: string | null}[]>) {
+    await this.ensureNameNotExists(documentName);
+
+    const crypto = require('crypto');
+    const blockKeys = blockValuesPerSegment.map(() => crypto.randomUUID());
+
+    const documentBuilder = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .addVariant()
+        .withName(documentName)
+        .done();
+
+    const blockListBuilder = documentBuilder.addValue().withAlias(blockListPropertyAlias).addBlockListValue();
+
+    blockValuesPerSegment.forEach((valuesBySegment, index) => {
+      const contentDataBuilder = blockListBuilder
+        .addContentData()
+        .withContentTypeKey(elementTypeId)
+        .withKey(blockKeys[index]);
+
+      for (const segmentValue of valuesBySegment) {
+        const contentDataValueBuilder = contentDataBuilder
+          .addContentDataValue()
+          .withAlias(blockPropertyAlias)
+          .withEditorAlias(blockPropertyEditorAlias)
+          .withValue(segmentValue.value);
+        if (segmentValue.segment !== null) {
+          contentDataValueBuilder.withSegment(segmentValue.segment);
+        }
+        contentDataValueBuilder.done();
+      }
+
+      contentDataBuilder.done();
+
+      blockListBuilder.addExpose().withContentKey(blockKeys[index]).done();
+      blockListBuilder.addLayout().withContentKey(blockKeys[index]).done();
+    });
+
+    const document = blockListBuilder.done().done().build();
+
+    return await this.create(document);
+  }
+
+  /**
+   * Creates a culture-variant document whose invariant Block Grid property already holds blocks with
+   * a value per culture, plus a matching expose entry per block and culture.
+   * @param documentName - name given to every variant
+   * @param documentTypeId - the document type, expected to vary by culture
+   * @param blockGridPropertyAlias - alias of the (invariant) block grid property
+   * @param elementTypeId - content element type of every block, expected to vary by culture
+   * @param blockPropertyAlias - alias of the variant property inside the element type
+   * @param blockPropertyEditorAlias - property editor alias of that property
+   * @param cultures - the cultures to create variants for
+   * @param blockValuesPerCulture - one entry per block, mapping culture to that block's value
+   */
+  async createDocumentWithBlockGridBlocksInCultures(
+    documentName: string,
+    documentTypeId: string,
+    blockGridPropertyAlias: string,
+    elementTypeId: string,
+    blockPropertyAlias: string,
+    blockPropertyEditorAlias: string,
+    cultures: Array<string>,
+    blockValuesPerCulture: Array<Record<string, string>>) {
+    await this.ensureNameNotExists(documentName);
+
+    const crypto = require('crypto');
+    const blockKeys = blockValuesPerCulture.map(() => crypto.randomUUID());
+
+    const documentBuilder = new DocumentBuilder().withDocumentTypeId(documentTypeId);
+
+    for (const culture of cultures) {
+      documentBuilder.addVariant().withName(documentName).withCulture(culture).done();
+    }
+
+    const blockGridBuilder = documentBuilder.addValue().withAlias(blockGridPropertyAlias).addBlockGridValue();
+
+    blockValuesPerCulture.forEach((valuesByCulture, index) => {
+      const contentDataBuilder = blockGridBuilder
+        .addContentData()
+        .withContentTypeKey(elementTypeId)
+        .withKey(blockKeys[index]);
+
+      for (const [culture, value] of Object.entries(valuesByCulture)) {
+        contentDataBuilder
+          .addContentDataValue()
+          .withAlias(blockPropertyAlias)
+          .withEditorAlias(blockPropertyEditorAlias)
+          .withCulture(culture)
+          .withValue(value)
+          .done();
+      }
+
+      contentDataBuilder.done();
+
+      for (const culture of Object.keys(valuesByCulture)) {
+        blockGridBuilder.addExpose().withContentKey(blockKeys[index]).withCulture(culture).done();
+      }
+
+      blockGridBuilder.addLayout().withContentKey(blockKeys[index]).done();
+    });
+
+    const document = blockGridBuilder.done().done().build();
+
+    return await this.create(document);
   }
 }

@@ -1,4 +1,5 @@
-import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
+import { UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../root/constants.js';
 import type { UmbMediaRecycleBinTreeItemModel } from './types.js';
 import type { MediaRecycleBinItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -14,7 +15,7 @@ import type { UmbOffsetPaginationRequestModel } from '@umbraco-cms/backoffice/ut
 /**
  * A data source for the Media Recycle Bin tree that fetches data from the server
  * @class UmbMediaRecycleBinTreeServerDataSource
- * @implements {UmbTreeDataSource}
+ * @augments {UmbTreeServerDataSourceBase}
  */
 export class UmbMediaRecycleBinTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	MediaRecycleBinItemResponseModel,
@@ -41,7 +42,10 @@ const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
 	const { data, ...rest } = await MediaService.getRecycleBinMediaRoot({
 		query: { skip, take },
 	});
-	return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
+	return {
+		data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) },
+		...rest,
+	};
 };
 
 const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
@@ -53,7 +57,10 @@ const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
 		const { data, ...rest } = await MediaService.getRecycleBinMediaChildren({
 			query: { parentId: args.parent.unique, skip, take },
 		});
-		return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
+		return {
+			data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) },
+			...rest,
+		};
 	}
 };
 
@@ -64,21 +71,25 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	});
 
 const mapper = (item: MediaRecycleBinItemResponseModel): UmbMediaRecycleBinTreeItemModel => {
+	const contentType = {
+		unique: item.mediaType.id,
+		icon: item.mediaType.icon,
+		collection: item.mediaType.collection ? { unique: item.mediaType.collection.id } : null,
+	};
+
 	return {
 		unique: item.id,
 		parent: {
 			unique: item.parent ? item.parent.id : null,
-			entityType: item.parent ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
+			entityType: item.parent ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE,
 		},
 		entityType: UMB_MEDIA_ENTITY_TYPE,
 		noAccess: false,
 		isTrashed: true,
 		hasChildren: item.hasChildren,
-		mediaType: {
-			unique: item.mediaType.id,
-			icon: item.mediaType.icon,
-			collection: item.mediaType.collection ? { unique: item.mediaType.collection.id } : null,
-		},
+		contentType,
+		// TODO (V20): remove when the deprecated `mediaType` field is removed.
+		mediaType: contentType,
 		variants: item.variants.map((variant) => {
 			return {
 				name: variant.name,

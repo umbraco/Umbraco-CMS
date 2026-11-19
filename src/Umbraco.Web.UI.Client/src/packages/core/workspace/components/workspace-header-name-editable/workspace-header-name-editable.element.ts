@@ -1,6 +1,6 @@
 import { UMB_NAMABLE_WORKSPACE_CONTEXT } from '../../namable/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, nothing, state, property } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -26,6 +26,7 @@ export class UmbWorkspaceHeaderNameEditableElement extends UmbLitElement {
 	 * The readonly state of the inner input.
 	 * @attr
 	 */
+	@property({ type: Boolean })
 	readonly = false;
 
 	@state()
@@ -33,6 +34,9 @@ export class UmbWorkspaceHeaderNameEditableElement extends UmbLitElement {
 
 	@state()
 	private _isWritableName = true;
+
+	@state()
+	private _isReadOnly = false;
 
 	#workspaceContext?: typeof UMB_NAMABLE_WORKSPACE_CONTEXT.TYPE;
 
@@ -43,7 +47,16 @@ export class UmbWorkspaceHeaderNameEditableElement extends UmbLitElement {
 			this.#workspaceContext = workspaceContext;
 			this.#observeName();
 			this.#observeNameWriteGuardRules();
+			this.#observeReadOnly();
 		});
+	}
+
+	#observeReadOnly() {
+		this.observe(
+			this.#workspaceContext?.readOnlyGuard?.permitted,
+			(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+			'umbObserveWorkspaceReadOnly',
+		);
 	}
 
 	#observeNameWriteGuardRules() {
@@ -87,10 +100,16 @@ export class UmbWorkspaceHeaderNameEditableElement extends UmbLitElement {
 			@input="${this.#onNameInput}"
 			label=${this.label ?? this.localize.term('placeholders_entername')}
 			placeholder=${this.placeholder ?? this.localize.term('placeholders_entername')}
-			?readonly=${this.readonly || !this._isWritableName}
+			?readonly=${this.readonly || this._isReadOnly || !this._isWritableName}
 			required
 			${umbBindToValidation(this, `$.name`, this._name)}
-			${umbFocus()}></uui-input>`;
+			${umbFocus()}>
+			${this._isReadOnly
+				? html`<uui-tag id="read-only-tag" slot="append" look="secondary">
+						${this.localize.term('general_readOnly')}
+					</uui-tag>`
+				: nothing}
+		</uui-input>`;
 	}
 
 	static override styles = [
@@ -102,6 +121,12 @@ export class UmbWorkspaceHeaderNameEditableElement extends UmbLitElement {
 
 			#nameInput {
 				flex: 1 1 auto;
+			}
+
+			#read-only-tag {
+				align-self: center;
+				margin: 0 var(--uui-size-space-2);
+				white-space: nowrap;
 			}
 		`,
 	];

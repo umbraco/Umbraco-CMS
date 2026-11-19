@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -58,46 +57,6 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     private bool _invalidateBackofficeUserAccess;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MigrationPlanExecutor"/> class, responsible for executing migration plans within the Umbraco CMS infrastructure.
-    /// </summary>
-    /// <param name="scopeProvider">Provides access to the core scope for database operations.</param>
-    /// <param name="scopeAccessor">Accesses the current scope context.</param>
-    /// <param name="loggerFactory">Factory for creating logger instances used for logging migration activities.</param>
-    /// <param name="migrationBuilder">Builds and manages migration steps and plans.</param>
-    /// <param name="databaseFactory">Factory for creating Umbraco database connections.</param>
-    /// <param name="databaseCacheRebuilder">Handles rebuilding of database-level caches after migrations.</param>
-    /// <param name="distributedCache">Manages distributed cache invalidation and synchronization.</param>
-    /// <param name="keyValueService">Service for storing and retrieving key-value pairs, often used for migration state.</param>
-    /// <param name="serviceScopeFactory">Factory for creating service scopes, enabling dependency injection within migration execution.</param>
-    /// <param name="appCaches">Provides access to application-level caches.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public MigrationPlanExecutor(
-        ICoreScopeProvider scopeProvider,
-        IScopeAccessor scopeAccessor,
-        ILoggerFactory loggerFactory,
-        IMigrationBuilder migrationBuilder,
-        IUmbracoDatabaseFactory databaseFactory,
-        IDatabaseCacheRebuilder databaseCacheRebuilder,
-        DistributedCache distributedCache,
-        IKeyValueService keyValueService,
-        IServiceScopeFactory serviceScopeFactory,
-        AppCaches appCaches)
-        : this(
-            scopeProvider,
-            scopeAccessor,
-            loggerFactory,
-            migrationBuilder,
-            databaseFactory,
-            databaseCacheRebuilder,
-            distributedCache,
-            keyValueService,
-            serviceScopeFactory,
-            appCaches,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentTypeFactory>())
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.MigrationPlanExecutor"/> class, responsible for executing migration plans within the Umbraco CMS infrastructure.
     /// </summary>
     /// <param name="scopeProvider">Provides access to core database transaction scopes.</param>
@@ -139,21 +98,37 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     }
 
     /// <inheritdoc/>
-    [Obsolete("Use ExecutePlanAsync instead. Scheduled for removal in Umbraco 18.")]
-    public ExecutedMigrationPlan ExecutePlan(MigrationPlan plan, string fromState) => ExecutePlanAsync(plan, fromState).GetAwaiter().GetResult();
-
-    /// <inheritdoc/>
     public async Task<ExecutedMigrationPlan> ExecutePlanAsync(MigrationPlan plan, string fromState)
     {
         plan.Validate();
+
+        // This class is registered as a singleton and a single boot can execute several plans - the Umbraco plan
+        // followed by one plan per package with pending migrations - so the flags are reset here to keep them scoped
+        // to the plan being executed. Without this, one plan asking for a rebuild makes every plan that follows it
+        // rebuild too (https://github.com/umbraco/Umbraco-CMS/discussions/23531).
+        _rebuildCache = false;
+        _invalidateBackofficeUserAccess = false;
 
         ExecutedMigrationPlan result = await RunMigrationPlanAsync(plan, fromState).ConfigureAwait(false);
 
         // If any completed migration requires us to rebuild cache we'll do that.
         if (_rebuildCache)
         {
-            _logger.LogInformation("Starts rebuilding the cache. This can be a long running operation");
-            await RebuildCache();
+            if (result.Successful)
+            {
+                _logger.LogInformation("Starts rebuilding the cache. This can be a long running operation");
+                await RebuildCache();
+            }
+            else
+            {
+                // A rebuild may depend on infrastructure that migrations part way through the plan put in place so
+                // attempting one on a failed plan could also error and mask the migration failure (#23612).
+                // The warning is necessary as even if the problem is fixed and the plan runs successfully to completion
+                // on a second attempt, the step that requested the rebuild may have completed and will not be run again.
+                _logger.LogWarning(
+                    "Skipping the cache rebuild requested by plan {PlanName} as it did not run to completion - the published cache should be rebuilt manually once the upgrade completes",
+                    plan.Name);
+            }
         }
 
         // If any completed migration requires us to sign out the user we'll do that.
@@ -208,7 +183,6 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
                     FinalState = transition.SourceState,
                     CompletedTransitions = completedTransitions,
                     Plan = plan,
-                    ExecutedMigrationContexts = executedMigrationContexts
                 };
             }
 
@@ -263,7 +237,6 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             FinalState = finalState,
             CompletedTransitions = completedTransitions,
             Plan = plan,
-            ExecutedMigrationContexts = executedMigrationContexts
         };
     }
 

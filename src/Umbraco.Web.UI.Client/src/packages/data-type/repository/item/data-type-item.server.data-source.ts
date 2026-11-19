@@ -12,7 +12,7 @@ let manifestPropertyEditorUis: Array<ManifestPropertyEditorUi> = [];
 /**
  * A server data source for Data Type items
  * @class UmbDataTypeItemServerDataSource
- * @implements {DocumentTreeDataSource}
+ * @augments {UmbItemServerDataSourceBase}
  */
 export class UmbDataTypeItemServerDataSource extends UmbItemServerDataSourceBase<
 	DataTypeItemResponseModel,

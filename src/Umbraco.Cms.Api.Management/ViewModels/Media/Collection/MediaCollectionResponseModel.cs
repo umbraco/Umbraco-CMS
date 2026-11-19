@@ -12,4 +12,9 @@ public class MediaCollectionResponseModel : ContentCollectionResponseModelBase<M
     /// Gets or sets a reference to the media type associated with this media collection.
     /// </summary>
     public MediaTypeCollectionReferenceResponseModel MediaType { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the file extension, without the leading dot and in lowercase; <c>null</c> when there is no file.
+    /// </summary>
+    public string? Extension { get; set; }
 }

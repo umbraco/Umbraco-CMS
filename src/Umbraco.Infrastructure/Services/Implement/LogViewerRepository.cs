@@ -38,6 +38,12 @@ public class LogViewerRepository : LogViewerRepositoryBase
     {
         var logs = new List<LogEvent>();
 
+        // StartTime/EndTime are server-local wall-clock DateTimes (they carry no offset). Re-attach
+        // the local offset so they become absolute instants comparable to each entry's timestamp,
+        // resolving them once here rather than per entry.
+        var rangeStart = new DateTimeOffset(DateTime.SpecifyKind(logTimePeriod.StartTime, DateTimeKind.Local));
+        var rangeEnd = new DateTimeOffset(DateTime.SpecifyKind(logTimePeriod.EndTime, DateTimeKind.Local));
+
         // foreach full day in the range - see if we can find one or more filenames that end with
         // yyyyMMdd.json - Ends with due to MachineName in filenames - could be 1 or more due to load balancing
         for (DateTime day = logTimePeriod.StartTime.Date; day.Date <= logTimePeriod.EndTime.Date; day = day.AddDays(1))
@@ -54,7 +60,7 @@ public class LogViewerRepository : LogViewerRepositoryBase
             {
                 try
                 {
-                    ReadLogFile(filePath, logFilter, logs);
+                    ReadLogFile(filePath, rangeStart, rangeEnd, logFilter, logs);
                 }
                 catch (Exception ex)
                 {
@@ -79,7 +85,7 @@ public class LogViewerRepository : LogViewerRepositoryBase
             }).ToArray();
     }
 
-    private void ReadLogFile(string filePath, ILogFilter logFilter, List<LogEvent> logs)
+    private void ReadLogFile(string filePath, DateTimeOffset rangeStart, DateTimeOffset rangeEnd, ILogFilter logFilter, List<LogEvent> logs)
     {
         using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var stream = new StreamReader(fs);
@@ -116,6 +122,14 @@ public class LogViewerRepository : LogViewerRepositoryBase
 
             // LogEventReader may return true with a null event for a benign skip.
             if (evt is null)
+            {
+                continue;
+            }
+
+            // Files are bucketed by calendar date, so a boundary file can hold entries outside the
+            // requested range — the range's time-of-day only narrows which entries apply, not just
+            // which files are opened. Exclude entries falling outside the exact range (#14710).
+            if (evt.Timestamp < rangeStart || evt.Timestamp > rangeEnd)
             {
                 continue;
             }

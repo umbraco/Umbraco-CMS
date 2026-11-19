@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text;
 using System.Xml;
+using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders;
@@ -10,7 +11,8 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 /// </summary>
 public abstract class OEmbedProviderBase : IEmbedProvider
 {
-    private static HttpClient? _httpClient;
+    private static readonly TimeSpan _requestTimeout = TimeSpan.FromSeconds(20);
+
     private readonly IJsonSerializer _jsonSerializer;
 
     /// <summary>
@@ -78,6 +80,18 @@ public abstract class OEmbedProviderBase : IEmbedProvider
     }
 
     /// <summary>
+    ///     Gets the <see cref="HttpClient"/> used to request the OEmbed response.
+    /// </summary>
+    /// <returns>The <see cref="HttpClient"/> to use.</returns>
+    /// <remarks>
+    ///     Returns a shared, process-wide instance which must not be mutated - do not assign
+    ///     <see cref="HttpClient.Timeout"/>, <see cref="HttpClient.BaseAddress"/> or default headers on it.
+    ///     A derived provider that needs its own configuration should override this and return a client
+    ///     obtained from <c>IHttpClientFactory</c>.
+    /// </remarks>
+    protected virtual HttpClient GetHttpClient() => SharedHttpClient.Instance;
+
+    /// <summary>
     ///     Downloads the response content from the specified URL.
     /// </summary>
     /// <param name="url">The URL to download from.</param>
@@ -85,17 +99,15 @@ public abstract class OEmbedProviderBase : IEmbedProvider
     /// <returns>A task that represents the asynchronous operation, containing the response content as a string.</returns>
     public virtual async Task<string> DownloadResponseAsync(string url, CancellationToken cancellationToken)
     {
-        if (_httpClient == null)
-        {
-            _httpClient = new HttpClient();
-            _httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd(Constants.HttpClients.Headers.UserAgentProductName);
-        }
+        // The timeout is applied per request rather than via HttpClient.Timeout, as the client is shared
+        // with other callers that need a more forgiving timeout, and Timeout cannot be changed once the
+        // client has been used.
+        using var timeoutCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeoutCancellation.CancelAfter(_requestTimeout);
 
-        using (var request = new HttpRequestMessage(HttpMethod.Get, url))
-        {
-            using HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken);
-            return await response.Content.ReadAsStringAsync(cancellationToken);
-        }
+        using var request = new HttpRequestMessage(HttpMethod.Get, url);
+        using HttpResponseMessage response = await GetHttpClient().SendAsync(request, timeoutCancellation.Token);
+        return await response.Content.ReadAsStringAsync(timeoutCancellation.Token);
     }
 
     /// <summary>
@@ -128,7 +140,7 @@ public abstract class OEmbedProviderBase : IEmbedProvider
         {
             DtdProcessing = DtdProcessing.Prohibit,
             XmlResolver = null,
-            CloseInput = true
+            CloseInput = true,
         };
         using var reader = XmlReader.Create(new StringReader(response), settings);
         doc.Load(reader);

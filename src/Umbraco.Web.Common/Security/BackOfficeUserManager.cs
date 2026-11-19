@@ -126,7 +126,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
 
     public async Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockUser(IUser user)
     {
-        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString());
+        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString(CultureInfo.InvariantCulture));
 
         if (identityUser is null)
         {
@@ -301,7 +301,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
 
     public async Task<Attempt<string, UserOperationStatus>> GeneratePasswordResetTokenAsync(IUser user)
     {
-        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString());
+        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString(CultureInfo.InvariantCulture));
 
         if (identityUser is null)
         {
@@ -314,7 +314,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
     }
     public async Task<Attempt<string, UserOperationStatus>> GenerateEmailConfirmationTokenAsync(IUser user)
     {
-        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString());
+        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString(CultureInfo.InvariantCulture));
 
         if (identityUser is null)
         {
@@ -328,7 +328,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
 
     public async Task<Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus>> GetLoginsAsync(IUser user)
     {
-        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString());
+        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString(CultureInfo.InvariantCulture));
         if (identityUser is null)
         {
             return Attempt.FailWithStatus<ICollection<IIdentityUserLogin>, UserOperationStatus>(UserOperationStatus.UserNotFound, Array.Empty<IIdentityUserLogin>());

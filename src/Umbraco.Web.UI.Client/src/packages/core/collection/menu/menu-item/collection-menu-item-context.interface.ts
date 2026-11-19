@@ -5,8 +5,8 @@ import type { UmbContextMinimal } from '@umbraco-cms/backoffice/context-api';
 
 export interface UmbCollectionMenuItemContext<
 	CollectionMenuItemType extends UmbCollectionItemModel = UmbCollectionItemModel,
-> extends UmbApi,
-		UmbContextMinimal {
+>
+	extends UmbApi, UmbContextMinimal {
 	item: Observable<CollectionMenuItemType | undefined>;
 	isSelectable: Observable<boolean>;
 	isSelected: Observable<boolean>;

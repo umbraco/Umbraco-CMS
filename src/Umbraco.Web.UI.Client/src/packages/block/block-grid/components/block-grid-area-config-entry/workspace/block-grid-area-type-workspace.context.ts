@@ -18,6 +18,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/property-editor';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
 export class UmbBlockGridAreaTypeWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<UmbBlockGridTypeAreaType>
@@ -44,9 +45,12 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias);
 	readonly properties = this.#properties.asObservable();
 
+	readonly validationContext = new UmbValidationContext(this);
+
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		super(host, workspaceArgs.manifest.alias);
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
+		this.addValidationContext(this.validationContext);
 	}
 
 	set manifest(manifest: ManifestWorkspace) {
@@ -106,8 +110,7 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 			alias: '',
 			columnSpan: 12,
 			rowSpan: 1,
-			minAllowed: 0,
-			maxAllowed: undefined,
+			validationLimit: undefined,
 			specifiedAllowance: [],
 		};
 
@@ -142,8 +145,8 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 
 	/**
 	 * @function propertyValueByAlias
-	 * @param {string} propertyAlias
-	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @param {string} propertyAlias - the alias to observe.
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} - an Observable for the value of this property.
 	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: keyof UmbBlockGridTypeAreaType) {
@@ -156,7 +159,7 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 
 	/**
 	 * @function setPropertyValue
-	 * @param {string} alias
+	 * @param {string} alias - the alias to set this value for.
 	 * @param {unknown} value - value can be a promise resolving into the actual value or the raw value it self.
 	 * @returns {Promise<void>}
 	 * @description Set the value of this property.

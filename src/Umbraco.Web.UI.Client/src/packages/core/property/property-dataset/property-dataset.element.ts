@@ -58,9 +58,8 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 
 	@property({ attribute: false })
 	/**
-	 * The name of the dataset, this name varies depending on the use-case. But this is either
-	 * @property name
-	 * @type {string}
+	 * The name of the dataset, this name varies depending on the use-case.
+	 * @property {string} name - The name of the dataset
 	 * @returns {string}
 	 * @example
 	 * ```ts
@@ -93,10 +92,10 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 		this.context = new UmbPropertyDatasetContextBase(this);
 		// prevent the first change event from firing:
 		this.#allowChangeEvent = false;
-		this.observe(this.context.name, this.#observerCallback);
+		this.observe(this.context.name, this.#observerCallback, null);
 		// prevent the first change event from firing:
 		this.#allowChangeEvent = false;
-		this.observe(this.context.properties, this.#observerCallback);
+		this.observe(this.context.properties, this.#observerCallback, null);
 	}
 
 	#observerCallback = () => {

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using Umbraco.Extensions;
 using Umbraco.Tests.Benchmarks.Config;
 
 namespace Umbraco.Tests.Benchmarks;
@@ -57,6 +58,9 @@ public class StringReplaceManyBenchmarks
         return result;
     }
 
+    [Benchmark(Description = "String.ReplaceMany w/chars - String Create")]
+    public string ReplaceManyStringCreate() => Text.ReplaceMany(ReplacedChars, ReplacementChar);
+
     // this is what v7 originally did
     [Benchmark(Description = "String.ReplaceMany w/dictionary - Aggregate")]
     public string ReplaceManyDictionaryAggregate() =>
@@ -79,39 +83,43 @@ public class StringReplaceManyBenchmarks
 
     short text, short replacement:
 
-                                           Method |     Mean |     Error |    StdDev | Scaled | ScaledSD |  Gen 0 | Allocated |
-    --------------------------------------------- |---------:|----------:|----------:|-------:|---------:|-------:|----------:|
-    'String.ReplaceMany w/chars - Aggregate'      | 236.0 ns |  40.92 ns |  2.312 ns |   1.00 |     0.00 | 0.0461 |     200 B |
-    'String.ReplaceMany w/chars - For Loop'       | 166.7 ns |  70.51 ns |  3.984 ns |   0.71 |     0.01 | 0.0420 |     180 B |
-    'String.ReplaceMany w/dictionary - Aggregate' | 606.5 ns | 342.94 ns | 19.377 ns |   2.57 |     0.07 | 0.0473 |     212 B |
-    'String.ReplaceMany w/dictionary - For Each'  | 571.8 ns | 232.33 ns | 13.127 ns |   2.42 |     0.05 | 0.0458 |     212 B |
+    | Method                                        | Mean     | Error    | StdDev   | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
+    |---------------------------------------------- |---------:|---------:|---------:|------:|--------:|-------:|----------:|------------:|
+    | 'String.ReplaceMany w/chars - Aggregate'      | 68.65 ns | 46.32 ns | 2.539 ns |  1.00 |    0.04 | 0.0185 |     240 B |        1.00 |
+    | 'String.ReplaceMany w/chars - For Loop'       | 66.85 ns | 10.66 ns | 0.584 ns |  0.97 |    0.03 | 0.0190 |     240 B |        1.00 |
+    | 'String.ReplaceMany w/chars - String Create'  | 39.22 ns | 13.80 ns | 0.757 ns |  0.57 |    0.02 | 0.0037 |      48 B |        0.20 |
+    | 'String.ReplaceMany w/dictionary - Aggregate' | 75.53 ns | 26.43 ns | 1.449 ns |  1.10 |    0.04 | 0.0189 |     240 B |        1.00 |
+    | 'String.ReplaceMany w/dictionary - For Each'  | 73.10 ns | 17.46 ns | 0.957 ns |  1.07 |    0.04 | 0.0186 |     240 B |        1.00 |
 
     long text, short replacement:
 
-                                           Method |      Mean |     Error |    StdDev | Scaled | ScaledSD |  Gen 0 | Allocated |
-    --------------------------------------------- |----------:|----------:|----------:|-------:|---------:|-------:|----------:|
-    'String.ReplaceMany w/chars - Aggregate'      |  5.771 us |  9.963 us | 0.5630 us |   1.00 |     0.00 | 1.6798 |   6.94 KB |
-    'String.ReplaceMany w/chars - For Loop'       |  4.962 us |  2.121 us | 0.1199 us |   0.87 |     0.08 | 1.6840 |   6.92 KB |
-    'String.ReplaceMany w/dictionary - Aggregate' | 14.514 us |  8.189 us | 0.4627 us |   2.53 |     0.22 | 1.6447 |   6.96 KB |
-    'String.ReplaceMany w/dictionary - For Each'  | 15.445 us | 24.745 us | 1.3981 us |   2.69 |     0.30 | 1.5696 |   6.96 KB |
+    | Method                                        | Mean     | Error     | StdDev   | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
+    |---------------------------------------------- |---------:|----------:|---------:|------:|--------:|-------:|----------:|------------:|
+    | 'String.ReplaceMany w/chars - Aggregate'      | 426.0 ns | 856.13 ns | 46.93 ns |  1.01 |    0.14 | 0.5656 |   6.97 KB |        1.00 |
+    | 'String.ReplaceMany w/chars - For Loop'       | 415.0 ns | 230.56 ns | 12.64 ns |  0.98 |    0.10 | 0.5658 |   6.97 KB |        1.00 |
+    | 'String.ReplaceMany w/chars - String Create'  | 389.8 ns | 177.93 ns |  9.75 ns |  0.92 |    0.09 | 0.1401 |   1.74 KB |        0.25 |
+    | 'String.ReplaceMany w/dictionary - Aggregate' | 414.8 ns | 191.44 ns | 10.49 ns |  0.98 |    0.10 | 0.5668 |   6.97 KB |        1.00 |
+    | 'String.ReplaceMany w/dictionary - For Each'  | 419.2 ns |  87.69 ns |  4.81 ns |  0.99 |    0.10 | 0.5653 |   6.97 KB |        1.00 |
 
     short text, long replacements dictionary:
 
-                                           Method |       Mean |      Error |    StdDev | Scaled | ScaledSD |  Gen 0 | Allocated |
-    --------------------------------------------- |-----------:|-----------:|----------:|-------:|---------:|-------:|----------:|
-    'String.ReplaceMany w/chars - Aggregate'      |   257.0 ns |   200.0 ns |  11.30 ns |   1.00 |     0.00 | 0.0452 |     200 B |
-    'String.ReplaceMany w/chars - For Loop'       |   182.4 ns |   221.0 ns |  12.49 ns |   0.71 |     0.05 | 0.0425 |     180 B |
-    'String.ReplaceMany w/dictionary - Aggregate' | 7,273.8 ns | 2,747.1 ns | 155.22 ns |  28.34 |     1.12 | 0.0714 |     464 B |
-    'String.ReplaceMany w/dictionary - For Each'  | 6,981.0 ns | 5,500.7 ns | 310.80 ns |  27.20 |     1.38 | 0.0775 |     464 B |
+    | Method                                        | Mean      | Error      | StdDev    | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
+    |---------------------------------------------- |----------:|-----------:|----------:|------:|--------:|-------:|----------:|------------:|
+    | 'String.ReplaceMany w/chars - Aggregate'      |  71.42 ns |  13.767 ns |  0.755 ns |  1.00 |    0.01 | 0.0185 |     240 B |        1.00 |
+    | 'String.ReplaceMany w/chars - For Loop'       |  69.19 ns |  36.993 ns |  2.028 ns |  0.97 |    0.03 | 0.0190 |     240 B |        1.00 |
+    | 'String.ReplaceMany w/chars - String Create'  |  39.95 ns |   4.868 ns |  0.267 ns |  0.56 |    0.01 | 0.0035 |      48 B |        0.20 |
+    | 'String.ReplaceMany w/dictionary - Aggregate' | 639.32 ns | 184.521 ns | 10.114 ns |  8.95 |    0.15 | 0.0389 |     528 B |        2.20 |
+    | 'String.ReplaceMany w/dictionary - For Each'  | 662.39 ns | 369.149 ns | 20.234 ns |  9.28 |    0.26 | 0.0399 |     528 B |        2.20 |
 
     long text, long replacements dictionary:
 
-                                           Method |       Mean |      Error |     StdDev | Scaled | ScaledSD |  Gen 0 | Allocated |
-    --------------------------------------------- |-----------:|-----------:|-----------:|-------:|---------:|-------:|----------:|
-    'String.ReplaceMany w/chars - Aggregate'      |   4.868 us |   3.420 us |  0.1932 us |   1.00 |     0.00 | 1.6816 |   6.94 KB |
-    'String.ReplaceMany w/chars - For Loop'       |   4.958 us |   2.633 us |  0.1487 us |   1.02 |     0.04 | 1.6791 |   6.92 KB |
-    'String.ReplaceMany w/dictionary - Aggregate' | 181.309 us | 210.177 us | 11.8754 us |  37.29 |     2.32 | 5.3571 |  24.28 KB |
-    'String.ReplaceMany w/dictionary - For Each'  | 174.567 us | 113.733 us |  6.4262 us |  35.90 |     1.57 | 5.8594 |  24.28 KB |
+    | Method                                        | Mean       | Error     | StdDev   | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
+    |---------------------------------------------- |-----------:|----------:|---------:|------:|--------:|-------:|----------:|------------:|
+    | 'String.ReplaceMany w/chars - Aggregate'      |   415.0 ns | 402.10 ns | 22.04 ns |  1.00 |    0.06 | 0.5657 |   6.97 KB |        1.00 |
+    | 'String.ReplaceMany w/chars - For Loop'       |   383.4 ns | 148.00 ns |  8.11 ns |  0.93 |    0.05 | 0.5664 |   6.97 KB |        1.00 |
+    | 'String.ReplaceMany w/chars - String Create'  |   363.5 ns |  57.10 ns |  3.13 ns |  0.88 |    0.04 | 0.1411 |   1.74 KB |        0.25 |
+    | 'String.ReplaceMany w/dictionary - Aggregate' | 2,981.0 ns | 893.78 ns | 48.99 ns |  7.20 |    0.34 | 1.8340 |  22.65 KB |        3.25 |
+    | 'String.ReplaceMany w/dictionary - For Each'  | 2,947.4 ns | 552.32 ns | 30.27 ns |  7.12 |    0.33 | 1.8223 |  22.65 KB |        3.25 |
 
     */
 

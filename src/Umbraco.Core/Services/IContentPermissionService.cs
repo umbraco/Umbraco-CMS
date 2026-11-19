@@ -1,10 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
-using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -13,8 +9,6 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface IContentPermissionService
 {
-    // TODO (V19): Remove the default implementations from this interface.
-
     /// <summary>
     ///     Authorize that a user has access to a content item.
     /// </summary>
@@ -22,8 +16,7 @@ public interface IContentPermissionService
     /// <param name="contentKey">The identifier of the content item to check for access.</param>
     /// <param name="permissionToCheck">The permission to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
-    Task<ContentAuthorizationStatus> AuthorizeAccessAsync(IUser user, Guid contentKey, string permissionToCheck)
-        => AuthorizeAccessAsync(user, contentKey.Yield(), new HashSet<string> { permissionToCheck });
+    Task<ContentAuthorizationStatus> AuthorizeAccessAsync(IUser user, Guid contentKey, string permissionToCheck);
 
     /// <summary>
     ///     Authorize that a user has access to content items.
@@ -110,18 +103,7 @@ public interface IContentPermissionService
     /// <param name="user"><see cref="IUser" /> to get permissions for.</param>
     /// <param name="contentKeys">The identifiers of the content items to get permissions for.</param>
     /// <returns>A task resolving into the effective permissions for each content item.</returns>
-    // TODO (V19): Remove the default implementation.
-    async Task<IEnumerable<NodePermissions>> GetPermissionsAsync(IUser user, IEnumerable<Guid> contentKeys)
-    {
-        // This default delegates to IUserService.GetDocumentPermissionsAsync, which resolves permissions using the same
-        // underlying algorithm as the optimised implementation in ContentPermissionService.
-        // The results are functionally equivalent; this default simply takes a less direct route.
-        // It exists for backward compatibility: custom IContentPermissionService implementations that predate this method
-        // will fall back here and retain the pre-existing IUserService behaviour without breaking.
-        IUserService userService = StaticServiceProvider.Instance.GetRequiredService<IUserService>();
-        Attempt<IEnumerable<NodePermissions>, UserOperationStatus> result = await userService.GetDocumentPermissionsAsync(user.Key, contentKeys);
-        return result.Success ? result.Result : [];
-    }
+    Task<IEnumerable<NodePermissions>> GetPermissionsAsync(IUser user, IEnumerable<Guid> contentKeys);
 
     /// <summary>
     ///     Filters the fallback permissions for a user. Fallback permissions are the user group default permissions
@@ -130,9 +112,17 @@ public interface IContentPermissionService
     /// <param name="user"><see cref="IUser" /> to filter permissions for.</param>
     /// <param name="fallbackPermissions">The fallback permissions aggregated from the user's groups.</param>
     /// <returns>A task resolving into the filtered set of fallback permissions.</returns>
-    // TODO (V19): Remove the default implementation.
-    // Default passes through unchanged for backward compatibility with custom implementations
-    // that predate this method.
-    Task<ISet<string>> FilterFallbackPermissionsAsync(IUser user, ISet<string> fallbackPermissions)
-        => Task.FromResult(fallbackPermissions);
+    /// <remarks>
+    ///     <para>
+    ///         Only removals are honoured. The returned set is intersected with the supplied one, so a verb added by an
+    ///         implementation is discarded. Every permission service is given its own copy of the same unfiltered set,
+    ///         which also means no implementation can reinstate a verb that another has removed.
+    ///     </para>
+    ///     <para>
+    ///         The supplied set holds every fallback verb assigned to the user, not only those relating to documents, and
+    ///         permission verbs carry nothing that identifies the entity type they belong to. An implementation should
+    ///         therefore only remove verbs it owns.
+    ///     </para>
+    /// </remarks>
+    Task<ISet<string>> FilterFallbackPermissionsAsync(IUser user, ISet<string> fallbackPermissions);
 }

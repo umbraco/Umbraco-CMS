@@ -39,7 +39,7 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 		this.observe(
 			this.#workspaceContext
 				? createObservablePart(this.#workspaceContext.variantOptions, (variants) =>
-						variants.map((v) => ({
+						variants?.map((v) => ({
 							culture: v.culture,
 							segment: v.segment,
 							unique: v.unique,
@@ -144,9 +144,9 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	};
 
 	override render() {
-		return !this._loading && this._routes && this._routes.length > 0
-			? html`<umb-router-slot .routes=${this._routes} @init=${this._gotWorkspaceRoute}></umb-router-slot>`
-			: html`<umb-view-loader></umb-view-loader>`;
+		return html`<umb-router-slot .routes=${this._loading ? [] : this._routes} @init=${this._gotWorkspaceRoute}
+			><umb-view-loader></umb-view-loader
+		></umb-router-slot>`;
 	}
 
 	static override styles = [

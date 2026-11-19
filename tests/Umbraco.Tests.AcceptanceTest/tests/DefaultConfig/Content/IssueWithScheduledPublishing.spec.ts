@@ -1,4 +1,4 @@
-import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const documentTypeName = "DocumentType";
 const contentName = "Content";
@@ -30,13 +30,12 @@ test('can schedule publish after unselecting all languages', async ({umbracoUi})
   await umbracoUi.content.enterContentName('Tester');
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickSchedulePublishButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSelectAllCheckbox();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSelectAllCheckbox();
   await umbracoUi.content.clickSchedulePublishLanguageButton(languageName);
 
   // Assert
   await umbracoUi.content.doesSchedulePublishModalButtonContainDisabledTag(false);
   await umbracoUi.content.clickSchedulePublishModalButton();
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.schedulePublishingUpdated);
 });

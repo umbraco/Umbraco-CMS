@@ -100,12 +100,47 @@ public interface IElementPermissionService
     Task<IEnumerable<NodePermissions>> GetPermissionsAsync(IUser user, IEnumerable<Guid> elementKeys);
 
     /// <summary>
+    ///     Filters a collection of element keys down to those the user has the required access to.
+    /// </summary>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
+    /// <param name="elementKeys">The identifiers of the elements to check for access.</param>
+    /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
+    /// <returns>A task resolving into the subset of <paramref name="elementKeys"/> the user is authorized to access.</returns>
+    // TODO (V20): Remove the default implementation.
+    async Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> elementKeys, ISet<string> permissionsToCheck)
+    {
+        var authorizedKeys = new HashSet<Guid>();
+        foreach (Guid elementKey in elementKeys)
+        {
+            ElementAuthorizationStatus status = await AuthorizeAccessAsync(user, elementKey.Yield(), permissionsToCheck);
+            if (status == ElementAuthorizationStatus.Success)
+            {
+                authorizedKeys.Add(elementKey);
+            }
+        }
+
+        return authorizedKeys;
+    }
+
+    /// <summary>
     ///     Filters the fallback permissions for a user. Fallback permissions are the user group default permissions
     ///     used by the UI when no granular per-element permissions are assigned.
     /// </summary>
     /// <param name="user"><see cref="IUser" /> to filter permissions for.</param>
     /// <param name="fallbackPermissions">The fallback permissions aggregated from the user's groups.</param>
     /// <returns>A task resolving into the filtered set of fallback permissions.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         Only removals are honoured. The returned set is intersected with the supplied one, so a verb added by an
+    ///         implementation is discarded. Every permission service is given its own copy of the same unfiltered set,
+    ///         which also means no implementation can reinstate a verb that another has removed.
+    ///     </para>
+    ///     <para>
+    ///         The supplied set holds every fallback verb assigned to the user, not only those relating to elements, and
+    ///         permission verbs carry nothing that identifies the entity type they belong to. An implementation should
+    ///         therefore only remove verbs it owns.
+    ///     </para>
+    /// </remarks>
     // TODO (V20): Remove the default implementation.
     Task<ISet<string>> FilterFallbackPermissionsAsync(IUser user, ISet<string> fallbackPermissions)
         => Task.FromResult(fallbackPermissions);

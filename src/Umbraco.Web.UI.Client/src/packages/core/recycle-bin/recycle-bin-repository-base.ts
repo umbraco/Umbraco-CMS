@@ -12,6 +12,7 @@ import type { UmbNotificationHandler } from '@umbraco-cms/backoffice/notificatio
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import type { UmbRepositoryErrorResponse, UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Base class for recycle bin repositories.
@@ -28,7 +29,7 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 	/**
 	 * Creates an instance of UmbRecycleBinRepositoryBase.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @param {UmbRecycleBinDataSourceConstructor} recycleBinSource
+	 * @param {UmbRecycleBinDataSourceConstructor} recycleBinSource - The data source constructor for the recycle bin
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
 	constructor(host: UmbControllerHost, recycleBinSource: UmbRecycleBinDataSourceConstructor) {
@@ -42,21 +43,21 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 
 	/**
 	 * Requests to trash an item.
-	 * @param {UmbRecycleBinTrashRequestArgs} args
-	 * @returns {*}
+	 * @param {UmbRecycleBinTrashRequestArgs} args - The item to trash
+	 * @returns {Promise<UmbRepositoryErrorResponse>} The result of the trash request
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
-	async requestTrash(args: UmbRecycleBinTrashRequestArgs) {
+	async requestTrash(args: UmbRecycleBinTrashRequestArgs): Promise<UmbRepositoryErrorResponse> {
 		return this.#recycleBinSource.trash(args);
 	}
 
 	/**
 	 * Requests to restore an item.
-	 * @param {UmbRecycleBinRestoreRequestArgs} args
-	 * @returns {*}
+	 * @param {UmbRecycleBinRestoreRequestArgs} args - The item to restore
+	 * @returns {Promise<UmbRepositoryErrorResponse>} The result of the restore request
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
-	async requestRestore(args: UmbRecycleBinRestoreRequestArgs) {
+	async requestRestore(args: UmbRecycleBinRestoreRequestArgs): Promise<UmbRepositoryErrorResponse> {
 		const { error } = await this.#recycleBinSource.restore(args);
 
 		if (!error) {
@@ -71,20 +72,22 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 
 	/**
 	 * Requests to empty the recycle bin.
-	 * @returns {*}
+	 * @returns {Promise<UmbRepositoryErrorResponse>} The result of the empty request
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
-	async requestEmpty() {
+	async requestEmpty(): Promise<UmbRepositoryErrorResponse> {
 		return this.#recycleBinSource.empty();
 	}
 
 	/**
 	 * Requests the original parent of an item.
-	 * @param {UmbRecycleBinOriginalParentRequestArgs} args
-	 * @returns {*}
+	 * @param {UmbRecycleBinOriginalParentRequestArgs} args - The item to find the original parent for
+	 * @returns {Promise<UmbRepositoryResponse<{ unique: string } | null>>} The original parent of the item
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
-	async requestOriginalParent(args: UmbRecycleBinOriginalParentRequestArgs) {
-		return this.#recycleBinSource.getOriginalParent(args);
+	async requestOriginalParent(
+		args: UmbRecycleBinOriginalParentRequestArgs,
+	): Promise<UmbRepositoryResponse<{ unique: string } | null>> {
+		return this.#recycleBinSource.getOriginalParent(args) as Promise<UmbRepositoryResponse<{ unique: string } | null>>;
 	}
 }

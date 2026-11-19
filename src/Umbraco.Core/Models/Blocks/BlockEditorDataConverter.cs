@@ -74,10 +74,13 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
     {
         if (value is not null)
         {
-            var converted = ConvertOriginalBlockFormat(value.ContentData);
-            if (converted)
+            // Content and settings must be converted independently: a block can have no content
+            // property values to migrate (e.g. a structural element type) while its settings still
+            // carry legacy flat values that need relocating.
+            var contentConverted = ConvertOriginalBlockFormat(value.ContentData);
+            var settingsConverted = ConvertOriginalBlockFormat(value.SettingsData);
+            if (contentConverted || settingsConverted)
             {
-                ConvertOriginalBlockFormat(value.SettingsData);
                 AmendExpose(value);
             }
         }
@@ -96,7 +99,7 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
     // this method is only meant to have any effect when migrating block editor values
     // from the original format to the new, variant enabled format
     private static void AmendExpose(TValue value)
-        => value.Expose = value.ContentData.ConvertAll(cd => new BlockItemVariation(cd.Key, null, null));
+        => value.Expose = value.ContentData.ConvertAll(cd => new BlockItemVariation(cd.Key, null));
 
     // this method is only meant to have any effect when migrating block editor values
     // from the original format to the new, variant enabled format

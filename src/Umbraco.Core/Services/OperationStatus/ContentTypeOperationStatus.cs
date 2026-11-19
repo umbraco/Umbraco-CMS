@@ -127,8 +127,9 @@ public enum ContentTypeOperationStatus
     NotImplemented,
 
     /// <summary>
-    ///     Element types cannot vary by segment.
+    ///     Element types can vary by segment, so this in an obsolete operation status.
     /// </summary>
+    [Obsolete("Element types can now vary by segment. Scheduled for removal in Umbraco 21.")]
     InvalidSegmentVariationForElementType,
 
     /// <summary>
@@ -140,4 +141,9 @@ public enum ContentTypeOperationStatus
     ///     Cannot change the element flag because the element type has existing element instances.
     /// </summary>
     InvalidElementFlagElementHasContent,
+
+    /// <summary>
+    ///     A property type varies in a way the content type itself does not.
+    /// </summary>
+    InvalidPropertyTypeVariation,
 }

@@ -1,14 +1,17 @@
-import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from '@playwright/test';
 
+const documentTypeTargetFolderName = 'TestDocumentTypeTargetFolder';
 const documentFolderName = 'TestFolder';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeTargetFolderName);
   await umbracoApi.documentType.ensureNameNotExists(documentFolderName);
   await umbracoUi.goToBackOffice();
 });
 
 test.afterEach(async ({umbracoApi}) => {
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeTargetFolderName);
   await umbracoApi.documentType.ensureNameNotExists(documentFolderName);
 });
 
@@ -119,4 +122,43 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(grandParentFolderName);
   await umbracoApi.documentType.ensureNameNotExists(parentFolderName);
+});
+
+test('can find a document type in a sibling nested folder', async ({umbracoApi}) => {
+  // Arrange
+  const firstChildFolderName = 'AAFirstChildFolder';
+  const nestedFolderName = 'NestedFolder';
+  const secondChildFolderName = 'ZZSecondChildFolder';
+  const targetDocumentTypeName = 'TargetDocumentType';
+  const parentFolderId = await umbracoApi.documentType.createFolder(documentFolderName);
+  const firstChildFolderId = await umbracoApi.documentType.createFolder(firstChildFolderName, parentFolderId);
+  await umbracoApi.documentType.createFolder(nestedFolderName, firstChildFolderId);
+  const secondChildFolderId = await umbracoApi.documentType.createFolder(secondChildFolderName, parentFolderId);
+  const targetDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeInFolder(targetDocumentTypeName, secondChildFolderId);
+
+  // Act
+  const documentTypeData = await umbracoApi.documentType.getByName(targetDocumentTypeName);
+
+  // Assert
+  expect(documentTypeData).toBeTruthy();
+  expect(documentTypeData.id).toBe(targetDocumentTypeId);
+  const secondChildFolderChildren = await umbracoApi.documentType.getChildren(secondChildFolderId);
+  expect(secondChildFolderChildren.map(child => child.id)).toContain(targetDocumentTypeId);
+});
+
+test('can move a document type folder to another document type folder', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const folderId = await umbracoApi.documentType.createFolder(documentFolderName);
+  const targetFolderId = await umbracoApi.documentType.createFolder(documentTypeTargetFolderName);
+
+  // Act
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+  await umbracoUi.documentType.clickRootFolderCaretButton();
+  await umbracoUi.documentType.clickActionsMenuForDocumentType(documentFolderName);
+  await umbracoUi.documentType.moveToFolder(documentTypeTargetFolderName);
+
+  // Assert
+  await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);
+  const targetFolderChildren = await umbracoApi.documentType.getChildren(targetFolderId);
+  expect(targetFolderChildren.some((child) => child.id === folderId)).toBeTruthy();
 });

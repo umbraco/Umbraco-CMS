@@ -53,6 +53,13 @@ export class LoginUiHelper extends UiBaseLocators {
     await this.click(this.loginBtn);
   }
 
+  async clickLoginButtonAndWaitForBackOffice() {
+    // The login button signs in and redirects back to the back office; wait for the backoffice shell
+    // to mount before continuing, otherwise the next navigation races an unauthenticated (still-login) page.
+    await this.click(this.loginBtn);
+    await expect(this.backOfficeMain).toBeVisible({timeout: ConstantHelper.timeout.pageLoad});
+  }
+
   async loginWithCredentials(email: string, password: string) {
     await this.enterEmail(email);
     await this.enterPassword(password);
@@ -68,8 +75,33 @@ export class LoginUiHelper extends UiBaseLocators {
     await this.containsText(this.loginErrorMessage, message);
   }
 
+  /**
+   * Clicks Logout in the current-user modal and waits for the sign-out to complete.
+   * Re-opens the modal if a navigation has closed it, so it can be called with the modal open or closed.
+   */
   async clickLogoutButtonAndWaitForUserLogout() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.revoke, this.click(this.logoutBtn), ConstantHelper.statusCodes.ok);
+    // Logging out is a full-page navigation to the sign-out endpoint, which clears the auth cookie
+    // and redirects to the logout landing. Register the listener before clicking: the response can
+    // arrive before a post-click waiter attaches. Any status is accepted - the endpoint answers with
+    // a redirect, and the cleared cookie is what matters.
+    let isSignedOut = false;
+    const signOutResponse = this.page.waitForResponse(
+      resp => resp.url().includes(ConstantHelper.apiEndpoints.backOfficeSignOut),
+    );
+    void signOutResponse.then(() => { isSignedOut = true; }, () => {});
+    // Any navigation closes the non-routable current-user modal, including the backoffice's own initial routing,
+    // so re-open it and retry until the sign-out is seen. A click can also land as the modal closes without starting
+    // the logout, so each attempt waits for the sign-out before counting as done.
+    await expect(async () => {
+      if (isSignedOut) {
+        return;
+      }
+      await this.clickCurrentUserAvatarButton();
+      // Raw click with its own timeout: this.click() has none after its visibility check, so a detached button hangs.
+      await this.logoutBtn.click({timeout: ConstantHelper.timeout.medium});
+      await expect.poll(() => isSignedOut, {timeout: ConstantHelper.timeout.medium}).toBe(true);
+    }).toPass({timeout: ConstantHelper.timeout.navigation});
+    return await signOutResponse;
   }
 
   async clickForgottenPasswordButton() {

@@ -1,7 +1,8 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Validation;
@@ -20,16 +21,43 @@ internal class MultiUrlPickerValueEditorValidationTests
     [TestCase(2, false, "[{\"icon\":\"icon-document\",\"name\":\"Page 1\",\"published\":true,\"queryString\":null,\"target\":null,\"trashed\":false,\"type\":\"document\",\"unique\":\"7d285be2-7cd5-4c7b-a252-b064e31f049f\",\"url\":\"/\"}]")]
     [TestCase(1, true, "[{\"icon\":\"icon-document\",\"name\":\"Page 1\",\"published\":true,\"queryString\":null,\"target\":null,\"trashed\":false,\"type\":\"document\",\"unique\":\"7d285be2-7cd5-4c7b-a252-b064e31f049f\",\"url\":\"/\"},{\"icon\":\"icon-document\",\"name\":\"Page 1\",\"published\":true,\"queryString\":null,\"target\":null,\"trashed\":false,\"type\":\"document\",\"unique\":\"7d285be2-7cd5-4c7b-a252-b064e31f049f\",\"url\":\"/\"}]")]
     [TestCase(3, false, "[{\"icon\":\"icon-document\",\"name\":\"Page 1\",\"published\":true,\"queryString\":null,\"target\":null,\"trashed\":false,\"type\":\"document\",\"unique\":\"7d285be2-7cd5-4c7b-a252-b064e31f049f\",\"url\":\"/\"},{\"icon\":\"icon-document\",\"name\":\"Page 1\",\"published\":true,\"queryString\":null,\"target\":null,\"trashed\":false,\"type\":\"document\",\"unique\":\"7d285be2-7cd5-4c7b-a252-b064e31f049f\",\"url\":\"/\"}]")]
-    [TestCase(1, false, "[]")]
-    [TestCase(1, false, null)]
+    [TestCase(1, true, "[]")]
+    [TestCase(1, true, null)]
     public void Validates_Min_Limit(int min, bool succeed, string? value)
     {
         var picker = CreateValueEditor();
 
-        picker.ConfigurationObject = new MultiUrlPickerConfiguration() { MinNumber = min };
+        picker.ConfigurationObject = new MultiUrlPickerConfiguration() { ValidationLimit = new NumberRange { Min = min } };
 
         var result = picker.Validate(value, false, null, PropertyValidationContext.Empty());
         ValidateResult(succeed, result);
+    }
+
+    [TestCase(null)]
+    [TestCase("[]")]
+    public void Can_Validate_Empty_Value_When_Minimum_Configured_And_Not_Mandatory(string? value)
+    {
+        var picker = CreateValueEditor();
+
+        picker.ConfigurationObject = new MultiUrlPickerConfiguration { MinNumber = 3 };
+
+        var result = picker.Validate(value, false, null, PropertyValidationContext.Empty());
+
+        Assert.IsEmpty(result);
+    }
+
+    [TestCase(null, Constants.Validation.ErrorMessages.Properties.Missing)]
+    [TestCase("[]", Constants.Validation.ErrorMessages.Properties.Empty)]
+    public void Cannot_Validate_Empty_Value_When_Mandatory(string? value, string expectedErrorMessage)
+    {
+        var picker = CreateValueEditor();
+
+        picker.ConfigurationObject = new MultiUrlPickerConfiguration { MinNumber = 3 };
+
+        var result = picker.Validate(value, true, null, PropertyValidationContext.Empty());
+
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual(expectedErrorMessage, result.First().ErrorMessage);
     }
 
     [TestCase(1, true, "[{\"icon\":\"icon-document\",\"name\":\"Page 1\",\"published\":true,\"queryString\":null,\"target\":null,\"trashed\":false,\"type\":\"document\",\"unique\":\"7d285be2-7cd5-4c7b-a252-b064e31f049f\",\"url\":\"/\"}]")]
@@ -41,7 +69,21 @@ internal class MultiUrlPickerValueEditorValidationTests
     {
         var picker = CreateValueEditor();
 
-        picker.ConfigurationObject = new MultiUrlPickerConfiguration() { MaxNumber = max };
+        picker.ConfigurationObject = new MultiUrlPickerConfiguration() { ValidationLimit = new NumberRange { Max = max } };
+
+        var result = picker.Validate(value, false, null, PropertyValidationContext.Empty());
+        ValidateResult(succeed, result);
+    }
+
+    [TestCase(true, "[{\"icon\":\"icon-document\",\"name\":\"Page 1\",\"published\":true,\"queryString\":null,\"target\":null,\"trashed\":false,\"type\":\"document\",\"unique\":\"7d285be2-7cd5-4c7b-a252-b064e31f049f\",\"url\":\"/\"}]")]
+    [TestCase(false, "[{\"icon\":\"icon-document\",\"name\":\"Page 1\",\"published\":true,\"queryString\":null,\"target\":null,\"trashed\":false,\"type\":\"document\",\"unique\":\"7d285be2-7cd5-4c7b-a252-b064e31f049f\",\"url\":\"/\"},{\"icon\":\"icon-document\",\"name\":\"Page 1\",\"published\":true,\"queryString\":null,\"target\":null,\"trashed\":false,\"type\":\"document\",\"unique\":\"7d285be2-7cd5-4c7b-a252-b064e31f049f\",\"url\":\"/\"}]")]
+    [TestCase(true, "[]")]
+    [TestCase(true, null)]
+    public void Validates_That_A_Single_Url_Picker_Holds_At_Most_One_Link(bool succeed, string? value)
+    {
+        var picker = CreateValueEditor();
+
+        picker.ConfigurationObject = new SingleUrlPickerConfiguration();
 
         var result = picker.Validate(value, false, null, PropertyValidationContext.Empty());
         ValidateResult(succeed, result);
@@ -64,7 +106,7 @@ internal class MultiUrlPickerValueEditorValidationTests
             Mock.Of<ILogger<MultiUrlPickerValueEditor>>(),
             Mock.Of<ILocalizedTextService>(),
             Mock.Of<IShortStringHelper>(),
-            new DataEditorAttribute("alias"),
+            new DataEditorAttribute("alias") { ValueType = ValueTypes.Json },
             Mock.Of<IPublishedUrlProvider>(),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Mock.Of<IIOHelper>(),

@@ -5,7 +5,7 @@ import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 
 /**
  * @class UmbMemberTypeStore
- * @augments {UmbStoreBase}
+ * @augments {UmbDetailStoreBase}
  * @description - Data Store for Member Types
  */
 export class UmbMemberTypeFolderStore extends UmbDetailStoreBase<UmbFolderModel> {

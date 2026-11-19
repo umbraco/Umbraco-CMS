@@ -4,15 +4,16 @@ End-to-end acceptance tests for Umbraco CMS using [Playwright](https://playwrigh
 
 You can watch a video following these instructions [here](https://www.youtube.com/watch?v=N4hBKB0U-d8) and a longer UmbraCollab recording [here](https://www.youtube.com/watch?v=hvoI28s_fDI). Make sure to use the latest recommended `main` branch rather than v10 that's mentioned in the video.
 
-> **npm package**: This project is also published to npm as [`@umbraco/acceptance-test-helpers`](https://www.npmjs.com/package/@umbraco/acceptance-test-helpers). See [README.npm.md](./README.npm.md) for the package documentation.
+> **npm package**: This project is also published to npm as [`@umbraco-cms/acceptance-test-helpers`](https://www.npmjs.com/package/@umbraco-cms/acceptance-test-helpers). See [README.npm.md](./README.npm.md) for the package documentation.
 
 ---
 
 ## Prerequisites
 
-- **Node.js 22+**
+- **Node.js 24** (see [`.nvmrc`](./.nvmrc))
 - **A running installed Umbraco instance** on URL: [https://localhost:44339](https://localhost:44339) (default development port)
   - Install using `SqlServer`/`LocalDb` as the tests execute too fast for `SQLite` to handle
+  - Set `Umbraco:CMS:Security:KeepUserLoggedIn` to `true` in that instance's `appsettings.Development.json`. Back-office auth is cookie-only, and this keeps the shared session cookie alive for the length of a run so tests never have to re-authenticate mid-run. CI sets it for every acceptance-test app.
 
 ---
 
@@ -171,9 +172,14 @@ The environment configuration is set up by the npm installation script, creating
 UMBRACO_USER_LOGIN=email@example.com
 UMBRACO_USER_PASSWORD=yourpassword
 URL=https://localhost:44339
+STORAGE_STATE_PATH=<path to this folder>/playwright/.auth/user.json
+CONSOLE_ERRORS_PATH=<path to this folder>/console-errors.json
 ```
 
-To reconfigure:
+- `STORAGE_STATE_PATH` lets the `umbracoApi` fixture save the refreshed admin session after each test. Without it, every test starts from the session saved by `auth.setup.ts`. With concurrent logins disabled (the default), any later admin sign-in invalidates that session, so specs that open the back office before using `umbracoApi` land on the login screen.
+- `CONSOLE_ERRORS_PATH` is where console errors captured during a run are written.
+
+To reconfigure, or to add missing variables to an older `.env`:
 ```bash
 npm run config
 ```
@@ -218,6 +224,7 @@ The test suite is organized into multiple Playwright projects (see `playwright.c
 | `setup` | Authentication setup (runs first) |
 | `defaultConfig` | Main test suite (depends on setup) |
 | `extensionRegistry` | Extension registry tests |
+| `segments` | Segment variation tests, run with a custom segment service and no other extensions |
 | `entityDataPicker` | Entity data picker tests |
 | `deliveryApi` | Delivery API tests |
 | `externalLoginAzureADB2C` | Azure AD B2C authentication tests |
@@ -243,4 +250,4 @@ Key settings in `playwright.config.ts`:
 
 - [Playwright Documentation](https://playwright.dev/docs/intro)
 - [Umbraco Documentation](https://docs.umbraco.com/)
-- [@umbraco/acceptance-test-helpers](https://www.npmjs.com/package/@umbraco/acceptance-test-helpers) (published from this project)
+- [@umbraco-cms/acceptance-test-helpers](https://www.npmjs.com/package/@umbraco-cms/acceptance-test-helpers) (published from this project)

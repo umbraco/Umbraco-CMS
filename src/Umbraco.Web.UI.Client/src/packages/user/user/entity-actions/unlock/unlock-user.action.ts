@@ -1,9 +1,12 @@
 import { UmbUnlockUserRepository } from '../../repository/index.js';
 import { UmbUserItemRepository } from '../../repository/item/user-item.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 export class UmbUnlockUserEntityAction extends UmbEntityActionBase<never> {
+	#localize = new UmbLocalizationController(this);
+
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 
@@ -17,9 +20,9 @@ export class UmbUnlockUserEntityAction extends UmbEntityActionBase<never> {
 		const item = data[0];
 
 		await umbConfirmModal(this._host, {
-			headline: `Unlock ${item.name}`,
-			content: 'Are you sure you want to unlock this user?',
-			confirmLabel: 'Unlock',
+			headline: this.#localize.term('user_unlockUserHeadline', item.name),
+			content: '#user_unlockUserConfirmation',
+			confirmLabel: '#actions_unlock',
 		});
 
 		const unlockUserRepository = new UmbUnlockUserRepository(this);

@@ -1,6 +1,7 @@
 import type { Editor } from '../../externals.js';
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
 import { UmbLink } from './link.tiptap-extension.js';
+import { linkFromAttributes } from './link-attributes.function.js';
 import { UMB_LINK_PICKER_MODAL } from '@umbraco-cms/backoffice/multi-url-picker';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbLinkPickerLink } from '@umbraco-cms/backoffice/multi-url-picker';
@@ -9,7 +10,7 @@ import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarElementApiBase {
 	override async execute(editor?: Editor) {
 		const attrs = editor?.getAttributes(UmbLink.name) ?? {};
-		const link = this.#getLinkData(attrs);
+		const link = linkFromAttributes(attrs);
 		const data = { config: {}, index: null, isNew: link?.url === undefined };
 		const value = { link };
 
@@ -27,23 +28,6 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 		} else {
 			editor?.chain().focus().extendMarkRange(UmbLink.name).unsetLink().run();
 		}
-	}
-
-	#getLinkData(attrs: Record<string, any>): UmbLinkPickerLink {
-		const queryString = attrs['data-anchor'];
-		const culture = attrs['data-culture'];
-		const url = attrs.href?.substring(0, attrs.href.length - (queryString?.length ?? 0));
-		const unique = url?.includes('localLink:') ? url.substring(url.indexOf(':') + 1, url.indexOf('}')) : null;
-
-		return {
-			name: attrs.title,
-			queryString,
-			target: attrs.target,
-			type: attrs.type,
-			unique,
-			url,
-			culture,
-		};
 	}
 
 	#parseLinkData(link: UmbLinkPickerLink) {
@@ -81,7 +65,8 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 		if (!url) return null;
 
 		return {
-			type: type ?? 'external',
+			// Only a local link carries its entity type on the anchor; see the `type` attribute on `UmbLink`.
+			type: unique ? type : null,
 			href: url,
 			'data-anchor': anchor,
 			target,
@@ -101,7 +86,8 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 
 	/**
 	 * If the URL is prefixed "www.", then prepend "http://" protocol scheme.
-	 * @param url
+	 * @param {string | null | undefined} url - The URL to check
+	 * @returns {string | null} The URL with the protocol scheme prepended, if applicable
 	 */
 	#ensureHttpProtocol(url: string | null | undefined) {
 		if (!url) return null;
@@ -113,7 +99,8 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 
 	/**
 	 * If the URL is an email address, then prepend "mailto:" protocol scheme.
-	 * @param url
+	 * @param {string | null | undefined} url - The URL to check
+	 * @returns {string | null} The URL with the "mailto:" scheme prepended, if applicable
 	 */
 	#transformURLToMailto(url: string | null | undefined) {
 		if (!url) return null;
@@ -125,7 +112,8 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 
 	/**
 	 * If the URL contains an anchor, then return the anchor.
-	 * @param queryString
+	 * @param {string | null} queryString - The query string to check
+	 * @returns {string | null} The anchor, if present
 	 */
 	#getAnchorFromQueryString(queryString: string | null) {
 		if (!queryString) return null;
@@ -134,7 +122,8 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 
 	/**
 	 * If the query string does not start with "?" or "#", then prepend it.
-	 * @param queryString
+	 * @param {string | null | undefined} queryString - The query string to normalize
+	 * @returns {string | null} The normalized query string
 	 */
 	#queryStringFromUrl(queryString: string | null | undefined) {
 		if (!queryString) return null;

@@ -2,8 +2,9 @@ import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-ba
 import type { Editor } from '../../externals.js';
 
 export default class UmbTiptapToolbarTextDirectionLtrExtensionApi extends UmbTiptapToolbarElementApiBase {
-	override isActive = (editor?: Editor) =>
-		editor?.isActive({ textDirection: 'ltr' }) === true || editor?.isActive({ textDirection: 'auto' }) === true;
+	override isActive(editor?: Editor) {
+		return editor?.isActive({ dir: 'ltr' }) === true || editor?.isActive({ dir: 'auto' }) === true;
+	}
 
 	override execute(editor?: Editor) {
 		if (!this.isActive(editor)) {

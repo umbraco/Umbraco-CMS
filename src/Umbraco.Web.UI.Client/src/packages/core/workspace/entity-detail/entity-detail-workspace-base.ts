@@ -2,25 +2,38 @@ import { UmbSubmittableWorkspaceContextBase } from '../submittable/index.js';
 import { umbWorkspaceWillNavigateAway } from '../utils/check-will-navigate-away.function.js';
 import { UmbEntityWorkspaceDataManager } from '../entity/entity-workspace-data-manager.js';
 import type { UmbSubmittableTreeEntityWorkspaceContext } from '../contexts/tokens/index.js';
-import type { UmbEntityDetailWorkspaceContextArgs, UmbEntityDetailWorkspaceContextCreateArgs } from './types.js';
+import { UmbDeleteEntityWorkspaceRedirectController } from '../controllers/delete-entity-workspace-redirect.controller.js';
+import type {
+	UmbEntityDetailIncomingDataHookMeta,
+	UmbEntityDetailInitHookMeta,
+	UmbEntityDetailWorkspaceContextArgs,
+	UmbEntityDetailWorkspaceContextCreateArgs,
+} from './types.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import {
+	UMB_PARENT_ENTITY_CONTEXT,
+	UmbEntityContext,
+	type UmbEntityModel,
+	type UmbEntityUnique,
+} from '@umbraco-cms/backoffice/entity';
 import { UMB_DISCARD_CHANGES_MODAL, umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UmbParallelHookController } from '@umbraco-cms/backoffice/hook-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	UmbDetailRepository,
 	UmbRepositoryResponse,
 	UmbRepositoryResponseWithAsObservable,
 } from '@umbraco-cms/backoffice/repository';
-import { UmbStateManager } from '@umbraco-cms/backoffice/utils';
+import { filter, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbReadOnlyGuardManager, UmbStateManager, type UmbGuardRule } from '@umbraco-cms/backoffice/utils';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbApiError } from '@umbraco-cms/backoffice/resources';
@@ -33,6 +46,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
 	CreateArgsType extends UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> =
 		UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
+	IncomingDataHookMetaType extends UmbEntityDetailIncomingDataHookMeta = UmbEntityDetailIncomingDataHookMeta,
 >
 	extends UmbSubmittableWorkspaceContextBase<DetailModelType>
 	implements UmbSubmittableTreeEntityWorkspaceContext
@@ -43,7 +57,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	/**
 	 * @description Data manager for the workspace.
 	 * @protected
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * @memberof UmbEntityDetailWorkspaceContextBase
 	 */
 	protected readonly _data = new UmbEntityWorkspaceDataManager<DetailModelType>(this);
 
@@ -56,10 +70,28 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	public readonly loading = new UmbStateManager(this);
 	public readonly forbidden = new UmbStateManager(this);
 
+	/**
+	 * Decides whether the entity is read-only. A rule with `permitted: true` makes the entity read-only, and its
+	 * `message` explains why. A read-only entity can't be submitted. Rules are cleared whenever the workspace loads or
+	 * creates an entity, so they apply to that entity only.
+	 */
+	public readonly readOnlyGuard: UmbReadOnlyGuardManager<UmbGuardRule> = new UmbReadOnlyGuardManager(this);
+
 	protected _getDataPromise?: Promise<
 		UmbRepositoryResponse<DetailModelType> | UmbRepositoryResponseWithAsObservable<DetailModelType>
 	>;
 	protected _detailRepository?: DetailRepositoryType;
+
+	/**
+	 * Awaited while an entity is being loaded or scaffolded, in parallel with the potential request for its data.
+	 * Anything that needs to take place during the initialization of the entity, like loading extensions and setup other hooks.
+	 */
+	public readonly initHook = new UmbParallelHookController<UmbEntityDetailInitHookMeta>(this);
+
+	/**
+	 * Runs on all incoming entity data before it is processed and sent to the Workspace Data Manager.
+	 */
+	public readonly incomingDataHook = new UmbParallelHookController<IncomingDataHookMetaType>(this);
 
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
@@ -94,6 +126,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 */
 	protected validationContext = new UmbValidationContext(this);
 
+	#navigationParentItemPath = new UmbStringState<string | undefined>(undefined);
+	/**
+	 * Where a "back to parent" navigation should go, computed from the entity's current parent (see
+	 * `UMB_PARENT_ENTITY_CONTEXT`). Override `_getNavigationParentItemPath` to provide entity-specific redirect
+	 * logic — the default implementation always resolves to `undefined` (no known target).
+	 */
+	public readonly navigationParentItemPath = this.#navigationParentItemPath.asObservable();
+
 	#initResolver?: () => void;
 	#initialized = false;
 
@@ -104,6 +144,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			this.#initResolver = resolve;
 		}
 	});
+
+	/**
+	 * Resolves once the workspace is initialized, meaning the detail repository is available.
+	 * Overrides of `load` and `createScaffold` await this before executing the `initHook`.
+	 */
+	protected get _initialized(): Promise<void> {
+		return this.#init;
+	}
 
 	constructor(host: UmbControllerHost, args: UmbEntityDetailWorkspaceContextArgs) {
 		super(host, args.workspaceAlias);
@@ -125,6 +173,32 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 				this.#onEntityUpdatedEvent as unknown as EventListener,
 			);
 		});
+
+		this.consumeContext(UMB_PARENT_ENTITY_CONTEXT, (instance) => {
+			this.observe(
+				instance?.parent,
+				(entity) => this.#navigationParentItemPath.setValue(this._getNavigationParentItemPath(entity)),
+				'umbObserveParentForNavigationPath',
+			);
+		});
+
+		new UmbDeleteEntityWorkspaceRedirectController(this, this);
+	}
+
+	// TODO: Ideally this would be resolved by a more global, outer navigation context instead of by each
+	// workspace individually. Right now, only the workspace itself knows how to match an entity to a path, so
+	// that responsibility sits here. Once there's a way to do that matching more generally, this method could
+	// source the information from that context instead.
+	/**
+	 * Resolves where a "back to parent" navigation should go, given the entity's current parent item (or
+	 * `undefined` when there's no parent or it's not yet known). Override to provide entity-specific redirect
+	 * logic — e.g. a root workspace or section fallback when there's no parent, or branching on the parent's
+	 * entity type (e.g. a folder vs. a regular item). Defaults to `undefined` (no known target).
+	 * @param {UmbEntityModel | undefined} _entity - The current parent entity, or undefined when there is none.
+	 * @returns {string | undefined} An absolute path to navigate to, or undefined if there is none.
+	 */
+	protected _getNavigationParentItemPath(_entity: UmbEntityModel | undefined): string | undefined {
+		return undefined;
 	}
 
 	/**
@@ -204,28 +278,45 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.setIsNew(false);
 		this.#entityContext.setUnique(unique);
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Loading ${this.getEntityType()} Details` });
-		await this.#init;
-		this._getDataPromise = this._detailRepository!.requestByUnique(unique);
-		const response = (await this._getDataPromise) as UmbRepositoryResponseWithAsObservable<DetailModelType>;
-		const { data, error, asObservable } = response;
+		try {
+			await this.#init;
+			const loading = this.initHook.execute({
+				entityType: this.getEntityType(),
+				unique,
+				isNew: false,
+			});
+			this._getDataPromise = this._detailRepository!.requestByUnique(unique);
+			const [response] = (await Promise.all([this._getDataPromise, loading])) as [
+				UmbRepositoryResponseWithAsObservable<DetailModelType>,
+				void,
+			];
+			const { data, error, asObservable } = response;
 
-		if (error) {
-			this.removeUmbControllerByAlias('umbEntityDetailTypeStoreObserver');
-			if (UmbApiError.isUmbApiError(error)) {
-				if (error.status === 401 || error.status === 403) {
-					this.forbidden.addState({ unique: FORBIDDEN_STATE_UNIQUE, message: error.message });
+			if (error) {
+				this.removeUmbControllerByAlias('umbEntityDetailTypeStoreObserver');
+				if (UmbApiError.isUmbApiError(error)) {
+					if (error.status === 401 || error.status === 403) {
+						this.forbidden.addState({ unique: FORBIDDEN_STATE_UNIQUE, message: error.message });
+					}
 				}
+			} else if (data) {
+				const processedData = await this._processIncomingData(data);
+				this._data.setPersisted(processedData);
+				this._data.setCurrent(processedData);
+
+				this.observe(
+					asObservable?.(),
+					(entity) => {
+						if (!entity) this._data.clear();
+					},
+					'umbEntityDetailTypeStoreObserver',
+				);
 			}
-		} else if (data) {
-			const processedData = await this._processIncomingData(data);
-			this._data.setPersisted(processedData);
-			this._data.setCurrent(processedData);
 
-			this.observe(asObservable?.(), (entity) => this.#onDetailStoreChange(entity), 'umbEntityDetailTypeStoreObserver');
+			return response;
+		} finally {
+			this.loading.removeState(LOADING_STATE_UNIQUE);
 		}
-
-		this.loading.removeState(LOADING_STATE_UNIQUE);
-		return response;
 	}
 
 	/**
@@ -258,12 +349,13 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	/**
-	 * Method to check if the workspace data is loaded.
-	 * @returns { Promise<any> | undefined } true if the workspace data is loaded.
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * Resolves once nothing is loading, meaning an ongoing load or scaffold has finished and its data has been applied.
+	 * Called right after `load` or `createScaffold` has been started, it waits for that to finish.
+	 * @returns {Promise<void>} A promise that resolves when the workspace is no longer loading.
+	 * @memberof UmbEntityDetailWorkspaceContextBase
 	 */
-	public isLoaded(): Promise<any> | undefined {
-		return this._getDataPromise;
+	public isLoaded(): Promise<void> {
+		return firstValueFrom(this.loading.isOff.pipe(filter((isOff) => isOff))).then(() => undefined);
 	}
 
 	/**
@@ -273,39 +365,56 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @param {UmbEntityUnique} args.parent.unique The unique identifier of the parent entity.
 	 * @param {string} args.parent.entityType The entity type of the parent entity.
 	 * @param {Partial<DetailModelType>} args.preset The preset data.
-	 * @returns { Promise<any> | undefined } The data of the scaffold.
+	 * @returns { Promise<DetailModelType | undefined> } The data of the scaffold.
 	 */
 	public async createScaffold(args: CreateArgsType) {
 		this.resetState();
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Creating ${this.getEntityType()} scaffold` });
-		await this.#init;
-		this._internal_setCreateUnderParent(args.parent);
+		try {
+			await this.#init;
+			this._internal_setCreateUnderParent(args.parent);
+			// Set before the loading hook runs, as extensions with an is-new condition cannot answer before this is known. [NL]
+			this.setIsNew(true);
 
-		const request = this._detailRepository!.createScaffold(args.preset);
-		this._getDataPromise = request;
-		let { data } = await request;
+			const loading = this.initHook.execute({
+				entityType: this.getEntityType(),
+				unique: undefined,
+				isNew: true,
+			});
+			const request = this._detailRepository!.createScaffold(args.preset);
+			this._getDataPromise = request;
+			let [{ data }] = await Promise.all([request, loading]);
 
-		if (data) {
-			data = await this._processIncomingData(data);
+			if (data) {
+				data = await this._processIncomingData(data);
 
-			if (this.modalContext) {
-				// Notice if the preset comes with values, they will overwrite the scaffolded values... [NL]
-				data = { ...data, ...this.modalContext.data.preset };
+				if (this.modalContext) {
+					// Notice if the preset comes with values, they will overwrite the scaffolded values... [NL]
+					data = { ...data, ...this.modalContext.data.preset };
+				}
+
+				this.#entityContext.setUnique(data.unique);
+				this._data.setPersisted(data);
+				this._data.setCurrent(data);
 			}
 
-			this.setIsNew(true);
-			this.#entityContext.setUnique(data.unique);
-			this._data.setPersisted(data);
-			this._data.setCurrent(data);
+			return data;
+		} finally {
+			this.loading.removeState(LOADING_STATE_UNIQUE);
 		}
-
-		this.loading.removeState(LOADING_STATE_UNIQUE);
-
-		return data;
 	}
 
 	protected async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
+		await this.incomingDataHook.execute({
+			entityType: this.getEntityType(),
+			unique: data.unique,
+		} as IncomingDataHookMetaType);
 		return data;
+	}
+
+	public override async requestSubmit(): Promise<void> {
+		if (this.readOnlyGuard.getPermitted()) return;
+		return super.requestSubmit();
 	}
 
 	async submit() {
@@ -332,7 +441,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	/**
 	 * Deletes the entity.
-	 * @param unique The unique identifier of the entity to delete.
+	 * @param {string} unique The unique identifier of the entity to delete.
 	 */
 	async delete(unique: string) {
 		await this.#init;
@@ -344,7 +453,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @protected
 	 * @param {string | URL} newUrl The new url that the workspace is navigating to.
 	 * @returns {boolean} true if the workspace is navigating away.
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * @memberof UmbEntityDetailWorkspaceContextBase
 	 */
 	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
 		return umbWorkspaceWillNavigateAway(this.routes, this.getUnique(), newUrl);
@@ -453,8 +562,17 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return this._data.getHasUnpersistedChanges();
 	}
 
+	/**
+	 * Resets the data back to the last persisted state, discarding any local changes.
+	 * @memberof UmbEntityDetailWorkspaceContextBase
+	 */
+	public resetData(): void {
+		this._data.resetCurrent();
+	}
+
 	override resetState() {
 		super.resetState();
+		this.readOnlyGuard.clearRules();
 		this.loading.clear();
 		this.forbidden.clear();
 		this._data.clear();
@@ -482,12 +600,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 				this.#checkIfInitialized();
 			},
 		);
-	}
-
-	#onDetailStoreChange(entity: DetailModelType | undefined) {
-		if (!entity) {
-			this._data.clear();
-		}
 	}
 
 	// Discriminator to identify events from this workspace context
@@ -518,6 +630,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this._detailRepository?.destroy();
 		this.#entityContext.destroy();
 		this._getDataPromise = undefined;
+		this.initHook.destroy();
+		this.incomingDataHook.destroy();
 		super.destroy();
 	}
 }

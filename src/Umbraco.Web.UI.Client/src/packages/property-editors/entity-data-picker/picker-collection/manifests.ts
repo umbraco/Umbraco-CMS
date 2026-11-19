@@ -1,13 +1,12 @@
+import { UMB_ENTITY_DATA_PICKER_SUPPORTS_TEXT_FILTER_CONDITION_ALIAS } from '../conditions/constants.js';
 import {
 	UMB_ENTITY_DATA_PICKER_COLLECTION_ALIAS,
 	UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS,
 	UMB_ENTITY_DATA_PICKER_COLLECTION_REPOSITORY_ALIAS,
 	UMB_ENTITY_DATA_PICKER_COLLECTION_TEXT_FILTER_ALIAS,
 } from './constants.js';
-import { UMB_ENTITY_DATA_PICKER_SUPPORTS_TEXT_FILTER_CONDITION_ALIAS } from '../conditions/constants.js';
-import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-
 import { manifests as collectionViewManifests } from './views/manifests.js';
+import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

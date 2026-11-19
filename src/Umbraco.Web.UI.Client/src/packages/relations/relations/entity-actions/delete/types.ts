@@ -1,7 +1,6 @@
 import type { ManifestEntityAction, MetaEntityActionDeleteKind } from '@umbraco-cms/backoffice/entity-action';
 
-export interface ManifestEntityActionDeleteWithRelationKind
-	extends ManifestEntityAction<MetaEntityActionDeleteWithRelationKind> {
+export interface ManifestEntityActionDeleteWithRelationKind extends ManifestEntityAction<MetaEntityActionDeleteWithRelationKind> {
 	type: 'entityAction';
 	kind: 'deleteWithRelation';
 }

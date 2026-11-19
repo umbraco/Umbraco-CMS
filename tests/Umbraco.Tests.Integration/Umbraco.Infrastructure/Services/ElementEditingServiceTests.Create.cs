@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services.Filters;
@@ -249,9 +248,7 @@ public partial class ElementEditingServiceTests
             ],
             Variants =
             [
-                new VariantModel { Name = "The Name" },
-                new VariantModel { Segment = "seg-1", Name = "The Name" },
-                new VariantModel { Segment = "seg-2", Name = "The Name" }
+                new VariantModel { Name = "The Name" }
             ],
         };
 
@@ -300,11 +297,7 @@ public partial class ElementEditingServiceTests
             Variants =
             [
                 new VariantModel { Name = "The English Name", Culture = "en-US" },
-                new VariantModel { Name = "The English Name", Culture = "en-US", Segment = "seg-1" },
-                new VariantModel { Name = "The English Name", Culture = "en-US", Segment = "seg-2" },
-                new VariantModel { Name = "The Danish Name", Culture = "da-DK" },
-                new VariantModel { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-1" },
-                new VariantModel { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-2" }
+                new VariantModel { Name = "The Danish Name", Culture = "da-DK" }
             ],
         };
 
@@ -401,6 +394,86 @@ public partial class ElementEditingServiceTests
         var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
+    }
+
+    [TestCase(ContentVariation.Culture, ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch)]
+    [TestCase(ContentVariation.Segment, ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch)]
+    [TestCase(ContentVariation.CultureAndSegment, ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch)]
+    public async Task Cannot_Create_Variant_Element_Without_Name(ContentVariation variation, ContentEditingOperationStatus expectedStatus)
+    {
+        var elementType = await CreateVariantElementType(variation, variantTitleAsMandatory: false);
+
+        var createModel = new ElementCreateModel
+        {
+            ContentTypeKey = elementType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" }
+            ],
+        };
+
+        var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(expectedStatus, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
+    }
+
+    [TestCase("")]
+    [TestCase(" ")]
+    public async Task Cannot_Create_Invariant_Element_With_Blank_Name(string name)
+    {
+        var elementType = await CreateInvariantElementType();
+
+        var createModel = new ElementCreateModel
+        {
+            ContentTypeKey = elementType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Name = name }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" }
+            ],
+        };
+
+        var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
+    }
+
+    [TestCase("")]
+    [TestCase(" ")]
+    public async Task Cannot_Create_Culture_Variant_Element_With_Only_Blank_Names(string name)
+    {
+        var elementType = await CreateVariantElementType(variantTitleAsMandatory: false);
+
+        var createModel = new ElementCreateModel
+        {
+            ContentTypeKey = elementType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = name },
+                new VariantModel { Culture = "da-DK", Name = name }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" }
+            ],
+        };
+
+        var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
         Assert.IsNotNull(result.Result);
         Assert.IsNull(result.Result.Content);
     }
@@ -557,6 +630,35 @@ public partial class ElementEditingServiceTests
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
         Assert.AreEqual(Constants.System.Root, result.Result.Content!.ParentId);
+    }
+
+    [Test]
+    public async Task Cannot_Create_Element_Under_Another_Element()
+    {
+        var parentElement = await CreateInvariantElement();
+        var elementType = await CreateInvariantElementType();
+
+        var createModel = new ElementCreateModel
+        {
+            ContentTypeKey = elementType.Key,
+            ParentKey = parentElement.Key,
+            Variants =
+            [
+                new VariantModel { Name = "Should Not Be Created" }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" },
+                new PropertyValueModel { Alias = "text", Value = "The text value" }
+            ],
+        };
+
+        var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.ParentNotFound, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
     }
 
     private static ElementCreateModel CreateElementModel(Guid contentTypeKey, Guid? parentKey)

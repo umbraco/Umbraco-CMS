@@ -1,6 +1,6 @@
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import UmbActionMenuItemApi from './action-menu-item.api.js';
 import UmbActionMenuItemElement from './action-menu-item.element.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{

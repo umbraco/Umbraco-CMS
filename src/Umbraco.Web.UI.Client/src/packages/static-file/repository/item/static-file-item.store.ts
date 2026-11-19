@@ -5,7 +5,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @class UmbStaticFileItemStore
- * @augments {UmbStoreBase}
+ * @augments {UmbItemStoreBase}
  * @description - Data Store for Static File items
  */
 

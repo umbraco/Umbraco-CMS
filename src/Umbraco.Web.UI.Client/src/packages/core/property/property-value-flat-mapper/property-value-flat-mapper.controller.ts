@@ -6,8 +6,10 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 	/**
 	 * Maps the property values of the given property data.
+	 * @template ValueType
+	 * @template {UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>} PropertyType
 	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} property - The property data.
-	 * @param mapper
+	 * @param {(property: PropertyType) => ReturnType | Promise<ReturnType>} mapper - The function used to map each property.
 	 * @returns {Promise<UmbPropertyValueDataPotentiallyWithEditorAlias>} - A promise that resolves to the mapped data.
 	 */
 	async flatMap<ReturnType, ValueType, PropertyType extends UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>>(
@@ -18,7 +20,32 @@ export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 
 		this.destroy();
 
-		return result ?? [];
+		return result;
+	}
+
+	/**
+	 * Maps the property values of the given property data.
+	 * @template ValueType
+	 * @template {UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>} PropertyType
+	 * @param {Array<UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>>} properties - The property data.
+	 * @param {(property: PropertyType) => ReturnType | Promise<ReturnType>} mapper - The function used to map each property.
+	 * @returns {Promise<Array<UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>>>} - A promise that resolves to the mapped data.
+	 */
+	async flatMapMany<
+		ReturnType,
+		ValueType,
+		PropertyType extends UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>,
+	>(
+		properties: Array<PropertyType>,
+		mapper: (property: PropertyType) => ReturnType | Promise<ReturnType>,
+	): Promise<Array<ReturnType>> {
+		const result = await Promise.all(
+			properties.map((property) => this.#mapValues<ReturnType, ValueType, PropertyType>(property, mapper)),
+		);
+
+		this.destroy();
+
+		return result.flat();
 	}
 
 	async #mapValues<
@@ -28,7 +55,7 @@ export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 	>(
 		incomingProperty: PropertyType,
 		mapper: (property: PropertyType) => ReturnType | Promise<ReturnType>,
-	): Promise<Array<ReturnType> | undefined> {
+	): Promise<Array<ReturnType>> {
 		const mapOfThisProperty: ReturnType = await mapper(incomingProperty);
 
 		const editorAlias = (incomingProperty as any).editorAlias as string | undefined;

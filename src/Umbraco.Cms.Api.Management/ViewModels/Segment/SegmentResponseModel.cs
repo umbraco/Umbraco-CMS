@@ -14,10 +14,4 @@ public class SegmentResponseModel
     /// Gets or sets the alias of the segment.
     /// </summary>
     public required string Alias { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the collection of culture identifiers (e.g., language codes) associated with the segment.
-    /// </summary>
-    [Obsolete("This property is temporary. A more permanent solution will follow. Scheduled for removal in Umbraco 20.")]
-    public IEnumerable<string>? Cultures { get; set; } = null;
 }

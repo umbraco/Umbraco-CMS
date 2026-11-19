@@ -75,6 +75,7 @@ test('can publish content with an element picker selected', {tag: '@smoke'}, asy
   // Create element type and element
   const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
+  await umbracoApi.element.publish(elementId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -99,12 +100,13 @@ test('can select multiple elements in the element picker', async ({umbracoApi, u
   const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const firstElementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   const secondElementId = await umbracoApi.element.createDefaultElement(secondElementName, elementTypeId);
+  await umbracoApi.element.publish(firstElementId);
+  await umbracoApi.element.publish(secondElementId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.addElementPicker(elementName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for element to be added
   await umbracoUi.content.addElementPicker(secondElementName);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
@@ -126,13 +128,14 @@ test('can not publish a mandatory element picker with an empty value', async ({u
   // Create element type and element
   const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
+  await umbracoApi.element.publish(elementId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   // Do not pick any element and the validation error appears
   await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   // Pick an element and the validation error disappears
   await umbracoUi.content.addElementPicker(elementName);
@@ -184,7 +187,6 @@ test('can validate maximum amount in element picker', async ({umbracoApi, umbrac
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.addElementPicker(elementName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for element to be added
 
   // Assert
   await umbracoUi.content.isChooseButtonVisible(false);

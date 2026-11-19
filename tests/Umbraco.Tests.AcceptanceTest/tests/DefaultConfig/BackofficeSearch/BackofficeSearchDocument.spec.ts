@@ -23,7 +23,8 @@ test.afterEach(async ({umbracoApi}) => {
 test('can find a document by name', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
-  await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
+  const documentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
+  await umbracoApi.document.waitUntilIndexed(documentName, documentId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -38,6 +39,7 @@ test('can navigate to the document workspace from a search result', async ({umbr
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
   const documentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
+  await umbracoApi.document.waitUntilIndexed(documentName, documentId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -52,8 +54,10 @@ test('can navigate to the document workspace from a search result', async ({umbr
 test('can navigate between search results with arrow keys', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
-  await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
-  await umbracoApi.document.createDefaultDocument(secondDocumentName, documentTypeId);
+  const documentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
+  const secondDocumentId = await umbracoApi.document.createDefaultDocument(secondDocumentName, documentTypeId);
+  await umbracoApi.document.waitUntilIndexed(documentNamePrefix, documentId);
+  await umbracoApi.document.waitUntilIndexed(documentNamePrefix, secondDocumentId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.backofficeSearch.clickSearchHeaderButton();
   await umbracoUi.backofficeSearch.searchForDocument(documentNamePrefix);
@@ -77,7 +81,8 @@ test('can navigate between search results with arrow keys', async ({umbracoApi, 
 test('clears search results when the input is emptied', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
-  await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
+  const documentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
+  await umbracoApi.document.waitUntilIndexed(documentName, documentId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -95,7 +100,8 @@ test('can find a child document by name', async ({umbracoApi, umbracoUi}) => {
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
   const parentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
-  await umbracoApi.document.createDefaultDocumentWithParent(childDocumentName, childDocumentTypeId, parentId);
+  const childDocumentId = await umbracoApi.document.createDefaultDocumentWithParent(childDocumentName, childDocumentTypeId, parentId);
+  await umbracoApi.document.waitUntilIndexed(childDocumentName, childDocumentId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -109,7 +115,8 @@ test('can find a child document by name', async ({umbracoApi, umbracoUi}) => {
 test('can find a document by partial name match', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
-  await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
+  const documentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
+  await umbracoApi.document.waitUntilIndexed(documentNamePrefix, documentId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act

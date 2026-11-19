@@ -116,7 +116,6 @@ test('can add an icon for a document type', {tag: '@smoke'}, async ({umbracoApi,
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.documentType.updateIcon(bugIcon);
   await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 

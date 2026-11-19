@@ -100,21 +100,21 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 		});
 
 		// Re-request when the displayed culture changes, so switching language fetches that culture.
-		this.observe(
-			this.#documentUrlsDataResolver?.requestCulture,
-			() => this.#scheduleRequestUrls(),
-			'observeRequestCulture',
-		);
+		this.observe(this.#documentUrlsDataResolver?.requestCulture, () => this.#scheduleRequestUrls(), null);
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#propertyDataSetVariantId = context?.getVariantId();
 			this.#setLinks();
 		});
 
-		this.observe(this.#documentUrlsDataResolver?.urls, (urls) => {
-			this.#urls = urls ?? [];
-			this.#setLinks();
-		});
+		this.observe(
+			this.#documentUrlsDataResolver?.urls,
+			(urls) => {
+				this.#urls = urls ?? [];
+				this.#setLinks();
+			},
+			null,
+		);
 	}
 
 	#setLinks() {

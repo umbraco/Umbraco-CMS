@@ -2,11 +2,16 @@
 import {ApiHelpers} from "./ApiHelpers";
 import {WebhookBuilder} from "../builders";
 import {ConstantHelper} from "./ConstantHelper";
+import {WebhookReceiver} from "./WebhookReceiver";
 
 export class WebhookApiHelper {
   api: ApiHelpers;
   page: Page;
   webhookSiteUrl: string = 'https://webhook.site/';
+  /**
+   * The base URL of the receiver in the test process, known once a receiver token has been generated.
+   */
+  receiverUrl: string = '';
 
   constructor(api: ApiHelpers, page: Page) {
     this.api = api;
@@ -24,7 +29,7 @@ export class WebhookApiHelper {
   }
 
   async doesExist(id: string) {
-    const response = await this.get(this.api.baseUrl + '/umbraco/management/api/v1/webhook/' + id);
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/webhook/' + id);
     return response.status() === 200;
   }
 
@@ -34,7 +39,7 @@ export class WebhookApiHelper {
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/webhook', webhookData);
     // Returns the id of the created webhook
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async delete(id: string) {
@@ -57,7 +62,7 @@ export class WebhookApiHelper {
     const allWebhooks = await this.getAll();
     const jsonWebhooks = await allWebhooks.json();
 
-    for (const webhook of jsonWebhooks.items) {
+    for (const webhook of this.api.itemsOf(jsonWebhooks)) {
       if (webhook.name === name) {
         return await this.get(webhook.id);
       }
@@ -69,7 +74,7 @@ export class WebhookApiHelper {
     const allWebhooks = await this.getAll();
     const jsonWebhooks = await allWebhooks.json();
 
-    for (const webhook of jsonWebhooks.items) {
+    for (const webhook of this.api.itemsOf(jsonWebhooks)) {
       if (webhook.name === name) {
         return await this.delete(webhook.id);
       }
@@ -77,6 +82,43 @@ export class WebhookApiHelper {
     return null;
   }
 
+  /**
+   * Generates a token for the receiver in the test process. The site under test must be able to reach this machine
+   * on its loopback address; use {@link generateWebhookSiteToken} when it cannot.
+   */
+  async generateReceiverToken() {
+    this.receiverUrl = await WebhookReceiver.start();
+    return WebhookReceiver.createToken();
+  }
+
+  /**
+   * Waits for requests to be received in the test process for the token.
+   *
+   * @param expectedContentFragment When given, only requests whose content contains it are waited for and returned.
+   * @returns The received requests, or null when none were received within the timeout.
+   */
+  async getReceivedRequests(receiverToken: string, expectedContentFragment?: string, timeout: number = ConstantHelper.timeout.navigation, pollInterval: number = ConstantHelper.timeout.short) {
+    const deadline = Date.now() + timeout;
+
+    while (true) {
+      const requests = WebhookReceiver.getRequests(receiverToken);
+      const matches = expectedContentFragment === undefined
+        ? requests
+        : requests.filter((request) => request.content.includes(expectedContentFragment));
+      if (matches.length > 0) {
+        return matches;
+      }
+      if (Date.now() >= deadline) {
+        return null;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, pollInterval));
+    }
+  }
+
+  /**
+   * Generates a token at webhook.site, for a site under test that cannot reach the receiver in the test process.
+   */
   async generateWebhookSiteToken() {
     const createWebhookResponse = await this.page.request.post(this.webhookSiteUrl + 'token', {
       headers: {
@@ -84,11 +126,10 @@ export class WebhookApiHelper {
       }
     });
     const webhookData = await createWebhookResponse.json();
-    const webhookToken = webhookData.uuid;
-    return webhookToken;
+    return webhookData.uuid;
   }
 
-  async getWebhookSiteRequestResponse(webhookSiteToken: string, timeoutMs: number = 15000, pollInterval: number = 1000, expectedContent?: string) {
+  async getWebhookSiteRequestResponse(webhookSiteToken: string, timeoutMs: number = ConstantHelper.timeout.veryLong, pollInterval: number = ConstantHelper.timeout.short, expectedContentFragment?: string) {
     const requestUrl = this.webhookSiteUrl + 'token/' + webhookSiteToken + '/requests';
     const start = Date.now();
 
@@ -102,12 +143,12 @@ export class WebhookApiHelper {
       const requests = requestJson.data ?? [];
       // Delivery to webhook.site is async and an unrelated request can arrive first, so when an
       // expected content is given, keep polling until the matching webhook has actually been received.
-      if (expectedContent === undefined) {
+      if (expectedContentFragment === undefined) {
         if (requests.length > 0) {
           return requests;
         }
       } else {
-        const matches = requests.filter((request) => (request.content ?? '').includes(expectedContent));
+        const matches = requests.filter((request) => (request.content ?? '').includes(expectedContentFragment));
         if (matches.length > 0) {
           return matches;
         }
@@ -117,6 +158,10 @@ export class WebhookApiHelper {
       await new Promise((resolve) => setTimeout(resolve, pollInterval));
     }
     return null;
+  }
+
+  private async getWebhookUrl(token: string) {
+    return (WebhookReceiver.hasToken(token) ? await WebhookReceiver.start() : this.webhookSiteUrl) + token;
   }
 
   async doesWebhookHaveEvent(webhookName: string, eventName: string) {
@@ -154,9 +199,9 @@ export class WebhookApiHelper {
     return eventData?.alias || '';
   }
 
-  async createDefaultWebhook(webhookName: string, webhookSiteToken: string, eventName: string = 'Content Published', isEnabled: boolean = true) {
+  async createDefaultWebhook(webhookName: string, token: string, eventName: string = 'Content Published', isEnabled: boolean = true) {
     await this.ensureNameNotExists(webhookName);
-    const webhookUrl = this.webhookSiteUrl + webhookSiteToken;
+    const webhookUrl = await this.getWebhookUrl(token);
     const eventAlias = await this.getEventAliasValue(eventName);
 
     const webhook = new WebhookBuilder()
@@ -169,9 +214,9 @@ export class WebhookApiHelper {
     return await this.create(webhook);
   }
 
-  async createWebhookForSpecificContentType(webhookName: string, webhookSiteToken: string, eventName: string, contentTypeName: string) {
+  async createWebhookForSpecificContentType(webhookName: string, token: string, eventName: string, contentTypeName: string) {
     await this.ensureNameNotExists(webhookName);
-    const webhookUrl = this.webhookSiteUrl + webhookSiteToken;
+    const webhookUrl = await this.getWebhookUrl(token);
     const eventAlias = await this.getEventAliasValue(eventName);
     const eventType = await this.getEventTypeValue(eventName);
     let contentTypeData;
@@ -191,9 +236,9 @@ export class WebhookApiHelper {
     return await this.create(webhook);
   }
 
-  async createWebhookWithHeader(webhookName: string, webhookSiteToken: string, eventName: string, headerName: string, headerValue: string) {
+  async createWebhookWithHeader(webhookName: string, token: string, eventName: string, headerName: string, headerValue: string) {
     await this.ensureNameNotExists(webhookName);
-    const webhookUrl = this.webhookSiteUrl + webhookSiteToken;
+    const webhookUrl = await this.getWebhookUrl(token);
     const eventAlias = await this.getEventAliasValue(eventName);
 
     const webhook = new WebhookBuilder()

@@ -1,5 +1,6 @@
 import { useMockHandlers, resetMockHandlers } from '../../../../../mocks/index.js';
-import { UmbMediaConfigurationRepository, resetUmbMediaConfigurationCache } from './configuration.repository.js';
+import { _resetMediaConfigurationCacheForTesting } from './configuration.cache.js';
+import { UmbMediaConfigurationRepository } from './configuration.repository.js';
 import type { UmbMediaConfigurationModel } from './types.js';
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
@@ -12,7 +13,6 @@ const UMB_SLUG = '/media';
 
 const configuration: UmbMediaConfigurationModel = {
 	disableDeleteWhenReferenced: true,
-	disableUnpublishWhenReferenced: true,
 };
 
 @customElement('umb-test-media-configuration-repository-host')
@@ -25,7 +25,7 @@ describe('UmbMediaConfigurationRepository', () => {
 
 	beforeEach(() => {
 		requestCount = 0;
-		resetUmbMediaConfigurationCache();
+		_resetMediaConfigurationCacheForTesting();
 		host = new UmbTestMediaConfigurationRepositoryHostElement();
 		document.body.appendChild(host);
 		repository = new UmbMediaConfigurationRepository(host);

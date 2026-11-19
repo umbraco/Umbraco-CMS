@@ -148,7 +148,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     {
         // Arrange - Initialize the publish status service to simulate production state
         // (in production, this runs at startup via PostRuntimePremigrationsUpgradeNotification)
-        var publishStatusManagementService = GetRequiredService<IPublishStatusManagementService>();
+        var publishStatusManagementService = GetRequiredService<IDocumentPublishStatusManagementService>();
         await publishStatusManagementService.InitializeAsync(CancellationToken.None);
 
         // PublishedTextPage is published, Textpage is draft-only (from base class setup)
@@ -631,7 +631,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         Assert.IsNull(trashedPage, "Trashed content should not be in cache");
 
         // Act - Restore to root (original location)
-        var restoreResult = await ContentEditingService.RestoreAsync(PublishedTextPage.Key.Value, null, Constants.Security.SuperUserKey);
+        var restoreResult = await ContentEditingService.RestoreAsync(PublishedTextPage.Key.Value, null, Constants.Security.SuperUserKey, includeDescendants: true);
         Assert.IsTrue(restoreResult.Success);
 
         // Assert - Restored content should be back in the draft cache, but not republished automatically

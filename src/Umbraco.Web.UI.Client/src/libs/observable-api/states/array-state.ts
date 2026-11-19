@@ -6,19 +6,32 @@ import { replaceInUniqueArray } from '../utils/replace-in-unique-array.function.
 import { UmbDeepState } from './deep-state.js';
 
 /**
+ * @description - The value held by a {@link UmbArrayState}. Nullable when constructed with `undefined` (or with a value typed to include `undefined`), otherwise a plain array.
+ */
+type UmbArrayStateValue<T, D extends T[] | undefined> = undefined extends D ? T[] | undefined : T[];
+
+/**
  * @class UmbArrayState
  * @augments {UmbDeepState<T>}
  * @description - A RxJS BehaviorSubject which deepFreezes the object-data to ensure its not manipulated from any implementations.
  * Additionally the Subject ensures the data is unique, not updating any Observes unless there is an actual change of the content.
  *
  * The ArrayState provides methods to append data when the data is an Object.
+ *
+ * Constructing with an actual array keeps the classic, non-nullable behaviour (`getValue()` returns `T[]`). Constructing with
+ * `undefined` — or a value typed to include `undefined` — makes the state nullable (`getValue()` returns `T[] | undefined`).
+ * Note this detection only works when the generic parameters aren't pinned explicitly to just `T`; to opt into the nullable
+ * behaviour while still naming `T`, provide all three generics: `new UmbArrayState<Item, unknown, undefined>(undefined, ...)`.
+ * @template T
  */
-export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
+export class UmbArrayState<T, U = unknown, D extends T[] | undefined = T[]> extends UmbDeepState<
+	UmbArrayStateValue<T, D>
+> {
 	readonly getUniqueMethod: (entry: T) => U;
 	#sortMethod?: (a: T, b: T) => number;
 
-	constructor(initialData: T[], getUniqueOfEntryMethod: (entry: T) => U) {
-		super(initialData);
+	constructor(initialData: T[] | (T[] | undefined) | D, getUniqueOfEntryMethod: (entry: T) => U) {
+		super(initialData as UmbArrayStateValue<T, D>);
 		this.getUniqueMethod = getUniqueOfEntryMethod;
 	}
 
@@ -46,8 +59,7 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 
 	/**
 	 * @function setValue
-	 * @param value
-	 * @param {T} data - The next data for this state to hold.
+	 * @param {UmbArrayStateValue<T, D>} value - The next data for this state to hold.
 	 * @description - Set the data of this state, if sortBy has been defined for this state the data will be sorted before set. If data is different than current this will trigger observations to update.
 	 * @example <caption>Example change the data of a state</caption>
 	 * const myState = new UmbArrayState(['Good morning']);
@@ -55,7 +67,7 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 	 * myState.setValue(['Goodnight'])
 	 * // myState.value is equal ['Goodnight'].
 	 */
-	override setValue(value: T[]) {
+	override setValue(value: UmbArrayStateValue<T, D>) {
 		if (value && this.#sortMethod) {
 			super.setValue([...value].sort(this.#sortMethod));
 		} else {
@@ -91,7 +103,7 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 	 */
 	getHasOne(unique: U): boolean {
 		if (this.getUniqueMethod) {
-			return this.getValue().some((x) => this.getUniqueMethod(x) === unique);
+			return this.getValue()?.some((x) => this.getUniqueMethod(x) === unique) ?? false;
 		} else {
 			throw new Error('Cannot use hasOne when no unique method provided to check for uniqueness');
 		}
@@ -115,7 +127,7 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 			let next = this.getValue();
 			if (!next) return this;
 			uniques.forEach((unique) => {
-				next = next.filter((x) => {
+				next = next!.filter((x) => {
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 					// @ts-ignore
 					return this.getUniqueMethod(x) !== unique;
@@ -157,8 +169,7 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 
 	/**
 	 * @function filter
-	 * @param predicate
-	 * @param {unknown} filterMethod - The unique value to remove.
+	 * @param {(value: T, index: number, array: T[]) => boolean} predicate - Method to determine which entries to keep.
 	 * @returns {UmbArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
 	 * @example <caption>Example remove entry with key '1'</caption>
@@ -198,7 +209,8 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 	 * myState.append({ key: 1, value: 'replaced-foo'});
 	 */
 	appendOne(entry: T) {
-		const next = [...this.getValue()];
+		const value = this.getValue();
+		const next = value ? [...value] : [];
 		if (this.getUniqueMethod) {
 			pushToUniqueArray(next, entry, this.getUniqueMethod);
 		} else {
@@ -223,7 +235,7 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 	 * myState.appendOneAt({ key: 2, value: 'in-between'}, 1);
 	 */
 	appendOneAt(entry: T, index: number) {
-		const next = [...this.getValue()];
+		const next = this.getValue() ? [...this.getValue()!] : [];
 		if (this.getUniqueMethod) {
 			pushAtToUniqueArray(next, entry, this.getUniqueMethod, index);
 		} else if (index === -1 || index >= next.length) {
@@ -252,22 +264,21 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 	 * ]);
 	 */
 	append(entries: T[]) {
+		const current = this.getValue() ? [...this.getValue()!] : [];
 		if (this.getUniqueMethod) {
-			const next = [...this.getValue()];
 			entries.forEach((entry) => {
-				pushToUniqueArray(next, entry, this.getUniqueMethod!);
+				pushToUniqueArray(current, entry, this.getUniqueMethod!);
 			});
-			this.setValue(next);
+			this.setValue(current);
 		} else {
-			this.setValue([...this.getValue(), ...entries]);
+			this.setValue([...current, ...entries]);
 		}
 		return this;
 	}
 
 	/**
 	 * @function replace
-	 * @param {Partial<T>} entires - data of entries to be replaced.
-	 * @param entries
+	 * @param {Array<T>} entries - data of entries to be replaced.
 	 * @returns {UmbArrayState<T>} Reference to it self.
 	 * @description - Replaces one or more entries, requires the ArrayState to be constructed with a getUnique method.
 	 * @example <caption>Example append some data.</caption>
@@ -284,9 +295,11 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 	 * // Only the existing item gets replaced:
 	 * myState.getValue(); // -> [{ key: 1, value: 'foo2'}, { key: 2, value: 'bar'}]
 	 */
-	replace(entries: Array<T>): UmbArrayState<T> {
+	replace(entries: Array<T>): this {
 		if (this.getUniqueMethod) {
-			const next = [...this.getValue()];
+			const current = this.getValue();
+			if (!current) return this;
+			const next = [...current];
 			entries.forEach((entry) => {
 				replaceInUniqueArray(next, entry as T, this.getUniqueMethod!);
 			});
@@ -315,7 +328,11 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 		if (!this.getUniqueMethod) {
 			throw new Error("Can't partial update an ArrayState without a getUnique method provided when constructed.");
 		}
-		this.setValue(partialUpdateFrozenArray(this.getValue(), entry, (x) => unique === this.getUniqueMethod!(x)));
+		const current = this.getValue();
+		if (!current) return this;
+		this.setValue(
+			partialUpdateFrozenArray(current, entry, (x) => unique === this.getUniqueMethod!(x)) as UmbArrayStateValue<T, D>,
+		);
 		return this;
 	}
 
@@ -336,14 +353,14 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 	 * ]);
 	 */
 	prepend(entries: T[]) {
+		const current = this.getValue() ? [...this.getValue()!] : [];
 		if (this.getUniqueMethod) {
-			const next = [...this.getValue()];
 			entries.forEach((entry) => {
-				prependToUniqueArray(next, entry, this.getUniqueMethod!);
+				prependToUniqueArray(current, entry, this.getUniqueMethod!);
 			});
-			this.setValue(next);
+			this.setValue(current);
 		} else {
-			this.setValue([...entries, ...this.getValue()]);
+			this.setValue([...entries, ...current]);
 		}
 
 		return this;

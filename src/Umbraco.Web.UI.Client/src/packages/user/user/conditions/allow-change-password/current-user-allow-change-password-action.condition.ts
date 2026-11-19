@@ -12,8 +12,7 @@ export class UmbCurrentUserAllowChangePasswordActionCondition extends UmbConditi
 		this.#init();
 	}
 
-	async #init() {
-		await this.#configRepository.initialized;
+	#init() {
 		this.observe(
 			this.#configRepository.part('allowChangePassword'),
 			(isAllowed) => {

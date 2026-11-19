@@ -1,5 +1,5 @@
-import type { UmbMemberGroupCollectionItemModel } from './types.js';
 import { UMB_EDIT_MEMBER_GROUP_WORKSPACE_PATH_PATTERN } from '../paths.js';
+import type { UmbMemberGroupCollectionItemModel } from './types.js';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 
 export class UmbMemberGroupCollectionContext extends UmbDefaultCollectionContext<UmbMemberGroupCollectionItemModel> {

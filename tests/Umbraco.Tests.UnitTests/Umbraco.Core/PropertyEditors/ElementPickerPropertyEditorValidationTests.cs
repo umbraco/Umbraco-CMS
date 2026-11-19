@@ -3,6 +3,7 @@ using System.Data;
 using System.Globalization;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -48,7 +49,7 @@ public class ElementPickerPropertyEditorValidationTests
             Mock.Of<IShortStringHelper>(),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Mock.Of<IIOHelper>(),
-            new DataEditorAttribute("alias"),
+            new DataEditorAttribute("alias") { ValueType = ValueTypes.Json },
             localizedTextServiceMock.Object,
             _elementServiceMock.Object,
             mockScopeProvider.Object)
@@ -181,6 +182,34 @@ public class ElementPickerPropertyEditorValidationTests
         // A non-GUID entry is not a resolvable key and must not be reported as missing.
         List<string> value = ["not-a-guid", elementKey.ToString()];
         Assert.IsEmpty(_valueEditor.Validate(value, false, null, PropertyValidationContext.Empty()));
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public void Can_Pass_Validation_For_Empty_Value_When_Minimum_Configured_And_Not_Mandatory(bool isNull)
+    {
+        _valueEditor.ConfigurationObject = new ElementPickerConfiguration
+        {
+            ValidationLimit = new NumberRange { Min = 2 },
+        };
+
+        List<string>? value = isNull ? null : [];
+        Assert.IsEmpty(_valueEditor.Validate(value, false, null, PropertyValidationContext.Empty()));
+    }
+
+    [TestCase(null, Constants.Validation.ErrorMessages.Properties.Missing)]
+    [TestCase("[]", Constants.Validation.ErrorMessages.Properties.Empty)]
+    public void Cannot_Pass_Validation_For_Empty_Value_When_Mandatory(string? value, string expectedErrorMessage)
+    {
+        _valueEditor.ConfigurationObject = new ElementPickerConfiguration
+        {
+            ValidationLimit = new NumberRange { Min = 2 },
+        };
+
+        ValidationResult[] result = _valueEditor.Validate(value, true, null, PropertyValidationContext.Empty()).ToArray();
+
+        Assert.AreEqual(1, result.Length);
+        Assert.AreEqual(expectedErrorMessage, result[0].ErrorMessage);
     }
 
     private IEnumerable<ValidationResult> Validate(IEnumerable<Guid> elementKeys)

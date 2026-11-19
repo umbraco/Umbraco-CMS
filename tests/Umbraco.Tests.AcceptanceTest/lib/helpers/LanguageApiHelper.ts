@@ -1,4 +1,6 @@
-﻿import {ApiHelpers} from "./ApiHelpers";
+﻿import {expect} from "@playwright/test";
+import {ApiHelpers} from "./ApiHelpers";
+import {ConstantHelper} from "./ConstantHelper";
 
 export class LanguageApiHelper {
   api: ApiHelpers
@@ -29,7 +31,7 @@ export class LanguageApiHelper {
     };
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/language', languageData);
     // Returns the id of the created language
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async update(isoCode: string, language: object) {
@@ -44,7 +46,7 @@ export class LanguageApiHelper {
     const allLanguages = await this.getAll();
     const jsonLanguages = await allLanguages.json();
 
-    for (const language of jsonLanguages.items) {
+    for (const language of this.api.itemsOf(jsonLanguages)) {
       if (language.name === name && language.isoCode !== null) {
         return await this.get(language.isoCode);
       }
@@ -52,24 +54,30 @@ export class LanguageApiHelper {
     return null;
   }
 
+  // Poll variant of getByName: the list projection lags a create, so wait for the language to be readable
+  // before a UI step navigates to the collection (which would otherwise fetch a pre-create snapshot).
+  async waitUntilNameExists(name: string, timeout: number = ConstantHelper.timeout.long) {
+    await expect.poll(() => this.getByName(name), {timeout}).toBeTruthy();
+  }
+
   async ensureNameNotExists(name: string) {
     const allLanguages = await this.getAll();
     const jsonLanguages = await allLanguages.json();
 
-    for (const language of jsonLanguages.items) {
-      if (language.name === name && language.isoCode !== null) {     
+    for (const language of this.api.itemsOf(jsonLanguages)) {
+      if (language.name === name && language.isoCode !== null) {
         return await this.delete(language.isoCode);
       }
     }
     return null;
   }
-  
+
   async ensureIsoCodeNotExists(isoCode: string) {
     const allLanguages = await this.getAll();
     const jsonLanguages = await allLanguages.json();
 
-    for (const language of jsonLanguages.items) {
-      if (language.isoCode === isoCode) {     
+    for (const language of this.api.itemsOf(jsonLanguages)) {
+      if (language.isoCode === isoCode) {
         return await this.delete(language.isoCode);
       }
     }
@@ -79,12 +87,25 @@ export class LanguageApiHelper {
   async getAll() {
     return await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/language?skip=0&take=10000');
   }
-  
+
+  /**
+   * Removes every language except the default one. With more than one language the UI differs - notably
+   * Save and publish becomes a variant picker - so a leaked language changes behaviour, not just state.
+   */
+  async ensureOnlyDefaultLanguageExists() {
+    const languages = await (await this.getAll()).json();
+    for (const language of languages.items) {
+      if (!language.isDefault) {
+        await this.delete(language.isoCode);
+      }
+    }
+  }
+
   async createDanishLanguage() {
     await this.ensureNameNotExists('Danish');
     return await this.create('Danish', false, false, 'da');
   }
-  
+
   async createFrenchLanguage() {
     await this.ensureNameNotExists('French');
     return await this.create('French', false, false, 'fr-FR');

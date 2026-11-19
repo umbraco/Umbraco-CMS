@@ -156,8 +156,9 @@ test.skip('can create content with block grid area with min allowed', async ({um
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
   await umbracoUi.content.clickLinkWithName(areaCreateLabel);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
-  await umbracoUi.content.isTextWithExactNameVisible('Minimum 2 entries, requires 1 more.');
   await umbracoUi.content.clickSaveAndPublishButton();
+  // The area range-validation message only renders after a publish attempt triggers validation.
+  await umbracoUi.content.isTextWithExactNameVisible('Minimum 2 entries, requires 1 more.');
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   await umbracoUi.content.clickInlineAddToAreaButton(firstElementTypeName, firstAreaName, 0, 1);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
@@ -168,6 +169,30 @@ test.skip('can create content with block grid area with min allowed', async ({um
   expect(contentData.variants[0].state).toBe('Published');
   await umbracoUi.reloadPage();
   await umbracoUi.content.doesBlockContainBlockCountInArea(firstElementTypeName, firstAreaName, 2);
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
+});
+
+test('can create content with block grid area with min allowed and an empty area', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
+  const minAllowed = 2;
+  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithMinAndMaxAllowed(blockGridDataTypeName, firstElementTypeId, secondElementTypeId, minAllowed, 10, firstAreaName, areaCreateLabel);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickAddBlockGridElementWithName('content');
+  await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+
+  // Assert
+  // The minimum applies once blocks are added to the area, so an empty area is valid.
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
@@ -189,8 +214,9 @@ test.skip('can create content with block grid area with max allowed', async ({um
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
   await umbracoUi.content.clickLinkWithName(areaCreateLabel);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
-  await umbracoUi.content.isTextWithExactNameVisible('Maximum 0 entries, you have entered 1 too many.');
   await umbracoUi.content.clickSaveAndPublishButton();
+  // The area range-validation message only renders after a publish attempt triggers validation.
+  await umbracoUi.content.isTextWithExactNameVisible('Maximum 0 entries, you have entered 1 too many.');
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   await umbracoUi.content.removeBlockFromArea(firstElementTypeName, firstAreaName, secondElementTypeName);
   await umbracoUi.content.clickConfirmToDeleteButton();
@@ -244,8 +270,9 @@ test.skip('can create content with a block grid area with specified allowance wi
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
   await umbracoUi.content.clickLinkWithName(areaCreateLabel);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
-  await umbracoUi.content.isTextWithExactNameVisible(warningMessage);
   await umbracoUi.content.clickSaveAndPublishButton();
+  // The area range-validation message only renders after a publish attempt triggers validation.
+  await umbracoUi.content.isTextWithExactNameVisible(warningMessage);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   await umbracoUi.content.clickInlineAddToAreaButton(firstElementTypeName, firstAreaName, 0, 1);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
@@ -253,6 +280,32 @@ test.skip('can create content with a block grid area with specified allowance wi
 
   // Assert
   await umbracoUi.content.doesBlockContainBlockCountInArea(firstElementTypeName, firstAreaName, 2);
+});
+
+test('cannot publish content with a block grid area with specified allowance with min allowed when that block type is absent',async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
+  const thirdElementTypeId = await umbracoApi.documentType.createEmptyElementType(thirdElementTypeName);
+  const minAllowed = 1;
+  const warningMessage = thirdElementTypeName + ' must be present at least ' + minAllowed + ' time(s).';
+  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaWithTwoSpecifiedAllowancesWithMinMaxInABlock(blockGridDataTypeName, firstElementTypeId, secondElementTypeId, thirdElementTypeId, minAllowed, 10, firstAreaName, areaCreateLabel);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickLinkWithName(areaCreateLabel);
+  await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isTextWithExactNameVisible(warningMessage);
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Draft');
 });
 
 // Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121 
@@ -274,8 +327,9 @@ test.skip('can create content with a block grid area with specified allowance wi
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
   await umbracoUi.content.clickInlineAddToAreaButton(firstElementTypeName, firstAreaName, 0, 1);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
-  await umbracoUi.content.isTextWithExactNameVisible(warningMessage);
   await umbracoUi.content.clickSaveAndPublishButton();
+  // The area range-validation message only renders after a publish attempt triggers validation.
+  await umbracoUi.content.isTextWithExactNameVisible(warningMessage);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   await umbracoUi.content.removeBlockFromArea(firstElementTypeName, firstAreaName, secondElementTypeName);
   await umbracoUi.content.clickConfirmToDeleteButton();

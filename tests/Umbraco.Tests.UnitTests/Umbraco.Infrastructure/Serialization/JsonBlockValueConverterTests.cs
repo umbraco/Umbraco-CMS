@@ -442,6 +442,78 @@ public class JsonBlockValueConverterTests
         });
     }
 
+    [TestCase(typeof(SingleBlockValue), Constants.PropertyEditors.Aliases.BlockList, true)]
+    [TestCase(typeof(SingleBlockValue), Constants.PropertyEditors.Aliases.BlockList, false)]
+    [TestCase(typeof(BlockListValue), Constants.PropertyEditors.Aliases.SingleBlock, true)]
+    [TestCase(typeof(BlockListValue), Constants.PropertyEditors.Aliases.SingleBlock, false)]
+    public void Own_Layout_Takes_Precedence_Over_Other_Supported_Layout(Type blockValueType, string otherAlias, bool ownLayoutFirst)
+    {
+        var ownAlias = ((BlockValue)Activator.CreateInstance(blockValueType)!).PropertyEditorAlias;
+        var ownContentKey = Guid.NewGuid();
+        var otherContentKey = Guid.NewGuid();
+
+        var ownLayout = $$"""
+            "{{ownAlias}}": [{ "contentKey": "{{ownContentKey}}" }]
+            """;
+        var otherLayout = $$"""
+            "{{otherAlias}}": [{ "contentKey": "{{otherContentKey}}" }]
+            """;
+        var json = $$"""
+            {
+                "layout": {
+                    {{(ownLayoutFirst ? ownLayout : otherLayout)}},
+                    {{(ownLayoutFirst ? otherLayout : ownLayout)}}
+                }
+            }
+            """;
+
+        AssertOwnLayoutHoldsContentKeys(DeserializeBlockValue(blockValueType, json), ownContentKey);
+    }
+
+    [TestCase(typeof(SingleBlockValue), Constants.PropertyEditors.Aliases.BlockList)]
+    [TestCase(typeof(BlockListValue), Constants.PropertyEditors.Aliases.SingleBlock)]
+    public void Can_Deserialize_Other_Supported_Layout_As_Own_Layout(Type blockValueType, string otherAlias)
+    {
+        var contentKey = Guid.NewGuid();
+        var json = $$"""
+            {
+                "layout": {
+                    "{{otherAlias}}": [{ "contentKey": "{{contentKey}}" }]
+                }
+            }
+            """;
+
+        BlockValue? deserialized = DeserializeBlockValue(blockValueType, json);
+        AssertOwnLayoutHoldsContentKeys(deserialized, contentKey);
+
+        // the layout is written back under the own alias only
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var serialized = serializer.Serialize(deserialized!);
+        Assert.Multiple(() =>
+        {
+            Assert.That(serialized, Does.Contain($"\"{deserialized!.PropertyEditorAlias}\""));
+            Assert.That(serialized, Does.Not.Contain($"\"{otherAlias}\""));
+        });
+    }
+
+    private static BlockValue? DeserializeBlockValue(Type blockValueType, string json)
+    {
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        return blockValueType == typeof(SingleBlockValue)
+            ? serializer.Deserialize<SingleBlockValue>(json)
+            : blockValueType == typeof(BlockListValue)
+                ? serializer.Deserialize<BlockListValue>(json)
+                : throw new ArgumentOutOfRangeException(nameof(blockValueType));
+    }
+
+    private static void AssertOwnLayoutHoldsContentKeys(BlockValue? blockValue, params Guid[] expectedContentKeys)
+    {
+        Assert.IsNotNull(blockValue);
+        Assert.AreEqual(1, blockValue!.Layout.Count);
+        Assert.IsTrue(blockValue.Layout.ContainsKey(blockValue.PropertyEditorAlias));
+        CollectionAssert.AreEqual(expectedContentKeys, blockValue.Layout[blockValue.PropertyEditorAlias].Select(layoutItem => layoutItem.ContentKey));
+    }
+
     [Test]
     public void Try_Deserialize_Unknown_Block_Layout_With_Nested_Array()
     {
@@ -507,5 +579,76 @@ public class JsonBlockValueConverterTests
         Assert.AreEqual(2, deserialized.ContentData[0].RawPropertyValues.Count);
         Assert.AreEqual("Text", deserialized.ContentData[0].RawPropertyValues["text"]);
         Assert.AreEqual("Values", deserialized.ContentData[0].RawPropertyValues["values"]);
+    }
+
+    /// <summary>
+    /// Test case that verifies the fix for https://github.com/umbraco/Umbraco-CMS/issues/23379.
+    /// </summary>
+    [Test]
+    public void Can_Populate_Expose_For_Legacy_Property_Less_Blocks()
+    {
+        // Legacy (pre-variant) block value with a content block that has no property values and no
+        // "expose" property. On upgrade the block must still be exposed to keep its published state.
+        var serialized = @"{
+   ""layout"":{
+      ""Umbraco.RichText"":[
+         {
+            ""contentUdi"":""umb://element/6ad18441631140d48515ea0fc5b00425""
+         }
+      ]
+   },
+   ""contentData"":[
+      {
+         ""contentTypeKey"":""a1d1123c-289b-4a05-b33f-9f06cb723da1"",
+         ""udi"":""umb://element/6ad18441631140d48515ea0fc5b00425""
+      }
+   ],
+   ""settingsData"":[
+   ]
+}";
+
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var deserialized = serializer.Deserialize<RichTextBlockValue>(serialized);
+
+        Assert.IsNotNull(deserialized);
+        Assert.AreEqual(1, deserialized.ContentData.Count);
+        Assert.IsEmpty(deserialized.ContentData[0].Values);
+
+        Assert.AreEqual(1, deserialized.Expose.Count);
+        Assert.AreEqual(Guid.Parse("6ad18441631140d48515ea0fc5b00425"), deserialized.Expose[0].ContentKey);
+        Assert.IsNull(deserialized.Expose[0].Culture);
+    }
+
+    [Test]
+    public void Does_Not_Populate_Expose_When_Expose_Present()
+    {
+        // Current-format block value that explicitly carries an empty "expose" array alongside content.
+        // This is a healthy (non-legacy) state and must be left untouched.
+        var serialized = @"{
+   ""layout"":{
+      ""Umbraco.RichText"":[
+         {
+            ""contentKey"":""6ad18441-6311-40d4-8515-ea0fc5b00425""
+         }
+      ]
+   },
+   ""contentData"":[
+      {
+         ""contentTypeKey"":""a1d1123c-289b-4a05-b33f-9f06cb723da1"",
+         ""key"":""6ad18441-6311-40d4-8515-ea0fc5b00425""
+      }
+   ],
+   ""settingsData"":[
+   ],
+   ""expose"":[
+   ]
+}";
+
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var deserialized = serializer.Deserialize<RichTextBlockValue>(serialized);
+
+        Assert.IsNotNull(deserialized);
+        Assert.AreEqual(1, deserialized.ContentData.Count);
+        Assert.IsEmpty(deserialized.Expose);
     }
 }

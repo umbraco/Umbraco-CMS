@@ -210,7 +210,7 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
         Assert.IsNull(trashedMedia, "Trashed media should not be in cache");
 
         // Act - Restore to root (original location)
-        var restoreResult = await MediaEditingService.RestoreAsync(SubImage.Key.Value, null, Constants.Security.SuperUserKey);
+        var restoreResult = await MediaEditingService.RestoreAsync(SubImage.Key.Value, null, Constants.Security.SuperUserKey, includeDescendants: true);
         Assert.IsTrue(restoreResult.Success);
 
         // Assert - Restored media should be back in the cache

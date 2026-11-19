@@ -6,33 +6,52 @@ import type {
 } from '../../types.js';
 import { UmbDocumentPublishingRepository } from '../repository/index.js';
 import { UmbDocumentPublishedPendingChangesManager } from '../pending-changes/index.js';
+import { computeAncestorPublishCoverage } from '../utils.js';
 import { UMB_DOCUMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
+import { UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS } from '../../reference/repository/constants.js';
+import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../item/repository/constants.js';
+import type { UmbDocumentAncestorPublishCoverageModel } from '../schedule-publish/types.js';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from '../publish-with-descendants/constants.js';
 import { UmbDocumentUnpublishManifestEntityActionMeta } from '../unpublish/entity-action/constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../../constants.js';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from './document-publishing.workspace-context.token.js';
 import { UMB_DOCUMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
-import { UmbDocumentVariantState } from '../../variant-state.js';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UMB_CONTENT_PUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
+import { UMB_DISCARD_CHANGES_MODAL, umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_CONTENT_PUBLISH_MODAL,
+	UmbContentReferencedEntitiesManager,
+	UmbContentUnpublishEntityAction,
+} from '@umbraco-cms/backoffice/content';
+import { UmbEntityReferenceCountManager } from '@umbraco-cms/backoffice/relations';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, umbExpandVariantIdsWithSegmentOptions } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { apiErrorWasNotified } from '@umbraco-cms/backoffice/resources';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityModel, UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { notifyWorkspaceActionStarting } from '@umbraco-cms/backoffice/workspace';
 import type {
 	UmbPublishableWorkspaceContext,
 	UmbWorkspaceActionExecutionOptions,
 } from '@umbraco-cms/backoffice/workspace';
+
+interface UmbDocumentPublishWithDescendantsArgs {
+	workspaceContext: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
+	unique: string;
+	entityType: string;
+	variantIds: Array<UmbVariantId>;
+	saveData: UmbDocumentDetailModel;
+	includeUnpublishedDescendants: boolean;
+}
 
 export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implements UmbPublishableWorkspaceContext {
 	/**
@@ -40,6 +59,24 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	 * @memberof UmbDocumentPublishingWorkspaceContext
 	 */
 	public readonly publishedPendingChanges = new UmbDocumentPublishedPendingChangesManager(this);
+
+	/**
+	 * Tracks how many items reference this document, so the publish flow can decide whether the confirmation
+	 * dialog has anything to say for a single-variant document (it always has something to say once there are
+	 * multiple variants to choose between). Loaded lazily, at the point of publishing/scheduling.
+	 * @memberof UmbDocumentPublishingWorkspaceContext
+	 */
+	public readonly referenceCount = new UmbEntityReferenceCountManager(this, {
+		referenceRepositoryAlias: UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
+		prefetch: false,
+	});
+
+	/**
+	 * Resolves the elements this document directly references (via its draft property values) that are not
+	 * fully published, for the same publish-confirmation decision as {@link referenceCount}.
+	 * @memberof UmbDocumentPublishingWorkspaceContext
+	 */
+	readonly #referencedEntities = new UmbContentReferencedEntitiesManager(this);
 
 	#init: Promise<unknown>;
 	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
@@ -66,7 +103,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				this.#documentWorkspaceContext = context;
 				this.#documentWorkspaceContext?.view.shortcuts.addOne({
 					unique: UMB_DOCUMENT_PUBLISHING_SHORTCUT_UNIQUE,
-					label: this.#localize.term('content_saveAndPublishShortcut'),
+					label: '#buttons_saveAndPublish',
 					key: 'p',
 					modifier: true,
 					action: () => this.saveAndPublish(),
@@ -129,15 +166,17 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const unique = this.#documentWorkspaceContext.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
-		const entityType = this.#documentWorkspaceContext.getEntityType();
-		if (!entityType) throw new Error('Entity type is missing');
-
-		const { options, selected } = await this.#determineVariantOptions();
+		const [{ options, selected }, entitiesNeedingAttention, ancestorPublishCoverage] = await Promise.all([
+			this.#determineVariantOptions(),
+			this.#resolveEntitiesNeedingAttention(),
+			this.#getAncestorPublishCoverage(unique),
+		]);
 
 		const result = await umbOpenModal(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
 			data: {
 				options,
 				activeVariants: selected,
+				currentVariant: this.#getCurrentScheduleVariant(options),
 				pickableFilter: this.#publishableVariantsFilter,
 				prevalues: options.map((option) => ({
 					unique: option.unique,
@@ -146,13 +185,18 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 						unpublishTime: option.variant?.scheduledUnpublishDate,
 					},
 				})),
+				unique,
+				itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
+				referenceRepositoryAlias: UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
+				entitiesNeedingAttention,
+				ancestorPublishCoverage,
 			},
 		}).catch(() => undefined);
 
 		if (!result?.selection.length) return;
 
 		// Map to the correct format for the API (UmbDocumentVariantPublishModel)
-		const variants =
+		const cultureVariants =
 			result?.selection.map<UmbDocumentVariantPublishModel>((x) => ({
 				variantId: UmbVariantId.FromString(x.unique),
 				schedule: {
@@ -161,9 +205,14 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				},
 			})) ?? [];
 
-		if (!variants.length) return;
+		if (!cultureVariants.length) return;
 
-		const variantIds = variants.map((x) => x.variantId);
+		let variantIds = cultureVariants.map((x) => x.variantId);
+		variantIds = umbExpandVariantIdsWithSegmentOptions(
+			variantIds,
+			await this.#documentWorkspaceContext.getVariantOptions(),
+		);
+
 		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
@@ -172,32 +221,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			variantIds,
 			async () => {
 				try {
-					if (!this.#documentWorkspaceContext) {
-						throw new Error('Document workspace context is missing');
-					}
-
-					// Save the document before scheduling
-					await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
-
-					// Schedule the document
-					const { error } = await this.#publishingRepository.publish(unique, variants);
-					if (error) {
-						throw error;
-					}
-
-					const notification = {
-						data: { message: this.#localize.term('speechBubbles_editContentScheduledSavedText') },
-					};
-					this.#notificationContext?.peek('positive', notification);
-
-					// reload the document so all states are updated after the publish operation
-					// TODO: It seems wrong to make a full reload, In this case I think we can just update the variants status? [NL]
-					await this.#documentWorkspaceContext.reload();
-					this.#loadAndProcessLastPublished();
-
-					// request reload of this entity
-					const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
-					this.#eventContext?.dispatchEvent(structureEvent);
+					await this.#performSchedule(variantIds, cultureVariants, saveData);
 				} catch (error) {
 					// Notify only on the publish path. The validation-failure path below already
 					// notifies, so a shared top-level .catch would fire a second toast. [JOV]
@@ -221,11 +245,52 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		);
 	}
 
+	async #performSchedule(
+		variantIds: Array<UmbVariantId>,
+		variants: Array<UmbDocumentVariantPublishModel>,
+		saveData: UmbDocumentDetailModel,
+	): Promise<void> {
+		if (!this.#documentWorkspaceContext) {
+			throw new Error('Document workspace context is missing');
+		}
+
+		const unique = this.#documentWorkspaceContext.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+
+		const entityType = this.#documentWorkspaceContext.getEntityType();
+		if (!entityType) throw new Error('Entity type is missing');
+
+		// Save the document before scheduling
+		await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
+
+		// Schedule the document
+		const { error } = await this.#publishingRepository.publish(unique, variants);
+		if (error) {
+			throw error;
+		}
+
+		const notification = {
+			data: { message: this.#localize.term('speechBubbles_editContentScheduledSavedText') },
+		};
+		this.#notificationContext?.peek('positive', notification);
+
+		// reload the document so all states are updated after the publish operation
+		// TODO: It seems wrong to make a full reload, In this case I think we can just update the variants status? [NL]
+		await this.#documentWorkspaceContext.reload();
+		this.#loadAndProcessLastPublished();
+		this.referenceCount.clear();
+
+		// request reload of this entity
+		const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
+		this.#eventContext?.dispatchEvent(structureEvent);
+	}
+
 	/**
 	 * Convert a date string to a server time string in ISO format, example: 2021-01-01T12:00:00.000+00:00.
 	 * The input must be a valid date string, otherwise it will return null.
 	 * The output matches the DateTimeOffset format in C#.
-	 * @param dateString
+	 * @param {string | null | undefined} dateString - The date string to convert.
+	 * @returns {string | null} The ISO date string, or null if invalid.
 	 */
 	#convertToDateTimeOffset(dateString: string | null | undefined) {
 		if (!dateString || dateString.length === 0) {
@@ -244,7 +309,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	}
 
 	/**
-	 * Publish the document with descendants
+	 * Save the document and publish it with descendants
 	 * @returns {Promise<void>}
 	 * @memberof UmbDocumentPublishingWorkspaceContext
 	 */
@@ -271,54 +336,143 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		if (!result?.selection.length) return;
 
 		// Map to variantIds
-		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+		let variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 
 		if (!variantIds.length) return;
 
-		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-		const localize = new UmbLocalizationController(this);
+		const workspaceContext = this.#documentWorkspaceContext;
 
-		const primaryVariantName = this.#documentWorkspaceContext.getName(variantIds[0]) ?? '';
+		variantIds = umbExpandVariantIdsWithSegmentOptions(variantIds, await workspaceContext.getVariantOptions());
+		const saveData = await workspaceContext.constructSaveData(variantIds);
 
-		const waitNotice = notificationContext?.peek('warning', {
+		try {
+			await workspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
+		} catch (error) {
+			// This throws before the submit flow starts, so nothing downstream tells the user why. [JOV]
+			this.#notify('danger', 'speechBubbles_editContentPublishedFailedByValidation');
+			throw error;
+		}
+
+		await workspaceContext.askServerToValidate(saveData, variantIds);
+
+		return workspaceContext.validateVariantsAndSubmit(
+			variantIds,
+			() =>
+				this.#performPublishWithDescendants({
+					workspaceContext,
+					unique,
+					entityType,
+					variantIds,
+					saveData,
+					includeUnpublishedDescendants: result.includeUnpublishedDescendants ?? false,
+				}),
+			(reason?: unknown) => this.#saveWithoutPublishing(variantIds, saveData, reason),
+		);
+	}
+
+	async #performPublishWithDescendants(args: UmbDocumentPublishWithDescendantsArgs): Promise<void> {
+		const { workspaceContext, unique, entityType, variantIds } = args;
+		const primaryVariantName = workspaceContext.getName(variantIds[0]) ?? '';
+
+		const waitNotice = this.#notificationContext?.peek('warning', {
 			data: {
-				headline: localize.term('publish_publishAll', primaryVariantName),
-				message: localize.term('publish_inProgress'),
+				headline: this.#localize.term('publish_publishAll', primaryVariantName),
+				message: this.#localize.term('publish_inProgress'),
 			},
 		});
+
+		let readBackFailed: boolean;
+		try {
+			// Each failure path notifies at the point it happens, so that a publish failure after a
+			// successful save does not claim the document was not saved. (#14925 review)
+			readBackFailed = await this.#saveAndPublishDescendants(args);
+		} finally {
+			waitNotice?.close();
+		}
+
+		this.#notify('positive', 'publish_nodePublishAll', primaryVariantName);
+		if (readBackFailed) {
+			this.#notify('warning', 'speechBubbles_editContentPublishedReloadFailed');
+		}
+
+		await this.#loadAndProcessLastPublished();
+		// The save above already dispatched the structure-reload event; the descendants need the children one.
+		this.#eventContext?.dispatchEvent(new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique }));
+	}
+
+	/**
+	 * Peeks a single-message notification, when a notification context is available.
+	 * @param {UmbNotificationColor} color - The notification color/severity.
+	 * @param {string} messageKey - The localization key for the message.
+	 * @param {...string} args - Arguments to interpolate into the localized message.
+	 */
+	#notify(color: UmbNotificationColor, messageKey: string, ...args: Array<string>): void {
+		this.#notificationContext?.peek(color, { data: { message: this.#localize.term(messageKey, ...args) } });
+	}
+
+	/**
+	 * Saves the selected variants, then publishes them with their descendants. The two are separate
+	 * server calls, so the save goes through the default persistence path first: it merges the response
+	 * into those variants only and dispatches the save events, leaving the workspace correctly saved
+	 * even when the publish leg fails afterwards.
+	 * @param {UmbDocumentPublishWithDescendantsArgs} args - The publish arguments.
+	 * @returns {Promise<boolean>} whether reading the document back after publishing failed
+	 */
+	async #saveAndPublishDescendants(args: UmbDocumentPublishWithDescendantsArgs): Promise<boolean> {
+		const { workspaceContext, unique, variantIds, saveData, includeUnpublishedDescendants } = args;
+
+		try {
+			await workspaceContext.performCreateOrUpdate(variantIds, saveData);
+		} catch (error) {
+			this.#notify('danger', 'speechBubbles_editContentPublishedFailed');
+			throw error;
+		}
 
 		const { error } = await this.#publishingRepository.publishWithDescendants(
 			unique,
 			variantIds,
-			result.includeUnpublishedDescendants ?? false,
+			includeUnpublishedDescendants,
 		);
+		if (error) {
+			// The document is saved at this point, so do not tell the user that it is not.
+			this.#notify('danger', 'speechBubbles_editContentPublishedFailedByValidation');
+			throw new Error('Error publishing document with descendants', { cause: error });
+		}
 
-		waitNotice?.close();
-
-		if (!error) {
-			notificationContext?.peek('positive', {
-				data: {
-					message: localize.term('publish_nodePublishAll', primaryVariantName),
-				},
+		// Publishing changed the variant states, so read them back the same variant-scoped way rather
+		// than through reload(), which would replace edits in variants that were not published.
+		try {
+			await workspaceContext.performCreateOrUpdate(variantIds, saveData, {
+				update: () => workspaceContext.loadWithoutPersist(),
 			});
-
-			// reload the document so all states are updated after the publish operation
-			// TODO: It seems wrong to make a full reload, I think we should only load the selected variants. [NL]
-			await this.#documentWorkspaceContext.reload();
-			await this.#loadAndProcessLastPublished();
-
-			// request reload of this entity
-			const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
-			this.#eventContext?.dispatchEvent(structureEvent);
-
-			// request reload of the children
-			const childrenEvent = new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique });
-			this.#eventContext?.dispatchEvent(childrenEvent);
+			return false;
+		} catch {
+			return true;
 		}
 	}
 
 	/**
-	 * Unpublish the document
+	 * Save the selected variants without publishing them, for when validation rejects the publish.
+	 * Rejects even though the save succeeded, to symbolize that we did not publish. [NL]
+	 * @param {Array<UmbVariantId>} variantIds - The variants to save.
+	 * @param {UmbDocumentDetailModel} saveData - The data to save.
+	 * @param {unknown} reason - The reason the publish was rejected, rethrown after saving.
+	 */
+	async #saveWithoutPublishing(
+		variantIds: Array<UmbVariantId>,
+		saveData: UmbDocumentDetailModel,
+		reason?: unknown,
+	): Promise<void> {
+		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+
+		await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
+		// TODO: Get rid of the save notification.
+		this.#notify('danger', 'speechBubbles_editContentPublishedFailedByValidation');
+		throw reason;
+	}
+
+	/**
+	 * Unpublish the document, asking to discard any unsaved changes first
 	 * @returns {Promise<void>}
 	 * @memberof UmbDocumentPublishingWorkspaceContext
 	 */
@@ -332,6 +486,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const entityType = this.#documentWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
+		// Unpublishing reloads the workspace, which discards any unsaved edit, so let the user confirm that.
+		if (!(await this.#confirmDiscardingUnsavedChanges())) return;
+
 		const action = new UmbContentUnpublishEntityAction(this, {
 			unique,
 			entityType,
@@ -344,6 +501,20 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		// TODO: It seems wrong to make a full reload, In this case I think we can just update the variants status? [NL]
 		await this.#documentWorkspaceContext.reload();
 		await this.#loadAndProcessLastPublished();
+		this.referenceCount.clear();
+	}
+
+	/**
+	 * Asks whether to discard unsaved changes, for actions that replace the workspace data.
+	 * @returns {Promise<boolean>} false when the user chose to keep their changes
+	 */
+	async #confirmDiscardingUnsavedChanges(): Promise<boolean> {
+		if (!this.#documentWorkspaceContext?.getHasUnpersistedChanges()) return true;
+
+		return umbOpenModal(this, UMB_DISCARD_CHANGES_MODAL).then(
+			() => true,
+			() => false,
+		);
 	}
 
 	async #handleSaveAndPublish(executionOptions?: UmbWorkspaceActionExecutionOptions) {
@@ -357,14 +528,20 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		const { options, selected } = await this.#determineVariantOptions();
 
-		// If there is only one variant, we don't need to open the modal.
 		if (options.length === 0) {
 			throw new Error('No variants are available');
-		} else if (options.length === 1) {
-			// If only one option we will skip ahead and save the document with the only variant available:
+		}
+
+		// Skip the confirmation dialog only when it would have nothing to say: a single variant to publish,
+		// nothing referencing this document, and no referenced element left unpublished. Otherwise open it —
+		// the modal hides the variant picker for an invariant document, showing just the reference sections.
+		const entitiesNeedingAttention = await this.#resolveEntitiesNeedingAttention();
+		const needsModal = await this.#needsPublishConfirmationModal(options, entitiesNeedingAttention);
+
+		if (!needsModal) {
 			variantIds.push(UmbVariantId.Create(options[0]));
 		} else {
-			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
+			// Otherwise the modal lets the user pick which variants to publish, and shows the ones that may not be.
 			const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 				data: {
 					headline: this.#localize.term('content_saveAndPublishModalTitle'),
@@ -372,6 +549,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 					// The shared modal's pickableFilter is typed against the generic UmbEntityVariantOptionModel, but
 					// #determineVariantOptions() (which supplies `options` above) only ever returns document variants here.
 					pickableFilter: (option) => this.#publishableVariantsFilter(option as UmbDocumentVariantOptionModel),
+					unique,
+					itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
+					referenceRepositoryAlias: UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
+					entitiesNeedingAttention,
 				},
 				value: { selection: selected },
 			}).catch(() => undefined);
@@ -384,6 +565,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		// User has committed to publishing (modal closed with a selection, or no modal needed).
 		notifyWorkspaceActionStarting(executionOptions);
 
+		if (this.#documentWorkspaceContext.getVariesBySegment()) {
+			variantIds = umbExpandVariantIdsWithSegmentOptions(
+				variantIds,
+				await this.#documentWorkspaceContext.getVariantOptions(),
+			);
+		}
+
 		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
@@ -394,24 +582,51 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				// Notify only on the publish path. The validation-failure path below already
 				// notifies, so a shared top-level .catch would fire a second, contradictory toast. [JOV]
 				return this.#performSaveAndPublish(variantIds, saveData).catch((error) => {
-					this.#notificationContext?.peek('danger', {
-						data: { message: this.#localize.term('speechBubbles_editContentPublishedFailed') },
-					});
+					// When the server reported why, the user has already seen it. Repeating a generic failure here
+					// would contradict it - and mislead, as a rejected publish still leaves the save in effect.
+					if (!apiErrorWasNotified(error?.cause)) {
+						this.#notify('danger', 'speechBubbles_editContentPublishedFailed');
+					}
 					return Promise.reject(error);
 				});
 			},
-			async (reason?: any) => {
-				// If data of the selection is not valid Then just save:
-				await this.#documentWorkspaceContext!.performCreateOrUpdate(variantIds, saveData);
-				// Notifying that the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
-				// TODO: Get rid of the save notification.
-				this.#notificationContext?.peek('danger', {
-					data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },
-				});
-				// Reject even thought the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
-				return await Promise.reject(reason);
-			},
+			(reason?: unknown) => this.#saveWithoutPublishing(variantIds, saveData, reason),
 		);
+	}
+
+	/**
+	 * Whether the publish confirmation modal has anything to say: either there is more than one variant to choose
+	 * between (or the only one can't be published), something references this document, or this document references an entity that needs attention.
+	 * @param {Array<UmbDocumentVariantOptionModel>} options - The variant options being published.
+	 * @param {Array<UmbEntityModel>} entitiesNeedingAttention - Entities this document references that need attention before publishing.
+	 * @returns {Promise<boolean>} Whether the confirmation modal should be shown.
+	 */
+	async #needsPublishConfirmationModal(
+		options: Array<UmbDocumentVariantOptionModel>,
+		entitiesNeedingAttention: Array<UmbEntityModel>,
+	): Promise<boolean> {
+		if (options.length > 1 || !this.#publishableVariantsFilter(options[0])) return true;
+		// Resolved from draft values, so it applies to a never-saved document too — unlike referencedBy below.
+		if (entitiesNeedingAttention.length > 0) return true;
+		// A document that has never been saved has no server-side references in either direction yet.
+		if (this.#documentWorkspaceContext?.getIsNew()) return false;
+		try {
+			return (await this.referenceCount.getTotalAsync()) > 0;
+		} catch {
+			// Couldn't determine the reference count — show the modal rather than risk publishing silently past
+			// references we failed to check for.
+			return true;
+		}
+	}
+
+	/**
+	 * Resolves the entities this document's current draft directly references that need attention before publishing.
+	 * @returns {Promise<Array<UmbEntityModel>>} The referenced entities needing attention.
+	 */
+	async #resolveEntitiesNeedingAttention(): Promise<Array<UmbEntityModel>> {
+		const values = this.#documentWorkspaceContext?.getData()?.values ?? [];
+		if (!values.length) return [];
+		return this.#referencedEntities.getEntitiesNeedingAttention(values);
 	}
 
 	async #performSaveAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
@@ -432,14 +647,26 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				return await this.#documentWorkspaceContext!.loadWithoutPersist();
 			} catch {
 				reloadAfterPublishFailed = true;
-				return saveData;
+				return { ...saveData, unique: this.#documentWorkspaceContext!.getUnique() ?? saveData.unique };
 			}
 		};
 
 		await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData, {
 			create: async (data, ids, parent) => {
-				const { error } = await this.#publishingRepository.createAndPublish(data, ids, parent.unique);
+				const { data: createdUnique, error } = await this.#publishingRepository.createAndPublish(
+					data,
+					ids,
+					parent.unique,
+				);
 				if (error) throw new Error('Error creating and publishing document', { cause: error });
+
+				// The server may have assigned a different unique than the one this workspace scaffolded with
+				// (e.g. a Saving notification handler assigning its own key). The reload below reads by the
+				// workspace's current unique, so it must be updated to the actual persisted one first.
+				if (createdUnique) {
+					this.#documentWorkspaceContext!.setUnique(createdUnique);
+				}
+
 				return loadAfterPublish();
 			},
 			update: async (data, ids) => {
@@ -464,18 +691,23 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		}
 
 		await this.#loadAndProcessLastPublished();
+		this.referenceCount.clear();
 
-		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
+		// Re-read the unique: for a new document, the server may have assigned a different one than the
+		// workspace scaffolded with, and `performCreateOrUpdate` above will have re-synced it if so.
+		const persistedUnique = this.#documentWorkspaceContext.getUnique() ?? unique;
+		const event = new UmbRequestReloadStructureForEntityEvent({ unique: persistedUnique, entityType });
 		this.#eventContext?.dispatchEvent(event);
 	}
 
+	async #getAncestorPublishCoverage(unique: string): Promise<UmbDocumentAncestorPublishCoverageModel | undefined> {
+		const { data, error } = await this.#publishingRepository.ancestorVariantStates(unique);
+		if (error || !data) return undefined;
+		return computeAncestorPublishCoverage(data);
+	}
+
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
-		const variantId = UmbVariantId.Create(option);
-		// If the read only guard is permitted it means the variant is read only
-		const isReadOnly = this.#documentWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(variantId);
-		// If the variant is read only, we can't publish it
-		const isPublishable = !isReadOnly;
-		return isPublishable;
+		return this.#documentWorkspaceContext!.getIsWritableVariant(UmbVariantId.Create(option));
 	};
 
 	async #determineVariantOptions(): Promise<{
@@ -485,7 +717,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		await this.#init;
 		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
 
-		const allOptions = await firstValueFrom(this.#documentWorkspaceContext.variantOptions);
+		const allOptions = await this.#documentWorkspaceContext.getVariantOptions();
 		const options = allOptions.filter((option) => option.segment === null);
 
 		// TODO: this is a temporary copy of the content-detail workspace context method.
@@ -495,17 +727,28 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
 		selected = selected.filter((x) => options.some((o) => o.unique === x));
 
-		// Filter out read-only variants
+		// Filter out variants that cannot be written
 		// TODO: This would not work with segments, as the 'selected'-array is an array of strings, not UmbVariantId's. [NL]
 		// Please have a look at the implementation in the content-detail workspace context, as that one compares variantIds. [NL]
-		selected = selected.filter(
-			(x) => this.#documentWorkspaceContext!.readOnlyGuard.getIsPermittedForVariant(new UmbVariantId(x)) === false,
-		);
+		selected = selected.filter((x) => this.#documentWorkspaceContext!.getIsWritableVariant(new UmbVariantId(x)));
 
 		return {
 			options,
 			selected,
 		};
+	}
+
+	#getCurrentScheduleVariant(options: Array<UmbDocumentVariantOptionModel>): string | undefined {
+		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+		// The schedule dialog lists cultures only, so an active segment variant resolves to its culture.
+		const activeCultures = this.#documentWorkspaceContext.splitView
+			.getActiveVariants()
+			.map((x) => UmbVariantId.Create(x).toSegmentInvariant().toString());
+
+		return activeCultures.find((unique) => {
+			const option = options.find((o) => o.unique === unique);
+			return !!option && this.#publishableVariantsFilter(option);
+		});
 	}
 
 	#getPublishVariantsSelection() {
@@ -543,6 +786,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				}
 
 				this.#currentUnique = unique;
+				this.referenceCount.setUnique(unique ?? undefined).catch(() => undefined);
 
 				if (isNew === false && unique) {
 					this.#loadAndProcessLastPublished().catch(() => undefined);

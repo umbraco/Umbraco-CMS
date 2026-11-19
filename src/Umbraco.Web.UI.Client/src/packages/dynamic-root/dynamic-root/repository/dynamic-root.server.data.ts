@@ -1,0 +1,36 @@
+import { DynamicRootService } from '@umbraco-cms/backoffice/external/backend-api';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { DynamicRootRequestModel, DynamicRootResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+
+/**
+ * UmbDynamicRootServerDataSource
+ * @class UmbDynamicRootServerDataSource
+ */
+export class UmbDynamicRootServerDataSource {
+	#host: UmbControllerHost;
+
+	constructor(host: UmbControllerHost) {
+		this.#host = host;
+	}
+
+	/**
+	 * Get dynamic root
+	 * @param {DynamicRootRequestModel} args - The dynamic root request arguments.
+	 * @returns {Promise<DynamicRootResponseModel | undefined>} The dynamic root response.
+	 * @memberof UmbDynamicRootServerDataSource
+	 */
+	async getRoot(args: DynamicRootRequestModel): Promise<DynamicRootResponseModel | undefined> {
+		if (!args.context) throw new Error('Dynamic Root context is missing');
+		if (!args.query) throw new Error('Dynamic Root query is missing');
+
+		const body: DynamicRootRequestModel = {
+			context: args.context,
+			query: args.query,
+		};
+
+		const { data } = await tryExecute(this.#host, DynamicRootService.postDynamicRootQuery({ body }));
+
+		return data;
+	}
+}

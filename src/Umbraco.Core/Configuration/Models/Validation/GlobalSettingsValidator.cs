@@ -29,6 +29,16 @@ public class GlobalSettingsValidator
             return ValidateOptionsResult.Fail(message3);
         }
 
+        if (!ValidateDatabaseTimeoutSetting(nameof(GlobalSettings.DatabaseCommandTimeout), options.DatabaseCommandTimeout, out var message4))
+        {
+            return ValidateOptionsResult.Fail(message4);
+        }
+
+        if (!ValidateDatabaseTimeoutSetting(nameof(GlobalSettings.DatabaseConnectTimeout), options.DatabaseConnectTimeout, out var message5))
+        {
+            return ValidateOptionsResult.Fail(message5);
+        }
+
         return ValidateOptionsResult.Success;
     }
 
@@ -65,6 +75,20 @@ public class GlobalSettingsValidator
                 $"The `{Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.TimeOut)}` must not exceed {maxTimeOut.TotalDays:F0} days. " +
                 $"Values larger than this overflow the browser's maximum timer delay and break session management. " +
                 $"Consider using the `KeepUserLoggedIn` setting instead.";
+            return false;
+        }
+
+        message = string.Empty;
+        return true;
+    }
+
+    private static bool ValidateDatabaseTimeoutSetting(string settingName, TimeSpan? configuredTimeOut, out string message)
+    {
+        if (configuredTimeOut < TimeSpan.Zero)
+        {
+            message =
+                $"The `{Constants.Configuration.ConfigGlobal}:{settingName}` must not be negative. " +
+                $"Use `00:00:00` for no limit, or omit the setting to use the value from the connection string.";
             return false;
         }
 

@@ -10,6 +10,9 @@ import {
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
+import { UmbInteractionMemoryScopeContext } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import { marked } from '@umbraco-cms/backoffice/external/marked';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -38,6 +41,27 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 ) {
 	protected override getFormElement() {
 		return this._codeEditor;
+	}
+
+	// Holds what the modals opened from this input remember between opens. They are rendered in the
+	// modal portal, not as descendants of this element, so context is the only channel that reaches
+	// them; upwards it is a property and an `interaction-memories-change` event.
+	#interactionMemoryScope = new UmbInteractionMemoryScopeContext(this);
+	#interactionMemoryBridge = new UmbEntityInputInteractionMemoryManager(this, this.#interactionMemoryScope.memory);
+
+	/**
+	 * The memories held by the modals opened from this input, e.g. the last-used folder in a media
+	 * picker opened from the markdown editor's toolbar. Bridged from the interaction-memory scope this
+	 * input provides.
+	 * @type {(Array<UmbInteractionMemoryModel> | undefined)}
+	 * @attr
+	 */
+	@property({ type: Array, attribute: false })
+	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
+		return this.#interactionMemoryBridge.getMemories();
+	}
+	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
+		this.#interactionMemoryBridge.setMemories(value);
 	}
 
 	// TODO: Make actions be able to handle multiple selection
@@ -76,6 +100,21 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 	@state()
 	private _actionExtensions: Array<UmbMarkdownEditorAction> = [];
 
+	@state()
+	private _isSticky = false;
+
+	@query('#toolbar')
+	private _toolbarElement?: HTMLElement;
+
+	// Detects the toolbar sticking by watching it drop below full visibility,
+	// regardless of which ancestor is the one actually scrolling.
+	#scrollObserver = new IntersectionObserver(
+		([entry]) => {
+			this._isSticky = entry.intersectionRatio < 1;
+		},
+		{ threshold: 1 },
+	);
+
 	#mediaUrlRepository = new UmbMediaUrlRepository(this);
 
 	constructor() {
@@ -86,6 +125,36 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 			() => !this.readonly && !!this.required && (this.value === undefined || this.value === null || this.value === ''),
 		);
+	}
+
+	override connectedCallback(): void {
+		super.connectedCallback();
+		// Re-arm the observer if this element is reconnected after a DOM move (e.g. block reordering).
+		if (!this.readonly && this._toolbarElement) {
+			this.#scrollObserver.observe(this._toolbarElement);
+		}
+	}
+
+	protected override firstUpdated(_changedProperties: Map<string, unknown>) {
+		super.firstUpdated(_changedProperties);
+		if (this._toolbarElement) this.#scrollObserver.observe(this._toolbarElement);
+	}
+
+	protected override updated(changedProperties: Map<string, unknown>) {
+		super.updated(changedProperties);
+		if (changedProperties.has('readonly')) {
+			this.#scrollObserver.disconnect();
+			this._isSticky = false;
+			if (!this.readonly && this._toolbarElement) {
+				this.#scrollObserver.observe(this._toolbarElement);
+			}
+		}
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.#scrollObserver.disconnect();
+		this._isSticky = false;
 	}
 
 	#onCodeEditorLoaded(event: UmbCodeEditorLoadedEvent) {
@@ -469,7 +538,7 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 	#renderToolbar() {
 		if (this.readonly) return nothing;
 		return html`
-			<div id="toolbar">
+			<div id="toolbar" ?data-sticky=${this._isSticky}>
 				<div id="buttons">
 					<uui-button-group>
 						<uui-button
@@ -610,12 +679,8 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 
 				border-radius: var(--uui-border-radius);
 				border: 1px solid var(--uui-color-border);
-				border-bottom: 0;
 				border-bottom-left-radius: 0;
 				border-bottom-right-radius: 0;
-				box-shadow:
-					0 2px 2px -2px rgba(34, 47, 62, 0.1),
-					0 8px 8px -4px rgba(34, 47, 62, 0.07);
 
 				background-color: var(--uui-color-surface);
 				color: var(--color-text);
@@ -630,6 +695,12 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 				uui-key {
 					text-transform: uppercase;
 				}
+			}
+
+			#toolbar[data-sticky] {
+				box-shadow:
+					0 2px 2px -2px rgba(34, 47, 62, 0.1),
+					0 8px 8px -4px rgba(34, 47, 62, 0.07);
 			}
 
 			#buttons {

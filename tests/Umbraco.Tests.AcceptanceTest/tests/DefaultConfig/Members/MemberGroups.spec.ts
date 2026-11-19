@@ -1,4 +1,4 @@
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const memberGroupName = 'Test Member Group';
@@ -18,11 +18,11 @@ test('can create a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoUi.memberGroup.clickMemberGroupCreateButton();
   await umbracoUi.memberGroup.enterMemberGroupName(memberGroupName);
   await umbracoUi.memberGroup.clickSaveButtonAndWaitForMemberGroupToBeCreated();
+  await umbracoApi.memberGroup.waitUntilNameExists(memberGroupName);
 
   // Assert
   await umbracoUi.memberGroup.clickMemberGroupsSidebarButton();
   await umbracoUi.memberGroup.isMemberGroupNameVisible(memberGroupName);
-  expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
 });
 
 test('cannot create member group with empty name', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -57,9 +57,6 @@ test('can delete a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
 
   // Act
   await umbracoUi.memberGroup.clickMemberGroupLinkByName(memberGroupName);
-  // This wait is currently necessary as the action button is clicked before it is "ready"
-  // TODO: Remove the wait and fix the 'clickActionButton'
-  await umbracoUi.memberGroup.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.memberGroup.clickActionButton();
   await umbracoUi.memberGroup.clickDeleteButton();
   await umbracoUi.memberGroup.clickConfirmToDeleteButtonAndWaitForMemberGroupToBeDeleted();

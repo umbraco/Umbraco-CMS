@@ -15,6 +15,22 @@ export const itemHandlers = [
 		return HttpResponse.json(response);
 	}),
 
+	// The picker's search results show the path to each hit, which it resolves through this endpoint. Without a
+	// handler the request falls through to the dev server's index.html and search never resolves.
+	http.get(umbracoPath(`/item${UMB_SLUG}/ancestors`), ({ request }) => {
+		const url = new URL(request.url);
+		const ids = url.searchParams.getAll('id');
+
+		const response = ids.map((id) => ({
+			id,
+			ancestors: umbMediaMockDb.item.getItems(
+				umbMediaMockDb.tree.getAncestorsOf({ descendantId: id }).map((ancestor) => ancestor.id),
+			),
+		}));
+
+		return HttpResponse.json(response);
+	}),
+
 	http.get(umbracoPath(`/item${UMB_SLUG}`), ({ request }) => {
 		const url = new URL(request.url);
 		const ids = url.searchParams.getAll('id');

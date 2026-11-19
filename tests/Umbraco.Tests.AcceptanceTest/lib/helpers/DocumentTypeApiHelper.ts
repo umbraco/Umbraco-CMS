@@ -13,7 +13,7 @@ export class DocumentTypeApiHelper {
     const rootDocumentTypes = await this.getAllAtRoot();
     const jsonDocumentTypes = await rootDocumentTypes.json();
 
-    for (const documentType of jsonDocumentTypes.items) {
+    for (const documentType of this.api.itemsOf(jsonDocumentTypes)) {
       if (documentType.name === name) {
         if (documentType.isFolder) {
           return await this.recurseDeleteChildren(documentType);
@@ -46,7 +46,10 @@ export class DocumentTypeApiHelper {
         }
         return await this.delete(child.id);
       } else if (child.hasChildren) {
-        return await this.recurseChildren(name, child.id, toDelete);
+        const result = await this.recurseChildren(name, child.id, toDelete);
+        if (result) {
+          return result;
+        }
       }
     }
     return false;
@@ -73,7 +76,7 @@ export class DocumentTypeApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/document-type/children?parentId=${id}&skip=0&take=10000&foldersOnly=false`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async create(documentType) {
@@ -81,7 +84,7 @@ export class DocumentTypeApiHelper {
       return;
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document-type', documentType);
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async update(id: string, documentType) {
@@ -105,7 +108,7 @@ export class DocumentTypeApiHelper {
     const rootDocumentTypes = await this.getAllAtRoot();
     const jsonDocumentTypes = await rootDocumentTypes.json();
 
-    for (const documentType of jsonDocumentTypes.items) {
+    for (const documentType of this.api.itemsOf(jsonDocumentTypes)) {
       if (documentType.name === name) {
         if (documentType.isFolder) {
           return this.getFolder(documentType.id);
@@ -136,6 +139,10 @@ export class DocumentTypeApiHelper {
   // FOLDER
   async getFolder(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document-type/folder/' + id);
+    if (!response.ok()) {
+      return null;
+    }
+
     return await response.json();
   }
 
@@ -150,7 +157,7 @@ export class DocumentTypeApiHelper {
 
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document-type/folder', folder);
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async renameFolder(folderId: string, folderName: string) {
@@ -166,6 +173,17 @@ export class DocumentTypeApiHelper {
     const documentType = new DocumentTypeBuilder()
       .withName(documentTypeName)
       .withAlias(AliasHelper.toAlias(documentTypeName))
+      .build();
+    return await this.create(documentType);
+  }
+
+  async createDefaultDocumentTypeInFolder(documentTypeName: string, folderId: string) {
+    await this.ensureNameNotExists(documentTypeName);
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withFolderId(folderId)
       .build();
     return await this.create(documentType);
   }
@@ -738,6 +756,34 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
+  async createDefaultElementTypeWithVaryBySegment(elementName: string, groupName: string = 'TestGroup', dataTypeName: string = 'Textstring', dataTypeId: string, elementTypeVaryBySegment: boolean = true, dataTypeVaryBySegment: boolean = true) {
+    await this.ensureNameNotExists(elementName);
+
+    const crypto = require('crypto');
+    const containerId = crypto.randomUUID();
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(elementName)
+      .withAlias(AliasHelper.toAlias(elementName))
+      .withIsElement(true)
+      .withAllowedInLibrary(true)
+      .withVariesBySegment(elementTypeVaryBySegment)
+      .addContainer()
+        .withName(groupName)
+        .withId(containerId)
+        .withType("Group")
+        .done()
+      .addProperty()
+        .withContainerId(containerId)
+        .withAlias(AliasHelper.toAlias(dataTypeName))
+        .withName(dataTypeName)
+        .withDataTypeId(dataTypeId)
+        .withVariesBySegment(dataTypeVaryBySegment)
+        .done()
+      .build();
+    return await this.create(documentType);
+  }
+
   async createElementTypeWithRegexValidation(elementName: string, groupName: string = 'TestGroup', dataTypeName: string = 'Textstring', dataTypeId: string, regex: string) {
     await this.ensureNameNotExists(elementName);
 
@@ -928,6 +974,20 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
+  async createDocumentTypeWithAllowedChildNodesAndCollectionId(documentTypeName: string, allowedChildNodeIds: string[], collectionId: string) {
+    await this.ensureNameNotExists(documentTypeName);
+
+    const builder = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true);
+    for (const allowedChildNodeId of allowedChildNodeIds) {
+      builder.addAllowedDocumentType().withId(allowedChildNodeId).done();
+    }
+    const documentType = builder.withCollectionId(collectionId).build();
+    return await this.create(documentType);
+  }
+
   async createDocumentTypeWithCollectionId(documentTypeName: string, collectionId: string) {
     await this.ensureNameNotExists(documentTypeName);
 
@@ -1077,6 +1137,70 @@ export class DocumentTypeApiHelper {
       .build();
 
     return await this.create(documentType);
+  }
+
+  async createVariantDocumentTypeWithVaryingAndSharedProperties(documentTypeName: string, dataTypeId: string, varyingPropertyName: string, sharedPropertyName: string) {
+    const crypto = require('crypto');
+    const containerId = crypto.randomUUID();
+    await this.ensureNameNotExists(documentTypeName);
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true)
+      .addContainer()
+        .withName('TestGroup')
+        .withId(containerId)
+        .withType("Group")
+        .done()
+      .addProperty()
+        .withContainerId(containerId)
+        .withAlias(AliasHelper.toAlias(varyingPropertyName))
+        .withName(varyingPropertyName)
+        .withDataTypeId(dataTypeId)
+        .withVariesByCulture(true)
+        .done()
+      .addProperty()
+        .withContainerId(containerId)
+        .withAlias(AliasHelper.toAlias(sharedPropertyName))
+        .withName(sharedPropertyName)
+        .withDataTypeId(dataTypeId)
+        .withVariesByCulture(false)
+        .done()
+      .withVariesByCulture(true)
+      .build();
+
+    return await this.create(documentType);
+  }
+
+  async createCultureAndSegmentVariantDocumentTypeWithProperties(documentTypeName: string, dataTypeId: string, properties: {name: string, variesByCulture: boolean, variesBySegment: boolean}[]) {
+    const crypto = require('crypto');
+    const containerId = crypto.randomUUID();
+    await this.ensureNameNotExists(documentTypeName);
+
+    const builder = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true)
+      .withVariesByCulture(true)
+      .withVariesBySegment(true)
+      .addContainer()
+        .withName('TestGroup')
+        .withId(containerId)
+        .withType("Group")
+        .done();
+    for (const property of properties) {
+      builder.addProperty()
+        .withContainerId(containerId)
+        .withAlias(AliasHelper.toAlias(property.name))
+        .withName(property.name)
+        .withDataTypeId(dataTypeId)
+        .withVariesByCulture(property.variesByCulture)
+        .withVariesBySegment(property.variesBySegment)
+        .done();
+    }
+
+    return await this.create(builder.build());
   }
 
   async createVariantDocumentTypeWithAllowedChildNodeAndInvariantPropertyEditor(documentTypeName: string, allowedChildNodeId: string, dataTypeName: string, dataTypeId: string, groupName: string = "TestGroup") {
@@ -1280,7 +1404,7 @@ export class DocumentTypeApiHelper {
 
   /**
    * Creates a document type with a nested Block List structure for testing the
-   * AllowEditInvariantFromNonDefault matrix.
+   * invariant-for-variant access matrix.
    *
    * Structure created:
    * - Document Type (Vary by culture)

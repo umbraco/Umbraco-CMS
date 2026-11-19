@@ -104,7 +104,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	#tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 	#currentTabComponent?: UmbContentTypeDesignEditorTabElement;
 	#processingTabId?: string;
-	#landingLocalPath?: string;
 
 	set manifest(value: ManifestWorkspaceViewContentTypeDesignEditorKind) {
 		this._compositionRepositoryAlias = value.meta.compositionRepositoryAlias;
@@ -134,6 +133,9 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	@state()
 	private _sortModeActive?: boolean;
 
+	@state()
+	private _isReadOnly = false;
+
 	constructor() {
 		super();
 
@@ -154,11 +156,15 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		this.#tabsStructureHelper.setContainerChildType('Tab');
 		this.#tabsStructureHelper.setIsRoot(true);
-		this.observe(this.#tabsStructureHelper.childContainers, (tabs) => {
-			this._tabs = tabs;
-			this.#sorter.setModel(tabs);
-			this.#createRoutes();
-		});
+		this.observe(
+			this.#tabsStructureHelper.childContainers,
+			(tabs) => {
+				this._tabs = tabs;
+				this.#sorter.setModel(tabs);
+				this.#createRoutes();
+			},
+			null,
+		);
 
 		this.observe(
 			this.#tabsStructureHelper.hasProperties,
@@ -166,29 +172,28 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				this._hasRootProperties = hasRootProperties;
 				this.#createRoutes();
 			},
-			'observeRootProperties',
+			null,
 		);
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
-			if (!workspaceContext) return;
-
-			// The router-slot does not re-match the URL when its routes are replaced, so the
-			// initial route set must reflect real data. Awaiting the structure load here ensures
-			// the tabs helper subscribes to populated containers and #createRoutes runs against
-			// actual tabs/groups rather than the empty initial emissions of the underlying state.
-			await workspaceContext.structure.whenLoaded();
-			if (workspaceContext !== this.#workspaceContext) return; // stale, superseded by newer context
-
-			// Ensure root-group state is correct before the first route set is generated. #createRoutes() can
-			// run synchronously when setStructureManager attaches observers, and umb-router-slot does not
-			// re-match the URL when routes are replaced.
-			this._hasRootGroups = (await workspaceContext.structure.getRootContainers('Group')).length > 0;
-			if (workspaceContext !== this.#workspaceContext) return; // stale, superseded by newer context
-
-			this.#tabsStructureHelper.setStructureManager(workspaceContext.structure);
+			this.#tabsStructureHelper.setStructureManager(workspaceContext?.structure);
+			this.#observeReadOnly();
 			this.#observeRootGroups();
 		});
+	}
+
+	#observeReadOnly() {
+		this.observe(
+			this.#workspaceContext?.readOnlyGuard?.permitted,
+			(isReadOnly) => {
+				this._isReadOnly = isReadOnly ?? false;
+				if (this.#currentTabComponent) {
+					this.#currentTabComponent.readonly = this._isReadOnly;
+				}
+			},
+			'_observeIsReadOnly',
+		);
 	}
 
 	#toggleSortMode() {
@@ -209,29 +214,19 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	#createRoutes() {
-		// TODO: How about storing a set of elements based on tab ids? to prevent re-initializing the element when renaming..[NL]
-		if (!this.#workspaceContext || !this._tabs || this._hasRootGroups === undefined) return;
+		if (
+			!this.#workspaceContext ||
+			this._tabs === undefined ||
+			this._hasRootGroups === undefined ||
+			this._hasRootProperties === undefined
+		) {
+			return;
+		}
+
 		const routes: UmbRoute[] = [];
 
 		// We gather the activeTab name to check for rename, this is a bit hacky way to redirect the user without noticing the url changes to the new name [NL]
 		let activeTabName: string | undefined = undefined;
-
-		if (this._tabs.length > 0) {
-			this._tabs?.forEach((tab) => {
-				const tabName = tab.name && tab.name !== '' ? tab.name : '-';
-				if (tab.ownerId && tab.ownerId === this.#processingTabId) {
-					activeTabName = tabName;
-				}
-				routes.push({
-					path: `tab/${encodeFolderName(tabName)}`,
-					component: () => import('./content-type-design-editor-tab.element.js'),
-					setup: (component) => {
-						this.#currentTabComponent = component as UmbContentTypeDesignEditorTabElement;
-						this.#currentTabComponent.containerId = tab.ownerId ?? tab.ids[0];
-					},
-				});
-			});
-		}
 
 		routes.push({
 			path: 'root',
@@ -239,44 +234,54 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			setup: (component) => {
 				this.#currentTabComponent = component as UmbContentTypeDesignEditorTabElement;
 				this.#currentTabComponent.containerId = null;
+				this.#currentTabComponent.readonly = this._isReadOnly;
 			},
 		});
 
-		// Duplicate the landing route onto the empty path rather than using `redirectTo`. The
-		// router-slot library only applies `redirectTo` on navigation events, not on the initial
-		// route attachment, so an empty-path redirect would leave the view stuck. The landing
-		// route is `root` when the content type has root properties/groups (or has no tabs),
-		// otherwise the first tab. Note: we deliberately do NOT set `pathMatch: 'full'`, because
-		// the modal sub-router appends paths like `/add-property/...` to the active local path;
-		// with `path: ''` matching prefix-wise (regex `/^/`), the tab stays mounted and the
-		// modal-router can match the appended segment.
-		const defaultRoute =
-			this._hasRootGroups || this._hasRootProperties || this._tabs.length === 0 ? routes[routes.length - 1] : routes[0];
-		this.#landingLocalPath = defaultRoute.path;
-		routes.push({
-			...defaultRoute,
-			path: '',
-			guards: [() => this.#processingTabId === undefined],
-		});
-
-		if (routes.length !== 0) {
-			routes.push({
-				path: `**`,
-				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-				guards: [() => this.#processingTabId === undefined],
-				setup: () => {
-					this.#currentTabComponent = undefined;
-				},
-			});
-		} else {
-			routes.push({
-				path: `**`,
-				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-				setup: () => {
-					this.#currentTabComponent = undefined;
-				},
+		if (this._tabs.length > 0) {
+			this._tabs?.forEach((tab) => {
+				const tabName = tab.name && tab.name !== '' ? tab.name : '-';
+				const path = `tab/${encodeFolderName(tabName)}`;
+				if (tab.ownerId && tab.ownerId === this.#processingTabId) {
+					activeTabName = tabName;
+				}
+				routes.push({
+					path,
+					component: () => import('./content-type-design-editor-tab.element.js'),
+					setup: (component) => {
+						this.#currentTabComponent = component as UmbContentTypeDesignEditorTabElement;
+						this.#currentTabComponent.containerId = tab.ownerId ?? tab.ids[0];
+						this.#currentTabComponent.readonly = this._isReadOnly;
+					},
+				});
 			});
 		}
+
+		if (routes.length !== 0) {
+			// If we have a tab, then navigate to it.
+			if (this._tabs.length > 0 && this._hasRootGroups === false && this._hasRootProperties === false) {
+				routes.push({
+					...routes[1],
+					unique: routes[1].path,
+					path: '',
+				});
+			} else {
+				routes.push({
+					...routes[0],
+					unique: routes[0].path,
+					path: '',
+				});
+			}
+		}
+
+		routes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			guards: [() => this.#processingTabId === undefined],
+			setup: () => {
+				this.#currentTabComponent = undefined;
+			},
+		});
 
 		this._routes = routes;
 
@@ -486,30 +491,22 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					<div id="container-list">${this.renderTabsNavigation()}</div>
 					${this.#renderActions()}
 				</div>
-				${this._routes
-					? html`<umb-router-slot
-							.routes=${this._routes}
-							@init=${(event: UmbRouterSlotInitEvent) => {
-								this._routerPath = event.target.absoluteRouterPath;
-							}}
-							@change=${(event: UmbRouterSlotChangeEvent) => {
-								let activePath = event.target.absoluteActiveViewPath ?? '';
-								// When the duplicated empty-path landing route is active, the router reports
-								// the absolute path as `${routerPath}/` with no local segment. Map it back to
-								// the canonical landing path so tab-navigation highlight and rename UI work.
-								if (this.#landingLocalPath && activePath === this._routerPath + '/') {
-									activePath = this._routerPath + '/' + this.#landingLocalPath;
-								}
-								this._activePath = activePath;
-							}}>
-						</umb-router-slot>`
-					: nothing}
+				<umb-router-slot
+					.routes=${this._routes}
+					@init=${(event: UmbRouterSlotInitEvent) => {
+						this._routerPath = event.target.absoluteRouterPath;
+					}}
+					@change=${(event: UmbRouterSlotChangeEvent) => {
+						this._activePath = event.target.absoluteActiveViewPath;
+					}}>
+					<umb-view-loader></umb-view-loader>
+				</umb-router-slot>
 			</umb-body-layout>
 		`;
 	}
 
 	#renderAddButton() {
-		if (this._sortModeActive) return;
+		if (this._sortModeActive || this._isReadOnly) return;
 		return html`
 			<uui-button
 				id="add-tab"
@@ -536,6 +533,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 								look="outline"
 								label=${this.localize.term('contentTypeEditor_compositions')}
 								compact
+								?disabled=${this._isReadOnly}
 								@click=${this.#openCompositionModal}>
 								<uui-icon name="icon-merge"></uui-icon>
 								<umb-localize key="contentTypeEditor_compositions"></umb-localize>
@@ -547,6 +545,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					look="outline"
 					label=${sortButtonText}
 					compact
+					?disabled=${this._isReadOnly}
 					@click=${this.#toggleSortMode}>
 					<uui-icon name="icon-height"></uui-icon>
 					${sortButtonText}
@@ -575,8 +574,11 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 	renderRootTab() {
 		const path = this._routerPath + '/root';
-		const rootTabActive = path === this._activePath;
-		if (!this._hasRootGroups && !this._hasRootProperties && !this._sortModeActive) {
+		let rootTabActive = path === this._activePath;
+		if (!rootTabActive && (this._hasRootGroups || this._hasRootProperties)) {
+			rootTabActive = this._routerPath + '/' === this._activePath;
+		}
+		if (!rootTabActive && !this._hasRootGroups && !this._hasRootProperties && !this._sortModeActive) {
 			// If we don't have any root groups/properties and we are not in sort mode, then we don't want to render the root tab.
 			return nothing;
 		}
@@ -594,9 +596,14 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		`;
 	}
 
+	#isDefaultRouteTab(tab: UmbPropertyTypeContainerMergedModel) {
+		if (tab !== this._tabs?.[0] || this._hasRootGroups || this._hasRootProperties) return false;
+		return this._routerPath + '/' === this._activePath;
+	}
+
 	renderTab(tab: UmbPropertyTypeContainerMergedModel) {
 		const path = this._routerPath + '/tab/' + encodeFolderName(tab.name && tab.name !== '' ? tab.name : '-');
-		const tabActive = path === this._activePath;
+		const tabActive = path === this._activePath || this.#isDefaultRouteTab(tab);
 		const ownedTab = tab.ownerId ? true : false;
 
 		return html`<uui-tab
@@ -631,7 +638,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			</div>`;
 		}
 
-		if (tabActive && ownedTab) {
+		if (tabActive && ownedTab && !this._isReadOnly) {
 			return html`<div class="tab-inner">
 				<uui-input
 					data-mark="tab:name-input"
@@ -652,7 +659,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (ownedTab) {
 			return html`<div class="not-active">
 				<span class=${hasTabName ? '' : 'invalid'}>${this.localize.string(tabName)}</span>
-				${this.renderDeleteFor(tab)}
+				${this._isReadOnly ? nothing : this.renderDeleteFor(tab)}
 			</div>`;
 		} else {
 			return html`<div class="not-active">

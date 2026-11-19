@@ -1,5 +1,6 @@
 import type { UmbWebhookDeliveryCollectionFilterModel, UmbWebhookDeliveryCollectionItemModel } from '../types.js';
 import { UMB_WEBHOOK_DELIVERY_ENTITY_TYPE } from '../../../entity.js';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { WebhookService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
@@ -23,12 +24,13 @@ export class UmbWebhookDeliveryCollectionServerDataSource implements UmbWebhookD
 
 	/**
 	 * Gets the Webhook delivery collection filtered by the given filter.
-	 * @param {UmbWebhookDeliveryCollectionFilterModel} filter
-	 * @param filter
-	 * @returns {*}
+	 * @param {UmbWebhookDeliveryCollectionFilterModel} filter The filter to apply
+	 * @returns {Promise<UmbDataSourceResponse<{ items: Array<UmbWebhookDeliveryCollectionItemModel>; total: number }>>} The filtered webhook delivery collection
 	 * @memberof UmbWebhookDeliveryCollectionServerDataSource
 	 */
-	async getCollection(filter: UmbWebhookDeliveryCollectionFilterModel) {
+	async getCollection(
+		filter: UmbWebhookDeliveryCollectionFilterModel,
+	): Promise<UmbDataSourceResponse<{ items: Array<UmbWebhookDeliveryCollectionItemModel>; total: number }>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			WebhookService.getWebhookByIdLogs({

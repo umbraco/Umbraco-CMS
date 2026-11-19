@@ -1,6 +1,6 @@
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import UmbDefaultSectionContext from './default-section.context.js';
 import { UmbDefaultSectionElement } from './default-section.element.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbExtensionManifestKind = {
 	type: 'kind',

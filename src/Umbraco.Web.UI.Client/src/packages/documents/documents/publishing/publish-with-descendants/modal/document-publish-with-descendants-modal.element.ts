@@ -26,6 +26,9 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 	@state()
 	private _hasNotSelectedMandatory?: boolean;
 
+	@state()
+	private _hasSelection = false;
+
 	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
 		if (!option.variant) {
 			// If not data present, then its not pickable.
@@ -75,6 +78,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 				//Getting not published mandatory options — the options that are mandatory and not currently published.
 				const missingMandatoryOptions = this._options.filter(isNotPublishedMandatory);
 				this._hasNotSelectedMandatory = missingMandatoryOptions.some((option) => !selection.includes(option.unique));
+				this._hasSelection = selection.length > 0;
 			},
 			'observeSelection',
 		);
@@ -97,7 +101,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 	}
 
 	override render() {
-		return html`<uui-dialog-layout headline=${this.localize.term('buttons_publishDescendants')}>
+		return html`<uui-dialog-layout headline=${this.localize.term('content_saveAndPublishDescendantsModalTitle')}>
 			<p id="subtitle">
 				${this._options.length === 1
 					? html`<umb-localize
@@ -134,7 +138,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 					label="${this.localize.term('buttons_publishDescendants')}"
 					look="primary"
 					color="positive"
-					?disabled=${this._hasNotSelectedMandatory}
+					?disabled=${this._hasNotSelectedMandatory || !this._hasSelection}
 					@click=${this.#submit}></uui-button>
 			</div>
 		</uui-dialog-layout> `;

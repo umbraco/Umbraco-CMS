@@ -14,6 +14,8 @@ export interface UmbMediaItemModel extends UmbEntityWithOptionalFlags {
 		collection: UmbReferenceByUnique | null;
 	};
 	name: string; // TODO: get correct variant name
+	/** The file extension, without the leading dot and in lowercase. Undefined when the item holds no file. */
+	extension?: string;
 	parent: { unique: UmbEntityUnique } | null; // TODO: Use UmbReferenceByUnique when it support unique as null
 	variants: Array<UmbMediaItemVariantModel>;
 }

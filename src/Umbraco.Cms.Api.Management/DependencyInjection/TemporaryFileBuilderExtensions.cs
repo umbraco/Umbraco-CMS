@@ -12,6 +12,7 @@ internal static class TemporaryFileBuilderExtensions
     {
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<TemporaryFileViewModelsMapDefinition>();
+
         builder.Services.AddTransient<ITemporaryFileConfigurationPresentationFactory, TemporaryFileConfigurationPresentationFactory>();
 
         return builder;

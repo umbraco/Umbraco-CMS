@@ -1,6 +1,7 @@
 import type { UmbCollectionItemModel } from './item/types.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import type { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 export type * from './action/create/types.js';
@@ -21,6 +22,15 @@ export interface UmbCollectionConfiguration {
 	orderDirection?: string;
 	pageSize?: number;
 	noItemsLabel?: string;
+	/**
+	 * Suppresses the per-item action menu. Set it where an action on an item would not make sense in the surroundings,
+	 * such as a picker, so that actions registered by anyone are suppressed rather than only the ones we know about.
+	 */
+	hideItemActions?: boolean;
+	/**
+	 * Suppresses the collection action bundle in the toolbar, on the same terms as `hideItemActions`.
+	 */
+	hideCollectionActions?: boolean;
 	userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
 	selectionConfiguration?: UmbCollectionSelectionConfiguration;
 	bulkActionConfiguration?: UmbCollectionBulkActionConfiguration;
@@ -55,9 +65,9 @@ export type UmbCollectionBulkActionConfiguration = {
 export interface UmbCollectionContext {
 	setConfig(config: UmbCollectionConfiguration): void;
 	getConfig(): UmbCollectionConfiguration | undefined;
-	requestCollection(): Promise<void>;
 	requestItemHref?(item: UmbCollectionItemModel): Promise<string | undefined>;
 	pagination: UmbPaginationManager;
 	items: Observable<any[]>;
 	totalItems: Observable<number>;
+	readonly interactionMemory?: UmbInteractionMemoryManager;
 }

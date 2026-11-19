@@ -36,9 +36,13 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.observe(umbExtensionsRegistry.byType('healthCheck'), (healthCheckManifests) => {
-			this._healthCheckDashboardContext.manifests = healthCheckManifests;
-		});
+		this.observe(
+			umbExtensionsRegistry.byType('healthCheck'),
+			(healthCheckManifests) => {
+				this._healthCheckDashboardContext.manifests = healthCheckManifests;
+			},
+			null,
+		);
 	}
 
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {

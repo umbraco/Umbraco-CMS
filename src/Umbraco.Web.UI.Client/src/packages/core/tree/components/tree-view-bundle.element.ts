@@ -63,7 +63,11 @@ export class UmbTreeViewBundleElement extends UmbLitElement {
 		if (this._views.length <= 1) return nothing;
 
 		return html`
-			<uui-button compact popovertarget="tree-view-bundle-popover" label=${this.localize.term('general_switchView')}>
+			<uui-button
+				compact
+				popovertarget="tree-view-bundle-popover"
+				label=${this.localize.term('general_switchView')}
+				data-mark="tree:switch-view">
 				<umb-icon name=${this._currentView.meta.icon}></umb-icon>
 			</uui-button>
 			<uui-popover-container id="tree-view-bundle-popover" placement="bottom-end">
@@ -85,7 +89,8 @@ export class UmbTreeViewBundleElement extends UmbLitElement {
 			<uui-menu-item
 				label=${this.localize.string(view.meta.label)}
 				@click-label=${() => this.#onClick(view)}
-				?active=${view.alias === this._currentView?.alias}>
+				?active=${view.alias === this._currentView?.alias}
+				data-mark="tree:switch-view:${view.alias}">
 				<umb-icon slot="icon" name=${view.meta.icon}></umb-icon>
 			</uui-menu-item>
 		`;

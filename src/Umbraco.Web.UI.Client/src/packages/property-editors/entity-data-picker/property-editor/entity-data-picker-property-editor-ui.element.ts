@@ -56,13 +56,7 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	private _min = 0;
 
 	@state()
-	private _minMessage = '';
-
-	@state()
 	private _max = Infinity;
-
-	@state()
-	private _maxMessage = '';
 
 	@state()
 	private _dataSourceConfig?: UmbConfigCollectionModel;
@@ -83,9 +77,13 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	constructor() {
 		super();
 
-		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
-			this._interactionMemories = interactionMemories ?? [];
-		});
+		this.observe(
+			this.#interactionMemoryManager.memoriesForPropertyEditor,
+			(interactionMemories) => {
+				this._interactionMemories = interactionMemories ?? [];
+			},
+			null,
+		);
 	}
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -95,9 +93,6 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 		const minMax = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 		this._min = minMax?.min ?? 0;
 		this._max = minMax?.max ?? Infinity;
-
-		this._minMessage = `${this.localize.term('validation_minCount')} ${this._min} ${this.localize.term('validation_items')}`;
-		this._maxMessage = `${this.localize.term('validation_maxCount')} ${this._max} ${this.localize.term('validation_itemsSelected')}`;
 
 		this._pickerViews =
 			config?.getValueByAlias<UmbEntityDataPickerPickerViewsConfigurationPropertyValue>('pickerViews');
@@ -203,9 +198,7 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 			.dataSourceConfig=${this._dataSourceConfig}
 			.pickerViews=${this._pickerViews}
 			.min=${this._min}
-			.min-message=${this._minMessage}
 			.max=${this._max}
-			.max-message=${this._maxMessage}
 			?readonly=${this.readonly}
 			@change=${this.#onChange}
 			.interactionMemories=${this._interactionMemories}

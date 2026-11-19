@@ -25,7 +25,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureNameNotExists('Danish');
 });
 
-test('can preview published content', async ({umbracoUi}) => {
+test('can preview published content', {tag: '@smoke'}, async ({umbracoUi}) => {
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickSaveAndPreviewButton();

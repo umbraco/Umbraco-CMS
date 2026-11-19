@@ -52,6 +52,7 @@ export class UmbModalContext<
 	public readonly key: string;
 	public readonly data: ModalData;
 	public readonly type: UmbModalType = 'dialog';
+	public readonly isReference?: boolean;
 	public readonly element?: ElementLoaderProperty<UUIModalElement>;
 	public readonly backdropBackground?: string;
 	public readonly router: IRouterSlot | null = null;
@@ -85,6 +86,7 @@ export class UmbModalContext<
 			size = this.alias.getDefaultModal()?.size ?? size;
 			this.element = this.alias.getDefaultModal()?.element || this.element;
 			this.backdropBackground = this.alias.getDefaultModal()?.backdropBackground || this.backdropBackground;
+			this.isReference = this.alias.getDefaultModal()?.isReference || this.isReference;
 			title = this.alias.getDefaultModal()?.title ?? undefined;
 		}
 
@@ -94,6 +96,7 @@ export class UmbModalContext<
 		size = args.modal?.size ?? size;
 		this.element = args.modal?.element || this.element;
 		this.backdropBackground = args.modal?.backdropBackground || this.backdropBackground;
+		this.isReference = args.modal?.isReference || this.isReference;
 
 		this.#size.setValue(size);
 
@@ -172,7 +175,7 @@ export class UmbModalContext<
 
 	/**
 	 * Closes this modal
-	 * @param reason
+	 * @param {UmbModalRejectReason} [reason] - The reason for rejecting the modal
 	 * @public
 	 * @memberof UmbModalContext
 	 */
@@ -193,7 +196,7 @@ export class UmbModalContext<
 
 	/**
 	 * Gives a Promise which will be resolved when this modal is submitted.
-	 * @returns {Promise<ModalValue>}
+	 * @returns {Promise<ModalValue>} A promise resolved with the modal's value on submit
 	 * @public
 	 * @memberof UmbModalContext
 	 */
@@ -203,7 +206,7 @@ export class UmbModalContext<
 
 	/**
 	 * Gives the current value of this modal.
-	 * @returns {ModalValue}
+	 * @returns {ModalValue} The current value
 	 * @public
 	 * @memberof UmbModalContext
 	 */
@@ -213,7 +216,7 @@ export class UmbModalContext<
 
 	/**
 	 * Sets the current value of this modal.
-	 * @param value
+	 * @param {ModalValue} value - The new value
 	 * @public
 	 * @memberof UmbModalContext
 	 */
@@ -223,7 +226,7 @@ export class UmbModalContext<
 
 	/**
 	 * Updates the current value of this modal.
-	 * @param partialValue
+	 * @param {Partial<ModalValue>} partialValue - The partial value to merge into the current value
 	 * @public
 	 * @memberof UmbModalContext
 	 */
@@ -233,7 +236,7 @@ export class UmbModalContext<
 
 	/**
 	 * Updates the size this modal.
-	 * @param size
+	 * @param {UUIModalSidebarSize} size - The new modal size
 	 * @public
 	 * @memberof UmbModalContext
 	 */

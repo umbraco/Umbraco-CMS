@@ -55,7 +55,32 @@ public interface IContentBlueprintEditingService
     /// <param name="key">The optional unique identifier for the new blueprint.</param>
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the creation result or an error status.</returns>
+    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 21.")]
     Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateFromContentAsync(Guid contentKey, string name, Guid? key, Guid userKey);
+
+    /// <summary>
+    ///     Creates a new content blueprint from an existing content item.
+    /// </summary>
+    /// <param name="contentKey">The unique identifier of the content item to create the blueprint from.</param>
+    /// <param name="name">The name for the new blueprint.</param>
+    /// <param name="key">The optional unique identifier for the new blueprint.</param>
+    /// <param name="parentKey">The unique identifier of the container to create the blueprint in, or <c>null</c> for the blueprint root.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <returns>An attempt containing the creation result or an error status.</returns>
+    // TODO (V21): Remove the default implementation when the obsolete CreateFromContentAsync overload is removed.
+    Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateFromContentAsync(Guid contentKey, string name, Guid? key, Guid? parentKey, Guid userKey)
+    {
+        // Only creating at the root can be satisfied by delegating to the existing method, so fail fast rather than
+        // silently create the blueprint somewhere other than the requested container.
+        if (parentKey.HasValue)
+        {
+            throw new NotImplementedException("This IContentBlueprintEditingService implementation does not support creating a blueprint in a container. Override the CreateFromContentAsync overload that takes a parentKey parameter to support it.");
+        }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        return CreateFromContentAsync(contentKey, name, key, userKey);
+#pragma warning restore CS0618 // Type or member is obsolete
+    }
 
     /// <summary>
     ///     Updates an existing content blueprint.

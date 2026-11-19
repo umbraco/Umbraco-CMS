@@ -3,7 +3,7 @@
 Published content caching layer for Umbraco CMS using Microsoft's HybridCache (in-memory + optional distributed cache). Provides high-performance content delivery with cache seeding, serialization, and notification-based invalidation.
 
 **Project Type**: Class Library (NuGet package)
-**Target Framework**: net10.0
+**Target Framework**: net11.0
 **Package ID**: Umbraco.Cms.PublishedCache.HybridCache
 **Namespace**: Umbraco.Cms.Infrastructure.HybridCache
 **Dependencies**: Umbraco.Core, Umbraco.Infrastructure, Microsoft.Extensions.Caching.Hybrid, MessagePack, K4os.Compression.LZ4
@@ -38,7 +38,8 @@ Umbraco.PublishedCache.HybridCache/
 ├── NotificationHandlers/
 │   ├── CacheRefreshingNotificationHandler.cs   # Content/media change handler (120 lines)
 │   ├── HybridCacheStartupNotificationHandler.cs
-│   └── SeedingNotificationHandler.cs      # Startup seeding (39 lines)
+│   ├── SeedingNotificationHandler.cs      # Startup seeding (39 lines)
+│   └── SerializerTypeCacheRefresherNotificationHandler.cs  # Clears the serializer factory's type snapshot on every server
 ├── Persistence/
 │   ├── ContentSourceDto.cs                # DTO for database queries
 │   ├── DatabaseCacheRepository.cs         # NPoco database access (891 lines)
@@ -60,7 +61,7 @@ Umbraco.PublishedCache.HybridCache/
 ├── Services/
 │   ├── DocumentCacheService.cs            # Content caching service (372 lines)
 │   ├── MediaCacheService.cs               # Media caching service
-│   ├── MemberCacheService.cs              # Member caching service
+│   ├── MemberCacheService.cs              # Maps members (not cached, see below)
 │   └── DomainCacheService.cs              # Domain caching service
 ├── CacheManager.cs                        # ICacheManager facade (27 lines)
 ├── ContentCacheNode.cs                    # Cache entry model (24 lines)
@@ -214,6 +215,19 @@ Handles 8 notification types:
 | `MediaTypeRefreshedNotification` | Clear type cache, `Rebuild()` |
 | `MediaTypeDeletedNotification` | Clear type cache |
 
+### Serializer content type snapshot
+
+`MsgPackContentNestedDataSerializerFactory` reads the content type and media type definitions once and keeps them,
+with the serializers and compression lookups derived from them, in a snapshot that `ClearTypeCache()` replaces.
+It must be cleared whenever a type changes, on every server:
+
+| Notification | Handler | Runs on |
+|--------------|---------|---------|
+| `ContentTypeRefreshedNotification`, `MediaTypeRefreshedNotification`, and the deleted variants | `CacheRefreshingNotificationHandler` (clears before any rebuild) | the server that saved the type |
+| `ContentTypeChangedNotification`, `MediaTypeChangedNotification` | `DeferredCacheRebuildNotificationHandler` (post-commit) | the server that saved the type |
+| `RebuildMemoryCacheByContentTypeAsync` (called by the content type and data type cache refreshers and by the deferred rebuild) | `DocumentCacheService`, `MediaCacheService`, `ElementCacheService` (clear before the entries are evicted, so their reload sees the new definitions) | every server |
+| `ContentTypeCacheRefresherNotification`, `DataTypeCacheRefresherNotification` (property types carry their data type's editor alias and storage type) | `SerializerTypeCacheRefresherNotificationHandler` | every server |
+
 ### RefreshContentAsync (DocumentCacheService.cs lines 300-324)
 
 1. Creates draft cache node from `IContent`
@@ -261,6 +275,18 @@ Uses `SqlContext.Templates` for cached SQL generation with optimized joins acros
 ### Experimental API Warning
 
 HybridCache API is experimental (suppressed with `#pragma warning disable EXTEXP0018`).
+
+### Members Are Mapped, Not Cached
+
+`IPublishedMemberCache` is the odd one out: it does not use HybridCache or `cmsContentNu` at all.
+`MemberCache.Get(IMember)` goes to `MemberCacheService.Get`, which calls
+`IPublishedContentFactory.ToPublishedMember` to map the supplied `IMember` entity on the fly. `IPublishedMember`
+exposes the underlying `IMember`, which cannot be reconstructed from a cache row, so the entity is required
+regardless — there is nothing a cached row could save. Nothing reads member rows, and the rebuild does not write
+them.
+
+Consequence for anything touching the rebuild: its arms are documents, media and elements - never members. A site upgraded
+from a version that did write member rows keeps them until its next *full* rebuild, which clears the whole table.
 
 ### Draft vs Published Caching
 
@@ -322,7 +348,7 @@ stored content without decompressing or walking the converted graph, so it omits
 conversion blow-up); true per-object bytes come from a GC dump. Note the tiers: **L0** is the
 converted-`IPublishedContent` cache reported above; **L1** is Microsoft HybridCache's in-process tier of
 `ContentCacheNode` entries (behind L0); **L2** is the optional distributed tier. The HybridCache **L1** has
-no exposed count/size — measure it from the GC dump until a sized backing cache is wired up (PR 3).
+no exposed count/size — measure it from the GC dump until a sized backing cache is wired up.
 
 ### Known Technical Debt
 

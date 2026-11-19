@@ -5,7 +5,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @class UmbLanguageItemStore
- * @augments {UmbStoreBase}
+ * @augments {UmbItemStoreBase}
  * @description - Data Store for Language items
  */
 

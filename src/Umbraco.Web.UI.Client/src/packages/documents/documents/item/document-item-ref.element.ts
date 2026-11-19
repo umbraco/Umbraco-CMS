@@ -1,30 +1,31 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../paths.js';
-import type { UmbDocumentItemModel } from './types.js';
 import type { UmbDocumentSearchItemModel } from '../search/types.js';
+import type { UmbDocumentItemModel } from './types.js';
 import { UmbDocumentItemDataResolver } from './document-item-data-resolver.js';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_CONTENT_SECTION_ALIAS } from '@umbraco-cms/backoffice/content';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+import { UMB_WORKSPACE_MODAL, umbGenerateWorkspaceLink } from '@umbraco-cms/backoffice/workspace';
 import type { UUISelectableEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
+import { UmbEntityItemRefFrameMixin } from '@umbraco-cms/backoffice/entity-item';
+
+const ANCESTOR_PATH_OBSERVER_ALIAS = 'umbObserveAncestorPath';
 
 @customElement('umb-document-item-ref')
-export class UmbDocumentItemRefElement extends UmbLitElement {
-	#item = new UmbDocumentItemDataResolver<UmbDocumentItemModel>(this);
+export class UmbDocumentItemRefElement extends UmbEntityItemRefFrameMixin(UmbLitElement) {
+	readonly #item = new UmbDocumentItemDataResolver<UmbDocumentItemModel>(this);
+	#ancestorResolvers: Array<UmbDocumentItemDataResolver<UmbDocumentItemModel>> = [];
 
 	@property({ type: Object })
 	public set item(value: UmbDocumentItemModel | undefined) {
 		this.#item.setData(value);
-		const ancestors = (value as UmbDocumentSearchItemModel | undefined)?.ancestors;
-		this._ancestorPath =
-			ancestors?.length
-				? ancestors
-						.map((a) => a.variants[0]?.name ?? '(Untitled)')
-						.filter(Boolean)
-						.join(' / ')
-				: '';
+		this.#setAncestors((value as UmbDocumentSearchItemModel | undefined)?.ancestors);
 	}
 	public get item(): UmbDocumentItemModel | undefined {
 		return this.#item.getData();
@@ -69,13 +70,27 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	@state()
 	private _ancestorPath = '';
 
+	@state()
+	private _userHasSectionAccess = false;
+
 	constructor() {
 		super();
+
+		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					match: UMB_CONTENT_SECTION_ALIAS,
+				},
+				onChange: (permitted: boolean) => {
+					this._userHasSectionAccess = permitted;
+				},
+			},
+		]);
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addUniquePaths(['unique'])
 			.onSetup(() => {
-				return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} } };
+				return { data: { entityType: UMB_DOCUMENT_ENTITY_TYPE, preset: {} }, modal: { isReference: true } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._editPath = routeBuilder({});
@@ -88,14 +103,41 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		this.#item.observe(this.#item.isDraft, (isDraft) => (this._isDraft = isDraft ?? false));
 	}
 
-	#getHref() {
-		// No `_editPath` means the modal route registration couldn't reach a parent route context
-		// (e.g. this ref is rendered inside a non-routable modal). Skip rendering an href so we don't
-		// produce a broken `/edit/<guid>` link. Consumers that know they will be in such a context
-		// (like the link-picker modal) should also pass `readonly` so the ref isn't styled as clickable.
-		if (!this._unique || !this._editPath) return;
-		const path = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this._unique });
-		return `${this._editPath}/${path}`;
+	protected override get isEntityFrameNavigable() {
+		return !this.readonly && !this.selectOnly && !this.disabled && this._userHasSectionAccess && !!this._unique;
+	}
+
+	#setAncestors(ancestors: Array<UmbDocumentItemModel> | undefined) {
+		this.#ancestorResolvers.forEach((resolver) => resolver.destroy());
+		this.#ancestorResolvers = (ancestors ?? []).map((ancestor) => {
+			const resolver = new UmbDocumentItemDataResolver<UmbDocumentItemModel>(this);
+			resolver.setData(ancestor);
+			return resolver;
+		});
+
+		if (this.#ancestorResolvers.length === 0) {
+			this.removeUmbControllerByAlias(ANCESTOR_PATH_OBSERVER_ALIAS);
+			this._ancestorPath = '';
+			return;
+		}
+
+		this.observe(
+			mergeObservables(
+				this.#ancestorResolvers.map((resolver) => resolver.name),
+				(names) => (names.every(Boolean) ? names.join(' / ') : ''),
+			),
+			(ancestorPath) => (this._ancestorPath = ancestorPath),
+			ANCESTOR_PATH_OBSERVER_ALIAS,
+		);
+	}
+
+	#getLink() {
+		if (!this._unique) return;
+		return umbGenerateWorkspaceLink({
+			pattern: UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
+			params: { unique: this._unique },
+			routePath: this._editPath,
+		});
 	}
 
 	#onSelected(event: UUISelectableEvent) {
@@ -111,11 +153,14 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	override render() {
 		if (!this.item) return nothing;
 
+		const link = this.#getLink();
+
 		return html`
 			<uui-ref-node
 				name=${this._name}
-				href=${ifDefined(this.#getHref())}
-				?readonly=${this.readonly}
+				href=${ifDefined(link?.href)}
+				target=${ifDefined(link?.target)}
+				?readonly=${this.readonly || !this._userHasSectionAccess}
 				?standalone=${this.standalone}
 				?select-only=${this.selectOnly}
 				?selectable=${this.selectable}
@@ -127,6 +172,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()}
 				${this._ancestorPath ? html`<span slot="detail" class="ancestor-path">${this._ancestorPath}</span>` : nothing}
 			</uui-ref-node>
+			${this.renderEntityFrame()}
 		`;
 	}
 
@@ -145,7 +191,8 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		return html`<uui-tag size="s" slot="tag" look="secondary" color="default">Draft</uui-tag>`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
+		...super.styles,
 		css`
 			.ancestor-path {
 				display: block;

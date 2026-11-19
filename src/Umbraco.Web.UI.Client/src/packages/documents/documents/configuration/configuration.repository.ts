@@ -1,12 +1,8 @@
+import { _getCachedDocumentConfiguration } from './configuration.cache.js';
 import { UmbDocumentConfigurationServerDataSource } from './configuration.server.data-source.js';
 import type { UmbDocumentConfigurationModel } from './types.js';
 import type { UmbContentConfigurationRepository } from '@umbraco-cms/backoffice/content';
 import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
-
-/**
- * The cached document configuration, shared across all repository instances.
- */
-let configurationPromise: Promise<UmbRepositoryResponse<UmbDocumentConfigurationModel>> | undefined;
 
 /**
  * @description - Repository for Document configuration.
@@ -22,22 +18,9 @@ export class UmbDocumentConfigurationRepository extends UmbRepositoryBase implem
 	 * @returns {Promise<UmbRepositoryResponse<UmbDocumentConfigurationModel>>} - The document configuration.
 	 * @memberof UmbDocumentConfigurationRepository
 	 */
-	async requestConfiguration(): Promise<UmbRepositoryResponse<UmbDocumentConfigurationModel>> {
-		configurationPromise ??= this.#serverDataSource.getConfiguration();
-		const response = await configurationPromise;
-		if (response.error) {
-			configurationPromise = undefined;
-		}
-		return response;
+	requestConfiguration(): Promise<UmbRepositoryResponse<UmbDocumentConfigurationModel>> {
+		return _getCachedDocumentConfiguration(() => this.#serverDataSource.getConfiguration());
 	}
 }
 
 export { UmbDocumentConfigurationRepository as api };
-
-/**
- * Test-only.
- * @internal
- */
-export function resetUmbDocumentConfigurationCache(): void {
-	configurationPromise = undefined;
-}

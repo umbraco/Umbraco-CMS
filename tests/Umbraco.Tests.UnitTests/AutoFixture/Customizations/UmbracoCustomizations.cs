@@ -12,7 +12,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Web.Common.Security;
 
@@ -31,7 +30,6 @@ internal sealed class UmbracoCustomizations : ICustomization
             .Customize(new ConstructorCustomization(typeof(BackOfficeDefaultController), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(MemberManager), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(DatabaseSchemaCreatorFactory), new GreedyConstructorQuery()))
-            .Customize(new ConstructorCustomization(typeof(InstallHelper), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(DatabaseBuilder), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(ContentVersionService), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(ContentFinderByUrlAlias), new GreedyConstructorQuery()));

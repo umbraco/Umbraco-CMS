@@ -33,6 +33,8 @@ export class BasePage {
 
   /**
    * Clicks an element after verifying it is visible.
+   * Note: the visibility wait defaults to `timeout.long`, longer than the other
+   * wrappers (`timeout.medium`), to absorb slow-rendering interactive elements.
    * @param locator - The element to click
    * @param options - Optional click configuration
    */
@@ -461,12 +463,31 @@ export class BasePage {
   }
 
   /**
-   * Asserts that an element is visible.
+   * Asserts that an element is (or, with `isVisible=false`, is not) visible, waiting
+   * up to the timeout. This is an assertion: it returns `void` and throws on mismatch.
+   * Do NOT use it as a boolean predicate — for a non-throwing check use {@link checkIsVisible}.
    * @param locator - The element to check
    * @param isVisible - Whether the element should be visible (default: true)
    */
   async isVisible(locator: Locator, isVisible: boolean = true, timeout?: number): Promise<void> {
     await expect(locator).toBeVisible({visible: isVisible, timeout: timeout ?? ConstantHelper.timeout.medium});
+  }
+
+  /**
+   * Asserts visibility across every match, for a locator that may legitimately match more than one
+   * element. Unlike `.first()`, `isVisible=false` here means no match is visible.
+   * @param locator - The element(s) to check
+   * @param isVisible - Whether at least one match must be visible (default: true)
+   * @param timeout - Maximum time to wait in milliseconds
+   */
+  protected async isAnyVisible(locator: Locator, isVisible: boolean = true, timeout?: number): Promise<void> {
+    const visibleMatches = locator.filter({visible: true});
+    const effectiveTimeout = timeout ?? ConstantHelper.timeout.medium;
+    if (isVisible) {
+      await expect(visibleMatches).not.toHaveCount(0, {timeout: effectiveTimeout});
+      return;
+    }
+    await expect(visibleMatches).toHaveCount(0, {timeout: effectiveTimeout});
   }
 
   /**
@@ -572,7 +593,9 @@ export class BasePage {
   }
 
   /**
-   * Checks if an element is currently visible.
+   * Returns whether an element is visible right now as a boolean. Unlike
+   * {@link isVisible}, this does NOT wait or assert — it reads the current state,
+   * so it can race with rendering. Prefer `isVisible` for assertions.
    * @param locator - The element to check
    * @returns True if visible, false otherwise
    */

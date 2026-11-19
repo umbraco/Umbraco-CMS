@@ -2,12 +2,12 @@ import {AliasHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const contentName = 'Test Rendering Content';
 const documentTypeName = 'TestDocumentTypeForContent';
-const dataTypeName = 'Member Picker';
+const dataTypeName = 'Single Member Picker';
 const templateName = 'TestTemplateForContent';
 const propertyName = 'Test Member Picker';
 let dataTypeData = null;
 const memberName = 'Test Member';
-const memberTypeName = 'Test Member Type';
+const memberTypeName = 'Test Member Type Rendering Picker';
 const username = 'testmember';
 const email = 'testmember@acceptance.test';
 const password = '0123456789';

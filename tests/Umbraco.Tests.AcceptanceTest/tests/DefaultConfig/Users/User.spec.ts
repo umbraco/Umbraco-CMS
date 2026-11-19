@@ -5,16 +5,25 @@ const nameOfTheUser = 'TestUser';
 const userEmail = 'TestUser@EmailTest.test';
 const defaultUserGroupName = 'Writers';
 let userCount = null;
+const documentBlueprintFolderName = 'TestDocumentBlueprintFolder';
+const firstDocumentBlueprintFolderName = 'FirstDocumentBlueprintFolder';
+const secondDocumentBlueprintFolderName = 'SecondDocumentBlueprintFolder';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
   await umbracoApi.user.ensureNameNotExists(nameOfTheUser);
+  await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintFolderName);
+  await umbracoApi.documentBlueprint.ensureNameNotExists(firstDocumentBlueprintFolderName);
+  await umbracoApi.documentBlueprint.ensureNameNotExists(secondDocumentBlueprintFolderName);
 });
 
 test.afterEach(async ({umbracoApi, umbracoUi}) => {
   // Waits so we can try to avoid db locks
   await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoApi.user.ensureNameNotExists(nameOfTheUser);
+  await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintFolderName);
+  await umbracoApi.documentBlueprint.ensureNameNotExists(firstDocumentBlueprintFolderName);
+  await umbracoApi.documentBlueprint.ensureNameNotExists(secondDocumentBlueprintFolderName);
 });
 
 test('can create a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -57,9 +66,6 @@ test('can delete a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.goToUserWithName(nameOfTheUser);
 
   // Act
-  // This wait is currently necessary as the action button is clicked before it is "ready"
-  // TODO: Remove the wait and fix the 'clickActionButton'
-  await umbracoUi.memberGroup.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.user.clickActionButton();
   await umbracoUi.user.clickDeleteButton();
   await umbracoUi.user.clickConfirmToDeleteButtonAndWaitForUserToBeDeleted();
@@ -383,8 +389,6 @@ test('can see if the user has the correct access based on content start nodes', 
 
   // Act
   await umbracoUi.user.goToUserWithName(nameOfTheUser);
-  // Currently this wait is necessary
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.long);
 
   // Assert
   await umbracoUi.user.doesUserHaveAccessToContentNode(documentName);
@@ -425,9 +429,6 @@ test('can change password for a user', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.user.goToUserWithName(nameOfTheUser);
 
   // Act
-  // This wait is currently necessary as the action button is clicked before it is "ready"
-  // TODO: Remove the wait and fix the 'clickActionButton'
-  await umbracoUi.memberGroup.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.user.clickActionButton();
   await umbracoUi.user.clickChangePasswordButton();
   await umbracoUi.user.updatePassword(userPassword);
@@ -472,9 +473,6 @@ test('can enable a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.goToUserWithName(newTestUser);
 
   // Act
-  // This wait is currently necessary as the action button is clicked before it is "ready"
-  // TODO: Remove the wait and fix the 'clickActionButton'
-  await umbracoUi.memberGroup.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.user.clickActionButton();
   await umbracoUi.user.clickEnableButton();
   await umbracoUi.user.clickConfirmEnableButton();
@@ -547,8 +545,6 @@ test('can search for a user', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.searchInUserSection(nameOfTheUser);
 
   // Assert
-  // Wait for filtering to be done
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   const userData = await umbracoApi.user.filterByText(nameOfTheUser);
   await umbracoUi.user.doesUserSectionContainUserAmount(userData.total);
   await umbracoUi.user.doesUserSectionContainUserWithText(nameOfTheUser);
@@ -567,8 +563,6 @@ test('can filter by status', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.filterByStatusName(inactiveStatus);
 
   // Assert
-  // Wait for filtering to be done
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   const userData = await umbracoApi.user.filterByUserStates(inactiveStatus);
   await umbracoUi.user.doesUserSectionContainUserAmount(userData.total);
   await umbracoUi.user.doesUserSectionContainUserWithText(nameOfTheUser);
@@ -587,11 +581,28 @@ test('can filter by user groups', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.filterByGroupName(defaultUserGroupName);
 
   // Assert
-  // Wait for filtering to be done
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   const userData = await umbracoApi.user.filterByUserGroupIds(userGroup.id);
   await umbracoUi.user.doesUserSectionContainUserAmount(userData.total);
   await umbracoUi.user.doesUserSectionContainUserWithText(defaultUserGroupName);
+});
+
+test('can filter by user type', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id], 'Api');
+  userCount = await umbracoApi.user.getUsersCount();
+  await umbracoUi.user.goToUsers();
+
+  // Act
+  await umbracoUi.user.doesUserSectionContainUserAmount(userCount);
+  await umbracoUi.user.filterByTypeName('API User');
+
+  // Assert
+  // Wait for filtering to be done
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
+  const userData = await umbracoApi.user.filterByUserKinds('Api');
+  await umbracoUi.user.doesUserSectionContainUserAmount(userData.total);
+  await umbracoUi.user.doesUserSectionContainUserWithText(nameOfTheUser);
 });
 
 test('can order by newest user', async ({umbracoApi, umbracoUi}) => {
@@ -606,9 +617,6 @@ test('can order by newest user', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.orderByNewestUser();
 
   // Assert
-  // Wait for filtering to be done
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
-
   await umbracoUi.user.doesUserSectionContainUserAmount(userCount);
   await umbracoUi.user.isUserWithNameTheFirstUserInList(nameOfTheUser);
 });
@@ -717,4 +725,76 @@ test.fixme('can allow access to all elements for a user', async ({umbracoApi, um
   // Assert
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
   expect(userData.hasElementRootAccess).toBeTruthy();
+});
+
+test('can add a document blueprint folder as a document blueprint start node to a user', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  const documentBlueprintFolderId = await umbracoApi.documentBlueprint.createFolder(documentBlueprintFolderName);
+  await umbracoUi.user.goToUserWithName(nameOfTheUser);
+
+  // Act
+  await umbracoUi.user.clickChooseDocumentBlueprintStartNodeButton();
+  await umbracoUi.user.clickLabelWithName(documentBlueprintFolderName, true, true);
+  await umbracoUi.user.clickChooseContainerButton();
+  await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.user.doesUserContainDocumentBlueprintStartNodeIds(nameOfTheUser, [documentBlueprintFolderId])).toBeTruthy();
+});
+
+test('can add multiple document blueprint start nodes for a user', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  const firstFolderId = await umbracoApi.documentBlueprint.createFolder(firstDocumentBlueprintFolderName);
+  const userData = await umbracoApi.user.getByName(nameOfTheUser);
+  userData.documentBlueprintStartNodeIds.push({id: firstFolderId});
+  await umbracoApi.user.update(userId, userData);
+  const secondFolderId = await umbracoApi.documentBlueprint.createFolder(secondDocumentBlueprintFolderName);
+  await umbracoUi.user.goToUserWithName(nameOfTheUser);
+
+  // Act
+  await umbracoUi.user.clickChooseDocumentBlueprintStartNodeButton();
+  await umbracoUi.user.clickLabelWithName(secondDocumentBlueprintFolderName, true, true);
+  await umbracoUi.user.clickChooseContainerButton();
+  await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.user.doesUserContainDocumentBlueprintStartNodeIds(nameOfTheUser, [firstFolderId, secondFolderId])).toBeTruthy();
+});
+
+test('can remove a document blueprint start node from a user', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  const documentBlueprintFolderId = await umbracoApi.documentBlueprint.createFolder(documentBlueprintFolderName);
+  const userData = await umbracoApi.user.getByName(nameOfTheUser);
+  userData.documentBlueprintStartNodeIds.push({id: documentBlueprintFolderId});
+  await umbracoApi.user.update(userId, userData);
+  expect(await umbracoApi.user.doesUserContainDocumentBlueprintStartNodeIds(nameOfTheUser, [documentBlueprintFolderId])).toBeTruthy();
+  await umbracoUi.user.goToUserWithName(nameOfTheUser);
+
+  // Act
+  await umbracoUi.user.clickRemoveButtonForDocumentBlueprintNodeWithName(documentBlueprintFolderName);
+  await umbracoUi.user.clickConfirmRemoveButton();
+  await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.user.doesUserContainDocumentBlueprintStartNodeIds(nameOfTheUser, [documentBlueprintFolderId])).toBeFalsy();
+});
+
+test('can allow access to all document blueprints for a user', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  await umbracoUi.user.goToUserWithName(nameOfTheUser);
+
+  // Act
+  await umbracoUi.user.clickAllowAccessToAllDocumentBlueprintsToggle();
+  await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.user.doesUserContainDocumentBlueprintRootAccess(nameOfTheUser)).toBeTruthy();
 });

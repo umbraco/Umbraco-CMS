@@ -6,12 +6,13 @@ import { customElement, html, ifDefined, nothing, property, state } from '@umbra
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_MODAL, umbGenerateWorkspaceLink } from '@umbraco-cms/backoffice/workspace';
 import type { UUISelectableEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbEntityItemRefFrameMixin } from '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-element-item-ref')
-export class UmbElementItemRefElement extends UmbLitElement {
-	#item = new UmbElementItemDataResolver<UmbElementItemModel>(this);
+export class UmbElementItemRefElement extends UmbEntityItemRefFrameMixin(UmbLitElement) {
+	readonly #item = new UmbElementItemDataResolver<UmbElementItemModel>(this);
 
 	@property({ type: Object })
 	public set item(value: UmbElementItemModel | undefined) {
@@ -63,7 +64,7 @@ export class UmbElementItemRefElement extends UmbLitElement {
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addUniquePaths(['unique'])
 			.onSetup(() => {
-				return { data: { entityType: UMB_ELEMENT_ENTITY_TYPE, preset: {} } };
+				return { data: { entityType: UMB_ELEMENT_ENTITY_TYPE, preset: {} }, modal: { isReference: true } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._editPath = routeBuilder({ entityType: UMB_ELEMENT_ENTITY_TYPE });
@@ -76,10 +77,17 @@ export class UmbElementItemRefElement extends UmbLitElement {
 		this.#item.observe(this.#item.isDraft, (isDraft) => (this._isDraft = isDraft ?? false));
 	}
 
-	#getHref() {
+	protected override get isEntityFrameNavigable() {
+		return !this.readonly && !this.selectOnly && !this.disabled && !!this._unique;
+	}
+
+	#getLink() {
 		if (!this._unique) return;
-		const path = UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this._unique });
-		return this._editPath + path;
+		return umbGenerateWorkspaceLink({
+			pattern: UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN,
+			params: { unique: this._unique },
+			routePath: this._editPath,
+		});
 	}
 
 	#onSelected(event: UUISelectableEvent) {
@@ -95,10 +103,13 @@ export class UmbElementItemRefElement extends UmbLitElement {
 	override render() {
 		if (!this.item) return nothing;
 
+		const link = this.#getLink();
+
 		return html`
 			<uui-ref-node
 				name=${this._name}
-				href=${ifDefined(this.#getHref())}
+				href=${ifDefined(link?.href)}
+				target=${ifDefined(link?.target)}
 				?readonly=${this.readonly}
 				?standalone=${this.standalone}
 				?select-only=${this.selectOnly}
@@ -110,6 +121,7 @@ export class UmbElementItemRefElement extends UmbLitElement {
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()}
 			</uui-ref-node>
+			${this.renderEntityFrame()}
 		`;
 	}
 

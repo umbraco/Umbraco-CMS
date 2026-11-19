@@ -16,10 +16,10 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import {
-	extractJsonQueryProps,
+	isAboveZeroAndBelowMinimum,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbFormControlMixin,
 	UmbValidationContext,
-	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 } from '@umbraco-cms/backoffice/validation';
 import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -40,10 +40,10 @@ import '../../components/block-list-entry/index.js';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
 	getUniqueOfElement: (element) => {
-		return element.contentKey!;
+		return element.key!;
 	},
 	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.contentKey;
+		return modelEntry.key;
 	},
 	//identifier: 'block-list-editor',
 	itemSelector: 'umb-block-list-entry',
@@ -74,8 +74,8 @@ export class UmbPropertyEditorUIBlockListElement
 			super.value = undefined;
 			// Clear manager state so blocks are actually removed
 			this.#managerContext.setLayouts([]);
-			this.#managerContext.setContents([]);
-			this.#managerContext.setSettings([]);
+			this.#managerContext.setContents(undefined);
+			this.#managerContext.setSettings(undefined);
 			this.#managerContext.setExposes([]);
 			return;
 		}
@@ -165,6 +165,9 @@ export class UmbPropertyEditorUIBlockListElement
 	private _blocks?: Array<UmbBlockTypeBaseModel>;
 
 	@state()
+	private _hasLibraryElements = false;
+
+	@state()
 	private _layouts: Array<UmbBlockLayoutBaseModel> = [];
 
 	@state()
@@ -231,38 +234,6 @@ export class UmbPropertyEditorUIBlockListElement
 			this.#gotPropertyContext(context);
 		});
 
-		// TODO: Why is this logic not part of the Block Grid and RTE Editors? [NL]
-		// Observe Blocks and clean up validation messages for content/settings that are not in the block list anymore:
-		this.observe(
-			this.#managerContext.layouts,
-			(layouts) => {
-				const validationMessagesToRemove: string[] = [];
-				const contentKeys = layouts.map((x) => x.contentKey);
-				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.contentData').forEach((message) => {
-					// get the KEY from this string: $.contentData[?(@.key == 'KEY')]
-					// TODO: Investigate if this is missing a part to just get the [] part of the path. Cause couldn't there be a sub path inside of this. [NL]
-					const key = extractJsonQueryProps(message.path).key;
-					if (key && contentKeys.indexOf(key) === -1) {
-						validationMessagesToRemove.push(message.key);
-					}
-				});
-
-				const settingsKeys = layouts.map((x) => x.settingsKey).filter((x) => x !== undefined) as string[];
-				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.settingsData').forEach((message) => {
-					// TODO: Investigate if this is missing a part to just get the [] part of the path. Cause couldn't there be a sub path inside of this. [NL]
-					// get the key from this string: $.settingsData[?(@.key == 'KEY')]
-					const key = extractJsonQueryProps(message.path).key;
-					if (key && settingsKeys.indexOf(key) === -1) {
-						validationMessagesToRemove.push(message.key);
-					}
-				});
-
-				// Remove the messages after the loop to prevent changing the array while iterating over it.
-				this.#validationContext.messages.removeMessageByKeys(validationMessagesToRemove);
-			},
-			null,
-		);
-
 		this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
 			this.observe(
 				context?.displayVariantId,
@@ -273,7 +244,7 @@ export class UmbPropertyEditorUIBlockListElement
 			);
 		});
 
-		this.observe(this.#managerContext.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false));
+		this.observe(this.#managerContext.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false), null);
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -283,7 +254,7 @@ export class UmbPropertyEditorUIBlockListElement
 					this._limitMin,
 					(this._limitMin ?? 0) - this.#entriesContext.getLength(),
 				),
-			() => !!this._limitMin && this.#entriesContext.getLength() < this._limitMin,
+			() => isAboveZeroAndBelowMinimum(this.#entriesContext.getLength(), this._limitMin),
 		);
 
 		this.addValidator(
@@ -326,6 +297,8 @@ export class UmbPropertyEditorUIBlockListElement
 			},
 			null,
 		);
+
+		this.observe(this.#entriesContext.hasLibraryElements, (x) => (this._hasLibraryElements = x), null);
 
 		this.observe(
 			this.#entriesContext.catalogueRouteBuilder,
@@ -406,15 +379,10 @@ export class UmbPropertyEditorUIBlockListElement
 			${this.#renderSortModeToolbar()}
 			${repeat(
 				this._layouts,
-				(layout) => layout.contentKey,
+				(layout) => layout.key,
 				(layout, index) => html`
 					${this.#renderInlineCreateButton(index)}
-					<umb-block-list-entry
-						index=${index}
-						.contentKey=${layout.contentKey}
-						.layout=${layout}
-						${umbDestroyOnDisconnect()}>
-					</umb-block-list-entry>
+					<umb-block-list-entry index=${index} .layout=${layout} ${umbDestroyOnDisconnect()}></umb-block-list-entry>
 				`,
 			)}
 			${this.#renderCreateButtonGroup()}
@@ -423,7 +391,12 @@ export class UmbPropertyEditorUIBlockListElement
 
 	#renderCreateButtonGroup() {
 		if (this._layouts.length > 0 && (this._limitMax === 1 || this.readonly)) return nothing;
-		return html`<uui-button-group>${this.#renderCreateButton()}${this.#renderPasteButton()}</uui-button-group>`;
+		const createPath = this.#entriesContext.getPathForCreateBlock(-1);
+		return html`
+			<uui-button-group>
+				${this.#renderCreateButton(createPath)}${this.#renderLibraryButton(createPath)}${this.#renderPasteButton()}
+			</uui-button-group>
+		`;
 	}
 
 	#renderInlineCreateButton(index: number) {
@@ -443,9 +416,8 @@ export class UmbPropertyEditorUIBlockListElement
 		`;
 	}
 
-	#renderCreateButton() {
+	#renderCreateButton(createPath: string | undefined) {
 		if (!this._catalogueRouteBuilder) return nothing;
-		const createPath = this.#entriesContext.getPathForCreateBlock(-1);
 		return html`
 			<uui-button
 				look="placeholder"
@@ -477,9 +449,25 @@ export class UmbPropertyEditorUIBlockListElement
 		}
 	}
 
+	#renderLibraryButton(createPath: string | undefined) {
+		if (!this._catalogueRouteBuilder || createPath || !this._hasLibraryElements) return nothing;
+		return html`
+			<uui-button
+				class="btnAction"
+				label=${this.localize.term('blockEditor_tabLibrary')}
+				look="placeholder"
+				href=${this._catalogueRouteBuilder?.({ view: 'library', index: -1 }) ?? ''}
+				?disabled=${this.readonly}
+				title=${this.localize.term('blockEditor_tabLibrary')}>
+				<uui-icon name="icon-link"></uui-icon>
+			</uui-button>
+		`;
+	}
+
 	#renderPasteButton() {
 		return html`
 			<uui-button
+				class="btnAction"
 				label=${this.localize.term('content_createFromClipboard')}
 				look="placeholder"
 				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}
@@ -503,8 +491,11 @@ export class UmbPropertyEditorUIBlockListElement
 
 			uui-button-group {
 				margin-top: 1px;
-				display: grid;
-				grid-template-columns: 1fr auto;
+				display: flex;
+
+				.btnAction {
+					flex: 0;
+				}
 			}
 		`,
 	];

@@ -5,7 +5,6 @@ import {
 	UmbBackofficeModalContainerElement,
 } from '@umbraco-cms/backoffice/components';
 import { UmbInteractionMemoryContext } from '@umbraco-cms/backoffice/interaction-memory';
-import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
@@ -39,9 +38,4 @@ export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbModalManagerContext(host);
 	new UmbActionEventContext(host);
 	new UmbInteractionMemoryContext(host);
-
-	host.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
-		// Initialize the auth context to let the app context know that the core module is ready
-		authContext?.setInitialized();
-	});
 };

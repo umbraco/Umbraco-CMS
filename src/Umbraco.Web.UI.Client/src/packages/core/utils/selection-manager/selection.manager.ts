@@ -27,7 +27,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 
 	/**
 	 * Returns whether items can be selected.
-	 * @returns {*}
+	 * @returns {boolean} Whether items can be selected.
 	 * @memberof UmbSelectionManager
 	 */
 	public getSelectable() {
@@ -36,7 +36,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 
 	/**
 	 * Sets whether items can be selected.
-	 * @param {boolean} value
+	 * @param {boolean} value - Whether items can be selected.
 	 * @memberof UmbSelectionManager
 	 */
 	public setSelectable(value: boolean) {
@@ -45,7 +45,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 
 	/**
 	 * Returns the current selection.
-	 * @returns {*}
+	 * @returns {Array<ValueType>} The current selection.
 	 * @memberof UmbSelectionManager
 	 */
 	public getSelection() {
@@ -53,16 +53,18 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 	}
 
 	/**
-	 * Sets the current selection.
-	 * @param {Array<ValueType>} value
+	 * Sets the current selection. Every other method that changes the selection applies it through this one.
+	 * Items not already selected must pass the allow limitation.
+	 * @param {Array<ValueType>} value - The new selection.
 	 * @memberof UmbSelectionManager
 	 */
 	public setSelection(value: Array<ValueType>) {
 		if (this.getSelectable() === false) return;
 		if (value === undefined) throw new Error('Value cannot be undefined');
 
+		const current = this.getSelection();
 		value.forEach((unique) => {
-			if (this.#allow(unique) === false) {
+			if (!current.includes(unique) && this.#allow(unique) === false) {
 				throw new Error(`${unique} is now allowed to be selected`);
 			}
 		});
@@ -73,7 +75,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 
 	/**
 	 * Returns whether multiple items can be selected.
-	 * @returns {*}
+	 * @returns {boolean} Whether multiple items can be selected.
 	 * @memberof UmbSelectionManager
 	 */
 	public getMultiple() {
@@ -82,7 +84,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 
 	/**
 	 * Sets whether multiple items can be selected.
-	 * @param {boolean} value
+	 * @param {boolean} value - Whether multiple items can be selected.
 	 * @memberof UmbSelectionManager
 	 */
 	public setMultiple(value: boolean) {
@@ -99,7 +101,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 
 	/**
 	 * Toggles the given unique id in the current selection.
-	 * @param {(ValueType)} unique
+	 * @param {(ValueType)} unique - The unique id to toggle.
 	 * @memberof UmbSelectionManager
 	 */
 	public toggleSelect(unique: ValueType) {
@@ -113,7 +115,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 
 	/**
 	 * Appends the given unique id to the current selection.
-	 * @param {(ValueType)} unique
+	 * @param {(ValueType)} unique - The unique id to select.
 	 * @memberof UmbSelectionManager
 	 */
 	public select(unique: ValueType) {
@@ -122,29 +124,27 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 		if (this.#allow(unique) === false) {
 			throw new Error('The item is now allowed to be selected');
 		}
-		const newSelection = this.getMultiple() ? [...this.getSelection(), unique] : [unique];
-		this.#selection.setValue(newSelection);
+		this.setSelection(this.getMultiple() ? [...this.getSelection(), unique] : [unique]);
 		this.getHostElement().dispatchEvent(new UmbSelectedEvent(unique));
 		this.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
 	/**
 	 * Removes the given unique id from the current selection.
-	 * @param {(ValueType)} unique
+	 * @param {(ValueType)} unique - The unique id to deselect.
 	 * @memberof UmbSelectionManager
 	 */
 	public deselect(unique: ValueType) {
 		if (this.getSelectable() === false) return;
-		const newSelection = this.getSelection().filter((x) => x !== unique);
-		this.#selection.setValue(newSelection);
+		this.setSelection(this.getSelection().filter((x) => x !== unique));
 		this.getHostElement().dispatchEvent(new UmbDeselectedEvent(unique));
 		this.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
 	/**
 	 * Returns true if the given unique id is selected.
-	 * @param {(ValueType)} unique
-	 * @returns {*}
+	 * @param {(ValueType)} unique - The unique id to check.
+	 * @returns {boolean} True if the given unique id is selected.
 	 * @memberof UmbSelectionManager
 	 */
 	public isSelected(unique: ValueType) {
@@ -157,12 +157,12 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 	 */
 	public clearSelection() {
 		if (this.getSelectable() === false) return;
-		this.#selection.setValue([]);
+		this.setSelection([]);
 	}
 
 	/**
 	 * Sets a function that determines if an item is selectable or not.
-	 * @param compareFn A function that determines if an item is selectable or not.
+	 * @param {(unique: ValueType) => boolean} compareFn A function that determines if an item is selectable or not.
 	 * @memberof UmbSelectionManager
 	 */
 	public setAllowLimitation(compareFn: (unique: ValueType) => boolean): void {
@@ -171,7 +171,7 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 
 	/**
 	 * Returns the function that determines if an item is selectable or not.
-	 * @returns {*}
+	 * @returns {(unique: ValueType) => boolean} The function that determines if an item is selectable or not.
 	 * @memberof UmbSelectionManager
 	 */
 	public getAllowLimitation() {

@@ -1,4 +1,5 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
+import {ConstantHelper} from "./ConstantHelper";
 import {MemberBuilder} from "../builders";
 
 export class MemberApiHelper {
@@ -13,12 +14,16 @@ export class MemberApiHelper {
     return await response.json();
   }
 
+  async waitUntilIndexed(query: string, id: string) {
+    await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.memberSearch, query, id);
+  }
+
   async create(member) {
     if (member == null) {
       return;
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/member', member);
-    return response.headers().location.split("v1/member/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async setLockedOut(id: string, isLockedOut: boolean) {
@@ -64,7 +69,7 @@ export class MemberApiHelper {
     const rootMembers = await this.getAll();
     const jsonMembers = await rootMembers.json();
 
-    for (const member of jsonMembers.items) {
+    for (const member of this.api.itemsOf(jsonMembers)) {
       if (member.variants[0].name === name) {
         return await this.get(member.id);
       }
@@ -76,7 +81,7 @@ export class MemberApiHelper {
     const rootMembers = await this.getAll();
     const jsonMembers = await rootMembers.json();
 
-    for (const member of jsonMembers.items) {
+    for (const member of this.api.itemsOf(jsonMembers)) {
       if (member.variants[0].name === name) {
         return await this.delete(member.id);
       }

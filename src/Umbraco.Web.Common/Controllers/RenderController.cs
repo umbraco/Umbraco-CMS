@@ -2,7 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
@@ -60,8 +63,9 @@ public class RenderController : UmbracoPageController, IRenderController
         if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
         {
             _logger.LogDebug(
-            "Response status: Content={Content}, StatusCode={ResponseStatusCode}, Culture={Culture}, Segment={Segment}",
+            "Response status: ContentId={ContentId}, ContentKey={ContentKey}, StatusCode={ResponseStatusCode}, Culture={Culture}, Segment={Segment}",
             pcr.PublishedContent?.Id ?? -1,
+            pcr.PublishedContent?.Key,
             pcr.ResponseStatusCode,
             pcr.Culture,
             pcr.Segment);
@@ -117,7 +121,7 @@ public class RenderController : UmbracoPageController, IRenderController
         if (EnsurePhysicalViewExists(UmbracoRouteValues.TemplateName) == false)
         {
             // no physical template file was found
-            return new PublishedContentNotFoundResult(UmbracoContext);
+            return new PublishedContentNotFoundResult(UmbracoContext, NotFoundViewPath);
         }
 
         return View(UmbracoRouteValues.TemplateName, model);
@@ -130,7 +134,7 @@ public class RenderController : UmbracoPageController, IRenderController
         if (!pcr.HasPublishedContent())
         {
             // means the builder could not find a proper document to handle 404
-            return new PublishedContentNotFoundResult(UmbracoContext);
+            return new PublishedContentNotFoundResult(UmbracoContext, NotFoundViewPath);
         }
 
         if (!pcr.HasTemplate())
@@ -139,9 +143,15 @@ public class RenderController : UmbracoPageController, IRenderController
             // at that point there isn't much we can do
             return new PublishedContentNotFoundResult(
                 UmbracoContext,
+                NotFoundViewPath,
                 "In addition, no template exists to render the custom 404.");
         }
 
-        return new PublishedContentNotFoundResult(UmbracoContext);
+        return new PublishedContentNotFoundResult(UmbracoContext, NotFoundViewPath);
     }
+
+    // Resolved from the request rather than injected: this controller is public and subclassed by implementors,
+    // so taking the settings as a constructor parameter would break every derived constructor.
+    private string NotFoundViewPath
+        => HttpContext.RequestServices.GetRequiredService<IOptionsMonitor<GlobalSettings>>().CurrentValue.NotFoundViewPath;
 }

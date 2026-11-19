@@ -9,7 +9,6 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
@@ -18,14 +17,32 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
 {
     [Test]
-    public void MultiUrlPickerValueConverter_InSingleMode_ConvertsContentToLinksWithContentInfo()
+    public void SingleUrlPickerValueConverter_YieldsOneLink()
     {
-        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
-        var publishedPropertyType = new Mock<IPublishedPropertyType>();
-        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+        IPublishedPropertyType publishedPropertyType = SetupUrlPickerPropertyType(multiple: false);
 
-        var valueConverter = MultiUrlPickerValueConverter();
-        Assert.AreEqual(typeof(IEnumerable<ApiLink>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        var valueConverter = MultiUrlPickerValueConverter(false);
+
+        Assert.AreEqual(typeof(Link), valueConverter.GetPropertyValueType(publishedPropertyType));
+    }
+
+    [Test]
+    public void MultiUrlPickerValueConverter_YieldsACollectionOfLinks()
+    {
+        IPublishedPropertyType publishedPropertyType = SetupUrlPickerPropertyType(multiple: true);
+
+        var valueConverter = MultiUrlPickerValueConverter(true);
+
+        Assert.AreEqual(typeof(IEnumerable<Link>), valueConverter.GetPropertyValueType(publishedPropertyType));
+    }
+
+    [Test]
+    public void SingleUrlPickerValueConverter_ConvertsContentToLinksWithContentInfo()
+    {
+        IPublishedPropertyType publishedPropertyType = SetupUrlPickerPropertyType(multiple: false);
+
+        var valueConverter = MultiUrlPickerValueConverter(false);
+        Assert.AreEqual(typeof(IEnumerable<ApiLink>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
 
         var inter = Serializer().Serialize(new[]
         {
@@ -34,7 +51,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 Udi = new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key)
             }
         });
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         var link = result.First();
@@ -50,14 +67,12 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     }
 
     [Test]
-    public void MultiUrlPickerValueConverter_InSingleMode_ConvertsMediaToLinksWithoutContentInfo()
+    public void SingleUrlPickerValueConverter_ConvertsMediaToLinksWithoutContentInfo()
     {
-        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
-        var publishedPropertyType = new Mock<IPublishedPropertyType>();
-        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+        IPublishedPropertyType publishedPropertyType = SetupUrlPickerPropertyType(multiple: false);
 
-        var valueConverter = MultiUrlPickerValueConverter();
-        Assert.AreEqual(typeof(IEnumerable<ApiLink>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        var valueConverter = MultiUrlPickerValueConverter(false);
+        Assert.AreEqual(typeof(IEnumerable<ApiLink>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
 
         var inter = Serializer().Serialize(new[]
         {
@@ -66,7 +81,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 Udi = new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key)
             }
         });
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         var link = result.First();
@@ -80,14 +95,12 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     }
 
     [Test]
-    public void MultiUrlPickerValueConverter_InMultiMode_CanHandleMixedLinkTypes()
+    public void MultiUrlPickerValueConverter_CanHandleMixedLinkTypes()
     {
-        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 10 }));
-        var publishedPropertyType = new Mock<IPublishedPropertyType>();
-        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+        IPublishedPropertyType publishedPropertyType = SetupUrlPickerPropertyType(multiple: true);
 
-        var valueConverter = MultiUrlPickerValueConverter();
-        Assert.AreEqual(typeof(IEnumerable<ApiLink>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        var valueConverter = MultiUrlPickerValueConverter(true);
+        Assert.AreEqual(typeof(IEnumerable<ApiLink>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
 
         var inter = Serializer().Serialize(new[]
         {
@@ -107,7 +120,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 Url = "https://umbraco.com/"
             }
         });
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.AreEqual(3, result.Count());
 
@@ -135,11 +148,9 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     [Test]
     public void MultiUrlPickerValueConverter_ConvertsExternalUrlToLinks()
     {
-        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
-        var publishedPropertyType = new Mock<IPublishedPropertyType>();
-        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+        IPublishedPropertyType publishedPropertyType = SetupUrlPickerPropertyType(multiple: true);
 
-        var valueConverter = MultiUrlPickerValueConverter();
+        var valueConverter = MultiUrlPickerValueConverter(true);
 
         var inter = Serializer().Serialize(new[]
         {
@@ -151,7 +162,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 Url = "https://umbraco.com/"
             }
         });
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         var link = result.First();
@@ -166,11 +177,9 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     [Test]
     public void MultiUrlPickerValueConverter_AppliesExplicitConfigurationToMediaLink()
     {
-        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
-        var publishedPropertyType = new Mock<IPublishedPropertyType>();
-        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+        IPublishedPropertyType publishedPropertyType = SetupUrlPickerPropertyType(multiple: true);
 
-        var valueConverter = MultiUrlPickerValueConverter();
+        var valueConverter = MultiUrlPickerValueConverter(true);
 
         var inter = Serializer().Serialize(new[]
         {
@@ -182,7 +191,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 Target = "_blank"
             }
         });
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         var link = result.First();
@@ -199,11 +208,9 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     [Test]
     public void MultiUrlPickerValueConverter_AppliesExplicitConfigurationToContentLink()
     {
-        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
-        var publishedPropertyType = new Mock<IPublishedPropertyType>();
-        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+        IPublishedPropertyType publishedPropertyType = SetupUrlPickerPropertyType(multiple: true);
 
-        var valueConverter = MultiUrlPickerValueConverter();
+        var valueConverter = MultiUrlPickerValueConverter(true);
 
         var inter = Serializer().Serialize(new[]
         {
@@ -215,7 +222,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 Target = "_blank"
             }
         });
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         var link = result.First();
@@ -231,11 +238,9 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     [Test]
     public void MultiUrlPickerValueConverter_PrioritizesContentUrlOverConfiguredUrl()
     {
-        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
-        var publishedPropertyType = new Mock<IPublishedPropertyType>();
-        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+        IPublishedPropertyType publishedPropertyType = SetupUrlPickerPropertyType(multiple: true);
 
-        var valueConverter = MultiUrlPickerValueConverter();
+        var valueConverter = MultiUrlPickerValueConverter(true);
 
         var inter = Serializer().Serialize(new[]
         {
@@ -246,7 +251,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 QueryString = "?something=true"
             }
         });
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         var link = result.First();
@@ -261,15 +266,13 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     [TestCase(123)]
     [TestCase("123")]
     [TestCase(null)]
-    public void MultiUrlPickerValueConverter_InSingleMode_ConvertsInvalidValueToEmptyArray(object? inter)
+    public void SingleUrlPickerValueConverter_ConvertsInvalidValueToEmptyArray(object? inter)
     {
-        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
-        var publishedPropertyType = new Mock<IPublishedPropertyType>();
-        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+        IPublishedPropertyType publishedPropertyType = SetupUrlPickerPropertyType(multiple: false);
 
-        var valueConverter = MultiUrlPickerValueConverter();
+        var valueConverter = MultiUrlPickerValueConverter(false);
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.IsEmpty(result);
     }
@@ -277,33 +280,53 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     [TestCase(123)]
     [TestCase("123")]
     [TestCase(null)]
-    public void MultiUrlPickerValueConverter_InMultiMode_ConvertsInvalidValueToEmptyArray(object? inter)
+    public void MultiUrlPickerValueConverter_ConvertsInvalidValueToEmptyArray(object? inter)
     {
-        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 10 }));
-        var publishedPropertyType = new Mock<IPublishedPropertyType>();
-        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+        IPublishedPropertyType publishedPropertyType = SetupUrlPickerPropertyType(multiple: true);
 
-        var valueConverter = MultiUrlPickerValueConverter();
+        var valueConverter = MultiUrlPickerValueConverter(true);
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.IsEmpty(result);
     }
 
     private IApiMediaUrlProvider ApiMediaUrlProvider() => new ApiMediaUrlProvider(PublishedUrlProvider);
 
-    private MultiUrlPickerValueConverter MultiUrlPickerValueConverter()
+    private MultiUrlPickerValueConverterBase MultiUrlPickerValueConverter(bool multiple)
     {
         var routeBuilder = CreateContentRouteBuilder(ApiContentPathProvider, CreateGlobalSettings());
-        return new MultiUrlPickerValueConverter(
-            Mock.Of<IProfilingLogger>(),
-            Serializer(),
-            PublishedUrlProvider,
-            new ApiContentNameProvider(),
-            ApiMediaUrlProvider(),
-            routeBuilder,
-            CacheManager.Content,
-            CacheManager.Media);
+        return multiple
+            ? new MultiUrlPickerValueConverter(
+                Mock.Of<IProfilingLogger>(),
+                Serializer(),
+                PublishedUrlProvider,
+                new ApiContentNameProvider(),
+                ApiMediaUrlProvider(),
+                routeBuilder,
+                CacheManager.Content,
+                CacheManager.Media)
+            : new SingleUrlPickerValueConverter(
+                Mock.Of<IProfilingLogger>(),
+                Serializer(),
+                PublishedUrlProvider,
+                new ApiContentNameProvider(),
+                ApiMediaUrlProvider(),
+                routeBuilder,
+                CacheManager.Content,
+                CacheManager.Media);
+    }
+
+    private static IPublishedPropertyType SetupUrlPickerPropertyType(bool multiple)
+    {
+        UrlPickerConfigurationBase configuration = multiple
+            ? new MultiUrlPickerConfiguration { ValidationLimit = new NumberRange { Max = 10 } }
+            : new SingleUrlPickerConfiguration();
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => configuration));
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+
+        return publishedPropertyType.Object;
     }
 
     private IJsonSerializer Serializer() => new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
@@ -312,13 +335,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     public void MultiUrlPickerValueConverter_DeliveryApi_ContentLinkWithCulture_IncludesCultureInApiLink()
     {
         // Arrange
-        var publishedDataType = new PublishedDataType(
-            123,
-            "test",
-            "test",
-            new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
-        var publishedPropertyType = new Mock<IPublishedPropertyType>();
-        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+        IPublishedPropertyType publishedPropertyType = SetupUrlPickerPropertyType(multiple: true);
 
         // Setup culture-specific URL path
         PublishedUrlProviderMock
@@ -329,7 +346,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 It.IsAny<Uri?>()))
             .Returns("/fr/the-page-url");
 
-        var valueConverter = MultiUrlPickerValueConverter();
+        var valueConverter = MultiUrlPickerValueConverter(true);
 
         var inter = Serializer().Serialize(new[]
         {
@@ -343,7 +360,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         // Act
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(
             Mock.Of<IPublishedElement>(),
-            publishedPropertyType.Object,
+            publishedPropertyType,
             PropertyCacheLevel.Element,
             inter,
             false,
@@ -366,16 +383,10 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     }
 
     [Test]
-    public void MultiUrlPickerValueConverter_ConvertToObject_ContentLinkWithCulture_GeneratesUrlWithCorrectCulture()
+    public void SingleUrlPickerValueConverter_ConvertToObject_ContentLinkWithCulture_GeneratesUrlWithCorrectCulture()
     {
         // Arrange
-        var publishedDataType = new PublishedDataType(
-            123,
-            "test",
-            "test",
-            new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
-        var publishedPropertyType = new Mock<IPublishedPropertyType>();
-        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+        IPublishedPropertyType publishedPropertyType = SetupUrlPickerPropertyType(multiple: false);
         PublishedUrlProviderMock
             .Setup(p => p.GetUrl(
                 PublishedContent,
@@ -383,7 +394,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 "fr-FR",
                 It.IsAny<Uri?>()))
             .Returns("/fr/the-page-url");
-        var valueConverter = MultiUrlPickerValueConverter();
+        var valueConverter = MultiUrlPickerValueConverter(false);
         var inter = Serializer().Serialize(new[]
         {
             new MultiUrlPickerValueEditor.LinkDto
@@ -396,7 +407,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         // Act
         var result = valueConverter.ConvertIntermediateToObject(
             Mock.Of<IPublishedElement>(),
-            publishedPropertyType.Object,
+            publishedPropertyType,
             PropertyCacheLevel.Element,
             inter,
             false);
@@ -405,5 +416,76 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         Assert.NotNull(result);
         var link = result as Link;
         Assert.AreEqual("/fr/the-page-url", link.Url);
+    }
+
+    [Test]
+    public void MultiUrlPickerValueConverter_ConvertToObject_ReadsDocumentsAndMediaInOneBatchEach()
+    {
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 10 }));
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+
+        var otherContentKey = Guid.NewGuid();
+        var otherContent = SetupPublishedContent("The other page", otherContentKey, PublishedItemType.Content, PublishedContentType);
+        RegisterContentWithProviders(otherContent.Object, false);
+
+        var valueConverter = MultiUrlPickerValueConverter(true);
+        var inter = Serializer().Serialize(new[]
+        {
+            new MultiUrlPickerValueEditor.LinkDto { Udi = new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key) },
+            new MultiUrlPickerValueEditor.LinkDto { Udi = new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key) },
+            new MultiUrlPickerValueEditor.LinkDto { Udi = new GuidUdi(Constants.UdiEntityType.Document, otherContentKey) },
+        });
+
+        var result = valueConverter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<Link>;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result?.Select(x => x.Type), Is.EqualTo(new[] { LinkType.Content, LinkType.Media, LinkType.Content }));
+            PublishedContentCacheMock.Verify(c => c.GetByIds(false, It.Is<IReadOnlyCollection<Guid>>(k => k.SequenceEqual(new[] { PublishedContent.Key, otherContentKey }))), Times.Once);
+            PublishedMediaCacheMock.Verify(c => c.GetByIds(It.Is<IReadOnlyCollection<Guid>>(k => k.SequenceEqual(new[] { PublishedMedia.Key }))), Times.Once);
+        });
+    }
+
+    [Test]
+    public void MultiUrlPickerValueConverter_ConvertToObject_SkipsLinksToMissingContent()
+    {
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 10 }));
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+
+        var valueConverter = MultiUrlPickerValueConverter(true);
+        var inter = Serializer().Serialize(new[]
+        {
+            new MultiUrlPickerValueEditor.LinkDto { Udi = new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()) },
+            new MultiUrlPickerValueEditor.LinkDto { Udi = new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key) },
+        });
+
+        var result = valueConverter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<Link>;
+
+        Assert.That(result?.Select(x => (x.Udi as GuidUdi)?.Guid), Is.EqualTo(new Guid?[] { PublishedContent.Key }));
+    }
+
+    [Test]
+    public void MultiUrlPickerValueConverter_ConvertToObject_DoesNotReadTheCachesForExternalLinks()
+    {
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 10 }));
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+
+        var valueConverter = MultiUrlPickerValueConverter(true);
+        var inter = Serializer().Serialize(new[]
+        {
+            new MultiUrlPickerValueEditor.LinkDto { Name = "External", Url = "https://example.com" },
+        });
+
+        var result = valueConverter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<Link>;
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, result?.Count());
+            PublishedContentCacheMock.Verify(c => c.GetByIds(It.IsAny<bool>(), It.IsAny<IReadOnlyCollection<Guid>>()), Times.Never);
+            PublishedMediaCacheMock.Verify(c => c.GetByIds(It.IsAny<IReadOnlyCollection<Guid>>()), Times.Never);
+        });
     }
 }

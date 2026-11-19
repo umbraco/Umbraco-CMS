@@ -38,7 +38,7 @@ test('can add a property to a document type', {tag: '@smoke'}, async ({umbracoAp
 test('can update a property in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const newDataTypeName = 'Image Media Picker';
+  const newDataTypeName = 'Single Image Media Picker';
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
@@ -149,7 +149,7 @@ test('can create a document type with a property in a tab', {tag: '@smoke'}, asy
 test('can create a document type with multiple groups', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const secondDataTypeName = 'Image Media Picker';
+  const secondDataTypeName = 'Single Image Media Picker';
   const secondGroupName = 'TesterGroup';
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName);
   const secondDataType = await umbracoApi.dataType.getByName(secondDataTypeName);
@@ -171,7 +171,7 @@ test('can create a document type with multiple groups', {tag: '@release'}, async
 test('can create a document type with multiple tabs', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const secondDataTypeName = 'Image Media Picker';
+  const secondDataTypeName = 'Single Image Media Picker';
   const secondGroupName = 'TesterGroup';
   const secondTabName = 'SecondTab';
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditorInTab(documentTypeName, dataTypeName, dataTypeData.id, tabName, groupName);
@@ -321,6 +321,28 @@ test('can enable validation for a property in a document type', {tag: '@release'
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.properties[0].validation.regEx).toBe(regex);
   expect(documentTypeData.properties[0].validation.regExMessage).toBe(regexMessage);
+});
+
+// Tests regression issue: https://github.com/umbraco/Umbraco-CMS/issues/22916
+test('preserves the selected validation option when re-opening a property in a document type', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const numberPresetRegex = '^[0-9]*$';
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+  await umbracoUi.documentType.goToDocumentType(documentTypeName);
+
+  // Act — set Number preset validation and save.
+  await umbracoUi.documentType.clickEditorSettingsButton();
+  await umbracoUi.documentType.selectValidationOption(numberPresetRegex);
+  await umbracoUi.documentType.clickSubmitButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
+
+  // Re-open the property settings.
+  await umbracoUi.documentType.clickEditorSettingsButton();
+
+  // Assert — the dropdown still reflects the saved Number preset, not "No validation".
+  await umbracoUi.documentType.doesSelectedValidationOptionHaveValue(numberPresetRegex);
 });
 
 test('can allow vary by culture for a property in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {

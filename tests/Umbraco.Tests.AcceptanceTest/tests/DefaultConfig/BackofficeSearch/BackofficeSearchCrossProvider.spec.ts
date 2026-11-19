@@ -18,8 +18,10 @@ test.afterEach(async ({umbracoApi}) => {
 test('can rerun the active query when switching providers', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
-  await umbracoApi.document.createDefaultDocument(sharedDocumentName, documentTypeId);
-  await umbracoApi.media.createDefaultMediaFile(sharedMediaName);
+  const documentId = await umbracoApi.document.createDefaultDocument(sharedDocumentName, documentTypeId);
+  const mediaId = await umbracoApi.media.createDefaultMediaFile(sharedMediaName);
+  await umbracoApi.document.waitUntilIndexed(sharedSearchPrefix, documentId);
+  await umbracoApi.media.waitUntilIndexed(sharedSearchPrefix, mediaId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.backofficeSearch.clickSearchHeaderButton();
   await umbracoUi.backofficeSearch.searchForDocument(sharedSearchPrefix);

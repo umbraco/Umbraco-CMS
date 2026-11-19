@@ -29,7 +29,6 @@ import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import '../../components/block-single-entry/index.js';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import {
-	extractJsonQueryProps,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbFormControlMixin,
 	UmbValidationContext,
@@ -41,10 +40,10 @@ import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockSingleLayoutModel, UmbBlockSingleEntryElement> = {
 	getUniqueOfElement: (element) => {
-		return element.contentKey!;
+		return element.key!;
 	},
 	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.contentKey;
+		return modelEntry.key;
 	},
 	//identifier: 'block-single-editor',
 	itemSelector: 'umb-block-single-entry',
@@ -151,6 +150,9 @@ export class UmbPropertyEditorUIBlockSingleElement
 	private _blocks?: Array<UmbBlockTypeBaseModel>;
 
 	@state()
+	private _hasLibraryElements = false;
+
+	@state()
 	private _layouts: Array<UmbBlockLayoutBaseModel> = [];
 
 	@state()
@@ -214,38 +216,6 @@ export class UmbPropertyEditorUIBlockSingleElement
 			this.#gotPropertyContext(context);
 		});
 
-		// TODO: Why is this logic not part of the Block Grid and RTE Editors? [NL]
-		// Observe Blocks and clean up validation messages for content/settings that are not in the block single anymore:
-		this.observe(
-			this.#managerContext.layouts,
-			(layouts) => {
-				const validationMessagesToRemove: string[] = [];
-				const contentKeys = layouts.map((x) => x.contentKey);
-				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.contentData').forEach((message) => {
-					// get the KEY from this string: $.contentData[?(@.key == 'KEY')]
-					// TODO: Investigate if this is missing a part to just get the [] part of the path. Cause couldn't there be a sub path inside of this. [NL]
-					const key = extractJsonQueryProps(message.path).key;
-					if (key && contentKeys.indexOf(key) === -1) {
-						validationMessagesToRemove.push(message.key);
-					}
-				});
-
-				const settingsKeys = layouts.map((x) => x.settingsKey).filter((x) => x !== undefined) as string[];
-				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.settingsData').forEach((message) => {
-					// TODO: Investigate if this is missing a part to just get the [] part of the path. Cause couldn't there be a sub path inside of this. [NL]
-					// get the key from this string: $.settingsData[?(@.key == 'KEY')]
-					const key = extractJsonQueryProps(message.path).key;
-					if (key && settingsKeys.indexOf(key) === -1) {
-						validationMessagesToRemove.push(message.key);
-					}
-				});
-
-				// Remove the messages after the loop to prevent changing the array while iterating over it.
-				this.#validationContext.messages.removeMessageByKeys(validationMessagesToRemove);
-			},
-			null,
-		);
-
 		this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
 			this.observe(
 				context?.displayVariantId,
@@ -291,6 +261,8 @@ export class UmbPropertyEditorUIBlockSingleElement
 			},
 			null,
 		);
+
+		this.observe(this.#entriesContext.hasLibraryElements, (x) => (this._hasLibraryElements = x), null);
 
 		this.observe(
 			this.#entriesContext.catalogueRouteBuilder,
@@ -395,13 +367,9 @@ export class UmbPropertyEditorUIBlockSingleElement
 		return html`
 			${repeat(
 				this._layouts,
-				(x) => x.contentKey,
+				(x) => x.key,
 				(layoutEntry) => html`
-					<umb-block-single-entry
-						.contentKey=${layoutEntry.contentKey}
-						.layout=${layoutEntry}
-						${umbDestroyOnDisconnect()}>
-					</umb-block-single-entry>
+					<umb-block-single-entry .layout=${layoutEntry} ${umbDestroyOnDisconnect()}></umb-block-single-entry>
 				`,
 			)}
 			${this.#renderCreateButtonGroup()}
@@ -413,12 +381,16 @@ export class UmbPropertyEditorUIBlockSingleElement
 		if ((this.readonly && this._layouts.length > 0) || this._layouts.length >= 1) {
 			return nothing;
 		} else {
-			return html` <uui-button-group> ${this.#renderCreateButton()} ${this.#renderPasteButton()} </uui-button-group> `;
+			const createPath = this.#entriesContext.getPathForCreateBlock(-1);
+			return html`
+				<uui-button-group>
+					${this.#renderCreateButton(createPath)}${this.#renderLibraryButton(createPath)}${this.#renderPasteButton()}
+				</uui-button-group>
+			`;
 		}
 	}
 
-	#renderCreateButton() {
-		const createPath = this.#entriesContext.getPathForCreateBlock(-1);
+	#renderCreateButton(createPath: string | undefined) {
 		return html`
 			<uui-button
 				look="placeholder"
@@ -443,9 +415,25 @@ export class UmbPropertyEditorUIBlockSingleElement
 		`;
 	}
 
+	#renderLibraryButton(createPath: string | undefined) {
+		if (!this._catalogueRouteBuilder || createPath || !this._hasLibraryElements) return nothing;
+		return html`
+			<uui-button
+				class="btnAction"
+				label=${this.localize.term('blockEditor_tabLibrary')}
+				look="placeholder"
+				href=${this._catalogueRouteBuilder?.({ view: 'library', index: -1 }) ?? ''}
+				?disabled=${this.readonly}
+				title=${this.localize.term('blockEditor_tabLibrary')}>
+				<uui-icon name="icon-link"></uui-icon>
+			</uui-button>
+		`;
+	}
+
 	#renderPasteButton() {
 		return html`
 			<uui-button
+				class="btnAction"
 				label=${this.localize.term('content_createFromClipboard')}
 				look="placeholder"
 				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}
@@ -465,8 +453,11 @@ export class UmbPropertyEditorUIBlockSingleElement
 
 			uui-button-group {
 				margin-top: 1px;
-				display: grid;
-				grid-template-columns: 1fr auto;
+				display: flex;
+
+				.btnAction {
+					flex: 0;
+				}
 			}
 		`,
 	];

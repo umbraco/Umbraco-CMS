@@ -1,5 +1,5 @@
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import UmbWorkspaceActionMenuItemElement from './workspace-action-menu-item.element.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbExtensionManifestKind = {
 	type: 'kind',

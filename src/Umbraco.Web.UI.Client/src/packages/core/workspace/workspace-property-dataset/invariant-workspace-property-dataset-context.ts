@@ -11,11 +11,12 @@ import { UmbVariantContext, UmbVariantId } from '@umbraco-cms/backoffice/variant
 import { UmbBooleanState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 
 /**
- * A property dataset context that hooks directly into the workspace context.
+ * A property dataset context that hooks directly into the workspace context. It is read-only while the workspace
+ * entity is read-only.
  */
 export class UmbInvariantWorkspacePropertyDatasetContext<
-		WorkspaceType extends UmbInvariantDatasetWorkspaceContext = UmbInvariantDatasetWorkspaceContext,
-	>
+	WorkspaceType extends UmbInvariantDatasetWorkspaceContext = UmbInvariantDatasetWorkspaceContext,
+>
 	extends UmbContextBase
 	implements UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext
 {
@@ -51,6 +52,15 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 
 		this.name = this.#workspace.name;
 		this.#variantContext.setVariantId(this.getVariantId());
+		this.#observeReadOnly();
+	}
+
+	#observeReadOnly() {
+		this.observe(
+			this.#workspace.readOnlyGuard?.permitted,
+			(isReadOnly) => this.#readOnly.setValue(isReadOnly ?? false),
+			null,
+		);
 	}
 
 	get properties(): Observable<Array<UmbPropertyValueData> | undefined> {
@@ -62,8 +72,8 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 
 	/**
 	 * @function propertyValueByAlias
-	 * @param {string} propertyAlias
-	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @param {string} propertyAlias - The alias of the property.
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>} An observable of the property value.
 	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {

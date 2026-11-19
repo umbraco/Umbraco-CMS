@@ -1,20 +1,22 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import type { UmbDocumentItemModel } from '../types.js';
 import type { UmbDocumentSearchItemModel, UmbDocumentSearchRequestArgs } from './types.js';
 import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DocumentService, type DocumentItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
-import type { UmbDocumentItemModel } from '../types.js';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Rollback that fetches data from the server
  * @class UmbDocumentSearchServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbSearchDataSource}
  */
-export class UmbDocumentSearchServerDataSource
-	implements UmbSearchDataSource<UmbDocumentSearchItemModel, UmbDocumentSearchRequestArgs>
-{
+export class UmbDocumentSearchServerDataSource implements UmbSearchDataSource<
+	UmbDocumentSearchItemModel,
+	UmbDocumentSearchRequestArgs
+> {
 	#host: UmbControllerHost;
 
 	/**
@@ -55,10 +57,12 @@ export class UmbDocumentSearchServerDataSource
 	/**
 	 * Get a list of versions for a document
 	 * @param {UmbDocumentSearchRequestArgs} args - The arguments for the search
-	 * @returns {*}
+	 * @returns {UmbDataSourceResponse<UmbPagedModel<UmbDocumentSearchItemModel>>} The search results
 	 * @memberof UmbDocumentSearchServerDataSource
 	 */
-	async search(args: UmbDocumentSearchRequestArgs) {
+	async search(
+		args: UmbDocumentSearchRequestArgs,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentSearchItemModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentService.getItemDocumentSearch({
@@ -115,6 +119,11 @@ export class UmbDocumentSearchServerDataSource
 	}
 }
 
+/**
+ * Maps a document ancestor response to an item model.
+ * @param {DocumentItemResponseModel} ancestor - The ancestor to map
+ * @returns {UmbDocumentItemModel} The mapped item model
+ */
 function mapAncestorToItemModel(ancestor: DocumentItemResponseModel): UmbDocumentItemModel {
 	return {
 		documentType: {

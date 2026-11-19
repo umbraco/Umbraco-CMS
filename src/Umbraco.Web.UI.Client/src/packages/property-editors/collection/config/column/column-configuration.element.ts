@@ -1,5 +1,6 @@
 import type { UmbInputCollectionContentTypePropertyElement } from './components/index.js';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -88,7 +89,7 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 		await umbConfirmModal(this, {
 			color: 'danger',
 			headline: `#actions_remove?`,
-			content: `#defaultdialogs_confirmremove ${column.header ?? ''}?`,
+			content: this.localize.term('defaultdialogs_confirmRemoveItem', escapeHTML(column.header ?? '')),
 			confirmLabel: '#actions_remove',
 		});
 

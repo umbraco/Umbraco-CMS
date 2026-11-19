@@ -54,7 +54,7 @@ public class BackOfficeDefaultController : Controller
     /// <summary>
     ///     Returns the default view for the BackOffice
     /// </summary>
-    /// <returns>The default view currently /umbraco/UmbracoBackOffice/Default.cshtml</returns>
+    /// <returns>The default view currently /umbraco/UmbracoBackOffice/Index.cshtml</returns>
     public ViewResult DefaultView()
     {
         var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(Index) + ".cshtml")

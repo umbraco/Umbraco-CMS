@@ -1,29 +1,29 @@
 import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestCollectionView
-	extends ManifestElement,
-		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
+	extends ManifestElement, ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'collectionView';
 	meta: MetaCollectionView;
 }
 
 export interface MetaCollectionView {
 	/**
-	 * The friendly name of the collection view
+	 * The friendly name of the collection view.
+	 * Core collection views use localization keys prefixed with `#` (e.g. `"#collection_tableViewLabel"`).
+	 * @example ["#collection_tableViewLabel", "Table"]
 	 */
 	label: string;
 
 	/**
 	 * An icon to represent the collection view
-	 * @examples [
-	 *   "icon-box",
-	 *   "icon-grid"
-	 * ]
+	 * @examples ["icon-box", "icon-grid"]
 	 */
 	icon: string;
 
 	/**
 	 * The URL pathname for this collection view that can be deep linked to by sharing the url
+	 * @deprecated Deprecated since v18. Collection views are no longer routed, so this pathname is unused. Scheduled
+	 * for removal in Umbraco 20.
 	 */
 	pathName: string;
 }

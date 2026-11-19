@@ -8,13 +8,11 @@ import type {
 	MetaEntityBulkActionDefaultKind,
 } from '@umbraco-cms/backoffice/extension-registry';
 
-const elementName = 'umb-entity-bulk-action';
-
-@customElement(elementName)
+@customElement('umb-entity-bulk-action')
 export class UmbEntityBulkActionDefaultElement<
-		MetaType extends MetaEntityBulkActionDefaultKind = MetaEntityBulkActionDefaultKind,
-		ApiType extends UmbEntityBulkAction<MetaType> = UmbEntityBulkAction<MetaType>,
-	>
+	MetaType extends MetaEntityBulkActionDefaultKind = MetaEntityBulkActionDefaultKind,
+	ApiType extends UmbEntityBulkAction<MetaType> = UmbEntityBulkAction<MetaType>,
+>
 	extends UmbLitElement
 	implements UmbEntityBulkActionElement
 {
@@ -26,13 +24,30 @@ export class UmbEntityBulkActionDefaultElement<
 	async #onClick(event: PointerEvent) {
 		if (!this.api) return;
 		event.stopPropagation();
-		await this.api.execute().catch(() => {});
+
+		try {
+			await this.api.execute();
+		} catch (error) {
+			// The action did not complete, so it must not be announced as executed: consumers treat that
+			// event as "done" and tear down the selection — and with it this element — which would cut short
+			// any notification the failure is still presenting.
+			// A dismissed modal rejects with a reason rather than an Error; that is a cancellation, not a failure.
+			if (error instanceof Error) {
+				console.error('Error executing action:', error);
+			}
+			return;
+		}
+
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
 	override render() {
 		return html`
-			<uui-button color="default" look="secondary" label=${this.localize.string(this.manifest?.meta.label ?? '')} @click=${this.#onClick}>
+			<uui-button
+				color="default"
+				look="secondary"
+				label=${this.localize.string(this.manifest?.meta.label ?? '')}
+				@click=${this.#onClick}>
 				${when(this.manifest?.meta.icon, () => html`<uui-icon name=${this.manifest!.meta.icon}></uui-icon>`)}
 				<span>${this.localize.string(this.manifest?.meta.label ?? '')}</span>
 			</uui-button>
@@ -44,6 +59,6 @@ export default UmbEntityBulkActionDefaultElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbEntityBulkActionDefaultElement;
+		'umb-entity-bulk-action': UmbEntityBulkActionDefaultElement;
 	}
 }

@@ -97,6 +97,7 @@ test('can create document blueprint with permission enabled', {tag: '@release'},
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   await umbracoUi.content.clickCreateBlueprintActionMenuOption();
+  await umbracoUi.content.clickModalMenuItemWithName('Document Blueprints');
   await umbracoUi.content.enterDocumentBlueprintName(documentBlueprintName);
   await umbracoUi.content.clickSaveDocumentBlueprintButton();
 
@@ -160,7 +161,6 @@ test('can empty recycle bin with delete permission enabled', {tag: '@release'}, 
 
   // Act
   await umbracoUi.content.clickRecycleBinButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.content.clickEmptyRecycleBinButton();
   await umbracoUi.content.clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied();
 
@@ -625,8 +625,8 @@ test('can rollback content with rollback permission enabled', {tag: '@release'},
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, documentText);
   // Verify audit trail
   await umbracoUi.content.clickInfoTab();
-  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.rollback);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentRolledBack);
+  await umbracoUi.content.doesAnyHistoryItemHaveTag(ConstantHelper.auditTrailTypes.rollback);
+  await umbracoUi.content.doesAnyHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentRolledBack);
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
@@ -657,13 +657,15 @@ test('can not see delete button in content for userGroup with delete permission 
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
 
   // Assert
-  await umbracoUi.content.isPermissionInActionsMenuVisible('Delete…', false);
   await umbracoUi.content.isPermissionInActionsMenuVisible('Create…', true);
+  await umbracoUi.content.isPermissionInActionsMenuVisible('Delete…', false);
 });
 
 test('can create and update content with permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedDocumentName = testDocumentName + ' Updated';
+  await umbracoApi.document.ensureNameNotExists(testDocumentName);
+  await umbracoApi.document.ensureNameNotExists(updatedDocumentName);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateAndUpdateDocumentPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);

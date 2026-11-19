@@ -6,8 +6,7 @@ import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cm
  * Shared by card and ref variants.
  */
 export interface ManifestEntityCollectionItemBase<MetaType = object>
-	extends ManifestElement<UmbEntityCollectionItemElement>,
-		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
+	extends ManifestElement<UmbEntityCollectionItemElement>, ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	/**
 	 * The entity types this collection item supports.
 	 */

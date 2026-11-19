@@ -23,6 +23,7 @@ export const urlHandlers = [
 					...urlInfo,
 					message: null,
 					provider: 'Default',
+					isExternal: false,
 				})),
 		}));
 

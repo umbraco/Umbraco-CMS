@@ -45,8 +45,10 @@ public sealed class ExternalMemberCacheRefresher : PayloadCacheRefresherBase<Ext
         /// <param name="key">The unique key of the external member.</param>
         /// <param name="removed">Whether the external member was removed.</param>
         /// <param name="indexableFieldsChanged">
-        ///     Whether any field that is part of the Examine value set has changed as part of this operation.
-        ///     Defaults to <c>true</c>. When <c>false</c>, Examine indexing handlers skip the re-index for this payload.
+        ///     Whether any field that is part of the search index value set has changed as part of this
+        ///     operation. Defaults to <c>true</c>. Mirrors
+        ///     <see cref="Constants.Conventions.Member.IndexableFieldsChangedStateKey"/> from the
+        ///     originating save. Note that external members are not currently indexed by search at all.
         /// </param>
         public JsonPayload(int id, Guid key, bool removed, bool indexableFieldsChanged = true)
         {
@@ -57,7 +59,7 @@ public sealed class ExternalMemberCacheRefresher : PayloadCacheRefresherBase<Ext
         }
 
         /// <summary>
-        ///     Gets the integer identifier of the external member (used as the Examine document ID).
+        ///     Gets the integer identifier of the external member.
         /// </summary>
         public int Id { get; }
 
@@ -76,7 +78,9 @@ public sealed class ExternalMemberCacheRefresher : PayloadCacheRefresherBase<Ext
         /// </summary>
         /// <remarks>
         ///     Explicitly set to <c>false</c> on login-only updates (which do not bump
-        ///     <c>UpdateDate</c>) so that the Examine indexing handlers skip re-indexing this payload.
+        ///     <c>UpdateDate</c>), mirroring <see cref="Constants.Conventions.Member.IndexableFieldsChangedStateKey"/>
+        ///     from the originating save. Note that external members are not currently indexed by
+        ///     search at all.
         /// </remarks>
         public bool IndexableFieldsChanged { get; }
     }

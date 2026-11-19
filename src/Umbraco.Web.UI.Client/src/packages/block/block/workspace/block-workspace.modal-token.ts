@@ -4,8 +4,9 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbBlockWorkspaceOriginData {}
 
-export interface UmbBlockWorkspaceData<OriginDataType extends UmbBlockWorkspaceOriginData = UmbBlockWorkspaceOriginData>
-	extends UmbWorkspaceModalData {
+export interface UmbBlockWorkspaceData<
+	OriginDataType extends UmbBlockWorkspaceOriginData = UmbBlockWorkspaceOriginData,
+> extends UmbWorkspaceModalData {
 	originData: OriginDataType;
 	baseDataPath: string;
 }

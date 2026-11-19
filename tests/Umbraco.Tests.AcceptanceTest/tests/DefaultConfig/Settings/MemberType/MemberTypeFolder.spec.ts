@@ -1,15 +1,18 @@
-import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
+const memberTypeTargetFolderName = 'TestMemberTypeTargetFolder';
 const memberTypeFolderName = 'TestMemberTypeFolder';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
+  await umbracoApi.memberType.ensureNameNotExists(memberTypeTargetFolderName);
   await umbracoApi.memberType.ensureNameNotExists(memberTypeFolderName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.memberType.goToSection(ConstantHelper.sections.settings);
 });
 
 test.afterEach(async ({umbracoApi}) => {
+  await umbracoApi.memberType.ensureNameNotExists(memberTypeTargetFolderName);
   await umbracoApi.memberType.ensureNameNotExists(memberTypeFolderName);
 });
 
@@ -135,4 +138,42 @@ test('can create a member type folder in a folder in a folder', async ({umbracoA
   // Clean
   await umbracoApi.memberType.ensureNameNotExists(childFolderName);
   await umbracoApi.memberType.ensureNameNotExists(grandparentFolderName);
+});
+
+test('can find a member type in a sibling nested folder', async ({umbracoApi}) => {
+  // Arrange
+  const firstChildFolderName = 'AAFirstChildFolder';
+  const nestedFolderName = 'NestedFolder';
+  const secondChildFolderName = 'ZZSecondChildFolder';
+  const targetMemberTypeName = 'TargetMemberType';
+  const parentFolderId = await umbracoApi.memberType.createFolder(memberTypeFolderName);
+  const firstChildFolderId = await umbracoApi.memberType.createFolder(firstChildFolderName, parentFolderId);
+  await umbracoApi.memberType.createFolder(nestedFolderName, firstChildFolderId);
+  const secondChildFolderId = await umbracoApi.memberType.createFolder(secondChildFolderName, parentFolderId);
+  const targetMemberTypeId = await umbracoApi.memberType.createDefaultMemberTypeInFolder(targetMemberTypeName, secondChildFolderId);
+
+  // Act
+  const memberTypeData = await umbracoApi.memberType.getByName(targetMemberTypeName);
+
+  // Assert
+  expect(memberTypeData).toBeTruthy();
+  expect(memberTypeData.id).toBe(targetMemberTypeId);
+  const secondChildFolderChildren = await umbracoApi.memberType.getChildren(secondChildFolderId);
+  expect(secondChildFolderChildren.map(child => child.id)).toContain(targetMemberTypeId);
+});
+
+test('can move a member type folder to another member type folder', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const folderId = await umbracoApi.memberType.createFolder(memberTypeFolderName);
+  const targetFolderId = await umbracoApi.memberType.createFolder(memberTypeTargetFolderName);
+
+  // Act
+  await umbracoUi.memberType.clickRootFolderCaretButton();
+  await umbracoUi.memberType.clickActionsMenuForMemberType(memberTypeFolderName);
+  await umbracoUi.memberType.moveToFolder(memberTypeTargetFolderName);
+
+  // Assert
+  await umbracoUi.memberType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);
+  const targetFolderChildren = await umbracoApi.memberType.getChildren(targetFolderId);
+  expect(targetFolderChildren.some((child) => child.id === folderId)).toBeTruthy();
 });

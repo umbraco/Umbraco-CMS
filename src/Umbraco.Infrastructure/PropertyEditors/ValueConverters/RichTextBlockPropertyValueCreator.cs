@@ -3,6 +3,7 @@
 
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 
@@ -18,7 +19,9 @@ internal sealed class RichTextBlockPropertyValueCreator : BlockPropertyValueCrea
     /// </summary>
     /// <param name="blockEditorConverter">The <see cref="BlockEditorConverter"/> used to convert block editor values.</param>
     /// <param name="variationContextAccessor">The <see cref="IVariationContextAccessor"/> providing access to the variation context.</param>
+    /// <param name="propertyRenderingContextAccessor">Provides access to the current rendering context.</param>
     /// <param name="blockEditorVarianceHandler">The <see cref="BlockEditorVarianceHandler"/> that handles block editor variance.</param>
+    /// <param name="elementCacheService">The cache for elements.</param>
     /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/> used for JSON serialization and deserialization.</param>
     /// <param name="constructorCache">The <see cref="RichTextBlockPropertyValueConstructorCache"/> used to cache rich text block property value constructors.</param>
     /// <param name="languageService">Service used to retrieve language information for fallback resolution.</param>
@@ -27,10 +30,11 @@ internal sealed class RichTextBlockPropertyValueCreator : BlockPropertyValueCrea
         IVariationContextAccessor variationContextAccessor,
         IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
         BlockEditorVarianceHandler blockEditorVarianceHandler,
+        IElementCacheService elementCacheService,
         IJsonSerializer jsonSerializer,
         RichTextBlockPropertyValueConstructorCache constructorCache,
         ILanguageService languageService)
-        : base(blockEditorConverter, variationContextAccessor, propertyRenderingContextAccessor, blockEditorVarianceHandler, languageService)
+        : base(blockEditorConverter, variationContextAccessor, propertyRenderingContextAccessor, blockEditorVarianceHandler, languageService, elementCacheService)
     {
         _jsonSerializer = jsonSerializer;
         _constructorCache = constructorCache;
@@ -43,15 +47,16 @@ internal sealed class RichTextBlockPropertyValueCreator : BlockPropertyValueCrea
     /// <param name="referenceCacheLevel">The cache level to use for property references during model creation.</param>
     /// <param name="blockValue">The <see cref="RichTextBlockValue"/> representing the value to convert.</param>
     /// <param name="preview">True to create the model in preview mode; otherwise, false.</param>
+    /// <param name="owningPropertyCulture">The culture of the stored property value the block value was loaded from, or <c>null</c> when the property does not vary by culture.</param>
     /// <param name="blockConfigurations">An array of <see cref="RichTextConfiguration.RichTextBlockConfiguration"/> objects that define the configuration for each block type.</param>
     /// <returns>A <see cref="RichTextBlockModel"/> that represents the parsed and configured block content, or <see cref="RichTextBlockModel.Empty"/> if the value is invalid or empty.</returns>
-    public async Task<RichTextBlockModel> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, RichTextBlockValue blockValue, bool preview, RichTextConfiguration.RichTextBlockConfiguration[] blockConfigurations)
+    public async Task<RichTextBlockModel> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, RichTextBlockValue blockValue, bool preview, string? owningPropertyCulture, RichTextConfiguration.RichTextBlockConfiguration[] blockConfigurations)
     {
         RichTextBlockModel CreateEmptyModel() => RichTextBlockModel.Empty;
 
         RichTextBlockModel CreateModel(IList<RichTextBlockItem> items) => new RichTextBlockModel(items);
 
-        RichTextBlockModel blockModel = await CreateBlockModelAsync(owner, referenceCacheLevel, blockValue, preview, blockConfigurations, CreateEmptyModel, CreateModel);
+        RichTextBlockModel blockModel = await CreateBlockModelAsync(owner, referenceCacheLevel, blockValue, preview, owningPropertyCulture, blockConfigurations, CreateEmptyModel, CreateModel);
 
         return blockModel;
     }

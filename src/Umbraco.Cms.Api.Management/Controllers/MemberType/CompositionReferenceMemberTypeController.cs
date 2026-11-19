@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType;
 
@@ -47,14 +48,14 @@ public class CompositionReferenceMemberTypeController : MemberTypeControllerBase
     [EndpointDescription("Gets a collection of member types that reference the specified member type as a composition.")]
     public async Task<IActionResult> CompositionReferences(CancellationToken cancellationToken, Guid id)
     {
-        var memberType = await _memberTypeService.GetAsync(id);
+        IMemberType? memberType = await _memberTypeService.GetAsync(id);
 
         if (memberType is null)
         {
             return OperationStatusResult(ContentTypeOperationStatus.NotFound);
         }
 
-        IEnumerable<IMemberType> composedOf = _memberTypeService.GetComposedOf(memberType.Id);
+        IEnumerable<IMemberType> composedOf = _memberTypeService.GetComposedOf(memberType.Id, ComposedOfType.Composition);
         List<MemberTypeCompositionResponseModel> responseModels = _umbracoMapper.MapEnumerable<IMemberType, MemberTypeCompositionResponseModel>(composedOf);
 
         return Ok(responseModels);

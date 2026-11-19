@@ -1,5 +1,5 @@
 import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
-import type { UmbMediaCollectionItemModel } from '../../types.js';
+import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from '../../types.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from '../../media-collection.context-token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -48,6 +48,12 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
+	@state()
+	private _orderingColumn = '';
+
+	@state()
+	private _orderingDesc = false;
+
 	#collectionContext?: typeof UMB_MEDIA_COLLECTION_CONTEXT.TYPE;
 
 	constructor() {
@@ -86,6 +92,16 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 				this._selection = selection as string[];
 			},
 			'_observeSelection',
+		);
+
+		this.observe(
+			this.#collectionContext.filter,
+			(filter) => {
+				const { orderBy, orderDirection } = filter as UmbMediaCollectionFilterModel;
+				this._orderingColumn = orderBy ?? '';
+				this._orderingDesc = orderDirection === 'desc';
+			},
+			'_observeOrdering',
 		);
 	}
 
@@ -159,7 +175,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 	#getPropertyValueByAlias(item: UmbMediaCollectionItemModel, alias: string) {
 		switch (alias) {
 			case 'contentTypeAlias':
-				return item.contentTypeAlias;
+				return item.contentType?.alias;
 			case 'createDate':
 				return item.createDate.toLocaleString(this.localize.lang());
 			case 'name':
@@ -209,6 +225,8 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 				.columns=${this._tableColumns}
 				.items=${this._tableItems}
 				.selection=${this._selection}
+				.orderingColumn=${this._orderingColumn}
+				.orderingDesc=${this._orderingDesc}
 				@selected=${this.#handleSelect}
 				@deselected=${this.#handleDeselect}
 				@ordered=${this.#handleOrdering}></umb-table>

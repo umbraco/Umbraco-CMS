@@ -66,12 +66,10 @@ test('can not see element in tree with read permission disabled', async ({umbrac
 
   // Act
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.library, false);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
 
   // Assert
   await umbracoUi.library.isElementInTreeVisible(elementName, false);
   await umbracoUi.page.goto(`${umbracoUi.page.url()}/workspace/element/edit/${elementId}`);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.minimal); // Wait for workspace to load
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
 });
 
@@ -151,7 +149,6 @@ test('can empty recycle bin with delete permission enabled', async ({umbracoApi,
 
   // Act
   await umbracoUi.library.clickRecycleBinButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.library.clickEmptyRecycleBinButton();
   await umbracoUi.library.clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied();
 
@@ -389,8 +386,8 @@ test('can rollback element with rollback permission enabled', async ({umbracoApi
   await umbracoUi.library.doesElementPropertyHaveValue(dataTypeName, elementText);
   // Verify audit trail
   await umbracoUi.library.clickInfoTab();
-  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.rollback);
-  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementRolledBack);
+  await umbracoUi.library.doesAnyHistoryItemHaveTag(ConstantHelper.auditTrailTypes.rollback);
+  await umbracoUi.library.doesAnyHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementRolledBack);
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
 });

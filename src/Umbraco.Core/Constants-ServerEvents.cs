@@ -18,6 +18,16 @@ public static partial class Constants
             public const string Document = "Umbraco:CMS:Document";
 
             /// <summary>
+            ///     The event source identifier for element events.
+            /// </summary>
+            public const string Element = "Umbraco:CMS:Element";
+
+            /// <summary>
+            ///     The event source identifier for element container events.
+            /// </summary>
+            public const string ElementContainer = "Umbraco:CMS:ElementContainer";
+
+            /// <summary>
             ///     The event source identifier for document blueprint events.
             /// </summary>
             public const string DocumentBlueprint = "Umbraco:CMS:DocumentBlueprint";

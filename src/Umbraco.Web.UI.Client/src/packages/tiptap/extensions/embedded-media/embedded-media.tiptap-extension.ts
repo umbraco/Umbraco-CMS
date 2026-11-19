@@ -29,13 +29,23 @@ export const umbEmbeddedMedia = Node.create<UmbEmbeddedMediaOptions>({
 	},
 
 	parseHTML() {
-		return [{ tag: '.umb-embed-holder', priority: 100 }];
+		return [
+			{ tag: '.umb-embed-holder', priority: 100 },
+			// Legacy TinyMCE embeds, for upgrading existing content.
+			{ tag: '.embeditem', priority: 100 },
+		];
 	},
 
 	renderHTML({ HTMLAttributes }) {
 		const { markup, ...attrs } = HTMLAttributes;
-		const embed = document.createRange().createContextualFragment(markup);
-		return [this.options.inline ? 'span' : 'div', mergeAttributes({ class: 'umb-embed-holder' }, attrs), embed];
+		const dom = document.createElement(this.options.inline ? 'span' : 'div');
+		for (const [name, value] of Object.entries(mergeAttributes({ class: 'umb-embed-holder' }, attrs))) {
+			if (value != null) dom.setAttribute(name, value);
+		}
+		if (markup) {
+			dom.append(document.createRange().createContextualFragment(markup));
+		}
+		return dom;
 	},
 
 	addCommands() {

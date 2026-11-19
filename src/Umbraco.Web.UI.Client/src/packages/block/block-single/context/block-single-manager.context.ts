@@ -22,13 +22,15 @@ export class UmbBlockSingleManagerContext<
 	}
 
 	/**
-	 * @param contentElementTypeKey
-	 * @param partialLayoutEntry
-	 * @param _originData
+	 * Creates block data with default presets for the given content element type.
+	 * @param {string} contentElementTypeKey - The key of the content element type to create.
+	 * @param {Omit<BlockLayoutType, 'contentKey'>} [partialLayoutEntry] - Partial layout entry to merge into the created layout entry.
+	 * @param {UmbBlockSingleWorkspaceOriginData} [_originData] - Origin data, unused by this implementation.
+	 * @returns {Promise<{ layout: BlockLayoutType; content: UmbBlockDataModel; settings: UmbBlockDataModel | undefined }>} the created block data.
 	 */
 	async createWithPresets(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey' | 'key'>,
 		// This property is used by some implementations, but not used in this. Do not remove. [NL]
 
 		_originData?: UmbBlockSingleWorkspaceOriginData,

@@ -1,6 +1,7 @@
 import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '../../default/default.action.kind.js';
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_ENTITY_ACTION_GROUP_STRUCTURE } from '../../action-groups/constants.js';
 import UmbDeleteEntityAction from './delete.action.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_ENTITY_ACTION_DELETE_KIND_MANIFEST: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -10,9 +11,10 @@ export const UMB_ENTITY_ACTION_DELETE_KIND_MANIFEST: UmbExtensionManifestKind = 
 	manifest: {
 		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
+		group: UMB_ENTITY_ACTION_GROUP_STRUCTURE,
 		kind: 'delete',
 		api: UmbDeleteEntityAction,
-		weight: 1100,
+		weight: 799,
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-trash',

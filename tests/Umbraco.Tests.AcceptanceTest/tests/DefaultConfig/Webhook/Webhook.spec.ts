@@ -2,28 +2,31 @@ import {expect} from "@playwright/test";
 import {test} from '@umbraco/acceptance-test-helpers';
 
 const webhookName = 'Test Webhook';
-let webhookSiteToken = '';
+const updatedWebhookName = 'Updated Webhook';
+let receiverToken = '';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoApi.webhook.ensureNameNotExists(webhookName);
+  await umbracoApi.webhook.ensureNameNotExists(updatedWebhookName);
   await umbracoUi.goToBackOffice();
-  webhookSiteToken = await umbracoApi.webhook.generateWebhookSiteToken();
+  receiverToken = await umbracoApi.webhook.generateReceiverToken();
 });
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.webhook.ensureNameNotExists(webhookName);
+  await umbracoApi.webhook.ensureNameNotExists(updatedWebhookName);
 });
 
 test('can create a webhook', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const event = 'Content Deleted';
-  const webhookSiteUrl = umbracoApi.webhook.webhookSiteUrl + webhookSiteToken;
+  const webhookUrl = umbracoApi.webhook.receiverUrl + receiverToken;
   await umbracoUi.webhook.goToWebhooks();
 
   // Act
   await umbracoUi.webhook.clickWebhookCreateButton();
   await umbracoUi.webhook.enterWebhookName(webhookName);
-  await umbracoUi.webhook.enterUrl(webhookSiteUrl);
+  await umbracoUi.webhook.enterUrl(webhookUrl);
   await umbracoUi.webhook.clickChooseEventButton();
   await umbracoUi.webhook.clickTextButtonWithName(event);
   await umbracoUi.webhook.clickSubmitButton();
@@ -31,29 +34,28 @@ test('can create a webhook', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   expect(await umbracoApi.webhook.doesNameExist(webhookName)).toBeTruthy();
-  expect(await umbracoApi.webhook.doesWebhookHaveUrl(webhookName, webhookSiteUrl)).toBeTruthy();
+  expect(await umbracoApi.webhook.doesWebhookHaveUrl(webhookName, webhookUrl)).toBeTruthy();
   expect(await umbracoApi.webhook.doesWebhookHaveEvent(webhookName, event)).toBeTruthy();
   await umbracoApi.webhook.isWebhookEnabled(webhookName);
 });
 
 test('can update webhook name', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const updatedName = 'Updated Webhook';
-  await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken);
+  await umbracoApi.webhook.createDefaultWebhook(webhookName, receiverToken);
   await umbracoUi.webhook.goToWebhookWithName(webhookName);
 
   // Act
-  await umbracoUi.webhook.enterWebhookName(updatedName);
+  await umbracoUi.webhook.enterWebhookName(updatedWebhookName);
   await umbracoUi.webhook.clickSaveButtonAndWaitForWebhookToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.webhook.doesNameExist(updatedName)).toBeTruthy();
+  expect(await umbracoApi.webhook.doesNameExist(updatedWebhookName)).toBeTruthy();
   expect(await umbracoApi.webhook.doesNameExist(webhookName)).toBeFalsy();
 });
 
 test('can delete a webhook', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken);
+  await umbracoApi.webhook.createDefaultWebhook(webhookName, receiverToken);
   await umbracoUi.webhook.goToWebhooks();
 
   // Act
@@ -68,7 +70,7 @@ test('can add content type for a webhook', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const contentTypeName = 'Test Document Type For Webhook';
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentType(contentTypeName);
-  await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken);
+  await umbracoApi.webhook.createDefaultWebhook(webhookName, receiverToken);
   await umbracoUi.webhook.goToWebhookWithName(webhookName);
 
   // Act
@@ -89,7 +91,7 @@ test('can add header for a webhook', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const headerName = 'test-header-name';
   const headerValue = 'test-header-value';
-  await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken);
+  await umbracoApi.webhook.createDefaultWebhook(webhookName, receiverToken);
   await umbracoUi.webhook.goToWebhookWithName(webhookName);
 
   // Act
@@ -105,7 +107,7 @@ test('can add header for a webhook', async ({umbracoApi, umbracoUi}) => {
 
 test('can disable a webhook', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken);
+  await umbracoApi.webhook.createDefaultWebhook(webhookName, receiverToken);
   await umbracoUi.webhook.goToWebhookWithName(webhookName);
 
   // Act
@@ -120,7 +122,7 @@ test('can disable a webhook', async ({umbracoApi, umbracoUi}) => {
 test('cannot remove all events from a webhook', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const event = 'Content Deleted';
-  await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken, event);
+  await umbracoApi.webhook.createDefaultWebhook(webhookName, receiverToken, event);
   await umbracoUi.webhook.goToWebhookWithName(webhookName);
 
   // Act
@@ -136,7 +138,7 @@ test('can remove a content type from a webhook', async ({umbracoApi, umbracoUi})
   const event = 'Media Saved';
   const mediaTypeName = 'Audio';
   const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-  await umbracoApi.webhook.createWebhookForSpecificContentType(webhookName, webhookSiteToken, event, mediaTypeName);
+  await umbracoApi.webhook.createWebhookForSpecificContentType(webhookName, receiverToken, event, mediaTypeName);
   expect(await umbracoApi.webhook.doesWebhookHaveContentTypeId(webhookName, mediaTypeData.id)).toBeTruthy();
   await umbracoUi.webhook.goToWebhookWithName(webhookName);
 
@@ -154,7 +156,7 @@ test('can remove a header from a webhook', async ({umbracoApi, umbracoUi}) => {
   const event = 'Content Published';
   const headerName = 'test-header-name';
   const headerValue = 'automation-test';
-  await umbracoApi.webhook.createWebhookWithHeader(webhookName, webhookSiteToken, event, headerName, headerValue);
+  await umbracoApi.webhook.createWebhookWithHeader(webhookName, receiverToken, event, headerName, headerValue);
   expect(await umbracoApi.webhook.doesWebhookHaveHeader(webhookName, headerName, headerValue)).toBeTruthy();
   await umbracoUi.webhook.goToWebhookWithName(webhookName);
 
@@ -169,7 +171,7 @@ test('can remove a header from a webhook', async ({umbracoApi, umbracoUi}) => {
 test('cannot add both content event and media event for a webhook', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const event = 'Content Published';
-  await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken, event);
+  await umbracoApi.webhook.createDefaultWebhook(webhookName, receiverToken, event);
   await umbracoUi.webhook.goToWebhookWithName(webhookName);
 
   // Act

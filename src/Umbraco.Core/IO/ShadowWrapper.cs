@@ -114,12 +114,14 @@ internal sealed class ShadowWrapper : IFileSystem, IFileProviderFactory
     /// <inheritdoc />
     public void DeleteFile(string path) => FileSystem.DeleteFile(path);
 
-    /// <summary>
-    /// Moves a file from the source path to the target path.
-    /// </summary>
-    /// <param name="source">The source file path.</param>
-    /// <param name="target">The target file path.</param>
-    public void MoveFile(string source, string target) => FileSystem.MoveFile(source, target);
+    /// <inheritdoc />
+    /// <remarks>
+    /// This must match the <see cref="IFileSystem.MoveFile(string, string, bool)"/> signature to implement it.
+    /// Otherwise a call through <see cref="IFileSystem"/> runs the interface's default implementation, a copy and
+    /// a delete, instead of the wrapped file system's own move.
+    /// </remarks>
+    public void MoveFile(string source, string target, bool overrideIfExists = true)
+        => FileSystem.MoveFile(source, target, overrideIfExists);
 
     /// <inheritdoc />
     public bool FileExists(string path) => FileSystem.FileExists(path);

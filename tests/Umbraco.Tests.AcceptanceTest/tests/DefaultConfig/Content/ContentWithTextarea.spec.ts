@@ -101,3 +101,35 @@ test('cannot input the text that exceeds the allowed amount of characters', {tag
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
+
+test('can navigate away from content with a textarea value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDocumentWithPropertyValue(contentName, documentTypeId, AliasHelper.toAlias(dataTypeName), text);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isSectionActive(ConstantHelper.sections.settings);
+  await umbracoUi.content.isDiscardChangesModalVisible(false);
+});
+
+test('can see discard changes when navigating away from content with a changed textarea value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDocumentWithPropertyValue(contentName, documentTypeId, AliasHelper.toAlias(dataTypeName), text);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterTextArea('Updated textarea');
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  await umbracoUi.content.isDiscardChangesModalVisible();
+});

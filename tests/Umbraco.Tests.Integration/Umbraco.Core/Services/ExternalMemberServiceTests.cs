@@ -219,6 +219,32 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Get_By_Keys()
+    {
+        // Arrange
+        var first = (await ExternalMemberService.CreateAsync(ExternalMemberIdentityBuilder.CreateSimple("keys-first@example.com", "First"))).Result;
+        var second = (await ExternalMemberService.CreateAsync(ExternalMemberIdentityBuilder.CreateSimple("keys-second@example.com", "Second"))).Result;
+        await ExternalMemberService.CreateAsync(ExternalMemberIdentityBuilder.CreateSimple("keys-not-requested@example.com", "Not Requested"));
+
+        // Act
+        var retrieved = (await ExternalMemberService.GetByKeysAsync([first.Key, second.Key, Guid.NewGuid()])).ToArray();
+
+        // Assert
+        CollectionAssert.AreEquivalent(new[] { first.Key, second.Key }, retrieved.Select(member => member.Key));
+        Assert.AreEqual("keys-first@example.com", retrieved.Single(member => member.Key == first.Key).Email);
+    }
+
+    [Test]
+    public async Task GetByKeys_Returns_Empty_For_No_Keys()
+    {
+        // Act
+        var retrieved = await ExternalMemberService.GetByKeysAsync([]);
+
+        // Assert
+        Assert.IsEmpty(retrieved);
+    }
+
+    [Test]
     public async Task GetByKey_Returns_Null_For_NonExistent()
     {
         // Act

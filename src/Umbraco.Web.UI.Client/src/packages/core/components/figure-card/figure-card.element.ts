@@ -85,10 +85,18 @@ export class UmbFigureCardElement extends UUICardElement {
 	#renderContent() {
 		return html`
       <div id="content">
-        <span title="${this.name}" id="name">${this.name}</span>
+        <span id="name-part">
+          ${this.#renderChildrenIndicator()}
+          <span title="${this.name}" id="name">${this.name}</span>
+        </span>
         <small title="${ifDefined(this.description)}">${this.description}<slot name="description"></slot></small>
       </div></div>
     `;
+	}
+
+	#renderChildrenIndicator() {
+		if (!this.hasChildren) return nothing;
+		return html`<uui-symbol-expand id="has-children" aria-hidden="true"></uui-symbol-expand>`;
 	}
 
 	static override styles = [
@@ -173,6 +181,16 @@ export class UmbFigureCardElement extends UUICardElement {
 				overflow: hidden;
 				text-overflow: ellipsis;
 				overflow-wrap: anywhere;
+			}
+
+			#name-part {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-space-1);
+			}
+
+			#has-children {
+				flex: none;
 			}
 
 			:host([image]:not([image=''])) #open-part {

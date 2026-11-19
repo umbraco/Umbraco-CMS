@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Cms.Infrastructure;
 
@@ -81,65 +80,6 @@ public static class Suspendable
         }
     }
 
-    /// <summary>
-    /// Represents events related to the Examine indexing process that can be suspended.
-    /// </summary>
-    /// <remarks>
-    /// This is really needed at all since the only place this is used is in ExamineComponent and that already maintains a flag of whether it suspsended or not
-    /// AHH... but Deploy probably uses this?
-    /// </remarks>
-    public static class ExamineEvents
-    {
-        private static bool _tried;
-        private static bool _suspended;
-
-        /// <summary>
-        /// Gets a value indicating whether indexing is currently allowed.
-        /// </summary>
-        public static bool CanIndex
-        {
-            get
-            {
-                if (_suspended == false)
-                {
-                    return true;
-                }
-
-                _tried = true; // remember we tried
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Suspends the indexers by setting the internal suspended flag and logs the suspension action.
-        /// </summary>
-        /// <param name="logger">The logger used to record information about the suspension of the indexers.</param>
-        public static void SuspendIndexers(ILogger logger)
-        {
-            logger.LogInformation("Suspend indexers.");
-            _suspended = true;
-        }
-
-        /// <summary>
-        /// Resumes the indexers after they have been suspended. If a rebuild was previously attempted while suspended, this method triggers a rebuild of the indexes using the provided <paramref name="backgroundIndexRebuilder"/>.
-        /// </summary>
-        /// <param name="backgroundIndexRebuilder">The <see cref="IIndexRebuilder"/> instance used to rebuild the indexes if required.</param>
-        public static void ResumeIndexers(IIndexRebuilder backgroundIndexRebuilder)
-        {
-            _suspended = false;
-
-            StaticApplicationLogging.Logger.LogInformation("Resume indexers (rebuild:{Tried}).", _tried);
-
-            if (_tried == false)
-            {
-                return;
-            }
-
-            _tried = false;
-
-            backgroundIndexRebuilder.RebuildIndexes(false);
-        }
-    }
 
     /// <summary>
     /// Represents scheduled publishing operations that can be suspended and resumed.

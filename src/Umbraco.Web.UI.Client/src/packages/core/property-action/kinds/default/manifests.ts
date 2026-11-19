@@ -1,5 +1,5 @@
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import UmbPropertyActionElement from './property-action.element.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST: UmbExtensionManifestKind = {
 	type: 'kind',

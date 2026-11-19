@@ -1,11 +1,17 @@
-import { UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT } from './content-collection-workspace.context-token.js';
-import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_CONTENT_COLLECTION_CONFIGURATION_CONTEXT } from './configuration/content-collection-configuration.context-token.js';
+import { customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbCollectionConfiguration } from '@umbraco-cms/backoffice/collection';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+import { UmbCollectionWorkspaceViewInteractionMemoryController } from '@umbraco-cms/backoffice/collection';
+import type { UmbCollectionConfiguration, UmbCollectionElement } from '@umbraco-cms/backoffice/collection';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import type { ManifestWorkspaceView, UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-content-collection-workspace-view')
 export class UmbContentCollectionWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
+	@property({ type: Object, attribute: false })
+	public manifest?: ManifestWorkspaceView;
+
 	@state()
 	private _loading = true;
 
@@ -15,14 +21,26 @@ export class UmbContentCollectionWorkspaceViewElement extends UmbLitElement impl
 	@state()
 	private _collectionAlias?: string;
 
+	@state()
+	private _collectionInteractionMemories?: Array<UmbInteractionMemoryModel>;
+
+	#workspaceViewInteractionMemory = new UmbCollectionWorkspaceViewInteractionMemoryController(this);
+
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._collectionAlias = workspaceContext?.collection.getCollectionAlias();
+		this.consumeContext(UMB_CONTENT_COLLECTION_CONFIGURATION_CONTEXT, (configurationContext) => {
+			this.observe(
+				configurationContext?.collectionAlias,
+				(collectionAlias) => {
+					this._collectionAlias = collectionAlias;
+					this.#workspaceViewInteractionMemory.setCollectionAlias(collectionAlias);
+				},
+				'_observeCollectionAlias',
+			);
 
 			this.observe(
-				workspaceContext?.collection.collectionConfig,
+				configurationContext?.collectionConfig,
 				(config) => {
 					if (config) {
 						this._config = config;
@@ -32,11 +50,36 @@ export class UmbContentCollectionWorkspaceViewElement extends UmbLitElement impl
 				'_observeConfigContentType',
 			);
 		});
+
+		this.observe(
+			this.#workspaceViewInteractionMemory.memories,
+			(memories) => {
+				this._collectionInteractionMemories = memories;
+			},
+			null,
+		);
+	}
+
+	protected override updated(changedProperties: PropertyValues) {
+		super.updated(changedProperties);
+		if (changedProperties.has('manifest')) {
+			this.#workspaceViewInteractionMemory.setWorkspaceViewAlias(this.manifest?.alias);
+		}
+	}
+
+	#onCollectionInteractionMemoriesChange(event: Event) {
+		event.stopPropagation();
+		const collection = event.currentTarget as UmbCollectionElement;
+		this.#workspaceViewInteractionMemory.writeInteractionMemory(collection.getInteractionMemories());
 	}
 
 	override render() {
 		if (this._loading) return nothing;
-		return html`<umb-collection .alias=${this._collectionAlias} .config=${this._config}></umb-collection>`;
+		return html`<umb-collection
+			.alias=${this._collectionAlias}
+			.config=${this._config}
+			.interactionMemories=${this._collectionInteractionMemories}
+			@interaction-memories-change=${this.#onCollectionInteractionMemoriesChange}></umb-collection>`;
 	}
 }
 

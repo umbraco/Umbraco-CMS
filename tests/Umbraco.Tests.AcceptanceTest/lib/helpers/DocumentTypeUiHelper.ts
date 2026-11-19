@@ -5,6 +5,7 @@ import {ConstantHelper} from "./ConstantHelper";
 export class DocumentTypeUiHelper extends UiBaseLocators {
   private readonly newDocumentTypeBtn: Locator;
   private readonly sharedAcrossCulturesToggle: Locator;
+  private readonly sharedAcrossSegmentsToggle: Locator;
   private readonly documentTypeSettingsTabBtn: Locator;
   private readonly documentTypeTemplatesTabBtn: Locator;
   private readonly varyBySegmentsBtn: Locator;
@@ -24,6 +25,7 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
     super(page);
     this.newDocumentTypeBtn = page.getByLabel('New Document Type…');
     this.sharedAcrossCulturesToggle = page.locator('label').filter({hasText: 'Shared across cultures'}).locator('#toggle');
+    this.sharedAcrossSegmentsToggle = page.locator('label').filter({hasText: 'Shared across segments'}).locator('#toggle');
     this.tabGroup = page.getByTestId('workspace:view-links');
     this.documentTypeSettingsTabBtn = this.tabGroup.locator('[data-mark*="Settings"]');
     this.documentTypeTemplatesTabBtn = this.tabGroup.locator('[data-mark*="Templates"]');
@@ -33,7 +35,7 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
     this.createDocumentTypeWithTemplateBtn = this.createOptionActionListModal.locator('umb-ref-item', {hasText: 'Document Type with template'});
     this.createElementTypeBtn = this.createOptionActionListModal.locator('umb-ref-item', {hasText: 'Element Type'});
     this.createDocumentFolderBtn = this.createOptionActionListModal.locator('umb-ref-item', {hasText: 'Folder'});
-    this.preventCleanupBtn = page.getByText('Prevent clean up');
+    this.preventCleanupBtn = page.getByText('Prevent cleanup');
     this.setAsDefaultBtn = page.getByText('Set as default');
     this.documentTypesMenu = page.locator('#menu-item').getByRole('link', {name: 'Document Types'});
     this.allowedChildNodesChooseBtn = page.locator('umb-property-layout[alias="ChildNodeType"]').locator('umb-input-document-type');
@@ -58,6 +60,10 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
 
   async clickSharedAcrossCulturesToggle() {
     await this.click(this.sharedAcrossCulturesToggle);
+  }
+
+  async clickSharedAcrossSegmentsToggle() {
+    await this.click(this.sharedAcrossSegmentsToggle);
   }
 
   async clickDocumentTypeSettingsTab() {
@@ -102,6 +108,10 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
   
   async isElementTypeNotApplicableMessageForPropertyWithNameVisible(propertyName: string) {
     await this.containsText(this.page.locator(`umb-property-layout[label="${propertyName}"] .info-message`) , 'This is not applicable for an Element Type.');
+  }
+
+  async isElementTypeOnlyAllowedInLibraryMessageForPropertyWithNameVisible(propertyName: string) {
+    await this.containsText(this.page.locator(`umb-property-layout[label="${propertyName}"] .info-message`), 'This is only applicable for an Element Type that is allowed in the Library.');
   }
 
   async reloadDocumentTypeTree() {
@@ -159,7 +169,7 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForDocumentTypeToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentType, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentType, this.clickSaveButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
   }
 
   async clickConfirmToDeleteButtonAndWaitForDocumentTypeToBeDeleted() {

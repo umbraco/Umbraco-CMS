@@ -582,7 +582,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Content Picker',
+		name: 'Single Document Picker',
 		id: 'fd1e0da5-5606-4862-b679-5d0cf3a52a59',
 		parent: null,
 		editorAlias: 'Umbraco.ContentPicker',
@@ -605,7 +605,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Member Picker (default)',
+		name: 'Single Member Picker (default)',
 		id: '1ea2e01f-ebd8-4ce1-8d71-6b1149e63548',
 		parent: null,
 		editorAlias: 'Umbraco.MemberPicker',
@@ -652,7 +652,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Multi URL Picker',
+		name: 'URL Picker',
 		id: 'b4e3535a-1753-47e2-8568-602cf8cfee6f',
 		parent: null,
 		editorAlias: 'Umbraco.MultiUrlPicker',
@@ -772,7 +772,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Content Picker - Default Config',
+		name: 'Single Document Picker - Default Config',
 		id: '1bd0d68f-8fe9-4906-bb5e-e33eafa83aa3',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -797,7 +797,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Content Picker - Show Open Button',
+		name: 'Single Document Picker - Show Open Button',
 		id: '8aa44228-5263-4395-9588-9ba401d9e0a1',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -900,7 +900,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Content Picker - Start Node',
+		name: 'Single Document Picker - Start Node',
 		id: 'adcccf89-532f-4a50-83c8-e742035a12a3',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -933,7 +933,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Content Picker - Ignore User Start Nodes',
+		name: 'Single Document Picker - Ignore User Start Nodes',
 		id: 'b01b3451-7875-4ac9-a772-b2f23b865af3',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -954,6 +954,196 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{
 				alias: 'ignoreUserStartNodes',
 				value: true,
+			},
+		],
+	},
+	{
+		name: 'Single Document Picker - Dynamic Root',
+		id: '99977fa3-8f02-4bca-ae70-518214ae4711',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.ContentPicker',
+		editorUiAlias: 'Umb.PropertyEditorUi.DocumentPicker',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'showOpenButton',
+				value: false,
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: false,
+			},
+			{
+				alias: 'dynamicRoot',
+				value: {
+					originAlias: 'Root',
+					querySteps: [
+						{
+							alias: 'FurthestAncestorOrSelf',
+							anyOfDocTypeKeys: [],
+						},
+					],
+				},
+			},
+		],
+	},
+	{
+		name: 'Document Picker - Default Config',
+		id: 'a7f4135c-e8fa-4ab1-b5a3-79f5e1be88a1',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.DocumentPicker.Multiple',
+		editorUiAlias: 'Umb.PropertyEditorUi.DocumentPicker.Multiple',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'ignoreUserStartNodes',
+				value: false,
+			},
+		],
+	},
+	{
+		name: 'Document Picker - Allowed Content Types',
+		id: 'aba6b8b8-fc75-478a-858b-b8e318af7a95',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.DocumentPicker.Multiple',
+		editorUiAlias: 'Umb.PropertyEditorUi.DocumentPicker.Multiple',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'allowedContentTypes',
+				value: '9cff8f66-0e13-4617-ab9b-9f845ecc5e24,41f34bb7-fd63-442f-8dcb-142df4246310',
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: false,
+			},
+		],
+	},
+	{
+		name: 'Document Picker - Start Node',
+		id: '22843d16-0429-4a95-993b-dac3fbdd1479',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.DocumentPicker.Multiple',
+		editorUiAlias: 'Umb.PropertyEditorUi.DocumentPicker.Multiple',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'startNodeId',
+				value: 'db79156b-3d5b-43d6-ab32-902dc423bec3',
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: false,
+			},
+		],
+	},
+	{
+		name: 'Document Picker - Ignore User Start Nodes',
+		id: '6ae78973-d0d3-486f-9808-799433c399bb',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.DocumentPicker.Multiple',
+		editorUiAlias: 'Umb.PropertyEditorUi.DocumentPicker.Multiple',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'ignoreUserStartNodes',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Document Picker - Dynamic Root',
+		id: '049f48b8-8683-4578-82a0-a74930c39759',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.DocumentPicker.Multiple',
+		editorUiAlias: 'Umb.PropertyEditorUi.DocumentPicker.Multiple',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'ignoreUserStartNodes',
+				value: false,
+			},
+			{
+				alias: 'dynamicRoot',
+				value: {
+					originAlias: 'Root',
+					querySteps: [
+						{
+							alias: 'FurthestAncestorOrSelf',
+							anyOfDocTypeKeys: [],
+						},
+					],
+				},
+			},
+		],
+	},
+	{
+		name: 'Document Picker - Validation Limit',
+		id: '622fea78-e211-41a8-82de-3f726aebac50',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.DocumentPicker.Multiple',
+		editorUiAlias: 'Umb.PropertyEditorUi.DocumentPicker.Multiple',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'validationLimit',
+				value: {
+					min: 1,
+					max: 3,
+				},
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: false,
 			},
 		],
 	},
@@ -1064,27 +1254,23 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'min',
-				value: 10,
+				alias: 'validationRange',
+				value: { min: 10, max: 100 },
 			},
 			{
 				alias: 'step',
 				value: 0.5,
 			},
-			{
-				alias: 'max',
-				value: 100,
-			},
 		],
 	},
 	{
-		name: 'Dropdown - Single Value',
+		name: 'Single Dropdown - Single Value',
 		id: '3c1f48e0-6eec-44f3-8072-3e22d442a0a0',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
 		},
-		editorAlias: 'Umbraco.DropDown.Flexible',
-		editorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+		editorAlias: 'Umbraco.DropDown.Single',
+		editorUiAlias: 'Umb.PropertyEditorUi.Dropdown.Single',
 		hasChildren: false,
 		noAccess: false,
 		isFolder: false,
@@ -1092,10 +1278,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [
-			{
-				alias: 'multiple',
-				value: false,
-			},
 			{
 				alias: 'items',
 				value: ['One', 'Two', 'Three'],
@@ -1122,16 +1304,37 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'multiple',
-				value: true,
-			},
-			{
 				alias: 'items',
 				value: ['One', 'Two', 'Three'],
 			},
 			{
 				alias: 'umbMigrationV14',
 				value: '2026-04-16T09:54:45.5048429+00:00',
+			},
+		],
+	},
+	{
+		name: 'Single Dropdown - With Placeholder',
+		id: '1bef0113-70e7-404c-9e0e-95ad957f4e22',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.DropDown.Single',
+		editorUiAlias: 'Umb.PropertyEditorUi.Dropdown.Single',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'items',
+				value: ['Red', 'Green', 'Blue'],
+			},
+			{
+				alias: 'placeholder',
+				value: 'Choose a color',
 			},
 		],
 	},
@@ -1410,10 +1613,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'multiple',
-				value: false,
-			},
-			{
 				alias: 'validationLimit',
 				value: {},
 			},
@@ -1445,10 +1644,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{
 				alias: 'filter',
 				value: 'cc07b313-0843-4aa8-bbda-871c8da728c8,a43e3414-9599-4230-a7d3-943a21b20122',
-			},
-			{
-				alias: 'multiple',
-				value: false,
 			},
 			{
 				alias: 'validationLimit',
@@ -1484,10 +1679,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'multiple',
-				value: true,
-			},
-			{
 				alias: 'validationLimit',
 				value: {},
 			},
@@ -1516,10 +1707,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [
-			{
-				alias: 'multiple',
-				value: true,
-			},
 			{
 				alias: 'validationLimit',
 				value: {
@@ -1553,10 +1740,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'multiple',
-				value: true,
-			},
-			{
 				alias: 'validationLimit',
 				value: {
 					min: 2,
@@ -1588,10 +1771,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [
-			{
-				alias: 'multiple',
-				value: false,
-			},
 			{
 				alias: 'validationLimit',
 				value: {},
@@ -1630,10 +1809,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'multiple',
-				value: false,
-			},
-			{
 				alias: 'validationLimit',
 				value: {},
 			},
@@ -1662,10 +1837,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [
-			{
-				alias: 'multiple',
-				value: false,
-			},
 			{
 				alias: 'validationLimit',
 				value: {},
@@ -1712,10 +1883,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [
-			{
-				alias: 'multiple',
-				value: false,
-			},
 			{
 				alias: 'validationLimit',
 				value: {},
@@ -1764,10 +1931,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 'cc07b313-0843-4aa8-bbda-871c8da728c8,a43e3414-9599-4230-a7d3-943a21b20122',
 			},
 			{
-				alias: 'multiple',
-				value: true,
-			},
-			{
 				alias: 'validationLimit',
 				value: {
 					min: 2,
@@ -1806,6 +1969,231 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{
 				alias: 'umbMigrationV14',
 				value: '2026-04-16T09:54:45.5067579+00:00',
+			},
+		],
+	},
+	{
+		name: 'Single Media Picker - Default Config',
+		id: 'e9c2290d-8b84-4e8f-999f-c6a3345505fc',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.MediaPicker.Single',
+		editorUiAlias: 'Umb.PropertyEditorUi.MediaPicker.Single',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'enableLocalFocalPoint',
+				value: false,
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: false,
+			},
+		],
+	},
+	{
+		name: 'Single Media Picker - Accepted Types',
+		id: 'eab7f568-6eaf-45d3-9300-fbf461c88fdb',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.MediaPicker.Single',
+		editorUiAlias: 'Umb.PropertyEditorUi.MediaPicker.Single',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'filter',
+				value: 'cc07b313-0843-4aa8-bbda-871c8da728c8,a43e3414-9599-4230-a7d3-943a21b20122',
+			},
+			{
+				alias: 'enableLocalFocalPoint',
+				value: false,
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: false,
+			},
+		],
+	},
+	{
+		name: 'Single Media Picker - Start Node',
+		id: '102e3c21-b307-4929-9d12-21484b3dd706',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.MediaPicker.Single',
+		editorUiAlias: 'Umb.PropertyEditorUi.MediaPicker.Single',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'startNodeId',
+				value: '5deac19f-5ca8-4b8c-a784-26593cec8d51',
+			},
+			{
+				alias: 'enableLocalFocalPoint',
+				value: false,
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: false,
+			},
+		],
+	},
+	{
+		name: 'Single Media Picker - Focal Point',
+		id: '29516112-3c5f-4701-b9d1-1cf967fcd64a',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.MediaPicker.Single',
+		editorUiAlias: 'Umb.PropertyEditorUi.MediaPicker.Single',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'enableLocalFocalPoint',
+				value: true,
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: false,
+			},
+		],
+	},
+	{
+		name: 'Single Media Picker - Crops',
+		id: '5b0a2dda-eb5c-4e10-8996-3f7b8a57ee05',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.MediaPicker.Single',
+		editorUiAlias: 'Umb.PropertyEditorUi.MediaPicker.Single',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'enableLocalFocalPoint',
+				value: false,
+			},
+			{
+				alias: 'crops',
+				value: [
+					{
+						alias: 'one',
+						label: 'One',
+						width: 100,
+						height: 100,
+					},
+					{
+						alias: 'two',
+						label: 'Two',
+						width: 200,
+						height: 200,
+					},
+				],
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: false,
+			},
+		],
+	},
+	{
+		name: 'Single Media Picker - Ignore User Start Nodes',
+		id: '5cf1398b-61ba-4d66-b0ae-839d6a46057a',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.MediaPicker.Single',
+		editorUiAlias: 'Umb.PropertyEditorUi.MediaPicker.Single',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'enableLocalFocalPoint',
+				value: false,
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Single Media Picker - Fully Configured',
+		id: '09dc3a5b-33d5-4de9-949b-f9384cc34a8a',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.MediaPicker.Single',
+		editorUiAlias: 'Umb.PropertyEditorUi.MediaPicker.Single',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'filter',
+				value: 'cc07b313-0843-4aa8-bbda-871c8da728c8,a43e3414-9599-4230-a7d3-943a21b20122',
+			},
+			{
+				alias: 'startNodeId',
+				value: '5deac19f-5ca8-4b8c-a784-26593cec8d51',
+			},
+			{
+				alias: 'enableLocalFocalPoint',
+				value: true,
+			},
+			{
+				alias: 'crops',
+				value: [
+					{
+						alias: 'one',
+						label: 'One',
+						width: 100,
+						height: 100,
+					},
+					{
+						alias: 'two',
+						label: 'Two',
+						width: 200,
+						height: 200,
+					},
+				],
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: true,
 			},
 		],
 	},
@@ -1854,7 +2242,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [],
 	},
 	{
-		name: 'Member Picker',
+		name: 'Single Member Picker',
 		id: '2555acc6-6adf-4cc3-b0bd-86a2dfdcc7b1',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -1868,6 +2256,88 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [],
+	},
+	{
+		name: 'Single Member Picker - With Member Type Filter',
+		id: 'b9470baf-a242-4d94-851b-d5e47e44de41',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.MemberPicker',
+		editorUiAlias: 'Umb.PropertyEditorUi.MemberPicker',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'filter',
+				value: 'd59be02f-1df9-4228-aa1e-01917d806cda',
+			},
+		],
+	},
+	{
+		name: 'Member Picker - Default Config',
+		id: '5108a34f-b1ec-44ff-9820-9bd2f152ca6d',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.MemberPicker.Multiple',
+		editorUiAlias: 'Umb.PropertyEditorUi.MemberPicker.Multiple',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [],
+	},
+	{
+		name: 'Member Picker - With Member Type Filter',
+		id: '71e35862-d4b0-43f2-8364-64394cc7fd53',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.MemberPicker.Multiple',
+		editorUiAlias: 'Umb.PropertyEditorUi.MemberPicker.Multiple',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'filter',
+				value: 'd59be02f-1df9-4228-aa1e-01917d806cda',
+			},
+		],
+	},
+	{
+		name: 'Member Picker - Validation Limit',
+		id: 'edfb8af7-9412-4be7-9338-7becbd500209',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.MemberPicker.Multiple',
+		editorUiAlias: 'Umb.PropertyEditorUi.MemberPicker.Multiple',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'validationLimit',
+				value: {
+					min: 1,
+					max: 3,
+				},
+			},
+		],
 	},
 	{
 		name: 'Upload Video',
@@ -1912,7 +2382,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Multi URL Picker - Default Config',
+		name: 'URL Picker - Default Config',
 		id: 'f455a80c-7f39-4fbb-b212-cf829dd28f7b',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -1926,14 +2396,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [
-			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
-			},
 			{
 				alias: 'overlaySize',
 				value: 'small',
@@ -2010,7 +2472,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Multi URL Picker - Min And Max',
+		name: 'URL Picker - Min And Max',
 		id: '5efb7a21-cbfa-452b-a7f0-9b6e467f651c',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -2025,12 +2487,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'minNumber',
-				value: 5,
-			},
-			{
-				alias: 'maxNumber',
-				value: 10,
+				alias: 'validationLimit',
+				value: { min: 5, max: 10 },
 			},
 			{
 				alias: 'overlaySize',
@@ -2089,7 +2547,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Multi URL Picker - Large Overlay Size',
+		name: 'URL Picker - Large Overlay Size',
 		id: 'd6d131e2-822f-437a-a1bc-57ddf55e9a5f',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -2103,14 +2561,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [
-			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
-			},
 			{
 				alias: 'overlaySize',
 				value: 'large',
@@ -2168,7 +2618,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Multi URL Picker - Hide Anchor Query String',
+		name: 'URL Picker - Hide Anchor Query String',
 		id: 'f088d56e-9efd-4c4d-8264-accbbe647181',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -2182,14 +2632,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [
-			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
-			},
 			{
 				alias: 'overlaySize',
 				value: 'small',
@@ -2224,7 +2666,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Multi URL Picker - Ignore User Start Nodes',
+		name: 'URL Picker - Ignore User Start Nodes',
 		id: '50a7ce3b-ba5a-4f20-8264-361d2194a15c',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -2238,14 +2680,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [
-			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
-			},
 			{
 				alias: 'overlaySize',
 				value: 'small',
@@ -2284,7 +2718,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Multi URL Picker - Fully Configured',
+		name: 'URL Picker - Fully Configured',
 		id: '68bee672-9317-40a4-860c-32240d4a2926',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -2299,12 +2733,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'minNumber',
-				value: 2,
-			},
-			{
-				alias: 'maxNumber',
-				value: 10,
+				alias: 'validationLimit',
+				value: { min: 2, max: 10 },
 			},
 			{
 				alias: 'overlaySize',
@@ -2313,6 +2743,122 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{
 				alias: 'hideAnchor',
 				value: true,
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: true,
+			},
+		],
+	},
+	{
+		name: 'Single URL Picker - Default Config',
+		id: 'dd328f90-0595-4382-94a9-f59a074412e1',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.UrlPicker.Single',
+		editorUiAlias: 'Umb.PropertyEditorUi.UrlPicker.Single',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'overlaySize',
+				value: 'small',
+			},
+			{
+				alias: 'hideAnchor',
+				value: false,
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: false,
+			},
+		],
+	},
+	{
+		name: 'Single URL Picker - Large Overlay Size',
+		id: '1acdcc51-d406-4ec8-ab6c-73d9f06869fb',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.UrlPicker.Single',
+		editorUiAlias: 'Umb.PropertyEditorUi.UrlPicker.Single',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'overlaySize',
+				value: 'large',
+			},
+			{
+				alias: 'hideAnchor',
+				value: false,
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: false,
+			},
+		],
+	},
+	{
+		name: 'Single URL Picker - Hide Anchor Query String',
+		id: '194e0d17-a0a7-44dd-aea8-b998e29bb7f4',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.UrlPicker.Single',
+		editorUiAlias: 'Umb.PropertyEditorUi.UrlPicker.Single',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'overlaySize',
+				value: 'small',
+			},
+			{
+				alias: 'hideAnchor',
+				value: true,
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: false,
+			},
+		],
+	},
+	{
+		name: 'Single URL Picker - Ignore User Start Nodes',
+		id: '15577624-a917-4797-987c-391473d73ee6',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.UrlPicker.Single',
+		editorUiAlias: 'Umb.PropertyEditorUi.UrlPicker.Single',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'overlaySize',
+				value: 'small',
+			},
+			{
+				alias: 'hideAnchor',
+				value: false,
 			},
 			{
 				alias: 'ignoreUserStartNodes',
@@ -2367,14 +2913,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				},
 			},
 			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
-			},
-			{
 				alias: 'showOpenButton',
 				value: false,
 			},
@@ -2412,12 +2950,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				},
 			},
 			{
-				alias: 'minNumber',
-				value: 2,
-			},
-			{
-				alias: 'maxNumber',
-				value: 10,
+				alias: 'validationLimit',
+				value: { min: 2, max: 10 },
 			},
 			{
 				alias: 'showOpenButton',
@@ -2459,14 +2993,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{
 				alias: 'filter',
 				value: '7184285e-9709-4e13-8c72-1fe52f024b28',
-			},
-			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
 			},
 			{
 				alias: 'showOpenButton',
@@ -2511,12 +3037,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 					'015bc281-7410-40e2-81b5-b8f7c963bd61,41f34bb7-fd63-442f-8dcb-142df4246310,13c10f78-bf14-411d-9444-751e4bd1b178,9cff8f66-0e13-4617-ab9b-9f845ecc5e24',
 			},
 			{
-				alias: 'minNumber',
-				value: 2,
-			},
-			{
-				alias: 'maxNumber',
-				value: 5,
+				alias: 'validationLimit',
+				value: { min: 2, max: 5 },
 			},
 			{
 				alias: 'showOpenButton',
@@ -2556,14 +3078,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				},
 			},
 			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
-			},
-			{
 				alias: 'showOpenButton',
 				value: false,
 			},
@@ -2599,14 +3113,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 					id: null,
 					dynamicRoot: null,
 				},
-			},
-			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
 			},
 			{
 				alias: 'showOpenButton',
@@ -2650,12 +3156,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 'cc07b313-0843-4aa8-bbda-871c8da728c8,a43e3414-9599-4230-a7d3-943a21b20122',
 			},
 			{
-				alias: 'minNumber',
-				value: 1,
-			},
-			{
-				alias: 'maxNumber',
-				value: 10,
+				alias: 'validationLimit',
+				value: { min: 1, max: 10 },
 			},
 			{
 				alias: 'showOpenButton',
@@ -2695,14 +3197,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				},
 			},
 			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
-			},
-			{
 				alias: 'showOpenButton',
 				value: false,
 			},
@@ -2738,14 +3232,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 					id: null,
 					dynamicRoot: null,
 				},
-			},
-			{
-				alias: 'minNumber',
-				value: 0,
-			},
-			{
-				alias: 'maxNumber',
-				value: 0,
 			},
 			{
 				alias: 'showOpenButton',
@@ -2789,12 +3275,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 'd59be02f-1df9-4228-aa1e-01917d806cda',
 			},
 			{
-				alias: 'minNumber',
-				value: 2,
-			},
-			{
-				alias: 'maxNumber',
-				value: 5,
+				alias: 'validationLimit',
+				value: { min: 2, max: 5 },
 			},
 			{
 				alias: 'showOpenButton',
@@ -2842,12 +3324,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'min',
-				value: 10,
-			},
-			{
-				alias: 'max',
-				value: 100,
+				alias: 'validationRange',
+				value: { min: 10, max: 100 },
 			},
 		],
 	},
@@ -2888,16 +3366,12 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'min',
-				value: 10,
+				alias: 'validationRange',
+				value: { min: 10, max: 70 },
 			},
 			{
 				alias: 'step',
 				value: 6,
-			},
-			{
-				alias: 'max',
-				value: 70,
 			},
 		],
 	},
@@ -2927,7 +3401,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Multiple Textstring - Default Config',
+		name: 'Text Box List - Default Config',
 		id: 'a9c636c7-d500-4ce5-bfb1-2d508fe79d7c',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -2945,18 +3419,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 				alias: 'umbMigrationV14',
 				value: '2026-04-16T09:54:45.5225801+00:00',
 			},
-			{
-				alias: 'min',
-				value: 0,
-			},
-			{
-				alias: 'max',
-				value: 0,
-			},
 		],
 	},
 	{
-		name: 'Multiple Textstring - Min',
+		name: 'Text Box List - Min',
 		id: '26ecc485-c84f-4806-9445-3996da82d0bb',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -2975,17 +3441,13 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: '2026-04-16T09:54:45.5229632+00:00',
 			},
 			{
-				alias: 'min',
-				value: 5,
-			},
-			{
-				alias: 'max',
-				value: 0,
+				alias: 'validationLimit',
+				value: { min: 5 },
 			},
 		],
 	},
 	{
-		name: 'Multiple Textstring - Max',
+		name: 'Text Box List - Max',
 		id: 'b88cc0ae-9216-45de-83c2-5e92de3ae153',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -3004,17 +3466,13 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: '2026-04-16T09:54:45.5232232+00:00',
 			},
 			{
-				alias: 'min',
-				value: 0,
-			},
-			{
-				alias: 'max',
-				value: 10,
+				alias: 'validationLimit',
+				value: { max: 10 },
 			},
 		],
 	},
 	{
-		name: 'Multiple Textstring - Fully Configured',
+		name: 'Text Box List - Fully Configured',
 		id: '78350acf-b981-4a55-96f8-a91001c73eef',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -3033,12 +3491,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: '2026-04-16T09:54:45.5235305+00:00',
 			},
 			{
-				alias: 'min',
-				value: 5,
-			},
-			{
-				alias: 'max',
-				value: 50,
+				alias: 'validationLimit',
+				value: { min: 5, max: 50 },
 			},
 		],
 	},
@@ -3337,24 +3791,12 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'enableRange',
-				value: false,
-			},
-			{
 				alias: 'initVal1',
 				value: 0,
 			},
 			{
-				alias: 'initVal2',
-				value: 0,
-			},
-			{
-				alias: 'minVal',
-				value: 0,
-			},
-			{
-				alias: 'maxVal',
-				value: 0,
+				alias: 'validationRange',
+				value: { min: 0 },
 			},
 			{
 				alias: 'step',
@@ -3378,24 +3820,12 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'enableRange',
-				value: false,
-			},
-			{
 				alias: 'initVal1',
 				value: 0,
 			},
 			{
-				alias: 'initVal2',
-				value: 0,
-			},
-			{
-				alias: 'minVal',
-				value: 5,
-			},
-			{
-				alias: 'maxVal',
-				value: 100,
+				alias: 'validationRange',
+				value: { min: 5, max: 100 },
 			},
 			{
 				alias: 'step',
@@ -3419,24 +3849,12 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'enableRange',
-				value: false,
-			},
-			{
 				alias: 'initVal1',
 				value: 0,
 			},
 			{
-				alias: 'initVal2',
-				value: 0,
-			},
-			{
-				alias: 'minVal',
-				value: 0,
-			},
-			{
-				alias: 'maxVal',
-				value: 0,
+				alias: 'validationRange',
+				value: { min: 0 },
 			},
 			{
 				alias: 'step',
@@ -3460,24 +3878,12 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'enableRange',
-				value: false,
-			},
-			{
 				alias: 'initVal1',
 				value: 6,
 			},
 			{
-				alias: 'initVal2',
-				value: 0,
-			},
-			{
-				alias: 'minVal',
-				value: 0,
-			},
-			{
-				alias: 'maxVal',
-				value: 0,
+				alias: 'validationRange',
+				value: { min: 0 },
 			},
 			{
 				alias: 'step',
@@ -3487,7 +3893,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 	},
 	{
 		name: 'Slider - Fully Configured',
-		id: 'dae71dda-3838-459e-b018-c432952288b0',
+		id: 'bc2e6b05-5b0c-4cde-b924-edfe6950cef8',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
 		},
@@ -3501,9 +3907,182 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'enableRange',
-				value: true,
+				alias: 'initVal1',
+				value: 15,
 			},
+			{
+				alias: 'validationRange',
+				value: { min: 10, max: 200 },
+			},
+			{
+				alias: 'step',
+				value: 5,
+			},
+		],
+	},
+	{
+		name: 'Range Slider - Default Config',
+		id: '17b898a4-0d97-405b-aa0f-ecee70d43cb7',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.Slider.Range',
+		editorUiAlias: 'Umb.PropertyEditorUi.Slider.Range',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'initVal1',
+				value: 0,
+			},
+			{
+				alias: 'initVal2',
+				value: 0,
+			},
+			{
+				alias: 'validationRange',
+				value: { min: 0 },
+			},
+			{
+				alias: 'minimumRange',
+				value: 0,
+			},
+			{
+				alias: 'step',
+				value: 0,
+			},
+		],
+	},
+	{
+		name: 'Range Slider - Min And Max',
+		id: 'a18eec15-50b7-429b-97dc-8fb7c8ad5e7f',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.Slider.Range',
+		editorUiAlias: 'Umb.PropertyEditorUi.Slider.Range',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'initVal1',
+				value: 0,
+			},
+			{
+				alias: 'initVal2',
+				value: 0,
+			},
+			{
+				alias: 'validationRange',
+				value: { min: 5, max: 100 },
+			},
+			{
+				alias: 'minimumRange',
+				value: 5,
+			},
+			{
+				alias: 'step',
+				value: 0,
+			},
+		],
+	},
+	{
+		name: 'Range Slider - Step Increments',
+		id: '73646cd9-c9fd-4e70-ba4a-c324d1d61934',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.Slider.Range',
+		editorUiAlias: 'Umb.PropertyEditorUi.Slider.Range',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'initVal1',
+				value: 0,
+			},
+			{
+				alias: 'initVal2',
+				value: 0,
+			},
+			{
+				alias: 'validationRange',
+				value: { min: 0 },
+			},
+			{
+				alias: 'minimumRange',
+				value: 0,
+			},
+			{
+				alias: 'step',
+				value: 10,
+			},
+		],
+	},
+	{
+		name: 'Range Slider - Initial Values',
+		id: 'cce99d3a-1002-4e25-95b1-9c74a7d03961',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.Slider.Range',
+		editorUiAlias: 'Umb.PropertyEditorUi.Slider.Range',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
+			{
+				alias: 'initVal1',
+				value: 6,
+			},
+			{
+				alias: 'initVal2',
+				value: 24,
+			},
+			{
+				alias: 'validationRange',
+				value: { min: 0 },
+			},
+			{
+				alias: 'minimumRange',
+				value: 0,
+			},
+			{
+				alias: 'step',
+				value: 0,
+			},
+		],
+	},
+	{
+		name: 'Range Slider - Fully Configured',
+		id: 'dae71dda-3838-459e-b018-c432952288b0',
+		parent: {
+			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
+		},
+		editorAlias: 'Umbraco.Slider.Range',
+		editorUiAlias: 'Umb.PropertyEditorUi.Slider.Range',
+		hasChildren: false,
+		noAccess: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+		flags: [],
+		values: [
 			{
 				alias: 'initVal1',
 				value: 10,
@@ -3513,12 +4092,12 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 30,
 			},
 			{
-				alias: 'minVal',
-				value: 5,
+				alias: 'validationRange',
+				value: { min: 5, max: 100 },
 			},
 			{
-				alias: 'maxVal',
-				value: 100,
+				alias: 'minimumRange',
+				value: 5,
 			},
 			{
 				alias: 'step',
@@ -3788,7 +4367,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'User Picker',
+		name: 'Single User Picker',
 		id: '3387e5da-4e32-43dc-b4dc-840fcbc468f9',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -3870,7 +4449,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Label - String',
+		name: 'Label',
 		id: 'b8164bfc-ae5d-4eee-b80e-bdf00745abba',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -3891,7 +4470,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Label - Decimal',
+		name: 'Label (decimal)',
 		id: '3145614f-1e5e-47d2-a587-d7eb2d937a8f',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -3912,7 +4491,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Label - DateTime',
+		name: 'Label (date and time)',
 		id: 'd9e26ead-b55f-4b24-96be-3da10ce87241',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -3933,7 +4512,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Label - Time',
+		name: 'Label (time)',
 		id: '3c78f54b-0812-4f7c-a483-29c54583bf9f',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -3954,7 +4533,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Label - Integer',
+		name: 'Label (integer)',
 		id: '0169a2ba-63b5-442d-af00-98d54bf959d9',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -3975,7 +4554,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Label - Big Integer',
+		name: 'Label (big integer)',
 		id: '59171d58-e368-42dd-88a9-a3504561442c',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -3996,7 +4575,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
-		name: 'Label - Long String',
+		name: 'Label (long string)',
 		id: 'b76769c6-9662-4848-afce-2c06a7464bf8',
 		parent: {
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
@@ -4320,7 +4899,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 								alias: 'left',
 								columnSpan: 6,
 								rowSpan: 1,
-								minAllowed: 0,
+								validationLimit: { min: 0 },
 								specifiedAllowance: [],
 							},
 							{
@@ -4328,7 +4907,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 								alias: 'right',
 								columnSpan: 6,
 								rowSpan: 1,
-								minAllowed: 0,
+								validationLimit: { min: 0 },
 								specifiedAllowance: [],
 							},
 						],
@@ -4357,7 +4936,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 								alias: 'left',
 								columnSpan: 6,
 								rowSpan: 1,
-								minAllowed: 0,
+								validationLimit: { min: 0 },
 								specifiedAllowance: [],
 							},
 							{
@@ -4365,7 +4944,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 								alias: 'right',
 								columnSpan: 6,
 								rowSpan: 1,
-								minAllowed: 0,
+								validationLimit: { min: 0 },
 								specifiedAllowance: [],
 							},
 						],
@@ -4455,3 +5034,17 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 ];
+
+const LIST_VIEW_CONTENT_DATA_TYPE_ID = 'c0808dd3-8133-4e4b-8ce8-e2bea84a96a4';
+export const UMB_LIST_VIEW_CONTENT_FIRST_DATA_TYPE_ID = 'f2a6d4c8-1e75-4b39-8a0c-5d9e3b7f6a12';
+
+// The Content workspace view comes before the Collection view, so a document only opens in its collection when asked to.
+const listViewContent = data.find((dataType) => dataType.id === LIST_VIEW_CONTENT_DATA_TYPE_ID)!;
+data.push({
+	...listViewContent,
+	id: UMB_LIST_VIEW_CONTENT_FIRST_DATA_TYPE_ID,
+	name: 'List View - Content First',
+	values: listViewContent.values.map((value) =>
+		value.alias === 'showContentFirst' ? { ...value, value: true } : value,
+	),
+});

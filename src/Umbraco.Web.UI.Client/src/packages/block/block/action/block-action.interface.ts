@@ -1,13 +1,30 @@
 import type { UmbBlockActionArgs } from './types.js';
+import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbAction } from '@umbraco-cms/backoffice/action';
 
 export interface UmbBlockAction<ArgsMetaType> extends UmbAction<UmbBlockActionArgs<ArgsMetaType>> {
 	/**
+	 * Optional, but recommended, observable for the href location, the action will act as a link.
+	 * The `execute` method will not be called.
+	 * @returns {Promise<Observable<string | undefined> | undefined> | undefined}
+	 */
+	getHrefObservable?: () => Promise<Observable<string | undefined> | undefined> | undefined;
+
+	/**
 	 * The href location, the action will act as a link.
 	 * The `execute` method will not be called.
+	 * Kept alongside `getHrefObservable` for actions whose href never changes after resolving once;
+	 * implement the observable variant instead when the href can change during the action's lifetime.
 	 * @returns {Promise<string | undefined>}
 	 */
 	getHref(): Promise<string | undefined>;
+
+	/**
+	 * An optional reactive observable for the href location.
+	 * When provided, the default kind element subscribes to it and updates the link reactively,
+	 * rather than resolving `getHref()` once at initialisation time.
+	 */
+	href?: Observable<string | undefined>;
 
 	/**
 	 * The `execute` method, the action will act as a button.
@@ -15,11 +32,29 @@ export interface UmbBlockAction<ArgsMetaType> extends UmbAction<UmbBlockActionAr
 	 */
 	execute(): Promise<void>;
 
+	// TODO: Remove in v.20. [NL]
 	/**
+	 * @deprecated Use `getValidationDataPathObservable()` instead. Optional validation data path for displaying an invalid badge on the action button.
 	 * Optional validation data path for displaying an invalid badge on the action button.
 	 * When provided, the default kind element creates a validation state controller
 	 * and renders a badge when validation messages exist at the given path.
 	 * @returns {Promise<string | undefined>}
 	 */
 	getValidationDataPath(): Promise<string | undefined>;
+
+	/**
+	 * Optional validation data path observable for displaying an invalid badge on the action button.
+	 * When provided, the default kind element creates a validation state controller
+	 * and renders a badge when validation messages exist at the given path.
+	 * @returns {Promise<Observable<string | undefined> | undefined> | undefined}
+	 */
+	getValidationDataPathObservable?(): Promise<Observable<string | undefined> | undefined> | undefined;
+
+	/**
+	 * An optional reactive observable for the validation data path.
+	 * When provided, the default kind element subscribes to it and updates the validation
+	 * state controller reactively, rather than resolving `getValidationDataPath()` once at
+	 * initialisation time.
+	 */
+	validationDataPath?: Observable<string | undefined>;
 }

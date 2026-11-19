@@ -8,7 +8,7 @@ export const domainHandlers = [
 	http.get(umbracoPath(`${UMB_SLUG}/:id/domains`), ({ params }) => {
 		const id = params.id as string;
 		if (!id) return;
-		const response = umbDocumentMockDb.getDomainsForDocument();
+		const response = umbDocumentMockDb.getDomainsForDocument(id);
 		return HttpResponse.json(response);
 	}),
 ];

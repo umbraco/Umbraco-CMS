@@ -13,7 +13,7 @@ export class UmbDocumentUserStartNodeValueSummaryElement extends UmbValueSummary
 
 	constructor() {
 		super();
-		this.observe(this.#resolver.name, (name) => (this._name = name));
+		this.observe(this.#resolver.name, (name) => (this._name = name), null);
 	}
 
 	protected override willUpdate(changedProperties: PropertyValueMap<this>): void {

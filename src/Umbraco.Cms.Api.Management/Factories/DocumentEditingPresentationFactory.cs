@@ -1,4 +1,4 @@
-using Umbraco.Cms.Api.Management.Patching;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Patching;
@@ -120,24 +120,21 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
                     };
                 }))
             .WhereNotNull()
+            .OrderByCultureSegmentAndAlias()
             .ToArray();
     }
 
     private DocumentVariantRequestModel[] MapVariantsToRequestModel(IContent content)
     {
-        IPropertyValue[] propertyValues = content.Properties.SelectMany(propertyCollection => propertyCollection.Values).ToArray();
         var cultures = content.AvailableCultures.DefaultIfEmpty(null).ToArray();
 
-        // The default segment (null) must always be included
-        var segments = propertyValues.Select(property => property.Segment).Union([null]).Distinct().ToArray();
-
         return cultures
-            .SelectMany(culture => segments.Select(segment => new DocumentVariantRequestModel
+            .Select(culture => new DocumentVariantRequestModel
             {
                 Culture = culture,
-                Segment = segment,
                 Name = content.GetCultureName(culture) ?? string.Empty,
-            }))
+            })
+            .OrderBy(variant => variant.Culture, StringComparer.Ordinal)
             .ToArray();
     }
 

@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import './input-toggle.element.js';
 import type { UmbInputToggleElement } from './input-toggle.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 
 const meta: Meta<UmbInputToggleElement> = {
 	title: 'Generic Components/Inputs/Toggle',

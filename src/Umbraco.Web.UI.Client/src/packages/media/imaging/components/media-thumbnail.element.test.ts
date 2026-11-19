@@ -18,7 +18,7 @@ describe('UmbMediaThumbnailElement', () => {
 
 		// Guard: if the private field is ever renamed, the injection above silently no-ops.
 		// Fail loudly here rather than letting later assertions pass vacuously.
-		expect(element.shadowRoot!.querySelector('#figure'), 'sample image should render').to.not.equal(null);
+		expect(element.shadowRoot!.querySelector('[part="img"]'), 'sample image should render').to.not.equal(null);
 	});
 
 	it('is defined with its own instance', () => {
@@ -26,18 +26,18 @@ describe('UmbMediaThumbnailElement', () => {
 	});
 
 	it('renders the image with a stylable "img" part', () => {
-		const img = element.shadowRoot!.querySelector<HTMLImageElement>('#figure');
+		const img = element.shadowRoot!.querySelector<HTMLImageElement>('[part="img"]');
 		expect(img).to.not.equal(null);
 		expect(img!.getAttribute('part')).to.equal('img');
 	});
 
 	it('shows the checkerboard background by default', () => {
-		const img = element.shadowRoot!.querySelector<HTMLImageElement>('#figure')!;
+		const img = element.shadowRoot!.querySelector<HTMLImageElement>('[part="img"]')!;
 		expect(getComputedStyle(img).backgroundImage).to.contain('svg');
 	});
 
 	it('removes the checkerboard when --umb-media-thumbnail-background is overridden', () => {
-		const img = element.shadowRoot!.querySelector<HTMLImageElement>('#figure')!;
+		const img = element.shadowRoot!.querySelector<HTMLImageElement>('[part="img"]')!;
 		element.style.setProperty('--umb-media-thumbnail-background', 'none');
 		expect(getComputedStyle(img).backgroundImage).to.equal('none');
 	});

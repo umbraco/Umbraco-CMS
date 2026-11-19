@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Content;
 /// Serves as the base response model for a collection of content items, parameterized by value and variant response model types.
 /// </summary>
 public abstract class ContentCollectionResponseModelBase<TValueResponseModelBase, TVariantResponseModel>
-    : ContentResponseModelBase<TValueResponseModelBase, TVariantResponseModel>
+    : ContentResponseModelBase<TValueResponseModelBase, TVariantResponseModel>, IHasChildren
     where TValueResponseModelBase : ValueResponseModelBase
     where TVariantResponseModel : VariantResponseModelBase
 {
@@ -19,4 +19,7 @@ public abstract class ContentCollectionResponseModelBase<TValueResponseModelBase
     /// Gets or sets the sort order of the content item within the collection.
     /// </summary>
     public int SortOrder { get; set; }
+
+    /// <inheritdoc />
+    public bool HasChildren { get; set; }
 }

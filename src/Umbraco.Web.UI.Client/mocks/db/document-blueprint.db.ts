@@ -2,11 +2,13 @@ import type { UmbMockDocumentBlueprintModel } from '../data/mock-data-set.types.
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
+import { UmbMockEntityFolderManager } from './utils/entity/entity-folder.manager.js';
 import { umbDocumentTypeMockDb } from './document-type.db.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	CreateDocumentBlueprintRequestModel,
+	CreateFolderRequestModel,
 	DocumentBlueprintItemResponseModel,
 	DocumentBlueprintResponseModel,
 	DocumentBlueprintTreeItemResponseModel,
@@ -17,12 +19,16 @@ import type {
 type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
 
 export class UmbDocumentBlueprintMockDB extends UmbEntityMockDbBase<UmbMockDocumentBlueprintModel> {
-	tree = new UmbMockEntityTreeManager<UmbMockDocumentBlueprintModel>(this, treeItemMapper);
+	tree = new UmbMockEntityTreeManager<UmbMockDocumentBlueprintModel>(this, (item) => treeItemMapper(item, this));
 	item = new UmbMockEntityItemManager<UmbMockDocumentBlueprintModel>(this, itemMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockDocumentBlueprintModel>(
 		this,
 		createMockDocumentBlueprintMapper,
 		detailResponseMapper,
+	);
+	folder = new UmbMockEntityFolderManager<UmbMockDocumentBlueprintModel>(
+		this,
+		createMockDocumentBlueprintFolderMapper,
 	);
 
 	constructor(data: Array<UmbMockDocumentBlueprintModel>) {
@@ -30,24 +36,43 @@ export class UmbDocumentBlueprintMockDB extends UmbEntityMockDbBase<UmbMockDocum
 	}
 }
 
-const treeItemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprintTreeItemResponseModel => {
-	const documentType = umbDocumentTypeMockDb.read(model.documentType.id);
-	if (!documentType) throw new Error(`Document type with id ${model.documentType.id} not found`);
+const treeItemMapper = (
+	model: UmbMockDocumentBlueprintModel,
+	db: UmbDocumentBlueprintMockDB,
+): DocumentBlueprintTreeItemResponseModel => {
+	const documentType = model.documentType ? umbDocumentTypeMockDb.read(model.documentType.id) : undefined;
+	if (model.documentType && !documentType) {
+		throw new Error(`Document type with id ${model.documentType.id} not found`);
+	}
 
 	return {
-		documentType: {
-			icon: documentType.icon,
-			id: documentType.id,
-		},
+		documentType: documentType ? { icon: documentType.icon, id: documentType.id } : null,
 		hasChildren: model.hasChildren,
 		id: model.id,
 		isFolder: model.isFolder,
 		name: model.name,
 		parent: model.parent,
+		parentIsFolder: model.parent ? (db.read(model.parent.id)?.isFolder ?? false) : false,
 		flags: model.flags,
 		noAccess: model.noAccess,
+		variants: model.isFolder ? [] : model.variants,
 	};
 };
+
+const createMockDocumentBlueprintFolderMapper = (
+	request: CreateFolderRequestModel,
+): UmbMockDocumentBlueprintModel => ({
+	documentType: null,
+	hasChildren: false,
+	id: request.id ? request.id : UmbId.new(),
+	isFolder: true,
+	name: request.name,
+	parent: request.parent,
+	values: [],
+	variants: [],
+	flags: [],
+	noAccess: false,
+});
 
 const createMockDocumentBlueprintMapper = (
 	request: CreateDocumentBlueprintRequestModel,
@@ -72,7 +97,6 @@ const createMockDocumentBlueprintMapper = (
 		variants: request.variants.map((variantRequest) => {
 			return {
 				culture: variantRequest.culture,
-				segment: variantRequest.segment,
 				name: variantRequest.name,
 				createDate: now,
 				updateDate: now,
@@ -88,6 +112,9 @@ const createMockDocumentBlueprintMapper = (
 };
 
 const detailResponseMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprintResponseModel => {
+	// Folders are read through the folder endpoints, so anything reaching here is a blueprint.
+	if (!model.documentType) throw new Error(`Document blueprint with id ${model.id} has no document type`);
+
 	return {
 		documentType: model.documentType,
 		id: model.id,
@@ -98,6 +125,9 @@ const detailResponseMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlu
 };
 
 const itemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprintItemResponseModel => {
+	// Folders are read through the folder endpoints, so anything reaching here is a blueprint.
+	if (!model.documentType) throw new Error(`Document blueprint with id ${model.id} has no document type`);
+
 	return {
 		documentType: {
 			collection: model.documentType.collection,

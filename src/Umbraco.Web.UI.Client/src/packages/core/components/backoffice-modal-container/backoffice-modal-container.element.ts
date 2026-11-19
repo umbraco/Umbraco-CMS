@@ -38,7 +38,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 	/**
 	 * We cannot render the umb-modal element directly in the uui-modal-container because it wont get recognized by UUI.
 	 *  We therefore have a helper class which creates the uui-modal element and returns it.
-	 * @param modals
+	 * @param {Array<UmbModalContext>} modals The current list of open modals.
 	 */
 	#createModalElements(modals: Array<UmbModalContext>) {
 		this.fillBackground = false;
@@ -124,6 +124,12 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 
 			:host([fill-background]) #container::after {
 				background: var(--backdrop-background);
+			}
+			uui-modal-container > * {
+				--umb-modal-index: 0;
+			}
+			uui-modal-container > *:not([index='0']) {
+				--umb-modal-index: 1;
 			}
 		`,
 	];

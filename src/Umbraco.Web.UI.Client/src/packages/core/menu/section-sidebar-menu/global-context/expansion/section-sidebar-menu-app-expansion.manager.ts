@@ -6,7 +6,7 @@ import { UmbEntityExpansionManager } from '@umbraco-cms/backoffice/utils';
  * Manages the expansion state of a section sidebar menu.
  * @exports
  * @class UmbSectionSidebarMenuAppExpansionManager
- * @augments {UmbControllerBase}
+ * @augments {UmbEntityExpansionManager}
  */
 export class UmbSectionSidebarMenuAppExpansionManager extends UmbEntityExpansionManager<UmbSectionMenuItemExpansionEntryModel> {
 	/**

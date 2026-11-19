@@ -1,10 +1,13 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
@@ -12,6 +15,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 /// Provides API endpoints for retrieving and managing available composition media types in the Umbraco CMS.
 /// </summary>
 [ApiVersion("1.0")]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
 public class AvailableCompositionMediaTypeController : MediaTypeControllerBase
 {
     private readonly IMediaTypeEditingService _mediaTypeEditingService;
@@ -36,6 +40,7 @@ public class AvailableCompositionMediaTypeController : MediaTypeControllerBase
     /// <returns>A <see cref="Task{IActionResult}"/> containing a collection of <see cref="AvailableMediaTypeCompositionResponseModel"/> representing the available media type compositions.</returns>
     [HttpPost("available-compositions")]
     [MapToApiVersion("1.0")]
+    [RequiresPermissions([])]
     [ProducesResponseType(typeof(IEnumerable<AvailableMediaTypeCompositionResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets available compositions.")]
     [EndpointDescription("Gets a collection of media types that are available to use as compositions for the specified media type.")]

@@ -22,14 +22,15 @@ export class MultipleTextStringDataTypeBuilder extends DataTypeBuilder {
 
   getValues() {
     let values: any = [];
-    values.push({
-      alias: 'min',
-      value: this.min || 0
-    });
-    values.push({
-      alias: 'max',
-      value: this.max || 0
-    });
+    if (this.min !== undefined || this.max !== undefined) {
+      values.push({
+        alias: 'validationLimit',
+        value: {
+          min: this.min,
+          max: this.max
+        }
+      });
+    }
     return values;
   }
 }

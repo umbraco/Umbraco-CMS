@@ -1,10 +1,6 @@
 import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UMB_ELEMENT_MENU_ITEM_ALIAS } from '../../menu/constants.js';
 import { UMB_ELEMENT_ROOT_WORKSPACE_ALIAS } from '../../workspace/element-root/constants.js';
-import {
-	UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS,
-	UMB_USER_PERMISSION_ELEMENT_FOLDER_UPDATE,
-} from '../user-permissions/constants.js';
 import { UMB_ELEMENT_COLLECTION_ALIAS } from '../../collection/constants.js';
 import { UMB_ELEMENT_FOLDER_WORKSPACE_ALIAS } from './constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
@@ -67,10 +63,6 @@ const workspaceAction: ManifestWorkspaceAction = {
 			match: UMB_ELEMENT_FOLDER_WORKSPACE_ALIAS,
 		},
 		{
-			alias: UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS,
-			allOf: [UMB_USER_PERMISSION_ELEMENT_FOLDER_UPDATE],
-		},
-		{
 			alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 		},
 	],
@@ -81,7 +73,7 @@ const menuStructure: ManifestWorkspaceContextMenuStructureKind = {
 	kind: 'menuStructure',
 	alias: 'Umb.Context.ElementFolder.Menu.Structure',
 	name: 'Element Folder Menu Structure Workspace Context',
-	api: () => import('./element-folder-menu-structure.context.js'),
+	api: () => import('../../workspace/element-menu-structure.context.js'),
 	meta: {
 		menuItemAlias: UMB_ELEMENT_MENU_ITEM_ALIAS,
 	},
@@ -95,7 +87,7 @@ const menuStructure: ManifestWorkspaceContextMenuStructureKind = {
 
 const workspaceFooterApp: ManifestWorkspaceFooterApp = {
 	type: 'workspaceFooterApp',
-	kind: 'menuBreadcrumb',
+	kind: 'variantMenuBreadcrumb',
 	alias: 'Umb.WorkspaceFooterApp.ElementFolder.Breadcrumb',
 	name: 'Element Folder Breadcrumb Workspace Footer App',
 	conditions: [

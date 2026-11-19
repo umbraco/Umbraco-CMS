@@ -34,7 +34,8 @@ test('can view users in a user group', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
 
   // Assert
-  expect(await umbracoUi.userGroup.getUsersInGroupCount()).toBe(2);
+  // The workspace user list loads async after the group opens; poll so the count isn't read before it populates.
+  await expect.poll(() => umbracoUi.userGroup.getUsersInGroupCount()).toBe(2);
   await umbracoUi.userGroup.isUserVisibleInUserGroup(userA.name);
   await umbracoUi.userGroup.isUserVisibleInUserGroup(userB.name);
 });

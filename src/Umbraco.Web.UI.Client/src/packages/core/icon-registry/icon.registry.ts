@@ -39,9 +39,9 @@ export class UmbIconRegistry extends UUIIconRegistry {
 		this.#icons = [...this.#icons, ...icons];
 	}
 	/**
-	 * @param {string} iconName
-	 * @returns {*}  {boolean}
-	 * @memberof UmbIconStore
+	 * @param {string} iconName - The name of the icon
+	 * @returns {boolean} Always true; the icon is loaded asynchronously.
+	 * @memberof UmbIconRegistry
 	 */
 	override acceptIcon(iconName: string): boolean {
 		const iconProvider = this.provideIcon(iconName);

@@ -1,4 +1,3 @@
-import { UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT } from '../server-event/constants.js';
 import type { UmbManagementApiInFlightRequestCache } from '../inflight-request/cache.js';
 import type { UmbManagementApiItemDataCache } from './cache.js';
 import type { UmbApiError, UmbCancelError, UmbApiResponse } from '@umbraco-cms/backoffice/resources';
@@ -16,11 +15,9 @@ export interface UmbManagementApiItemDataRequestManagerArgs<ItemResponseModelTyp
 export class UmbManagementApiItemDataRequestManager<ItemResponseModelType> extends UmbControllerBase {
 	#dataCache: UmbManagementApiItemDataCache<ItemResponseModelType>;
 	#inflightRequestCache?: UmbManagementApiInFlightRequestCache<ItemResponseModelType>;
-	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
 	getUniqueMethod: (item: ItemResponseModelType) => string;
 
 	#getItems;
-	#isConnectedToServerEvents = false;
 
 	constructor(host: UmbControllerHost, args: UmbManagementApiItemDataRequestManagerArgs<ItemResponseModelType>) {
 		super(host);
@@ -29,11 +26,6 @@ export class UmbManagementApiItemDataRequestManager<ItemResponseModelType> exten
 		this.#dataCache = args.dataCache;
 		this.#inflightRequestCache = args.inflightRequestCache;
 		this.getUniqueMethod = args.getUniqueMethod;
-
-		this.consumeContext(UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT, (context) => {
-			this.#serverEventContext = context;
-			this.#observeServerEventsConnection();
-		});
 	}
 
 	async getItems(ids: Array<string>): Promise<UmbApiResponse<{ data?: Array<ItemResponseModelType> }>> {
@@ -42,7 +34,7 @@ export class UmbManagementApiItemDataRequestManager<ItemResponseModelType> exten
 		let cacheItems: Array<ItemResponseModelType> = [];
 
 		// Only read from the cache when we are connected to the server events
-		if (this.#isConnectedToServerEvents) {
+		if (this.#dataCache.serverEventsConnected) {
 			const cachedIds = ids.filter((id) => this.#dataCache.has(id));
 			cacheItems = cachedIds
 				.map((id) => this.#dataCache.get(id))
@@ -93,7 +85,7 @@ export class UmbManagementApiItemDataRequestManager<ItemResponseModelType> exten
 				const serverItems = serverData ?? [];
 				error = serverError;
 
-				if (this.#isConnectedToServerEvents) {
+				if (this.#dataCache.serverEventsConnected) {
 					serverItems.forEach((item) => this.#dataCache.set(this.getUniqueMethod(item), item));
 				}
 
@@ -135,23 +127,5 @@ export class UmbManagementApiItemDataRequestManager<ItemResponseModelType> exten
 		const data: Array<ItemResponseModelType> = [...cacheItems, ...inflightItems, ...newlyFetchedItems];
 
 		return { data, error };
-	}
-
-	#observeServerEventsConnection() {
-		this.observe(
-			this.#serverEventContext?.isConnected,
-			(isConnected) => {
-				/* We purposefully ignore the initial value of isConnected.
-				We only care about whether the connection is established or not (true/false) */
-				if (isConnected === undefined) return;
-				this.#isConnectedToServerEvents = isConnected;
-
-				// Clear the cache if we lose connection to the server events
-				if (this.#isConnectedToServerEvents === false) {
-					this.#dataCache.clear();
-				}
-			},
-			'umbObserveServerEventsConnection',
-		);
 	}
 }

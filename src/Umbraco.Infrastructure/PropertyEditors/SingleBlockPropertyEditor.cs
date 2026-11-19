@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.PropertyEditors;
@@ -27,7 +28,6 @@ public class SingleBlockPropertyEditor : DataEditor
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IIOHelper _ioHelper;
-    private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SingleBlockPropertyEditor"/> class.
@@ -35,23 +35,15 @@ public class SingleBlockPropertyEditor : DataEditor
     /// <param name="dataValueEditorFactory">A factory used to create data value editors for property editing.</param>
     /// <param name="jsonSerializer">The JSON serializer used for serializing and deserializing property values.</param>
     /// <param name="ioHelper">An IO helper for file and path operations.</param>
-    /// <param name="blockValuePropertyIndexValueFactory">A factory for creating index values for block value properties.</param>
     public SingleBlockPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper,
-        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
+        IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
         _jsonSerializer = jsonSerializer;
         _ioHelper = ioHelper;
-        _blockValuePropertyIndexValueFactory = blockValuePropertyIndexValueFactory;
     }
-
-    /// <summary>
-    /// Gets the <see cref="IPropertyIndexValueFactory"/> instance used to generate index values for properties in the single block property editor.
-    /// </summary>
-    public override IPropertyIndexValueFactory PropertyIndexValueFactory => _blockValuePropertyIndexValueFactory;
 
     /// <inheritdoc/>
     public override bool SupportsConfigurableElements => true;
@@ -90,6 +82,20 @@ public class SingleBlockPropertyEditor : DataEditor
     {
         var valueEditor = (SingleBlockEditorPropertyValueEditor)GetValueEditor();
         return valueEditor.MergeVariantInvariantPropertyValue(sourceValue, targetValue, canUpdateInvariantData, allowedCultures);
+    }
+
+    /// <inheritdoc />
+    public override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture)
+    {
+        var valueEditor = (SingleBlockEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue, defaultCulture);
+    }
+
+    /// <inheritdoc />
+    public override bool ArePropertyValuesEquivalent(object? editedValue, object? publishedValue)
+    {
+        var valueEditor = (SingleBlockEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.ArePropertyValuesEquivalent(editedValue, publishedValue);
     }
 
     internal sealed class SingleBlockEditorPropertyValueEditor : BlockEditorPropertyValueEditor<SingleBlockValue, SingleBlockLayoutItem>
@@ -133,8 +139,25 @@ public class SingleBlockPropertyEditor : DataEditor
             Validators.Add(new SingleBlockValidator(BlockEditorValues, textService));
         }
 
-        protected override SingleBlockValue CreateWithLayout(IEnumerable<SingleBlockLayoutItem> layout) =>
-            new(layout.Single());
+        /// <inheritdoc />
+        public override IValueRequiredValidator RequiredValidator => new BlockEditorValueRequiredValidator<SingleBlockValue>(JsonSerializer);
+
+        /// <summary>
+        /// Creates a single block value holding the specified layout.
+        /// </summary>
+        /// <param name="layout">The layout items.</param>
+        /// <returns>The single block value.</returns>
+        /// <remarks>
+        /// A stored value is not guaranteed to hold exactly one block - for example, a value written by another block
+        /// editor whose layout this editor supports - so every layout item is carried over, and any surplus is left for
+        /// validation to report.
+        /// </remarks>
+        protected override SingleBlockValue CreateWithLayout(IEnumerable<SingleBlockLayoutItem> layout)
+        {
+            var value = new SingleBlockValue();
+            value.Layout[value.PropertyEditorAlias] = layout.ToArray();
+            return value;
+        }
 
         /// <inheritdoc/>
         public override IEnumerable<Guid> ConfiguredElementTypeKeys()

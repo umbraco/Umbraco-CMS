@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
@@ -32,6 +33,12 @@ internal sealed class ServerEventSender :
     IDistributedCacheAsyncNotificationHandler<DictionaryItemSavedNotification>,
     IDistributedCacheAsyncNotificationHandler<DomainDeletedNotification>,
     IDistributedCacheAsyncNotificationHandler<DomainSavedNotification>,
+    IDistributedCacheAsyncNotificationHandler<ElementDeletedNotification>,
+    IDistributedCacheAsyncNotificationHandler<ElementMovedToRecycleBinNotification>,
+    IDistributedCacheAsyncNotificationHandler<ElementSavedNotification>,
+    IDistributedCacheAsyncNotificationHandler<EntityContainerDeletedNotification>,
+    IDistributedCacheAsyncNotificationHandler<EntityContainerMovedToRecycleBinNotification>,
+    IDistributedCacheAsyncNotificationHandler<EntityContainerSavedNotification>,
     IDistributedCacheAsyncNotificationHandler<LanguageDeletedNotification>,
     IDistributedCacheAsyncNotificationHandler<LanguageSavedNotification>,
     IDistributedCacheAsyncNotificationHandler<MediaDeletedNotification>,
@@ -68,18 +75,29 @@ internal sealed class ServerEventSender :
     IDistributedCacheAsyncNotificationHandler<WebhookDeletedNotification>,
     IDistributedCacheAsyncNotificationHandler<WebhookSavedNotification>
 {
+    private static readonly IReadOnlyDictionary<Guid, string> _containerEventSources = new Dictionary<Guid, string>
+    {
+        [Constants.ObjectTypes.Element] = Constants.ServerEvents.EventSource.ElementContainer,
+    };
+
     private readonly IServerEventRouter _serverEventRouter;
     private readonly IIdKeyMap _idKeyMap;
+    private readonly IEntityService _entityService;
+    private readonly ILogger<ServerEventSender> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ServerEventSender"/> class.
     /// </summary>
     /// <param name="serverEventRouter">The router responsible for handling server events.</param>
     /// <param name="idKeyMap">The map used to resolve identifier keys.</param>
-    public ServerEventSender(IServerEventRouter serverEventRouter, IIdKeyMap idKeyMap)
+    /// <param name="entityService">The entity service used to resolve entity paths.</param>
+    /// <param name="logger">The logger.</param>
+    public ServerEventSender(IServerEventRouter serverEventRouter, IIdKeyMap idKeyMap, IEntityService entityService, ILogger<ServerEventSender> logger)
     {
         _serverEventRouter = serverEventRouter;
         _idKeyMap = idKeyMap;
+        _entityService = entityService;
+        _logger = logger;
     }
 
     /// <inheritdoc/>
@@ -193,6 +211,54 @@ internal sealed class ServerEventSender :
     /// <inheritdoc/>
     public Task HandleAsync(IEnumerable<DomainSavedNotification> notifications, CancellationToken cancellationToken)
         => NotifySavedAsync(Constants.ServerEvents.EventSource.Domain, notifications);
+
+    /// <inheritdoc/>
+    public Task HandleAsync(ElementDeletedNotification notification, CancellationToken cancellationToken)
+        => NotifyDeletedAsync(Constants.ServerEvents.EventSource.Element, notification);
+
+    /// <inheritdoc/>
+    public Task HandleAsync(IEnumerable<ElementDeletedNotification> notifications, CancellationToken cancellationToken)
+        => NotifyDeletedAsync(Constants.ServerEvents.EventSource.Element, notifications);
+
+    /// <inheritdoc/>
+    public Task HandleAsync(ElementMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
+        => NotifyTrashedAsync(Constants.ServerEvents.EventSource.Element, notification);
+
+    /// <inheritdoc/>
+    public Task HandleAsync(IEnumerable<ElementMovedToRecycleBinNotification> notifications, CancellationToken cancellationToken)
+        => NotifyTrashedAsync(Constants.ServerEvents.EventSource.Element, notifications);
+
+    /// <inheritdoc/>
+    public Task HandleAsync(ElementSavedNotification notification, CancellationToken cancellationToken)
+        => NotifySavedAsync(Constants.ServerEvents.EventSource.Element, notification);
+
+    /// <inheritdoc/>
+    public Task HandleAsync(IEnumerable<ElementSavedNotification> notifications, CancellationToken cancellationToken)
+        => NotifySavedAsync(Constants.ServerEvents.EventSource.Element, notifications);
+
+    /// <inheritdoc/>
+    public Task HandleAsync(EntityContainerDeletedNotification notification, CancellationToken cancellationToken)
+        => NotifyContainersDeletedAsync(notification);
+
+    /// <inheritdoc/>
+    public Task HandleAsync(IEnumerable<EntityContainerDeletedNotification> notifications, CancellationToken cancellationToken)
+        => NotifyContainersDeletedAsync(notifications);
+
+    /// <inheritdoc/>
+    public Task HandleAsync(EntityContainerMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
+        => NotifyContainersTrashedAsync(notification);
+
+    /// <inheritdoc/>
+    public Task HandleAsync(IEnumerable<EntityContainerMovedToRecycleBinNotification> notifications, CancellationToken cancellationToken)
+        => NotifyContainersTrashedAsync(notifications);
+
+    /// <inheritdoc/>
+    public Task HandleAsync(EntityContainerSavedNotification notification, CancellationToken cancellationToken)
+        => NotifyContainersSavedAsync(notification);
+
+    /// <inheritdoc/>
+    public Task HandleAsync(IEnumerable<EntityContainerSavedNotification> notifications, CancellationToken cancellationToken)
+        => NotifyContainersSavedAsync(notifications);
 
     /// <inheritdoc/>
     public Task HandleAsync(LanguageDeletedNotification notification, CancellationToken cancellationToken)
@@ -489,6 +555,49 @@ internal sealed class ServerEventSender :
         }
     }
 
+    // Container notifications are shared by every container type, so each container is announced on the
+    // source for the type it contains. Container types without a source are not announced.
+    private static string? GetContainerEventSource(EntityContainer container)
+        => _containerEventSources.GetValueOrDefault(container.ContainedObjectType);
+
+    private async Task NotifyContainersDeletedAsync(params IEnumerable<EntityContainerDeletedNotification> notifications)
+    {
+        var seen = new HashSet<Guid>();
+        foreach (EntityContainer container in notifications.SelectMany(x => x.DeletedEntities))
+        {
+            if (seen.Add(container.Key) && GetContainerEventSource(container) is { } source)
+            {
+                await RouteDeletedEvent(source, container);
+            }
+        }
+    }
+
+    private async Task NotifyContainersTrashedAsync(params IEnumerable<EntityContainerMovedToRecycleBinNotification> notifications)
+    {
+        var seen = new HashSet<Guid>();
+        foreach (MoveToRecycleBinEventInfo<EntityContainer> movedEvent in notifications.SelectMany(x => x.MoveInfoCollection))
+        {
+            if (seen.Add(movedEvent.Entity.Key) && GetContainerEventSource(movedEvent.Entity) is { } source)
+            {
+                await RouteTrashedEvent(source, movedEvent);
+            }
+        }
+    }
+
+    private async Task NotifyContainersSavedAsync(params IEnumerable<EntityContainerSavedNotification> notifications)
+    {
+        var seen = new HashSet<Guid>();
+        foreach (EntityContainer container in notifications.SelectMany(x => x.SavedEntities))
+        {
+            if (seen.Add(container.Key) && GetContainerEventSource(container) is { } source)
+            {
+                // Containers do not track an update date, so a new container is recognised by its identity
+                // having been assigned during the save.
+                await RouteSavedEvent(source, container, isNew: container.WasPropertyDirty(nameof(EntityContainer.Id)));
+            }
+        }
+    }
+
     private async Task NotifyDeletedAsync<T>(string source, params IEnumerable<DeletedNotification<T>> notifications)
         where T : IEntity
     {
@@ -515,12 +624,7 @@ internal sealed class ServerEventSender :
             {
                 if (seen.Add(movedEvent.Entity.Key))
                 {
-                    await _serverEventRouter.RouteEventAsync(new ServerEvent
-                    {
-                        EventType = Constants.ServerEvents.EventType.Trashed,
-                        EventSource = source,
-                        Key = movedEvent.Entity.Key,
-                    });
+                    await RouteTrashedEvent(source, movedEvent);
                 }
             }
         }
@@ -640,25 +744,48 @@ internal sealed class ServerEventSender :
         }
     }
 
+    private async Task RouteTrashedEvent<T>(string source, MoveToRecycleBinEventInfo<T> movedEvent)
+        where T : IEntity
+        => await _serverEventRouter.RouteEventAsync(
+            new ServerEvent
+            {
+                EventType = Constants.ServerEvents.EventType.Trashed,
+                EventSource = source,
+                Key = movedEvent.Entity.Key,
+            },
+
+            // Use the pre-trash path: after the move the entity's own Path is under the
+            // recycle bin, which HasPathAccess rejects for every non-root user, so start-node
+            // recipients would never be told their content or media was trashed.
+            new ServerEventRoutingContext { EntityPath = movedEvent.OriginalPath });
+
     private async Task RouteDeletedEvent<T>(string source, T entity)
         where T : IEntity
-        => await _serverEventRouter.RouteEventAsync(new ServerEvent
-        {
-            EventType = Constants.ServerEvents.EventType.Deleted,
-            EventSource = source,
-            Key = entity.Key,
-        });
+        => await _serverEventRouter.RouteEventAsync(
+            new ServerEvent
+            {
+                EventType = Constants.ServerEvents.EventType.Deleted,
+                EventSource = source,
+                Key = entity.Key,
+            },
+            new ServerEventRoutingContext { EntityPath = (entity as IUmbracoEntity)?.Path });
 
-    private async Task RouteCreatedOrUpdatedEvent<T>(string source, T entity)
+    private Task RouteCreatedOrUpdatedEvent<T>(string source, T entity)
         where T : IEntity
-        => await _serverEventRouter.RouteEventAsync(new ServerEvent
-        {
-            EventType = entity.CreateDate == entity.UpdateDate
-                ? Constants.ServerEvents.EventType.Created
-                : Constants.ServerEvents.EventType.Updated,
-            Key = entity.Key,
-            EventSource = source,
-        });
+        => RouteSavedEvent(source, entity, isNew: entity.CreateDate == entity.UpdateDate);
+
+    private async Task RouteSavedEvent<T>(string source, T entity, bool isNew)
+        where T : IEntity
+        => await _serverEventRouter.RouteEventAsync(
+            new ServerEvent
+            {
+                EventType = isNew
+                    ? Constants.ServerEvents.EventType.Created
+                    : Constants.ServerEvents.EventType.Updated,
+                Key = entity.Key,
+                EventSource = source,
+            },
+            new ServerEventRoutingContext { EntityPath = (entity as IUmbracoEntity)?.Path });
 
     private async Task RouteDocumentUpdatedEventForPublicAccessModification(IEnumerable<PublicAccessEntry> entities)
     {
@@ -676,12 +803,24 @@ internal sealed class ServerEventSender :
                 continue;
             }
 
-            await _serverEventRouter.RouteEventAsync(new ServerEvent
+            IEntitySlim? documentEntity = _entityService.Get(getKeyAttempt.Result, UmbracoObjectTypes.Document);
+            if (documentEntity is null)
             {
-                EventType = Constants.ServerEvents.EventType.Updated,
-                Key = getKeyAttempt.Result,
-                EventSource = Constants.ServerEvents.EventSource.Document,
-            });
+                // Without a path the event cannot be authorized per recipient, so it fails closed
+                // downstream. Log it, as it is unexpected for a document that was just modified.
+                _logger.LogWarning(
+                    "Could not resolve the path for document {DocumentKey} following a public access change; the update event will not reach entity-scoped subscribers.",
+                    getKeyAttempt.Result);
+            }
+
+            await _serverEventRouter.RouteEventAsync(
+                new ServerEvent
+                {
+                    EventType = Constants.ServerEvents.EventType.Updated,
+                    Key = getKeyAttempt.Result,
+                    EventSource = Constants.ServerEvents.EventSource.Document,
+                },
+                new ServerEventRoutingContext { EntityPath = documentEntity?.Path });
         }
     }
 }

@@ -28,11 +28,4 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		name: 'Create Partial View From Snippet Modal',
 		js: () => import('./snippet-modal/create-from-snippet-modal.js'),
 	},
-	// Deprecated: kept for backwards compatibility. Scheduled for removal in Umbraco 19.
-	{
-		type: 'modal',
-		alias: 'Umb.Modal.PartialView.CreateOptions',
-		name: 'Partial View Create Options Modal',
-		element: () => import('./options-modal/partial-view-create-options-modal.element.js'),
-	},
 ];

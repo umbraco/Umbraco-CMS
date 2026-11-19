@@ -41,6 +41,18 @@ public class CompositeStringArrayKeyTests
     }
 
     [Test]
+    public void Keys_Are_Compared_Ordinally()
+    {
+        // Ordinal case folding, not invariant-culture lowercasing: KELVIN SIGN and LATIN CAPITAL LETTER
+        // SHARP S lowercase to "k" and to LATIN SMALL LETTER SHARP S under the invariant culture, but are
+        // distinct code points ordinally.
+        var key1 = new CompositeStringArrayKey(CharAsString(0x212A), CharAsString(0x1E9E));
+        var key2 = new CompositeStringArrayKey("k", CharAsString(0x00DF));
+
+        Assert.IsFalse(key1.Equals(key2));
+    }
+
+    [Test]
     public void Different_Length_Keys_Are_Not_Equal()
     {
         var key1 = new CompositeStringArrayKey("a", "b");
@@ -67,4 +79,6 @@ public class CompositeStringArrayKeyTests
         Assert.IsTrue(dict.ContainsKey(lookup));
         Assert.AreEqual("value", dict[lookup]);
     }
+
+    private static string CharAsString(int codePoint) => ((char)codePoint).ToString();
 }

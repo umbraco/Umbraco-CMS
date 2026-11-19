@@ -1,6 +1,6 @@
 import { UMB_ENTITY_BULK_ACTION_DEFAULT_KIND_MANIFEST } from '../../default/default.action.kind.js';
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbDuplicateToEntityBulkAction } from './duplicate-to.action.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -12,7 +12,7 @@ export const manifest: UmbExtensionManifestKind = {
 		type: 'entityBulkAction',
 		kind: 'duplicateTo',
 		api: UmbDuplicateToEntityBulkAction,
-		weight: 700,
+		weight: 710,
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-split',

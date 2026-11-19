@@ -1,5 +1,6 @@
 using System.Data;
 using System.Data.Common;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -105,6 +106,23 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     public override string FormatGuid(Guid guid) => guid.ToString().ToUpperInvariant();
 
     /// <inheritdoc />
+    /// <remarks>
+    /// SQLite stores date and time values as text, so the formats for <see cref="DateTimeOffset"/>, <see cref="DateOnly"/>
+    /// and <see cref="TimeOnly"/> match those the ADO.NET provider writes for parameters, keeping values comparable and
+    /// sortable whichever way they were written.
+    /// </remarks>
+    public override string FormatDateTimeOffset(DateTimeOffset dateTimeOffset)
+        => dateTimeOffset.ToString(@"yyyy\-MM\-dd HH\:mm\:ss.FFFFFFFzzz", CultureInfo.InvariantCulture);
+
+    /// <inheritdoc />
+    public override string FormatDateOnly(DateOnly date)
+        => date.ToString(@"yyyy\-MM\-dd", CultureInfo.InvariantCulture);
+
+    /// <inheritdoc />
+    public override string FormatTimeOnly(TimeOnly time)
+        => time.ToString(time.Ticks % TimeSpan.TicksPerSecond == 0 ? "HH:mm:ss" : "HH:mm:ss.fffffff", CultureInfo.InvariantCulture);
+
+    /// <inheritdoc />
     public override string Format(TableDefinition table)
     {
         var columns = Format(table.Columns);
@@ -181,10 +199,21 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
 
     /// <inheritdoc />
-    public override string ConvertIntegerToOrderableString => "substr('0000000000'||'{0}', -10, 10)";
+    /// <remarks>
+    /// SQLite has no <c>TRUNCATE TABLE</c> statement.
+    /// </remarks>
+    public override string TruncateTable => "DELETE FROM {0}";
 
     /// <inheritdoc />
-    public override string ConvertDecimalToOrderableString => "substr('0000000000'||'{0}', -10, 10)";
+    /// <remarks>Offsets the value into the non-negative range so every integer has the same number of digits.</remarks>
+    public override string ConvertIntegerToOrderableString => "printf('%010d', {0} + 2147483648)";
+
+    /// <inheritdoc />
+    /// <remarks>
+    ///     Decimals are stored as text, so the integer and fractional parts are padded as text, which keeps every
+    ///     digit of the stored value.
+    /// </remarks>
+    public override string ConvertDecimalToOrderableString { get; } = BuildConvertDecimalToOrderableString();
 
     /// <inheritdoc />
     public override string ConvertDateToOrderableString => "{0}";
@@ -231,6 +260,50 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     {
         ColumnAttribute? attr = column.FirstAttribute<ColumnAttribute>();
         return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
+    }
+
+    // Builds an expression that turns a decimal stored as text into a fixed-width string of digits whose text order
+    // matches the numeric order: a sign marker ('0' for negative, '1' otherwise) followed by 29 integer digits and
+    // 28 fractional digits, which is wide enough for any System.Decimal. For example:
+    //
+    //    2.25  ->  1 00000000000000000000000000002 2500000000000000000000000000
+    //   -2.25  ->  0 99999999999999999999999999997 7499999999999999999999999999
+    //   -1.5   ->  0 99999999999999999999999999998 4999999999999999999999999999
+    //
+    // (spaces added for readability). Negatives get the '0' marker so they sort below every non-negative value, and
+    // their digits are complemented (each d becomes 9 - d) so a larger magnitude sorts lower: -2.25 before -1.5.
+    //
+    // This is done with string functions rather than arithmetic because SQLite has no exact decimal type: arithmetic
+    // on the stored text goes through REAL (a double) and would lose digits beyond about 15 significant figures.
+    private static string BuildConvertDecimalToOrderableString()
+    {
+        // The value without its sign, split at the decimal point. The stored text has no trailing zeros and may have
+        // no point at all ("10"), so the point's position differs from value to value.
+        const string absolute = "ltrim({0}, '-')";
+        const string point = "instr(" + absolute + ", '.')";
+        const string integerPart = "CASE " + point + " WHEN 0 THEN " + absolute + " ELSE substr(" + absolute + ", 1, " + point + " - 1) END";
+        const string fractionalPart = "CASE " + point + " WHEN 0 THEN '' ELSE substr(" + absolute + ", " + point + " + 1) END";
+
+        // Pad the integer part on the left to 29 digits (SQLite has no LPAD, so printf pads with spaces that are then
+        // replaced with zeros) and the fractional part on the right to 28 digits. Every value then has its digits in
+        // the same positions, and the point itself can be dropped.
+        const string digits = "replace(printf('%29s', " + integerPart + "), ' ', '0') || substr(" + fractionalPart + " || '0000000000000000000000000000', 1, 28)";
+
+        // Complement each digit for negatives. SQLite has no TRANSLATE, so this nests replace() calls, in two passes
+        // through placeholder letters: replacing 0 with 9 directly would have the later 9 -> 0 replacement turn it
+        // back. The first pass maps 0..9 to a..j, the second maps a..j to 9..0.
+        var complementedDigits = digits;
+        for (var digit = 0; digit <= 9; digit++)
+        {
+            complementedDigits = $"replace({complementedDigits}, '{digit}', '{(char)('a' + digit)}')";
+        }
+
+        for (var digit = 0; digit <= 9; digit++)
+        {
+            complementedDigits = $"replace({complementedDigits}, '{(char)('a' + digit)}', '{9 - digit}')";
+        }
+
+        return "CASE WHEN substr({0}, 1, 1) = '-' THEN '0' || " + complementedDigits + " ELSE '1' || " + digits + " END";
     }
 
     /// <inheritdoc />
@@ -378,24 +451,34 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     public override IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db)
     {
         IEnumerable<string> tables = GetTablesInSchema(db);
+        var columns = new List<ColumnInfo>();
 
+        // Materialized rather than yielded, so the transaction always completes and a caller that stops
+        // enumerating early cannot leave it open (which would prevent the enclosing scope from committing).
         db.BeginTransaction();
-        foreach (var table in tables)
+        try
         {
-            DbCommand? cmd = db.CreateCommand(db.Connection, CommandType.Text, $"PRAGMA table_info({table})");
-            DbDataReader reader = cmd.ExecuteReader();
-
-            while (reader.Read())
+            foreach (var table in tables)
             {
-                var ordinal = reader.GetInt32("cid");
-                var columnName = reader.GetString("name");
-                var type = reader.GetString("type");
-                var notNull = reader.GetBoolean("notnull");
-                yield return new ColumnInfo(table, columnName, ordinal, notNull, type);
+                using DbCommand cmd = db.CreateCommand(db.Connection, CommandType.Text, $"PRAGMA table_info({table})");
+                using DbDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    var ordinal = reader.GetInt32("cid");
+                    var columnName = reader.GetString("name");
+                    var type = reader.GetString("type");
+                    var notNull = reader.GetBoolean("notnull");
+                    columns.Add(new ColumnInfo(table, columnName, ordinal, notNull, type));
+                }
             }
         }
+        finally
+        {
+            db.CompleteTransaction();
+        }
 
-        db.CompleteTransaction();
+        return columns;
     }
 
     /// <inheritdoc />

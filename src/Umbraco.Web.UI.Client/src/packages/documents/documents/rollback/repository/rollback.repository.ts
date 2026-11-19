@@ -54,6 +54,7 @@ export class UmbDocumentRollbackRepository extends UmbControllerBase implements 
 					})),
 					values: data.values.map((v) => ({
 						culture: v.culture ?? null,
+						segment: v.segment ?? null,
 						alias: v.alias,
 						value: v.value,
 					})),
@@ -71,16 +72,6 @@ export class UmbDocumentRollbackRepository extends UmbControllerBase implements 
 	async rollback(versionId: string, culture?: string) {
 		return await this.#dataSource.rollback(versionId, culture);
 	}
-
-	/** @deprecated Use {@link requestVersionsByEntityId} instead. Scheduled for removal in Umbraco 19. */
-	async requestVersionsByDocumentId(id: string, culture?: string) {
-		return await this.#dataSource.getVersionsByDocumentId(id, culture);
-	}
 }
-
-/**
- * @deprecated Use {@link UmbDocumentRollbackRepository} instead. Scheduled for removal in Umbraco 19.
- */
-export { UmbDocumentRollbackRepository as UmbRollbackRepository };
 
 export default UmbDocumentRollbackRepository;

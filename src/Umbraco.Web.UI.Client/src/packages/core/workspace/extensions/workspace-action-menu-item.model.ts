@@ -4,18 +4,29 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
 
 export interface ManifestWorkspaceActionMenuItem<
 	MetaType extends MetaWorkspaceActionMenuItem = MetaWorkspaceActionMenuItem,
-> extends ManifestElementAndApi<UmbControllerHostElement, UmbWorkspaceActionMenuItem<MetaType>>,
+>
+	extends
+		ManifestElementAndApi<UmbControllerHostElement, UmbWorkspaceActionMenuItem<MetaType>>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'workspaceActionMenuItem';
 	/**
 	 * Define which workspace actions this menu item should be shown for.
-	 * @examples [
-	 * 	['Umb.WorkspaceAction.Document.Save', 'Umb.WorkspaceAction.Document.SaveAndPublish'],
-	 * 	"Umb.WorkspaceAction.Document.Save"
-	 * ]
+	 * @examples [["Umb.WorkspaceAction.Document.Save", "Umb.WorkspaceAction.Document.SaveAndPublish"], "Umb.WorkspaceAction.Document.Save"]
 	 * @required
 	 */
 	forWorkspaceActions: string | string[];
+	/**
+	 * The alias of the action group this action belongs to. The actions of a group render together, ordered by their
+	 * own weight, and the group's weight orders the group in the menu. Actions without a registered group render last.
+	 * @examples ["Umb.WorkspaceActionMenuItemGroup.Publishing"]
+	 */
+	group?: string;
+	/**
+	 * Renders a separator above this action inside its group. The first action of a group needs none, as a separator
+	 * already sits between groups.
+	 * The separator belongs to this action, so it is not rendered when the action is not.
+	 */
+	separatorBefore?: boolean;
 	meta: MetaType;
 }
 
@@ -32,19 +43,13 @@ export interface ManifestWorkspaceActionMenuItemDefaultKind<
 export interface MetaWorkspaceActionMenuItemDefaultKind extends MetaWorkspaceActionMenuItem {
 	/**
 	 * An icon to represent the action to be performed
-	 * @examples [
-	 *   "icon-box",
-	 *   "icon-grid"
-	 * ]
+	 * @examples ["icon-box", "icon-grid"]
 	 */
 	icon: string;
 
 	/**
 	 * The friendly name of the action to perform
-	 * @examples [
-	 *   "Create",
-	 *   "Create Content Template"
-	 * ]
+	 * @examples ["Create", "Create Content Template"]
 	 */
 	label: string;
 }

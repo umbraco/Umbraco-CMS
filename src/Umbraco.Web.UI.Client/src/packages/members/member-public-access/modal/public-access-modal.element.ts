@@ -263,11 +263,17 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 			<uui-radio-group
 				@change=${(e: UUIRadioEvent) =>
 					e.target.value === 'members' ? (this._specific = true) : (this._specific = false)}>
-				<uui-radio ?checked=${this._specific === true} label=${this.localize.term('publicAccess_paMembers')} value="members">
+				<uui-radio
+					?checked=${this._specific === true}
+					label=${this.localize.term('publicAccess_paMembers')}
+					value="members">
 					<strong>${this.localize.term('publicAccess_paMembers')}</strong><br />
 					${this.localize.term('publicAccess_paMembersHelp')}
 				</uui-radio>
-				<uui-radio ?checked=${this._specific === false} label=${this.localize.term('publicAccess_paGroups')} value="groups">
+				<uui-radio
+					?checked=${this._specific === false}
+					label=${this.localize.term('publicAccess_paGroups')}
+					value="groups">
 					<strong>${this.localize.term('publicAccess_paGroups')}</strong><br />
 					${this.localize.term('publicAccess_paGroupsHelp')}
 				</uui-radio>

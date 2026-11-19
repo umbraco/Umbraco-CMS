@@ -53,7 +53,11 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 						: nothing}
 				</uui-box>
 
-				<uui-button slot="actions" id="cancel" label=${this.localize.term('general_cancel')} @click="${this._rejectModal}"></uui-button>
+				<uui-button
+					slot="actions"
+					id="cancel"
+					label=${this.localize.term('general_cancel')}
+					@click="${this._rejectModal}"></uui-button>
 				<uui-button
 					slot="actions"
 					id="confirm"

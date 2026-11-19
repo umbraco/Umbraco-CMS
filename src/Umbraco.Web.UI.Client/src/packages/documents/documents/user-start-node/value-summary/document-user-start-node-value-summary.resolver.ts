@@ -40,4 +40,3 @@ export class UmbDocumentUserStartNodeValueSummaryResolver
 		return values.map((v) => (v ? (itemByUnique.get(v.unique) ?? null) : null));
 	}
 }
-

@@ -3,6 +3,8 @@ export { UmbEntityContext } from './entity.context.js';
 export * from './constants.js';
 export * from './contexts/ancestors/index.js';
 export * from './contexts/parent/index.js';
+export * from './event/index.js';
 export * from './input/index.js';
+export * from './utils.js';
 
 export type * from './types.js';

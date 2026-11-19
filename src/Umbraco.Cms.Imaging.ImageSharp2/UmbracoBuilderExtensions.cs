@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Web.Caching;
@@ -50,10 +52,18 @@ public static class UmbracoBuilderExtensions
         {
             options.AddFilter(new UmbracoPipelineFilter(nameof(ImageSharpComposer))
             {
-                PrePipeline = prePipeline => prePipeline.UseImageSharp()
+                PrePipeline = prePipeline =>
+                {
+                    ImageProcessingMemory.Configure(
+                        prePipeline.ApplicationServices,
+                        GC.GetGCMemoryInfo().TotalAvailableMemoryBytes);
+                    prePipeline.UseMiddleware<ImageProcessingThrottleMiddleware>();
+                    prePipeline.UseImageSharp();
+                }
             });
         });
 
         return builder.Services;
     }
+
 }

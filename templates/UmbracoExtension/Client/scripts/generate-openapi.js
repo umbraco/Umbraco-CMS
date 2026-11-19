@@ -39,6 +39,11 @@ fetch(openApiUrl).then(async (response) => {
       // but filter out @hey-api/sdk because we override its responseStyle below.
       ...defaultPlugins.filter((plugin) => (typeof plugin === 'string' ? plugin : plugin.name) !== '@hey-api/sdk'),
       {
+        // Throw on error responses, like the backoffice's own HTTP client, so tryExecute can report them
+        name: '@hey-api/client-fetch',
+        throwOnError: true,
+      },
+      {
         name: '@hey-api/sdk',
         responseStyle: 'fields',
       }

@@ -103,6 +103,119 @@ describe('UmbTableElement', () => {
 		});
 	});
 
+	describe('select only', () => {
+		function getRow(id: string): HTMLElement {
+			return element.shadowRoot!.querySelector(`uui-table-row[data-sortable-id="${id}"]`) as HTMLElement;
+		}
+
+		it('turns every row into select-only when a selection exists', async () => {
+			element.items = items(['1', '2']);
+			element.selection = ['1'];
+			await element.updateComplete;
+
+			expect(getRow('1').hasAttribute('select-only')).to.be.true;
+			expect(getRow('2').hasAttribute('select-only')).to.be.true;
+		});
+
+		it('keeps a row interactive when it opts out, even while a selection exists', async () => {
+			element.items = [item('1'), item('2', { selectOnly: false })];
+			element.selection = ['1'];
+			await element.updateComplete;
+
+			expect(getRow('2').hasAttribute('select-only')).to.be.false;
+			// The row is still part of selection mode, so it presents its checkbox.
+			expect(getRow('2').hasAttribute('data-selection-mode')).to.be.true;
+		});
+
+		it('keeps a row interactive when it opts out of a select-only configuration', async () => {
+			element.config = { ...config, selectOnly: true };
+			element.items = [item('1'), item('2', { selectOnly: false })];
+			await element.updateComplete;
+
+			expect(getRow('1').hasAttribute('select-only')).to.be.true;
+			expect(getRow('2').hasAttribute('select-only')).to.be.false;
+		});
+	});
+
+	describe('children indicator', () => {
+		const customSymbol = () => html`<span class="custom-symbol"></span>`;
+
+		function getIndicatorCell(id: string): HTMLElement {
+			return element.shadowRoot!.querySelector(
+				`uui-table-row[data-sortable-id="${id}"] .children-indicator-cell`,
+			) as HTMLElement;
+		}
+
+		it('renders the default expand symbol when no symbol is provided', async () => {
+			element.items = [item('1', { childrenIndicator: { href: '/open' } })];
+			await element.updateComplete;
+
+			const cell = getIndicatorCell('1');
+			expect(cell.querySelector('uui-button[data-mark="table-row:open"] uui-symbol-expand')).to.exist;
+		});
+
+		it('renders a provided symbol inside the link when the indicator has an href', async () => {
+			element.items = [item('1', { childrenIndicator: { href: '/open', renderExpandSymbol: customSymbol } })];
+			await element.updateComplete;
+
+			const link = getIndicatorCell('1').querySelector('uui-button[data-mark="table-row:open"]')!;
+			expect(link.getAttribute('href')).to.equal('/open');
+			expect(link.querySelector('.custom-symbol')).to.exist;
+			expect(link.querySelector('uui-symbol-expand')).to.not.exist;
+		});
+
+		it('renders a provided symbol inside the button when the indicator has an open handler', async () => {
+			element.items = [item('1', { childrenIndicator: { onOpen: () => {}, renderExpandSymbol: customSymbol } })];
+			await element.updateComplete;
+
+			const button = getIndicatorCell('1').querySelector('uui-button[data-mark="table-row:open"]')!;
+			expect(button.hasAttribute('href')).to.be.false;
+			expect(button.querySelector('.custom-symbol')).to.exist;
+			expect(button.querySelector('uui-symbol-expand')).to.not.exist;
+		});
+
+		it('renders a provided symbol on its own when the indicator has nowhere to lead', async () => {
+			element.items = [item('1', { childrenIndicator: { renderExpandSymbol: customSymbol } })];
+			await element.updateComplete;
+
+			const cell = getIndicatorCell('1');
+			expect(cell.querySelector('.custom-symbol')).to.exist;
+			expect(cell.querySelector('uui-button')).to.not.exist;
+			expect(cell.querySelector('uui-symbol-expand')).to.not.exist;
+		});
+
+		it('keeps the default expand symbol on rows that do not provide one', async () => {
+			element.items = [
+				item('1', { childrenIndicator: { href: '/open', renderExpandSymbol: customSymbol } }),
+				item('2', { childrenIndicator: { href: '/open' } }),
+			];
+			await element.updateComplete;
+
+			expect(getIndicatorCell('1').querySelector('.custom-symbol')).to.exist;
+			expect(getIndicatorCell('2').querySelector('.custom-symbol')).to.not.exist;
+			expect(getIndicatorCell('2').querySelector('uui-symbol-expand')).to.exist;
+		});
+
+		it('invokes the open handler when a provided symbol is activated', async () => {
+			let opened = 0;
+			element.items = [item('1', { childrenIndicator: { onOpen: () => opened++, renderExpandSymbol: customSymbol } })];
+			await element.updateComplete;
+
+			getIndicatorCell('1')
+				.querySelector('uui-button')!
+				.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+			expect(opened).to.equal(1);
+		});
+
+		it('leaves rows without an indicator without an indicator', async () => {
+			element.items = [item('1', { childrenIndicator: { href: '/open' } }), item('2')];
+			await element.updateComplete;
+
+			expect(getIndicatorCell('2').children.length).to.equal(0);
+		});
+	});
+
 	describe('header checkbox state', () => {
 		it('is checked when every selectable row on the current page is selected', async () => {
 			element.items = items(['1', '2', '3', '4']);

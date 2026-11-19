@@ -5,7 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * @class UmbTemplateDetailStore
- * @augments {UmbStoreBase}
+ * @augments {UmbDetailStoreBase}
  * @description - Data Store for Template Details
  */
 export class UmbTemplateDetailStore extends UmbDetailStoreBase<UmbTemplateDetailModel> {

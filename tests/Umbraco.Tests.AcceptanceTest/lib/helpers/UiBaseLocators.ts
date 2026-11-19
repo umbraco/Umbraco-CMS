@@ -9,10 +9,12 @@ export class UiBaseLocators extends BasePage {
   public readonly confirmBtn: Locator;
   public readonly chooseBtn: Locator;
   public readonly chooseModalBtn: Locator;
+  public readonly chooseModalLink: Locator;
   public readonly createBtn: Locator;
   public readonly addBtn: Locator;
   public readonly updateBtn: Locator;
   public readonly changeBtn: Locator;
+  public readonly replaceBtn: Locator;
   public readonly deleteBtn: Locator;
   public readonly deleteExactBtn: Locator;
   public readonly removeExactBtn: Locator;
@@ -72,6 +74,7 @@ export class UiBaseLocators extends BasePage {
   public readonly openedModal: Locator;
   public readonly container: Locator;
   public readonly containerChooseBtn: Locator;
+  public readonly backofficeModalContainer: Locator;
   public readonly containerSaveAndPublishBtn: Locator;
   public readonly createModalBtn: Locator;
   public readonly copyModalBtn: Locator;
@@ -86,7 +89,7 @@ export class UiBaseLocators extends BasePage {
   public readonly property: Locator;
   public readonly addPropertyBtn: Locator;
   public readonly labelAboveBtn: Locator;
-  public readonly propertyEditorChangeBtn: Locator;
+  public readonly propertyEditorReplaceBtn: Locator;
 
   // Group & Tab Management
   public readonly addGroupBtn: Locator;
@@ -202,6 +205,7 @@ export class UiBaseLocators extends BasePage {
   public readonly createNewDocumentBlueprintBtn: Locator;
 
   // User
+  public readonly currentUserHeaderApp: Locator;
   public readonly currentUserAvatarBtn: Locator;
   public readonly currentUserModal: Locator;
   public readonly newPasswordTxt: Locator;
@@ -225,6 +229,10 @@ export class UiBaseLocators extends BasePage {
   public readonly confirmActionModalEntityReferences: Locator;
   public readonly referenceHeadline: Locator;
   public readonly entityItemRef: Locator;
+  public readonly viewDependentItemsBtn: Locator;
+  public readonly viewReferencedDescendantsBtn: Locator;
+  public readonly entityReferencesModal: Locator;
+  public readonly entityReferencesModalCloseBtn: Locator;
   public readonly entityItem: Locator;
 
   // Workspace & Action
@@ -245,11 +253,12 @@ export class UiBaseLocators extends BasePage {
 
   // Block
   public readonly blockTypeCard: Locator;
-  public readonly backofficeModalContainer: Locator;
 
   // User & User Group
   public readonly allowAccessToAllElementsBtn: Locator;
   public readonly elementStartNode: Locator;
+  public readonly allowAccessToAllDocumentBlueprintsBtn: Locator;
+  public readonly documentBlueprintStartNode: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -258,15 +267,23 @@ export class UiBaseLocators extends BasePage {
     this.saveBtn = page.getByLabel("Save", { exact: true });
     this.submitBtn = page.getByLabel("Submit");
     this.confirmBtn = page.getByLabel("Confirm");
-    this.chooseBtn = page.getByLabel("Choose", { exact: true });
+    // The element/entity pickers render two "Choose" controls (a modal-opening link and a button)
+    // with the same accessible name; .first() keeps this unambiguous (a no-op for single-Choose pickers).
+    this.chooseBtn = page.getByLabel("Choose", { exact: true }).first();
+    // The tree-picker modal's primary confirm button is labelled by its action: "Choose" for entity
+    // pickers, "Move" for a move, "Copy" for a duplicate. Match any so one helper covers all three.
     this.chooseModalBtn = page
       .locator("uui-modal-sidebar")
       .locator('[look="primary"]')
-      .getByLabel("Choose");
+      .getByLabel(/^(Choose|Move|Copy)$/);
+    // The element/entity picker renders both a "Choose" link (opens the tree-picker modal) and a button;
+    // target the link specifically so the shared chooseModalBtn's strict-mode match isn't tripped.
+    this.chooseModalLink = page.getByRole("link", { name: "Choose", exact: true });
     this.createBtn = page.getByRole("button", { name: /^Create(…)?$/ });
     this.addBtn = page.getByRole("button", { name: "Add", exact: true });
     this.updateBtn = page.getByLabel("Update");
     this.changeBtn = page.getByLabel("Change", { exact: true });
+    this.replaceBtn = page.getByLabel("Replace", { exact: true });
     this.deleteBtn = page.getByRole("button", { name: /^Delete(…)?$/ });
     this.deleteExactBtn = page.getByRole("button", {
       name: "Delete",
@@ -342,14 +359,13 @@ export class UiBaseLocators extends BasePage {
     this.sidebarSaveBtn = this.sidebarModal.getByLabel("Save", { exact: true });
     this.openedModal = page.locator("uui-modal-container[backdrop]");
     this.container = page.locator("#container");
-    this.containerChooseBtn = page.locator("#container").getByLabel("Choose");
+    // Like chooseModalBtn: the confirm button in a #container picker is labelled by its action -
+    // "Choose" for a destination picker, "Move"/"Copy" for a move/duplicate. Match any of them.
+    this.containerChooseBtn = page.locator("#container").getByLabel(/^(Choose|Move|Copy)$/);
     this.backofficeModalContainer = page.locator('umb-backoffice-modal-container');
     this.containerSaveAndPublishBtn = page
       .locator("#container")
       .getByLabel("Save and Publish");
-    this.createModalBtn = page
-      .locator("uui-modal-sidebar")
-      .getByLabel("Create", { exact: true });
     this.createModalBtn = this.sidebarModal.getByLabel("Create", {
       exact: true,
     });
@@ -368,7 +384,7 @@ export class UiBaseLocators extends BasePage {
       .locator("uui-modal-sidebar")
       .getByTestId("input:propertytype-description")
       .locator("#textarea");
-    this.propertyEditorChangeBtn = page.locator('[label="Property editor"]').getByLabel('Change');
+    this.propertyEditorReplaceBtn = page.locator('[label="Property editor"]').getByLabel('Replace', { exact: true });
     this.property = page.locator("umb-property");
     this.addPropertyBtn = page.getByLabel("Add property", { exact: true });
     this.labelAboveBtn = page
@@ -496,11 +512,11 @@ export class UiBaseLocators extends BasePage {
       .locator("#caret-button");
 
     // View Options
-    this.gridBtn = page.getByLabel("Grid");
-    this.listBtn = page.getByLabel("List");
-    this.viewBundleBtn = page.locator(
-      "umb-collection-view-bundle uui-button svg",
-    );
+    // The alias suffix (Grid/Table) is stable across entity types, but the entity segment isn't
+    // (e.g. Umb.CollectionView.Document.Grid vs Umb.CollectionView.Media.Grid), so match on suffix only.
+    this.gridBtn = page.locator('[data-mark^="collection:switch-view:"][data-mark$=".Grid"]');
+    this.listBtn = page.locator('[data-mark^="collection:switch-view:"][data-mark$=".Table"]');
+    this.viewBundleBtn = page.locator('[data-mark="collection:switch-view"]');
 
     // Media
     this.mediaCardItems = page.locator("uui-card-media");
@@ -552,9 +568,8 @@ export class UiBaseLocators extends BasePage {
       .locator("umb-ref-item", { hasText: "Document Blueprint for" });
 
     // User
-    this.currentUserAvatarBtn = page
-      .getByTestId("header-app:Umb.HeaderApp.CurrentUser")
-      .locator("uui-avatar");
+    this.currentUserHeaderApp = page.getByTestId("header-app:Umb.HeaderApp.CurrentUser");
+    this.currentUserAvatarBtn = this.currentUserHeaderApp.locator("uui-avatar");
     this.currentUserModal = page.locator("umb-current-user-modal");
     this.currentPasswordTxt = page.locator('input[name="oldPassword"]');
     this.newPasswordTxt = page.locator('input[name="newPassword"]');
@@ -587,12 +602,18 @@ export class UiBaseLocators extends BasePage {
     this.confirmActionModalEntityReferences = page.locator(
       "umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references",
     );
-    this.entityItemRef = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references,umb-entity-references-workspace-info-app').locator('uui-ref-list').first().getByTestId('entity-item-ref');
+    // Single-entity confirm dialogs summarise references behind a "View items that depend on this…" button that
+    // opens umb-entity-references-modal; bulk dialogs and the workspace info app still list them inline.
+    this.entityReferencesModal = page.locator('umb-entity-references-modal');
+    // Target the uui-button host: its inner native button sits behind the slotted label, which intercepts clicks.
+    this.viewDependentItemsBtn = page.locator('umb-entity-references-summary uui-button').filter({hasText: 'View items that depend on this'});
+    this.viewReferencedDescendantsBtn = page.locator('umb-entity-references-summary uui-button').filter({hasText: 'View referenced descendants'});
+    this.entityReferencesModalCloseBtn = this.entityReferencesModal.getByLabel('Close');
+    this.entityItemRef = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references,umb-entity-references-workspace-info-app,umb-entity-references-modal').locator('uui-ref-list').first().getByTestId('entity-item-ref');
     this.referenceHeadline = page
       .locator(
-        "umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references",
+        'umb-confirm-action-modal-entity-references #reference-headline, umb-confirm-bulk-action-modal-entity-references #reference-headline, umb-entity-references-modal umb-localize[key="references_labelDependsOnThis"], umb-entity-references-modal umb-localize[key="references_labelDependentDescendants"]',
       )
-      .locator("#reference-headline")
       .first();
     this.entityItem = page.locator("umb-entity-item-ref");
 
@@ -630,6 +651,8 @@ export class UiBaseLocators extends BasePage {
     // User & User Group
     this.allowAccessToAllElementsBtn = page.getByText('Allow access to all elements');
     this.elementStartNode = page.locator('[label="Select element start node"]').locator('umb-input-entity-data');
+    this.allowAccessToAllDocumentBlueprintsBtn = page.getByText('Allow access to all document blueprints');
+    this.documentBlueprintStartNode = page.locator('umb-input-document-blueprint');
   }
 
   // Helper Methods
@@ -657,9 +680,9 @@ export class UiBaseLocators extends BasePage {
   }
 
   async isActionsMenuForNameVisible(name: string, isVisible = true) {
-    const menuItem = this.getMenuItemByLabel(name);
-    await this.click(menuItem);
-    await this.isVisible(menuItem.locator("#action-modal").first(), isVisible);
+    const menuItems = this.getMenuItemByLabel(name);
+    await this.click(menuItems.first());
+    await this.isAnyVisible(menuItems.locator("#action-modal"), isVisible);
   }
 
   // Caret Button Methods
@@ -681,17 +704,31 @@ export class UiBaseLocators extends BasePage {
     await this.click(this.caretBtn);
   }
 
+  /** @param isInModal - @deprecated use {@link clickModalCaretButtonForName} instead; kept for backwards compatibility. */
   async openCaretButtonForName(name: string, isInModal: boolean = false) {
-    let menuItem: Locator;
     if (isInModal) {
-      menuItem = this.sidebarModal.locator(`uui-menu-item[label="${name}"]`);
-    } else {
-      menuItem = this.getMenuItemByLabel(name);
+      await this.clickModalCaretButtonForName(name);
+      return;
     }
+    const menuItem = this.getMenuItemByLabel(name).first();
     await this.waitForVisible(menuItem, ConstantHelper.timeout.long);
-    const isCaretButtonOpen = await menuItem.getAttribute("show-children");
-    if (isCaretButtonOpen === null) {
-      await this.clickCaretButtonForName(name);
+    // The caret toggles, so acting on a single read can collapse a node that was still expanding.
+    await expect(async () => {
+      await this.clickCaretButtonIfCollapsed(menuItem);
+      expect(await menuItem.getAttribute("show-children")).not.toBeNull();
+    }).toPass({timeout: ConstantHelper.timeout.medium});
+  }
+
+  // A picker browses into the node rather than expanding it in place, so there is no expanded state to assert.
+  async clickModalCaretButtonForName(name: string) {
+    const menuItem = this.sidebarModal.locator(`uui-menu-item[label="${name}"]`).first();
+    await this.waitForVisible(menuItem, ConstantHelper.timeout.long);
+    await this.clickCaretButtonIfCollapsed(menuItem);
+  }
+
+  private async clickCaretButtonIfCollapsed(menuItem: Locator) {
+    if (await menuItem.getAttribute("show-children") === null) {
+      await this.click(menuItem.locator("#caret-button").first());
     }
   }
 
@@ -704,19 +741,37 @@ export class UiBaseLocators extends BasePage {
     await this.openCaretButtonForName(treeName);
   }
 
+  /**
+   * Expands a tree root and makes sure it stays expanded.
+   * After a save, the Backoffice expands the tree by itself to reveal the saved item. If that happens between
+   * reading `show-children` and clicking the caret, the click collapses the tree again, so retry until it is open.
+   * @param treeRoot - The `uui-menu-item` of the tree root
+   */
+  async expandTreeRoot(treeRoot: Locator) {
+    await expect(async () => {
+      if ((await treeRoot.getAttribute('show-children')) === null) {
+        await treeRoot.locator(this.caretBtn).first().click();
+      }
+      await expect(treeRoot).toHaveAttribute('show-children', {timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.long});
+  }
+
   async isTreeItemVisible(name: string, isVisible = true) {
-    await this.isVisible(
+    await this.isAnyVisible(
       this.treeItem.locator('[label="' + name + '"]'),
       isVisible,
     );
   }
 
   async doesTreeItemHaveTheCorrectIcon(name: string, icon: string) {
+    // Exact-label match, unlike a text-content filter which would also match ancestors.
+    // Scoped to #icon-container so the item's own icon is checked, not one rendered by its children.
     return await this.isVisible(
-      this.treeItem
-        .filter({ hasText: name })
-        .locator("umb-icon")
-        .locator('[name="' + icon + '"]'),
+      this.getMenuItemByLabel(name)
+        .first()
+        .locator("#icon-container umb-icon")
+        .first()
+        .and(this.page.locator(`[name="${icon}"]`)),
     );
   }
 
@@ -764,6 +819,10 @@ export class UiBaseLocators extends BasePage {
 
   async clickChangeButton() {
     await this.click(this.changeBtn);
+  }
+
+  async clickReplaceButton() {
+    await this.click(this.replaceBtn);
   }
 
   async clickDeleteButton() {
@@ -854,7 +913,6 @@ export class UiBaseLocators extends BasePage {
 
   async clickConfirmTrashButton() {
     await this.click(this.confirmTrashBtn);
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
   }
 
   async clickDeleteAndConfirmButton() {
@@ -935,8 +993,10 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
-  async isSuccessButtonWithTextVisible(text: string) {
-    return await this.isVisible(this.successState.filter({ hasText: text }));
+  // timeout is overridable because the success state can follow a slow server operation (e.g. rebuilding the
+  // database cache) that exceeds the default timeout under load; most callers can use the default.
+  async isSuccessButtonWithTextVisible(text: string, timeout?: number) {
+    return await this.isVisible(this.successState.filter({ hasText: text }), true, timeout);
   }
 
   async isSuccessStateIconVisible() {
@@ -1035,6 +1095,10 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
+  async clickCaretButtonForModalMenuItemWithName(name: string) {
+    await this.click(this.sidebarModal.locator(`uui-menu-item[label="${name}"] #caret-button`).last());
+  }
+
   async doesModalHaveText(text: string) {
     await this.containsText(this.openedModal, text);
   }
@@ -1101,6 +1165,10 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
+  async isSectionActive(sectionName: string) {
+    await expect(this.activeSectionLink.getByText(sectionName)).toBeVisible();
+  }
+
   async isBackOfficeMainVisible(isVisible: boolean = true) {
     await this.isVisible(this.backOfficeMain, isVisible, ConstantHelper.timeout.navigation);
   }
@@ -1135,7 +1203,7 @@ export class UiBaseLocators extends BasePage {
   // the click keeps working regardless of how the tree item renders its label HTML. Scope defaults to the
   // section sidebar; pass a modal/other root for trees rendered elsewhere (e.g. pickers).
   async clickTreeItemWithName(name: string, scope?: Locator | Page) {
-    await this.click((scope ?? this.sectionSidebar).getByText(name, { exact: true }));
+    await this.click((scope ?? this.sectionSidebar).getByText(name, { exact: true }).first());
   }
 
   async clickButtonWithName(name: string, isExact: boolean = false) {
@@ -1143,6 +1211,9 @@ export class UiBaseLocators extends BasePage {
       name: name,
       exact: isExact,
     });
+    // In scrollable pickers (e.g. the user-group modal) the target button can render below the fold,
+    // where a force click fails with "element is outside of the viewport". Scroll it in first.
+    await this.scrollIntoView(exactButtonWithNameLocator);
     await this.click(exactButtonWithNameLocator, { force: true });
   }
 
@@ -1183,15 +1254,23 @@ export class UiBaseLocators extends BasePage {
 
   // Alias & Icon Methods
   async enterAliasName(aliasName: string) {
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
-    await this.click(this.aliasLockBtn, { force: true });
+    // Retry unlocking until the field is editable (an early toggle click can be lost). The toggle only
+    // shows while locked, so the visibility guard avoids re-locking it.
+    await expect(async () => {
+      if (await this.aliasLockBtn.isVisible()) {
+        await this.click(this.aliasLockBtn, { force: true });
+      }
+      await expect(this.aliasNameTxt).toBeEditable({ timeout: ConstantHelper.timeout.short });
+    }).toPass({ timeout: ConstantHelper.timeout.medium });
     await this.enterText(this.aliasNameTxt, aliasName);
   }
 
   async updateIcon(iconName: string) {
     await this.click(this.iconBtn, { force: true });
     await this.searchForTypeToFilterValue(iconName);
-    await this.clickLabelWithName(iconName, true, true);
+    const iconOption = this.page.getByLabel(iconName, {exact: true});
+    await iconOption.scrollIntoViewIfNeeded();
+    await this.click(iconOption, {force: true});
     await this.clickSubmitButton();
   }
 
@@ -1220,7 +1299,7 @@ export class UiBaseLocators extends BasePage {
 
   async updatePropertyEditor(propertyEditorName: string) {
     await this.clickEditorSettingsButton();
-    await this.click(this.propertyEditorChangeBtn);
+    await this.click(this.propertyEditorReplaceBtn);
     await this.searchForTypeToFilterValue(propertyEditorName);
     await this.click(this.page.getByText(propertyEditorName, { exact: true }));
     await this.enterAPropertyName(propertyEditorName);
@@ -1395,6 +1474,10 @@ export class UiBaseLocators extends BasePage {
       this.validationMessage.filter({ hasText: message }),
       isVisible,
     );
+  }
+
+  async doesSelectedValidationOptionHaveValue(value: string) {
+    await this.hasValue(this.validation, value);
   }
 
   // Composition & Structure Methods
@@ -1727,7 +1810,7 @@ export class UiBaseLocators extends BasePage {
   async uploadFile(filePath: string) {
     const [fileChooser] = await Promise.all([
       this.page.waitForEvent("filechooser"),
-      await this.clickToUploadButton(),
+      this.clickToUploadButton(),
     ]);
     await fileChooser.setFiles(filePath);
   }
@@ -1756,15 +1839,16 @@ export class UiBaseLocators extends BasePage {
 
   // User Methods
   async clickCurrentUserAvatarButton() {
-    // Retry the open: the first click can land before the avatar is interactive, leaving the modal closed.
+    // Wait for the backoffice to finish loading; clicking before the current-user extension bundle is ready
+    // no-ops, so the modal never opens.
+    await this.waitForPageLoad();
+    // Only click while the modal is closed: a click with the modal open closes it.
     await expect(async () => {
       if (!(await this.currentUserModal.isVisible())) {
         await this.click(this.currentUserAvatarBtn);
       }
-      await expect(this.currentUserModal).toBeVisible({
-        timeout: ConstantHelper.timeout.short,
-      });
-    }).toPass({timeout: ConstantHelper.timeout.medium});
+      await expect(this.currentUserModal).toBeVisible({timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.long});
   }
 
   // Collection Methods
@@ -1799,11 +1883,11 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
-  async doesCollectionTreeItemTableRowHaveIcon(name: string, icon: string) {
+  async doesCollectionTreeItemTableRowHaveIcon(name: string, icon: string, exact: boolean = false) {
     await this.waitForVisible(this.collectionTreeItemTableRow.first());
     await this.isVisible(
       this.collectionTreeItemTableRow
-        .filter({ hasText: name })
+        .filter(exact ? { has: this.page.getByText(name, { exact: true }) } : { hasText: name })
         .locator("umb-icon")
         .locator('[name="' + icon + '"]'),
     );
@@ -1836,6 +1920,19 @@ export class UiBaseLocators extends BasePage {
     await this.containsText(this.confirmActionModalEntityReferences, text);
   }
 
+  async clickViewItemsThatDependOnThisButton() {
+    await this.click(this.viewDependentItemsBtn);
+  }
+
+  async clickViewReferencedDescendantsButton() {
+    await this.click(this.viewReferencedDescendantsBtn);
+  }
+
+  async clickCloseEntityReferencesModalButton() {
+    await this.click(this.entityReferencesModalCloseBtn);
+    await this.isVisible(this.entityReferencesModal, false);
+  }
+
   // Entity Action Methods
   async clickEntityActionWithName(name: string) {
     const regex = new RegExp(`^entity-action:.*${name}$`);
@@ -1856,6 +1953,12 @@ export class UiBaseLocators extends BasePage {
 
   async clickMoveToActionMenuOption() {
     await this.clickEntityActionWithName("MoveTo");
+  }
+
+  async moveToFolder(folderName: string) {
+    await this.clickMoveToActionMenuOption();
+    await this.click(this.sidebarModal.getByText(folderName, {exact: true}));
+    await this.click(this.chooseModalBtn);
   }
 
   async clickCreateBlueprintActionMenuOption() {
@@ -1957,7 +2060,7 @@ export class UiBaseLocators extends BasePage {
 
   // Loader Methods
   async waitUntilUiLoaderIsNoLongerVisible() {
-    await this.waitForHidden(this.uiLoader, ConstantHelper.timeout.navigation);
+    await this.isAnyVisible(this.uiLoader, false, ConstantHelper.timeout.navigation);
   }
 
   // Dashboard Methods
@@ -2012,19 +2115,41 @@ export class UiBaseLocators extends BasePage {
     return await this.isVisible(this.page.getByText(message), isVisible);
   }
 
-  // Executes a promise (e.g. button click) and waits for a single API response.
+  async isDiscardChangesModalVisible(isVisible: boolean = true) {
+    return await this.isVisible(this.page.getByTestId('discard-changes-modal'), isVisible);
+  }
+
+  async clickDiscardChangesButton() {
+    await this.click(this.page.getByTestId('discard-changes-modal').getByTestId('action:discard-changes'));
+  }
+
+  async clickStayOnPageButton() {
+    await this.click(this.page.getByTestId('discard-changes-modal').getByTestId('action:stay'));
+  }
+
+  /**
+   * Runs an action and resolves on the first response whose URL contains `url`
+   * and whose status matches.
+   *
+   * `url` is matched with `includes`, so endpoint constants are prefixes of each
+   * other (e.g. `.../document` also matches `.../document-type` and `.../document/{id}/publish`).
+   * When more than one such call is in flight, pass `method` and/or a more specific
+   * `url` fragment to disambiguate.
+   *
+   * @returns the trailing path segment of the response URL (the created/affected id),
+   *          or the `Location` header's last segment for 201 responses.
+   */
   async waitForResponseAfterExecutingPromise(
     url: string,
-    promise: Promise<void>,
+    action: Promise<void> | (() => Promise<void>),
     statusCode: number,
     method?: string,
   ) {
-    const [response] = await Promise.all([
-      this.page.waitForResponse(
-        (resp) => resp.url().includes(url) && resp.status() === statusCode && (method === undefined || resp.request().method() === method),
-      ),
-      promise,
-    ]);
+    // Prefer the callback form: an already-started promise can complete before the listener attaches.
+    const responsePromise = this.page.waitForResponse(
+      (resp) => resp.url().includes(url) && resp.status() === statusCode && (method === undefined || resp.request().method() === method),
+    );
+    const [response] = await Promise.all([responsePromise, typeof action === "function" ? action() : action]);
 
     if (statusCode === 201) {
       return response.headers()["location"]?.split("/").pop();
@@ -2032,9 +2157,24 @@ export class UiBaseLocators extends BasePage {
     return response.url().split("?")[0].split("/").pop();
   }
 
-  // Executes a promise (e.g. button click) and waits for multiple API responses.
-  // Use when an action triggers multiple API calls (e.g. moving multiple items).
-  // Returns an array of IDs extracted from the responses.
+  /**
+   * Waits until the workspace has re-routed from .../{entityType}/create/... to .../{entityType}/edit/{id}.
+   * A create isn't finished until this reload lands: a follow-up variant/segment switch started beforehand
+   * is discarded (the workspace reverts to the default culture), losing its edits so the awaited update
+   * response never fires.
+   */
+  async waitForWorkspaceEditRoute(entityType: 'document' | 'element') {
+    await expect(this.page).toHaveURL(new RegExp(`/workspace/${entityType}/edit/`), {timeout: ConstantHelper.timeout.long});
+  }
+
+  /**
+   * Runs an action that triggers several matching API calls (e.g. moving multiple
+   * items) and resolves once `expectedCount` responses matching `url` + `statusCode`
+   * have arrived. Uses the same loose `includes` URL matching as
+   * {@link waitForResponseAfterExecutingPromise}.
+   *
+   * @returns the ids extracted from each collected response, in arrival order.
+   */
   async waitForMultipleResponsesAfterExecutingPromise(
     url: string,
     promise: Promise<void>,
@@ -2043,21 +2183,27 @@ export class UiBaseLocators extends BasePage {
   ) {
     const responses: Response[] = [];
 
-    // Create a promise that resolves when we've collected enough responses
+    let resolveResponses!: () => void;
     const responsePromise = new Promise<void>((resolve) => {
-      this.page.on("response", (resp) => {
-        if (resp.url().includes(url) && resp.status() === statusCode) {
-          responses.push(resp);
-          // Resolve once we have all expected responses
-          if (responses.length >= expectedCount) {
-            resolve();
-          }
-        }
-      });
+      resolveResponses = resolve;
     });
+    // Named handler so it can be removed afterwards — otherwise every call leaks a
+    // listener that keeps mutating this (and prior calls') response arrays.
+    const onResponse = (resp) => {
+      if (resp.url().includes(url) && resp.status() === statusCode) {
+        responses.push(resp);
+        if (responses.length >= expectedCount) {
+          resolveResponses();
+        }
+      }
+    };
+    this.page.on("response", onResponse);
 
-    // Execute action and wait for responses simultaneously
-    await Promise.all([responsePromise, promise]);
+    try {
+      await Promise.all([responsePromise, promise]);
+    } finally {
+      this.page.off("response", onResponse);
+    }
 
     // Extract IDs from responses
     return responses.map((resp) => {
@@ -2068,8 +2214,13 @@ export class UiBaseLocators extends BasePage {
     });
   }
 
-  // Executes a promise and waits for multiple 201 Created responses matching URL endings.
-  // Returns array of IDs extracted from Location headers, in same order as urlEndings.
+  /**
+   * Runs an action and waits for one 201 Created response per entry in `urlEndings`.
+   * Unlike the sibling helpers this matches with `endsWith` (exact URL suffix), so
+   * prefix-overlapping endpoints do not collide.
+   *
+   * @returns the created ids from each `Location` header, in the order of `urlEndings`.
+   */
   async waitForCreatedResponsesAfterExecutingPromise(
     urlEndings: string[],
     promise: Promise<void>,
@@ -2134,6 +2285,22 @@ export class UiBaseLocators extends BasePage {
     await this.click(this.elementStartNode.filter({hasText: elementStartNodeName}).getByLabel('Remove'));
   }
 
+  async clickAllowAccessToAllDocumentBlueprints() {
+    await this.click(this.allowAccessToAllDocumentBlueprintsBtn);
+  }
+
+  async clickChooseDocumentBlueprintStartNodeButton() {
+    await this.click(this.documentBlueprintStartNode.getByLabel('Choose'));
+  }
+
+  async clickRemoveButtonForDocumentBlueprintNodeWithName(documentBlueprintStartNodeName: string) {
+    await this.click(this.documentBlueprintStartNode.filter({hasText: documentBlueprintStartNodeName}).getByLabel('Remove'));
+  }
+
+  async isDocumentBlueprintStartNodeWithNameVisible(documentBlueprintStartNodeName: string, isVisible: boolean = true) {
+    return this.isVisible(this.documentBlueprintStartNode.filter({hasText: documentBlueprintStartNodeName}), isVisible);
+  }
+
   async isRestoreFromRecycleBinMessageVisible(restoreItem: string, targetFolderName: string) {
     const message = 'Restore ' + restoreItem + ' to ' + targetFolderName;
     return await this.doesModalHaveText(message);
@@ -2164,5 +2331,11 @@ export class UiBaseLocators extends BasePage {
       await this.languageBtn.selectOption(language, {force: true});
       await expect(this.uiCultureInput).toHaveAttribute('value', language.toLowerCase(), {timeout: ConstantHelper.timeout.short});
     }).toPass({timeout: ConstantHelper.timeout.medium});
+  }
+
+  async clickSegmentVariantButton(segmentName: string) {
+    const segmentVariant = this.page.locator('.variant.segment-variant').filter({has: this.page.locator('.variant-name', {hasText: segmentName})});
+    await this.click(segmentVariant.locator('button.switch-button'));
+    await expect(segmentVariant).toContainClass('selected');
   }
 }

@@ -33,6 +33,9 @@ export abstract class UmbCollectionViewElementBase<
 	protected _loading = false;
 
 	@state()
+	protected _hideItemActions = false;
+
+	@state()
 	protected _itemHrefs: Map<string, string> = new Map();
 
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
@@ -67,6 +70,12 @@ export abstract class UmbCollectionViewElementBase<
 				this.#collectionContext?.selection.multiple,
 				(multiple) => (this._multiple = multiple ?? false),
 				'umbCollectionSelectionMultipleObserver',
+			);
+
+			this.observe(
+				this.#collectionContext?.hideItemActions,
+				(hideItemActions) => (this._hideItemActions = hideItemActions ?? false),
+				'umbCollectionHideItemActionsObserver',
 			);
 
 			this.observe(

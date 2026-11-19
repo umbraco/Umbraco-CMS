@@ -1,3 +1,4 @@
+export * from './constants.js';
 export * from './action/index.js';
 export * from './clipboard/index.js';
 export * from './conditions/constants.js';
@@ -6,6 +7,7 @@ export * from './context/index.js';
 export * from './events/index.js';
 export * from './modals/index.js';
 export * from './property-value-cloner/index.js';
+export * from './property-value-entity-reference/index.js';
 export * from './property-value-resolver/index.js';
 export * from './validation/index.js';
 export * from './workspace/index.js';

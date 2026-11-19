@@ -29,6 +29,7 @@ export const treeHandlers = [
 		const before = Number(url.searchParams.get('before'));
 		const after = Number(url.searchParams.get('after'));
 		const response = umbMemberTypeMockDb.tree.getSiblingsOf({ targetId, before, after });
+		if (!response) return new HttpResponse(null, { status: 404, statusText: 'target not found' });
 		return HttpResponse.json(response);
 	}),
 ];

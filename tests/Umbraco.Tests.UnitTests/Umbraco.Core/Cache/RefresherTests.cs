@@ -152,6 +152,7 @@ public class RefresherTests
         ContentTypeCacheRefresher.JsonPayload[] source =
         {
             new ContentTypeCacheRefresher.JsonPayload("xxx", 1234, ContentTypeChangeTypes.None),
+            new ContentTypeCacheRefresher.JsonPayload("xxx", 5678, ContentTypeChangeTypes.None, true),
         };
 
         var json = JsonSerializer.Serialize(source);
@@ -160,6 +161,12 @@ public class RefresherTests
         Assert.AreEqual(source[0].ItemType, payload[0].ItemType);
         Assert.AreEqual(source[0].Id, payload[0].Id);
         Assert.AreEqual(source[0].ChangeTypes, payload[0].ChangeTypes);
+
+        // IsElement drives which cache service a content type change is routed to, and on subscriber servers
+        // the payload only ever arrives via this JSON round trip.
+        Assert.IsFalse(payload[0].IsElement);
+        Assert.AreEqual(source[1].Id, payload[1].Id);
+        Assert.IsTrue(payload[1].IsElement);
     }
 
     [Test]

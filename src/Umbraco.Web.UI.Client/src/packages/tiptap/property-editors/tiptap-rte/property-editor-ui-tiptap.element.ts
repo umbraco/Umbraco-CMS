@@ -1,7 +1,10 @@
 import type { UmbInputTiptapElement } from '../../components/input-tiptap/input-tiptap.element.js';
-import { css, customElement, html, styleMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state, styleMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorUiRteElementBase } from '@umbraco-cms/backoffice/rte';
+import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 import '../../components/input-tiptap/input-tiptap.element.js';
 
@@ -10,6 +13,42 @@ import '../../components/input-tiptap/input-tiptap.element.js';
  */
 @customElement('umb-property-editor-ui-tiptap')
 export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElementBase {
+	readonly #interactionMemoryManager = new UmbPropertyEditorUiInteractionMemoryManager(this, {
+		memoryUniquePrefix: 'UmbRte',
+	});
+
+	@state()
+	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
+
+	public override set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		// Unconditionally, and before the base's own guard: without a config hash there is no key to
+		// persist the memories under.
+		this.#interactionMemoryManager.setPropertyEditorConfig(config);
+		super.config = config;
+	}
+
+	constructor() {
+		super();
+
+		this.observe(
+			this.#interactionMemoryManager.memoriesForPropertyEditor,
+			(memories) => {
+				this._interactionMemories = memories ?? [];
+			},
+			null,
+		);
+	}
+
+	async #onInteractionMemoriesChange(event: Event) {
+		const memories = (event.target as UmbInputTiptapElement).interactionMemories;
+
+		if (memories && memories.length > 0) {
+			await this.#interactionMemoryManager.saveMemoriesForPropertyEditor(memories);
+		} else {
+			await this.#interactionMemoryManager.deleteMemoriesForPropertyEditor();
+		}
+	}
+
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 
@@ -19,20 +58,6 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 	#onChange(event: CustomEvent & { target: UmbInputTiptapElement }) {
 		const tipTapElement = event.target;
 		const markup = tipTapElement.value;
-
-		// Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
-		const usedContentKeys: string[] = [];
-
-		// Regex matching all block elements in the markup, and extracting the content key. It's the same as the one used on the backend.
-		const regex = new RegExp(
-			/<umb-rte-block(?:-inline)?(?: class="(?:.[^"]*)")? data-content-key="(?<key>.[^"]*)">(?:<!--Umbraco-Block-->)?<\/umb-rte-block(?:-inline)?>/gi,
-		);
-		let blockElement: RegExpExecArray | null;
-		while ((blockElement = regex.exec(markup)) !== null) {
-			if (blockElement.groups?.key) {
-				usedContentKeys.push(blockElement.groups.key);
-			}
-		}
 
 		if (this.value) {
 			this.value = {
@@ -52,7 +77,7 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 		}
 
 		// lets run this one after we set the value, to make sure we don't reset the value.
-		this._filterUnusedBlocks(usedContentKeys);
+		this._filterUnusedBlocksFromMarkup(markup);
 
 		this._fireChangeEvent();
 	}
@@ -67,7 +92,9 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 				.value=${this._markup}
 				?readonly=${this.readonly}
 				?required=${this.mandatory}
-				@change=${this.#onChange}></umb-input-tiptap>
+				.interactionMemories=${this._interactionMemories}
+				@change=${this.#onChange}
+				@interaction-memories-change=${this.#onInteractionMemoriesChange}></umb-input-tiptap>
 		`;
 	}
 
