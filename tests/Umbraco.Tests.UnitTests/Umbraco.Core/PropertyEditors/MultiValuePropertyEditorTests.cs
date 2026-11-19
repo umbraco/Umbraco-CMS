@@ -144,6 +144,22 @@ public class MultiValuePropertyEditorTests
         }
     }
 
+    [TestCase("Red", true)]
+    [TestCase("Rood", false)]
+    [TestCase("Red,Groen", false)]
+    public void MultipleValueEditor_Validates_Against_Option_Values_Not_Labels(string values, bool expectedSuccess)
+    {
+        var editor = CreateValueEditor();
+        editor.ConfigurationObject = new ValueListConfiguration
+        {
+            Items = [new() { Value = "Red", Label = "Rood" }, new() { Value = "Green", Label = "Groen" }],
+        };
+
+        var result = editor.Validate(values.Split(','), false, null, PropertyValidationContext.Empty());
+
+        Assert.AreEqual(expectedSuccess ? 0 : 1, result.Count());
+    }
+
     private static MultipleValueEditor CreateValueEditor()
     {
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();

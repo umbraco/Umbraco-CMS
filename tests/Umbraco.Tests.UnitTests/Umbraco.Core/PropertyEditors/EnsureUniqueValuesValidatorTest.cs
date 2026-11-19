@@ -16,122 +16,74 @@ public class EnsureUniqueValuesValidatorTest
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer()
         => new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
-    [Test]
-    public void Expects_Array_Of_String_Not_Single_String()
-    {
-        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
-        var result = validator.Validate(
-            "hello",
-            null,
-            null,
-            PropertyValidationContext.Empty());
-        Assert.AreEqual(1, result.Count());
-    }
+    // Reads the items the way configuration data is read from the database, so they have the same runtime type.
+    private object DeserializeItems(string itemsJson)
+        => ConfigurationEditorJsonSerializer().Deserialize<Dictionary<string, object>>($$"""{"items":{{itemsJson}}}""")!["items"];
+
+    private static JsonArray Options(params string[] values)
+        => new(values.Select(value => (JsonNode)new JsonObject { ["value"] = value }).ToArray());
+
+    private IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(object? value)
+        => new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer())
+            .Validate(value, null, null, PropertyValidationContext.Empty());
 
     [Test]
-    public void Expects_Array_Of_String()
-    {
-        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
-        var result =
-            validator.Validate(
-                new JsonArray("hello", "world"),
-                null,
-                null,
-                PropertyValidationContext.Empty());
-        Assert.AreEqual(0, result.Count());
-    }
+    public void Expects_Array_Of_Options_Not_Single_String()
+        => Assert.AreEqual(1, Validate("hello").Count());
+
+    [Test]
+    public void Rejects_Plain_String_Items()
+        => Assert.AreEqual(1, Validate(new JsonArray("hello", "world")).Count());
 
     [Test]
     public void Allows_Unique_Values()
-    {
-        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
-        var result =
-            validator.Validate(
-                new JsonArray("one", "two", "three"),
-                null,
-                null,
-                PropertyValidationContext.Empty());
-        Assert.AreEqual(0, result.Count());
-    }
+        => Assert.AreEqual(0, Validate(Options("one", "two", "three")).Count());
 
     [Test]
-    public void Does_Not_Allow_Multiple_Values()
-    {
-        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
-        var result =
-            validator.Validate(
-                new JsonArray("one", "one"),
-                null,
-                null,
-                PropertyValidationContext.Empty());
-        Assert.AreEqual(1, result.Count());
-    }
+    public void Rejects_Duplicate_Value()
+        => Assert.AreEqual(1, Validate(Options("one", "one")).Count());
 
     [Test]
     public void Validates_Multiple_Duplicate_Values()
-    {
-        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
-        var result =
-            validator.Validate(
-                new JsonArray("one", "two", "three", "one", "two"),
-                null,
-                null,
-                PropertyValidationContext.Empty());
-        Assert.AreEqual(2, result.Count());
-    }
+        => Assert.AreEqual(2, Validate(Options("one", "two", "three", "one", "two")).Count());
 
     [Test]
     public void Handles_Null()
+        => Assert.AreEqual(0, Validate(null).Count());
+
+    [Test]
+    public void Handles_Collections_Of_Options()
     {
-        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
-        var result =
-            validator.Validate(
-                null,
-                null,
-                null,
-                PropertyValidationContext.Empty());
-        Assert.AreEqual(0, result.Count());
+        var options = new[] { new ValueListOption { Value = "one" }, new ValueListOption { Value = "two" } };
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(0, Validate(options).Count());
+            Assert.AreEqual(0, Validate(options.ToList()).Count());
+            Assert.AreEqual(0, Validate((IEnumerable<ValueListOption>)options).Count());
+        });
     }
 
     [Test]
-    public void Handles_IEnumerable_Of_String()
+    public void Accepts_Options_With_Labels()
     {
-        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
-        IEnumerable<string> value = new[] { "one", "two", "three" };
-        var result =
-            validator.Validate(
-                value,
-                null,
-                null,
-                PropertyValidationContext.Empty());
-        Assert.AreEqual(0, result.Count());
+        var items = new JsonArray(
+            new JsonObject { ["value"] = "one", ["label"] = "One" },
+            new JsonObject { ["value"] = "two" },
+            new JsonObject { ["value"] = "three", ["label"] = "Three" });
+
+        Assert.AreEqual(0, Validate(items).Count());
     }
 
     [Test]
-    public void Handles_Array_Of_String()
-    {
-        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
-        string[] value = { "one", "two", "three" };
-        var result =
-            validator.Validate(
-                value,
-                null,
-                null,
-                PropertyValidationContext.Empty());
-        Assert.AreEqual(0, result.Count());
-    }
+    public void Accepts_Options_As_Read_From_The_Database()
+        => Assert.AreEqual(
+            0,
+            Validate(DeserializeItems("""[{"value":"one"},{"value":"two","label":"Two"},{"value":"three"}]""")).Count());
 
     [Test]
-    public void Handles_List_Of_String()
-    {
-        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
-        var value = new List<string> { "one", "two", "three" };
-        var result =
-            validator.Validate(
-                value,
-                null,
-                null,
-                PropertyValidationContext.Empty());
-        Assert.AreEqual(0, result.Count());
-    }
+    public void Rejects_Duplicate_Value_With_Different_Labels()
+        => Assert.AreEqual(
+            2,
+            Validate(DeserializeItems("""[{"value":"one"},{"value":"one","label":"One"},{"value":"two"},{"value":"two"},{"value":"three"}]""")).Count());
 }

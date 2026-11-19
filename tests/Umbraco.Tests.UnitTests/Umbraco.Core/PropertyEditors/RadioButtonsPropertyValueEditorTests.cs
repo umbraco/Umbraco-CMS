@@ -32,6 +32,21 @@ public class RadioButtonsPropertyValueEditorTests
         }
     }
 
+    [TestCase("Red", true)]
+    [TestCase("Rood", false)]
+    public void Validates_Against_Option_Values_Not_Labels(object value, bool expectedSuccess)
+    {
+        var editor = CreateValueEditor();
+        editor.ConfigurationObject = new ValueListConfiguration
+        {
+            Items = [new() { Value = "Red", Label = "Rood" }, new() { Value = "Green", Label = "Groen" }],
+        };
+
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+
+        Assert.AreEqual(expectedSuccess ? 0 : 1, result.Count());
+    }
+
     private static RadioButtonsPropertyEditor.RadioButtonsPropertyValueEditor CreateValueEditor()
     {
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
