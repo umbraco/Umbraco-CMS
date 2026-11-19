@@ -3,6 +3,8 @@ import { TableHandlePlugin } from './plugins/table-handle.js';
 import { UmbTableView } from './plugins/table-view.js';
 
 export const UmbTable = Table.extend({
+	// Runs the table's Tab/Shift-Tab cell navigation before other extensions' (e.g. indent) Tab handlers.
+	priority: 200,
 	addProseMirrorPlugins() {
 		return [...(this.parent?.() ?? []), TableHandlePlugin(this.editor)];
 	},
