@@ -9,6 +9,8 @@ using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Extensions;
+using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
 
@@ -23,6 +25,7 @@ public class RuntimeState : IRuntimeState
 
     private readonly IOptions<GlobalSettings> _globalSettings = null!;
     private readonly IOptions<UnattendedSettings> _unattendedSettings = null!;
+    private readonly IOptions<RuntimeSettings> _runtimeSettings = null!;
     private readonly IUmbracoVersion _umbracoVersion = null!;
     private readonly IUmbracoDatabaseFactory _databaseFactory = null!;
     private readonly ILogger<RuntimeState> _logger = null!;
@@ -71,6 +74,7 @@ public class RuntimeState : IRuntimeState
        : this(
              globalSettings,
              unattendedSettings,
+             StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>(),
              umbracoVersion,
              databaseFactory,
              logger,
@@ -95,6 +99,7 @@ public class RuntimeState : IRuntimeState
     /// <param name="databaseProviderMetadata">A collection of metadata for available database providers.</param>
     /// <param name="runtimeModeValidationService">Service for validating the current runtime mode.</param>
     /// <param name="databaseAvailabilityCheck">Service to check the availability of the database.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public RuntimeState(
        IOptions<GlobalSettings> globalSettings,
        IOptions<UnattendedSettings> unattendedSettings,
@@ -106,9 +111,51 @@ public class RuntimeState : IRuntimeState
        IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
        IRuntimeModeValidationService runtimeModeValidationService,
        IDatabaseAvailabilityCheck databaseAvailabilityCheck)
+        : this(
+            globalSettings,
+            unattendedSettings,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>(),
+            umbracoVersion,
+            databaseFactory,
+            logger,
+            packageMigrationState,
+            conflictingRouteService,
+            databaseProviderMetadata,
+            runtimeModeValidationService,
+            databaseAvailabilityCheck)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RuntimeState" /> class.
+    /// </summary>
+    /// <param name="globalSettings">The global settings for the Umbraco application.</param>
+    /// <param name="unattendedSettings">The unattended installation and upgrade settings.</param>
+    /// <param name="runtimeSettings">The runtime settings.</param>
+    /// <param name="umbracoVersion">Provides information about the current Umbraco version.</param>
+    /// <param name="databaseFactory">Factory for creating Umbraco database connections.</param>
+    /// <param name="logger">The logger used for logging runtime state information.</param>
+    /// <param name="packageMigrationState">Tracks the state of pending package migrations.</param>
+    /// <param name="conflictingRouteService">Service for detecting conflicting routes in the application.</param>
+    /// <param name="databaseProviderMetadata">A collection of metadata for available database providers.</param>
+    /// <param name="runtimeModeValidationService">Service for validating the current runtime mode.</param>
+    /// <param name="databaseAvailabilityCheck">Service to check the availability of the database.</param>
+    public RuntimeState(
+       IOptions<GlobalSettings> globalSettings,
+       IOptions<UnattendedSettings> unattendedSettings,
+       IOptions<RuntimeSettings> runtimeSettings,
+       IUmbracoVersion umbracoVersion,
+       IUmbracoDatabaseFactory databaseFactory,
+       ILogger<RuntimeState> logger,
+       PendingPackageMigrations packageMigrationState,
+       IConflictingRouteService conflictingRouteService,
+       IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
+       IRuntimeModeValidationService runtimeModeValidationService,
+       IDatabaseAvailabilityCheck databaseAvailabilityCheck)
     {
         _globalSettings = globalSettings;
         _unattendedSettings = unattendedSettings;
+        _runtimeSettings = runtimeSettings;
         _umbracoVersion = umbracoVersion;
         _databaseFactory = databaseFactory;
         _logger = logger;
@@ -332,7 +379,12 @@ public class RuntimeState : IRuntimeState
                 IReadOnlyDictionary<string, string?>? keyValues = database.GetFromKeyValueTable(Constants.Conventions.Migrations.KeyValuePrefix);
 
                 // This could need both an upgrade AND package migrations to execute, so always add any pending package migrations
-                IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState.GetPendingPackageMigrations(keyValues);
+                MigrationBehavior migrationBehavior = _runtimeSettings.Value.MigrationBehavior;
+                IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState
+                    .GetPendingPackageMigrationPlans(keyValues)
+                    .Where(plan => migrationBehavior.ShouldMigrate(plan, GetState(keyValues, plan), _logger))
+                    .Select(plan => plan.Name)
+                    .ToList();
                 _startupState[PendingPackageMigrationsStateKey] = packagesRequiringMigration;
 
                 if (DoesUmbracoRequireUpgrade(keyValues))
@@ -378,6 +430,16 @@ public class RuntimeState : IRuntimeState
             _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
         }
 
-        return CurrentMigrationState != FinalMigrationState;
+        if (CurrentMigrationState == FinalMigrationState)
+        {
+            return false;
+        }
+
+        return _runtimeSettings.Value.MigrationBehavior.ShouldMigrate(plan, CurrentMigrationState, _logger);
     }
+
+    private static string? GetState(IReadOnlyDictionary<string, string?>? keyValues, MigrationPlan plan)
+        => keyValues?.TryGetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name, out var state) ?? false
+            ? state
+            : null;
 }
