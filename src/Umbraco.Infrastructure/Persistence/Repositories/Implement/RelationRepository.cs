@@ -4,7 +4,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
@@ -22,6 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelation>, IRelationRepository
 {
     private readonly IRelationTypeRepository _relationTypeRepository;
+    private readonly IEntityRepository _entityRepository;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RelationRepository"/> class.
@@ -29,12 +29,14 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
     /// <param name="scopeAccessor">Provides access to the current EF Core database scope.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="relationTypeRepository">Repository for managing relation types.</param>
+    /// <param name="entityRepository">Repository used to build the entities on either side of a relation.</param>
     /// <param name="repositoryCacheVersionService">Service responsible for managing cache versioning for repository data.</param>
     /// <param name="cacheSyncService">Service used to synchronize cache state across distributed environments.</param>
     public RelationRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         ILogger<RelationRepository> logger,
         IRelationTypeRepository relationTypeRepository,
+        IEntityRepository entityRepository,
         IRepositoryCacheVersionService repositoryCacheVersionService,
         ICacheSyncService cacheSyncService)
         : base(
@@ -42,8 +44,11 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
             AppCaches.NoCache,
             logger,
             repositoryCacheVersionService,
-            cacheSyncService) =>
+            cacheSyncService)
+    {
         _relationTypeRepository = relationTypeRepository;
+        _entityRepository = entityRepository;
+    }
 
     /// <inheritdoc />
     public Task<IEnumerable<IRelation>> GetByParentIdAsync(
@@ -316,32 +321,133 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
                 .ExecuteDeleteAsync(cancellationToken));
 
     /// <inheritdoc />
-    /// <remarks>
-    ///     TODO: Implement when <see cref="EntityRepository"/> is migrated to EF Core. The current NPoco implementation
-    ///     paged across <c>umbracoNode</c> joined to relation rows; recreating that join over EF Core requires either
-    ///     duplicating the entity-slim projection or coordinating with the existing NPoco entity repository.
-    /// </remarks>
     public Task<PagedModel<IUmbracoEntity>> GetPagedParentEntitiesByChildIdAsync(
         int childId,
         int skip,
         int take,
         Guid[]? entityTypes = null,
         CancellationToken cancellationToken = default)
-        => throw new NotImplementedException(
-            "GetPagedParentEntitiesByChildIdAsync depends on EntityRepository being migrated to EF Core.");
+        => GetPagedRelatedEntitiesAsync(
+            db => db.Relations.Where(relation => relation.ChildId == childId).Select(relation => relation.ParentId),
+            skip,
+            take,
+            entityTypes,
+            cancellationToken);
 
     /// <inheritdoc />
-    /// <remarks>
-    ///     TODO: Implement when <see cref="EntityRepository"/> is migrated to EF Core. See <see cref="GetPagedParentEntitiesByChildIdAsync"/>.
-    /// </remarks>
     public Task<PagedModel<IUmbracoEntity>> GetPagedChildEntitiesByParentIdAsync(
         int parentId,
         int skip,
         int take,
         Guid[]? entityTypes = null,
         CancellationToken cancellationToken = default)
-        => throw new NotImplementedException(
-            "GetPagedChildEntitiesByParentIdAsync depends on EntityRepository being migrated to EF Core.");
+        => GetPagedRelatedEntitiesAsync(
+            db => db.Relations.Where(relation => relation.ParentId == parentId).Select(relation => relation.ChildId),
+            skip,
+            take,
+            entityTypes,
+            cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<IUmbracoEntity>> GetParentEntitiesByChildIdsAsync(
+        int[] childIds,
+        int[] relationTypes,
+        Guid entityType,
+        CancellationToken cancellationToken = default)
+    {
+        if (childIds.Length == 0)
+        {
+            return [];
+        }
+
+        HashSet<int> parentIds = await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            var ids = new HashSet<int>();
+            List<int> relationTypeIds = [.. relationTypes.Distinct()];
+            var childIdsPerQuery = Math.Max(1, Constants.Sql.MaxParameterCount - relationTypeIds.Count - 1);
+            foreach (IEnumerable<int> group in childIds.InGroupsOf(childIdsPerQuery))
+            {
+                List<int> batch = [.. group];
+                IQueryable<RelationDto> relations = db.Relations.Where(relation => batch.Contains(relation.ChildId));
+                if (relationTypeIds.Count > 0)
+                {
+                    relations = relations.Where(relation => relationTypeIds.Contains(relation.RelationType));
+                }
+
+                List<int> batchParentIds = await relations
+                    .Join(
+                        db.Nodes.Where(node => node.NodeObjectType == entityType),
+                        relation => relation.ParentId,
+                        node => node.NodeId,
+                        (relation, node) => node.NodeId)
+                    .Distinct()
+                    .ToListAsync(cancellationToken);
+                ids.UnionWith(batchParentIds);
+            }
+
+            return ids;
+        });
+
+        return GetEntities(entityType, parentIds);
+    }
+
+    // TODO: only the relation filter belongs here. Move the object type filter, count, ordering, paging and entity
+    // building to the entity repository when it moves to EF Core.
+    private async Task<PagedModel<IUmbracoEntity>> GetPagedRelatedEntitiesAsync(
+        Func<UmbracoDbContext, IQueryable<int>> relatedNodeIds,
+        int skip,
+        int take,
+        Guid[]? entityTypes,
+        CancellationToken cancellationToken)
+    {
+        (int total, List<(int NodeId, Guid ObjectType)> page) = await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            IQueryable<int> nodeIds = relatedNodeIds(db);
+
+            // A node without an object type cannot be built as an entity, so it is not counted either.
+            IQueryable<NodeDto> nodes = db.Nodes.Where(node => node.NodeObjectType != null && nodeIds.Contains(node.NodeId));
+            if (entityTypes is { Length: > 0 })
+            {
+                List<Guid> objectTypes = [.. entityTypes];
+                nodes = nodes.Where(node => objectTypes.Contains(node.NodeObjectType!.Value));
+            }
+
+            var count = await nodes.CountAsync(cancellationToken);
+            var rows = await nodes
+                .OrderBy(node => node.SortOrder)
+                .ThenBy(node => node.NodeId)
+                .Skip(skip)
+                .Take(take)
+                .Select(node => new { node.NodeId, ObjectType = node.NodeObjectType!.Value })
+                .ToListAsync(cancellationToken);
+
+            return (count, rows.ConvertAll(row => (row.NodeId, row.ObjectType)));
+        });
+
+        var entities = new Dictionary<int, IUmbracoEntity>(page.Count);
+        foreach (IGrouping<Guid, (int NodeId, Guid ObjectType)> group in page.GroupBy(row => row.ObjectType))
+        {
+            foreach (IUmbracoEntity entity in GetEntities(group.Key, group.Select(row => row.NodeId)))
+            {
+                entities[entity.Id] = entity;
+            }
+        }
+
+        return new PagedModel<IUmbracoEntity>(
+            total,
+            page.Where(row => entities.ContainsKey(row.NodeId)).Select(row => entities[row.NodeId]).ToArray());
+    }
+
+    private List<IUmbracoEntity> GetEntities(Guid objectType, IEnumerable<int> ids)
+    {
+        var entities = new List<IUmbracoEntity>();
+        foreach (IEnumerable<int> group in ids.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            entities.AddRange(_entityRepository.GetAll(objectType, [.. group]));
+        }
+
+        return entities;
+    }
 
     /// <inheritdoc />
     protected override async Task<IRelation?> PerformGetAsync(int key)
@@ -358,17 +464,6 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
             List<RelationDto> dtos = await BaseQuery(db).OrderBy(x => x.RelationType).ToListAsync();
             return await BuildEntitiesAsync(dtos);
         });
-
-    /// <inheritdoc />
-    /// <remarks>
-    ///     TODO: Implement when <see cref="EntityRepository"/> is migrated to EF Core. See <see cref="GetPagedParentEntitiesByChildIdAsync"/>.
-    /// </remarks>
-    public IEnumerable<IUmbracoEntity> GetParentEntitiesByChildIds(
-        int[] childIds,
-        int[] relationTypes,
-        Guid entityType)
-        => throw new NotImplementedException(
-            "GetParentEntitiesByChildIds depends on EntityRepository being migrated to EF Core.");
 
     /// <inheritdoc />
     protected override async Task<IEnumerable<IRelation>?> PerformGetManyAsync(int[]? keys)

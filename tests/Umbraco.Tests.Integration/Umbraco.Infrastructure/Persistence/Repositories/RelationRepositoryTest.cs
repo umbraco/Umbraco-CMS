@@ -171,7 +171,6 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    [Ignore("Deferred until EntityRepository is migrated to EF Core - GetPagedParentEntitiesByChildIdAsync throws NotImplementedException")]
     public async Task Get_Paged_Parent_Entities_By_Child_Id()
     {
         var (createdContent, createdMembers, createdMedia) = await CreateTestDataForPagingTestsAsync();
@@ -216,7 +215,6 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    [Ignore("Deferred until EntityRepository is migrated to EF Core - GetPagedParentEntitiesByChildIdAsync/GetPagedChildEntitiesByParentIdAsync throw NotImplementedException")]
     public async Task Get_Paged_Parent_Child_Entities_With_Same_Entity_Relation()
     {
         // Create a media item and create a relationship between itself (parent -> child)
@@ -244,7 +242,6 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    [Ignore("Deferred until EntityRepository is migrated to EF Core - GetPagedChildEntitiesByParentIdAsync throws NotImplementedException")]
     public async Task Get_Paged_Child_Entities_By_Parent_Id()
     {
         var (createdContent, createdMembers, _) = await CreateTestDataForPagingTestsAsync();
@@ -281,6 +278,50 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             var membersFromContent = await repository.GetPagedChildEntitiesByParentIdAsync(createdContent[0].Id, 0, 100, [UmbracoObjectTypes.Member.GetGuid()]);
             Assert.AreEqual(3, membersFromContent.Total);
         }
+    }
+
+    [Test]
+    public async Task GetPagedChildEntitiesByParentIdAsync_PagesEachRelatedEntityOnceInSortOrder()
+    {
+        _subpage.SortOrder = _subpage2.SortOrder + 1;
+        await ContentService.SaveAsync(_subpage, Constants.Security.SuperUserKey, null, CancellationToken.None);
+
+        using var scope = ScopeProvider.CreateScope();
+        var repository = CreateRepository(out _);
+        await repository.SaveAsync(new Relation(_textpage.Id, _subpage.Id, _relateContentType) { Comment = string.Empty }, CancellationToken.None);
+
+        var firstPage = await repository.GetPagedChildEntitiesByParentIdAsync(_textpage.Id, 0, 1);
+        var secondPage = await repository.GetPagedChildEntitiesByParentIdAsync(_textpage.Id, 1, 1);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(firstPage.Total, Is.EqualTo(2));
+            Assert.That(firstPage.Items.Select(entity => entity.Id), Is.EqualTo(new[] { _subpage2.Id }));
+            Assert.That(secondPage.Total, Is.EqualTo(2));
+            Assert.That(secondPage.Items.Select(entity => entity.Id), Is.EqualTo(new[] { _subpage.Id }));
+        });
+    }
+
+    [Test]
+    public async Task GetParentEntitiesByChildIdsAsync_ReturnsASharedParentOnceAndAppliesBothFilters()
+    {
+        using var scope = ScopeProvider.CreateScope();
+        var repository = CreateRepository(out _);
+        int[] childIds = [_subpage.Id, _subpage2.Id];
+
+        var parents = (await repository.GetParentEntitiesByChildIdsAsync(childIds, [], Constants.ObjectTypes.Document)).ToArray();
+        var parentsOfTheRelationType = await repository.GetParentEntitiesByChildIdsAsync(childIds, [_relateContent.Id], Constants.ObjectTypes.Document);
+        var parentsOfAnotherRelationType = await repository.GetParentEntitiesByChildIdsAsync(childIds, [_relateContentType.Id], Constants.ObjectTypes.Document);
+        var parentsOfAnotherEntityType = await repository.GetParentEntitiesByChildIdsAsync(childIds, [], Constants.ObjectTypes.Media);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(parents.Select(entity => entity.Id), Is.EqualTo(new[] { _textpage.Id }));
+            Assert.That(parents[0], Is.InstanceOf<IDocumentEntitySlim>());
+            Assert.That(parentsOfTheRelationType.Select(entity => entity.Id), Is.EqualTo(new[] { _textpage.Id }));
+            Assert.That(parentsOfAnotherRelationType, Is.Empty);
+            Assert.That(parentsOfAnotherEntityType, Is.Empty);
+        });
     }
 
     private async Task<(List<IContent> createdContent, List<IMember> createdMembers, List<IMedia> createdMedia)> CreateTestDataForPagingTestsAsync()

@@ -23,6 +23,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 ///     <para>Limited to objects that have a corresponding node (in umbracoNode table).</para>
 ///     <para>Returns <see cref="IEntitySlim" /> objects, i.e. lightweight representation of entities.</para>
 /// </remarks>
+// TODO (EF Core): when this repository moves to EF Core, take over the node filtering, counting, ordering, paging and entity
+// building in RelationRepository.GetPagedRelatedEntitiesAsync and RelationRepository.GetEntities.
 internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 {
     /// <summary>
