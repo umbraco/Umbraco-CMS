@@ -1,4 +1,5 @@
 import type { UmbLinkPickerModalData, UmbLinkPickerModalValue } from './link-picker-modal.token.js';
+import type { UmbLinkPickerLink } from './types.js';
 import { UmbLinkPickerModalElement } from './link-picker-modal.element.js';
 import { UMB_DOCUMENT_LINK_PICKER_MODAL } from '../document-link-picker-modal/document-link-picker-modal.token.js';
 import { aTimeout, expect, fixture, html, waitUntil } from '@open-wc/testing';
@@ -18,12 +19,18 @@ import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import type { UmbInputMultiUrlElement } from '../components/input-multi-url/index.js';
 import { UmbDocumentItemStore } from '../../documents/documents/item/repository/document-item.store.js';
 import { UmbDocumentUrlStore } from '../../documents/documents/url/repository/document-url.store.js';
+import { UmbMediaItemStore } from '../../media/media/repository/item/media-item.store.js';
+import { UmbMediaUrlStore } from '../../media/media/url/repository/media-url.store.js';
+import { manifests as mediaItemManifests } from '../../media/media/repository/item/manifests.js';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 import '../components/input-multi-url/index.js';
 
-// Kitchen-sink documents.
+// Kitchen-sink documents and media.
 const HOME_ID = 'db79156b-3d5b-43d6-ab32-902dc423bec3';
 const CHECKBOX_LIST_ID = '9dfcda46-88bf-4d69-bb2d-e94667051727';
+const IMAGE_ID = '76c02ec8-6a82-4c47-95da-56f6628b58fb';
+const OTHER_IMAGE_ID = 'ee9c1205-4121-4610-b0b3-a522dfd3461d';
 
 // Provides what the app provides at runtime: the item stores the repositories wait for, and the
 // ambient cultures a document name resolves against.
@@ -33,6 +40,8 @@ class UmbTestLinkPickerModalHostElement extends UmbElementMixin(HTMLElement) {
 		super();
 		new UmbDocumentItemStore(this);
 		new UmbDocumentUrlStore(this);
+		new UmbMediaItemStore(this);
+		new UmbMediaUrlStore(this);
 		const variantContext = new UmbVariantContext(this);
 		variantContext.setCulture(null);
 		variantContext.setFallbackCulture('en-US');
@@ -171,15 +180,21 @@ describe('UmbLinkPickerModalElement', () => {
 		});
 	});
 
-	describe('picked document', () => {
+	describe('changing the target of a saved link', () => {
 		let host: UmbTestLinkPickerModalHostElement;
 		let modal: UmbLinkPickerModalElement;
 		let openedModals: Array<unknown>;
 		let pickerResult: () => Promise<unknown>;
 
+		// The media input resolves its item repository through the extension registry.
+		const mediaItemRepository = mediaItemManifests.find((manifest) => manifest.type === 'repository')!;
+
 		before(async () => {
 			await useMockSet('kitchenSink');
+			umbExtensionsRegistry.register(mediaItemRepository);
 		});
+
+		after(() => umbExtensionsRegistry.unregister(mediaItemRepository.alias));
 
 		beforeEach(async () => {
 			host = await fixture(html`<umb-test-link-picker-modal-host></umb-test-link-picker-modal-host>`);
@@ -194,10 +209,10 @@ describe('UmbLinkPickerModalElement', () => {
 				},
 			};
 			host.provideContext(UMB_MODAL_MANAGER_CONTEXT, modalManager as never);
+		});
 
-			const value = new UmbObjectState<UmbLinkPickerModalValue>({
-				link: { type: 'document', unique: HOME_ID, name: 'My title', queryString: '#anchor', target: '_blank' },
-			});
+		const openDialog = async (link: UmbLinkPickerLink) => {
+			const value = new UmbObjectState<UmbLinkPickerModalValue>({ link });
 			modal = document.createElement('umb-link-picker-modal');
 			modal.modalContext = {
 				value: value.asObservable(),
@@ -205,19 +220,22 @@ describe('UmbLinkPickerModalElement', () => {
 				updateValue: (partial: Partial<UmbLinkPickerModalValue>) => value.update(partial),
 			} as unknown as UmbModalContext<UmbLinkPickerModalData, UmbLinkPickerModalValue>;
 			host.appendChild(modal);
+			await modal.updateComplete;
+		};
 
+		const openDocumentLink = async (name: string) => {
+			await openDialog({ type: 'document', unique: HOME_ID, name, queryString: '#anchor', target: '_blank' });
 			await waitUntil(
 				() => modal.shadowRoot?.querySelector<UmbEntityItemRefElement>('umb-entity-item-ref')?.item,
 				'picked document was not loaded',
 			);
-		});
+		};
 
-		const replaceButton = () =>
-			modal.shadowRoot!.querySelector<HTMLElement>(
-				`uui-action-bar uui-button[label="${modal.localize.term('actions_replace')}"]`,
-			);
+		const replaceButton = (root: ShadowRoot | null | undefined = modal.shadowRoot) =>
+			root?.querySelector<HTMLElement>(`uui-action-bar uui-button[label="${modal.localize.term('actions_replace')}"]`);
 
 		it('replaces the document in place, keeping title, anchor and target', async () => {
+			await openDocumentLink('My title');
 			expect(replaceButton(), 'replace button').to.exist;
 
 			replaceButton()!.click();
@@ -234,6 +252,7 @@ describe('UmbLinkPickerModalElement', () => {
 		});
 
 		it('keeps the link and settles quietly when the picker is closed without choosing', async () => {
+			await openDocumentLink('My title');
 			pickerResult = () => Promise.reject(new Error('Closed'));
 			const unhandled: Array<unknown> = [];
 			const onUnhandledRejection = (event: PromiseRejectionEvent) => {
@@ -252,6 +271,52 @@ describe('UmbLinkPickerModalElement', () => {
 
 			expect(unhandled).to.be.empty;
 			expect(modal.value.link).to.include({ type: 'document', unique: HOME_ID, name: 'My title' });
+		});
+
+		it('updates a title that is the document name when the document is replaced', async () => {
+			await openDocumentLink('Home');
+
+			replaceButton()!.click();
+			await waitUntil(() => modal.value.link.unique === CHECKBOX_LIST_ID, 'document was not changed');
+
+			expect(modal.value.link).to.include({ unique: CHECKBOX_LIST_ID, name: 'Checkbox List' });
+		});
+
+		it('updates a title that is the media name when the media item is replaced', async () => {
+			pickerResult = () => Promise.resolve({ selection: [OTHER_IMAGE_ID] });
+			await openDialog({ type: 'media', unique: IMAGE_ID, name: 'Placeholder 73640' });
+			const mediaInput = modal.shadowRoot!.querySelector<UmbInputMediaElement>('umb-input-media')!;
+			await waitUntil(() => replaceButton(mediaInput.shadowRoot), 'picked media was not loaded');
+
+			replaceButton(mediaInput.shadowRoot)!.click();
+			await waitUntil(() => modal.value.link.unique === OTHER_IMAGE_ID, 'media was not changed');
+
+			expect(modal.value.link).to.include({ unique: OTHER_IMAGE_ID, name: 'Placeholder 5085407' });
+		});
+
+		describe('manual URL', () => {
+			const enterUrl = async (url: string) => {
+				const urlInput = modal.shadowRoot!.querySelector<HTMLInputElement>('[data-mark="input:url"]')!;
+				urlInput.value = url;
+				urlInput.dispatchEvent(new Event('input'));
+				await modal.updateComplete;
+			};
+
+			it('updates a title that is the host name when the URL changes', async () => {
+				await openDialog({ type: 'external', url: 'https://umbraco.com/products', name: 'umbraco.com' });
+
+				await enterUrl('https://example.com/about');
+
+				expect(modal.value.link).to.include({ url: 'https://example.com/about', name: 'example.com' });
+			});
+
+			it('keeps a title of its own when the URL changes', async () => {
+				await openDialog({ type: 'external', url: 'https://umbraco.com/products', name: 'Our products' });
+
+				await enterUrl('https://example.com/about');
+
+				expect(modal.value.link).to.include({ url: 'https://example.com/about', name: 'Our products' });
+			});
 		});
 	});
 });
