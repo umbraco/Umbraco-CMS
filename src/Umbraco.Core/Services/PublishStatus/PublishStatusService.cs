@@ -236,28 +236,29 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
             return false;
         }
 
+        // The keys run from the document itself (index 0) up through its ancestors to the root.
+        const int FirstAncestorIndex = 1;
         Guid[] ancestorsOrSelfKeys = keys as Guid[] ?? keys.ToArray();
-        for (var i = 1; i < ancestorsOrSelfKeys.Length; i++)
+
+        // Find the nearest ancestor that is not published in the culture. The document's own publish state is the
+        // caller's concern, so the search starts at its parent.
+        var firstUnpublishedIndex = Array.FindIndex(
+            ancestorsOrSelfKeys,
+            FirstAncestorIndex,
+            key => IsDocumentPublished(key, culture) is false);
+
+        // Every ancestor up to the root is published in the culture, so no domains need to be looked up.
+        if (firstUnpublishedIndex < 0)
         {
-            if (IsDocumentPublished(ancestorsOrSelfKeys[i], culture))
-            {
-                continue;
-            }
-
-            // A domain for the culture starts that culture's route, so an unpublished ancestor above it is not part of
-            // the route. Domains are only looked up here, as most paths are fully published.
-            for (var j = 0; j < i; j++)
-            {
-                if (HasDomainForCulture(ancestorsOrSelfKeys[j], culture))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return true;
         }
 
-        return true;
+        // A domain for the culture starts that culture's route, so an unpublished ancestor above it is not part of
+        // the route. The path is therefore published if the document or any ancestor below the unpublished one has a
+        // domain for the culture.
+        return ancestorsOrSelfKeys
+            .Take(firstUnpublishedIndex)
+            .Any(key => HasDomainForCulture(key, culture));
     }
 
     private bool HasPublishedAncestorPathInternal(Guid contentKey, string? culture)
