@@ -236,30 +236,35 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
             return false;
         }
 
-        // The keys run from the document itself (index 0) up through its ancestors to the root.
-        const int FirstAncestorIndex = 1;
-        Guid[] ancestorsOrSelfKeys = keys as Guid[] ?? keys.ToArray();
-
-        // Find the nearest ancestor that is not published in the culture. The document's own publish state is the
-        // caller's concern, so the search starts at its parent.
-        var firstUnpublishedIndex = Array.FindIndex(
-            ancestorsOrSelfKeys,
-            FirstAncestorIndex,
-            key => IsDocumentPublished(key, culture) is false);
+        Guid[] ancestorsOrSelfKeys = keys as Guid[] ?? [.. keys];
+        int firstUnpublishedAncestorIndex = GetIndexOfFirstUnpublishedAncestor(ancestorsOrSelfKeys, culture);
 
         // Every ancestor up to the root is published in the culture, so no domains need to be looked up.
-        if (firstUnpublishedIndex < 0)
+        if (firstUnpublishedAncestorIndex < 0)
         {
             return true;
         }
 
         // A domain for the culture starts that culture's route, so an unpublished ancestor above it is not part of
-        // the route. The path is therefore published if the document or any ancestor below the unpublished one has a
-        // domain for the culture.
-        return ancestorsOrSelfKeys
-            .Take(firstUnpublishedIndex)
-            .Any(key => HasDomainForCulture(key, culture));
+        // the route.
+        return HasDomainForCultureBelow(ancestorsOrSelfKeys, firstUnpublishedAncestorIndex, culture);
     }
+
+    private int GetIndexOfFirstUnpublishedAncestor(Guid[] ancestorsOrSelfKeys, string culture)
+    {
+        // The keys run from the document itself (index 0) up through its ancestors to the root. The document's own
+        // publish state is the caller's concern, so the search starts at its parent.
+        const int FirstAncestorIndex = 1;
+        return Array.FindIndex(
+            ancestorsOrSelfKeys,
+            FirstAncestorIndex,
+            key => IsDocumentPublished(key, culture) is false);
+    }
+
+    private bool HasDomainForCultureBelow(Guid[] ancestorsOrSelfKeys, int index, string culture)
+        => ancestorsOrSelfKeys
+            .Take(index)
+            .Any(key => HasDomainForCulture(key, culture));
 
     private bool HasPublishedAncestorPathInternal(Guid contentKey, string? culture)
     {
