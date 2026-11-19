@@ -66,6 +66,15 @@ public class BackOfficeAuthorizationInitializationMiddleware : IMiddleware
             return;
         }
 
+        // During a background unattended upgrade the migrations own the database, and a write on another connection
+        // can invalidate their transaction (SQLite's snapshot isolation). No token is needed meanwhile, as the
+        // back office only polls the anonymous server status, and the host is left unregistered so the first
+        // request after the upgrade completes registers it.
+        if (_runtimeState.Level == RuntimeLevel.Upgrading)
+        {
+            return;
+        }
+
         if (_umbracoRequestPaths.IsBackOfficeRequest(context.Request.Path) == false)
         {
             return;
