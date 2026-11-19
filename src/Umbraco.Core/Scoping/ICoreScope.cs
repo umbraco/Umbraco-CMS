@@ -99,7 +99,7 @@ public interface ICoreScope : IDisposable, IAsyncDisposable, IInstanceIdentifiab
     ///     Disposes the scope, publishing any pending scoped notifications asynchronously when the implementation supports it.
     /// </summary>
     /// <returns>A task that represents the asynchronous dispose operation.</returns>
-    // TODO (V19): Remove the default implementation.
+    // TODO (V20): Remove the default implementation.
     ValueTask IAsyncDisposable.DisposeAsync()
     {
         Dispose();

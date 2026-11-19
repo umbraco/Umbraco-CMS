@@ -9,7 +9,6 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
@@ -405,5 +404,76 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         Assert.NotNull(result);
         var link = result as Link;
         Assert.AreEqual("/fr/the-page-url", link.Url);
+    }
+
+    [Test]
+    public void MultiUrlPickerValueConverter_ConvertToObject_ReadsDocumentsAndMediaInOneBatchEach()
+    {
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 10 }));
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+
+        var otherContentKey = Guid.NewGuid();
+        var otherContent = SetupPublishedContent("The other page", otherContentKey, PublishedItemType.Content, PublishedContentType);
+        RegisterContentWithProviders(otherContent.Object, false);
+
+        var valueConverter = MultiUrlPickerValueConverter();
+        var inter = Serializer().Serialize(new[]
+        {
+            new MultiUrlPickerValueEditor.LinkDto { Udi = new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key) },
+            new MultiUrlPickerValueEditor.LinkDto { Udi = new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key) },
+            new MultiUrlPickerValueEditor.LinkDto { Udi = new GuidUdi(Constants.UdiEntityType.Document, otherContentKey) },
+        });
+
+        var result = valueConverter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<Link>;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result?.Select(x => x.Type), Is.EqualTo(new[] { LinkType.Content, LinkType.Media, LinkType.Content }));
+            PublishedContentCacheMock.Verify(c => c.GetByIds(false, It.Is<IReadOnlyCollection<Guid>>(k => k.SequenceEqual(new[] { PublishedContent.Key, otherContentKey }))), Times.Once);
+            PublishedMediaCacheMock.Verify(c => c.GetByIds(It.Is<IReadOnlyCollection<Guid>>(k => k.SequenceEqual(new[] { PublishedMedia.Key }))), Times.Once);
+        });
+    }
+
+    [Test]
+    public void MultiUrlPickerValueConverter_ConvertToObject_SkipsLinksToMissingContent()
+    {
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 10 }));
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+
+        var valueConverter = MultiUrlPickerValueConverter();
+        var inter = Serializer().Serialize(new[]
+        {
+            new MultiUrlPickerValueEditor.LinkDto { Udi = new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()) },
+            new MultiUrlPickerValueEditor.LinkDto { Udi = new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key) },
+        });
+
+        var result = valueConverter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<Link>;
+
+        Assert.That(result?.Select(x => (x.Udi as GuidUdi)?.Guid), Is.EqualTo(new Guid?[] { PublishedContent.Key }));
+    }
+
+    [Test]
+    public void MultiUrlPickerValueConverter_ConvertToObject_DoesNotReadTheCachesForExternalLinks()
+    {
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 10 }));
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+
+        var valueConverter = MultiUrlPickerValueConverter();
+        var inter = Serializer().Serialize(new[]
+        {
+            new MultiUrlPickerValueEditor.LinkDto { Name = "External", Url = "https://example.com" },
+        });
+
+        var result = valueConverter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<Link>;
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, result?.Count());
+            PublishedContentCacheMock.Verify(c => c.GetByIds(It.IsAny<bool>(), It.IsAny<IReadOnlyCollection<Guid>>()), Times.Never);
+            PublishedMediaCacheMock.Verify(c => c.GetByIds(It.IsAny<IReadOnlyCollection<Guid>>()), Times.Never);
+        });
     }
 }

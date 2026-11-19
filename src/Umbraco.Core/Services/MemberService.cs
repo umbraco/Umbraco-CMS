@@ -1008,7 +1008,7 @@ namespace Umbraco.Cms.Core.Services
             var savingNotification = new MemberSavingNotification(member, evtMsgs);
             savingNotification.State.Add(Constants.Conventions.Member.LoginPropertiesOnlyStateKey, true);
             savingNotification.State.Add(Constants.Conventions.Member.IndexableFieldsChangedStateKey, false);
-            if (scope.Notifications.PublishCancelable(savingNotification))
+            if (await scope.Notifications.PublishCancelableAsync(savingNotification))
             {
                 scope.Complete();
                 return;

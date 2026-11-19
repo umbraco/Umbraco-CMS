@@ -302,6 +302,32 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
+    public async Task GetContentSource_Returns_The_Published_Version_Or_The_Draft_Of_A_Node_With_Unpublished_Changes()
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
+        var publishedName = Textpage.Name;
+
+        // Rename the draft without publishing it, so the published and the draft versions of the node differ.
+        IContent draft = ContentService.GetById(Textpage.Key)!;
+        const string draftName = "A name that is not published";
+        draft.Name = draftName;
+        ContentService.Save(draft);
+
+        var publishedBySingleRead = Describe(await DatabaseCacheRepository.GetContentSourceAsync(Textpage.Key, preview: false));
+        var draftBySingleRead = Describe(await DatabaseCacheRepository.GetContentSourceAsync(Textpage.Key, preview: true));
+        var publishedByBatchedRead = Describe((await DatabaseCacheRepository.GetContentSourcesAsync([Textpage.Key], preview: false)).Single());
+        var draftByBatchedRead = Describe((await DatabaseCacheRepository.GetContentSourcesAsync([Textpage.Key], preview: true)).Single());
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(publishedBySingleRead, Is.EqualTo((Textpage.Id, Textpage.Key, false, publishedName)), "The published version by a single read.");
+            Assert.That(draftBySingleRead, Is.EqualTo((Textpage.Id, Textpage.Key, true, draftName)), "The draft by a single read.");
+            Assert.That(publishedByBatchedRead, Is.EqualTo((Textpage.Id, Textpage.Key, false, publishedName)), "The published version by a batched read.");
+            Assert.That(draftByBatchedRead, Is.EqualTo((Textpage.Id, Textpage.Key, true, draftName)), "The draft by a batched read.");
+        });
+    }
+
+    [Test]
     public async Task GetContentSourceAsync_In_A_Scope_Sees_The_Uncommitted_Changes_Of_The_Scope()
     {
         await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);

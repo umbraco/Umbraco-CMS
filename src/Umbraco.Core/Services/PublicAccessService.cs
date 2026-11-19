@@ -443,7 +443,7 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
 
 
             var deletingNotification = new PublicAccessEntryDeletingNotification(attempt.Result!, evtMsgs);
-            if (scope.Notifications.PublishCancelable(deletingNotification))
+            if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
             {
                 scope.Complete();
                 return Attempt.Fail(PublicAccessOperationStatus.CancelledByNotification);

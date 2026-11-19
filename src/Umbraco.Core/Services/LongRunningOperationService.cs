@@ -218,6 +218,9 @@ internal class LongRunningOperationService : ILongRunningOperationService
 
                 await Task.WhenAny(operationTask, Task.Delay(_options.Value.TimeBetweenStatusChecks)).ConfigureAwait(false);
             }
+
+            // The loop above also ends when the operation faults or is cancelled; awaiting it surfaces that here.
+            await operationTask.ConfigureAwait(false);
         }
         catch (Exception)
         {

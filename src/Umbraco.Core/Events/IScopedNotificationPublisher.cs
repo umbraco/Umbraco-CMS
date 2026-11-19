@@ -52,7 +52,7 @@ public interface IScopedNotificationPublisher
     /// <param name="completed">Whether the scope completed; pending notifications are only published when it did.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    // TODO (V19): Remove the default implementation.
+    // TODO (V20): Remove the default implementation.
     Task ScopeExitAsync(bool completed, CancellationToken cancellationToken = default)
     {
         ScopeExit(completed);
