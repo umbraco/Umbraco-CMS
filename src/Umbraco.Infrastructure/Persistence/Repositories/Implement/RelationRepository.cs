@@ -363,8 +363,8 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
         HashSet<int> parentIds = await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             var ids = new HashSet<int>();
-            List<int> relationTypeIds = [.. relationTypes];
-            var childIdsPerQuery = Constants.Sql.MaxParameterCount - relationTypeIds.Count - 1;
+            List<int> relationTypeIds = [.. relationTypes.Distinct()];
+            var childIdsPerQuery = Math.Max(1, Constants.Sql.MaxParameterCount - relationTypeIds.Count - 1);
             foreach (IEnumerable<int> group in childIds.InGroupsOf(childIdsPerQuery))
             {
                 List<int> batch = [.. group];
