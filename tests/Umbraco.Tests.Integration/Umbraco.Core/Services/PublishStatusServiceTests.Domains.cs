@@ -87,6 +87,17 @@ internal sealed partial class PublishStatusServiceTests
     }
 
     [Test]
+    public async Task Culture_Domain_On_Document_Outside_The_Content_Tree_Yields_Unpublished_Ancestor_Path()
+    {
+        (_, IContent branch, _) = await CreateBranchUnderRootPublishedOnlyInDefaultCulture();
+        await AssignDomains(branch, new DomainModel { DomainName = "test.local/branch/da", IsoCode = SecondCulture });
+
+        ContentService.MoveToRecycleBin(ContentService.GetById(branch.Key)!);
+
+        Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(branch.Key, SecondCulture));
+    }
+
+    [Test]
     public async Task Culture_Domain_Below_Ancestor_Unpublished_In_Culture_Does_Not_Affect_Ancestor_Path_In_Any_Culture()
     {
         (_, IContent branch, IContent child) = await CreateBranchUnderRootPublishedOnlyInDefaultCulture();

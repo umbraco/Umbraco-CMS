@@ -231,16 +231,36 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
             culture = defaultCulture;
         }
 
-        // A domain for the culture starts that culture's route, so the ancestors above it are not part of it.
-        if (HasDomainForCulture(contentKey, culture))
+        if (_documentNavigationQueryService.TryGetAncestorsOrSelfKeys(contentKey, out IEnumerable<Guid> keys) is false)
         {
-            return true;
+            return false;
         }
 
-        return HasPublishedAncestorPathInternal(contentKey, culture, stopAtDomainForCulture: true);
+        Guid[] ancestorsOrSelfKeys = keys as Guid[] ?? keys.ToArray();
+        for (var i = 1; i < ancestorsOrSelfKeys.Length; i++)
+        {
+            if (IsDocumentPublished(ancestorsOrSelfKeys[i], culture))
+            {
+                continue;
+            }
+
+            // A domain for the culture starts that culture's route, so an unpublished ancestor above it is not part of
+            // the route. Domains are only looked up here, as most paths are fully published.
+            for (var j = 0; j < i; j++)
+            {
+                if (HasDomainForCulture(ancestorsOrSelfKeys[j], culture))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
-    private bool HasPublishedAncestorPathInternal(Guid contentKey, string? culture, bool stopAtDomainForCulture = false)
+    private bool HasPublishedAncestorPathInternal(Guid contentKey, string? culture)
     {
         var success = _documentNavigationQueryService.TryGetAncestorsKeys(contentKey, out IEnumerable<Guid> keys);
         if (success is false)
@@ -260,11 +280,6 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
             if (isPublished is false)
             {
                 return false;
-            }
-
-            if (stopAtDomainForCulture && HasDomainForCulture(key, culture!))
-            {
-                return true;
             }
         }
 
