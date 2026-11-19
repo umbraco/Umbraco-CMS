@@ -162,7 +162,34 @@ const blockListDocument: UmbMockDocumentModel = {
 						],
 					},
 				],
-				settingsData: [],
+				settingsData: [
+					{
+						contentTypeKey: '5b3e9d7a-2c14-4a68-8f0b-6d1e4a9c7b23',
+						key: 'block-list-settings-library-element-one-a',
+						values: [
+							{
+								editorAlias: 'Umbraco.TextBox',
+								culture: null,
+								segment: null,
+								alias: 'textSize',
+								value: 'Small',
+							},
+						],
+					},
+					{
+						contentTypeKey: '5b3e9d7a-2c14-4a68-8f0b-6d1e4a9c7b23',
+						key: 'block-list-settings-library-element-one-b',
+						values: [
+							{
+								editorAlias: 'Umbraco.TextBox',
+								culture: null,
+								segment: null,
+								alias: 'textSize',
+								value: 'Large',
+							},
+						],
+					},
+				],
 				expose: [
 					{
 						contentKey: 'a08c8c6a-8da2-46d0-87b7-536985985b24',
@@ -182,7 +209,7 @@ const blockListDocument: UmbMockDocumentModel = {
 						{
 							key: 'block-list-item-library-element-one-a',
 							contentKey: 'library-element-one-id',
-							settingsKey: null,
+							settingsKey: 'block-list-settings-library-element-one-a',
 							isExternalContent: true,
 						},
 						{
@@ -206,7 +233,7 @@ const blockListDocument: UmbMockDocumentModel = {
 						{
 							key: 'block-list-item-library-element-one-b',
 							contentKey: 'library-element-one-id',
-							settingsKey: null,
+							settingsKey: 'block-list-settings-library-element-one-b',
 							isExternalContent: true,
 						},
 					],
