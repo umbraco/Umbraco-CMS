@@ -21,7 +21,7 @@ internal sealed class MemberTypeSensitivePropertyNotificationHandler : ContentNo
     INotificationHandler<MemberTypeSavingNotification>,
     IDistributedCacheNotificationHandler<MemberTypeSavedNotification>
 {
-    private const string ChangedSensitivePropertyAliasesStateKey = "ChangedSensitivePropertyAliases";
+    private const string NotificationStateKey = "Umbraco.Cms.Search.Core.Cache.MemberType.MemberTypeSensitivePropertyNotificationHandler";
 
     private readonly IMemberTypeService _memberTypeService;
     private readonly ILogger<MemberTypeSensitivePropertyNotificationHandler> _logger;
@@ -80,13 +80,13 @@ internal sealed class MemberTypeSensitivePropertyNotificationHandler : ContentNo
             }
         }
 
-        notification.State[ChangedSensitivePropertyAliasesStateKey] = changedSensitivePropertyAliases;
+        notification.State[NotificationStateKey] = changedSensitivePropertyAliases;
     }
 
     /// <inheritdoc />
     public void Handle(MemberTypeSavedNotification notification)
     {
-        if (notification.State.TryGetValue(ChangedSensitivePropertyAliasesStateKey, out var value) is false
+        if (notification.State.TryGetValue(NotificationStateKey, out var value) is false
             || value is not Dictionary<Guid, string[]> changedSensitivePropertyAliases
             || changedSensitivePropertyAliases.Count == 0)
         {

@@ -128,14 +128,14 @@ public class MemberTypeSensitivePropertyIndexingTests : ContentBaseTestBase
         IMemberType memberType = new MemberTypeBuilder()
             .WithAlias(MemberTypeAlias)
             .AddPropertyGroup()
-            .WithAlias("group")
-            .WithName("Group")
-            .AddPropertyType()
-            .WithAlias(PropertyAlias)
-            .WithDataTypeId(Constants.DataTypes.Textbox)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
-            .Done()
-            .Done()
+                .WithAlias("group")
+                .WithName("Group")
+                .AddPropertyType()
+                    .WithAlias(PropertyAlias)
+                    .WithDataTypeId(Constants.DataTypes.Textbox)
+                    .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+                    .Done()
+                .Done()
             .Build();
         memberType.SetIsSensitiveProperty(PropertyAlias, isSensitive);
         await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
@@ -152,8 +152,8 @@ public class MemberTypeSensitivePropertyIndexingTests : ContentBaseTestBase
                 .WithEmail($"member{name}@local")
                 .WithLogin($"member{name}@local", "Test123456")
                 .AddPropertyData()
-                .WithKeyValue(PropertyAlias, organization)
-                .Done()
+                    .WithKeyValue(PropertyAlias, organization)
+                    .Done()
                 .Build());
 
     private async Task SetSensitive(bool isSensitive)
