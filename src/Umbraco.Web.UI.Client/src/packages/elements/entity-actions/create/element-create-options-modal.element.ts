@@ -14,8 +14,10 @@ import { css, customElement, html, nothing, repeat, state, when } from '@umbraco
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { createExtensionApiByAlias, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
 import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-element-create-options-modal')
 export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
@@ -34,6 +36,9 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _hrefList: Array<string | undefined> = [];
+
+	@state()
+	private _search = '';
 
 	constructor() {
 		super();
@@ -125,14 +130,59 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 		}
 	}
 
+	#matchesSearch(...texts: Array<string | undefined>) {
+		const search = this._search.trim().toLowerCase();
+		return !search || texts.some((text) => text?.toLowerCase().includes(search));
+	}
+
+	#getCreateOptionLabel(manifest?: ManifestEntityCreateOptionAction) {
+		if (!manifest) return '';
+		return manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
+	}
+
+	#getFilteredCreateOptions() {
+		return this._createOptionControllers
+			.map((controller, index) => ({ controller, href: this._hrefList[index] }))
+			.filter(
+				({ controller }) => controller.manifest && this.#matchesSearch(this.#getCreateOptionLabel(controller.manifest)),
+			);
+	}
+
+	#getFilteredElementTypes() {
+		return this._allowedElementTypes.filter((elementType) =>
+			this.#matchesSearch(this.localize.string(elementType.name), this.localize.string(elementType.description ?? '')),
+		);
+	}
+
+	#onSearch(event: UUIInputEvent) {
+		this._search = event.target.value as string;
+	}
+
+	// Enter picks the first match: the first create option (for example a folder) while the search is empty,
+	// otherwise the first element type.
+	#onSearchKeydown(event: KeyboardEvent) {
+		if (event.key !== 'Enter') return;
+		event.preventDefault();
+
+		const createOptions = this.#getFilteredCreateOptions();
+		const [firstElementType] = this.#getFilteredElementTypes();
+		if (createOptions.length && (!this._search.trim() || !firstElementType)) {
+			this.#onCreateOptionSelect(createOptions[0].controller, createOptions[0].href);
+		} else if (firstElementType) {
+			this.#onNavigate(firstElementType);
+		}
+	}
+
 	override render() {
+		const optionCount = this._allowedElementTypes.length + this._createOptionControllers.length;
 		return html`
 			<uui-dialog-layout headline=${this.localize.term('general_create')}>
 				${when(
-					this._allowedElementTypes.length === 0 && this._createOptionControllers.length === 0,
+					optionCount === 0,
 					() => this.#renderNoAllowedTypes(),
 					() => html`
-						<uui-ref-list>${this.#renderCreateOptionActions()}${this.#renderAllowedElementTypes()}</uui-ref-list>
+						${when(optionCount > 8, () => this.#renderSearch())}
+						<div id="options">${this.#renderOptions()}</div>
 					`,
 				)}
 				<uui-button
@@ -141,6 +191,35 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 					label=${this.localize.term('general_cancel')}
 					@click="${this._rejectModal}"></uui-button>
 			</uui-dialog-layout>
+		`;
+	}
+
+	#renderSearch() {
+		return html`
+			<uui-input
+				id="search"
+				name="element-type-search"
+				label=${this.localize.term('general_search')}
+				placeholder=${this.localize.term('placeholders_search')}
+				.value=${this._search}
+				@input=${this.#onSearch}
+				@keydown=${this.#onSearchKeydown}
+				${umbFocus()}>
+				<uui-icon name="icon-search" slot="prepend"></uui-icon>
+			</uui-input>
+		`;
+	}
+
+	#renderOptions() {
+		const createOptions = this.#getFilteredCreateOptions();
+		const elementTypes = this.#getFilteredElementTypes();
+		if (createOptions.length === 0 && elementTypes.length === 0) {
+			return html`<p id="no-results">${this.localize.term('general_noResultsFor', this._search.trim())}</p>`;
+		}
+		return html`
+			<uui-ref-list>
+				${this.#renderCreateOptionActions(createOptions)}${this.#renderAllowedElementTypes(elementTypes)}
+			</uui-ref-list>
 		`;
 	}
 
@@ -154,13 +233,13 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	#renderAllowedElementTypes() {
+	#renderAllowedElementTypes(elementTypes: Array<UmbAllowedElementTypeModel>) {
 		return repeat(
-			this._allowedElementTypes,
+			elementTypes,
 			(elementType) => elementType.unique,
 			(elementType) => html`
 				<uui-ref-node-document-type
-					.name=${this.localize.string(elementType.name) + '...'}
+					.name=${this.localize.string(elementType.name)}
 					.alias=${this.localize.string(elementType.description ?? '')}
 					select-only
 					selectable
@@ -171,20 +250,22 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	#renderCreateOptionActions() {
+	#renderCreateOptionActions(
+		createOptions: Array<{
+			controller: UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>;
+			href?: string;
+		}>,
+	) {
 		return repeat(
-			this._createOptionControllers,
-			(controller) => controller.manifest?.alias,
-			(controller, index) => {
+			createOptions,
+			({ controller }) => controller.manifest?.alias,
+			({ controller, href }) => {
 				const manifest = controller.manifest;
 				if (!manifest) return nothing;
 
-				const label = manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
-				const href = this._hrefList[index];
-
 				return html`
 					<uui-ref-node-document-type
-						.name=${manifest.meta.additionalOptions ? label + '...' : label}
+						.name=${this.#getCreateOptionLabel(manifest)}
 						select-only
 						selectable
 						@selected=${() => this.#onCreateOptionSelect(controller, href)}>
@@ -197,7 +278,42 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 
 	static override styles = css`
 		:host {
-			max-width: 800px;
+			display: block;
+			/* A fixed width, so the dialog doesn't narrow as the search filters out the longer descriptions. */
+			width: 800px;
+			max-width: 100%;
+		}
+
+		/* Cap the dialog at 80% of the window and scroll only the options. Otherwise the modal's <dialog> scrolls
+		   itself and its scrollbar squares off the rounded corners. The layout's slots are display: contents, so
+		   the search, the options and the actions are its flex items. */
+		uui-dialog-layout {
+			display: flex;
+			flex-direction: column;
+			box-sizing: border-box;
+			max-height: 80vh;
+		}
+
+		#search {
+			flex: none;
+			width: 100%;
+			margin-bottom: var(--uui-size-space-4);
+		}
+
+		/* Each option's selection border sits 2px outside it. The padding keeps it inside the scroll box, so a short
+		   list doesn't scroll and the focus ring isn't clipped; the negative margin keeps the options aligned. */
+		#options {
+			flex: 1 1 auto;
+			min-height: 0;
+			padding: 2px;
+			margin: 0 -2px;
+			overflow-x: hidden;
+			overflow-y: auto;
+		}
+
+		#no-results {
+			margin: var(--uui-size-space-4) 0;
+			color: var(--uui-color-text-alt);
 		}
 
 		uui-ref-node-document-type {
