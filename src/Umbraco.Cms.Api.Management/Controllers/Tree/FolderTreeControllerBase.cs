@@ -21,6 +21,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
     where TItem : FolderTreeItemResponseModel, new()
 {
     private readonly Guid _folderObjectTypeId;
+    private readonly Dictionary<int, bool> _isFolderById = [];
     private bool _foldersOnly;
 
     protected abstract UmbracoObjectTypes FolderObjectType { get; }
@@ -83,6 +84,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         Attempt<Guid> getKeyAttempt = EntityService.GetKey(entity.ParentId, ItemObjectType);
         if (getKeyAttempt.Success)
         {
+            _isFolderById[entity.ParentId] = false;
             return getKeyAttempt.Result;
         }
 
@@ -90,6 +92,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         getKeyAttempt = EntityService.GetKey(entity.ParentId, FolderObjectType);
         if (getKeyAttempt.Success)
         {
+            _isFolderById[entity.ParentId] = true;
             return getKeyAttempt.Result;
         }
 
@@ -139,7 +142,24 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
             viewModel.IsFolder = true;
         }
 
+        if (viewModel.Parent is not null)
+        {
+            viewModel.ParentIsFolder = IsFolder(entity.ParentId);
+        }
+
         return viewModel;
+    }
+
+    private bool IsFolder(int id)
+    {
+        if (_isFolderById.TryGetValue(id, out var isFolder))
+        {
+            return isFolder;
+        }
+
+        isFolder = FolderObjectType != UmbracoObjectTypes.Unknown && IdKeyMap.GetKeyForId(id, FolderObjectType).Success;
+        _isFolderById[id] = isFolder;
+        return isFolder;
     }
 
     protected override Task<IEntitySlim[]> GetAncestorEntitiesAsync(Guid descendantKey, bool includeSelf = true)
@@ -165,7 +185,13 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
             ancestors = ancestors.Append(entity);
         }
 
-        return Task.FromResult(ancestors.OrderBy(item => item.Level).ToArray());
+        IEntitySlim[] orderedAncestors = ancestors.OrderBy(item => item.Level).ToArray();
+        foreach (IEntitySlim ancestor in orderedAncestors)
+        {
+            _isFolderById[ancestor.Id] = ancestor.NodeObjectType == _folderObjectTypeId;
+        }
+
+        return Task.FromResult(orderedAncestors);
     }
 
     private IEntitySlim[] GetEntities(Guid? parentKey, int skip, int take, out long totalItems)
@@ -226,6 +252,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
             Attempt<Guid> getKeyAttempt = IdKeyMap.GetKeyForId(entity.ParentId, FolderObjectType);
             if (getKeyAttempt.Success)
             {
+                _isFolderById[entity.ParentId] = true;
                 return getKeyAttempt.Result;
             }
         }
@@ -233,6 +260,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         Attempt<Guid> itemKeyAttempt = IdKeyMap.GetKeyForId(entity.ParentId, ItemObjectType);
         if (itemKeyAttempt.Success)
         {
+            _isFolderById[entity.ParentId] = false;
             return itemKeyAttempt.Result;
         }
 

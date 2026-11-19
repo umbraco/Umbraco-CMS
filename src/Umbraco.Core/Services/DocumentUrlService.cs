@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -1237,21 +1238,6 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
         string cultureOrDefault = GetCultureOrDefault(culture);
 
         Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
-        ILookup<Guid, Domain?> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToLookup(x => x, ancestorKey =>
-        {
-            Attempt<int> idAttempt = _idKeyMap.GetIdForKey(ancestorKey, UmbracoObjectTypes.Document);
-
-            if (idAttempt.Success is false)
-            {
-                return null;
-            }
-
-            IEnumerable<Domain> domains = _domainCacheService.GetAssigned(idAttempt.Result, false);
-
-            // If no culture is specified, we assume invariant and return the first domain.
-            // This is also only used to later to specify the node id in the route, so it does not matter what culture it is.
-            return GetDomainForCultureOrInvariant(domains, culture);
-        });
 
         var urlSegments = new List<string>();
 
@@ -1259,7 +1245,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
 
         foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeysArray)
         {
-            Domain? domain = ancestorOrSelfKeyToDomains[ancestorOrSelfKey].WhereNotNull().FirstOrDefault();
+            Domain? domain = GetDomain(ancestorOrSelfKey, culture);
             if (domain is not null)
             {
                 foundDomain = domain;
@@ -1290,8 +1276,27 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return foundDomain.ContentId + "/" + string.Join("/", urlSegments);
         }
 
-        var isRootFirstItem = GetTopMostRootKey(isDraft, cultureOrDefault) == ancestorsOrSelfKeysArray.Last();
+        // Whether the content is under the topmost root only matters for a single URL segment (see HideTopLevel), so
+        // skip looking the roots up for everything deeper.
+        var isRootFirstItem = _globalSettings.HideTopLevelNodeFromPath
+                              && urlSegments.Count == 1
+                              && GetTopMostRootKey(isDraft, cultureOrDefault) == ancestorsOrSelfKeysArray.Last();
         return GetFullUrl(isRootFirstItem, urlSegments, null, leftToRight);
+    }
+
+    private Domain? GetDomain(Guid documentKey, string? culture)
+    {
+        Attempt<int> idAttempt = _idKeyMap.GetIdForKey(documentKey, UmbracoObjectTypes.Document);
+        if (idAttempt.Success is false)
+        {
+            return null;
+        }
+
+        IEnumerable<Domain> domains = _domainCacheService.GetAssigned(idAttempt.Result, false);
+
+        // If no culture is specified, we assume invariant and return the first domain.
+        // This is also only used to later to specify the node id in the route, so it does not matter what culture it is.
+        return GetDomainForCultureOrInvariant(domains, culture);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1313,35 +1318,30 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
 
     private string GetFullUrl(bool isRootFirstItem, List<string> segments, Domain? foundDomain, bool leftToRight)
     {
-        var urlSegments = new List<string>(segments);
+        ReadOnlySpan<string> urlSegments = CollectionsMarshal.AsSpan(segments);
 
         if (foundDomain is not null)
         {
             return foundDomain.Name.EnsureEndsWith("/") + string.Join('/', urlSegments);
         }
 
-        var hideTopLevel = HideTopLevel(_globalSettings.HideTopLevelNodeFromPath, isRootFirstItem, urlSegments);
+        var hideTopLevel = HideTopLevel(_globalSettings.HideTopLevelNodeFromPath, isRootFirstItem, urlSegments.Length);
         if (leftToRight)
         {
-            return '/' + string.Join('/', urlSegments.Skip(hideTopLevel ? 1 : 0));
+            return '/' + string.Join('/', hideTopLevel ? urlSegments[1..] : urlSegments);
         }
 
-        if (hideTopLevel)
-        {
-            urlSegments.RemoveAt(urlSegments.Count - 1);
-        }
-
-        return '/' + string.Join('/', urlSegments);
+        return '/' + string.Join('/', hideTopLevel ? urlSegments[..^1] : urlSegments);
     }
 
-    private static bool HideTopLevel(bool hideTopLevelNodeFromPath, bool isRootFirstItem, List<string> urlSegments)
+    private static bool HideTopLevel(bool hideTopLevelNodeFromPath, bool isRootFirstItem, int urlSegmentCount)
     {
         if (hideTopLevelNodeFromPath is false)
         {
             return false;
         }
 
-        if (isRootFirstItem is false && urlSegments.Count == 1)
+        if (isRootFirstItem is false && urlSegmentCount == 1)
         {
             return false;
         }
@@ -1353,7 +1353,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     public bool HasAny()
     {
         ThrowIfNotInitialized();
-        return _documentUrlCache.Any();
+        return _documentUrlCache.IsEmpty is false;
     }
 
     private bool TryGetPrimaryUrlSegment(Guid documentKey, string culture, bool isDraft, [NotNullWhen(true)] out string? segment)

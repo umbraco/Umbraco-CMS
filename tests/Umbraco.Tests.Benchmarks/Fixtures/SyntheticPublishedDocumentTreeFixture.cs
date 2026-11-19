@@ -181,7 +181,8 @@ internal sealed class SyntheticPublishedDocumentTreeFixture
             publishStatusMock.Object,
             NullLogger<DocumentCacheService>.Instance,
             new ConvertedPublishedContentCacheFactory(null, NullLogger<ConvertedPublishedContentCacheFactory>.Instance),
-            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())));
+            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())),
+            Mock.Of<IContentCacheDataSerializerFactory>());
 
         _hybridCache = hybridCache;
         _cacheService = cacheService;

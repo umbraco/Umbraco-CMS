@@ -29,7 +29,11 @@ export const umbEmbeddedMedia = Node.create<UmbEmbeddedMediaOptions>({
 	},
 
 	parseHTML() {
-		return [{ tag: '.umb-embed-holder', priority: 100 }];
+		return [
+			{ tag: '.umb-embed-holder', priority: 100 },
+			// Legacy TinyMCE embeds, for upgrading existing content.
+			{ tag: '.embeditem', priority: 100 },
+		];
 	},
 
 	renderHTML({ HTMLAttributes }) {

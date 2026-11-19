@@ -102,6 +102,97 @@ public class ContentSearchServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(_contentByName["Root 3/Child 2"].Key, result.Items.First().Key);
     }
 
+    [Test]
+    public async Task Can_Order_By_Published_With_Culture()
+    {
+        // Ordering by "published" with a culture builds a CASE over the published flag and a 0/1 literal pair,
+        // which must use the provider's boolean literals (providers with a native boolean type, e.g. PostgreSQL,
+        // need both CASE branches to be boolean).
+        // Its own parent and content types, so publishing here doesn't change what the fixture's other tests see.
+        // An invariant child takes the THEN branch (the document's published flag); a culture-variant child takes
+        // the ELSE branch (whether the culture has a published version).
+        var invariantType = new ContentTypeBuilder()
+            .WithAlias("publishedOrderingInvariant")
+            .Build();
+        await ContentTypeService.CreateAsync(invariantType, Constants.Security.SuperUserKey);
+
+        var variantType = new ContentTypeBuilder()
+            .WithAlias("publishedOrderingVariant")
+            .WithContentVariation(ContentVariation.Culture)
+            .Build();
+        await ContentTypeService.CreateAsync(variantType, Constants.Security.SuperUserKey);
+
+        var parentType = new ContentTypeBuilder()
+            .WithAlias("publishedOrderingParent")
+            .Build();
+        parentType.AllowedAsRoot = true;
+        parentType.AllowedContentTypes =
+        [
+            new ContentTypeSort(invariantType.Key, 1, invariantType.Alias),
+            new ContentTypeSort(variantType.Key, 2, variantType.Alias),
+        ];
+        await ContentTypeService.CreateAsync(parentType, Constants.Security.SuperUserKey);
+
+        var parent = new ContentBuilder()
+            .WithContentType(parentType)
+            .WithName("Published ordering")
+            .Build();
+        ContentService.Save(parent);
+
+        try
+        {
+            await AssertPublishedOrderingAsync(parent, invariantType, variantType);
+        }
+        finally
+        {
+            // Removed again so the fixture's other tests (the system root's children among them) see only their own content
+            ContentService.Delete(parent);
+            foreach (var type in new[] { parentType, invariantType, variantType })
+            {
+                await ContentTypeService.DeleteAsync(type.Key, Constants.Security.SuperUserKey);
+            }
+        }
+    }
+
+    private async Task AssertPublishedOrderingAsync(IContent parent, IContentType invariantType, IContentType variantType)
+    {
+        Assert.IsTrue(ContentService.Publish(parent, ["*"]).Success);
+
+        IContent Invariant(string name)
+        {
+            var child = new ContentBuilder().WithContentType(invariantType).WithParent(parent).WithName(name).Build();
+            ContentService.Save(child);
+            return child;
+        }
+
+        IContent Variant(string name)
+        {
+            var child = new ContentBuilder().WithContentType(variantType).WithParent(parent).WithCultureName("en-US", name).Build();
+            ContentService.Save(child);
+            return child;
+        }
+
+        var publishedInvariant = Invariant("Invariant published");
+        Invariant("Invariant draft");
+        var publishedVariant = Variant("Variant published");
+        Variant("Variant draft");
+        Assert.IsTrue(ContentService.Publish(publishedInvariant, ["*"]).Success);
+        Assert.IsTrue(ContentService.Publish(publishedVariant, ["en-US"]).Success);
+
+        var result = await ContentSearchService.SearchChildrenAsync(
+            null,
+            parent.Key,
+            Ordering.By("published", Direction.Descending, culture: "en-US"),
+            0,
+            1000);
+        Assert.AreEqual(4, result.Total);
+
+        // The published invariant and published variant children come first
+        CollectionAssert.AreEquivalent(
+            new[] { publishedInvariant.Key, publishedVariant.Key },
+            result.Items.Take(2).Select(item => item.Key).ToArray());
+    }
+
     [SetUp]
     public async Task SetUpTest()
     {

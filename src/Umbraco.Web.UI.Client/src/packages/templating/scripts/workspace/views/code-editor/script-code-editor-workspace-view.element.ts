@@ -11,6 +11,9 @@ export class UmbScriptCodeEditorWorkspaceViewElement extends UmbLitElement imple
 	@state()
 	private _content?: string | null = '';
 
+	@state()
+	private _isReadOnly = false;
+
 	#context?: typeof UMB_SCRIPT_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -19,6 +22,12 @@ export class UmbScriptCodeEditorWorkspaceViewElement extends UmbLitElement imple
 		this.consumeContext(UMB_SCRIPT_WORKSPACE_CONTEXT, (context) => {
 			this.#context = context;
 			this.observe(this.#context?.content, (content) => (this._content = content));
+
+			this.observe(
+				context?.readOnlyGuard.permitted,
+				(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+				'_observeIsReadOnly',
+			);
 		});
 	}
 
@@ -48,6 +57,7 @@ export class UmbScriptCodeEditorWorkspaceViewElement extends UmbLitElement imple
 				id="content"
 				language="javascript"
 				.code=${this._content ?? ''}
+				?readonly=${this._isReadOnly}
 				@input=${this.#onCodeEditorInput}></umb-code-editor>
 		`;
 	}
