@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -92,7 +93,8 @@ internal sealed class DocumentHybridCacheStaleSetRaceTests : UmbracoIntegrationT
             publishStatus.Object,
             new NullLogger<DocumentCacheService>(),
             new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()),
-            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())));
+            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())),
+            Mock.Of<IContentCacheDataSerializerFactory>());
     }
 
     [Test]
@@ -169,5 +171,63 @@ internal sealed class DocumentHybridCacheStaleSetRaceTests : UmbracoIntegrationT
             Assert.AreEqual(newNode.Key, cachedNode!.Key, "Cached node should be the refreshed node.");
             Assert.AreEqual(NewName, cachedNode!.Data?.Name, "Cached node should hold the refreshed name.");
         });
+    }
+
+    [Test]
+    public async Task Synchronous_Read_Through_Does_Not_Clobber_A_Concurrent_Synchronous_Refresh()
+    {
+        ContentCacheNode oldNode = BuildPublishedNode(OldName, OldTitle);
+        ContentCacheNode newNode = BuildPublishedNode(NewName, NewTitle);
+
+        // The synchronous read-through reads the pre-publish (old) snapshot, then blocks before writing back.
+        using var readReachedDatabase = new ManualResetEventSlim();
+        using var releaseRead = new ManualResetEventSlim();
+        _databaseCacheRepository
+            .Setup(x => x.GetContentSource(Textpage.Key, false))
+            .Returns(() =>
+            {
+                readReachedDatabase.Set();
+                releaseRead.Wait(TimeSpan.FromSeconds(10));
+                return oldNode;
+            });
+
+        // The synchronous refresh after a commit reads the new snapshot.
+        _databaseCacheRepository
+            .Setup(x => x.GetContentSourceForPublishStates(Textpage.Key))
+            .Returns((null, newNode));
+
+        await _hybridCache.RemoveAsync($"{Textpage.Key}");
+
+        // 1. Start the synchronous request; it reads the old snapshot and blocks before the cache write-back.
+        Task<IPublishedContent?> staleRead = Task.Run(() => _documentCacheService.GetByKey(Textpage.Key, false));
+        Assert.That(readReachedDatabase.Wait(TimeSpan.FromSeconds(10)), Is.True, "The read never reached the database.");
+
+        // 2. The synchronous refresh stores the new snapshot (and bumps the generation).
+        _documentCacheService.RefreshMemoryCache(Textpage.Key);
+
+        // 3. Let the blocked request resume and perform its (now stale) write-back.
+        releaseRead.Set();
+        IPublishedContent? staleResult = await staleRead;
+
+        Assert.IsNotNull(staleResult);
+        Assert.AreEqual(OldName, staleResult!.Name, "Name should be served from the stale snapshot.");
+
+        // 4. A fresh synchronous lookup must observe the refreshed content, not the stale snapshot.
+        IPublishedContent? result = _documentCacheService.GetByKey(Textpage.Key, false);
+
+        Assert.IsNotNull(result);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(NewName, result!.Name, "Name was served from the clobbered stale snapshot.");
+            Assert.AreEqual(
+                NewTitle,
+                result.GetProperty("title")?.GetSourceValue(),
+                "Property value was served from the clobbered stale snapshot.");
+        });
+
+        _databaseCacheRepository.Verify(
+            x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()),
+            Times.Never,
+            "The synchronous read must not use the asynchronous repository read.");
     }
 }

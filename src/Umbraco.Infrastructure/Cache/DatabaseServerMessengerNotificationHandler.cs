@@ -80,10 +80,22 @@ public sealed class DatabaseServerMessengerNotificationHandler :
         _messenger?.Sync();
     }
 
-    /// <inheritdoc />
-    [Obsolete("Please use HandleAsync. Scheduled for removal in Umbraco 19.")]
+    /// <summary>
+    /// Handles the end of an Umbraco request: writes the batched distributed cache instructions, then publishes the
+    /// repository cache versions deferred during the request, without leaving the request thread.
+    /// </summary>
+    /// <param name="notification">The notification instance signaling the end of an Umbraco request.</param>
+    /// <remarks>
+    /// This is the registered handler. It is kept synchronous on purpose: the version write takes the
+    /// <see cref="Constants.Locks.CacheVersion"/> lock, and awaiting it would need a second thread-pool thread
+    /// while the first one is blocked on the lock. See <see cref="HandleAsync"/> for the ordering.
+    /// </remarks>
+    // TODO (V20): register HandleAsync instead once locks and notification publishing are asynchronous.
     public void Handle(UmbracoRequestEndNotification notification)
-        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
+    {
+        _messenger?.SendMessages();
+        _repositoryCacheVersionService.FlushCacheUpdates();
+    }
 
     /// <summary>
     /// Handles the end of an Umbraco request: writes the batched distributed cache instructions, then publishes the

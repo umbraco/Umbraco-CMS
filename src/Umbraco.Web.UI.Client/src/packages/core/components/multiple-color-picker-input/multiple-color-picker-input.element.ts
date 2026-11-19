@@ -42,13 +42,13 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 	min?: number;
 
 	/**
-	 * Min validation message.
+	 * Min validation message. When not set, a localized message stating the minimum and how many more items are needed is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field needs more items';
+	minMessage?: string;
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -60,13 +60,13 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 	max?: number;
 
 	/**
-	 * Max validation message.
+	 * Max validation message. When not set, a localized message stating the maximum and how many items are over it is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'max-message' })
-	maxMessage = 'This field exceeds the allowed amount of items';
+	maxMessage?: string;
 
 	/**
 	 * Disables the input
@@ -105,12 +105,16 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 
 		this.addValidator(
 			'rangeUnderflow',
-			() => this.minMessage,
+			() =>
+				this.minMessage ||
+				this.localize.term('validation_entriesShort', this.min, (this.min ?? 0) - this._items.length),
 			() => isAboveZeroAndBelowMinimum(this._items.length, this.min),
 		);
 		this.addValidator(
 			'rangeOverflow',
-			() => this.maxMessage,
+			() =>
+				this.maxMessage ||
+				this.localize.term('validation_entriesExceed', this.max, this._items.length - (this.max ?? 0)),
 			() => !!this.max && this._items.length > this.max,
 		);
 	}
@@ -197,14 +201,15 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 	}
 
 	#renderAddButton() {
-		if (this.disabled || this.readonly) return nothing;
+		if (this.disabled) return nothing;
+		if (this.readonly && this._items.length > 0) return nothing;
 		return html`
 			<uui-button
 				id="action"
 				label=${this.localize.term('general_add')}
 				look="placeholder"
 				color="default"
-				?disabled=${this.disabled}
+				?disabled=${this.readonly}
 				@click=${this.#onAdd}></uui-button>
 		`;
 	}

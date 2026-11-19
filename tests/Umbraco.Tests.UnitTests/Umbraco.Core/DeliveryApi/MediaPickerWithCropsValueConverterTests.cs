@@ -344,6 +344,58 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         }
     }
 
+    [Test]
+    public void MediaPickerWithCropsValueConverter_InMultiMode_ReadsTheMediaInOneBatch()
+    {
+        var publishedPropertyType = SetupMediaPropertyType(true);
+        var firstMediaKey = SetupMedia("First media", ".jpg", 200, 400, "First alt text", 800);
+        var secondMediaKey = SetupMedia("Second media", ".png", 300, 600, "Second alt text", 900);
+
+        var valueConverter = MediaPickerWithCropsValueConverter();
+        var inter = SerializeMediaWithCropsDtos(firstMediaKey, secondMediaKey);
+
+        var result = valueConverter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<MediaWithCrops>;
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, result?.Count());
+            PublishedMediaCacheMock.Verify(c => c.GetByIds(It.Is<IReadOnlyCollection<Guid>>(k => k.SequenceEqual(new[] { firstMediaKey, secondMediaKey }))), Times.Once);
+        });
+    }
+
+    [Test]
+    public void MediaPickerWithCropsValueConverter_InMultiMode_ConvertsTheSameMediaPickedTwiceToTwoItemsFromOneRead()
+    {
+        var publishedPropertyType = SetupMediaPropertyType(true);
+        var mediaKey = SetupMedia("My media", ".jpg", 200, 400, "My alt text", 800);
+
+        var valueConverter = MediaPickerWithCropsValueConverter();
+        var inter = SerializeMediaWithCropsDtos(mediaKey, mediaKey);
+
+        var result = valueConverter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<MediaWithCrops>;
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, result?.Count());
+            PublishedMediaCacheMock.Verify(c => c.GetByIds(It.Is<IReadOnlyCollection<Guid>>(k => k.SequenceEqual(new[] { mediaKey }))), Times.Once);
+        });
+    }
+
+    [Test]
+    public void MediaPickerWithCropsValueConverter_InMultiMode_ConvertsMediaInTheOrderOfTheValueAndSkipsMissingOnes()
+    {
+        var publishedPropertyType = SetupMediaPropertyType(true);
+        var firstMediaKey = SetupMedia("First media", ".jpg", 200, 400, "First alt text", 800);
+        var thirdMediaKey = SetupMedia("Third media", ".png", 300, 600, "Third alt text", 900);
+
+        var valueConverter = MediaPickerWithCropsValueConverter();
+        var inter = SerializeMediaWithCropsDtos(firstMediaKey, Guid.NewGuid(), thirdMediaKey);
+
+        var result = valueConverter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<MediaWithCrops>;
+
+        Assert.That(result?.Select(x => x.Content.Name), Is.EqualTo(new[] { "First media", "Third media" }));
+    }
+
     private string SerializeMediaWithCropsDtos(params Guid[] mediaKeys)
     {
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());

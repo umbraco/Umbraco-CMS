@@ -57,6 +57,44 @@ public interface IDocumentCacheService
     }
 
     /// <summary>
+    /// Gets a published content item by its unique key, for synchronous callers.
+    /// </summary>
+    /// <param name="key">The unique key of the content.</param>
+    /// <param name="preview">Optional value indicating whether to include unpublished content. If <c>null</c>, uses the default preview setting.</param>
+    /// <returns>The published content, or <c>null</c> if not found.</returns>
+    /// <remarks>
+    /// Implementations should avoid blocking on <see cref="GetByKeyAsync"/>, and read synchronously from the
+    /// backing stores that support it: a caller blocked on asynchronous work needs a second thread to complete it.
+    /// A store with no synchronous read, for example a distributed cache, may still have to be waited on.
+    /// The default implementation blocks on <see cref="GetByKeyAsync"/>.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation and reference to it in the remarks.
+    IPublishedContent? GetByKey(Guid key, bool? preview = null)
+        => GetByKeyAsync(key, preview).GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Gets a published content item by its integer identifier, for synchronous callers.
+    /// </summary>
+    /// <param name="id">The integer identifier of the content.</param>
+    /// <param name="preview">Optional value indicating whether to include unpublished content. If <c>null</c>, uses the default preview setting.</param>
+    /// <returns>The published content, or <c>null</c> if not found.</returns>
+    /// <remarks>See <see cref="GetByKey"/>. The default implementation blocks on <see cref="GetByIdAsync"/>.</remarks>
+    // TODO (V20): Remove the default implementation and reference to it in the remarks.
+    IPublishedContent? GetById(int id, bool? preview = null)
+        => GetByIdAsync(id, preview).GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Gets multiple published content items by their unique keys, for synchronous callers.
+    /// </summary>
+    /// <param name="keys">The unique keys of the content to retrieve.</param>
+    /// <param name="preview">Optional value indicating whether to include unpublished content. If <c>null</c>, uses the default preview setting.</param>
+    /// <returns>The published content items that exist, in the same order as <paramref name="keys"/> (missing items omitted).</returns>
+    /// <remarks>See <see cref="GetByKey"/>. The default implementation blocks on <see cref="GetByKeysAsync"/>.</remarks>
+    // TODO (V20): Remove the default implementation and reference to it in the remarks.
+    IReadOnlyList<IPublishedContent> GetByKeys(IReadOnlyCollection<Guid> keys, bool? preview = null)
+        => GetByKeysAsync(keys, preview).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Attempts to retrieve a content item from the in-memory converted-content cache without
     /// touching the distributed cache or the database.
     /// </summary>
@@ -100,6 +138,20 @@ public interface IDocumentCacheService
     Task RefreshContentAsync(IContent content);
 
     /// <summary>
+    /// Refreshes the cache for the specified content item without leaving the calling thread.
+    /// </summary>
+    /// <param name="content">The content item to refresh.</param>
+    /// <remarks>
+    /// Runs inside the transaction that persists the content, under the content tree lock. Until the lock wait and
+    /// the notification pipeline are asynchronous, awaiting there needs a second thread-pool thread while the first
+    /// is blocked, which under load stretches the time the lock is held. Implementations should avoid awaiting here
+    /// wherever their backing store allows it.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void RefreshContent(IContent content)
+        => RefreshContentAsync(content).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Removes the specified content item from the cache.
     /// </summary>
     /// <param name="content">The content item to remove from the cache.</param>
@@ -134,10 +186,26 @@ public interface IDocumentCacheService
     Task RefreshMemoryCacheAsync(Guid key);
 
     /// <summary>
+    /// Refreshes the in-memory cache for the specified key without leaving the calling thread.
+    /// </summary>
+    /// <param name="key">The key of the content item.</param>
+    /// <remarks>
+    /// Runs on the saving thread after the commit, under a content tree read lock; see <see cref="RefreshContent"/>
+    /// for why it is synchronous.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void RefreshMemoryCache(Guid key)
+        => RefreshMemoryCacheAsync(key).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Removes the content item with the specified key from the memory cache.
     /// </summary>
     /// <param name="key">The unique key of the content to remove.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
+    /// <remarks>
+    /// Called after the change is committed, outside the content tree lock, so an implementation can order the
+    /// removal after a refresh of the same item that is still completing.
+    /// </remarks>
     Task RemoveFromMemoryCacheAsync(Guid key);
 
     /// <summary>

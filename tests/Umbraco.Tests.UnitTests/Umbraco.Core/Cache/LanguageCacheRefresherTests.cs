@@ -20,12 +20,27 @@ public class LanguageCacheRefresherTests
 {
     private Mock<IDomainCacheService> _domainCacheService = null!;
     private Mock<IPublishStatusManagementService> _publishStatusManagementService = null!;
+    private Mock<IDefaultCultureAccessor> _defaultCultureAccessor = null!;
 
     [SetUp]
     public void SetUp()
     {
         _domainCacheService = new Mock<IDomainCacheService>();
         _publishStatusManagementService = new Mock<IPublishStatusManagementService>();
+        _defaultCultureAccessor = new Mock<IDefaultCultureAccessor>();
+    }
+
+    [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.Add)]
+    [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.Remove)]
+    [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.Update)]
+    [TestCase(LanguageCacheRefresher.JsonPayload.LanguageChangeType.ChangeCulture)]
+    public void RefreshInternal_Clears_The_Default_Culture(LanguageCacheRefresher.JsonPayload.LanguageChangeType changeType)
+    {
+        LanguageCacheRefresher refresher = CreateRefresher();
+
+        refresher.RefreshInternal([Payload(changeType)]);
+
+        _defaultCultureAccessor.Verify(x => x.ClearCache(), Times.Once);
     }
 
     [Test]
@@ -128,6 +143,7 @@ public class LanguageCacheRefresherTests
             Mock.Of<IEventAggregator>(),
             _domainCacheService.Object,
             notificationFactory.Object,
-            _publishStatusManagementService.Object);
+            _publishStatusManagementService.Object,
+            _defaultCultureAccessor.Object);
     }
 }

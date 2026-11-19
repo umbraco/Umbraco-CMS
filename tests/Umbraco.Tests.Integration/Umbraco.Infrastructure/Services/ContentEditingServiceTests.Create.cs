@@ -382,6 +382,78 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
+    public async Task Cannot_Create_With_Element_Type_At_Root()
+    {
+        var contentType = ContentTypeBuilder.CreateBasicContentType();
+        contentType.AllowedAsRoot = true;
+        contentType.IsElement = true;
+        ContentTypeService.Save(contentType);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Name = "Test Create" }
+            ],
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
+    }
+
+    [Test]
+    public async Task Cannot_Create_With_Element_Type_As_Child()
+    {
+        var rootContentType = ContentTypeBuilder.CreateBasicContentType("root", "Root");
+        rootContentType.AllowedAsRoot = true;
+        ContentTypeService.Save(rootContentType);
+
+        var elementType = ContentTypeBuilder.CreateBasicContentType("element", "Element");
+        elementType.IsElement = true;
+        ContentTypeService.Save(elementType);
+
+        rootContentType.AllowedContentTypes = new[]
+        {
+            new ContentTypeSort(elementType.Key, 1, elementType.Alias)
+        };
+        ContentTypeService.Save(rootContentType);
+
+        var rootKey = (await ContentEditingService.CreateAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = rootContentType.Key,
+                ParentKey = Constants.System.RootKey,
+                Variants =
+                [
+                    new () { Name = "Root" }
+                ]
+            },
+            Constants.Security.SuperUserKey)).Result.Content!.Key;
+
+        var result = await ContentEditingService.CreateAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = elementType.Key,
+                ParentKey = rootKey,
+                Variants =
+                [
+                    new () { Name = "Child" }
+                ]
+            },
+            Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
+    }
+
+    [Test]
     public async Task Cannot_Create_Without_Content_Type()
     {
         var createModel = new ContentCreateModel
@@ -508,6 +580,116 @@ public partial class ContentEditingServiceTests
         Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status);
         Assert.IsNotNull(result.Result);
         Assert.IsNull(result.Result.Content);
+    }
+
+    [TestCase(ContentVariation.Culture, ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch)]
+    [TestCase(ContentVariation.Segment, ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch)]
+    [TestCase(ContentVariation.CultureAndSegment, ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch)]
+    public async Task Cannot_Create_Variant_Content_Without_Name(ContentVariation variation, ContentEditingOperationStatus expectedStatus)
+    {
+        var contentType = await CreateVariantContentType(variation, variantTitleAsMandatory: false);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" }
+            ]
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(expectedStatus, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
+    }
+
+    [TestCase("")]
+    [TestCase(" ")]
+    public async Task Cannot_Create_Invariant_Content_With_Blank_Name(string name)
+    {
+        var contentType = ContentTypeBuilder.CreateContentMetaContentType();
+        contentType.AllowedTemplates = null;
+        contentType.AllowedAsRoot = true;
+        ContentTypeService.Save(contentType);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Name = name }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" }
+            ]
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
+    }
+
+    [TestCase("")]
+    [TestCase(" ")]
+    public async Task Cannot_Create_Culture_Variant_Content_With_Only_Blank_Names(string name)
+    {
+        var contentType = await CreateVariantContentType(variantTitleAsMandatory: false);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = name },
+                new VariantModel { Culture = "da-DK", Name = name }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" }
+            ]
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
+    }
+
+    [Test]
+    public async Task Can_Create_Culture_Variant_Content_With_A_Blank_Name_In_Some_Cultures()
+    {
+        var contentType = await CreateVariantContentType(variantTitleAsMandatory: false);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "The English Name" },
+                new VariantModel { Culture = "da-DK", Name = string.Empty }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" }
+            ]
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.IsNotNull(result.Result.Content);
+        Assert.AreEqual("The English Name", result.Result.Content!.GetCultureName("en-US"));
+        Assert.IsNull(result.Result.Content.GetCultureName("da-DK"));
     }
 
     [Test]

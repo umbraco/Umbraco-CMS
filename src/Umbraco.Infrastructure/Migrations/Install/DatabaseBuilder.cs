@@ -460,7 +460,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 var upgrader = new Upgrader(plan);
                 ExecutedMigrationPlan result = await upgrader.ExecuteAsync(_migrationPlanExecutor, _scopeProvider, _keyValueService).ConfigureAwait(false);
 
-                _aggregator.Publish(new UmbracoPlanExecutedNotification { ExecutedPlan = result });
+                await _aggregator.PublishAsync(new UmbracoPlanExecutedNotification { ExecutedPlan = result });
 
                 // The migration may have failed, it this is the case, we throw the exception now that we've taken care of business.
                 if (result.Successful is false && result.Exception is not null)
