@@ -852,6 +852,8 @@ export default {
 		publishAll: 'Publicar %0% y todas sus subpáginas',
 		publishHelp:
 			'Pulsa en <em>aceptar</em> para publicar <strong>%0%</strong> y por lo tanto, hacer que tu contenido esté disponible al público.<br/><br /> Puedes publicar esta página y todas sus subpáginas marcando <em>publicar todos los hijos</em> debajo. ',
+		publishedNotificationTitle: 'Publicado',
+		publishedNotificationDescription: '%0% ya está disponible públicamente',
 	},
 	colorpicker: {
 		noColors: 'No has configurado ningún color',
@@ -962,6 +964,7 @@ export default {
 		dictionaryItemSaved: 'Elemento del diccionario guardado',
 		editContentPublishedFailedByParent: 'La publicación ha fallado porque la página padre no está publicada',
 		editContentPublishedHeader: 'Contenido publicado',
+		editElementPublishedHeader: 'Elemento publicado',
 		editContentPublishedText: 'y visible en el sitio web',
 		editContentSavedHeader: 'Contenido guardado',
 		editContentSavedText: 'Recuerda publicar para hacer los cambios visibles',
