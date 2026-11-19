@@ -220,17 +220,17 @@ public class BackOfficeUserStore :
     }
 
     /// <inheritdoc />
-    public Task<UserOperationStatus> SaveAsync(IUser user)
+    public async Task<UserOperationStatus> SaveAsync(IUser user)
     {
         EventMessages eventMessages = _eventMessagesFactory.Get();
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         var savingNotification = new UserSavingNotification(user, eventMessages);
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             scope.Complete();
-            return Task.FromResult(UserOperationStatus.CancelledByNotification);
+            return UserOperationStatus.CancelledByNotification;
         }
 
         if (string.IsNullOrWhiteSpace(user.Username))
@@ -267,7 +267,7 @@ public class BackOfficeUserStore :
             scope.Complete();
         }
 
-        return Task.FromResult(UserOperationStatus.Success);
+        return UserOperationStatus.Success;
     }
 
     /// <inheritdoc />
