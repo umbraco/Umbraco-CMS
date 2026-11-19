@@ -1,7 +1,9 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
@@ -9,6 +11,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
@@ -30,10 +33,53 @@ public class PublishedRouter : IPublishedRouter
     private readonly IProfilingLogger _profilingLogger;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IPublishedValueFallback _publishedValueFallback;
+    private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IIdKeyMap _idKeyMap;
+    private readonly IPreviewService _previewService;
     private readonly IRequestAccessor _requestAccessor;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private WebRoutingSettings _webRoutingSettings;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PublishedRouter" /> class.
+    /// </summary>
+    [Obsolete("Use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public PublishedRouter(
+        IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
+        ContentFinderCollection contentFinders,
+        IContentLastChanceFinder contentLastChanceFinder,
+        IVariationContextAccessor variationContextAccessor,
+        IProfilingLogger proflog,
+        ILogger<PublishedRouter> logger,
+        IPublishedUrlProvider publishedUrlProvider,
+        IRequestAccessor requestAccessor,
+        IPublishedValueFallback publishedValueFallback,
+        IFileService fileService,
+        IContentTypeService contentTypeService,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IEventAggregator eventAggregator,
+        IDomainCache domainCache)
+        : this(
+            webRoutingSettings,
+            contentFinders,
+            contentLastChanceFinder,
+            variationContextAccessor,
+            proflog,
+            logger,
+            publishedUrlProvider,
+            requestAccessor,
+            publishedValueFallback,
+            fileService,
+            contentTypeService,
+            umbracoContextAccessor,
+            eventAggregator,
+            domainCache,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            StaticServiceProvider.Instance.GetRequiredService<IPreviewService>())
+    {
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedRouter" /> class.
@@ -52,7 +98,10 @@ public class PublishedRouter : IPublishedRouter
         IContentTypeService contentTypeService,
         IUmbracoContextAccessor umbracoContextAccessor,
         IEventAggregator eventAggregator,
-        IDomainCache domainCache)
+        IDomainCache domainCache,
+        IPublishStatusQueryService publishStatusQueryService,
+        IIdKeyMap idKeyMap,
+        IPreviewService previewService)
     {
         _webRoutingSettings = webRoutingSettings.CurrentValue ??
                               throw new ArgumentNullException(nameof(webRoutingSettings));
@@ -71,6 +120,9 @@ public class PublishedRouter : IPublishedRouter
         _umbracoContextAccessor = umbracoContextAccessor;
         _eventAggregator = eventAggregator;
         _domainCache = domainCache;
+        _publishStatusQueryService = publishStatusQueryService;
+        _idKeyMap = idKeyMap;
+        _previewService = previewService;
         webRoutingSettings.OnChange(x => _webRoutingSettings = x);
     }
 
@@ -311,23 +363,31 @@ public class PublishedRouter : IPublishedRouter
         // not apply
         bool IsPublishedContentDomain(Domain domain)
         {
-            // just get it from content cache - optimize there, not here
-            IPublishedContent? domainDocument = umbracoContext.Content?.GetById(domain.ContentId);
+            // Previewing resolves the document from the draft cache, which the publish status doesn't cover. The
+            // decision is taken from the preview service, as the content cache does, so both agree on what is a preview.
+            if (_previewService.IsInPreview())
+            {
+                return IsPublishedContentDomainInPreview(umbracoContext, domain);
+            }
 
-            // not published - at all
-            if (domainDocument == null)
+            // The publish status is held in memory, so this is answered without reading content from the cache,
+            // which would block the request thread whenever the cache has to read through.
+            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(domain.ContentId, UmbracoObjectTypes.Document);
+            if (keyAttempt.Success is false)
             {
                 return false;
             }
 
-            // invariant - always published
-            if (!domainDocument.ContentType.VariesByCulture())
+            Guid key = keyAttempt.Result;
+            if (_publishStatusQueryService.HasPublishedAncestorPath(key) is false)
             {
-                return true;
+                return false;
             }
 
-            // variant, ensure that the culture corresponding to the domain's language is published
-            return domain.Culture is not null && domainDocument.Cultures.ContainsKey(domain.Culture);
+            // Invariant documents report as published in every culture, variant documents per culture.
+            return domain.Culture is null
+                ? _publishStatusQueryService.IsDocumentPublishedInAnyCulture(key)
+                : _publishStatusQueryService.IsDocumentPublished(key, domain.Culture);
         }
 
         domains = domains?.Where(IsPublishedContentDomain).ToList();
@@ -335,6 +395,23 @@ public class PublishedRouter : IPublishedRouter
         defaultCulture = domainsCache?.DefaultCulture;
 
         return DomainUtilities.SelectDomain(domains, uri, defaultCulture: defaultCulture);
+    }
+
+    private static bool IsPublishedContentDomainInPreview(IUmbracoContext umbracoContext, Domain domain)
+    {
+        IPublishedContent? domainDocument = umbracoContext.Content?.GetById(domain.ContentId);
+
+        if (domainDocument == null)
+        {
+            return false;
+        }
+
+        if (!domainDocument.ContentType.VariesByCulture())
+        {
+            return true;
+        }
+
+        return domain.Culture is not null && domainDocument.Cultures.ContainsKey(domain.Culture);
     }
 
     /// <summary>
