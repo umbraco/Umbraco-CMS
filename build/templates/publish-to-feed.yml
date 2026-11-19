@@ -59,7 +59,7 @@ parameters:
         blobPrefix: ui
 
 jobs:
-  - ${{ if and(ne(parameters.runTag, ''), or(parameters.publishNuGet, parameters.publishBackofficeToNpm, parameters.publishTestHelpersToNpm, parameters.uploadDocs)) }}:
+  - ${{ if ne(parameters.runTag, '') }}:
       - job: TagRun
         displayName: Tag run ${{ parameters.runTag }}
         pool:
@@ -69,67 +69,67 @@ jobs:
           - script: echo "##vso[build.addbuildtag]${{ parameters.runTag }}"
             displayName: Tag the run
 
-  - ${{ if parameters.publishNuGet }}:
-      - deployment: PushNuGet
-        displayName: Push NuGet packages to ${{ parameters.nuGetTarget }}
-        environment: ${{ parameters.environment }}
-        pool:
-          vmImage: "windows-latest" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so we'll use windows until an alternative is available.
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - download: none
-                - download: ${{ parameters.pipeline }}
-                  artifact: nupkg
-                  displayName: Download nupkg
-                - task: NuGetCommand@2
-                  displayName: Push packages
-                  inputs:
-                    command: "push"
-                    packagesToPush: $(Pipeline.Workspace)/${{ parameters.pipeline }}/nupkg/**/*.nupkg
-                    nuGetFeedType: "external"
-                    publishFeedCredentials: ${{ parameters.nuGetConnection }}
+  - deployment: PushNuGet
+    displayName: Push NuGet packages to ${{ parameters.nuGetTarget }}
+    condition: eq('${{ parameters.publishNuGet }}', 'True')
+    environment: ${{ parameters.environment }}
+    pool:
+      vmImage: "windows-latest" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so we'll use windows until an alternative is available.
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: none
+            - download: ${{ parameters.pipeline }}
+              artifact: nupkg
+              displayName: Download nupkg
+            - task: NuGetCommand@2
+              displayName: Push packages
+              inputs:
+                command: "push"
+                packagesToPush: $(Pipeline.Workspace)/${{ parameters.pipeline }}/nupkg/**/*.nupkg
+                nuGetFeedType: "external"
+                publishFeedCredentials: ${{ parameters.nuGetConnection }}
 
-  - ${{ if parameters.publishBackofficeToNpm }}:
-      - deployment: PushBackofficeToNpm
-        displayName: Push Backoffice to ${{ parameters.npmTarget }}
-        environment: ${{ parameters.environment }}
-        pool:
-          vmImage: "ubuntu-latest"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - download: none
-                - template: npm-publish.yml
-                  parameters:
-                    pipeline: ${{ parameters.pipeline }}
-                    artifactName: npm
-                    registry: ${{ parameters.npmRegistry }}
-                    customEndpoint: ${{ parameters.npmEndpoint }}
-                    displayName: Push package
-                    npmTag: ${{ parameters.npmDistTag }}
+  - deployment: PushBackofficeToNpm
+    displayName: Push Backoffice to ${{ parameters.npmTarget }}
+    condition: eq('${{ parameters.publishBackofficeToNpm }}', 'True')
+    environment: ${{ parameters.environment }}
+    pool:
+      vmImage: "ubuntu-latest"
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: none
+            - template: npm-publish.yml
+              parameters:
+                pipeline: ${{ parameters.pipeline }}
+                artifactName: npm
+                registry: ${{ parameters.npmRegistry }}
+                customEndpoint: ${{ parameters.npmEndpoint }}
+                displayName: Push package
+                npmTag: ${{ parameters.npmDistTag }}
 
-  - ${{ if parameters.publishTestHelpersToNpm }}:
-      - deployment: PushTestHelpersToNpm
-        displayName: Push Test Helpers to ${{ parameters.npmTarget }}
-        environment: ${{ parameters.environment }}
-        pool:
-          vmImage: "ubuntu-latest"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - download: none
-                - template: npm-publish.yml
-                  parameters:
-                    pipeline: ${{ parameters.pipeline }}
-                    artifactName: npm-testhelpers
-                    registry: ${{ parameters.npmRegistry }}
-                    customEndpoint: ${{ parameters.npmEndpoint }}
-                    displayName: Push package
-                    npmTag: ${{ parameters.npmDistTag }}
+  - deployment: PushTestHelpersToNpm
+    displayName: Push Test Helpers to ${{ parameters.npmTarget }}
+    condition: eq('${{ parameters.publishTestHelpersToNpm }}', 'True')
+    environment: ${{ parameters.environment }}
+    pool:
+      vmImage: "ubuntu-latest"
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: none
+            - template: npm-publish.yml
+              parameters:
+                pipeline: ${{ parameters.pipeline }}
+                artifactName: npm-testhelpers
+                registry: ${{ parameters.npmRegistry }}
+                customEndpoint: ${{ parameters.npmEndpoint }}
+                displayName: Push package
+                npmTag: ${{ parameters.npmDistTag }}
 
   - ${{ if parameters.uploadDocs }}:
       - ${{ each doc in parameters.docs }}:

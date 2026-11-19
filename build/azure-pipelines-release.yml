@@ -120,32 +120,31 @@ stages:
           npmRegistry: https://www.myget.org/F/umbracoprereleases/npm/
           npmEndpoint: "MyGet (npm) - Umbracoprereleases"
 
-  - ${{ if or(not(parameters.skipNuGetPush), not(parameters.skipBackofficeNpmPush), not(parameters.skipTestHelpersNpmPush), not(parameters.skipApiDocsUpload)) }}:
-      - stage: Publish_Public
-        displayName: Public feed
-        dependsOn: Resolve_Release
-        condition: and(in(dependencies.Resolve_Release.result, 'Succeeded', 'SucceededWithIssues'), eq(dependencies.Resolve_Release.outputs['Resolve.resolve.kind'], 'public'))
-        variables:
-          # `latest` for stable releases, `next` for prereleases.
-          npmDistTag: $[ stageDependencies.Resolve_Release.Resolve.outputs['resolve.npmDistTag'] ]
-          umbracoMajorVersion: $[ stageDependencies.Resolve_Release.Resolve.outputs['resolve.versionMajor'] ]
-        jobs:
-          - template: templates/publish-to-feed.yml
-            parameters:
-              pipeline: build
-              environment: Public Feed
-              runTag: release-public
-              publishNuGet: ${{ not(parameters.skipNuGetPush) }}
-              nuGetTarget: NuGet
-              nuGetConnection: "NuGet - Umbraco.*"
-              publishBackofficeToNpm: ${{ not(parameters.skipBackofficeNpmPush) }}
-              publishTestHelpersToNpm: ${{ not(parameters.skipTestHelpersNpmPush) }}
-              npmTarget: npm
-              npmRegistry: https://registry.npmjs.org/
-              npmEndpoint: "NPM - Umbraco Backoffice"
-              npmDistTag: $(npmDistTag)
-              uploadDocs: ${{ not(parameters.skipApiDocsUpload) }}
-              umbracoMajorVersion: $(umbracoMajorVersion)
+  - stage: Publish_Public
+    displayName: Public feed
+    dependsOn: Resolve_Release
+    condition: and(in(dependencies.Resolve_Release.result, 'Succeeded', 'SucceededWithIssues'), eq(dependencies.Resolve_Release.outputs['Resolve.resolve.kind'], 'public'), or(${{ not(parameters.skipNuGetPush) }}, ${{ not(parameters.skipBackofficeNpmPush) }}, ${{ not(parameters.skipTestHelpersNpmPush) }}, ${{ not(parameters.skipApiDocsUpload) }}))
+    variables:
+      # `latest` for stable releases, `next` for prereleases.
+      npmDistTag: $[ stageDependencies.Resolve_Release.Resolve.outputs['resolve.npmDistTag'] ]
+      umbracoMajorVersion: $[ stageDependencies.Resolve_Release.Resolve.outputs['resolve.versionMajor'] ]
+    jobs:
+      - template: templates/publish-to-feed.yml
+        parameters:
+          pipeline: build
+          environment: Public Feed
+          runTag: release-public
+          publishNuGet: ${{ not(parameters.skipNuGetPush) }}
+          nuGetTarget: NuGet
+          nuGetConnection: "NuGet - Umbraco.*"
+          publishBackofficeToNpm: ${{ not(parameters.skipBackofficeNpmPush) }}
+          publishTestHelpersToNpm: ${{ not(parameters.skipTestHelpersNpmPush) }}
+          npmTarget: npm
+          npmRegistry: https://registry.npmjs.org/
+          npmEndpoint: "NPM - Umbraco Backoffice"
+          npmDistTag: $(npmDistTag)
+          uploadDocs: ${{ not(parameters.skipApiDocsUpload) }}
+          umbracoMajorVersion: $(umbracoMajorVersion)
 
   - stage: Upload_Dependency_Track
     displayName: Dependency Track
