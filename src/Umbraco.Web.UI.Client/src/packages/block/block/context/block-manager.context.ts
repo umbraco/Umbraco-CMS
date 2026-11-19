@@ -651,14 +651,29 @@ export abstract class UmbBlockManagerContext<
 	setOneLayout(layoutData: BlockLayoutType, _originData?: BlockOriginDataType) {
 		this._layouts.appendOne(layoutData);
 	}
+	#isExternalContentKey(contentKey: string) {
+		return this._collectExternalContentKeys(this._layouts.getValue()).includes(contentKey);
+	}
+
+	/**
+	 * Set the content of a block. Ignored for external content, which belongs to the element it references and is not stored in the block value.
+	 * @param {UmbBlockDataModel} contentData The content to set.
+	 */
 	setOneContent(contentData: UmbBlockDataModel) {
+		if (this.#isExternalContentKey(contentData.key)) return;
 		this.#contents.appendOne(contentData);
 	}
 	setOneSettings(settingsData: UmbBlockDataModel) {
 		this.#settings.appendOne(settingsData);
 	}
+
+	/**
+	 * Mark the content of a block as exposed for a variant. Ignored for external content, which does not keep an exposed state.
+	 * @param {string} contentKey The key of the content.
+	 * @param {UmbVariantId} variantId The variant to expose it for.
+	 */
 	setOneExpose(contentKey: string, variantId: UmbVariantId) {
-		if (!variantId) return;
+		if (!variantId || this.#isExternalContentKey(contentKey)) return;
 		this.#exposes.appendOne({ contentKey, ...variantId.toObject() });
 	}
 
