@@ -24,3 +24,10 @@ Seen 2026-10-12 merging v19/dev commit 043b6858906 (invariant-for-variant user-g
 - `[GeneratedRegex]` upstream makes `ContentTypeEditingServiceBase` `partial`; the `Async*` fork must be `partial` too (CS0260). Rename detection merged upstream's edits into the fork automatically this time.
 - Sync-API usages in new upstream files (`NewDefaultUrlProvider`, `BatchElementsController`, `ElementIndexingNotificationHandler`, the element paths in `DraftContentChangeStrategy`/`ContentTypeIndexingService`) only show up as compile errors; the test projects then needed ~200 call sites ported (delegated to one agent with the API table; unit 7881 green, 588 touched integration tests green).
 - Upstream's NPoco `WebhookRepository` now deletes queued requests first; the EF Core model has no request DTO, so the EF Core repository issues a raw `DELETE` for that table.
+
+Update 18-11-2026 (element campaign PR 6, not merged yet when written): the sync `PublishableContentServiceBase`, NPoco
+`PublishableContentRepositoryBase` and sync `IPublishableContentRepository` are deleted and the async base tier is renamed ONTO those
+names (user decision). Upstream `v19/dev` still has the sync files under the same paths/names, so a merge-up no longer raises a
+modify/delete conflict there: git tries to merge sync hunks straight into the async files. Walk every hunk a merge lands in
+`src/Umbraco.Core/Services/PublishableContentServiceBase.cs` and `IPublishableContentRepository.cs` by hand; a clean auto-merge there is
+suspect, not reassuring. (The EF Core repository base lives in `Implement/EFCore/`, a different path from upstream's NPoco one.)

@@ -144,3 +144,14 @@ Update 18-11-2026: PR 5 merged as `0b5b4c28bbe` (#24653). Its human review added
 other service bases keep the old names. PR 0 (#24657) is ready for review; TODOs on `EntityRepository` and
 `RelationRepository.GetPagedRelatedEntitiesAsync` mark the node paging and entity building for the entity repository's EF Core migration.
 User decisions on that: keep it EF Core, no new `IQuery` use, no new NPoco code. PR 6 is next and unblocked.
+
+Update 18-11-2026 (PR 6 started): branch `v20/feature/ef-core-element-repository-6-retire-sync-engine`, cut on top of PR 0. Deletes the sync
+engine, renames the Element repository and (user decision) renames the three async base types onto the freed names in the same PR; see
+[[project_merge_up_sync_async_twins_need_manual_port]] for the merge-up hazard that creates. To keep per-step commits without committing
+before the user asks, stage each step and record `git write-tree`; the trees can become commits later with `git commit-tree`.
+
+Update 18-11-2026 (PR 6 opened): draft #24678, commits `a6bcee41781`, `e7428aa4ec4`, `a1e4a9b9ade`. Trap hit: the NPoco
+`ContentRepositoryBase` is a PUBLIC class, so its protected members are public API even when nothing calls them; check the declaring
+class's visibility before deleting an orphaned member. Git Bash `sed -i` strips CR from CRLF files; use the Python edit helper instead.
+
+Update 19-11-2026: PR 0 merged as `695e5f90a34` (#24657). PR 6 (#24678) was rebased onto `v18/feature/ef-core-repositories` after that (commits `5f641d8a99e`, `ab315b63f8d`, `a4a9bae5387`), force pushed, ready for review. It is the only PR left; after it merges, do the campaign cleanup in CAMPAIGN.md (final `sync-memory.sh push`, remove the worktree, delete the campaign branch).

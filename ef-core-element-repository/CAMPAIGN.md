@@ -165,6 +165,8 @@ Acceptance: the four §4a fixtures and the un-ignored relation tests green on SQ
 
 Status 17-11-2026: implemented and in review as draft #24657 (`34672930fc0`). The bulk lookup became `GetParentEntitiesByChildIdsAsync`; the paged lookups order by sort order then node id, as upstream does. The four §4a fixtures pass locally.
 
+Status 19-11-2026: merged as `695e5f90a34` (#24657).
+
 Status 18-11-2026: ready for review. `f08b1b70944` adds the TODOs for the entity repository follow-up (§8, 18-11-2026 row). The merge of PR 5 conflicts only on `ElementRepositoryTest`; take the deletion.
 
 ### PR 1: EF Core Element DTOs and the no-op migration
@@ -280,6 +282,10 @@ Scope:
 
 Acceptance: solution builds; full integration and unit suites green; `grep -rn "Async\(Element\|PublishableContent\)" src tests` returns only the names the decision above leaves in place.
 
+Status 18-11-2026: implemented and in review as draft #24678 (`a6bcee41781`, `e7428aa4ec4`, `a1e4a9b9ade`), stacked on PR 0. The base-tier renames are included (§8). `SortorderExists` on the NPoco `ContentRepositoryBase` stays: the class is public.
+
+Status 19-11-2026: after PR 0 merged, the three commits were rebased onto the integration branch (`5f641d8a99e`, `ab315b63f8d`, `a4a9bae5387`) and force pushed. #24678 is ready for review and shows only its own changes.
+
 ## 6. Per-PR checklist (do all of it, in order, every PR)
 
 0. On a machine that may be behind: `git -C .claude/campaign pull`, then `.claude/campaign/ef-core-element-repository/sync-memory.sh pull` (Windows: `sync-memory.ps1 pull`) so the local Claude memory matches the committed snapshot. Read this file again if the decisions log (§8) has new rows.
@@ -317,6 +323,7 @@ Steps 2 and 10 to 11 of §6 are the points in each PR where this must happen. A 
 |---|---|---|
 | 17-11-2026 | PR 5: `ElementService.DeleteOfTypesAsync` is not a straight mirror of `ContentService`: it returns `NotFound` for an unknown type key through `IContentTypeRepository.ExistsAsync`, and returns early when no element matches. | User decision; an id lookup whose ids go unused was rejected. Without the early return every content type delete wrote an element audit row and an empty tree-change notification. |
 | 17-11-2026 | PR 5 leaves scheduled publishing in the async engine untouched (invariant release keeps `includeInvariantForVariant: true`). | A writer-permission lookup for parity with the sync engine was tried and reverted: it changes documents too, has no observable effect on invariant content, and an existing test requires a release with no known writer to succeed. |
+| 18-11-2026 | PR 6 renames `AsyncPublishableContentServiceBase`, `AsyncPublishableContentRepositoryBase` and `IAsyncPublishableContentRepository` onto the names its deletions free, in the same PR. The branch is cut on top of PR 0 so the search fixtures pass. | User decision. Known cost: the PR diff shows the two bases as rewrites, and a later merge-up from `v19/dev` will merge sync hunks into the async files under those names instead of raising a modify/delete conflict, so every hunk landing there must be walked by hand. |
 | 18-11-2026 | PR 0 keeps the node filtering, counting, ordering, paging and entity building in the EF Core `RelationRepository` (`GetPagedRelatedEntitiesAsync`, `GetEntities`), although it is entity repository work. Follow-up for the entity repository migration: move it there, and delete `IEntityRepositoryExtended` with its `sqlCustomization` overload, which has no callers left. TODOs mark both ends (`EntityRepository` class, `RelationRepository.GetPagedRelatedEntitiesAsync`). | The user wants this in EF Core and no new `IQuery` use; the only entity repository today is NPoco, so there is nowhere to move it yet. The TODOs keep it from being missed. |
 | 17-11-2026 | PR 5 adds `RecycleBinElement` to the integrity-check root ids; elements inside containers are still reported and that is left alone. | Reviewer note from PR 4. The container case needs the walk to know container nodes; nothing calls the check for elements. |
 | 16-11-2026 | New PR 4b after PR 4: the generic read path requires a resolved content type (`InvalidOperationException` naming the content type id in the base, non-nullable hook and EF Core factory overloads). | PR 4 review found that the nullable `IContentType?` on the hook is a lie both EF Core builders throw on; fixing it touches the base and `DocumentRepository`, so it is its own small PR rather than a late change to PR 4. |

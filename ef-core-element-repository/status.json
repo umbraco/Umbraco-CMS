@@ -2,7 +2,7 @@
   "campaign": "Element repository and service from NPoco to EF Core",
   "targetBranch": "v18/feature/ef-core-repositories",
   "planFile": ".claude/campaign/ef-core-element-repository/CAMPAIGN.md",
-  "updated": "18-11-2026",
+  "updated": "19-11-2026",
   "artifact": {
     "url": "https://claude.ai/artifact/Q5Bttu57VfLyS1ajt7nKtU",
     "title": "Element Repository Campaign"
@@ -12,7 +12,7 @@
       "id": 0,
       "slug": "relation-entity-lookups",
       "title": "Relation parent and child entity lookups (optional, unblocks four search fixtures)",
-      "status": "in-review",
+      "status": "merged",
       "branch": "v20/feature/ef-core-element-repository-0-relation-entity-lookups",
       "pr": "#24657",
       "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24657",
@@ -37,7 +37,8 @@
         }
       ],
       "acceptance": "No NotImplementedException left in RelationRepository.cs; the four search fixtures and the un-ignored relation tests green.",
-      "notes": "Implemented 17-11-2026, cut from a2a288de44b. Related node ids resolved with EF Core (db.Relations, db.Nodes), entities built by IEntityRepository.GetAll(objectType, ids) per object type, batched under the parameter limit; RelationRepository takes IEntityRepository in its constructor. Paged lookups order by sortOrder then node id, as upstream does. The sync GetParentEntitiesByChildIds became GetParentEntitiesByChildIdsAsync with a cancellation token. Four ignored tests enabled (red on NotImplementedException first), two added (paging order with de-duplication across relation types, proven red against node-id ordering; shared parent returned once with both filters). The four search fixtures pass 28 of 28 on SQLite. Independent review: no must-fix; list-based Contains and the sort-order parity applied. Committed as 34672930fc0, draft PR #24657. Touches one line of ElementRepositoryTest, which PR 5 deletes: whichever merges second takes the deletion. 18-11-2026: ready for review, no longer a draft. f08b1b70944 adds TODOs on EntityRepository and RelationRepository.GetPagedRelatedEntitiesAsync: the node filtering, counting, ordering, paging and entity building move to the entity repository when it goes to EF Core (decision row in section 8). Review bot and Copilot comments answered without code changes. The merge of 0b5b4c28bbe (PR 5) conflicts only on ElementRepositoryTest; resolved locally by taking the deletion, 76 relation and search tests green on the merged build, merge commit not yet pushed."
+      "notes": "Implemented 17-11-2026, cut from a2a288de44b. Related node ids resolved with EF Core (db.Relations, db.Nodes), entities built by IEntityRepository.GetAll(objectType, ids) per object type, batched under the parameter limit; RelationRepository takes IEntityRepository in its constructor. Paged lookups order by sortOrder then node id, as upstream does. The sync GetParentEntitiesByChildIds became GetParentEntitiesByChildIdsAsync with a cancellation token. Four ignored tests enabled (red on NotImplementedException first), two added (paging order with de-duplication across relation types, proven red against node-id ordering; shared parent returned once with both filters). The four search fixtures pass 28 of 28 on SQLite. Independent review: no must-fix; list-based Contains and the sort-order parity applied. Committed as 34672930fc0, draft PR #24657. Touches one line of ElementRepositoryTest, which PR 5 deletes: whichever merges second takes the deletion. 18-11-2026: ready for review, no longer a draft. f08b1b70944 adds TODOs on EntityRepository and RelationRepository.GetPagedRelatedEntitiesAsync: the node filtering, counting, ordering, paging and entity building move to the entity repository when it goes to EF Core (decision row in section 8). Review bot and Copilot comments answered without code changes. The merge of 0b5b4c28bbe (PR 5) conflicts only on ElementRepositoryTest; resolved locally by taking the deletion, 76 relation and search tests green on the merged build, merge pushed as 2379bcb833c. A last review commit (5a7179fc808, batched suggestions) reworded the TODO comments. Merged 19-11-2026 as 695e5f90a34.",
+      "mergeCommit": "695e5f90a34"
     },
     {
       "id": 1,
@@ -358,10 +359,10 @@
       "id": 6,
       "slug": "retire-sync-engine",
       "title": "Retire the sync engine and drop the scaffolding names",
-      "status": "planned",
-      "branch": "",
-      "pr": "",
-      "prUrl": "",
+      "status": "in-review",
+      "branch": "v20/feature/ef-core-element-repository-6-retire-sync-engine",
+      "pr": "#24678",
+      "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24678",
       "dependsOn": [
         5,
         "4b"
@@ -370,33 +371,46 @@
       "tasks": [
         {
           "text": "PublishableContentServiceBase.cs deleted",
-          "done": false
+          "done": true
         },
         {
           "text": "NPoco PublishableContentRepositoryBase.cs and IPublishableContentRepository.cs deleted",
-          "done": false
+          "done": true
         },
         {
           "text": "Unreferenced NPoco element factory builders removed",
-          "done": false
+          "done": true
         },
         {
           "text": "IAsyncElementRepository/AsyncElementRepository renamed to IElementRepository/ElementRepository",
-          "done": false
+          "done": true
         },
         {
-          "text": "Decision recorded: rename the async base tier onto the freed names or not",
-          "done": false
+          "text": "Decision recorded: the async base tier is renamed onto the freed names in this PR",
+          "done": true
         },
         {
-          "text": "Handover folder .claude/campaign/ef-core-element-repository/ deleted as the final commit (after a last sync-memory.sh push)",
+          "text": "After merge: campaign worktree removed and campaign branch deleted (after a last sync-memory push)",
           "done": false
         }
       ],
-      "acceptance": "Solution builds; full suites green; only the agreed Async-prefixed names remain."
+      "acceptance": "Solution builds; full suites green; only the agreed Async-prefixed names remain.",
+      "notes": "Started 18-11-2026. Branch cut on top of PR 0 (2379bcb833c) so the search fixtures pass; the PR shows PR 0's changes until #24657 merges. Decision 18-11-2026: the three base-tier renames (AsyncPublishableContentServiceBase, AsyncPublishableContentRepositoryBase, IAsyncPublishableContentRepository onto the freed names) happen in this PR. Implemented 18-11-2026 as three commits (a6bcee41781 deletions, e7428aa4ec4 Element repository rename, a1e4a9b9ade base renames), draft PR #24678. Beyond the plan: the unused NPoco document, element and schedule builders in ContentBaseFactory are gone, the service base field and constructor parameter are _contentRepository/contentRepository, and summaries and comments no longer say async or cite the deleted NPoco base. The protected SortorderExists on the public NPoco ContentRepositoryBase was removed by mistake and restored after review: it is public API. 380 integration tests green on SQLite (element, document repository, content notification, search fixtures). 19-11-2026: PR 0 merged as 695e5f90a34 with one extra review commit, which conflicted with this branch on the two TODO comments. The three commits were rebased onto the integration branch (5f641d8a99e, ab315b63f8d, a4a9bae5387) and force pushed, so the PR shows only its own 20 files; the tree equals the tested one apart from those comment lines. Ready for review, mergeable."
     }
   ],
   "log": [
+    {
+      "date": "19-11-2026",
+      "text": "PR 0 merged as 695e5f90a34 (#24657). PR 6 (#24678) rebased onto the integration branch as three commits (head a4a9bae5387) and force pushed; ready for review. PR 6 is the only PR left."
+    },
+    {
+      "date": "18-11-2026",
+      "text": "PR 6 opened as draft #24678 (three commits): sync publishing engine deleted, Element repository and the publishable base tier renamed without the Async prefix. Draft until PR 0 (#24657) merges, since the branch is stacked on it."
+    },
+    {
+      "date": "18-11-2026",
+      "text": "PR 6 started on v20/feature/ef-core-element-repository-6-retire-sync-engine, cut on top of PR 0. The async base tier is renamed onto the freed names in this PR."
+    },
     {
       "date": "18-11-2026",
       "text": "PR 5 merged as 0b5b4c28bbe (#24653) after a human review round (recycle bin id per service, notification hooks prefixed with Create). PR 0 (#24657) is ready for review with TODOs marking the entity repository follow-up; its merge with the integration branch is resolved locally and waits to be pushed. PR 6 is unblocked."
