@@ -89,7 +89,7 @@ export class UmbUserItemRefElement extends UmbEntityItemRefFrameMixin(UmbLitElem
 					.imgUrls=${this.item.avatarUrls}></umb-user-avatar>
 				<slot name="actions" slot="actions"></slot>
 			</uui-ref-node-user>
-			${this.renderEntityFrame(this.item.name)}
+			${this.renderEntityFrame()}
 		`;
 	}
 

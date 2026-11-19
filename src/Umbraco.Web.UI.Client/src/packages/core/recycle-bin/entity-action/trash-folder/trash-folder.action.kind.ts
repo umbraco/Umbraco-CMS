@@ -11,7 +11,7 @@ export const UMB_ENTITY_ACTION_TRASH_FOLDER_KIND_MANIFEST: UmbExtensionManifestK
 		type: 'entityAction',
 		kind: 'trashFolder',
 		api: () => import('./trash-folder.action.js'),
-		weight: 1150,
+		weight: 799,
 		meta: {
 			icon: 'icon-trash',
 			label: '#actions_trash',

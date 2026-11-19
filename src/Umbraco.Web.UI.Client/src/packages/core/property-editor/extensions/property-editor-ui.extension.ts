@@ -33,7 +33,6 @@ export interface MetaPropertyEditorUi {
 	supportsDataSource?: {
 		/**
 		 * Whether the property editor UI is enabled for use with data sources.
-		 * @type {boolean}
 		 */
 		enabled: boolean;
 		/**

@@ -42,10 +42,28 @@ public interface IContentCacheService
     Task RefreshMemoryCacheAsync(Guid key);
 
     /// <summary>
+    /// Refreshes the in-memory cache for the specified key without leaving the calling thread.
+    /// </summary>
+    /// <param name="key">The key of the content item.</param>
+    /// <remarks>
+    /// Runs on the saving thread after the commit, under a tree read lock. Until the lock wait and the notification
+    /// pipeline are asynchronous, awaiting there needs a second thread-pool thread while the first is blocked, which
+    /// under load stretches the time the lock is held. Implementations should avoid awaiting here wherever their
+    /// backing store allows it.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void RefreshMemoryCache(Guid key)
+        => RefreshMemoryCacheAsync(key).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Removes the item with the specified key from the memory cache.
     /// </summary>
     /// <param name="key">The unique key of the item to remove.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
+    /// <remarks>
+    /// Called after the change is committed, outside the tree lock, so an implementation can order the removal
+    /// after a refresh of the same item that is still completing.
+    /// </remarks>
     Task RemoveFromMemoryCacheAsync(Guid key);
 
     /// <summary>

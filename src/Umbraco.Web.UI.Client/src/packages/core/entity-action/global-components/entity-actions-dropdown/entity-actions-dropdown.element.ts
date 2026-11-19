@@ -2,7 +2,6 @@ import { UmbEntityActionListElement } from '../../entity-action-list.element.js'
 import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 import { html, customElement, property, css, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIScrollContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-entity-actions-dropdown')
 export class UmbEntityActionsDropdownElement extends UmbLitElement {
@@ -15,7 +14,6 @@ export class UmbEntityActionsDropdownElement extends UmbLitElement {
 	@query('#action-modal')
 	private _dropdownElement?: UmbDropdownElement;
 
-	#scrollContainerElement?: UUIScrollContainerElement;
 	#entityActionListElement?: UmbEntityActionListElement;
 
 	// Event handler as arrow function to maintain consistent reference
@@ -42,12 +40,11 @@ export class UmbEntityActionsDropdownElement extends UmbLitElement {
 
 		// First create dropdown content when the dropdown is opened.
 		// Programmatically create the elements so they are cached if the dropdown is opened again
-		this.#scrollContainerElement = new UUIScrollContainerElement();
+		// TODO: Clean up after a timeout. [NL]
 		this.#entityActionListElement = new UmbEntityActionListElement();
 		this.#entityActionListElement.addEventListener('action-executed', this.#onActionExecuted);
 		this.#entityActionListElement.setAttribute('label', this.label ?? '');
-		this.#scrollContainerElement.appendChild(this.#entityActionListElement);
-		this._dropdownElement?.appendChild(this.#scrollContainerElement);
+		this._dropdownElement?.appendChild(this.#entityActionListElement);
 	}
 
 	override render() {

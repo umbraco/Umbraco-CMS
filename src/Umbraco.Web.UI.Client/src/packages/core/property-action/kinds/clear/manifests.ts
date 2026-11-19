@@ -11,6 +11,8 @@ export const UMB_PROPERTY_ACTION_CLEAR_KIND_MANIFEST: UmbExtensionManifestKind =
 	manifest: {
 		...UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		api: UmbClearPropertyAction,
+		weight: 0,
+		separatorBefore: true,
 		meta: {
 			icon: 'icon-delete',
 			label: '#actions_clear',

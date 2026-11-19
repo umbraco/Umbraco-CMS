@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 
@@ -65,7 +65,7 @@ public class AddHasAccessToInvariantForVariantToUserGroup : AsyncMigrationBase
         if (wasPermissive)
         {
             // The old setting was permissive at the tenant level: every group gets the permission.
-            Database.Execute($"UPDATE {userGroupTable} SET {columnName} = 1");
+            Database.Execute($"UPDATE {userGroupTable} SET {columnName} = @0", true);
             return;
         }
 
@@ -73,14 +73,15 @@ public class AddHasAccessToInvariantForVariantToUserGroup : AsyncMigrationBase
         // under the old default-language coupling, plus the built-in admin group (id = 1).
         Database.Execute(
             $@"UPDATE {userGroupTable}
-               SET {columnName} = 1
-               WHERE {hasAccessToAllLanguagesColumn} = 1
+               SET {columnName} = @0
+               WHERE {hasAccessToAllLanguagesColumn} = @0
                  OR {idColumn} = 1
                  OR {idColumn} IN (
                      SELECT l.{userGroupIdColumn}
                      FROM {userGroup2LanguageTable} l
                      INNER JOIN {languageTable} lang ON l.{languageIdColumn} = lang.{idColumn}
-                     WHERE lang.{isDefaultVariantLangColumn} = 1
-                 )");
+                     WHERE lang.{isDefaultVariantLangColumn} = @0
+                 )",
+            true);
     }
 }

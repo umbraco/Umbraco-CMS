@@ -12,6 +12,9 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 	@state()
 	private _content?: string | null = '';
 
+	@state()
+	private _isReadOnly = false;
+
 	#stylesheetWorkspaceContext?: UmbStylesheetWorkspaceContext;
 
 	constructor() {
@@ -23,6 +26,12 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 			this.observe(this.#stylesheetWorkspaceContext?.content, (content) => {
 				this._content = content;
 			});
+
+			this.observe(
+				workspaceContext?.readOnlyGuard.permitted,
+				(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+				'_observeIsReadOnly',
+			);
 		});
 	}
 
@@ -33,7 +42,7 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html` <uui-box>
+		return html`<uui-box>
 			<div slot="header" id="code-editor-menu-container"></div>
 			${this.#renderCodeEditor()}
 		</uui-box>`;
@@ -49,6 +58,7 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 				id="content"
 				language="css"
 				.code=${this._content ?? ''}
+				?readonly=${this._isReadOnly}
 				@input=${this.#onCodeEditorInput}></umb-code-editor>
 		`;
 	}

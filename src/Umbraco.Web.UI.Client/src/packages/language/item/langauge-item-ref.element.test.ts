@@ -15,8 +15,9 @@ describe('UmbLanguageItemRefElement', () => {
 
 	const getFrame = () => element.shadowRoot!.querySelector('umb-entity-frame');
 
-	it('renders the entity frame with the item name when editable', () => {
-		expect(getFrame()?.textContent).to.contain(item.name);
+	it('renders the entity frame with only the link icon when editable', () => {
+		expect(getFrame()?.querySelector('uui-icon[name="link"]')).to.not.be.null;
+		expect(getFrame()?.textContent?.trim()).to.equal('');
 	});
 
 	it('renders no entity frame when readonly', async () => {

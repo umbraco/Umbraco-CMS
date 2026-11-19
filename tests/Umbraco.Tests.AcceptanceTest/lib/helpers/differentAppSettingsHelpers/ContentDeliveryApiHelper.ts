@@ -107,11 +107,11 @@ export class ContentDeliveryApiHelper {
     }
   }
 
-  async verifyEditorialPropertiesForContentItemWithMultiURLPicker(contentName: string, contentItemJson, pickerType: string) {
+  async verifyEditorialPropertiesForContentItemWithMultiURLPicker(contentName: string, contentItemJson, pickerType: string, propertyAlias: string = 'multiUrlPicker') {
     const contentData = await this.api.document.getByName(contentName);
-    const multiUrlPickerProperty = contentData.values.find((p) => p.alias === 'multiUrlPicker');
+    const multiUrlPickerProperty = contentData.values.find((p) => p.alias === propertyAlias);
     const expectedMultiUrlPickerValue = multiUrlPickerProperty.value;
-    const actualMultiUrlPickerValue = contentItemJson.properties['multiUrlPicker'];
+    const actualMultiUrlPickerValue = contentItemJson.properties[propertyAlias];
     // Verify that the multi URL picker property has the expected structure and values  
     expect(actualMultiUrlPickerValue[0].queryString).toBe(expectedMultiUrlPickerValue[0].queryString);
     expect(actualMultiUrlPickerValue[0].title).toBe(expectedMultiUrlPickerValue[0].name);

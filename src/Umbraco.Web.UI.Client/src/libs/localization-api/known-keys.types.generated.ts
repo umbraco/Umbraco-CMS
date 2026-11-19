@@ -65,6 +65,15 @@ declare global {
 		actionDescriptions_translate: string;
 		actionDescriptions_unpublish: string;
 		actionDescriptions_update: string;
+		actionGroups_clipboard: string;
+		actionGroups_create: string;
+		actionGroups_edit: string;
+		actionGroups_importExport: string;
+		actionGroups_notifications: string;
+		actionGroups_other: string;
+		actionGroups_publishing: string;
+		actionGroups_routing: string;
+		actionGroups_structure: string;
 		actions_assigndomain: string;
 		actions_auditTrail: string;
 		actions_browse: string;

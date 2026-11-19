@@ -5,6 +5,7 @@ import { expect, fixture, html, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { readActionGroupList } from '@umbraco-cms/internal/test-utils';
 
 @customElement('umb-test-property-action-menu-action')
 class UmbTestPropertyActionElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -18,7 +19,9 @@ const PROPERTY_EDITOR_UI_ALIAS = 'Umb.Test.PropertyActionMenu';
 describe('UmbPropertyActionMenuElement', () => {
 	let aliases: Array<string> = [];
 
-	async function renderSequence(actions: Array<{ alias: string; weight: number; separatorBefore?: boolean }>) {
+	async function renderSequence(
+		actions: Array<{ alias: string; weight: number; group?: string; separatorBefore?: boolean }>,
+	) {
 		aliases = actions.map((a) => a.alias);
 		umbExtensionsRegistry.registerMany(
 			actions.map(
@@ -27,6 +30,7 @@ describe('UmbPropertyActionMenuElement', () => {
 					alias: action.alias,
 					name: action.alias,
 					weight: action.weight,
+					group: action.group,
 					separatorBefore: action.separatorBefore,
 					forPropertyEditorUis: [PROPERTY_EDITOR_UI_ALIAS],
 					elementName: 'umb-test-property-action-menu-action',
@@ -39,14 +43,10 @@ describe('UmbPropertyActionMenuElement', () => {
 			html`<umb-property-action-menu .propertyEditorUiAlias=${PROPERTY_EDITOR_UI_ALIAS}></umb-property-action-menu>`,
 		);
 		const read = () =>
-			Array.from(element.shadowRoot?.querySelector('umb-popover-layout')?.children ?? []).map((child) =>
-				child.getAttribute('role') === 'separator'
-					? '|'
-					: child instanceof UmbTestPropertyActionElement
-						? (child as any).manifest.alias
-						: child.tagName,
+			readActionGroupList(element.shadowRoot?.querySelector('umb-action-group-list'), (child) =>
+				child instanceof UmbTestPropertyActionElement ? (child as any).manifest.alias : child.tagName,
 			);
-		await waitUntil(() => read().filter((entry) => entry !== '|').length === actions.length);
+		await waitUntil(() => read().filter((entry) => aliases.includes(entry)).length === actions.length);
 		return read();
 	}
 
@@ -60,16 +60,56 @@ describe('UmbPropertyActionMenuElement', () => {
 				{ alias: 'a', weight: 2 },
 				{ alias: 'b', weight: 1 },
 			]),
-		).to.deep.equal(['a', 'b']);
+		).to.deep.equal(['[', 'a', 'b', ']']);
 	});
 
-	it('renders a separator above each action that sets separatorBefore, except the first', async () => {
+	it('starts a new line for each action that sets separatorBefore, except the first', async () => {
 		expect(
 			await renderSequence([
 				{ alias: 'a', weight: 3, separatorBefore: true },
 				{ alias: 'b', weight: 2 },
 				{ alias: 'c', weight: 1, separatorBefore: true },
 			]),
-		).to.deep.equal(['a', 'b', '|', 'c']);
+		).to.deep.equal(['[', 'a', 'b', '|', 'c', ']']);
+	});
+
+	describe('action groups', () => {
+		const GROUPS = ['Umb.Test.PropertyActionMenu.Clipboard', 'Umb.Test.PropertyActionMenu.Edit'];
+
+		beforeEach(() => {
+			umbExtensionsRegistry.registerMany([
+				{ type: 'propertyActionGroup', alias: GROUPS[0], name: GROUPS[0], weight: 1200, meta: { label: 'Clipboard' } },
+				{ type: 'propertyActionGroup', alias: GROUPS[1], name: GROUPS[1], weight: 1100, meta: { label: 'Edit' } },
+			]);
+		});
+
+		afterEach(() => {
+			umbExtensionsRegistry.unregisterMany(GROUPS);
+		});
+
+		it('renders each group as its own block and the ungrouped actions last', async () => {
+			expect(
+				await renderSequence([
+					{ alias: 'clear', weight: 0, separatorBefore: true },
+					{ alias: 'package', weight: 5000 },
+					{ alias: 'sort', weight: 1000, group: GROUPS[1] },
+					{ alias: 'paste', weight: 1190, group: GROUPS[0] },
+					{ alias: 'copy', weight: 1200, group: GROUPS[0] },
+				]),
+			).to.deep.equal([
+				'[Clipboard',
+				'copy',
+				'paste',
+				']',
+				'[Edit',
+				'sort',
+				']',
+				'[Other',
+				'package',
+				'|',
+				'clear',
+				']',
+			]);
+		});
 	});
 });

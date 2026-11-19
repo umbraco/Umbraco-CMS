@@ -110,8 +110,22 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             Schedules = schedules,
         };
 
-        return await PublishAsync(key, cultureAndSchedule, userKey);
+        return await RunInWritePathAsync(
+            () => PublishAsync(key, cultureAndSchedule, userKey),
+            callerIsInScope: _coreScopeProvider.Context is not null);
     }
+
+    /// <summary>
+    /// Runs the publish once the caller may enter the write path. Runs it directly unless a derived service gates it.
+    /// </summary>
+    /// <param name="publish">The publish to run.</param>
+    /// <param name="callerIsInScope">Whether the caller is already inside a scope.</param>
+    /// <returns>The publish result.</returns>
+    // TODO (V20): Remove once the content tree lock can be awaited, so that waiting for it no longer holds a thread.
+    protected virtual Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> RunInWritePathAsync(
+        Func<Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>>> publish,
+        bool callerIsInScope)
+        => publish();
 
     private async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
         Guid key,

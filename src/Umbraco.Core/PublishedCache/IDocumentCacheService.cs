@@ -73,6 +73,20 @@ public interface IDocumentCacheService : IContentCacheService
     Task RefreshContentAsync(IContent content);
 
     /// <summary>
+    /// Refreshes the cache for the specified content item without leaving the calling thread.
+    /// </summary>
+    /// <param name="content">The content item to refresh.</param>
+    /// <remarks>
+    /// Runs inside the transaction that persists the content, under the content tree lock. Until the lock wait and
+    /// the notification pipeline are asynchronous, awaiting there needs a second thread-pool thread while the first
+    /// is blocked, which under load stretches the time the lock is held. Implementations should avoid awaiting here
+    /// wherever their backing store allows it.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void RefreshContent(IContent content)
+        => RefreshContentAsync(content).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Gets all published content items of the specified content type.
     /// </summary>
     /// <param name="contentType">The published content type to filter by.</param>

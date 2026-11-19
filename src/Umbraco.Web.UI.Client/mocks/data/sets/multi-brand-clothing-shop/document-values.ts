@@ -5,6 +5,7 @@ export type UmbMbcsValue = UmbMockDocumentModel['values'][number];
 
 let pickerItemCounter = 0;
 let blockCounter = 0;
+let layoutCounter = 0;
 
 const invariant = (editorAlias: string, alias: string, value: unknown): Array<UmbMbcsValue> => [
 	{ editorAlias, alias, culture: null, segment: null, value },
@@ -120,6 +121,7 @@ const withKeys = (block: UmbMbcsBlock): UmbMbcsBlockInstance => ({
 });
 
 const toLayoutItem = (block: UmbMbcsBlockInstance): Record<string, unknown> => ({
+	key: mbcsId('layout', ++layoutCounter),
 	columnSpan: block.columnSpan,
 	rowSpan: 1,
 	areas: (block.areas ?? []).map((area) => ({ key: area.key, items: area.items.map(toLayoutItem) })),

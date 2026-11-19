@@ -1,5 +1,5 @@
 import { UmbAuthContext, type UmbAuthSession } from './auth.context.js';
-import { aTimeout, expect } from '@open-wc/testing';
+import { aTimeout, expect, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
@@ -539,6 +539,195 @@ describe('UmbAuthContext', () => {
 			expect(url.origin + url.pathname).to.equal('http://localhost/umbraco/login');
 			expect(url.searchParams.get('ReturnUrl')).to.equal(new URL('auth-callback', document.baseURI).pathname);
 			expect(openedWindows[0].target).to.equal('umbracoAuthPopup');
+		});
+	});
+
+	describe('Sign-in by another user', () => {
+		const realFetch = window.fetch;
+		let channel: BroadcastChannel;
+		let userCalls: number;
+		// Answers GET /user/current with the user behind the session cookie, or with the given failure
+		let respondToUserCall: () => Promise<Response>;
+		let userChanges: number;
+
+		const userResponse = (id: string) =>
+			Promise.resolve(
+				new Response(JSON.stringify({ id }), { status: 200, headers: { 'Content-Type': 'application/json' } }),
+			);
+		const signedInAs = (id: string) => () => userResponse(id);
+		const signInElsewhere = () =>
+			channel.postMessage({ type: 'authorized', expiresIn: 300, issuedAt: Math.floor(Date.now() / 1000) });
+
+		beforeEach(async () => {
+			document.body.appendChild(hostElement);
+			userCalls = 0;
+			respondToUserCall = signedInAs('admin');
+			window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
+				const url = input instanceof Request ? input.url : input.toString();
+				// The test runner's own requests have to reach the real fetch
+				if (!url.includes('/umbraco/management/api/')) return realFetch.call(window, input, init);
+				if (url.endsWith('/user/current')) {
+					userCalls++;
+					return respondToUserCall();
+				}
+				// The keep-alive, and the configuration it reads the renewed expiry from
+				const timeoutUtc = new Date(Date.now() + 300_000).toISOString();
+				return Promise.resolve(new Response(JSON.stringify({ timeoutUtc }), { status: 200 }));
+			}) as typeof window.fetch;
+			userChanges = 0;
+			context.userChanged.subscribe(() => userChanges++);
+
+			// The page has loaded the backoffice for the admin
+			channel = new BroadcastChannel('umb:auth');
+			signInElsewhere();
+			await waitUntil(() => context.getIsAuthorized());
+			context.bindUser('admin');
+		});
+
+		afterEach(() => {
+			window.fetch = realFetch;
+			channel.close();
+			hostElement.remove();
+		});
+
+		it('holds a sign-in until the signed-in user is known', async () => {
+			let answer: (response: Response) => void = () => {};
+			respondToUserCall = () => new Promise<Response>((resolve) => (answer = resolve));
+			context.timeOut();
+
+			signInElsewhere();
+			await waitUntil(() => userCalls === 1);
+			await aTimeout(50);
+			expect(context.getIsAuthorized(), 'nothing may resume before the user is known').to.be.false;
+
+			answer(await userResponse('admin'));
+			await waitUntil(() => context.getIsAuthorized());
+			expect(userChanges).to.equal(0);
+		});
+
+		it('resumes the page when the same user signs in again', async () => {
+			context.timeOut();
+
+			signInElsewhere();
+
+			await waitUntil(() => context.getIsAuthorized());
+			expect(userChanges).to.equal(0);
+		});
+
+		it('does not resume the page for a different user, and reports the change', async () => {
+			respondToUserCall = signedInAs('editor');
+			context.timeOut();
+
+			signInElsewhere();
+
+			await waitUntil(() => userChanges === 1);
+			await aTimeout(50);
+			expect(context.getIsAuthorized()).to.be.false;
+		});
+
+		it('reports the change again for each later sign-in, while the page has not started over', async () => {
+			respondToUserCall = signedInAs('editor');
+			context.timeOut();
+			signInElsewhere();
+			await waitUntil(() => userChanges === 1);
+
+			signInElsewhere();
+
+			await waitUntil(() => userChanges === 2);
+			expect(context.getIsAuthorized()).to.be.false;
+		});
+
+		it('reports the change when a different user signs in while this page still holds a session', async () => {
+			respondToUserCall = signedInAs('editor');
+
+			signInElsewhere();
+
+			await waitUntil(() => userChanges === 1);
+		});
+
+		it('holds a session another tab re-establishes after this one ended, until the user is known', async () => {
+			respondToUserCall = signedInAs('editor');
+			context.timeOut();
+
+			channel.postMessage({
+				type: 'sessionUpdate',
+				expiresAt: Math.floor(Date.now() / 1000) + 240,
+				sessionWindowInMs: 240_000,
+			});
+
+			await waitUntil(() => userChanges === 1);
+			expect(context.getIsAuthorized()).to.be.false;
+		});
+
+		it('holds a session the server still has after this page ended its own, until the user is known', async () => {
+			respondToUserCall = signedInAs('editor');
+			context.timeOut();
+
+			const renewed = await context.keepAlive();
+
+			expect(renewed).to.be.false;
+			expect(userChanges).to.equal(1);
+			expect(context.getIsAuthorized()).to.be.false;
+		});
+
+		it('resumes the page from a session the server still has for the same user', async () => {
+			context.timeOut();
+
+			const renewed = await context.keepAlive();
+
+			expect(renewed).to.be.true;
+			expect(userChanges).to.equal(0);
+			expect(context.getIsAuthorized()).to.be.true;
+		});
+
+		it('renews the session in hand without looking up the user', async () => {
+			expect(await context.keepAlive()).to.be.true;
+			expect(userCalls).to.equal(0);
+		});
+
+		it('retries a failed lookup of the signed-in user before deciding', async () => {
+			let failures = 1;
+			respondToUserCall = () =>
+				failures-- > 0 ? Promise.resolve(new Response(null, { status: 500 })) : userResponse('admin');
+			context.timeOut();
+
+			signInElsewhere();
+
+			await waitUntil(() => context.getIsAuthorized(), undefined, { timeout: 5000 });
+			expect(userCalls).to.equal(2);
+			expect(userChanges).to.equal(0);
+		});
+
+		it('treats a signed-in user that cannot be determined as a different user', async function () {
+			// Every lookup attempt fails, so this waits for all retries
+			this.timeout(6000);
+			respondToUserCall = () => Promise.reject(new TypeError('Failed to fetch'));
+			context.timeOut();
+
+			signInElsewhere();
+
+			await waitUntil(() => userChanges === 1, undefined, { timeout: 5000 });
+			expect(context.getIsAuthorized()).to.be.false;
+		});
+
+		it('reports the change when the page is bound to a different user', () => {
+			context.bindUser('admin');
+			expect(userChanges).to.equal(0);
+
+			context.bindUser('editor');
+			expect(userChanges).to.equal(1);
+		});
+
+		it('applies a sign-in straight away while the page has not loaded a user', async () => {
+			// The lookup never answers, so only a context that does not wait for it can resume
+			respondToUserCall = () => new Promise<Response>(() => {});
+			const unboundContext = new UmbAuthContext(hostElement, 'http://localhost', '/umbraco', false);
+			unboundContext.timeOut();
+
+			signInElsewhere();
+
+			await waitUntil(() => unboundContext.getIsAuthorized());
+			unboundContext.destroy();
 		});
 	});
 });
