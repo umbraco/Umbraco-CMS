@@ -1,5 +1,6 @@
 import type { UmbDocumentItemModel } from '../../item/types.js';
 import { UmbDocumentPickerInputContext } from './input-document.context.js';
+import '../document-ancestor-path/document-ancestor-path.element.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -159,6 +160,9 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 	@state()
 	private _statuses?: Array<UmbRepositoryItemsStatus>;
 
+	@state()
+	private _selectedItemsAncestors = new Map<string, Array<UmbDocumentItemModel>>();
+
 	#pickerInputContext = new UmbDocumentPickerInputContext(this);
 	#interactionMemoryManager = new UmbEntityInputInteractionMemoryManager(
 		this,
@@ -189,6 +193,13 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 		this.observe(this.#pickerInputContext.selection, (selection) => (this.value = selection.join(',')), null);
 
 		this.observe(this.#pickerInputContext.selectedItems, (selectedItems) => (this._items = selectedItems), null);
+
+		this.observe(
+			this.#pickerInputContext.selectedItemsAncestors,
+			(ancestors) =>
+				(this._selectedItemsAncestors = new Map(ancestors.map((entry) => [entry.unique, entry.ancestors]))),
+			null,
+		);
 
 		this.observe(this.#pickerInputContext.statuses, (statuses) => (this._statuses = statuses), null);
 	}
@@ -266,12 +277,19 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 										</uui-action-bar>
 									`,
 								)}
+								${this.#renderAncestorPath(unique, isError)}
 							</umb-entity-item-ref>
 						`;
 					},
 				)}
 			</uui-ref-list>
 		`;
+	}
+
+	#renderAncestorPath(unique: string, isError: boolean) {
+		const ancestors = this._selectedItemsAncestors.get(unique);
+		if (isError || !ancestors?.length) return nothing;
+		return html`<umb-document-ancestor-path slot="detail" .ancestors=${ancestors}></umb-document-ancestor-path>`;
 	}
 
 	static override styles = [
