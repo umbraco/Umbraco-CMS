@@ -119,9 +119,13 @@ export class UmbContentWorkspaceDataManager<
 
 		const changedVariants: Array<GatheredVariantData> = current?.variants.map((variant) => {
 			const persistedVariant = persisted?.variants.find((x) => x.culture === variant.culture);
+			if (!persistedVariant) {
+				// If there is no persisted variant, then we just need to check if the new variant has a name, if not then we consider it as a non-existing('just scaffolded') variant [NL]
+				return { culture: variant.culture, equal: !variant.name };
+			}
 			return {
 				culture: variant.culture,
-				equal: persistedVariant ? jsonStringComparison(variant, persistedVariant) : false,
+				equal: jsonStringComparison(variant, persistedVariant),
 			};
 		});
 
