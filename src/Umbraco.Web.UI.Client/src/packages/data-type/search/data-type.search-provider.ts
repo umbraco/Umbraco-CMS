@@ -19,6 +19,7 @@ export class UmbDataTypeSearchProvider
 
 	override destroy(): void {
 		this.#repository.destroy();
+		super.destroy();
 	}
 }
 

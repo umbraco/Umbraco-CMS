@@ -296,6 +296,10 @@ export default {
 		otherElements: 'Properties',
 		parentNotPublished: "This document is published but is not visible because the parent '%0%' is unpublished",
 		parentCultureNotPublished: "This culture is published but is not visible because it is unpublished on parent '%0%'",
+		ancestorNotPublishedScheduleWarning:
+			"An ancestor isn't published. The scheduled publish will fail unless every ancestor is published by then.",
+		ancestorCultureNotPublishedScheduleWarning:
+			"An ancestor isn't published in this language. The scheduled publish will fail unless every ancestor is published in this language by then.",
 		parentNotPublishedAnomaly: 'This document is published but is not in the cache',
 		getUrlException: 'Could not get the URL',
 		routeError: 'This document is published but its URL would collide with content %0%',
@@ -502,6 +506,8 @@ export default {
 		noDocumentTypesCreateNew: 'Create a new Document Type',
 		noDocumentTypesAllowedAtRoot:
 			'There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Structure</strong>.',
+		noDocumentTypesAllowedAtRootWithNoSettingsAccess:
+			'There are no Document Types allowed for creating content at the root.',
 		noMediaTypes:
 			'There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Structure</strong>.',
 		noMediaTypesWithNoSettingsAccess:
@@ -509,6 +515,9 @@ export default {
 		noMediaTypesEditPermissions: 'Edit permissions for this Media Type',
 		noElementTypes:
 			'There are no allowed Element Types available for creating elements here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allow in Library</strong> under <strong>Structure</strong>.',
+		noMediaTypesAllowedAtRoot:
+			'There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow at root</strong> option under <strong>Structure</strong>.',
+		noMediaTypesAllowedAtRootWithNoSettingsAccess: 'There are no Media Types allowed for creating media at the root.',
 		documentTypeWithoutTemplate: 'Document Type without a template',
 		documentTypeWithTemplate: 'Document Type with Template',
 		documentTypeWithTemplateDescription:
@@ -757,6 +766,7 @@ export default {
 		indexCannotRebuild: 'This index cannot be rebuilt because it has no assigned',
 		iIndexPopulator: 'IIndexPopulator',
 		noResults: 'No results were found',
+		searchNotAllowed: 'You do not have permission to search this index.',
 		searchResultsFound: 'Showing %0% - %1% of %2% result(s) - Page %3% of %4%',
 		corruptStatus: 'Possible corrupt index detected',
 		corruptErrorDescription: 'Error received when evaluating the index:',
@@ -1507,7 +1517,7 @@ export default {
 		pickedTrashedItems: 'You have picked media items currently deleted or in the recycle bin',
 		trashed: 'Trashed',
 		openMedia: 'Open in Media Library',
-		changeMedia: 'Change Media Item',
+		changeMedia: 'Replace Media Item',
 		editMediaEntryLabel: 'Edit %0% on %1%',
 		confirmCancelMediaEntryCreationHeadline: 'Discard creation?',
 		confirmCancelMediaEntryCreationMessage: 'Are you sure you want to cancel the creation.',
@@ -2002,6 +2012,9 @@ export default {
 		elementDoesNotSupport: 'This is not applicable for an Element Type.',
 		elementTypeOnlySupport: 'This is only applicable for an Element Type.',
 		propertyHasChanges: 'You have made changes to this property. Are you sure you want to discard them?',
+		confirmPropertyAliasChangeHeadline: 'Changing the alias may cause data loss',
+		confirmPropertyAliasChangeMessage:
+			'Existing content for <strong>%0%</strong> will be removed where it is used as embedded content, such as in a local Block.',
 		displaySettingsHeadline: 'Appearance',
 		displaySettingsLabelOnLeft: 'Label to the left',
 		displaySettingsLabelOnTop: 'Label above (full-width)',
@@ -2484,6 +2497,7 @@ export default {
 		customValidation: 'Custom validation',
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
 		entriesExceed: 'Maximum %0% entries, you have entered <strong>%1%</strong> too many.',
+		itemMissingValueMessage: 'Item %0% is missing a value',
 		entriesAreasMismatch: 'The content amount requirements are not met for one or more areas.',
 		minimumOnlyWhenInUse:
 			'The minimum applies once items have been added. To require a value, mark the property as mandatory.',

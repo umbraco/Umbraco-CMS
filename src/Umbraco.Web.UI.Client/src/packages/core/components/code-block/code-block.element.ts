@@ -50,7 +50,7 @@ export class UmbCodeBlockElement extends UmbLitElement {
 	override render() {
 		return html`
 			${this.#renderHeader()}
-			<pre><uui-scroll-container><code><slot></slot></code></uui-scroll-container></pre>
+			<pre dir="ltr"><uui-scroll-container><code><slot></slot></code></uui-scroll-container></pre>
 		`; // Avoid breaks between elements of <pre></pre>
 	}
 
@@ -58,7 +58,7 @@ export class UmbCodeBlockElement extends UmbLitElement {
 		if (!this.language && !this.copy) return;
 		return html`
 			<div id="header">
-				<span id="lang">${this.language}</span>
+				<span id="lang" dir="auto">${this.language}</span>
 				${when(
 					this.copy,
 					() => html`
@@ -124,7 +124,7 @@ export class UmbCodeBlockElement extends UmbLitElement {
 			}
 
 			#lang {
-				margin-left: var(--uui-size-space-3);
+				margin-inline-start: var(--uui-size-space-3);
 			}
 		`,
 	];

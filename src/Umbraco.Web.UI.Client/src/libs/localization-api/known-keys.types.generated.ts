@@ -469,6 +469,8 @@ declare global {
 		content_alternativeTextHelp: string;
 		content_alternativeUrls: string;
 		content_altTextOptional: string;
+		content_ancestorCultureNotPublishedScheduleWarning: string;
+		content_ancestorNotPublishedScheduleWarning: string;
 		content_captionTextOptional: string;
 		content_childItems: string;
 		content_clickToEdit: string;
@@ -652,6 +654,8 @@ declare global {
 		contentTypeEditor_confirmDeletePropertyMessage: string;
 		contentTypeEditor_confirmDeleteTabMessage: string;
 		contentTypeEditor_confirmDeleteTabNotice: string;
+		contentTypeEditor_confirmPropertyAliasChangeHeadline: string;
+		contentTypeEditor_confirmPropertyAliasChangeMessage: string;
 		contentTypeEditor_convertToTab: string;
 		contentTypeEditor_copiedUnderneath: string;
 		contentTypeEditor_cultureAndVariantInvariantLabel: string;
@@ -749,12 +753,15 @@ declare global {
 		create_newStyleSheetFile: string;
 		create_noDocumentTypes: string;
 		create_noDocumentTypesAllowedAtRoot: string;
+		create_noDocumentTypesAllowedAtRootWithNoSettingsAccess: string;
 		create_noDocumentTypesAtRoot: string;
 		create_noDocumentTypesCreateNew: string;
 		create_noDocumentTypesEditPermissions: string;
 		create_noDocumentTypesWithNoSettingsAccess: string;
 		create_noElementTypes: string;
 		create_noMediaTypes: string;
+		create_noMediaTypesAllowedAtRoot: string;
+		create_noMediaTypesAllowedAtRootWithNoSettingsAccess: string;
 		create_noMediaTypesEditPermissions: string;
 		create_noMediaTypesWithNoSettingsAccess: string;
 		create_updateData: string;
@@ -1037,6 +1044,7 @@ declare global {
 		examineManagement_rebuildIndexWarning: string;
 		examineManagement_searchDescription: string;
 		examineManagement_searchers: string;
+		examineManagement_searchNotAllowed: string;
 		examineManagement_searchResultsFound: string;
 		examineManagement_tools: string;
 		examineManagement_toolsDescription: string;
@@ -2686,6 +2694,7 @@ declare global {
 		validation_invalidUserGroupName: string;
 		validation_invalidUsername: string;
 		validation_invalidValue: string;
+		validation_itemMissingValueMessage: string;
 		validation_items: string;
 		validation_itemsSelected: string;
 		validation_legacyOption: string;

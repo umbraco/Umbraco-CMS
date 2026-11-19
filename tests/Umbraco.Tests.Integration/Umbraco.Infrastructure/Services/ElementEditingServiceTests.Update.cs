@@ -217,4 +217,56 @@ public partial class ElementEditingServiceTests
             });
         }
     }
+
+    [TestCase("")]
+    [TestCase(" ")]
+    public async Task Cannot_Update_Invariant_With_Blank_Name(string name)
+    {
+        var element = await CreateInvariantElement();
+        var originalName = element.Name;
+
+        var updateModel = new ElementUpdateModel
+        {
+            Variants = [new VariantModel { Name = name }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The updated title" }],
+        };
+
+        var result = await ElementEditingService.UpdateAsync(element.Key, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+
+        var updated = await ElementEditingService.GetAsync(element.Key);
+        Assert.IsNotNull(updated);
+        Assert.AreEqual(originalName, updated.Name);
+    }
+
+    [TestCase("")]
+    [TestCase(" ")]
+    public async Task Cannot_Update_Culture_Variant_With_Only_Blank_Names(string name)
+    {
+        var element = await CreateCultureVariantElement();
+        var originalEnglishName = element.GetCultureName("en-US");
+        var originalDanishName = element.GetCultureName("da-DK");
+
+        var updateModel = new ElementUpdateModel
+        {
+            Properties = [new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" }],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = name },
+                new VariantModel { Culture = "da-DK", Name = name }
+            ],
+        };
+
+        var result = await ElementEditingService.UpdateAsync(element.Key, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+
+        var updated = await ElementEditingService.GetAsync(element.Key);
+        Assert.IsNotNull(updated);
+        Assert.AreEqual(originalEnglishName, updated.GetCultureName("en-US"));
+        Assert.AreEqual(originalDanishName, updated.GetCultureName("da-DK"));
+    }
 }

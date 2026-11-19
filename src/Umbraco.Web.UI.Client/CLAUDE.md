@@ -10,13 +10,15 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 - **[Manifests & Aliases](./docs/manifests.md)** - Manifest shape, alias conventions, alias constants, how aliases connect extensions, registration, registry operations, kind merging
 - **[Entities](./docs/entities.md)** - Entity types, entity context, how entityType connects workspaces/trees/actions/routing
 - **[Workspaces](./docs/workspaces.md)** - Workspace types, base classes, extension points, workspace contexts, save flow, routing
-- **[Core Primitives](./docs/core-primitives.md)** - UmbLitElement, observable state, Context API, controller lifecycle
+- **[Core Primitives](./docs/core-primitives.md)** - UmbLitElement (observe, consume/provide context, localization), observable state overview, controller lifecycle
+- **[Context API](./docs/context-api.md)** - Context tokens, shared aliases, resolution rules, token lookup
 - **[State System](./docs/state-system.md)** - `Umb*State` change-detection contract, per-type comparison semantics, `asObservablePart`, mute/unmute, observer-guard anti-patterns
 - **[Data Flow](./docs/data-flow.md)** - Data flow chain, data sources, tryExecute, generated API clients, stores, complete worked example
 - **[Repositories](./docs/repositories.md)** - Repository categories (detail, item, tree, collection, action-specific), file structure, naming, extension registration, data source delegation
 - **[Package Development](./docs/package-development.md)** - Package & module structure, folder structure conventions, localization, organizational rules
 - **[Value Type](./docs/value-type.md)** - Compile-time type map (`UmbValueTypeMap`); declaring typed value type constants via declaration merging
 - **[Value Summary](./docs/value-summary.md)** - `valueSummary` extension type; rendering compact values in collection views, batch resolver pattern, coordinator
+- **[Clipboard](./docs/clipboard.md)** - Copy/paste between property editors; entry value types as interop formats, copy/paste value translators, where clipboard work belongs
 
 ### Development
 
@@ -56,7 +58,9 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 | Write or modify tests                                   | [docs/testing.md](./docs/testing.md)                                                                                           |
 | Work with auth or security                              | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md)                                            |
 | Scaffold a new package or module                        | [docs/package-development.md](./docs/package-development.md)                                                                   |
+| Consume or provide a context, or create a context token | [docs/context-api.md](./docs/context-api.md) — tokens can share an alias; consume the most specific one once                   |
 | Write or change observers / `Umb*State` usage           | [docs/state-system.md](./docs/state-system.md) — states already deduplicate; do not add "is this a re-emit?" guards            |
+| Add clipboard copy/paste to a property editor           | [docs/clipboard.md](./docs/clipboard.md) — then use the `general-add-clipboard-support` skill                                  |
 | Add, rename, or remove a key in `src/assets/lang/en.ts` | [docs/package-development.md](./docs/package-development.md#type-safe-localization-keys)                                       |
 
 This is not optional. Skipping these leads to convention violations that are caught in review.

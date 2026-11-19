@@ -72,29 +72,34 @@ public class DistributedBackgroundJobHostedService : BackgroundService
             await Task.Delay(_distributedJobSettings.Delay, stoppingToken);
         }
 
-        // Distributed background jobs require write access to the database (e.g., to acquire locks, update job state).
-        if (_databaseReadOnlyAccessor.IsReadOnly())
-        {
-            return;
-        }
-
-        try
-        {
-            // Update all jobs, periods might have changed when restarting.
-            await _distributedJobService.EnsureJobsAsync();
-        }
-        catch (Exception exception)
-        {
-            // We swallow exception here, don't want the app to crash if something goes wrong
-            _logger.LogError(exception, "An exception occurred while attempting to ensure distributed background jobs on startup.");
-        }
-
         using PeriodicTimer timer = new(_distributedJobSettings.Period);
+        var initialized = false;
 
         try
         {
             while (await timer.WaitForNextTickAsync(stoppingToken))
             {
+                if (initialized is false)
+                {
+                    try
+                    {
+                        // Distributed background jobs require write access to the database (e.g., to acquire locks, update job state).
+                        if (_databaseReadOnlyAccessor.IsReadOnly())
+                        {
+                            return;
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        // We swallow exception here and retry on the next tick, don't want the app to crash if the database is briefly unavailable
+                        _logger.LogWarning(exception, "An exception occurred while checking whether the database is read-only. Retrying on the next tick.");
+                        continue;
+                    }
+
+                    await EnsureJobsAsync();
+                    initialized = true;
+                }
+
                 try
                 {
                     await RunRunnableJob(stoppingToken);
@@ -114,6 +119,20 @@ public class DistributedBackgroundJobHostedService : BackgroundService
         catch (OperationCanceledException)
         {
             _logger.LogInformation("Timed Hosted Service is stopping.");
+        }
+    }
+
+    private async Task EnsureJobsAsync()
+    {
+        try
+        {
+            // Update all jobs, periods might have changed when restarting.
+            await _distributedJobService.EnsureJobsAsync();
+        }
+        catch (Exception exception)
+        {
+            // We swallow exception here, don't want the app to crash if something goes wrong
+            _logger.LogError(exception, "An exception occurred while attempting to ensure distributed background jobs on startup.");
         }
     }
 

@@ -128,7 +128,7 @@ internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEnt
         AuditEntryDto dto = AuditEntryFactory.BuildDto(entity);
         try
         {
-            Database.Insert(dto);
+            Database.ExecuteInSavepoint(() => Database.Insert(dto));
         }
         catch (DbException) when (_runtimeState.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading)
         {

@@ -17,8 +17,8 @@ import {
  *
  * Runs `onInit` once the user is authorized AND the session's current user has loaded, so extensions
  * can rely on `UMB_CURRENT_USER_CONTEXT` being populated. Runs `onUnload` when the session ends
- * (sign-out or timeout) or the extension is unregistered. If the user authorizes again, `onInit`
- * runs again — potentially for a different user.
+ * (sign-out or timeout) or the extension is unregistered. If the same user signs in again, `onInit`
+ * runs again. A different user gets a new page, where `onInit` runs for that user.
  */
 export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializerBase<
 	'userEntryPoint',
@@ -34,7 +34,8 @@ export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializ
 
 	constructor(host: UmbElement, extensionRegistry: UmbExtensionRegistry<ManifestUserEntryPoint>) {
 		// Create the gate before super() (no `this` access yet) and hand it to the base, which empties
-		// the observed set while it is false — so extensions unload on sign-out and instantiate on sign-in.
+		// the observed set while it is false, so extensions unload when the session ends and instantiate once
+		// the session's current user has loaded.
 		const active = new UmbBooleanState<boolean>(false);
 		super(host, extensionRegistry, 'userEntryPoint', active.asObservable());
 		this.#active = active;
@@ -47,8 +48,9 @@ export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializ
 					if (this.#isAuthorized) {
 						void this.#loadCurrentUser();
 					} else {
-						// The context keeps the previous user once authorization is lost, and the next sign-in may be
-						// a different user, so drop its cached load and only count a load completed for the new session.
+						// The context keeps the user of the ended session. Only the same user resumes this page (a different
+						// user starts it over), but their data may have changed since, so drop the cached load and only count
+						// a load completed for the new session.
 						this.#currentUserContext?.invalidate();
 						this.#isUserLoaded = false;
 						this.#userLoad = undefined;
@@ -68,6 +70,9 @@ export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializ
 				currentUserContext?.currentUser,
 				(currentUser) => {
 					this.#hasUser = !!currentUser;
+					// Counts a load that succeeded through another caller after this initializer's own load failed. Only a
+					// changed user emits here, so the same user with unchanged data is picked up at the next sign-in or reload.
+					if (this.#isAuthorized && !this.#isUserLoaded) void this.#loadCurrentUser();
 					this.#updateActive();
 				},
 				'umbObserveCurrentUser',
@@ -80,7 +85,12 @@ export class UmbUserEntryPointExtensionInitializer extends UmbExtensionInitializ
 		const userLoad = this.#currentUserContext?.load();
 		this.#userLoad = userLoad;
 		if (!userLoad) return;
-		await userLoad;
+		try {
+			await userLoad;
+		} catch {
+			// A failed load is not counted; the current user observer counts a later load that succeeds.
+			return;
+		}
 		if (userLoad !== this.#userLoad) return;
 		this.#isUserLoaded = true;
 		this.#updateActive();

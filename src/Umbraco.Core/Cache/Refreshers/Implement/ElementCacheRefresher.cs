@@ -165,7 +165,7 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
         else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode) || payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
             // NOTE: RefreshBranch might be triggered even though elements do not support branch publishing
-            _elementCacheService.RefreshMemoryCacheAsync(payload.Key).GetAwaiter().GetResult();
+            _elementCacheService.RefreshMemoryCache(payload.Key);
         }
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))

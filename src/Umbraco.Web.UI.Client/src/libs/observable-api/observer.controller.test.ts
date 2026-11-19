@@ -63,4 +63,41 @@ describe('UmbObserverController', () => {
 			expect(hostElement.hasUmbController(secondCtrl)).to.be.true;
 		});
 	});
+
+	describe('Observer Controllers on a disconnected host', () => {
+		let hostElement: UmbTestControllerHostElement;
+
+		beforeEach(() => {
+			hostElement = document.createElement('test-my-observer-controller-host') as UmbTestControllerHostElement;
+			document.body.appendChild(hostElement);
+			document.body.removeChild(hostElement);
+		});
+
+		it('stops observing once added to a host that has been disconnected', async () => {
+			const state = new UmbObjectState({ value: 'initial' });
+			const received: Array<string | undefined> = [];
+
+			new UmbObserverController(hostElement, state.asObservable(), (data) => received.push(data?.value));
+
+			await Promise.resolve();
+			state.setValue({ value: 'changed' });
+
+			expect(received).to.deep.equal(['initial']);
+		});
+
+		it('resumes observing with the current value when the host reconnects', async () => {
+			const state = new UmbObjectState({ value: 'initial' });
+			const received: Array<string | undefined> = [];
+
+			new UmbObserverController(hostElement, state.asObservable(), (data) => received.push(data?.value));
+
+			await Promise.resolve();
+			state.setValue({ value: 'changed' });
+			document.body.appendChild(hostElement);
+
+			expect(received).to.deep.equal(['initial', 'changed']);
+
+			document.body.removeChild(hostElement);
+		});
+	});
 });

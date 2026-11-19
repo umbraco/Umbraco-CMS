@@ -112,7 +112,6 @@ const richTextEditor = (id: string, name: string, blockElementTypeIds: Array<str
 			value: [
 				[
 					[
-						'Umb.Tiptap.Toolbar.StyleSelect',
 						'Umb.Tiptap.Toolbar.Bold',
 						'Umb.Tiptap.Toolbar.Italic',
 						'Umb.Tiptap.Toolbar.BulletList',
@@ -427,6 +426,35 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{ alias: 'useSingleBlockMode', value: false },
 			{ alias: 'useLiveEditing', value: true },
 			{ alias: 'useInlineEditingAsDefault', value: true },
+		],
+	),
+	dataType(
+		DATA_TYPE_IDS.mediaCollection,
+		'Collection View - Media',
+		'Umbraco.ListView',
+		'Umb.PropertyEditorUi.Collection',
+		[
+			{ alias: 'pageSize', value: 50 },
+			{ alias: 'orderBy', value: 'updateDate' },
+			{ alias: 'orderDirection', value: 'desc' },
+			{
+				alias: 'includeProperties',
+				value: [
+					{ alias: 'sortOrder', header: 'Sort order', isSystem: true, nameTemplate: null },
+					{ alias: 'updateDate', header: 'Last edited', isSystem: true, nameTemplate: null },
+					{ alias: 'creator', header: 'Created by', isSystem: true, nameTemplate: null },
+				],
+			},
+			{
+				alias: 'layouts',
+				value: [
+					{ icon: 'icon-grid', name: 'Media Grid Collection View', collectionView: 'Umb.CollectionView.Media.Grid' },
+					{ icon: 'icon-list', name: 'Media Table Collection View', collectionView: 'Umb.CollectionView.Media.Table' },
+				],
+			},
+			{ alias: 'icon', value: 'icon-layers' },
+			{ alias: 'tabName', value: 'Items' },
+			{ alias: 'showContentFirst', value: false },
 		],
 	),
 	dataType(DATA_TYPE_IDS.imageCropper, 'Image Cropper', 'Umbraco.ImageCropper', 'Umb.PropertyEditorUi.ImageCropper', [
