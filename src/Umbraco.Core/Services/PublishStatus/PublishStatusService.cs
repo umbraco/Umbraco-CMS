@@ -1,6 +1,11 @@
 using System.Collections.Concurrent;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services.Navigation;
@@ -16,6 +21,8 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly ILanguageService _languageService;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
+    private readonly IDomainCacheService _domainCacheService;
+    private readonly IIdKeyMap _idKeyMap;
 
     private ConcurrentDictionary<Guid, ISet<string>> _publishedCultures = new();
     private volatile bool _defaultCultureIsStale;
@@ -25,27 +32,59 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
     /// </summary>
     private string? DefaultCulture { get; set; }
 
-/// <summary>
-/// Initializes a new instance of the <see cref="PublishStatusService"/> class.
-/// </summary>
-/// <param name="logger">The logger for diagnostic output.</param>
-/// <param name="publishStatusRepository">The repository for accessing publish status data.</param>
-/// <param name="coreScopeProvider">The provider for creating database scopes.</param>
-/// <param name="languageService">The service for retrieving language information.</param>
-/// <param name="documentNavigationQueryService">The service for querying document navigation structure.</param>
-public PublishStatusService(
-    ILogger<PublishStatusService> logger,
-    IPublishStatusRepository publishStatusRepository,
-    ICoreScopeProvider coreScopeProvider,
-    ILanguageService languageService,
-    IDocumentNavigationQueryService documentNavigationQueryService)
-{
-    _logger = logger;
-    _publishStatusRepository = publishStatusRepository;
-    _coreScopeProvider = coreScopeProvider;
-    _languageService = languageService;
-    _documentNavigationQueryService = documentNavigationQueryService;
-}
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishStatusService"/> class.
+    /// </summary>
+    /// <param name="logger">The logger for diagnostic output.</param>
+    /// <param name="publishStatusRepository">The repository for accessing publish status data.</param>
+    /// <param name="coreScopeProvider">The provider for creating database scopes.</param>
+    /// <param name="languageService">The service for retrieving language information.</param>
+    /// <param name="documentNavigationQueryService">The service for querying document navigation structure.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
+    public PublishStatusService(
+        ILogger<PublishStatusService> logger,
+        IPublishStatusRepository publishStatusRepository,
+        ICoreScopeProvider coreScopeProvider,
+        ILanguageService languageService,
+        IDocumentNavigationQueryService documentNavigationQueryService)
+        : this(
+            logger,
+            publishStatusRepository,
+            coreScopeProvider,
+            languageService,
+            documentNavigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IDomainCacheService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishStatusService"/> class.
+    /// </summary>
+    /// <param name="logger">The logger for diagnostic output.</param>
+    /// <param name="publishStatusRepository">The repository for accessing publish status data.</param>
+    /// <param name="coreScopeProvider">The provider for creating database scopes.</param>
+    /// <param name="languageService">The service for retrieving language information.</param>
+    /// <param name="documentNavigationQueryService">The service for querying document navigation structure.</param>
+    /// <param name="domainCacheService">The service for retrieving the domains assigned to documents.</param>
+    /// <param name="idKeyMap">The map between document keys and identifiers.</param>
+    public PublishStatusService(
+        ILogger<PublishStatusService> logger,
+        IPublishStatusRepository publishStatusRepository,
+        ICoreScopeProvider coreScopeProvider,
+        ILanguageService languageService,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IDomainCacheService domainCacheService,
+        IIdKeyMap idKeyMap)
+    {
+        _logger = logger;
+        _publishStatusRepository = publishStatusRepository;
+        _coreScopeProvider = coreScopeProvider;
+        _languageService = languageService;
+        _documentNavigationQueryService = documentNavigationQueryService;
+        _domainCacheService = domainCacheService;
+        _idKeyMap = idKeyMap;
+    }
 
     /// <inheritdoc/>
     public async Task InitializeAsync(CancellationToken cancellationToken)
@@ -181,9 +220,27 @@ public PublishStatusService(
 
     /// <inheritdoc/>
     public bool HasPublishedAncestorPath(Guid contentKey, string culture)
-        => HasPublishedAncestorPathInternal(contentKey, culture);
+    {
+        if (culture == Constants.System.InvariantCulture)
+        {
+            return HasPublishedAncestorPathInternal(contentKey, culture);
+        }
 
-    private bool HasPublishedAncestorPathInternal(Guid contentKey, string? culture)
+        if (string.IsNullOrEmpty(culture) && GetDefaultCulture() is { } defaultCulture)
+        {
+            culture = defaultCulture;
+        }
+
+        // A domain for the culture starts that culture's route, so the ancestors above it are not part of it.
+        if (HasDomainForCulture(contentKey, culture))
+        {
+            return true;
+        }
+
+        return HasPublishedAncestorPathInternal(contentKey, culture, stopAtDomainForCulture: true);
+    }
+
+    private bool HasPublishedAncestorPathInternal(Guid contentKey, string? culture, bool stopAtDomainForCulture = false)
     {
         var success = _documentNavigationQueryService.TryGetAncestorsKeys(contentKey, out IEnumerable<Guid> keys);
         if (success is false)
@@ -204,9 +261,33 @@ public PublishStatusService(
             {
                 return false;
             }
+
+            if (stopAtDomainForCulture && HasDomainForCulture(key, culture!))
+            {
+                return true;
+            }
         }
 
         return true;
+    }
+
+    private bool HasDomainForCulture(Guid documentKey, string culture)
+    {
+        Attempt<int> idAttempt = _idKeyMap.GetIdForKey(documentKey, UmbracoObjectTypes.Document);
+        if (idAttempt.Success is false)
+        {
+            return false;
+        }
+
+        foreach (Domain domain in _domainCacheService.GetAssigned(idAttempt.Result, includeWildcards: false))
+        {
+            if (string.Equals(domain.Culture, culture, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <inheritdoc/>
