@@ -241,7 +241,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
         dropdownSingleDataType.ConfigurationData = new Dictionary<string, object>
         {
             { "multiple", false },
-            { "items", new [] { "One", "Two", "Three" } }
+            { "items", new [] { new { value = "One" }, new { value = "Two" }, new { value = "Three" } } }
         };
         await dataTypeService.CreateAsync(dropdownSingleDataType, Constants.Security.SuperUserKey);
 
@@ -256,7 +256,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
         dropdownMultipleDataType.ConfigurationData = new Dictionary<string, object>
         {
             { "multiple", true },
-            { "items", new [] { "One", "Two", "Three" } }
+            { "items", new [] { new { value = "One" }, new { value = "Two" }, new { value = "Three" } } }
         };
         await dataTypeService.CreateAsync(dropdownMultipleDataType, Constants.Security.SuperUserKey);
 
@@ -270,7 +270,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .Build();
         radioButtonListDataType.ConfigurationData = new Dictionary<string, object>
         {
-            { "items", new [] { "One", "Two", "Three" } }
+            { "items", new [] { new { value = "One" }, new { value = "Two" }, new { value = "Three" } } }
         };
         await dataTypeService.CreateAsync(radioButtonListDataType, Constants.Security.SuperUserKey);
 
@@ -284,7 +284,7 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .Build();
         checkBoxListDataType.ConfigurationData = new Dictionary<string, object>
         {
-            { "items", new [] { "One", "Two", "Three" } }
+            { "items", new [] { new { value = "One" }, new { value = "Two" }, new { value = "Three" } } }
         };
         await dataTypeService.CreateAsync(checkBoxListDataType, Constants.Security.SuperUserKey);
 

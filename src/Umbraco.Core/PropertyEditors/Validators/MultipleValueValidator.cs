@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -39,7 +37,7 @@ public class MultipleValueValidator : IValueValidator
         }
 
         var invalidValues = values
-            .Where(x => x.IsNullOrWhiteSpace() is false && valueListConfiguration.Items.Contains(x) is false)
+            .Where(x => x.IsNullOrWhiteSpace() is false && valueListConfiguration.Items.Any(option => option.Value == x) is false)
             .ToList();
 
         if (invalidValues.Count == 1)

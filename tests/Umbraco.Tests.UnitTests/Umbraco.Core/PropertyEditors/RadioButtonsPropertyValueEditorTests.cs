@@ -44,7 +44,7 @@ public class RadioButtonsPropertyValueEditorTests
 
         var configuration = new ValueListConfiguration
         {
-            Items = ["Red", "Green", "Blue"],
+            Items = [new() { Value = "Red" }, new() { Value = "Green" }, new() { Value = "Blue" }],
         };
 
         return new RadioButtonsPropertyEditor.RadioButtonsPropertyValueEditor(

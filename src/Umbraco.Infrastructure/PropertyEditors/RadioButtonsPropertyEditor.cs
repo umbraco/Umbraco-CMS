@@ -105,7 +105,7 @@ public class RadioButtonsPropertyEditor : DataEditor, IValueSchemaProvider
                 yield break;
             }
 
-            if (valueListConfiguration.Items.Contains(valueAsString) is false)
+            if (valueListConfiguration.Items.Any(option => option.Value == valueAsString) is false)
             {
                 yield return new ValidationResult(
                     _localizedTextService.Localize("validation", "notOneOfOptions", [valueAsString]),
