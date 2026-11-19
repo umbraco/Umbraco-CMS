@@ -127,6 +127,35 @@ public class PublishedRouterTests
         Assert.IsFalse(router.FindAndSetDomain(request));
     }
 
+    [TestCase(true, true)]
+    [TestCase(false, false)]
+    public async Task FindAndSetDomain_Without_A_Culture_Resolves_Domain_When_Content_Is_Published_In_Any_Culture(bool isPublishedInAnyCulture, bool expectedResolved)
+    {
+        (PublishedRouter router, IPublishedRequestBuilder request, _) = await SetUpDomainRoutingAsync(
+            domainContentId: 1234,
+            domainCulture: null,
+            isPublishedInCulture: false,
+            hasPublishedAncestorPath: true,
+            isInPreview: false,
+            isPublishedInAnyCulture: isPublishedInAnyCulture);
+
+        Assert.AreEqual(expectedResolved, router.FindAndSetDomain(request));
+    }
+
+    [Test]
+    public async Task FindAndSetDomain_Without_A_Culture_Ignores_Domain_When_Ancestor_Path_Is_Not_Published()
+    {
+        (PublishedRouter router, IPublishedRequestBuilder request, _) = await SetUpDomainRoutingAsync(
+            domainContentId: 1234,
+            domainCulture: null,
+            isPublishedInCulture: false,
+            hasPublishedAncestorPath: false,
+            isInPreview: false,
+            isPublishedInAnyCulture: true);
+
+        Assert.IsFalse(router.FindAndSetDomain(request));
+    }
+
     [Test]
     public async Task FindAndSetDomain_Resolves_Domain_From_The_Content_Cache_When_Previewing()
     {
@@ -174,12 +203,13 @@ public class PublishedRouterTests
 
     private async Task<(PublishedRouter Router, IPublishedRequestBuilder Request, Mock<IPublishedContentCache> ContentCache)> SetUpDomainRoutingAsync(
         int domainContentId,
-        string domainCulture,
+        string? domainCulture,
         bool isPublishedInCulture,
         bool hasPublishedAncestorPath,
         bool isInPreview,
         bool keyResolves = true,
-        bool umbracoContextInPreviewMode = false)
+        bool umbracoContextInPreviewMode = false,
+        bool isPublishedInAnyCulture = false)
     {
         var documentKey = Guid.NewGuid();
 
@@ -189,7 +219,12 @@ public class PublishedRouterTests
             .Returns(keyResolves ? Attempt.Succeed(documentKey) : Attempt<Guid>.Fail());
 
         var publishStatus = new Mock<IPublishStatusQueryService>();
-        publishStatus.Setup(x => x.IsDocumentPublished(documentKey, domainCulture)).Returns(isPublishedInCulture);
+        if (domainCulture is not null)
+        {
+            publishStatus.Setup(x => x.IsDocumentPublished(documentKey, domainCulture)).Returns(isPublishedInCulture);
+        }
+
+        publishStatus.Setup(x => x.IsDocumentPublishedInAnyCulture(documentKey)).Returns(isPublishedInAnyCulture);
         publishStatus.Setup(x => x.HasPublishedAncestorPath(documentKey)).Returns(hasPublishedAncestorPath);
 
         // Strict, so that reading content from the cache outside of preview fails the test.
@@ -204,7 +239,7 @@ public class PublishedRouterTests
 
         var domainCache = new Mock<IDomainCache>();
         domainCache.Setup(x => x.GetAll(false)).Returns([new Domain(1, "example.com", domainContentId, domainCulture, false, 0)]);
-        domainCache.Setup(x => x.DefaultCulture).Returns(domainCulture);
+        domainCache.Setup(x => x.DefaultCulture).Returns(domainCulture ?? "en-US");
 
         var uri = new Uri("http://example.com");
         var umbracoContext = new Mock<IUmbracoContext>();
