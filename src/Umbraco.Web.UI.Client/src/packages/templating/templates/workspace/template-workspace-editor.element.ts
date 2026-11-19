@@ -1,9 +1,8 @@
 import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context-token.js';
-import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 /**
  * Template alias pattern - allows first character to be a letter, digit, or underscore.
@@ -19,25 +18,14 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _alias?: string = '';
 
-	/**
-	 * Whether editing is restricted. True when in production mode OR when runtime mode is still unknown.
-	 * This ensures a safe default (restricted) until we confirm the runtime mode.
-	 */
 	@state()
-	private _isRestricted = true;
+	private _isReadOnly = false;
 
 	#templateWorkspaceContext?: typeof UMB_TEMPLATE_WORKSPACE_CONTEXT.TYPE;
 	#isNew = false;
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
-			this.observe(context?.isProductionMode, (isProductionMode) => {
-				// Restricted until we confirm it's NOT production mode (safe default).
-				this._isRestricted = isProductionMode !== false;
-			});
-		});
 
 		this.consumeContext(UMB_TEMPLATE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#templateWorkspaceContext = workspaceContext;
@@ -52,6 +40,12 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			this.observe(this.#templateWorkspaceContext?.isNew, (isNew) => {
 				this.#isNew = !!isNew;
 			});
+
+			this.observe(
+				workspaceContext?.readOnlyGuard.permitted,
+				(isReadOnly) => (this._isReadOnly = isReadOnly ?? false),
+				'_observeIsReadOnly',
+			);
 		});
 	}
 
@@ -72,11 +66,16 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 					.alias=${this._alias}
 					alias-pattern=${UMB_TEMPLATE_ALIAS_PATTERN}
 					?auto-generate-alias=${this.#isNew}
-					?readonly=${this._isRestricted}
+					?readonly=${this._isReadOnly}
 					@change=${this.#onNameAndAliasChange}
 					required
 					${umbBindToValidation(this)}
 					${umbFocus()}>
+					${this._isReadOnly
+						? html`<uui-tag id="read-only-tag" slot="append" look="secondary">
+								${this.localize.term('general_readOnly')}
+							</uui-tag>`
+						: nothing}
 				</umb-input-with-alias>
 			</umb-entity-detail-workspace-editor>
 		`;
@@ -86,6 +85,12 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		css`
 			umb-input-with-alias {
 				width: 100%;
+			}
+
+			#read-only-tag {
+				align-self: center;
+				margin: 0 var(--uui-size-space-2);
+				white-space: nowrap;
 			}
 		`,
 	];

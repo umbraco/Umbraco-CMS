@@ -72,7 +72,7 @@ test('can change property editor in a data type', {tag: '@smoke'}, async ({umbra
 
   // Act
   await umbracoUi.dataType.goToDataType(dataTypeName);
-  await umbracoUi.dataType.clickChangeButton();
+  await umbracoUi.dataType.clickReplaceButton();
   await umbracoUi.dataType.selectAPropertyEditor(updatedEditorName);
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
