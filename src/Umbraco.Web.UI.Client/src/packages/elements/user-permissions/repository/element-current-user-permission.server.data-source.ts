@@ -9,7 +9,7 @@ import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
  * @class UmbElementCurrentUserPermissionServerDataSource
  */
 export class UmbElementCurrentUserPermissionServerDataSource {
-	#host: UmbControllerHost;
+	readonly #host: UmbControllerHost;
 
 	/**
 	 * Creates an instance of UmbElementCurrentUserPermissionServerDataSource.

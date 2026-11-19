@@ -3,19 +3,19 @@ import type {
 	UmbBlockTransferToElementLibraryModalValue,
 } from './transfer-to-element-library-modal.token.js';
 import { css, customElement, html, ifDefined, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
-import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import {
+	UmbElementTypeStructureRepository,
 	UMB_ELEMENT_CURRENT_USER_PERMISSION_REPOSITORY_ALIAS,
 	UMB_USER_PERMISSION_ELEMENT_CREATE,
 	UMB_USER_PERMISSION_ELEMENT_PUBLISH,
-	UmbElementTypeStructureRepository,
-	type UmbElementCurrentUserPermissionRepository,
 } from '@umbraco-cms/backoffice/element';
-import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import type { UmbElementCurrentUserPermissionRepository } from '@umbraco-cms/backoffice/element';
+import type { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-block-transfer-to-element-library-modal')
 export class UmbBlockTransferToElementLibraryModalElement extends UmbModalBaseElement<
@@ -111,7 +111,8 @@ export class UmbBlockTransferToElementLibraryModalElement extends UmbModalBaseEl
 			this,
 			UMB_ELEMENT_CURRENT_USER_PERMISSION_REPOSITORY_ALIAS,
 		);
-		const { data } = await repository.requestPermissions([folderUnique]);
+		const { data, error } = await repository.requestPermissions([folderUnique]);
+		if (error) throw error;
 		return data?.find((item) => item.unique === folderUnique)?.verbs ?? [];
 	}
 

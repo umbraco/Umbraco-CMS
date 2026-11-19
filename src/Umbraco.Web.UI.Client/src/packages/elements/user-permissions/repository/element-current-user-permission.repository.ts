@@ -7,10 +7,11 @@ import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/back
  * @class UmbElementCurrentUserPermissionRepository
  */
 export class UmbElementCurrentUserPermissionRepository extends UmbRepositoryBase {
-	#dataSource = new UmbElementCurrentUserPermissionServerDataSource(this);
+	readonly #dataSource = new UmbElementCurrentUserPermissionServerDataSource(this);
 
 	/**
 	 * Requests the permissions the current user has at the given elements or element folders.
+	 * The request is all-or-nothing: if any of the uniques cannot be found, the response contains an error and no data.
 	 * @param {Array<string>} uniques - The uniques of the elements or element folders
 	 * @returns {Promise<UmbRepositoryResponse<Array<UmbElementCurrentUserPermissionsModel>>>} The permissions for each unique
 	 * @memberof UmbElementCurrentUserPermissionRepository
