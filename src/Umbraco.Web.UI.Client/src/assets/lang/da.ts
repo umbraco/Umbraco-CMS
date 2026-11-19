@@ -2248,8 +2248,8 @@ export default {
 		type: 'Type',
 		sortNameAscending: 'Navn (A-Å)',
 		sortNameDescending: 'Navn (Å-A)',
-		sortCreateDateAscending: 'Nyeste',
-		sortCreateDateDescending: 'Ældste',
+		sortCreateDateAscending: 'Ældste',
+		sortCreateDateDescending: 'Nyeste',
 		userKindDefault: 'Bruger',
 		userKindApi: 'API-bruger',
 		sortLastLoginDateDescending: 'Sidst logget ind',
@@ -3115,5 +3115,6 @@ export default {
 		cultureSelectLabel: 'Kultur',
 		searchDisabled: 'Søgning utilgængelig. Indeksstatus:',
 		searchError: 'Søgningen fejlede. Prøv igen.',
+		searchNotAllowed: 'Du har ikke adgang til at søge i dette indeks.',
 	},
 } as UmbLocalizationDictionary;

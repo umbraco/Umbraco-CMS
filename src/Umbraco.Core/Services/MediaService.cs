@@ -1448,7 +1448,7 @@ namespace Umbraco.Cms.Core.Services
                     .WhereNotNull()
                     .ToArray();
 
-                var savingNotification = new MediaSavingNotification(itemsA, messages);
+                var savingNotification = new MediaSavingNotification(itemsA, messages) { IsSorting = true };
 #pragma warning disable CS0618 // Type or member is obsolete
                 if (scope.Notifications.PublishCancelable(savingNotification))
 #pragma warning restore CS0618 // Type or member is obsolete

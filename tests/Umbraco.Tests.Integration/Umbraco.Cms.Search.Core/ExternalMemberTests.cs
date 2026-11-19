@@ -48,7 +48,9 @@ public class ExternalMemberTests : ContentBaseTestBase
     [Test]
     public async Task CreateExternalMember_YieldsDocumentWithSystemAndMemberFields()
     {
-        ExternalMemberIdentity member = await CreateExternalMemberAsync("external-one@local", "External One");
+        ExternalMemberIdentity createdMember = await CreateExternalMemberAsync("external-one@local", "External One");
+        ExternalMemberIdentity member = await ExternalMemberService.GetByKeyAsync(createdMember.Key)
+            ?? throw new InvalidOperationException("External member was not found");
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.Member);
         Assert.That(documents, Has.Count.EqualTo(1));

@@ -23,7 +23,7 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
             .Where<NodeDto>(x => x.Path.SqlStartsWith(content.Path, TextColumnType.NVarchar));
 
         Assert.AreEqual(
-            "SELECT * FROM [umbracoNode] WHERE (upper([umbracoNode].[path]) LIKE upper(@0))",
+            "SELECT * FROM [umbracoNode] WHERE (upper([umbracoNode].[path]) LIKE upper(@0) ESCAPE '\\')",
             sql.SQL.Replace("\n", " "));
         Assert.AreEqual(1, sql.Arguments.Length);
         Assert.AreEqual(content.Path + "%", sql.Arguments[0]);
@@ -37,7 +37,7 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
             .Where<NodeDto>(x => x.Path.StartsWith(content.Path) && x.NodeId != content.NodeId);
 
         Assert.AreEqual(
-            "SELECT * FROM [umbracoNode] WHERE ((upper([umbracoNode].[path]) LIKE upper(@0) AND ([umbracoNode].[id] <> @1)))",
+            "SELECT * FROM [umbracoNode] WHERE ((upper([umbracoNode].[path]) LIKE upper(@0) ESCAPE '\\' AND ([umbracoNode].[id] <> @1)))",
             sql.SQL.Replace("\n", " "));
         Assert.AreEqual(2, sql.Arguments.Length);
         Assert.AreEqual(content.Path + "%", sql.Arguments[0]);
@@ -52,7 +52,7 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
             .Where<NodeDto>(x => x.Level == level && !x.Path.StartsWith("-20"));
 
         Assert.AreEqual(
-            "SELECT * FROM [umbracoNode] WHERE ((([umbracoNode].[level] = @0) AND NOT (upper([umbracoNode].[path]) LIKE upper(@1))))",
+            "SELECT * FROM [umbracoNode] WHERE ((([umbracoNode].[level] = @0) AND NOT (upper([umbracoNode].[path]) LIKE upper(@1) ESCAPE '\\')))",
             sql.SQL.Replace("\n", " "));
         Assert.AreEqual(2, sql.Arguments.Length);
         Assert.AreEqual(level, sql.Arguments[0]);
@@ -67,7 +67,7 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
             .Where<NodeDto>(x => x.Level == level && x.Path.StartsWith("-20") == false);
 
         Assert.AreEqual(
-            "SELECT * FROM [umbracoNode] WHERE ((([umbracoNode].[level] = @0) AND NOT (upper([umbracoNode].[path]) LIKE upper(@1))))",
+            "SELECT * FROM [umbracoNode] WHERE ((([umbracoNode].[level] = @0) AND NOT (upper([umbracoNode].[path]) LIKE upper(@1) ESCAPE '\\')))",
             sql.SQL.Replace("\n", " "));
         Assert.AreEqual(2, sql.Arguments.Length);
         Assert.AreEqual(level, sql.Arguments[0]);
@@ -150,7 +150,7 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
             .Where<NodeDto>(x => x.Text.StartsWith("D"));
 
         Assert.AreEqual(
-            "SELECT * FROM [umbracoNode] WHERE (upper([umbracoNode].[text]) LIKE upper(@0))",
+            "SELECT * FROM [umbracoNode] WHERE (upper([umbracoNode].[text]) LIKE upper(@0) ESCAPE '\\')",
             sql.SQL.Replace("\n", " "));
         Assert.AreEqual(1, sql.Arguments.Length);
         Assert.AreEqual("D%", sql.Arguments[0]);

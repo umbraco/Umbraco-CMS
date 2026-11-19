@@ -14,6 +14,7 @@ export class UiBaseLocators extends BasePage {
   public readonly addBtn: Locator;
   public readonly updateBtn: Locator;
   public readonly changeBtn: Locator;
+  public readonly replaceBtn: Locator;
   public readonly deleteBtn: Locator;
   public readonly deleteExactBtn: Locator;
   public readonly removeExactBtn: Locator;
@@ -88,7 +89,7 @@ export class UiBaseLocators extends BasePage {
   public readonly property: Locator;
   public readonly addPropertyBtn: Locator;
   public readonly labelAboveBtn: Locator;
-  public readonly propertyEditorChangeBtn: Locator;
+  public readonly propertyEditorReplaceBtn: Locator;
 
   // Group & Tab Management
   public readonly addGroupBtn: Locator;
@@ -228,6 +229,10 @@ export class UiBaseLocators extends BasePage {
   public readonly confirmActionModalEntityReferences: Locator;
   public readonly referenceHeadline: Locator;
   public readonly entityItemRef: Locator;
+  public readonly viewDependentItemsBtn: Locator;
+  public readonly viewReferencedDescendantsBtn: Locator;
+  public readonly entityReferencesModal: Locator;
+  public readonly entityReferencesModalCloseBtn: Locator;
   public readonly entityItem: Locator;
 
   // Workspace & Action
@@ -278,6 +283,7 @@ export class UiBaseLocators extends BasePage {
     this.addBtn = page.getByRole("button", { name: "Add", exact: true });
     this.updateBtn = page.getByLabel("Update");
     this.changeBtn = page.getByLabel("Change", { exact: true });
+    this.replaceBtn = page.getByLabel("Replace", { exact: true });
     this.deleteBtn = page.getByRole("button", { name: /^Delete(…)?$/ });
     this.deleteExactBtn = page.getByRole("button", {
       name: "Delete",
@@ -378,7 +384,7 @@ export class UiBaseLocators extends BasePage {
       .locator("uui-modal-sidebar")
       .getByTestId("input:propertytype-description")
       .locator("#textarea");
-    this.propertyEditorChangeBtn = page.locator('[label="Property editor"]').getByLabel('Change');
+    this.propertyEditorReplaceBtn = page.locator('[label="Property editor"]').getByLabel('Replace', { exact: true });
     this.property = page.locator("umb-property");
     this.addPropertyBtn = page.getByLabel("Add property", { exact: true });
     this.labelAboveBtn = page
@@ -596,12 +602,18 @@ export class UiBaseLocators extends BasePage {
     this.confirmActionModalEntityReferences = page.locator(
       "umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references",
     );
-    this.entityItemRef = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references,umb-entity-references-workspace-info-app').locator('uui-ref-list').first().getByTestId('entity-item-ref');
+    // Single-entity confirm dialogs summarise references behind a "View items that depend on this…" button that
+    // opens umb-entity-references-modal; bulk dialogs and the workspace info app still list them inline.
+    this.entityReferencesModal = page.locator('umb-entity-references-modal');
+    // Target the uui-button host: its inner native button sits behind the slotted label, which intercepts clicks.
+    this.viewDependentItemsBtn = page.locator('umb-entity-references-summary uui-button').filter({hasText: 'View items that depend on this'});
+    this.viewReferencedDescendantsBtn = page.locator('umb-entity-references-summary uui-button').filter({hasText: 'View referenced descendants'});
+    this.entityReferencesModalCloseBtn = this.entityReferencesModal.getByLabel('Close');
+    this.entityItemRef = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references,umb-entity-references-workspace-info-app,umb-entity-references-modal').locator('uui-ref-list').first().getByTestId('entity-item-ref');
     this.referenceHeadline = page
       .locator(
-        "umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references",
+        'umb-confirm-action-modal-entity-references #reference-headline, umb-confirm-bulk-action-modal-entity-references #reference-headline, umb-entity-references-modal umb-localize[key="references_labelDependsOnThis"], umb-entity-references-modal umb-localize[key="references_labelDependentDescendants"]',
       )
-      .locator("#reference-headline")
       .first();
     this.entityItem = page.locator("umb-entity-item-ref");
 
@@ -807,6 +819,10 @@ export class UiBaseLocators extends BasePage {
 
   async clickChangeButton() {
     await this.click(this.changeBtn);
+  }
+
+  async clickReplaceButton() {
+    await this.click(this.replaceBtn);
   }
 
   async clickDeleteButton() {
@@ -1079,6 +1095,10 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
+  async clickCaretButtonForModalMenuItemWithName(name: string) {
+    await this.click(this.sidebarModal.locator(`uui-menu-item[label="${name}"] #caret-button`).last());
+  }
+
   async doesModalHaveText(text: string) {
     await this.containsText(this.openedModal, text);
   }
@@ -1279,7 +1299,7 @@ export class UiBaseLocators extends BasePage {
 
   async updatePropertyEditor(propertyEditorName: string) {
     await this.clickEditorSettingsButton();
-    await this.click(this.propertyEditorChangeBtn);
+    await this.click(this.propertyEditorReplaceBtn);
     await this.searchForTypeToFilterValue(propertyEditorName);
     await this.click(this.page.getByText(propertyEditorName, { exact: true }));
     await this.enterAPropertyName(propertyEditorName);
@@ -1822,8 +1842,13 @@ export class UiBaseLocators extends BasePage {
     // Wait for the backoffice to finish loading; clicking before the current-user extension bundle is ready
     // no-ops, so the modal never opens.
     await this.waitForPageLoad();
-    await this.click(this.currentUserAvatarBtn);
-    await expect(this.currentUserModal).toBeVisible({timeout: ConstantHelper.timeout.long});
+    // Only click while the modal is closed: a click with the modal open closes it.
+    await expect(async () => {
+      if (!(await this.currentUserModal.isVisible())) {
+        await this.click(this.currentUserAvatarBtn);
+      }
+      await expect(this.currentUserModal).toBeVisible({timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.long});
   }
 
   // Collection Methods
@@ -1893,6 +1918,19 @@ export class UiBaseLocators extends BasePage {
 
   async doesReferencesContainText(text: string) {
     await this.containsText(this.confirmActionModalEntityReferences, text);
+  }
+
+  async clickViewItemsThatDependOnThisButton() {
+    await this.click(this.viewDependentItemsBtn);
+  }
+
+  async clickViewReferencedDescendantsButton() {
+    await this.click(this.viewReferencedDescendantsBtn);
+  }
+
+  async clickCloseEntityReferencesModalButton() {
+    await this.click(this.entityReferencesModalCloseBtn);
+    await this.isVisible(this.entityReferencesModal, false);
   }
 
   // Entity Action Methods
@@ -2293,5 +2331,11 @@ export class UiBaseLocators extends BasePage {
       await this.languageBtn.selectOption(language, {force: true});
       await expect(this.uiCultureInput).toHaveAttribute('value', language.toLowerCase(), {timeout: ConstantHelper.timeout.short});
     }).toPass({timeout: ConstantHelper.timeout.medium});
+  }
+
+  async clickSegmentVariantButton(segmentName: string) {
+    const segmentVariant = this.page.locator('.variant.segment-variant').filter({has: this.page.locator('.variant-name', {hasText: segmentName})});
+    await this.click(segmentVariant.locator('button.switch-button'));
+    await expect(segmentVariant).toContainClass('selected');
   }
 }

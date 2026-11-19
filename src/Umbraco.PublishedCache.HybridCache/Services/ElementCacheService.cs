@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSizeReporter
 {
     private readonly IDatabaseCacheRepository _databaseCacheRepository;
+    private readonly IContentCacheDataSerializerFactory _serializerFactory;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly Microsoft.Extensions.Caching.Hybrid.HybridCache _hybridCache;
     private readonly IPublishedContentFactory _publishedContentFactory;
@@ -30,6 +31,11 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
     private readonly IPreviewAccessEvaluator _previewAccessEvaluator;
     private readonly CacheSettings _cacheSettings;
     private readonly ILogger<ElementCacheService> _logger;
+    private readonly ElementSourceReader _readElementSourceAsync;
+    private readonly ElementSourceReader _readElementSource;
+    private readonly ElementSourcesReader _readElementSourcesAsync;
+    private readonly ElementSourcesReader _readElementSources;
+    private readonly KeyedLock<Guid> _refreshLocks = new();
     private HashSet<Guid>? _seedKeys;
 
     private readonly IConvertedPublishedContentCache<string, IPublishedElement> _publishedElementCache;
@@ -80,9 +86,11 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         IOptions<CacheSettings> cacheSettings,
         ILogger<ElementCacheService> logger,
         IConvertedPublishedContentCacheFactory cacheFactory,
-        IPreviewAccessEvaluator previewAccessEvaluator)
+        IPreviewAccessEvaluator previewAccessEvaluator,
+        IContentCacheDataSerializerFactory serializerFactory)
     {
         _databaseCacheRepository = databaseCacheRepository;
+        _serializerFactory = serializerFactory;
         _scopeProvider = scopeProvider;
         _hybridCache = hybridCache;
         _publishedContentFactory = publishedContentFactory;
@@ -94,7 +102,18 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
         _publishedElementCache = cacheFactory.Create<string, IPublishedElement>(_cacheSettings.Entry.Element.MaximumLocalCacheItems, CacheName);
+
+        _readElementSourceAsync = _databaseCacheRepository.GetElementSourceAsync;
+        _readElementSource = (key, preview) => Task.FromResult(_databaseCacheRepository.GetElementSource(key, preview));
+        _readElementSourcesAsync = _databaseCacheRepository.GetElementSourcesAsync;
+        _readElementSources = (keys, preview) => Task.FromResult(_databaseCacheRepository.GetElementSources(keys, preview));
     }
+
+    // Reads element sources from the database. The synchronous members pass a reader that reads synchronously and
+    // returns a completed task, so the shared read logic only awaits what HybridCache itself has to wait for.
+    private delegate Task<ContentCacheNode?> ElementSourceReader(Guid key, bool preview);
+
+    private delegate Task<IEnumerable<ContentCacheNode>> ElementSourcesReader(IEnumerable<Guid> keys, bool preview);
 
     /// <inheritdoc />
     public string CacheName => "Published elements (converted, L0)";
@@ -105,16 +124,216 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
     /// <inheritdoc />
     public long? GetApproximateBytes() => _publishedElementCache.ApproximateSizeInBytes;
 
-    public async Task<IPublishedElement?> GetByKeyAsync(Guid key, bool? preview = null)
+    // The synchronous member returns an L0 hit directly, and otherwise runs the same read logic as the asynchronous
+    // one with a synchronous database reader. The returned task has then already completed, unless HybridCache
+    // itself had to wait (an L2 round trip, or a concurrent read of the same key), so synchronous callers do not
+    // block on asynchronous I/O.
+
+    /// <inheritdoc />
+    public Task<IPublishedElement?> GetByKeyAsync(Guid key, bool? preview = null)
+        => GetAccessibleNodeAsync(key, preview ?? _previewSessionService.IsActive(), _readElementSourceAsync);
+
+    /// <inheritdoc />
+    public IPublishedElement? GetByKey(Guid key, bool? preview = null)
     {
         bool calculatedPreview = preview ?? _previewSessionService.IsActive();
-        IPublishedElement? element = await GetNodeAsync(key, calculatedPreview);
+        return TryGetCached(key, calculatedPreview, out IPublishedElement? cached)
+            ? cached
+            : GetByKeyWithSynchronousReadsAsync(key, calculatedPreview).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Runs the read logic behind <see cref="GetByKey"/>, reading the database synchronously on a cache miss.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="GetByKey"/> blocks on the returned task, which only avoids sync-over-async if the task has already
+    /// completed when it is returned. That holds only while every await in the shared read logic completes
+    /// synchronously, so it is kept as a separate method for tests to assert on directly; the public member can't
+    /// show whether it blocked. It is internal because it exists only to verify that guarantee, not as an API.
+    /// </remarks>
+    internal Task<IPublishedElement?> GetByKeyWithSynchronousReadsAsync(Guid key, bool preview)
+        => GetAccessibleNodeAsync(key, preview, _readElementSource);
+
+    private async Task<IPublishedElement?> GetAccessibleNodeAsync(Guid key, bool preview, ElementSourceReader readElementSource)
+    {
+        IPublishedElement? element = await GetNodeAsync(key, preview, readElementSource);
 
         // As for documents (see DocumentCacheService), a draft is only handed out when the preview user may browse
         // the element; otherwise it resolves as it would outside preview: its published version, or nothing.
-        return calculatedPreview && element is not null && _previewAccessEvaluator.CanPreviewElement(element) is false
-            ? await GetNodeAsync(key, false)
+        return preview && element is not null && _previewAccessEvaluator.CanPreviewElement(element) is false
+            ? await GetNodeAsync(key, false, readElementSource)
             : element;
+    }
+
+    /// <inheritdoc />
+    public Task<IReadOnlyList<IPublishedElement>> GetByKeysAsync(IReadOnlyCollection<Guid> keys, bool? preview = null)
+        => GetByKeysCoreAsync(keys, preview ?? _previewSessionService.IsActive(), _readElementSourcesAsync);
+
+    /// <inheritdoc />
+    public IReadOnlyList<IPublishedElement> GetByKeys(IReadOnlyCollection<Guid> keys, bool? preview = null)
+        => GetByKeysWithSynchronousReadsAsync(keys, preview ?? _previewSessionService.IsActive()).GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Runs the read logic behind <see cref="GetByKeys"/>, reading the database synchronously on a cache miss.
+    /// </summary>
+    /// <remarks>See <see cref="GetByKeyWithSynchronousReadsAsync"/>.</remarks>
+    internal Task<IReadOnlyList<IPublishedElement>> GetByKeysWithSynchronousReadsAsync(IReadOnlyCollection<Guid> keys, bool preview)
+        => GetByKeysCoreAsync(keys, preview, _readElementSources);
+
+    // The batch equivalent of GetAccessibleNodeAsync: it resolves to what the same keys would one at a time, but the
+    // keys that miss both caches share one database read.
+    private async Task<IReadOnlyList<IPublishedElement>> GetByKeysCoreAsync(IReadOnlyCollection<Guid> keys, bool preview, ElementSourcesReader readElementSources)
+    {
+        // Captured once before any backing-store read, so a refresh landing mid-fetch makes the whole set skip its
+        // write-back rather than overwrite fresher entries (see GetNodeAsync).
+        long generation = Interlocked.Read(ref _cacheGeneration);
+
+        var resolved = new Dictionary<Guid, IPublishedElement>(keys.Count);
+
+        // Each tier is handed only the keys the previous one could not account for: the L0 probe, the L1/L2 probe,
+        // then a single batched database read.
+        List<Guid> pending = ProbeConvertedCache(keys, preview, resolved);
+        if (pending.Count > 0)
+        {
+            pending = await ProbeHybridCacheAsync(pending, preview, generation, resolved);
+        }
+
+        if (pending.Count > 0)
+        {
+            await ReadFromDatabaseAsync(pending, preview, generation, resolved, readElementSources);
+        }
+
+        if (preview)
+        {
+            await ReplaceInaccessibleDraftsAsync(resolved, readElementSources);
+        }
+
+        var ordered = new List<IPublishedElement>(keys.Count);
+        foreach (Guid key in keys)
+        {
+            if (resolved.TryGetValue(key, out IPublishedElement? element))
+            {
+                ordered.Add(element);
+            }
+        }
+
+        return ordered;
+    }
+
+    // Replaces the drafts the preview user may not browse with their published versions; see GetAccessibleNodeAsync.
+    private async Task ReplaceInaccessibleDraftsAsync(Dictionary<Guid, IPublishedElement> resolved, ElementSourcesReader readElementSources)
+    {
+        Guid[] inaccessibleKeys = resolved
+            .Where(entry => _previewAccessEvaluator.CanPreviewElement(entry.Value) is false)
+            .Select(entry => entry.Key)
+            .ToArray();
+        if (inaccessibleKeys.Length == 0)
+        {
+            return;
+        }
+
+        foreach (Guid key in inaccessibleKeys)
+        {
+            resolved.Remove(key);
+        }
+
+        foreach (IPublishedElement element in await GetByKeysCoreAsync(inaccessibleKeys, false, readElementSources))
+        {
+            resolved[element.Key] = element;
+        }
+    }
+
+    private List<Guid> ProbeConvertedCache(IReadOnlyCollection<Guid> keys, bool preview, Dictionary<Guid, IPublishedElement> resolved)
+    {
+        var pending = new List<Guid>(keys.Count);
+        var seen = new HashSet<Guid>(keys.Count);
+
+        foreach (Guid key in keys)
+        {
+            if (seen.Add(key) is false)
+            {
+                continue;
+            }
+
+            if (TryGetCached(key, preview, out IPublishedElement? cached) && cached is not null)
+            {
+                resolved[key] = cached;
+            }
+            else
+            {
+                pending.Add(key);
+            }
+        }
+
+        return pending;
+    }
+
+    // An entry holding a null node is a cached "this key resolves to nothing", written deliberately by GetNodeAsync,
+    // so it accounts for its key and is not passed on to the database read.
+    private async Task<List<Guid>> ProbeHybridCacheAsync(List<Guid> keys, bool preview, long generation, Dictionary<Guid, IPublishedElement> resolved)
+    {
+        var pending = new List<Guid>(keys.Count);
+
+        foreach (Guid key in keys)
+        {
+            (bool exists, ContentCacheNode? node) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(GetCacheKey(key, preview), CancellationToken.None);
+            if (exists is false)
+            {
+                pending.Add(key);
+            }
+            else if (node is not null)
+            {
+                ResolveNode(key, node, preview, generation, resolved);
+            }
+        }
+
+        return pending;
+    }
+
+    private async Task ReadFromDatabaseAsync(List<Guid> keys, bool preview, long generation, Dictionary<Guid, IPublishedElement> resolved, ElementSourcesReader readElementSources)
+    {
+        IReadOnlyCollection<ContentCacheNode> nodes = (await readElementSources(keys, preview)).ToArray();
+
+        foreach (ContentCacheNode node in nodes)
+        {
+            ResolveNode(node.Key, node, preview, generation, resolved);
+        }
+
+        if (IsCacheGenerationCurrent(generation) is false)
+        {
+            return;
+        }
+
+        // As GetNodeAsync does for a single key, promote what the database returned into L1, and cache a null for the
+        // keys it had nothing for so they are not re-read on every request.
+        foreach (ContentCacheNode node in nodes)
+        {
+            await _hybridCache.SetAsync(GetCacheKey(node.Key, preview), node, GetEntryOptions(node.Key, preview), GenerateTags(node));
+        }
+
+        var returnedKeys = nodes.Select(node => node.Key).ToHashSet();
+        foreach (Guid key in keys.Where(key => returnedKeys.Contains(key) is false))
+        {
+            await _hybridCache.SetAsync(GetCacheKey(key, preview), (ContentCacheNode?)null, GetEntryOptions(key, preview), GenerateTags(null));
+        }
+    }
+
+    // Converts a cache node, adds it to the resolved set and, when the snapshot is still current, populates L0
+    // (published only, as in GetNodeAsync).
+    private void ResolveNode(Guid key, ContentCacheNode node, bool preview, long generation, Dictionary<Guid, IPublishedElement> resolved)
+    {
+        IPublishedElement? element = _publishedContentFactory.ToIPublishedElement(node, preview)?.CreateModel(_publishedModelFactory);
+        if (element is null)
+        {
+            return;
+        }
+
+        resolved[key] = element;
+
+        if (preview is false && IsCacheGenerationCurrent(generation))
+        {
+            _publishedElementCache.Set(GetCacheKey(key, preview), element, ContentCacheNodeSizeEstimator.EstimateBytes(node));
+        }
     }
 
     public bool TryGetCached(Guid key, bool preview, out IPublishedElement? element)
@@ -129,7 +348,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         return false;
     }
 
-    private async Task<IPublishedElement?> GetNodeAsync(Guid key, bool preview)
+    private async Task<IPublishedElement?> GetNodeAsync(Guid key, bool preview, ElementSourceReader readElementSource)
     {
         var cacheKey = GetCacheKey(key, preview);
 
@@ -139,6 +358,12 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         }
 
         (bool exists, ContentCacheNode? contentCacheNode) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
+
+        // The entry is another entity type's, so the key identifies no element.
+        if (contentCacheNode?.IsOtherEntityType(ContentCacheDataSerializerEntityType.Element) is true)
+        {
+            return null;
+        }
 
         // A value found in the backing store is already current, so it can always populate the caches
         // below; only a value built from the read-through DB fetch needs the generation guard.
@@ -151,12 +376,13 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
             // memory permanently stale until a full clear).
             long generation = Interlocked.Read(ref _cacheGeneration);
 
-            contentCacheNode = await GetContentCacheNodeFromRepo();
+            bool cacheable;
+            (contentCacheNode, cacheable) = await GetContentCacheNodeFromRepo();
             snapshotIsCurrent = IsCacheGenerationCurrent(generation);
 
             // Skip the write when the generation moved — a refresh has superseded this snapshot. A null
             // node is still written when current (negative caching, tagged so it can be cleared).
-            if (snapshotIsCurrent)
+            if (cacheable && snapshotIsCurrent)
             {
                 await _hybridCache.SetAsync(
                     cacheKey,
@@ -191,10 +417,21 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
         return result;
 
-        async Task<ContentCacheNode?> GetContentCacheNodeFromRepo()
+        async Task<(ContentCacheNode? Node, bool Cacheable)> GetContentCacheNodeFromRepo()
         {
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-            return await _databaseCacheRepository.GetElementSourceAsync(key, preview);
+            ContentCacheNode? node = await readElementSource(key, preview);
+
+            // A null cached under a key that another cache also reads would hide that cache's item. Documents read
+            // the same published and draft keys as elements; media reads only the published one.
+            if (node is null)
+            {
+                ContentCacheDataSerializerEntityType entityTypes = preview
+                    ? ContentCacheDataSerializerEntityType.Document
+                    : ContentCacheDataSerializerEntityType.Document | ContentCacheDataSerializerEntityType.Media;
+                return (null, _databaseCacheRepository.GetKeysOfEntityTypes([key], entityTypes).Count == 0);
+            }
+
+            return (node, true);
         }
     }
 
@@ -328,12 +565,97 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         scope.Complete();
     }
 
+    /// <inheritdoc />
+    public void RefreshMemoryCache(Guid key)
+    {
+        // Waiting for the distributed cache write needs a thread-pool thread. Under the element tree lock that wait
+        // can starve on a busy pool and hold the lock for seconds, so the writes are issued under the lock and only
+        // waited for once the scope is disposed. HybridCache updates the in-process cache and sends the distributed
+        // write before its first await, so both still happen under the lock; only the wait for the acknowledgement
+        // moves out. The per-element lock makes the next refresh or removal of the same element on this node wait
+        // for these writes, so a slow write cannot land on top of a newer one from this node.
+        // TODO (V20): await the cache writes directly once the refresh pipeline is asynchronous.
+        using (_refreshLocks.Enter(key))
+        {
+            ValueTask draftWrite;
+            ValueTask publishedWrite;
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+            {
+                scope.ReadLock(Constants.Locks.ElementTree);
+
+                (ContentCacheNode? draftNode, ContentCacheNode? publishedNode) = _databaseCacheRepository.GetElementSourceForPublishStates(key);
+
+                draftWrite = draftNode is not null
+                    ? _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(draftNode))
+                    : _hybridCache.RemoveAsync(GetCacheKey(key, true));
+
+                var cacheKey = GetCacheKey(key, false);
+                publishedWrite = publishedNode is not null
+                    ? _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode))
+                    : _hybridCache.RemoveAsync(cacheKey);
+                _publishedElementCache.Remove(cacheKey);
+                InvalidateMemoryCacheGeneration();
+
+                scope.Complete();
+            }
+
+            // Both writes settle before the lock is released, even when one of them fails.
+            Task.WhenAll(draftWrite.AsTask(), publishedWrite.AsTask()).GetAwaiter().GetResult();
+        }
+    }
+
+    /// <inheritdoc />
     public async Task RemoveFromMemoryCacheAsync(Guid key)
+    {
+        // Ordered after a pending refresh of the same element, so a slow write from that refresh cannot bring the
+        // entries back. Not for callers holding the element tree lock: a refresh waiting for that lock holds this one.
+        using (await _refreshLocks.EnterAsync(key))
+        {
+            await RemoveFromMemoryCacheUnorderedAsync(key);
+        }
+    }
+
+    // Removes both entries of an element without waiting for a pending refresh of it, for callers that hold the
+    // element tree lock. The refresh that follows their commit removes the entries again, in order.
+    private async Task RemoveFromMemoryCacheUnorderedAsync(Guid key)
     {
         await _hybridCache.RemoveAsync(GetCacheKey(key, true));
         await ClearPublishedCacheAsync(key);
     }
 
+    /// <inheritdoc />
+    public void RefreshElement(IElement element)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        if (element.Trashed)
+        {
+            _databaseCacheRepository.DeleteContentItem(element.Id);
+
+            // TODO (V20): await the memory-cache removals once the notification pipeline is asynchronous.
+            RemoveFromMemoryCacheUnorderedAsync(element.Key).GetAwaiter().GetResult();
+            scope.Complete();
+            return;
+        }
+
+        var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(element, true);
+        _databaseCacheRepository.RefreshElement(draftCacheNode);
+
+        if (element.PublishedState is PublishedState.Publishing)
+        {
+            var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(element, false);
+            _databaseCacheRepository.RefreshElement(publishedCacheNode);
+        }
+        else if (element.PublishedState is PublishedState.Unpublishing)
+        {
+            _databaseCacheRepository.RemovePublishedElement(element.Id);
+            ClearPublishedCacheAsync(element.Key).GetAwaiter().GetResult();
+        }
+
+        scope.Complete();
+    }
+
+    /// <inheritdoc />
     public async Task RefreshElementAsync(IElement element)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -341,7 +663,7 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
         if (element.Trashed)
         {
             await _databaseCacheRepository.DeleteContentItemAsync(element.Id);
-            await RemoveFromMemoryCacheAsync(element.Key);
+            await RemoveFromMemoryCacheUnorderedAsync(element.Key);
             scope.Complete();
             return;
         }
@@ -387,6 +709,10 @@ internal sealed class ElementCacheService : IElementCacheService, IMemoryCacheSi
 
     public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> elementTypeIds)
     {
+        // Entries evicted below are reloaded on their next miss, through the serializer factory. Discard what it has
+        // derived from the type definitions first, so that reload sees the changed definitions.
+        _serializerFactory.ClearTypeCache();
+
         // Clear the hybrid cache by element type tag for the affected element types.
         var elementTypeIdsAsArray = elementTypeIds as int[] ?? elementTypeIds.ToArray();
         var elementTypeIdTags = elementTypeIdsAsArray.Select(ElementTypeIdTag).ToArray();

@@ -361,7 +361,11 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	}
 
 	readonly #expose = () => {
-		this.#context.expose();
+		if (this._showContentEdit) {
+			this.#context.edit();
+		} else {
+			this.#context.expose();
+		}
 	};
 
 	readonly #onUfmResolved = (event: UmbUfmResolvedEvent) => {
@@ -608,6 +612,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			.umb-block-single__block {
 				--umb-entity-frame-opacity: 0;
 				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
+				--umb-entity-frame-contrast-color: var(--uui-color-interactive-contrast);
 
 				&:hover,
 				&:focus-within {

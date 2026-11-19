@@ -63,6 +63,26 @@ public class TextTests : SearcherTestBase
             });
     }
 
+    [TestCase("*single12")]
+    [TestCase("?single12")]
+    public async Task LeadingWildcardCharactersInFilterValueAreIgnored(string value)
+    {
+        SearchResult result = await SearchAsync(
+            filters: [new TextFilter(FieldMultipleValues, [value], false)]);
+
+        Assert.That(result.Documents.Select(d => d.Id), Is.EqualTo(new[] { DocumentIds[12] }));
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task FilterOfOnlyWildcardCharactersContributesNoCriterion(bool negate)
+    {
+        SearchResult result = await SearchAsync(
+            filters: [new TextFilter(FieldMultipleValues, ["*", "?*"], negate)]);
+
+        Assert.That(result.Total, Is.EqualTo(100));
+    }
+
     [Test]
     public async Task CanFilterDocumentsBySpecificTextNegated()
     {

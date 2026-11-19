@@ -6,6 +6,7 @@ using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Microsoft.Data.Sqlite;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Tests.Benchmarks;
 
@@ -124,11 +125,11 @@ public class MediaUniqueNameBenchmarks
     [Benchmark]
     public string? FetchPrefixMatched()
     {
-        var prefix = GetSafeLikePrefix(SimilarNodeName.GetBaseText(ProposedName));
+        var prefix = SqlLikeEscaping.EscapeValue(SimilarNodeName.GetBaseText(ProposedName));
 
         using SqliteCommand command = _connection.CreateCommand();
         command.CommandText =
-            "SELECT id, text FROM umbracoNode WHERE nodeObjectType = @objectType AND parentId = @parentId AND upper(text) LIKE upper(@prefix)";
+            $"SELECT id, text FROM umbracoNode WHERE nodeObjectType = @objectType AND parentId = @parentId AND upper(text) LIKE upper(@prefix) {SqlLikeEscaping.EscapeClause}";
         command.Parameters.AddWithValue("@objectType", MediaObjectType);
         command.Parameters.AddWithValue("@parentId", ParentId);
         command.Parameters.AddWithValue("@prefix", prefix + "%");
@@ -150,13 +151,5 @@ public class MediaUniqueNameBenchmarks
         }
 
         return siblings;
-    }
-
-    // Mirrors ContentRepositoryBase.GetSafeLikePrefix so this benchmark builds the same prefix as
-    // production; keep the two in sync if the truncation logic changes.
-    private static string GetSafeLikePrefix(string baseText)
-    {
-        var index = baseText.IndexOf('[');
-        return index < 0 ? baseText : baseText[..index];
     }
 }

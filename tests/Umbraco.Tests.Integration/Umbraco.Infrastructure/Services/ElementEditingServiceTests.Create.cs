@@ -398,6 +398,86 @@ public partial class ElementEditingServiceTests
         Assert.IsNull(result.Result.Content);
     }
 
+    [TestCase(ContentVariation.Culture, ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch)]
+    [TestCase(ContentVariation.Segment, ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch)]
+    [TestCase(ContentVariation.CultureAndSegment, ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch)]
+    public async Task Cannot_Create_Variant_Element_Without_Name(ContentVariation variation, ContentEditingOperationStatus expectedStatus)
+    {
+        var elementType = await CreateVariantElementType(variation, variantTitleAsMandatory: false);
+
+        var createModel = new ElementCreateModel
+        {
+            ContentTypeKey = elementType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" }
+            ],
+        };
+
+        var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(expectedStatus, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
+    }
+
+    [TestCase("")]
+    [TestCase(" ")]
+    public async Task Cannot_Create_Invariant_Element_With_Blank_Name(string name)
+    {
+        var elementType = await CreateInvariantElementType();
+
+        var createModel = new ElementCreateModel
+        {
+            ContentTypeKey = elementType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Name = name }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" }
+            ],
+        };
+
+        var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
+    }
+
+    [TestCase("")]
+    [TestCase(" ")]
+    public async Task Cannot_Create_Culture_Variant_Element_With_Only_Blank_Names(string name)
+    {
+        var elementType = await CreateVariantElementType(variantTitleAsMandatory: false);
+
+        var createModel = new ElementCreateModel
+        {
+            ContentTypeKey = elementType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = name },
+                new VariantModel { Culture = "da-DK", Name = name }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" }
+            ],
+        };
+
+        var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
+    }
+
     [TestCase(ContentVariation.Culture)]
     [TestCase(ContentVariation.Segment)]
     public async Task Cannot_Create_With_Variant_Property_Value_For_Invariant_Content(ContentVariation contentVariation)

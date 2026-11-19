@@ -14,6 +14,42 @@ internal partial class BlockListElementLevelVariationTests
 {
     private IContentValidationService ContentValidationService => GetRequiredService<IContentValidationService>();
 
+    /// <summary>
+    /// Tests whether validating for all cultures includes the culture variant block values held in a non-default
+    /// segment of a culture invariant block property.
+    /// </summary>
+    [TestCase("Valid value in Danish", true)]
+    [TestCase("Invalid value in Danish", false)]
+    public async Task Validates_Culture_Variant_Block_Values_In_Non_Default_Segments_For_All_Cultures(string segmentValueInDanish, bool expectedValid)
+    {
+        var elementType = await CreateElementTypeWithValidationAsync();
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.CultureAndSegment, blockListDataType, ContentVariation.Segment);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            [BlockPropertyForSegment(null, "Valid value in Danish"), BlockPropertyForSegment("s1", segmentValueInDanish)],
+            false);
+
+        var isValid = GetRequiredService<IPropertyValidationService>().IsPropertyDataValid(content, out IProperty[] invalidProperties, CultureImpact.All);
+
+        Assert.AreEqual(expectedValid, isValid);
+        Assert.AreEqual(expectedValid ? 0 : 1, invalidProperties.Length);
+
+        BlockProperty BlockPropertyForSegment(string? segment, string valueInDanish)
+        {
+            return new BlockProperty(BlockValues(), BlockValues(), null, segment);
+
+            List<BlockPropertyValue> BlockValues() =>
+            [
+                new() { Alias = "invariantText", Value = "Valid invariant value" },
+                new() { Alias = "variantText", Value = "Valid value in English", Culture = "en-US" },
+                new() { Alias = "variantText", Value = valueInDanish, Culture = "da-DK" },
+            ];
+        }
+    }
+
     [Test]
     public async Task Can_Validate_Invalid_Properties()
     {

@@ -142,6 +142,8 @@ test('can find a document type in a sibling nested folder', async ({umbracoApi})
   // Assert
   expect(documentTypeData).toBeTruthy();
   expect(documentTypeData.id).toBe(targetDocumentTypeId);
+  const secondChildFolderChildren = await umbracoApi.documentType.getChildren(secondChildFolderId);
+  expect(secondChildFolderChildren.map(child => child.id)).toContain(targetDocumentTypeId);
 });
 
 test('can move a document type folder to another document type folder', async ({umbracoApi, umbracoUi}) => {

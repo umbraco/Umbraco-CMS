@@ -38,10 +38,12 @@ import {
   DateTimeWithTimeZonePickerDataTypeBuilder,
   DateOnlyPickerDataTypeBuilder,
   TimeOnlyPickerDataTypeBuilder,
+  DateTimePickerDataTypeBuilder,
   EntityDataPickerDataTypeBuilder,
   ElementPickerDataTypeBuilder,
   UserPickerDataTypeBuilder,
-  MemberGroupPickerDataTypeBuilder
+  MemberGroupPickerDataTypeBuilder,
+  SingleBlockDataTypeBuilder
 } from "../builders";
 
 export class DataTypeApiHelper {
@@ -361,6 +363,19 @@ export class DataTypeApiHelper {
       .build();
 
     return await this.save(blockList);
+  }
+
+  async createSingleBlockDataTypeWithABlock(name: string, contentElementTypeId: string) {
+    await this.ensureNameNotExists(name);
+
+    const singleBlock = new SingleBlockDataTypeBuilder()
+      .withName(name)
+      .addBlock()
+        .withContentElementTypeKey(contentElementTypeId)
+        .done()
+      .build();
+
+    return await this.save(singleBlock);
   }
 
   async createBlockListDataTypeWithContentAndSettingsElementType(name: string, contentElementTypeId: string, settingsElementTypeId: string) {
@@ -1852,6 +1867,24 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
+  async createContentPickerSourceDataTypeWithDynamicRootAndQueryStep(name: string, originAlias: string, queryStepAlias: string, docTypeKeys: string[]) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultiNodeTreePickerDataTypeBuilder()
+      .withName(name)
+      .addStartNode()
+        .withType('content')
+        .withOriginAlias(originAlias)
+        .addQueryStep()
+          .withAlias(queryStepAlias)
+          .withDocTypeKeys(docTypeKeys)
+          .done()
+        .done()
+      .build();
+
+    return await this.save(dataType);
+  }
+
   async doesContentPickerHaveDynamicRoot(dataTypeName: string, originAlias: string) {
     const dataType = await this.getByName(dataTypeName);
     const startNodeValue = dataType.values.find((item: any) => item.alias === 'startNode');
@@ -2282,6 +2315,16 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
+  async createDefaultDateTimePickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new DateTimePickerDataTypeBuilder()
+      .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
   async createDefaultUserPickerDataType(name: string) {
     await this.ensureNameNotExists(name);
 
@@ -2382,13 +2425,35 @@ export class DataTypeApiHelper {
     return await this.save(builder);
   }
 
-  async createDefaultElementPickerWithValidationLimit(name: string, minValidation: number = 0, maxValidation: number = 0) {
+  async createDefaultElementPickerWithValidationLimit(name: string, minValidation?: number, maxValidation?: number) {
     await this.ensureNameNotExists(name);
 
     const builder = new ElementPickerDataTypeBuilder()
       .withName(name)
       .withMinValidation(minValidation)
       .withMaxValidation(maxValidation)
+      .build();
+
+    return await this.save(builder);
+  }
+
+  async createElementPickerDataTypeWithAllowedContentTypes(name: string, allowedContentTypeIds: string[]) {
+    await this.ensureNameNotExists(name);
+
+    const builder = new ElementPickerDataTypeBuilder()
+      .withName(name)
+      .withAllowedContentTypeIds(allowedContentTypeIds)
+      .build();
+
+    return await this.save(builder);
+  }
+
+  async createElementPickerDataTypeWithStartNode(name: string, startNodeFolderId: string) {
+    await this.ensureNameNotExists(name);
+
+    const builder = new ElementPickerDataTypeBuilder()
+      .withName(name)
+      .withStartNodeId(startNodeFolderId)
       .build();
 
     return await this.save(builder);

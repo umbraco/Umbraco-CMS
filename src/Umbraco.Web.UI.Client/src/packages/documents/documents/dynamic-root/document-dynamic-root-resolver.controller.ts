@@ -20,6 +20,17 @@ export class UmbDocumentDynamicRootResolver extends UmbControllerBase {
 	 * @returns {Promise<string | undefined>} The resolved start node unique, or undefined when there is nothing to resolve.
 	 */
 	async resolveStartNodeUnique(dynamicRoot: UmbDynamicRoot | undefined): Promise<string | undefined> {
+		const uniques = await this.resolveStartNodeUniques(dynamicRoot);
+		return uniques?.[0];
+	}
+
+	/**
+	 * Resolves the uniques of the documents the picker should start from, as a dynamic root query can resolve to
+	 * more than one document.
+	 * @param {UmbDynamicRoot | undefined} dynamicRoot - The configured dynamic root.
+	 * @returns {Promise<Array<string> | undefined>} The resolved start node uniques, or undefined when there is nothing to resolve.
+	 */
+	async resolveStartNodeUniques(dynamicRoot: UmbDynamicRoot | undefined): Promise<Array<string> | undefined> {
 		if (!dynamicRoot) return undefined;
 
 		// Use passContextAliasMatches to skip past block element workspaces and find the document workspace.
@@ -44,6 +55,6 @@ export class UmbDocumentDynamicRootResolver extends UmbControllerBase {
 
 		const result = await this.#repository.requestRoot(dynamicRoot, unique, parentUnique);
 
-		return result?.length ? result[0] : undefined;
+		return result?.length ? result : undefined;
 	}
 }
