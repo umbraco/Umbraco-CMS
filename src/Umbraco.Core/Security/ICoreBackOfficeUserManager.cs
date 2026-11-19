@@ -81,7 +81,7 @@ public interface ICoreBackOfficeUserManager
     /// <param name="user">The principal of the user who requested the password reset.</param>
     /// <param name="toString">Additional information about the request.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    // TODO (V19): Remove the default implementation.
+    // TODO (V20): Remove the default implementation.
     Task NotifyForgotPasswordRequestedAsync(IPrincipal user, string toString)
     {
         NotifyForgotPasswordRequested(user, toString);

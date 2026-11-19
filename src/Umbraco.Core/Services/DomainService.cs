@@ -264,7 +264,7 @@ public class DomainService : RepositoryService, IDomainService
         {
             scope.Complete();
 
-            // this is the only error scenario in DeleteAll
+            // this is the only error scenario in DeleteAllAsync
             return Attempt.FailWithStatus(DomainOperationStatus.CancelledByNotification, new DomainUpdateResult());
         }
 
