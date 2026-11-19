@@ -425,6 +425,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         _ => MemberLoginFailedReason.InvalidCredentials,
     };
 
+    [Obsolete("Use NotifyRequiresTwoFactorAsync instead. Scheduled for removal in Umbraco 21.")]
     protected void NotifyRequiresTwoFactor(MemberIdentityUser user) => Notify(
         user,
         currentUser => new MemberTwoFactorRequestedNotification(currentUser.Key));
@@ -442,7 +443,9 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         where T : INotification
     {
         T notification = createNotification(currentUser);
+#pragma warning disable CS0618 // Type or member is obsolete
         _eventAggregator.Publish(notification);
+#pragma warning restore CS0618 // Type or member is obsolete
         return notification;
     }
 

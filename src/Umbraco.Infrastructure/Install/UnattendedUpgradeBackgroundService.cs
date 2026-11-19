@@ -224,7 +224,9 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
     {
         try
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             _eventAggregator.Publish(notification);
+#pragma warning restore CS0618 // Type or member is obsolete
         }
         catch (Exception ex)
         {

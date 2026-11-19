@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Core.Events;
 public partial class EventAggregator : IEventAggregator
 {
     /// <inheritdoc />
+    [Obsolete("Use PublishAsync instead. Scheduled for removal in Umbraco 21.")]
     public void Publish<TNotification>(TNotification notification)
         where TNotification : INotification
     {
@@ -19,6 +20,7 @@ public partial class EventAggregator : IEventAggregator
     }
 
     /// <inheritdoc />
+    [Obsolete("Use PublishAsync instead. Scheduled for removal in Umbraco 21.")]
     public void Publish<TNotification, TNotificationHandler>(IEnumerable<TNotification> notifications)
         where TNotification : INotification
         where TNotificationHandler : INotificationHandler
@@ -52,6 +54,7 @@ public partial class EventAggregator : IEventAggregator
     }
 
     /// <inheritdoc />
+    [Obsolete("Use PublishCancelableAsync instead. Scheduled for removal in Umbraco 21.")]
     public bool PublishCancelable<TCancelableNotification>(TCancelableNotification notification)
         where TCancelableNotification : ICancelableNotification
     {

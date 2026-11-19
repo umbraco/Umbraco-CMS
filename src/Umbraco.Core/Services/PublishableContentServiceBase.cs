@@ -16,6 +16,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+// The synchronous content service API still publishes its notifications synchronously.
+#pragma warning disable CS0618 // Type or member is obsolete
+
 /// <summary>
 /// Base class for publishable content services.
 /// </summary>

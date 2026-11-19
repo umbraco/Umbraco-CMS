@@ -160,7 +160,9 @@ public class ContentModelBinder : IModelBinder
         // the error with more details, and optionally request that
         // the application restarts.
         var args = new ModelBindingErrorNotification(sourceType, modelType, msg);
+#pragma warning disable CS0618 // Type or member is obsolete
         _eventAggregator.Publish(args);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         throw new ModelBindingException(msg.ToString());
     }

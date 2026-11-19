@@ -41,10 +41,14 @@ public class EventAggregatorTests
         var aggregator = provider.GetService<IEventAggregator>();
 
         var notification = new Notification();
+#pragma warning disable CS0618 // Type or member is obsolete
         aggregator.Publish(notification);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         var childNotification = new ChildNotification();
+#pragma warning disable CS0618 // Type or member is obsolete
         aggregator.Publish(childNotification);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(A + B + C, notification.SubscriberCount, "Notification should be handled by all 3 registered INotificationHandlers (A, B and C).");
         Assert.AreEqual(A, childNotification.SubscriberCount, "ChildNotification should only be handled by a single registered INotificationHandler (A).");
@@ -90,7 +94,9 @@ public class EventAggregatorTests
             new Notification(),
             new ChildNotification()
         };
+#pragma warning disable CS0618 // Type or member is obsolete
         aggregator.Publish(notifications);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(A + B + C, notifications[0].SubscriberCount, "Notification should be handled by all 3 registered INotificationHandlers (A, B and C).");
         Assert.AreEqual(A + B + C, notifications[1].SubscriberCount, "Notification should be handled by all 3 registered INotificationHandlers (A, B and C).");
@@ -135,10 +141,14 @@ public class EventAggregatorTests
         var aggregator = provider.GetService<IEventAggregator>();
 
         var notification = new Notification();
+#pragma warning disable CS0618 // Type or member is obsolete
         aggregator.Publish<INotification, IDistributedCacheNotificationHandler>(notification);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         var childNotification = new ChildNotification();
+#pragma warning disable CS0618 // Type or member is obsolete
         aggregator.Publish<INotification, IDistributedCacheNotificationHandler>(childNotification);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(B, notification.SubscriberCount, "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
         Assert.AreEqual(0, childNotification.SubscriberCount, "ChildNotification should not be handled, since it has no registered IDistributedCacheNotificationHandler.");
@@ -184,7 +194,9 @@ public class EventAggregatorTests
             new Notification(),
             new ChildNotification()
         };
+#pragma warning disable CS0618 // Type or member is obsolete
         aggregator.Publish<INotification, IDistributedCacheNotificationHandler>(notifications);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Assert.AreEqual(B, notifications[0].SubscriberCount, "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
         Assert.AreEqual(B, notifications[1].SubscriberCount, "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");

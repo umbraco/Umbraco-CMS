@@ -13,6 +13,7 @@ public interface IBackOfficeUserManager : IUmbracoUserManager<BackOfficeIdentity
     /// </summary>
     /// <param name="currentUser">The principal representing the user initiating the notification, typically an administrator or system process.</param>
     /// <param name="userId">The unique identifier of the user for whom the password reset was requested.</param>
+    [Obsolete("Use NotifyForgotPasswordRequestedAsync instead. Scheduled for removal in Umbraco 21.")]
     void NotifyForgotPasswordRequested(IPrincipal currentUser, string userId);
 
     /// <summary>
@@ -20,6 +21,7 @@ public interface IBackOfficeUserManager : IUmbracoUserManager<BackOfficeIdentity
     /// </summary>
     /// <param name="currentUser">The principal representing the user performing the notification action.</param>
     /// <param name="userId">The unique identifier of the user whose password was changed.</param>
+    [Obsolete("Use NotifyForgotPasswordChangedAsync instead. Scheduled for removal in Umbraco 21.")]
     void NotifyForgotPasswordChanged(IPrincipal currentUser, string userId);
 
     /// <summary>
@@ -28,6 +30,7 @@ public interface IBackOfficeUserManager : IUmbracoUserManager<BackOfficeIdentity
     /// <param name="currentUser">The principal representing the user performing the logout.</param>
     /// <param name="userId">The optional identifier of the user who logged out; may be <c>null</c>.</param>
     /// <returns>A <see cref="SignOutSuccessResult"/> representing the outcome of the logout notification.</returns>
+    [Obsolete("Use NotifyLogoutSuccessAsync instead. Scheduled for removal in Umbraco 21.")]
     SignOutSuccessResult NotifyLogoutSuccess(IPrincipal currentUser, string? userId);
 
     /// <summary>
@@ -39,7 +42,9 @@ public interface IBackOfficeUserManager : IUmbracoUserManager<BackOfficeIdentity
     // TODO (V20): Remove the default implementation.
     Task NotifyForgotPasswordRequestedAsync(IPrincipal currentUser, string userId)
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         NotifyForgotPasswordRequested(currentUser, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
         return Task.CompletedTask;
     }
 
@@ -52,7 +57,9 @@ public interface IBackOfficeUserManager : IUmbracoUserManager<BackOfficeIdentity
     // TODO (V20): Remove the default implementation.
     Task NotifyForgotPasswordChangedAsync(IPrincipal currentUser, string userId)
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         NotifyForgotPasswordChanged(currentUser, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
         return Task.CompletedTask;
     }
 
@@ -64,5 +71,7 @@ public interface IBackOfficeUserManager : IUmbracoUserManager<BackOfficeIdentity
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="SignOutSuccessResult"/> representing the outcome of the logout notification.</returns>
     // TODO (V20): Remove the default implementation.
     Task<SignOutSuccessResult> NotifyLogoutSuccessAsync(IPrincipal currentUser, string? userId)
+#pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(NotifyLogoutSuccess(currentUser, userId));
+#pragma warning restore CS0618 // Type or member is obsolete
 }

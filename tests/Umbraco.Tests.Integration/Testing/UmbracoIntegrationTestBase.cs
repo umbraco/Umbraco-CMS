@@ -139,7 +139,9 @@ public abstract class UmbracoIntegrationTestBase
         connectionStrings.CurrentValue.ConnectionString = meta.ConnectionString;
         connectionStrings.CurrentValue.ProviderName = meta.Provider;
         state.DetermineRuntimeLevel();
+#pragma warning disable CS0618 // Type or member is obsolete
         serviceProvider.GetRequiredService<IEventAggregator>().Publish(new UnattendedInstallNotification());
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     private TestDbMeta SetupPerTestDatabase(ITestDatabase db, bool withSchema)

@@ -647,7 +647,9 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             scope.WriteLock(Constants.Locks.ContentTree);
 
             var savingNotification = new ContentSavingNotification(content, evtMsgs);
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(savingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
             }
@@ -964,7 +966,9 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         }
 
         var savingNotification = new ContentSavingNotification(document, evtMsgs);
+#pragma warning disable CS0618 // Type or member is obsolete
         if (scope.Notifications.PublishCancelable(savingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, document);
         }
@@ -1005,7 +1009,9 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
             var movingToRecycleBinNotification =
                 new ContentMovingToRecycleBinNotification(moveEventInfo, eventMessages);
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(movingToRecycleBinNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return OperationResult.Cancel(eventMessages); // causes rollback
@@ -1102,7 +1108,9 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentKey);
 
             var movingNotification = new ContentMovingNotification(moveEventInfo, eventMessages);
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(movingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return OperationResult.Cancel(eventMessages); // causes rollback
@@ -1295,7 +1303,9 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
             var emptyingRecycleBinNotification = new ContentEmptyingRecycleBinNotification(contents, eventMessages);
             var deletingContentNotification = new ContentDeletingNotification(contents, eventMessages);
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification) || scope.Notifications.PublishCancelable(deletingContentNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return OperationResult.Cancel(eventMessages);
@@ -1381,6 +1391,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// <param name="recursive">A value indicating whether to recursively copy children.</param>
     /// <param name="userId">Optional Id of the User copying the Content</param>
     /// <returns>The newly created <see cref="IContent" /> object</returns>
+#pragma warning disable CS0618 // Type or member is obsolete
     public IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1521,6 +1532,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
         return copy;
     }
+#pragma warning restore CS0618 // Type or member is obsolete
 
     private bool TryGetParentKey(int parentId, [NotNullWhen(true)] out Guid? parentKey)
     {
@@ -1548,7 +1560,9 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             var sendingToPublishNotification = new ContentSendingToPublishNotification(content, evtMsgs);
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(sendingToPublishNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return false;
@@ -1703,13 +1717,17 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         var savingNotification = new ContentSavingNotification(itemsA, eventMessages);
 
         // raise cancelable sorting event
+#pragma warning disable CS0618 // Type or member is obsolete
         if (scope.Notifications.PublishCancelable(sortingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             return OperationResult.Cancel(eventMessages);
         }
 
         // raise cancelable saving event
+#pragma warning disable CS0618 // Type or member is obsolete
         if (scope.Notifications.PublishCancelable(savingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             return OperationResult.Cancel(eventMessages);
         }
@@ -1845,7 +1863,9 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 return;
             }
 
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(new ContentDeletingNotification(contents, eventMessages)))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return;

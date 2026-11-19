@@ -209,8 +209,10 @@ public class CoreRuntime : IRuntime
         if (isRestarting == false)
         {
             // Add application started and stopped notifications last (to ensure they're always published after starting)
+#pragma warning disable CS0618 // Type or member is obsolete
             _hostApplicationLifetime?.ApplicationStarted.Register(() => _eventAggregator.Publish(new UmbracoApplicationStartedNotification(false)));
             _hostApplicationLifetime?.ApplicationStopped.Register(() => _eventAggregator.Publish(new UmbracoApplicationStoppedNotification(false)));
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         // Per-server caches are now seeded (UmbracoApplicationStartingNotification has completed), so the

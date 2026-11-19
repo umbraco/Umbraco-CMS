@@ -226,7 +226,9 @@ internal partial class UserService : RepositoryService, IUserService
             };
 
             var savingNotification = new UserSavingNotification(user, evtMsgs);
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(savingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return user;
@@ -310,7 +312,9 @@ internal partial class UserService : RepositoryService, IUserService
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 var deletingNotification = new UserDeletingNotification(user, evtMsgs);
+#pragma warning disable CS0618 // Type or member is obsolete
                 if (scope.Notifications.PublishCancelable(deletingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
                 {
                     scope.Complete();
                     return;
@@ -357,7 +361,9 @@ internal partial class UserService : RepositoryService, IUserService
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             var savingNotification = new UserSavingNotification(entitiesA, evtMsgs);
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(savingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return;

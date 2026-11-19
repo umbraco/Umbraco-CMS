@@ -52,7 +52,9 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
         var eventMessages = new EventMessages();
         var savingNotification = new RedirectUrlSavingNotification(redir, eventMessages);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         if (scope.Notifications.PublishCancelable(savingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             scope.Complete();
             return Attempt.FailWithStatus<IRedirectUrl?, RedirectUrlOperationStatus>(RedirectUrlOperationStatus.CancelledByNotification, redir);
@@ -79,7 +81,9 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
 
         var deletingNotification = new RedirectUrlDeletingNotification(redirectUrl, eventMessages);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         if (scope.Notifications.PublishCancelable(deletingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             scope.Complete();
             return RedirectUrlOperationStatus.CancelledByNotification;
@@ -114,7 +118,9 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
         EventMessages eventMessages = EventMessagesFactory.Get();
         var deletingNotification = new RedirectUrlDeletingNotification(redirectUrl, eventMessages);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         if (scope.Notifications.PublishCancelable(deletingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             scope.Complete();
             return RedirectUrlOperationStatus.CancelledByNotification;
@@ -149,7 +155,9 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
         EventMessages eventMessages = EventMessagesFactory.Get();
         var deletingNotification = new RedirectUrlDeletingNotification(redirectUrls, eventMessages);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         if (scope.Notifications.PublishCancelable(deletingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             scope.Complete();
             return RedirectUrlOperationStatus.CancelledByNotification;

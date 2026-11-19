@@ -699,7 +699,9 @@ namespace Umbraco.Cms.Core.Services
             if (publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.Saving))
             {
                 savingNotification = new MemberSavingNotification(member, evtMsgs);
+#pragma warning disable CS0618 // Type or member is obsolete
                 if (scope.Notifications.PublishCancelable(savingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
@@ -755,7 +757,9 @@ namespace Umbraco.Cms.Core.Services
             scope.WriteLock(Constants.Locks.MemberTree);
 
             var savingNotification = new MemberSavingNotification(membersA, evtMsgs);
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(savingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return OperationResult.Attempt.Cancel(evtMsgs);
@@ -849,7 +853,9 @@ namespace Umbraco.Cms.Core.Services
             scope.WriteLock(Constants.Locks.MemberTree);
 
             var deletingNotification = new MemberDeletingNotification(member, evtMsgs);
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(deletingNotification))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return OperationResult.Attempt.Cancel(evtMsgs);
@@ -1209,7 +1215,9 @@ namespace Umbraco.Cms.Core.Services
                 return;
             }
 
+#pragma warning disable CS0618 // Type or member is obsolete
             if (scope.Notifications.PublishCancelable(new MemberDeletingNotification(members, evtMsgs)))
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 scope.Complete();
                 return;
