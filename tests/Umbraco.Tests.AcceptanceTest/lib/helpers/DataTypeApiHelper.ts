@@ -705,6 +705,42 @@ export class DataTypeApiHelper {
     return await this.save(blockGrid);
   }
 
+  async createBlockGridWithAnAreaWithTwoSpecifiedAllowancesWithMinMaxInABlock(blockGridName: string, contentElementTypeId: string, firstSpecifiedAllowanceElementTypeId: string, secondSpecifiedAllowanceElementTypeId: string, secondMinAllowed: number, secondMaxAllowed: number, areaAlias: string = 'area', createLabel: string = 'CreateLabel', columnSpan: number = 6, rowSpan: number = 1) {
+    await this.ensureNameNotExists(blockGridName);
+
+    const blockGrid = new BlockGridDataTypeBuilder()
+      .withName(blockGridName)
+      .addBlock()
+        .withContentElementTypeKey(contentElementTypeId)
+        .withAllowAtRoot(true)
+        .addArea()
+          .withAlias(areaAlias)
+          .withCreateLabel(createLabel)
+          .withColumnSpan(columnSpan)
+          .withRowSpan(rowSpan)
+          .addSpecifiedAllowance()
+            .withElementTypeKey(firstSpecifiedAllowanceElementTypeId)
+            .done()
+          .addSpecifiedAllowance()
+            .withElementTypeKey(secondSpecifiedAllowanceElementTypeId)
+            .withMinAllowed(secondMinAllowed)
+            .withMaxAllowed(secondMaxAllowed)
+            .done()
+          .done()
+        .done()
+      .addBlock()
+        .withContentElementTypeKey(firstSpecifiedAllowanceElementTypeId)
+        .withAllowInAreas(true)
+        .done()
+      .addBlock()
+        .withContentElementTypeKey(secondSpecifiedAllowanceElementTypeId)
+        .withAllowInAreas(true)
+        .done()
+      .build();
+
+    return await this.save(blockGrid);
+  }
+
   async createBlockGridWithAnAreaInABlockWithAllowInAreas(blockGridName: string, contentElementTypeId: string, areaAlias: string = 'area', allowInAreas = false, createButtonLabel :string = 'CreateLabel', columnSpan: number = 6, rowSpan: number = 1, minAllowed: number = 0, maxAllowed: number = 2) {
     await this.ensureNameNotExists(blockGridName);
 
@@ -1805,6 +1841,24 @@ export class DataTypeApiHelper {
       .addStartNode()
         .withType('content')
         .withOriginAlias(originAlias)
+        .done()
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createContentPickerSourceDataTypeWithDynamicRootAndQueryStep(name: string, originAlias: string, queryStepAlias: string, docTypeKeys: string[]) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultiNodeTreePickerDataTypeBuilder()
+      .withName(name)
+      .addStartNode()
+        .withType('content')
+        .withOriginAlias(originAlias)
+        .addQueryStep()
+          .withAlias(queryStepAlias)
+          .withDocTypeKeys(docTypeKeys)
+          .done()
         .done()
       .build();
 

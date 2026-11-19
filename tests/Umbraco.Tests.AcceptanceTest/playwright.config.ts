@@ -113,6 +113,17 @@ export default defineConfig({
       }
     },
     {
+      name: 'allowEditInvariantConfig',
+      testMatch: 'AllowEditInvariantConfig/**',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
+    },
+    {
       name: 'contentSettingConfig',
       testMatch: 'ContentSettingConfig/**',
       dependencies: ['setup'],

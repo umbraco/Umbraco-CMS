@@ -1,13 +1,85 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 internal sealed partial class MediaTypeEditingServiceTests
 {
+    [Test]
+    public async Task Removing_Composition_Deletes_The_Composition_Property_Data_Of_The_Composing_Media()
+    {
+        var compositionProperty = MediaTypePropertyTypeModel("Composition text", "compositionText");
+        var compositionCreateModel = MediaTypeCreateModel("Composition", "composition", propertyTypes: [compositionProperty]);
+        var composition = (await MediaTypeEditingService.CreateAsync(compositionCreateModel, Constants.Security.SuperUserKey)).Result!;
+        var compositionPropertyTypeIds = composition.PropertyTypes.Select(x => x.Id).ToArray();
+        Composition[] compositions = [new() { Key = composition.Key, CompositionType = CompositionType.Composition }];
+
+        var composingProperty = MediaTypePropertyTypeModel("Composing text", "composingText");
+        var composingCreateModel = MediaTypeCreateModel("Composing", "composing", propertyTypes: [composingProperty], compositions: compositions);
+        composingCreateModel.AllowedAsRoot = true;
+        var composingType = (await MediaTypeEditingService.CreateAsync(composingCreateModel, Constants.Security.SuperUserKey)).Result!;
+
+        var otherComposingProperty = MediaTypePropertyTypeModel("Other composing text", "otherComposingText");
+        var otherComposingCreateModel = MediaTypeCreateModel("Other composing", "otherComposing", propertyTypes: [otherComposingProperty], compositions: compositions);
+        otherComposingCreateModel.AllowedAsRoot = true;
+        var otherComposingType = (await MediaTypeEditingService.CreateAsync(otherComposingCreateModel, Constants.Security.SuperUserKey)).Result!;
+
+        async Task<IMedia> CreateMedia(IMediaType mediaType, string ownAlias, string name)
+        {
+            var createModel = new MediaCreateModel
+            {
+                ContentTypeKey = mediaType.Key,
+                ParentKey = Constants.System.RootKey,
+                Variants = [new VariantModel { Name = name }],
+                Properties =
+                [
+                    new PropertyValueModel { Alias = "compositionText", Value = $"{name} compositionText" },
+                    new PropertyValueModel { Alias = ownAlias, Value = $"{name} {ownAlias}" },
+                ],
+            };
+            var result = await MediaEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+            Assert.That(result.Success, Is.True, result.Status.ToString());
+            return result.Result.Content!;
+        }
+
+        var composingMedia = new List<IMedia>();
+        for (var i = 0; i < 3; i++)
+        {
+            composingMedia.Add(await CreateMedia(composingType, "composingText", $"Composing {i}"));
+        }
+
+        var otherComposingMedia = new List<IMedia>();
+        for (var i = 0; i < 2; i++)
+        {
+            otherComposingMedia.Add(await CreateMedia(otherComposingType, "otherComposingText", $"Other composing {i}"));
+        }
+
+        List<PropertyDataDto> before = FetchAllPropertyData();
+
+        var updateModel = MediaTypeUpdateModel("Composing", "composing", propertyTypes: [composingProperty]);
+        updateModel.AllowedAsRoot = true;
+        var updateResult = await MediaTypeEditingService.UpdateAsync(composingType, updateModel, Constants.Security.SuperUserKey);
+        Assert.That(updateResult.Success, Is.True);
+
+        AssertOnlyPropertyDataDeleted(before, compositionPropertyTypeIds, composingMedia.Select(x => x.Id).ToArray());
+        var mediaService = GetRequiredService<IMediaService>();
+        foreach (IMedia media in composingMedia)
+        {
+            Assert.That(mediaService.GetById(media.Key)!.Properties.Contains("compositionText"), Is.False);
+        }
+
+        foreach (IMedia media in otherComposingMedia)
+        {
+            Assert.That(mediaService.GetById(media.Key)!.GetValue<string>("compositionText"), Is.Not.Empty);
+        }
+    }
+
     [Test]
     public async Task Can_Update_All_Basic_Settings()
     {

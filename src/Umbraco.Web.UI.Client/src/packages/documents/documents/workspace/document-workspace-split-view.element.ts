@@ -95,8 +95,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 			? html`<div id="splitViews">
 						${repeat(
 							this._variants,
-							(view) =>
-								view.index + '_' + (view.culture ?? '') + '_' + (view.segment ?? '') + '_' + this._variants!.length,
+							(view) => view.index,
 							(view) => html`
 								<umb-workspace-split-view
 									.loading=${this._loading}

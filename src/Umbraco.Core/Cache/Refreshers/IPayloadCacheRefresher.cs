@@ -15,5 +15,9 @@ public interface IPayloadCacheRefresher<TPayload> : IJsonCacheRefresher
     /// Refreshes internal (isolated) caches by a payload.
     /// </summary>
     /// <param name="payloads">The payload.</param>
+    /// <remarks>
+    /// Subject to the same contract as <see cref="IJsonCacheRefresher.RefreshInternal(string)"/>: in-memory clears only,
+    /// with no distributed locks, database access or published-cache work.
+    /// </remarks>
     void RefreshInternal(TPayload[] payloads) => Refresh(payloads);
 }

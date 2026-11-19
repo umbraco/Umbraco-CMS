@@ -325,11 +325,21 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 				display: block;
 				height: 100%;
 				--uui-tab-background: var(--uui-color-surface);
-
-				padding: calc(var(--uui-size-layout-1));
 			}
 			umb-badge {
 				--uui-badge-inset: 0 0 auto auto;
+			}
+
+			uui-tab-group {
+				margin-left: calc(var(--uui-size-space-4));
+				padding-left: calc(var(--uui-size-space-1));
+				margin-right: calc(var(--uui-size-space-4));
+				padding-right: calc(var(--uui-size-space-1));
+				border-bottom: 1px solid var(--uui-color-border);
+			}
+			umb-block-workspace-view-edit-tab {
+				display: block;
+				margin: calc(var(--uui-size-layout-1));
 			}
 		`,
 	];

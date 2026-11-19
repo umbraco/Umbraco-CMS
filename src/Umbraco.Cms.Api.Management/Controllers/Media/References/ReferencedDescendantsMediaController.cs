@@ -1,13 +1,19 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.References;
 
@@ -19,17 +25,38 @@ public class ReferencedDescendantsMediaController : MediaControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesSkipTakeService;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IAuthorizationService _authorizationService;
     /// <summary>
     /// Initializes a new instance of the <see cref="ReferencedDescendantsMediaController"/> class.
     /// </summary>
     /// <param name="trackedReferencesSkipTakeService">Service for retrieving tracked references with skip/take pagination.</param>
     /// <param name="umbracoMapper">The mapper used to map Umbraco domain models to API models.</param>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public ReferencedDescendantsMediaController(
         ITrackedReferencesService trackedReferencesSkipTakeService,
         IUmbracoMapper umbracoMapper)
+        : this(
+            trackedReferencesSkipTakeService,
+            umbracoMapper,
+            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReferencedDescendantsMediaController"/> class.
+    /// </summary>
+    /// <param name="trackedReferencesSkipTakeService">Service for retrieving tracked references with skip/take pagination.</param>
+    /// <param name="umbracoMapper">The mapper used to map Umbraco domain models to API models.</param>
+    /// <param name="authorizationService">The service used to authorize access to the requested items.</param>
+    [ActivatorUtilitiesConstructor]
+    public ReferencedDescendantsMediaController(
+        ITrackedReferencesService trackedReferencesSkipTakeService,
+        IUmbracoMapper umbracoMapper,
+        IAuthorizationService authorizationService)
     {
         _trackedReferencesSkipTakeService = trackedReferencesSkipTakeService;
         _umbracoMapper = umbracoMapper;
+        _authorizationService = authorizationService;
     }
 
     [Obsolete("Use the ReferencedDescendants2 action method instead. Scheduled for removal in Umbraco 19, when ReferencedDescendants2 will be renamed back to ReferencedDescendants.")]
@@ -74,6 +101,16 @@ public class ReferencedDescendantsMediaController : MediaControllerBase
         int skip = 0,
         int take = 20)
     {
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            MediaPermissionResource.WithKeys(id),
+            AuthorizationPolicies.MediaPermissionByResource);
+
+        if (authorizationResult.Succeeded is false)
+        {
+            return Forbidden();
+        }
+
         Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> relationItemsAttempt = await _trackedReferencesSkipTakeService.GetPagedDescendantsInReferencesAsync(id, UmbracoObjectTypes.Media, skip, take, true);
 
         if (relationItemsAttempt.Success is false)

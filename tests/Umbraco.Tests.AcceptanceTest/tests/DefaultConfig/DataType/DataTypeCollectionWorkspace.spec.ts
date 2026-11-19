@@ -1,12 +1,14 @@
-﻿import {test} from '@umbraco/acceptance-test-helpers';
+import {test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'TestDataType';
 const dataTypeFolderName = 'TestDataTypeFolder';
+const childFolderName = 'Test Child Folder';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
   await umbracoApi.dataType.ensureNameNotExists(dataTypeFolderName);
+  await umbracoApi.dataType.ensureNameNotExists(childFolderName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
 });
@@ -14,14 +16,14 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
   await umbracoApi.dataType.ensureNameNotExists(dataTypeFolderName);
+  await umbracoApi.dataType.ensureNameNotExists(childFolderName);
 });
 
-test('can create a data type using create options', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoUi.dataType.clickDataTypesMenu();
-
+test('can create a data type from the tree actions menu', async ({umbracoApi, umbracoUi}) => {
   // Act
-  await umbracoUi.dataType.clickCreateActionWithOptionName('Data Type');
+  await umbracoUi.dataType.clickActionsMenuAtRoot();
+  await umbracoUi.dataType.clickCreateActionMenuOption();
+  await umbracoUi.dataType.clickDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor('Text Box');
@@ -29,37 +31,32 @@ test('can create a data type using create options', async ({umbracoApi, umbracoU
 
   // Assert
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
-  // Check if the created data type is displayed in the collection view and has correct icon
-  await umbracoUi.dataType.clickDataTypesMenu();
-  await umbracoUi.dataType.doesCollectionTreeItemTableRowHaveName(dataTypeName);
-  await umbracoUi.dataType.doesCollectionTreeItemTableRowHaveIcon(dataTypeName, 'icon-autofill');
+  await umbracoUi.dataType.reloadDataTypeTree();
+  await umbracoUi.dataType.isDataTypeTreeItemVisible(dataTypeName);
+  await umbracoUi.dataType.doesTreeItemHaveTheCorrectIcon(dataTypeName, 'icon-autofill');
 });
 
-test('can create a data type folder using create options', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoUi.dataType.clickDataTypesMenu();
-
+test('can create a data type folder from the tree actions menu', async ({umbracoApi, umbracoUi}) => {
   // Act
-  await umbracoUi.dataType.clickCreateActionWithOptionName('Folder');
-  await umbracoUi.dataType.enterFolderName(dataTypeFolderName);
-  await umbracoUi.dataType.clickConfirmCreateFolderButtonAndWaitForDataTypeToBeCreated();
+  await umbracoUi.dataType.clickActionsMenuAtRoot();
+  await umbracoUi.dataType.createDataTypeFolderAndWaitForDataTypeToBeCreated(dataTypeFolderName);
 
   // Assert
   expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
-  // Check if the created data type is displayed in the collection view and has correct icon
-  await umbracoUi.dataType.clickDataTypesMenu();
-  await umbracoUi.dataType.doesCollectionTreeItemTableRowHaveName(dataTypeFolderName);
-  await umbracoUi.dataType.doesCollectionTreeItemTableRowHaveIcon(dataTypeFolderName, 'icon-folder');
+  await umbracoUi.dataType.isDataTypeTreeItemVisible(dataTypeFolderName);
+  await umbracoUi.dataType.doesTreeItemHaveTheCorrectIcon(dataTypeFolderName, 'icon-folder');
 });
 
-test('can create a data type in a folder using create options', async ({umbracoApi, umbracoUi}) => {
+test('can create a data type in a folder from the tree actions menu', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.dataType.createFolder(dataTypeFolderName);
+  const dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
   await umbracoUi.dataType.reloadDataTypeTree();
-  await umbracoUi.dataType.goToDataType(dataTypeFolderName);
 
   // Act
-  await umbracoUi.dataType.clickCreateActionWithOptionName('Data Type');
+  await umbracoUi.dataType.clickRootFolderCaretButton();
+  await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
+  await umbracoUi.dataType.clickCreateActionMenuOption();
+  await umbracoUi.dataType.clickDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor('Text Box');
@@ -67,28 +64,27 @@ test('can create a data type in a folder using create options', async ({umbracoA
 
   // Assert
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
-  // Check if the created data type is displayed in the collection view and has correct icon
+  await expect.poll(async () => (await umbracoApi.dataType.getChildren(dataTypeFolderId))[0]?.name).toBe(dataTypeName);
   await umbracoUi.dataType.goToDataType(dataTypeFolderName);
-  await umbracoUi.dataType.doesCollectionTreeItemTableRowHaveName(dataTypeName);
-  await umbracoUi.dataType.doesCollectionTreeItemTableRowHaveIcon(dataTypeName, 'icon-autofill');
+  await umbracoUi.dataType.doesTreeItemHaveTheCorrectIcon(dataTypeName, 'icon-autofill');
 });
 
-test('can create a data type folder in a folder using create options', async ({umbracoApi, umbracoUi}) => {
+test('can create a data type folder in a folder from the tree actions menu', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const childFolderName = 'Test Child Folder';
-  await umbracoApi.dataType.ensureNameNotExists(childFolderName);
-  await umbracoApi.dataType.createFolder(dataTypeFolderName);
+  const dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
   await umbracoUi.dataType.reloadDataTypeTree();
-  await umbracoUi.dataType.goToDataType(dataTypeFolderName);
 
   // Act
-  await umbracoUi.dataType.clickCreateActionWithOptionName('Folder');
-  await umbracoUi.dataType.enterFolderName(childFolderName);
-  await umbracoUi.dataType.clickConfirmCreateFolderButtonAndWaitForDataTypeToBeCreated();
+  await umbracoUi.dataType.clickRootFolderCaretButton();
+  await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
+  await umbracoUi.dataType.createDataTypeFolderAndWaitForDataTypeToBeCreated(childFolderName);
 
   // Assert
   expect(await umbracoApi.dataType.doesNameExist(childFolderName)).toBeTruthy();
-  // Check if the created data type is displayed in the collection view and has correct icon
-  await umbracoUi.dataType.doesCollectionTreeItemTableRowHaveName(childFolderName);
-  await umbracoUi.dataType.doesCollectionTreeItemTableRowHaveIcon(childFolderName, 'icon-folder');
+  await expect.poll(async () => {
+    const [child] = await umbracoApi.dataType.getChildren(dataTypeFolderId);
+    return {name: child?.name, isFolder: child?.isFolder};
+  }).toEqual({name: childFolderName, isFolder: true});
+  await umbracoUi.dataType.openCaretButtonForName(dataTypeFolderName);
+  await umbracoUi.dataType.doesTreeItemHaveTheCorrectIcon(childFolderName, 'icon-folder');
 });

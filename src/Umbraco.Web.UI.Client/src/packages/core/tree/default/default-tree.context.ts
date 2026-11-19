@@ -75,6 +75,7 @@ export class UmbDefaultTreeContext<
 	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
 	public readonly targetPagination = this.#treeItemChildrenManager.targetPagination;
 	public readonly startNode = this.#treeItemChildrenManager.startNode;
+	public readonly startNodes = this.#treeItemChildrenManager.startNodes;
 	public readonly foldersOnly = this.#treeItemChildrenManager.foldersOnly;
 	public readonly additionalRequestArgs = this.#treeItemChildrenManager.additionalRequestArgs;
 	public readonly isLoading = this.#treeItemChildrenManager.isLoading;
@@ -212,7 +213,7 @@ export class UmbDefaultTreeContext<
 	async #debouncedLoadTree(reload = false) {
 		await this.#init;
 
-		const hasStartNode = this.getStartNode();
+		const hasStartNode = this.getStartNode() !== undefined || this.getStartNodes().length > 0;
 		const hideTreeRoot = this.getHideTreeRoot();
 
 		// Always load the tree root entity, even when the root node is hidden or we are drilled
@@ -347,6 +348,37 @@ export class UmbDefaultTreeContext<
 	 */
 	getStartNode(): UmbTreeStartNode | undefined {
 		return this.#treeItemChildrenManager.getStartNode();
+	}
+
+	/**
+	 * Sets the startNodes config. Only two or more nodes make the tree present the nodes themselves as its top
+	 * level. The single start node is configured separately, through `setStartNode`.
+	 * @param {Array<UmbTreeStartNode> | undefined} startNodes - The start nodes
+	 * @memberof UmbDefaultTreeContext
+	 */
+	setStartNodes(startNodes: Array<UmbTreeStartNode> | undefined) {
+		const current = this.getStartNodes();
+		const next = startNodes ?? [];
+		const isUnchanged =
+			current.length === next.length &&
+			current.every(
+				(startNode, index) =>
+					startNode.unique === next[index].unique && startNode.entityType === next[index].entityType,
+			);
+		if (isUnchanged) return;
+
+		this.#treeItemChildrenManager.setStartNodes(next);
+		this.#clearTree();
+		this.loadTree();
+	}
+
+	/**
+	 * Gets the startNodes config
+	 * @returns {Array<UmbTreeStartNode>} - The start nodes
+	 * @memberof UmbDefaultTreeContext
+	 */
+	getStartNodes(): Array<UmbTreeStartNode> {
+		return this.#treeItemChildrenManager.getStartNodes();
 	}
 
 	/**

@@ -40,14 +40,14 @@ export class UmbResendInviteToUserModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html`<uui-dialog-layout headline="Resend invite">
+		return html`<uui-dialog-layout headline=${this.localize.term('actions_resendInvite')}>
 			${this.#renderForm()}
 
-			<uui-button @click=${this._rejectModal} slot="actions" label="Cancel" look="secondary"></uui-button>
+			<uui-button @click=${this._rejectModal} slot="actions" label=${this.localize.term('general_cancel')} look="secondary"></uui-button>
 			<uui-button
 				slot="actions"
 				type="submit"
-				label="Resend invite"
+				label=${this.localize.term('actions_resendInvite')}
 				look="primary"
 				color="positive"
 				form="ResendInviteToUserForm"></uui-button>
@@ -58,7 +58,9 @@ export class UmbResendInviteToUserModalElement extends UmbModalBaseElement<
 		return html` <uui-form>
 			<form id="ResendInviteToUserForm" name="form" @submit="${this.#onSubmitForm}">
 				<uui-form-layout-item>
-					<uui-label id="messageLabel" slot="label" for="message" required>Message</uui-label>
+					<uui-label id="messageLabel" slot="label" for="message" required>
+						<umb-localize key="general_message"></umb-localize>
+					</uui-label>
 					<uui-textarea id="message" label="message" name="message" required></uui-textarea>
 				</uui-form-layout-item>
 			</form>

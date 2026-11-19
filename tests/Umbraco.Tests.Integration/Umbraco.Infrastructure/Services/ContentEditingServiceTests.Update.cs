@@ -862,4 +862,78 @@ public partial class ContentEditingServiceTests
             Assert.Less(firstUpdateDateDa, updatedContent.GetUpdateDate("da-DK"));
         }
     }
+
+    [Test]
+    public async Task Cannot_Update_With_An_Over_Long_Name()
+    {
+        var content = await CreateInvariantContent();
+        var originalName = content.Name;
+
+        var updateModel = new ContentUpdateModel
+        {
+            Variants = [new VariantModel { Name = new string('x', 256) }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The updated title" }],
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+
+        var updated = await ContentEditingService.GetAsync(content.Key);
+        Assert.IsNotNull(updated);
+        Assert.AreEqual(originalName, updated.Name);
+    }
+
+    [TestCase("")]
+    [TestCase(" ")]
+    public async Task Cannot_Update_Invariant_With_Blank_Name(string name)
+    {
+        var content = await CreateInvariantContent();
+        var originalName = content.Name;
+
+        var updateModel = new ContentUpdateModel
+        {
+            Variants = [new VariantModel { Name = name }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The updated title" }],
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+
+        var updated = await ContentEditingService.GetAsync(content.Key);
+        Assert.IsNotNull(updated);
+        Assert.AreEqual(originalName, updated.Name);
+    }
+
+    [TestCase("")]
+    [TestCase(" ")]
+    public async Task Cannot_Update_Culture_Variant_With_Only_Blank_Names(string name)
+    {
+        var content = await CreateCultureVariantContent();
+        var originalEnglishName = content.GetCultureName("en-US");
+        var originalDanishName = content.GetCultureName("da-DK");
+
+        var updateModel = new ContentUpdateModel
+        {
+            Properties = [new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" }],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = name },
+                new VariantModel { Culture = "da-DK", Name = name }
+            ]
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+
+        var updated = await ContentEditingService.GetAsync(content.Key);
+        Assert.IsNotNull(updated);
+        Assert.AreEqual(originalEnglishName, updated.GetCultureName("en-US"));
+        Assert.AreEqual(originalDanishName, updated.GetCultureName("da-DK"));
+    }
 }

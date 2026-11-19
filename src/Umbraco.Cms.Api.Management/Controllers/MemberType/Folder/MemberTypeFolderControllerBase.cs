@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -15,6 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Folder;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.MemberType}/folder")]
 [ApiExplorerSettings(GroupName = "Member Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
+[RequiresPermissionsFor(Constants.Permissions.Entities.MemberType.Resource)]
 public abstract class MemberTypeFolderControllerBase : FolderManagementControllerBase<IMemberType>
 {
     protected MemberTypeFolderControllerBase(

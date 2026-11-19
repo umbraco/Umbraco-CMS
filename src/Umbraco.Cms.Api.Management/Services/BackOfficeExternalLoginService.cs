@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using System.Security.Principal;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -171,7 +170,16 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
             return Attempt.FailWithStatus(ExternalLoginOperationStatus.UserNotFound, Enumerable.Empty<IdentityError>());
         }
 
-        ExternalLoginInfo? info = await _backOfficeSignInManager.GetExternalLoginInfoAsync();
+
+        // The cookie's security stamp might only be validated periodically, so a cookie issued before the stamp
+        // changed (for example by signing out) can still authenticate. It must not be able to link a login.
+        if (string.Equals(cookieAuthenticatedUserAttempt.Principal.FindFirstValue(Constants.Security.SecurityStampClaimType), user.SecurityStamp, StringComparison.Ordinal) is false)
+        {
+            return Attempt.FailWithStatus(ExternalLoginOperationStatus.Unauthorized, Enumerable.Empty<IdentityError>());
+        }
+
+        // Only accept an external login from a link flow started for this user.
+        ExternalLoginInfo? info = await _backOfficeSignInManager.GetExternalLoginInfoAsync(user.Id);
 
         if (info is null)
         {

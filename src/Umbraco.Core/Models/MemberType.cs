@@ -20,7 +20,7 @@ public class MemberType : ContentTypeCompositionBase, IMemberType
     /// <summary>
     ///     Gets or Sets a Dictionary of Tuples (MemberCanEdit, VisibleOnProfile, IsSensitive) by the PropertyTypes' alias.
     /// </summary>
-    private readonly IDictionary<string, MemberTypePropertyProfileAccess> _memberTypePropertyTypes;
+    private IDictionary<string, MemberTypePropertyProfileAccess> _memberTypePropertyTypes;
 
     // Dictionary is divided into string: PropertyTypeAlias, Tuple: MemberCanEdit, VisibleOnProfile, PropertyTypeId
     private string _alias = string.Empty;
@@ -203,5 +203,16 @@ public class MemberType : ContentTypeCompositionBase, IMemberType
             var tuple = new MemberTypePropertyProfileAccess(false, false, value);
             _memberTypePropertyTypes.Add(propertyTypeAlias, tuple);
         }
+    }
+
+    /// <inheritdoc />
+    protected override void PerformDeepClone(object clone)
+    {
+        base.PerformDeepClone(clone);
+
+        var clonedEntity = (MemberType)clone;
+        clonedEntity._memberTypePropertyTypes = _memberTypePropertyTypes.ToDictionary(
+            x => x.Key,
+            x => new MemberTypePropertyProfileAccess(x.Value.IsVisible, x.Value.IsEditable, x.Value.IsSensitive));
     }
 }

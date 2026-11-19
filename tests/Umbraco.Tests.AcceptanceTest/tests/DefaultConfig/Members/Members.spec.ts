@@ -150,8 +150,7 @@ test('can remove member group', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeUpdated();
 
   // Assert
-  const memberData = await umbracoApi.member.get(memberId);
-  expect(memberData.groups.length).toBe(0);
+  await expect.poll(async () => (await umbracoApi.member.get(memberId)).groups.length).toBe(0);
 
   // Clean
   await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);

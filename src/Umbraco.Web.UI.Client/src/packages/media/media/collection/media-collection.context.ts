@@ -6,6 +6,7 @@ import type { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 	UmbMediaCollectionItemModel,
@@ -65,27 +66,12 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 		return this._requestCollection();
 	}
 
-	protected override async _requestCollection() {
-		await this._init;
+	protected override _setCollectionData(data: UmbPagedModel<UmbMediaCollectionItemModel>) {
+		this.#cleanupPlaceholdersFromCollection(data.items);
+		const placeholders = this.#placeholders.getValue();
 
-		if (!this._configured) this._configure();
-
-		if (!this._repository) throw new Error(`Missing repository for ${this._manifest}`);
-
-		this._loading.setValue(true);
-
-		const filter = this._filter.getValue();
-		const { data } = await this._repository.requestCollection(filter);
-
-		if (data) {
-			this.#cleanupPlaceholdersFromCollection(data.items);
-			const placeholders = this.#placeholders.getValue();
-
-			this._items.setValue([...placeholders, ...data.items]);
-			this._setTotalItems(placeholders.length + data.total);
-		}
-
-		this._loading.setValue(false);
+		this._items.setValue([...placeholders, ...data.items]);
+		this._setTotalItems(placeholders.length + data.total);
 	}
 
 	#cleanupPlaceholdersFromCollection(collection: Array<UmbMediaCollectionItemModel>) {

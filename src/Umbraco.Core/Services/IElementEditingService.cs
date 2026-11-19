@@ -45,7 +45,22 @@ public interface IElementEditingService
     /// <param name="culturesToPublish">The cultures to publish.</param>
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the creation result or an error status.</returns>
-    // TODO (V19): Remove default implementation.
+    /// <remarks>
+    ///     The returned status reports the outcome of the save and the publish separately, as the two can differ:
+    ///     a publish blocked by a business rule still leaves the save in effect.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation when the obsolete CreateAndPublishAsync(ElementCreateModel, string[], Guid) overload is removed.
+    Task<Attempt<ElementCreateResult, ContentEditingAndPublishingStatus>> CreateAndPublishAsync(ElementCreateModel createModel, ISet<string> culturesToPublish, Guid userKey)
+        => throw new NotImplementedException();
+
+    /// <summary>
+    ///     Creates and publishes a new element.
+    /// </summary>
+    /// <param name="createModel">The model containing the element data.</param>
+    /// <param name="culturesToPublish">The cultures to publish.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <returns>An attempt containing the creation result or an error status.</returns>
+    [Obsolete("Use the overload taking an ISet<string> of cultures to publish, which reports the save and the publish outcome separately. Scheduled for removal in Umbraco 19.")]
     Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAndPublishAsync(ElementCreateModel createModel, string[] culturesToPublish, Guid userKey)
         => throw new NotImplementedException();
 
@@ -66,7 +81,23 @@ public interface IElementEditingService
     /// <param name="culturesToPublish">The cultures to publish.</param>
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the update result or an error status.</returns>
-    // TODO (V19): Remove default implementation.
+    /// <remarks>
+    ///     The returned status reports the outcome of the save and the publish separately, as the two can differ:
+    ///     a publish blocked by a business rule still leaves the save in effect.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation when the obsolete UpdateAndPublishAsync(Guid, ElementUpdateModel, string[], Guid) overload is removed.
+    Task<Attempt<ElementUpdateResult, ContentEditingAndPublishingStatus>> UpdateAndPublishAsync(Guid key, ElementUpdateModel updateModel, ISet<string> culturesToPublish, Guid userKey)
+        => throw new NotImplementedException();
+
+    /// <summary>
+    ///     Updates and publishes an existing element.
+    /// </summary>
+    /// <param name="key">The unique identifier of the element to update.</param>
+    /// <param name="updateModel">The model containing the updated element data.</param>
+    /// <param name="culturesToPublish">The cultures to publish.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <returns>An attempt containing the update result or an error status.</returns>
+    [Obsolete("Use the overload taking an ISet<string> of cultures to publish, which reports the save and the publish outcome separately. Scheduled for removal in Umbraco 19.")]
     Task<Attempt<ElementUpdateResult, ContentEditingOperationStatus>> UpdateAndPublishAsync(Guid key, ElementUpdateModel updateModel, string[] culturesToPublish, Guid userKey)
         => throw new NotImplementedException();
 

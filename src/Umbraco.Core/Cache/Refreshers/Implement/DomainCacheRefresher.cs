@@ -85,15 +85,14 @@ public sealed class DomainCacheRefresher : PayloadCacheRefresherBase<DomainCache
     public override void RefreshInternal(JsonPayload[] payloads)
     {
         ClearAllIsolatedCacheByEntityType<IDomain>();
-
-        // note: must do what's above FIRST else the repositories still have the old cached
-        // content and when the PublishedCachesService is notified of changes it does not see
-        // the new content...
-
-        // notify
-        _domainCacheService.Refresh(payloads);
-
         base.RefreshInternal(payloads);
+    }
+
+    /// <inheritdoc />
+    public override void Refresh(JsonPayload[] payloads)
+    {
+        _domainCacheService.Refresh(payloads);
+        base.Refresh(payloads);
     }
 
     // these events should never trigger

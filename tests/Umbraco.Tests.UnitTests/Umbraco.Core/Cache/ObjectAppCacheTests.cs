@@ -1,7 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Diagnostics;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Internal;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 
@@ -25,7 +27,7 @@ public class ObjectAppCacheTests : RuntimeAppCacheTests
     internal override IAppPolicyCache AppPolicyCache => _provider;
 
     // Replacing a cached value evicts the previous entry on a background thread. The eviction must not
-    // remove the re-added key from the key-tracking set, otherwise key-based operations stop finding the
+    // remove the re-added key from the tracked keys, otherwise key-based operations stop finding the
     // live entry. Regression test for https://github.com/umbraco/Umbraco-CMS/issues/23064.
     [Test]
     public void Replacing_A_Value_Keeps_The_Key_Tracked()
@@ -34,14 +36,7 @@ public class ObjectAppCacheTests : RuntimeAppCacheTests
         _provider.Insert("key", () => "first", timeout);
         _provider.Insert("key", () => "second", timeout);
 
-        // The replaced entry is evicted on a background thread. On a build with the bug that eviction
-        // removes the key from the tracking set - a sticky desync we can detect. On a fixed build nothing
-        // changes and the bounded wait simply elapses.
-        var stopwatch = Stopwatch.StartNew();
-        while (stopwatch.Elapsed < TimeSpan.FromSeconds(2) && _provider.SearchByKey("key").Any())
-        {
-            Thread.Sleep(25);
-        }
+        WaitForEvictionCallbacks(_provider, 1);
 
         Assert.Multiple(() =>
         {
@@ -51,5 +46,44 @@ public class ObjectAppCacheTests : RuntimeAppCacheTests
 
         _provider.ClearByKey("key");
         Assert.That(_provider.Get("key"), Is.Null);
+    }
+
+    // Re-caching an expired value evicts the expired entry on a background thread. The eviction must not
+    // remove the re-added key from the tracked keys, otherwise key-based operations stop finding the
+    // live entry. Regression test for https://github.com/umbraco/Umbraco-CMS/issues/24301.
+    [Test]
+    public void Re_Caching_An_Expired_Value_Keeps_The_Key_Tracked()
+    {
+        var clock = new TestClock();
+        using var cache = new ObjectCacheAppCache(new MemoryCacheOptions { Clock = clock }, NullLoggerFactory.Instance);
+        var timeout = TimeSpan.FromMinutes(10);
+
+        cache.Get("key", () => "first", timeout);
+        clock.UtcNow += timeout + TimeSpan.FromSeconds(1);
+        Assert.That(cache.Get("key", () => "second", timeout), Is.EqualTo("second"));
+
+        WaitForEvictionCallbacks(cache, 1);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cache.Get("key"), Is.EqualTo("second"));
+            Assert.That(cache.SearchByKey("key"), Is.EquivalentTo(new[] { "second" }));
+        });
+
+        cache.ClearByKey("key");
+        Assert.That(cache.Get("key"), Is.Null);
+    }
+
+    // Eviction callbacks run on a background thread, so wait for them to complete before asserting on the
+    // tracked keys. The timeout only elapses if a callback never runs.
+    private static void WaitForEvictionCallbacks(ObjectCacheAppCache cache, int expectedCount)
+        => Assert.That(
+            SpinWait.SpinUntil(() => cache.CompletedEvictionCallbacks >= expectedCount, TimeSpan.FromSeconds(5)),
+            Is.True,
+            "Timed out waiting for the eviction callbacks to complete.");
+
+    private sealed class TestClock : ISystemClock
+    {
+        public DateTimeOffset UtcNow { get; set; } = DateTimeOffset.UtcNow;
     }
 }

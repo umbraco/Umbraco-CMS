@@ -89,6 +89,5 @@ test('can update member with members section set', async ({umbracoApi, umbracoUi
 
   // Assert
   await umbracoUi.member.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource, false);
-  const memberData = await umbracoApi.member.get(memberId);
-  expect(memberData.username).toBe(updatedUsername);
+  await expect.poll(async () => (await umbracoApi.member.get(memberId)).username).toBe(updatedUsername);
 });

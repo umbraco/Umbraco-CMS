@@ -30,9 +30,23 @@ export const manifests: Array<UmbExtensionManifest> = [
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_PARTIAL_VIEW_WORKSPACE_ALIAS,
 			},
+		],
+	},
+	{
+		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.PartialView.CodeEditor',
+		name: 'Partial View Workspace Code Editor View',
+		element: () => import('./views/code-editor/partial-view-code-editor-workspace-view.element.js'),
+		weight: 700,
+		meta: {
+			label: '#template_tabCode',
+			pathname: 'code',
+			icon: 'icon-brackets',
+		},
+		conditions: [
 			{
-				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
-				match: false,
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_PARTIAL_VIEW_WORKSPACE_ALIAS,
 			},
 		],
 	},
@@ -43,7 +57,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('../../local-components/production-mode-workspace-action/production-mode-workspace-action.js'),
 		element: () =>
 			import('../../local-components/production-mode-workspace-action/production-mode-workspace-action.js'),
-		weight: 60,
+		weight: 1100,
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,

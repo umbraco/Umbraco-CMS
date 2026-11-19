@@ -292,7 +292,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             // subquery with an IN clause into an inner join anyways.
             .Append($"WHERE {QuoteTableName("umbracoNode")}.id IN ({subQuery.SQL})", subQuery.Arguments)
             .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
-            .OrderBy<NodeDto>(x => x.SortOrder);
+            .OrderBy<NodeDto>(x => x.SortOrder, x => x.NodeId);
 
         return MapDtosToContent(Database.Fetch<MemberDto>(sql));
     }
@@ -408,6 +408,9 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             ApplyOrdering(ref sql, ordering);
         }
 
+        // Order ties by id so that pages neither skip nor repeat members with equal values.
+        sql.OrderBy<NodeDto>(x => x.NodeId);
+
         var pageIndex = skip / take;
         Page<MemberDto>? pageResult = await Database.PageAsync<MemberDto>(pageIndex + 1, take, sql);
 
@@ -421,12 +424,8 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
         // GetMany uses WHERE IN which does not preserve order, so we must
         // re-sort the results to match the ordering returned by the paged query.
-        IEnumerable<IMember> members = GetMany(nodeIds);
-        if (ordering is not null && ordering.IsEmpty is false)
-        {
-            var orderMap = nodeIds.Select((id, index) => (id, index)).ToDictionary(x => x.id, x => x.index);
-            members = members.OrderBy(m => orderMap.GetValueOrDefault(m.Id, int.MaxValue));
-        }
+        var orderMap = nodeIds.Select((id, index) => (id, index)).ToDictionary(x => x.id, x => x.index);
+        IEnumerable<IMember> members = GetMany(nodeIds).OrderBy(m => orderMap.GetValueOrDefault(m.Id, int.MaxValue));
 
         return new PagedModel<IMember>(pageResult.TotalItems, members);
     }
@@ -752,7 +751,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             Sql<ISqlContext> sql = translator.Translate();
 
             baseQuery.Append($"WHERE {QuoteTableName("umbracoNode")}.id IN (" + sql.SQL + ")", sql.Arguments)
-                .OrderBy<NodeDto>(x => x.SortOrder);
+                .OrderBy<NodeDto>(x => x.SortOrder, x => x.NodeId);
 
             return MapDtosToContent(Database.Fetch<MemberDto>(baseQuery));
         }
@@ -760,7 +759,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         {
             var translator = new SqlTranslator<IMember>(baseQuery, query);
             Sql<ISqlContext> sql = translator.Translate()
-                .OrderBy<NodeDto>(x => x.SortOrder);
+                .OrderBy<NodeDto>(x => x.SortOrder, x => x.NodeId);
 
             return MapDtosToContent(Database.Fetch<MemberDto>(sql));
         }

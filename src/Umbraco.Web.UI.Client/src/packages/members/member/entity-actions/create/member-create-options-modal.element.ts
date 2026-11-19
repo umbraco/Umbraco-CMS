@@ -24,7 +24,7 @@ export class UmbMemberCreateOptionsModalElement extends UmbModalBaseElement<
 	}
 
 	async #getOptions() {
-		const { data } = await this.#memberTypeStructureRepository.requestAllowedChildrenOf(null, null);
+		const { data } = await this.#memberTypeStructureRepository.requestAllAllowedChildrenOf(null, null);
 		if (!data) return;
 
 		this._options = data.items

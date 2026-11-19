@@ -6,6 +6,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Media Entity Picker Property Editor UI',
 	element: () => import('./property-editor-ui-media-entity-picker.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Media Entity Picker',
 		icon: 'icon-picture',
 		group: '#propertyEditorUIGroups_pickers',

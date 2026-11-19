@@ -655,6 +655,7 @@ export type DataTypeTreeItemResponseModel = {
     isDeletable: boolean;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;
@@ -723,6 +724,7 @@ export type DocumentBlueprintTreeItemResponseModel = {
     variants: Array<DocumentVariantItemResponseModel>;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;
@@ -919,6 +921,7 @@ export type DocumentTypeTreeItemResponseModel = {
     icon: string;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;
@@ -1086,6 +1089,7 @@ export type ElementTreeItemResponseModel = {
     variants: Array<ElementVariantItemResponseModel>;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;
@@ -1727,6 +1731,7 @@ export type MediaTypeTreeItemResponseModel = {
     isDeletable: boolean;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;
@@ -1902,6 +1907,7 @@ export type MemberTypeTreeItemResponseModel = {
     icon: string;
     isFolder: boolean;
     noAccess: boolean;
+    parentIsFolder: boolean;
     name: string;
     id: string;
     parent?: null | ReferenceByIdModel;
@@ -2730,6 +2736,7 @@ export type ServerInformationResponseModel = {
     assemblyVersion: string;
     baseUtcOffset: string;
     runtimeMode: RuntimeModeModel;
+    isDebugMode: boolean;
 };
 
 export type ServerStatusResponseModel = {
@@ -10282,6 +10289,7 @@ export type GetImagingResizeUrlsData = {
     path?: never;
     query?: {
         id?: Array<string>;
+        dataTypeId?: string;
         height?: number;
         width?: number;
         mode?: ImageCropModeModel;
@@ -11762,6 +11770,7 @@ export type GetMediaUrlsData = {
     path?: never;
     query?: {
         id?: Array<string>;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/media/urls';
 };
@@ -18187,6 +18196,7 @@ export type GetFilterUserData = {
         orderDirection?: DirectionModel;
         userGroupIds?: Array<string>;
         userStates?: Array<UserStateModel>;
+        userKinds?: Array<UserKindModel>;
         filter?: string;
     };
     url: '/umbraco/management/api/v1/filter/user';
@@ -20060,6 +20070,10 @@ export type GetItemWebhookErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetItemWebhookResponses = {

@@ -19,7 +19,7 @@ export class UmbServerContext extends UmbContextBase {
 	/**
 	 * Observable that provides the full server information.
 	 * Every subscriber shares one request: the server is asked for its information at most once per
-	 * app session, no matter how many consumers observe this or the derived `isProductionMode`.
+	 * app session, no matter how many consumers observe this or the derived `isProductionMode` and `isDebugMode`.
 	 */
 	public readonly serverInformation = defer(() => {
 		this.#requestServerInformation();
@@ -34,6 +34,12 @@ export class UmbServerContext extends UmbContextBase {
 	public readonly isProductionMode = this.serverInformation.pipe(
 		map((info) => (info ? info.runtimeMode === RuntimeModeModel.PRODUCTION : undefined)),
 	);
+
+	/**
+	 * Observable that emits true when the server is running in debug mode,
+	 * false when not, or undefined until server information is loaded.
+	 */
+	public readonly isDebugMode = this.serverInformation.pipe(map((info) => (info ? info.isDebugMode : undefined)));
 
 	constructor(host: UmbControllerHost, config: UmbServerContextConfig) {
 		super(host, UMB_SERVER_CONTEXT);

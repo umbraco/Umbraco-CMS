@@ -28,7 +28,7 @@ public partial class ElementEditingServiceTests
             ],
         };
 
-        var result = await ElementEditingService.CreateAndPublishAsync(createModel, [], Constants.Security.SuperUserKey);
+        var result = await ElementEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         VerifyCreateAndPublish(result.Result.Content);
 
@@ -68,7 +68,7 @@ public partial class ElementEditingServiceTests
             ],
         };
 
-        var result = await ElementEditingService.CreateAndPublishAsync(createModel, ["en-US", "da-DK"], Constants.Security.SuperUserKey);
+        var result = await ElementEditingService.CreateAndPublishAsync(createModel, new HashSet<string> { "en-US", "da-DK" }, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         VerifyCreateAndPublish(result.Result.Content);
 
@@ -111,7 +111,7 @@ public partial class ElementEditingServiceTests
             ],
         };
 
-        var result = await ElementEditingService.CreateAndPublishAsync(createModel, ["en-US"], Constants.Security.SuperUserKey);
+        var result = await ElementEditingService.CreateAndPublishAsync(createModel, new HashSet<string> { "en-US" }, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         VerifyCreateAndPublish(result.Result.Content);
 
@@ -148,11 +148,11 @@ public partial class ElementEditingServiceTests
             ],
         };
 
-        var result = await ElementEditingService.CreateAndPublishAsync(createModel, [], Constants.Security.SuperUserKey);
+        var result = await ElementEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(
             ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch,
-            result.Status,
+            result.Status.ContentEditingOperationStatus,
             "Creating an invariant element without any variants should fail with a variance mismatch.");
     }
 
@@ -169,8 +169,138 @@ public partial class ElementEditingServiceTests
             ],
         };
 
-        var result = await ElementEditingService.CreateAndPublishAsync(createModel, [], Constants.Security.SuperUserKey);
+        var result = await ElementEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeNotFound, result.Status);
+        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeNotFound, result.Status.ContentEditingOperationStatus);
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_With_Invalid_Property_Values()
+    {
+        var elementType = await CreateVariantElementType();
+
+        // "variantTitle" is mandatory, so publishing is rejected while saving is not
+        var createModel = new ElementCreateModel
+        {
+            ContentTypeKey = elementType.Key,
+            ParentKey = null,
+            Variants = [new VariantModel { Culture = "en-US", Name = "English Name" }],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = null, Culture = "en-US" }
+            ],
+        };
+
+        var result = await ElementEditingService.CreateAndPublishAsync(createModel, new HashSet<string> { "en-US" }, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
+            Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, result.Status.ContentPublishingOperationStatus);
+            Assert.AreEqual(new[] { "variantTitle" }, result.Result.InvalidPropertyAliases.ToArray());
+        });
+
+        var created = await ElementEditingService.GetAsync(result.Result.Content!.Key);
+        Assert.IsNotNull(created);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("English Name", created.GetCultureName("en-US"));
+            Assert.IsFalse(created.IsCulturePublished("en-US"));
+            Assert.AreEqual("The Invariant Title", created.GetValue<string>("invariantTitle"));
+        });
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_With_Invalid_Property_Values_With_Obsolete_Overload()
+    {
+        var elementType = await CreateVariantElementType();
+
+        var createModel = new ElementCreateModel
+        {
+            ContentTypeKey = elementType.Key,
+            ParentKey = null,
+            Variants = [new VariantModel { Culture = "en-US", Name = "English Name" }],
+            Properties = [new PropertyValueModel { Alias = "variantTitle", Value = null, Culture = "en-US" }],
+        };
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        var result = await ElementEditingService.CreateAndPublishAsync(createModel, ["en-US"], Constants.Security.SuperUserKey);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        // the obsolete overload cannot express a publish failure, so it keeps collapsing to "unknown"
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Unknown, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_With_Cultures_For_An_Invariant_Element_Type()
+    {
+        var elementType = await CreateInvariantElementType();
+
+        var createModel = new ElementCreateModel
+        {
+            ContentTypeKey = elementType.Key,
+            ParentKey = null,
+            Variants = [new VariantModel { Name = "The Element" }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The title" }],
+        };
+
+        var result = await ElementEditingService.CreateAndPublishAsync(createModel, new HashSet<string> { "en-US" }, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status.ContentEditingOperationStatus);
+            Assert.IsNull(result.Status.ContentPublishingOperationStatus);
+        });
+    }
+
+    [TestCase("*")]
+    [TestCase("zz-ZZ")]
+    public async Task Cannot_CreateAndPublish_With_An_Invalid_Culture_To_Publish(string culture)
+    {
+        var elementType = await CreateVariantElementType();
+
+        var createModel = new ElementCreateModel
+        {
+            ContentTypeKey = elementType.Key,
+            ParentKey = null,
+            Variants = [new VariantModel { Culture = "en-US", Name = "English Name" }],
+            Properties = [new PropertyValueModel { Alias = "variantTitle", Value = "The English Title", Culture = "en-US" }],
+        };
+
+        var result = await ElementEditingService.CreateAndPublishAsync(createModel, new HashSet<string> { culture }, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(ContentEditingOperationStatus.InvalidCulture, result.Status.ContentEditingOperationStatus);
+            Assert.IsNull(result.Status.ContentPublishingOperationStatus);
+        });
+    }
+
+    [Test]
+    public async Task Cannot_CreateAndPublish_With_An_Over_Long_Name()
+    {
+        var elementType = await CreateInvariantElementType();
+
+        var createModel = new ElementCreateModel
+        {
+            ContentTypeKey = elementType.Key,
+            ParentKey = null,
+            Variants = [new VariantModel { Name = new string('x', Constants.Validation.MaxNameLength + 1) }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The title" }],
+        };
+
+        var result = await ElementEditingService.CreateAndPublishAsync(createModel, new HashSet<string>(), Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status.ContentEditingOperationStatus);
+            Assert.IsNull(result.Status.ContentPublishingOperationStatus);
+        });
     }
 }

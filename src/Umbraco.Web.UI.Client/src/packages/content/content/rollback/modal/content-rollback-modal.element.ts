@@ -114,7 +114,9 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 			this.#currentDocument = data;
 			const itemVariants = this.#currentDocument?.variants ?? [];
 
-			this._isInvariant = itemVariants.length === 1 && new UmbVariantId(itemVariants[0].culture).isInvariant();
+			// A document is culture invariant when none of its variants carry a culture. It may still hold
+			// several variants, as any segment adds one.
+			this._isInvariant = itemVariants.every((variant) => UmbVariantId.Create(variant).isCultureInvariant());
 			this.#selectCulture();
 
 			const cultures = itemVariants.map((x) => x.culture).filter((x) => x !== null) as Array<string>;
@@ -215,7 +217,9 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 			name: data.variants.find((x) => x.culture === this._selectedCulture)?.name || data.variants[0].name,
 			id: data.id,
 			properties: data.values
-				.filter((x) => x.culture === this._selectedCulture || !x.culture) // When invariant, culture is undefined or null.
+				// When invariant, culture is undefined or null. Segment values are overrides of the default
+				// segment value, so only the default segment is shown here.
+				.filter((x) => (x.culture === this._selectedCulture || !x.culture) && !x.segment)
 				.map((value) => {
 					return {
 						alias: value.alias,
@@ -365,9 +369,11 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 	async #setDiffs() {
 		if (!this._selectedVersion) return;
 
+		// When invariant, culture is undefined or null. Segment values are overrides of the default segment
+		// value, so only the default segment is diffed.
 		const currentPropertyValues = this.#currentDocument?.values.filter(
-			(x) => x.culture === this._selectedCulture || !x.culture,
-		); // When invariant, culture is undefined or null.
+			(x) => (x.culture === this._selectedCulture || !x.culture) && !x.segment,
+		);
 
 		if (!currentPropertyValues) {
 			throw new Error('Current property values are not set');

@@ -469,6 +469,8 @@ declare global {
 		content_alternativeTextHelp: string;
 		content_alternativeUrls: string;
 		content_altTextOptional: string;
+		content_ancestorCultureNotPublishedScheduleWarning: string;
+		content_ancestorNotPublishedScheduleWarning: string;
 		content_captionTextOptional: string;
 		content_childItems: string;
 		content_clickToEdit: string;
@@ -555,6 +557,7 @@ declare global {
 		content_scheduledPublishDocumentation: string;
 		content_scheduledPublishing: string;
 		content_scheduledPublishServerTime: string;
+		content_scheduleForAllLanguages: string;
 		content_schedulePublishHelp: string;
 		content_selectAllVariants: string;
 		content_sendForApproval: string;
@@ -651,6 +654,8 @@ declare global {
 		contentTypeEditor_confirmDeletePropertyMessage: string;
 		contentTypeEditor_confirmDeleteTabMessage: string;
 		contentTypeEditor_confirmDeleteTabNotice: string;
+		contentTypeEditor_confirmPropertyAliasChangeHeadline: string;
+		contentTypeEditor_confirmPropertyAliasChangeMessage: string;
 		contentTypeEditor_convertToTab: string;
 		contentTypeEditor_copiedUnderneath: string;
 		contentTypeEditor_cultureAndVariantInvariantLabel: string;
@@ -748,12 +753,15 @@ declare global {
 		create_newStyleSheetFile: string;
 		create_noDocumentTypes: string;
 		create_noDocumentTypesAllowedAtRoot: string;
+		create_noDocumentTypesAllowedAtRootWithNoSettingsAccess: string;
 		create_noDocumentTypesAtRoot: string;
 		create_noDocumentTypesCreateNew: string;
 		create_noDocumentTypesEditPermissions: string;
 		create_noDocumentTypesWithNoSettingsAccess: string;
 		create_noElementTypes: string;
 		create_noMediaTypes: string;
+		create_noMediaTypesAllowedAtRoot: string;
+		create_noMediaTypesAllowedAtRootWithNoSettingsAccess: string;
 		create_noMediaTypesEditPermissions: string;
 		create_noMediaTypesWithNoSettingsAccess: string;
 		create_updateData: string;
@@ -1036,6 +1044,7 @@ declare global {
 		examineManagement_rebuildIndexWarning: string;
 		examineManagement_searchDescription: string;
 		examineManagement_searchers: string;
+		examineManagement_searchNotAllowed: string;
 		examineManagement_searchResultsFound: string;
 		examineManagement_tools: string;
 		examineManagement_toolsDescription: string;
@@ -1463,6 +1472,7 @@ declare global {
 		login_passwordIsBlank: string;
 		login_passwordMinLength: string;
 		login_passwordMismatch: string;
+		login_passwordResetUnavailable: string;
 		login_receivedErrorFromServer: string;
 		login_rememberMe: string;
 		login_requestPasswordResetConfirmation: string;
@@ -1553,6 +1563,8 @@ declare global {
 		main_sections: string;
 		main_tree: string;
 		media_browseFilesAction: string;
+		media_chooseMediaTypeHeadline: string;
+		media_chooseMediaTypeMoreFiles: (count: number) => string;
 		media_clickToUpload: string;
 		media_createFolderFailed: string;
 		media_disallowedFileExtension: (extension: string) => string;
@@ -1756,6 +1768,8 @@ declare global {
 		placeholders_usernameHint: string;
 		preview_connectionFailed: string;
 		preview_connectionLost: string;
+		preview_connectionReconnecting: string;
+		preview_connectionRestored: string;
 		preview_endLabel: string;
 		preview_endTitle: string;
 		preview_openWebsiteLabel: string;
@@ -1953,6 +1967,7 @@ declare global {
 		rte_config_overlaySize_description: string;
 		rte_label: string;
 		scripts_editscript: string;
+		scripts_tabCode: string;
 		sections_content: string;
 		sections_library: string;
 		sections_marketplace: string;
@@ -2241,6 +2256,7 @@ declare global {
 		template_sectionMandatoryDesc: string;
 		template_sectionName: string;
 		template_systemFields: string;
+		template_tabCode: string;
 		template_template: string;
 		template_websiteRoot: string;
 		template_where: string;
@@ -2489,11 +2505,15 @@ declare global {
 		user_deleteUserConfirmation: string;
 		user_descriptionField: string;
 		user_disabled: string;
+		user_disableUserConfirmation: string;
+		user_disableUserHeadline: (name: string) => string;
 		user_documentType: string;
 		user_duplicateLogin: string;
 		user_editors: string;
 		user_emailDescription: (usernameIsEmail: boolean) => string;
 		user_emailRequired: string;
+		user_enableUserConfirmation: string;
+		user_enableUserHeadline: (name: string) => string;
 		user_entityPermissionsDescription: string;
 		user_entityPermissionsLabel: string;
 		user_excerptField: string;
@@ -2593,7 +2613,10 @@ declare global {
 		user_stateInactive: string;
 		user_stateInvited: string;
 		user_stateLockedOut: string;
+		user_type: string;
 		user_unknownFailure: string;
+		user_unlockUserConfirmation: string;
+		user_unlockUserHeadline: (name: string) => string;
 		user_updateDate: string;
 		user_userCreated: string;
 		user_userCreatedApiSuccessHelp: string;
@@ -2670,6 +2693,8 @@ declare global {
 		validation_invalidToken: string;
 		validation_invalidUserGroupName: string;
 		validation_invalidUsername: string;
+		validation_invalidValue: string;
+		validation_itemMissingValueMessage: string;
 		validation_items: string;
 		validation_itemsSelected: string;
 		validation_legacyOption: string;
@@ -2678,6 +2703,7 @@ declare global {
 		validation_mandatoryMessageLabel: string;
 		validation_maxCount: string;
 		validation_minCount: string;
+		validation_minimumOnlyWhenInUse: string;
 		validation_minimumRange: string;
 		validation_numberMaximum: string;
 		validation_numberMinimum: string;

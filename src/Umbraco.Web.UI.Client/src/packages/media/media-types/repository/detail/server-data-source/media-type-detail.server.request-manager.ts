@@ -14,8 +14,8 @@ import {
 
 export class UmbManagementApiMediaTypeDetailDataRequestManager extends UmbManagementApiDetailDataRequestManager<
 	MediaTypeResponseModel,
-	UpdateMediaTypeRequestModel,
-	CreateMediaTypeRequestModel
+	CreateMediaTypeRequestModel,
+	UpdateMediaTypeRequestModel
 > {
 	static #inflightRequestCache = new UmbManagementApiInFlightRequestCache<MediaTypeResponseModel>();
 

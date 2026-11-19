@@ -1,13 +1,20 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.References;
 
@@ -19,18 +26,39 @@ public class ReferencedByDocumentController : DocumentControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly IRelationTypePresentationFactory _relationTypePresentationFactory;
+    private readonly IAuthorizationService _authorizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ReferencedByDocumentController"/> class.
     /// </summary>
     /// <param name="trackedReferencesService">Service for tracking document references.</param>
     /// <param name="relationTypePresentationFactory">Factory for creating relation type presentation models.</param>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public ReferencedByDocumentController(
         ITrackedReferencesService trackedReferencesService,
         IRelationTypePresentationFactory relationTypePresentationFactory)
+        : this(
+            trackedReferencesService,
+            relationTypePresentationFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReferencedByDocumentController"/> class.
+    /// </summary>
+    /// <param name="trackedReferencesService">Service for tracking document references.</param>
+    /// <param name="relationTypePresentationFactory">Factory for creating relation type presentation models.</param>
+    /// <param name="authorizationService">The service used to authorize access to the requested items.</param>
+    [ActivatorUtilitiesConstructor]
+    public ReferencedByDocumentController(
+        ITrackedReferencesService trackedReferencesService,
+        IRelationTypePresentationFactory relationTypePresentationFactory,
+        IAuthorizationService authorizationService)
     {
         _trackedReferencesService = trackedReferencesService;
         _relationTypePresentationFactory = relationTypePresentationFactory;
+        _authorizationService = authorizationService;
     }
 
     /// <summary>
@@ -91,6 +119,16 @@ public class ReferencedByDocumentController : DocumentControllerBase
         int skip = 0,
         int take = 20)
     {
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ContentPermissionResource.WithKeys(ActionBrowse.ActionLetter, id),
+            AuthorizationPolicies.ContentPermissionByResource);
+
+        if (authorizationResult.Succeeded is false)
+        {
+            return Forbidden();
+        }
+
         Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> relationItemsAttempt = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, UmbracoObjectTypes.Document, skip, take, true);
 
         if (relationItemsAttempt.Success is false)

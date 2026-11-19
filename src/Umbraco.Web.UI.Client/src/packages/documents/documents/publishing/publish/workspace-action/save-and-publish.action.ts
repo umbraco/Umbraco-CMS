@@ -1,11 +1,11 @@
-import { UmbDocumentUserPermissionCondition } from '../../../user-permissions/document/conditions/document-user-permission.condition.js';
 import {
 	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 } from '../../../user-permissions/document/constants.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../../workspace-context/constants.js';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../../constants.js';
+import { UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../../constants.js';
 import { UmbWorkspaceActionBase, type UmbWorkspaceActionArgs } from '@umbraco-cms/backoffice/workspace';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceActionBase {
@@ -20,20 +20,21 @@ export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceAction
 		 will first be triggered when the condition is changed to permitted */
 		this.disable();
 
-		new UmbDocumentUserPermissionCondition(host, {
-			host,
-			config: {
-				alias: 'Umb.Condition.UserPermission.Document',
-				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE, UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
+		// Resolve the condition by alias, so a condition registered in its place is honoured here too.
+		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE, UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
+				},
+				onChange: (permitted: boolean) => {
+					if (permitted) {
+						this.enable();
+					} else {
+						this.disable();
+					}
+				},
 			},
-			onChange: (permitted: boolean) => {
-				if (permitted) {
-					this.enable();
-				} else {
-					this.disable();
-				}
-			},
-		});
+		]);
 	}
 
 	async hasAdditionalOptions() {

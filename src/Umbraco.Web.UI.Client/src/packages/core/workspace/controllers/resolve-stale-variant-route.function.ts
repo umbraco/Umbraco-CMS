@@ -1,9 +1,11 @@
 import { UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from './constants.js';
 import { UMB_MODAL_ROUTE_PATH_SEGMENT } from '@umbraco-cms/backoffice/router';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A minimal variant option descriptor consumed by {@link resolveStaleVariantRoute}.
+ * @deprecated Deprecated since v17.9. This is specific to content workspaces and no longer used by the core. Scheduled for removal in Umbraco 20.
  */
 export interface UmbStaleVariantRouteResolverVariant {
 	culture: string | null;
@@ -13,6 +15,7 @@ export interface UmbStaleVariantRouteResolverVariant {
 
 /**
  * The arguments for {@link resolveStaleVariantRoute}.
+ * @deprecated Deprecated since v17.9. This is specific to content workspaces and no longer used by the core. Scheduled for removal in Umbraco 20.
  */
 export interface UmbStaleVariantRouteResolverArgs {
 	/**
@@ -39,8 +42,14 @@ export interface UmbStaleVariantRouteResolverArgs {
  * Split-view parts are resolved individually and deduplicated.
  * @param {UmbStaleVariantRouteResolverArgs} args - The current path, workspace route, variant options and app culture.
  * @returns {string | null} The corrected path without the query string, or null when the URL is valid or not applicable.
+ * @deprecated Deprecated since v17.9. This is specific to content workspaces and no longer used by the core. Scheduled for removal in Umbraco 20.
  */
 export function resolveStaleVariantRoute(args: UmbStaleVariantRouteResolverArgs): string | null {
+	new UmbDeprecation({
+		deprecated: 'resolveStaleVariantRoute is deprecated.',
+		removeInVersion: '20.0.0',
+		solution: 'It is specific to content workspaces and is no longer used by the core; there is no replacement.',
+	}).warn();
 	const { currentPath, workspaceRoute, variants, appCulture } = args;
 	if (variants.length === 0) return null;
 

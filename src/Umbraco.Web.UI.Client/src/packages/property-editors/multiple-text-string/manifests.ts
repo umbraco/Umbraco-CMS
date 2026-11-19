@@ -8,6 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Multiple Text String Property Editor UI',
 		element: () => import('./property-editor-ui-multiple-text-string.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Multiple Text String',
 			propertyEditorSchemaAlias: 'Umbraco.MultipleTextstring',
 			icon: 'icon-ordered-list',

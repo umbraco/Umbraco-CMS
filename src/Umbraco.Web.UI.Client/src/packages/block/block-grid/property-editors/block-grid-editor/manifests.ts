@@ -8,6 +8,7 @@ const propertyEditorUi: UmbExtensionManifest = {
 	name: 'Block Grid Property Editor UI',
 	element: () => import('./property-editor-ui-block-grid.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Block Grid',
 		propertyEditorSchemaAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 		icon: 'icon-layout',

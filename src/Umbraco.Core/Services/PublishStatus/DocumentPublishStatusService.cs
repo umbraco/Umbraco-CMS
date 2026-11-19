@@ -110,6 +110,15 @@ public class DocumentPublishStatusService :
         scope.Complete();
     }
 
+    /// <inheritdoc />
+    public void AddOrUpdateStatus(Guid documentKey)
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        ISet<string> publishedCultures = _publishStatusRepository.GetPublishStatus(documentKey);
+        SetStatus(documentKey, publishedCultures);
+        scope.Complete();
+    }
+
     /// <inheritdoc/>
     public Task RemoveAsync(Guid documentKey, CancellationToken cancellationToken)
     {
@@ -132,4 +141,44 @@ public class DocumentPublishStatusService :
             SetStatus(documentKey, publishedCultures);
         }
     }
+
+    /// <inheritdoc />
+    public void AddOrUpdateStatusWithDescendants(Guid rootDocumentKey)
+    {
+        IDictionary<Guid, ISet<string>> publishStatus;
+        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
+        {
+            publishStatus = _publishStatusRepository.GetDescendantsOrSelfPublishStatus(rootDocumentKey);
+            scope.Complete();
+        }
+
+        foreach ((Guid documentKey, ISet<string> publishedCultures) in publishStatus)
+        {
+            SetStatus(documentKey, publishedCultures);
+        }
+    }
+
+    /// <inheritdoc/>
+    public async Task RefreshCultureAsync(string culture, CancellationToken cancellationToken)
+    {
+        HashSet<Guid> publishedKeys;
+        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
+        {
+            publishedKeys = (await _publishStatusRepository.GetPublishedKeysAsync(culture, cancellationToken)).ToHashSet();
+            scope.Complete();
+        }
+
+        RefreshCulture(culture, publishedKeys);
+    }
+
+    /// <inheritdoc/>
+    public Task RefreshDefaultCultureAsync(CancellationToken cancellationToken)
+    {
+        InvalidateDefaultCulture();
+        return Task.CompletedTask;
+    }
+
+    /// <inheritdoc/>
+    protected override string? ReadDefaultCulture()
+        => _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
 }
