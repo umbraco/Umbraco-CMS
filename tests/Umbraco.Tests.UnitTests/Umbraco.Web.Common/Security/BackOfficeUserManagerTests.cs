@@ -26,12 +26,15 @@ public class BackOfficeUserManagerTests
 
     private Mock<IEventAggregator> _eventAggregator = null!;
     private Mock<IUserLockoutStore<BackOfficeIdentityUser>> _userStore = null!;
+    private Mock<IBackOfficeUserPasswordChecker> _passwordChecker = null!;
 
     [SetUp]
     public void SetUp()
     {
         _eventAggregator = new Mock<IEventAggregator>();
+        _passwordChecker = new Mock<IBackOfficeUserPasswordChecker>();
         _userStore = new Mock<IUserLockoutStore<BackOfficeIdentityUser>>();
+        _userStore.As<IUserPasswordStore<BackOfficeIdentityUser>>();
         _userStore
             .Setup(x => x.GetLockoutEnabledAsync(It.IsAny<BackOfficeIdentityUser>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
@@ -93,6 +96,49 @@ public class BackOfficeUserManagerTests
     }
 
     [Test]
+    public async Task Can_Publish_Password_Changed_Notification_Asynchronously()
+    {
+        // Arrange
+        BackOfficeIdentityUser user = CreateUser();
+        user.Id = "1";
+        _passwordChecker
+            .Setup(x => x.CheckPasswordAsync(user, "currentPassword"))
+            .ReturnsAsync(BackOfficeUserPasswordCheckerResult.ValidCredentials);
+        BackOfficeUserManager sut = CreateSut();
+
+        // Act
+        IdentityResult result = await sut.ChangePasswordAsync(user, "currentPassword", "newPassword");
+
+        // Assert
+        Assert.IsTrue(result.Succeeded);
+        VerifyPublishedAsynchronously<UserPasswordChangedNotification>();
+    }
+
+    [Test]
+    public async Task Can_Publish_Password_Reset_Notification_Asynchronously()
+    {
+        // Arrange
+        BackOfficeIdentityUser user = CreateUser();
+        user.Id = "1";
+        _userStore
+            .Setup(x => x.FindByIdAsync(user.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+        var tokenProvider = new Mock<IUserTwoFactorTokenProvider<BackOfficeIdentityUser>>();
+        tokenProvider
+            .Setup(x => x.ValidateAsync(It.IsAny<string>(), "resetToken", It.IsAny<UserManager<BackOfficeIdentityUser>>(), user))
+            .ReturnsAsync(true);
+        BackOfficeUserManager sut = CreateSut();
+        sut.RegisterTokenProvider(sut.Options.Tokens.PasswordResetTokenProvider, tokenProvider.Object);
+
+        // Act
+        IdentityResult result = await sut.ChangePasswordWithResetAsync(user.Id, "resetToken", "newPassword");
+
+        // Assert
+        Assert.IsTrue(result.Succeeded);
+        VerifyPublishedAsynchronously<UserPasswordResetNotification>();
+    }
+
+    [Test]
     public async Task Can_Publish_Logout_Success_Notification_Asynchronously()
     {
         // Arrange
@@ -131,7 +177,7 @@ public class BackOfficeUserManagerTests
             Mock.Of<ILogger<UserManager<BackOfficeIdentityUser>>>(),
             Options.Create(new UserPasswordConfigurationSettings()),
             _eventAggregator.Object,
-            Mock.Of<IBackOfficeUserPasswordChecker>(),
+            _passwordChecker.Object,
             Options.Create(new GlobalSettings()));
 
     private static BackOfficeIdentityUser CreateUser()
