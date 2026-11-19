@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
@@ -179,6 +180,26 @@ public class BackOfficeSignInManagerTests
             ((AutoLinkSignInResult)actual).Errors);
     }
 
+    [Test]
+    public async Task Can_Publish_Account_Locked_Notification_Asynchronously_When_Sign_In_Is_Locked_Out()
+    {
+        // Arrange
+        var eventAggregator = new Mock<IEventAggregator>();
+        _userManager = MockUserManager(eventAggregator.Object);
+        var sut = new HandleSignInBackOfficeSignInManager(
+            _userManager.Object,
+            Mock.Of<IHttpContextAccessor>(x => x.HttpContext == new DefaultHttpContext()),
+            MockExternalLoginProviders(null));
+
+        // Act
+        await sut.InvokeHandleSignIn(CreateUser(), TestEmail, SignInResult.LockedOut);
+
+        // Assert
+        eventAggregator.Verify(
+            x => x.PublishAsync(It.IsAny<UserLockedNotification>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
     private BackOfficeSignInManager CreateSut(ExternalSignInAutoLinkOptions? autoLinkOptions = null)
     {
         _userManager = MockUserManager();
@@ -199,7 +220,7 @@ public class BackOfficeSignInManagerTests
             Mock.Of<IRequestCache>());
     }
 
-    private static Mock<BackOfficeUserManager> MockUserManager()
+    private static Mock<BackOfficeUserManager> MockUserManager(IEventAggregator? eventAggregator = null)
         => new(
             Mock.Of<IIpResolver>(),
             Mock.Of<IUserStore<BackOfficeIdentityUser>>(),
@@ -212,7 +233,7 @@ public class BackOfficeSignInManagerTests
             Mock.Of<IHttpContextAccessor>(),
             Mock.Of<ILogger<UserManager<BackOfficeIdentityUser>>>(),
             Options.Create(new UserPasswordConfigurationSettings()),
-            Mock.Of<IEventAggregator>(),
+            eventAggregator ?? Mock.Of<IEventAggregator>(),
             Mock.Of<IBackOfficeUserPasswordChecker>(),
             Options.Create(new GlobalSettings()));
 
@@ -244,4 +265,31 @@ public class BackOfficeSignInManagerTests
 
     private static ExternalLoginInfo CreateExternalLoginInfoWithEmail(params Claim[] claims)
         => CreateExternalLoginInfo([new Claim(ClaimTypes.Email, TestEmail), .. claims]);
+
+    private sealed class HandleSignInBackOfficeSignInManager : BackOfficeSignInManager
+    {
+        public HandleSignInBackOfficeSignInManager(
+            BackOfficeUserManager userManager,
+            IHttpContextAccessor httpContextAccessor,
+            IBackOfficeExternalLoginProviders externalLoginProviders)
+            : base(
+                userManager,
+                httpContextAccessor,
+                externalLoginProviders,
+                Mock.Of<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>>(),
+                Microsoft.Extensions.Options.Options.Create(new IdentityOptions()),
+                Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
+                Mock.Of<ILogger<SignInManager<BackOfficeIdentityUser>>>(),
+                Mock.Of<IAuthenticationSchemeProvider>(),
+                Mock.Of<IUserConfirmation<BackOfficeIdentityUser>>(),
+                Mock.Of<IEventAggregator>(),
+                Microsoft.Extensions.Options.Options.Create(new SecuritySettings()),
+                Microsoft.Extensions.Options.Options.Create(new BackOfficeAuthenticationTypeSettings()),
+                Mock.Of<IRequestCache>())
+        {
+        }
+
+        public Task<SignInResult> InvokeHandleSignIn(BackOfficeIdentityUser user, string username, SignInResult result)
+            => HandleSignIn(user, username, result);
+    }
 }

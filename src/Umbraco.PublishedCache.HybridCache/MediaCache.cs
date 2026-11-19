@@ -49,6 +49,9 @@ public sealed class MediaCache : IPublishedMediaCache
     public IPublishedContent? GetById(bool preview, Guid contentId) => GetById(contentId);
 
     /// <inheritdoc/>
+    public IReadOnlyList<IPublishedContent> GetByIds(IReadOnlyCollection<Guid> keys) => _mediaCacheService.GetByKeys(keys);
+
+    /// <inheritdoc/>
     public IPublishedContent? GetById(int contentId) => _mediaCacheService.GetById(contentId);
 
     /// <inheritdoc/>
