@@ -39,6 +39,15 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	@property({ attribute: false })
 	editContentTypePath?: string;
 
+	/**
+	 * Sets the group to readonly mode, meaning it and its properties can't be changed, sorted or removed.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean })
+	readonly = false;
+
 	@state()
 	private _groupId?: string;
 
@@ -142,6 +151,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 			<uui-box>
 				${this.#renderContainerHeader()}
 				<umb-content-type-design-editor-properties
+					.readonly=${this.readonly}
 					.editContentTypePath=${this.editContentTypePath}
 					.containerId=${this._groupId}></umb-content-type-design-editor-properties>
 			</uui-box>
@@ -151,7 +161,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	// TODO: impl UMB_EDIT_DOCUMENT_TYPE_PATH_PATTERN, but we need either a generic type or a way to get the path pattern.... [NL]
 	#renderContainerHeader() {
 		return html`
-			<div slot="header" class="drag-handle">
+			<div slot="header" class="drag-handle ${this.readonly ? 'read-only' : ''}">
 				<div>
 					${when(this.sortModeActive && this._hasOwnerContainer, () => html`<uui-icon name="icon-grip"></uui-icon>`)}
 					<uui-input
@@ -161,6 +171,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 						placeholder=${this.localize.term('placeholders_entername')}
 						.value=${this._group!.name}
 						?disabled=${!this._hasOwnerContainer}
+						?readonly=${this.readonly}
 						@blur=${this.#blurGroup}
 						@change=${this.#renameGroup}
 						${this._group!.name === '' ? umbFocus() : nothing}
@@ -187,7 +198,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 					`,
 				)}
 				${when(
-					!this._inherited && !this.sortModeActive,
+					!this._inherited && !this.sortModeActive && !this.readonly,
 					() => html`
 						<uui-button compact label=${this.localize.term('actions_delete')} @click=${this.#requestRemove}>
 							<uui-icon name="delete"></uui-icon>
@@ -278,7 +289,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				padding: var(--uui-size-space-4) var(--uui-size-space-5);
 			}
 
-			:host([has-owner-container]) div[slot='header'] {
+			:host([has-owner-container]) div[slot='header']:not(.read-only) {
 				cursor: grab;
 			}
 

@@ -26,6 +26,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeReporter
 {
     private readonly IDatabaseCacheRepository _databaseCacheRepository;
+    private readonly IContentCacheDataSerializerFactory _serializerFactory;
     private readonly IIdKeyMap _idKeyMap;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly Microsoft.Extensions.Caching.Hybrid.HybridCache _hybridCache;
@@ -95,6 +96,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     /// <param name="cacheSettings">The cache configuration options.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="cacheFactory">The factory that creates the in-memory converted-content (L0) cache.</param>
+    /// <param name="serializerFactory">The factory whose content type snapshot is discarded when the memory cache is rebuilt by content type.</param>
     public MediaCacheService(
         IDatabaseCacheRepository databaseCacheRepository,
         IIdKeyMap idKeyMap,
@@ -106,9 +108,11 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         IPublishedModelFactory publishedModelFactory,
         IOptions<CacheSettings> cacheSettings,
         ILogger<MediaCacheService> logger,
-        IConvertedPublishedContentCacheFactory cacheFactory)
+        IConvertedPublishedContentCacheFactory cacheFactory,
+        IContentCacheDataSerializerFactory serializerFactory)
     {
         _databaseCacheRepository = databaseCacheRepository;
+        _serializerFactory = serializerFactory;
         _idKeyMap = idKeyMap;
         _scopeProvider = scopeProvider;
         _hybridCache = hybridCache;
@@ -312,12 +316,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     // database-read node is promoted into L1 — an L1/L2 hit is already there.
     private async Task ReadFromDatabaseAsync(List<Guid> keys, long generation, Dictionary<Guid, IPublishedContent> resolved, MediaSourcesReader readMediaSources)
     {
-        IReadOnlyCollection<ContentCacheNode> coldNodes;
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
-        {
-            coldNodes = (await readMediaSources(keys)).ToArray();
-            scope.Complete();
-        }
+        IReadOnlyCollection<ContentCacheNode> coldNodes = (await readMediaSources(keys)).ToArray();
 
         // Mirrors GetNodeAsync, which warms the id/key map for every node the database returns.
         if (coldNodes.Count > 0)
@@ -431,10 +430,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
         async Task<ContentCacheNode?> GetContentCacheNodeFromRepo()
         {
-            using ICoreScope scope = _scopeProvider.CreateCoreScope();
-            ContentCacheNode? mediaCacheNode = await readMediaSource(key);
-            scope.Complete();
-            return mediaCacheNode;
+            return await readMediaSource(key);
         }
     }
 
@@ -622,6 +618,10 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     /// <inheritdoc />
     public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> mediaTypeIds)
     {
+        // Entries evicted below are reloaded on their next miss, through the serializer factory. Discard what it has
+        // derived from the type definitions first, so that reload sees the changed definitions.
+        _serializerFactory.ClearTypeCache();
+
         // Clear the hybrid cache by media type tag for the affected media types.
         var mediaTypeIdsAsArray = mediaTypeIds as int[] ?? mediaTypeIds.ToArray();
         var mediaTypeIdTags = mediaTypeIdsAsArray.Select(MediaTypeIdTag).ToArray();

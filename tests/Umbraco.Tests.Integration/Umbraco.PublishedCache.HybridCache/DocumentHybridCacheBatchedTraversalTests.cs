@@ -8,9 +8,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
-using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -217,109 +215,5 @@ internal sealed class DocumentHybridCacheBatchedTraversalTests : UmbracoIntegrat
                 items[i - 1].SortOrder,
                 "Children should be returned in sort order.");
         }
-    }
-
-    /// <summary>
-    /// Decorates the real <see cref="IDatabaseCacheRepository"/>, forwarding every call while counting
-    /// single-row versus batched reads. The batched methods must be overridden explicitly: the interface
-    /// default loops the single-row method, so without these overrides the decorator would never reach
-    /// the real batched query.
-    /// </summary>
-    private sealed class CountingDatabaseCacheRepository : IDatabaseCacheRepository
-    {
-        private readonly IDatabaseCacheRepository _inner;
-
-        public CountingDatabaseCacheRepository(IDatabaseCacheRepository inner) => _inner = inner;
-
-        public int SingleContentReads { get; private set; }
-
-        public int BatchContentReads { get; private set; }
-
-        public int SingleMediaReads { get; private set; }
-
-        public int BatchMediaReads { get; private set; }
-
-        public int AsyncReads { get; private set; }
-
-        public void Reset()
-        {
-            SingleContentReads = 0;
-            BatchContentReads = 0;
-            SingleMediaReads = 0;
-            BatchMediaReads = 0;
-            AsyncReads = 0;
-        }
-
-        public Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
-        {
-            SingleContentReads++;
-            AsyncReads++;
-            return _inner.GetContentSourceAsync(key, preview);
-        }
-
-        public Task<IEnumerable<ContentCacheNode>> GetContentSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
-        {
-            BatchContentReads++;
-            AsyncReads++;
-            return _inner.GetContentSourcesAsync(keys, preview);
-        }
-
-        public Task<ContentCacheNode?> GetMediaSourceAsync(Guid key)
-        {
-            SingleMediaReads++;
-            AsyncReads++;
-            return _inner.GetMediaSourceAsync(key);
-        }
-
-        public Task<IEnumerable<ContentCacheNode>> GetMediaSourcesAsync(IEnumerable<Guid> keys)
-        {
-            BatchMediaReads++;
-            AsyncReads++;
-            return _inner.GetMediaSourcesAsync(keys);
-        }
-
-        public ContentCacheNode? GetContentSource(Guid key, bool preview = false)
-        {
-            SingleContentReads++;
-            return _inner.GetContentSource(key, preview);
-        }
-
-        public IEnumerable<ContentCacheNode> GetContentSources(IEnumerable<Guid> keys, bool preview = false)
-        {
-            BatchContentReads++;
-            return _inner.GetContentSources(keys, preview);
-        }
-
-        public ContentCacheNode? GetMediaSource(Guid key)
-        {
-            SingleMediaReads++;
-            return _inner.GetMediaSource(key);
-        }
-
-        public IEnumerable<ContentCacheNode> GetMediaSources(IEnumerable<Guid> keys)
-        {
-            BatchMediaReads++;
-            return _inner.GetMediaSources(keys);
-        }
-
-        public Task DeleteContentItemAsync(int id) => _inner.DeleteContentItemAsync(id);
-
-        public IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType)
-            => _inner.GetContentByContentTypeKey(keys, entityType);
-
-        public IEnumerable<Guid> GetDocumentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false)
-            => _inner.GetDocumentKeysByContentTypeKeys(keys, published);
-
-        public Task RefreshContentAsync(ContentCacheNode contentCacheNode) => _inner.RefreshContentAsync(contentCacheNode);
-
-        public Task RefreshMediaAsync(ContentCacheNode contentCacheNode) => _inner.RefreshMediaAsync(contentCacheNode);
-
-        public Task RemovePublishedContentAsync(int id) => _inner.RemovePublishedContentAsync(id);
-
-        public void Rebuild(
-            IReadOnlyCollection<int>? contentTypeIds,
-            IReadOnlyCollection<int>? mediaTypeIds,
-            Action<Action>? executeStep)
-            => _inner.Rebuild(contentTypeIds, mediaTypeIds, executeStep);
     }
 }

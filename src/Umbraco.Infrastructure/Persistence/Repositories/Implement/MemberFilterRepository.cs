@@ -74,11 +74,11 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
                 .Append(") AS combined");
         }
 
-        // Apply ordering.
+        // Apply ordering, with ties ordered by key so that pages neither skip nor repeat members with equal values.
         var orderColumn = MapOrderByColumn(ordering.OrderBy);
         combinedSql = ordering.Direction == Direction.Ascending
-            ? combinedSql.Append($"ORDER BY {orderColumn} ASC")
-            : combinedSql.Append($"ORDER BY {orderColumn} DESC");
+            ? combinedSql.Append($"ORDER BY {orderColumn} ASC, {QCol("key")} ASC")
+            : combinedSql.Append($"ORDER BY {orderColumn} DESC, {QCol("key")} ASC");
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
         Page<MemberFilterItemDto> page = await Database.PageAsync<MemberFilterItemDto>(pageNumber + 1, pageSize, combinedSql);
@@ -272,9 +272,10 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
         if (filter.Filter.IsNullOrWhiteSpace() is false)
         {
             var keyword = hasWhere ? "AND" : "WHERE";
+            var escape = SqlSyntax.GetLikeEscapeClause();
             sql = sql.Append(
-                $"{keyword} ({emailCol} LIKE @filterParam OR {usernameCol} LIKE @filterParam OR {nameCol} LIKE @filterParam)",
-                new { filterParam = $"%{filter.Filter}%" });
+                $"{keyword} ({emailCol} LIKE @filterParam {escape} OR {usernameCol} LIKE @filterParam {escape} OR {nameCol} LIKE @filterParam {escape})",
+                new { filterParam = $"%{SqlSyntax.EscapeLikeValue(filter.Filter)}%" });
         }
     }
 

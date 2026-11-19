@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
+using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.HybridCache;
 
@@ -19,15 +20,42 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.HybridCache;
 public class DeferredCacheRebuildNotificationHandlerTests
 {
     private Mock<IDeferredCacheRebuildService> _deferredCacheRebuildService = null!;
+    private Mock<IContentCacheDataSerializerFactory> _serializerFactory = null!;
 
     [SetUp]
     public void SetUp()
-        => _deferredCacheRebuildService = new Mock<IDeferredCacheRebuildService>(MockBehavior.Strict);
+    {
+        _deferredCacheRebuildService = new Mock<IDeferredCacheRebuildService>(MockBehavior.Strict);
+        _serializerFactory = new Mock<IContentCacheDataSerializerFactory>();
+    }
 
     private DeferredCacheRebuildNotificationHandler CreateHandler(ContentTypeRebuildMode mode) =>
         new(
             _deferredCacheRebuildService.Object,
+            _serializerFactory.Object,
             Options.Create(new CacheSettings { ContentTypeRebuildMode = mode }));
+
+    /// <summary>
+    ///     Verifies that, once a type change has been committed, the serializer factory's type cache is cleared
+    ///     whether or not the rebuild is deferred.
+    /// </summary>
+    [TestCase(ContentTypeRebuildMode.Immediate)]
+    [TestCase(ContentTypeRebuildMode.Deferred)]
+    public void Committed_Type_Change_Clears_The_Serializer_Type_Cache(ContentTypeRebuildMode mode)
+    {
+        var handler = CreateHandler(mode);
+        _deferredCacheRebuildService.Setup(x => x.QueueContentTypeRebuild(It.IsAny<IReadOnlyCollection<int>>()));
+        _deferredCacheRebuildService.Setup(x => x.QueueMediaTypeRebuild(It.IsAny<IReadOnlyCollection<int>>()));
+
+        handler.Handle(new ContentTypeChangedNotification(
+            new ContentTypeChange<IContentType>(CreateContentType(100), ContentTypeChangeTypes.RefreshOther),
+            new EventMessages()));
+        handler.Handle(new MediaTypeChangedNotification(
+            new ContentTypeChange<IMediaType>(CreateMediaType(200), ContentTypeChangeTypes.RefreshOther),
+            new EventMessages()));
+
+        _serializerFactory.Verify(x => x.ClearTypeCache(), Times.Exactly(2));
+    }
 
     /// <summary>
     ///     Verifies that a structural content type change in deferred mode queues the rebuild via the deferred service.
@@ -204,6 +232,7 @@ public class DeferredCacheRebuildNotificationHandlerTests
     {
         var services = new ServiceCollection();
         services.AddSingleton(_deferredCacheRebuildService.Object);
+        services.AddSingleton(_serializerFactory.Object);
         services.AddSingleton(Options.Create(new CacheSettings { ContentTypeRebuildMode = ContentTypeRebuildMode.Deferred }));
         services.AddTransient<INotificationHandler<ContentTypeChangedNotification>, DeferredCacheRebuildNotificationHandler>();
         services.AddTransient<INotificationHandler<MediaTypeChangedNotification>, DeferredCacheRebuildNotificationHandler>();
