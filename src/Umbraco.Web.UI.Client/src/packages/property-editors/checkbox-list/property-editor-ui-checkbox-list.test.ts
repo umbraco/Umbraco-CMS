@@ -152,4 +152,34 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 			expect(checkboxElements).to.have.length(0);
 		});
 	});
+
+	describe('labelled options', () => {
+		function getCheckboxes() {
+			return Array.from(getCheckboxListElement(element)?.shadowRoot?.querySelectorAll('uui-checkbox') ?? []) as Array<
+				HTMLElement & { label: string; value: string }
+			>;
+		}
+
+		beforeEach(async () => {
+			setupBasicStringConfig(element, ['one', { value: 'two', label: 'Two' }] as Array<string>);
+			await element.updateComplete;
+		});
+
+		it('shows the label of an option, or its value when it has none', async () => {
+			await getCheckboxListElement(element)?.updateComplete;
+
+			const checkboxes = getCheckboxes();
+			expect(checkboxes.map((checkbox) => checkbox.label)).to.deep.equal(['one', 'Two']);
+			expect(checkboxes.map((checkbox) => checkbox.value)).to.deep.equal(['one', 'two']);
+		});
+
+		it('shows a stored value that is not an option by its value', async () => {
+			element.value = ['three'];
+			setupBasicStringConfig(element, ['one', { value: 'two', label: 'Two' }] as Array<string>);
+			await element.updateComplete;
+			await getCheckboxListElement(element)?.updateComplete;
+
+			expect(getCheckboxes()[2].label).to.match(/^three \(/);
+		});
+	});
 });

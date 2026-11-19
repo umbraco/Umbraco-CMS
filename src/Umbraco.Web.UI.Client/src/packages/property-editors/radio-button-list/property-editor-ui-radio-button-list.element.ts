@@ -1,3 +1,4 @@
+import { umbParseValueListOptions } from '../utils/value-list-options.js';
 import type { UmbInputRadioButtonListElement, UmbRadioButtonItem } from '@umbraco-cms/backoffice/components';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -41,13 +42,10 @@ export class UmbPropertyEditorUIRadioButtonListElement
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		const items = config.getValueByAlias('items');
+		const options = umbParseValueListOptions(config.getValueByAlias('items'));
 
-		if (Array.isArray(items) && items.length > 0) {
-			this._list =
-				typeof items[0] === 'string'
-					? items.map((item) => ({ label: item, value: item }))
-					: items.map((item) => ({ label: item.name, value: item.value }));
+		if (options.length > 0) {
+			this._list = options.map((option) => ({ label: option.label, value: option.value }));
 
 			// If selection includes a value that is not in the list, add it to the list
 			if (this.value && !this._list.find((item) => item.value === this.value)) {

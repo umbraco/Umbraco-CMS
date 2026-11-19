@@ -1,4 +1,5 @@
 import { ensureArray, updateItemsSelectedState } from '../utils/property-editor-ui-state-manager.js';
+import { umbParseValueListOptions } from '../utils/value-list-options.js';
 import './components/input-checkbox-list/input-checkbox-list.element.js';
 import type {
 	UmbCheckboxListItem,
@@ -40,17 +41,14 @@ export class UmbPropertyEditorUICheckboxListElement
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		const items = config.getValueByAlias('items');
+		const options = umbParseValueListOptions(config.getValueByAlias('items'));
 
-		if (Array.isArray(items) && items.length) {
-			this._list =
-				typeof items[0] === 'string'
-					? items.map((item) => ({ label: item, value: item, checked: this.#selection.includes(item) }))
-					: items.map((item) => ({
-							label: item.name,
-							value: item.value,
-							checked: this.#selection.includes(item.value),
-						}));
+		if (options.length) {
+			this._list = options.map((option) => ({
+				label: option.label,
+				value: option.value,
+				checked: this.#selection.includes(option.value),
+			}));
 
 			// If selection includes a value that is not in the list, add it to the list
 			this.#selection.forEach((value) => {
