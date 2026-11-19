@@ -13,6 +13,7 @@
 @inject IOptions<GlobalSettings> GlobalSettings
 @inject IOptions<SecuritySettings> SecuritySettings
 @inject IEmailSender EmailSender
+@inject Umbraco.Cms.Core.Security.IUserForgotPasswordSender ForgotPasswordSender
 @inject IHostingEnvironment HostingEnvironment
 @inject IProfilerHtml ProfilerHtml
 @inject IBackOfficeExternalLoginProviders ExternalLogins
@@ -29,8 +30,8 @@
     var loginLogoImageAlternative = Url.RouteUrl(BackOfficeGraphicsController.LoginLogoAlternativeRouteName, new {Version= "1"});
     var loginBackgroundImage = Url.RouteUrl(BackOfficeGraphicsController.LoginBackGroundRouteName, new {Version= "1"});
     var usernameIsEmail = SecuritySettings.Value.UsernameIsEmail;
-    var allowUserInvite = EmailSender.CanSendRequiredEmail();
-    var allowPasswordReset = SecuritySettings.Value.AllowPasswordReset && EmailSender.CanSendRequiredEmail();
+    var allowUserInvite = EmailSender.IsEmailConfigured();
+    var allowPasswordReset = ForgotPasswordSender.IsPasswordResetConfigured();
     var disableLocalLogin = ExternalLogins.HasDenyLocalLogin();
 }
 

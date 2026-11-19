@@ -343,7 +343,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
         sql
             .OrderBy<NodeDto>(x => x.Level)
-            .OrderBy<NodeDto>(x => x.SortOrder);
+            .OrderBy<NodeDto>(x => x.SortOrder, x => x.NodeId);
 
         return MapDtosToContent(Database.Fetch<ContentDto>(sql));
     }

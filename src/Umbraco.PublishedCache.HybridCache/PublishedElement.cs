@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
@@ -57,10 +58,10 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
         Id = contentNode.Id;
         Key = contentNode.Key;
         CreatorId = contentNode.CreatorId;
-        CreateDate = contentNode.CreateDate;
+        CreateDate = contentNode.CreateDate.EnsureUtc();
         SortOrder = contentNode.SortOrder;
         WriterId = contentData.WriterId;
-        UpdateDate = contentData.VersionDate;
+        UpdateDate = contentData.VersionDate.EnsureUtc();
     }
 
     protected ContentNode ContentNode { get; }
@@ -120,7 +121,7 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
             return _cultures = _cultureInfos
                 .ToDictionary(
                     x => x.Key,
-                    x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.UrlSegment, x.Value.Date),
+                    x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.UrlSegment, x.Value.Date.EnsureUtc()),
                     StringComparer.OrdinalIgnoreCase);
         }
     }

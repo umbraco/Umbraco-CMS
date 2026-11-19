@@ -9,7 +9,6 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -29,14 +28,24 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Upgrade.V_18_0_0;
 
 /// <summary>
-/// Tests for the conversion of single block mode Block Lists performed by <see cref="MigrateSingleBlockList" />,
-/// covering the nested case reported in https://github.com/umbraco/Umbraco-CMS/issues/23596.
+/// Tests for the migration of single block mode Block Lists to the single block property editor.
 /// </summary>
+/// <remarks>
+/// <para>
+/// The upgrade runs <see cref="MigrateSingleBlockListDataTypes" />, which only switches the data types; the stored
+/// values are left in the block list format, which must remain readable by the single block property editor wherever
+/// the value is stored - including nested in other block editors (https://github.com/umbraco/Umbraco-CMS/issues/23596).
+/// </para>
+/// <para>
+/// The paging tests cover the obsolete <see cref="MigrateSingleBlockList" />, which also converts the stored values
+/// and can still be run explicitly. As the single block property editor reads both formats, those tests assert the
+/// stored format itself rather than whether the value can be read.
+/// </para>
+/// </remarks>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
@@ -79,7 +88,9 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
 
         // The harness logger factory is registered after this runs and defaults to NullLoggerFactory, so the
         // closed generic the migration is constructed with is the seam to record what it logged.
+#pragma warning disable CS0618 // Type or member is obsolete
         builder.Services.AddUnique<ILogger<MigrateSingleBlockList>>(_ => _migrationLogger);
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     [Test]
@@ -103,13 +114,18 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         Content content = SaveContent(
             schema,
             BuildOuterValueJson(schema, outerBlockKey, BuildNestedSingleBlockListJson(schema, innerBlockKey)));
+        var valueBeforeMigration = await GetStoredValueAsync(content.Id, OuterPropertyAlias);
 
         await ExecuteMigrationAsync();
 
-        await AssertDataTypeIsSingleBlockAsync(schema.NestedDataType.Id);
+        await AssertDataTypeIsSingleBlockAsync(schema.NestedDataType);
+        await AssertStoredValueIsUnchangedAsync(content.Id, OuterPropertyAlias, valueBeforeMigration);
 
         BlockItemData outerBlock = await GetStoredOuterBlockAsync(schema, content.Id, outerBlockKey);
-        AssertNestedValueIsConvertedSingleBlock(schema, outerBlock, innerBlockKey);
+        AssertNestedValueIsReadableAsSingleBlock(schema, outerBlock, innerBlockKey);
+
+        BlockItemData outerEditorBlock = await GetOuterEditorBlockAsync(schema, content.Key, outerBlockKey);
+        AssertIsInnerSingleBlock(schema, GetNestedEditorValue(outerEditorBlock), innerBlockKey);
     }
 
     [Test]
@@ -128,11 +144,17 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
                 schema,
                 outerBlockKey,
                 ToPascalCasedPropertyNames(BuildNestedSingleBlockListJson(schema, innerBlockKey)))));
+        var valueBeforeMigration = await GetStoredValueAsync(content.Id, OuterPropertyAlias);
 
         await ExecuteMigrationAsync();
 
+        await AssertStoredValueIsUnchangedAsync(content.Id, OuterPropertyAlias, valueBeforeMigration);
+
         BlockItemData outerBlock = await GetStoredOuterBlockAsync(schema, content.Id, outerBlockKey);
-        AssertNestedValueIsConvertedSingleBlock(schema, outerBlock, innerBlockKey);
+        AssertNestedValueIsReadableAsSingleBlock(schema, outerBlock, innerBlockKey);
+
+        BlockItemData outerEditorBlock = await GetOuterEditorBlockAsync(schema, content.Key, outerBlockKey);
+        AssertIsInnerSingleBlock(schema, GetNestedEditorValue(outerEditorBlock), innerBlockKey);
     }
 
     [Test]
@@ -151,14 +173,22 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
             BuildNestedSingleBlockListJson(schema, innerBlockKey)));
 
         Content content = SaveContent(schema, BuildOuterValueJson(schema, outerBlockKey, intermediateJson));
+        var valueBeforeMigration = await GetStoredValueAsync(content.Id, OuterPropertyAlias);
 
         await ExecuteMigrationAsync();
+
+        await AssertStoredValueIsUnchangedAsync(content.Id, OuterPropertyAlias, valueBeforeMigration);
 
         BlockItemData outerBlock = await GetStoredOuterBlockAsync(schema, content.Id, outerBlockKey);
         var intermediateValue = JsonSerializer.Deserialize<BlockListValue>(GetNestedValueJson(outerBlock))!;
         BlockItemData intermediateBlock = intermediateValue.ContentData.Single(x => x.Key == intermediateBlockKey);
+        AssertNestedValueIsReadableAsSingleBlock(schema, intermediateBlock, innerBlockKey);
 
-        AssertNestedValueIsConvertedSingleBlock(schema, intermediateBlock, innerBlockKey);
+        BlockItemData outerEditorBlock = await GetOuterEditorBlockAsync(schema, content.Key, outerBlockKey);
+        var intermediateEditorValue = outerEditorBlock.Values.Single(x => x.Alias == NestedPropertyAlias).Value as BlockListValue;
+        Assert.That(intermediateEditorValue, Is.Not.Null);
+        BlockItemData intermediateEditorBlock = intermediateEditorValue!.ContentData.Single(x => x.Key == intermediateBlockKey);
+        AssertIsInnerSingleBlock(schema, GetNestedEditorValue(intermediateEditorBlock), innerBlockKey);
     }
 
     [Test]
@@ -178,13 +208,21 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
             pageContentType,
             "Top level page",
             BuildNestedSingleBlockListJson(schema, innerBlockKey));
+        var valueBeforeMigration = await GetStoredValueAsync(content.Id, OuterPropertyAlias);
 
         await ExecuteMigrationAsync();
 
-        var storedValue = await GetStoredValueAsync(content.Id, OuterPropertyAlias);
-        Assert.That(storedValue, Is.Not.Null.And.Not.Empty);
+        await AssertDataTypeIsSingleBlockAsync(schema.NestedDataType);
+        await AssertStoredValueIsUnchangedAsync(content.Id, OuterPropertyAlias, valueBeforeMigration);
 
-        AssertIsInnerSingleBlock(schema, JsonSerializer.Deserialize<SingleBlockValue>(storedValue!), innerBlockKey);
+        AssertIsInnerSingleBlock(schema, JsonSerializer.Deserialize<SingleBlockValue>(valueBeforeMigration!), innerBlockKey);
+
+        IContent migratedContent = ContentService.GetById(content.Key)!;
+        IDataType migratedDataType = (await DataTypeService.GetAsync(schema.NestedDataType.Key))!;
+        AssertIsInnerSingleBlock(
+            schema,
+            migratedDataType.Editor!.GetValueEditor().ToEditor(migratedContent.Properties[OuterPropertyAlias]!) as SingleBlockValue,
+            innerBlockKey);
     }
 
     [Test]
@@ -204,11 +242,12 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
 
         await ExecuteMigrationAsync();
 
-        BlockItemData outerBlock = await GetStoredOuterBlockAsync(schema, content.Id, outerBlockKey);
+        BlockItemData outerEditorBlock = await GetOuterEditorBlockAsync(schema, content.Key, outerBlockKey);
 
         Assert.That(
-            outerBlock.Values.Single(x => x.Alias == TextPropertyAlias).Value,
+            outerEditorBlock.Values.Single(x => x.Alias == TextPropertyAlias).Value,
             Is.EqualTo(OuterTextValue));
+        AssertIsInnerSingleBlock(schema, GetNestedEditorValue(outerEditorBlock), innerBlockKey);
     }
 
     [Test]
@@ -217,18 +256,32 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         TestSchema schema = await CreateSchemaAsync();
         var outerBlockKey = Guid.NewGuid();
 
-        // A single block mode Block List holding no block at all: neither the layout lookup nor the access of the
-        // first layout item in the conversion may throw.
+        // A single block mode Block List holding no block at all.
         Content content = SaveContent(
             schema,
             BuildOuterValueJson(schema, outerBlockKey, JsonSerializer.Serialize(new BlockListValue())));
+        var valueBeforeMigration = await GetStoredValueAsync(content.Id, OuterPropertyAlias);
 
         await ExecuteMigrationAsync();
 
-        // There is nothing to convert, so the value is left as it was - but the upgrade completes and the containing
-        // block is still there.
-        BlockItemData outerBlock = await GetStoredOuterBlockAsync(schema, content.Id, outerBlockKey);
-        Assert.That(outerBlock.Values.Select(x => x.Alias), Does.Contain(NestedPropertyAlias));
+        await AssertDataTypeIsSingleBlockAsync(schema.NestedDataType);
+        await AssertStoredValueIsUnchangedAsync(content.Id, OuterPropertyAlias, valueBeforeMigration);
+
+        BlockItemData outerEditorBlock = await GetOuterEditorBlockAsync(schema, content.Key, outerBlockKey);
+        Assert.That(outerEditorBlock.Values.Select(x => x.Alias), Does.Contain(NestedPropertyAlias));
+    }
+
+    [Test]
+    public async Task Does_Not_Migrate_Block_List_Not_In_Single_Block_Mode()
+    {
+        TestSchema schema = await CreateSchemaAsync();
+
+        await ExecuteMigrationAsync();
+
+        await AssertDataTypeIsSingleBlockAsync(schema.NestedDataType);
+
+        IDataType migratedContainerDataType = (await DataTypeService.GetAsync(schema.ContainerDataType.Key))!;
+        Assert.That(migratedContainerDataType.EditorAlias, Is.EqualTo(Constants.PropertyEditors.Aliases.BlockList));
     }
 
     [Test]
@@ -270,6 +323,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
             var storedValue = await GetStoredValueAsync(content.Id, OuterPropertyAlias);
             Assert.That(storedValue, Is.Not.Null.And.Not.Empty);
 
+            AssertIsStoredInSingleBlockFormat(storedValue!);
             AssertIsInnerSingleBlock(schema, JsonSerializer.Deserialize<SingleBlockValue>(storedValue!), innerBlockKey);
         }
 
@@ -350,6 +404,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         {
             var converted = storedValues
                 .WhereNotNull()
+                .Where(IsStoredInSingleBlockFormat)
                 .Select(JsonSerializer.Deserialize<SingleBlockValue>)
                 .WhereNotNull()
                 .SingleOrDefault(x => x.GetLayouts()?.Any(layout => layout.ContentKey == innerBlockKey) ?? false);
@@ -791,7 +846,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         return content;
     }
 
-    private Task ExecuteMigrationAsync() => ExecuteMigrationAsync<MigrateSingleBlockList>();
+    private Task ExecuteMigrationAsync() => ExecuteMigrationAsync<MigrateSingleBlockListDataTypes>();
 
     private async Task ExecuteMigrationAsync<TMigration>()
         where TMigration : AsyncMigrationBase
@@ -818,17 +873,20 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         Assert.That(result.Successful, Is.True, result.Exception?.ToString());
     }
 
-    private async Task AssertDataTypeIsSingleBlockAsync(int dataTypeId)
+    private async Task AssertDataTypeIsSingleBlockAsync(IDataType dataType)
     {
         using Cms.Infrastructure.Scoping.IScope scope = ScopeProvider.CreateScope();
 
         Sql<ISqlContext> sql = scope.Database.SqlContext.Sql()
             .Select<DataTypeDto>()
             .From<DataTypeDto>()
-            .Where<DataTypeDto>(dataType => dataType.NodeId == dataTypeId);
+            .Where<DataTypeDto>(x => x.NodeId == dataType.Id);
 
         DataTypeDto dto = await scope.Database.FirstAsync<DataTypeDto>(sql);
         scope.Complete();
+
+        // Read through the service as well, so a stale repository cache would show.
+        IDataType? migratedDataType = await DataTypeService.GetAsync(dataType.Key);
 
         Assert.Multiple(() =>
         {
@@ -837,7 +895,54 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
             // The alias the backoffice registers the single block editor UI under - a data type left pointing at
             // anything else has no editor in the backoffice.
             Assert.That(dto.EditorUiAlias, Is.EqualTo("Umb.PropertyEditorUi.BlockSingle"));
+
+            Assert.That(migratedDataType?.EditorAlias, Is.EqualTo(Constants.PropertyEditors.Aliases.SingleBlock));
         });
+    }
+
+    private async Task AssertStoredValueIsUnchangedAsync(int contentId, string propertyAlias, string? valueBeforeMigration)
+    {
+        Assert.That(valueBeforeMigration, Is.Not.Null.And.Not.Empty);
+        Assert.That(
+            await GetStoredValueAsync(contentId, propertyAlias),
+            Is.EqualTo(valueBeforeMigration),
+            "The migration must only switch the data types, not rewrite stored values.");
+    }
+
+    /// <summary>
+    /// Maps the stored container value to the editor, which resolves the value editor of every nested block property
+    /// from its (migrated) data type - as the backoffice does when the content is opened.
+    /// </summary>
+    private async Task<BlockItemData> GetOuterEditorBlockAsync(TestSchema schema, Guid contentKey, Guid outerBlockKey)
+    {
+        IContent content = ContentService.GetById(contentKey)!;
+        IDataType containerDataType = (await DataTypeService.GetAsync(
+            schema.PageContentType.PropertyTypes.Single(x => x.Alias == OuterPropertyAlias).DataTypeKey))!;
+
+        var editorValue = containerDataType.Editor!.GetValueEditor().ToEditor(content.Properties[OuterPropertyAlias]!);
+
+        BlockValue? outerValue = editorValue switch
+        {
+            BlockValue blockValue => blockValue,
+            RichTextEditorValue richTextEditorValue => richTextEditorValue.Blocks,
+            _ => null,
+        };
+
+        Assert.That(outerValue, Is.Not.Null, $"Unexpected editor value: {editorValue}");
+
+        return outerValue!.ContentData.SingleOrDefault(x => x.Key == outerBlockKey)
+               ?? throw new AssertionException($"The block {outerBlockKey} is missing from the editor value.");
+    }
+
+    private static SingleBlockValue? GetNestedEditorValue(BlockItemData containingBlock)
+    {
+        var nestedValue = containingBlock.Values.Single(x => x.Alias == NestedPropertyAlias).Value;
+        Assert.That(
+            nestedValue,
+            Is.InstanceOf<SingleBlockValue>(),
+            "The nested value was not mapped to the editor by the single block property editor.");
+
+        return nestedValue as SingleBlockValue;
     }
 
     private async Task<BlockItemData> GetStoredOuterBlockAsync(TestSchema schema, int contentId, Guid outerBlockKey)
@@ -910,7 +1015,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         return dtos.Single().TextValue;
     }
 
-    private void AssertNestedValueIsConvertedSingleBlock(
+    private void AssertNestedValueIsReadableAsSingleBlock(
         TestSchema schema,
         BlockItemData containingBlock,
         Guid innerBlockKey)
@@ -920,10 +1025,31 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         AssertIsInnerSingleBlock(schema, JsonSerializer.Deserialize<SingleBlockValue>(nestedJson), innerBlockKey);
     }
 
+    private void AssertNestedValueIsConvertedSingleBlock(
+        TestSchema schema,
+        BlockItemData containingBlock,
+        Guid innerBlockKey)
+    {
+        var nestedJson = GetNestedValueJson(containingBlock);
+
+        AssertIsStoredInSingleBlockFormat(nestedJson);
+        AssertIsInnerSingleBlock(schema, JsonSerializer.Deserialize<SingleBlockValue>(nestedJson), innerBlockKey);
+    }
+
+    private static bool IsStoredInSingleBlockFormat(string json)
+        => json.Contains($"\"{Constants.PropertyEditors.Aliases.SingleBlock}\"")
+           && json.Contains($"\"{Constants.PropertyEditors.Aliases.BlockList}\"") is false;
+
+    private static void AssertIsStoredInSingleBlockFormat(string json)
+        => Assert.That(
+            IsStoredInSingleBlockFormat(json),
+            Is.True,
+            $"The value is not stored in the single block format - it was not converted: {json}");
+
     private static string GetNestedValueJson(BlockItemData containingBlock)
     {
         var nestedValue = containingBlock.Values.Single(x => x.Alias == NestedPropertyAlias).Value;
-        Assert.That(nestedValue, Is.Not.Null, "The nested value was overwritten with null by the migration.");
+        Assert.That(nestedValue, Is.Not.Null, "The nested value was overwritten with null.");
 
         var nestedJson = nestedValue as string;
         Assert.That(nestedJson, Is.Not.Null.And.Not.Empty);
@@ -939,7 +1065,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
         Assert.That(
             layoutItems,
             Is.Not.Null,
-            $"The value holds no \"{Constants.PropertyEditors.Aliases.SingleBlock}\" layout - it was not converted.");
+            "The value holds no layout the single block property editor can read.");
         Assert.That(layoutItems!.Length, Is.EqualTo(1));
         Assert.That(layoutItems[0].ContentKey, Is.EqualTo(innerBlockKey));
 
@@ -1013,7 +1139,9 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
     /// Captures what the migration logged, which is the only place some of its behaviour is observable - the page
     /// boundaries it actually used, and whether a value was skipped or refused.
     /// </summary>
+#pragma warning disable CS0618 // Type or member is obsolete
     private sealed class RecordingLogger : ILogger<MigrateSingleBlockList>
+#pragma warning restore CS0618 // Type or member is obsolete
     {
         private readonly List<(LogLevel Level, string Message)> _entries = new();
 

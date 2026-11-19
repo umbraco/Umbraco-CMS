@@ -4,11 +4,11 @@ pr: none
 trigger: none
 
 schedules:
-  - cron: '0 0 * * *'
-    displayName: Daily 0AM build (main)
+  - cron: '30 1 * * *'
+    displayName: Daily 1:30 AM build (v18/dev)
     branches:
       include:
-        - main
+        - v18/dev
 
 parameters:
   - name: skipIntegrationTests
@@ -184,7 +184,7 @@ stages:
               command: test
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
-              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
+              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
 
       # Integration Tests (SQL Server)
       - job:
@@ -307,7 +307,7 @@ stages:
               command: test
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
-              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
+              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build -- NUnit.AssemblySelectLimit=100000'
 
           # Stop SQL Server
           - pwsh: docker stop mssql
@@ -323,6 +323,7 @@ stages:
     dependsOn: [Build, Integration]
     condition: in(dependencies.Build.result, 'Succeeded', 'SucceededWithIssues')
     variables:
+      umbracoVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion'] ]
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       # Enable console logging in Release mode
       SERILOG__WRITETO__0__NAME: Async
@@ -502,6 +503,7 @@ stages:
     dependsOn: [Build, DefaultConfigE2E]
     condition: in(dependencies.Build.result, 'Succeeded', 'SucceededWithIssues')
     variables:
+      umbracoVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion'] ]
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       ASPNETCORE_URLS: https://localhost:44331
       PlaywrightPassword: UmbracoAcceptance123!

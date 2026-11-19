@@ -16,4 +16,12 @@ public abstract class ContentUpdateResultBase<TContent>
     ///     Gets the validation result containing any validation errors that occurred during the update.
     /// </summary>
     public ContentValidationResult ValidationResult { get; init; } = new();
+
+    /// <summary>
+    ///     Gets the aliases of the properties that failed validation when publishing.
+    /// </summary>
+    /// <remarks>
+    ///     Only populated when the operation included a publish that was blocked by invalid property values.
+    /// </remarks>
+    public IEnumerable<string> InvalidPropertyAliases { get; init; } = [];
 }

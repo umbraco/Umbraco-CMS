@@ -47,7 +47,7 @@ test('can save and publish english variant when danish has empty mandatory field
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
+  expect(contentData.variants[1].state).toBe('Published');
 });
 
 test('can publish english variant after visiting danish that has empty mandatory field', async ({umbracoUi}) => {
@@ -67,7 +67,7 @@ test('can publish english variant after visiting danish that has empty mandatory
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue, false);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
 });
 
 test('cannot publish danish variant with empty mandatory field', async ({umbracoUi}) => {
@@ -83,7 +83,7 @@ test('cannot publish danish variant with empty mandatory field', async ({umbraco
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
 
@@ -117,5 +117,5 @@ test('can publish english variant from actions menu when danish has empty mandat
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
+  expect(contentData.variants[1].state).toBe('Published');
 });

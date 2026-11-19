@@ -122,7 +122,16 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
         // No change or created from blueprint.
         if (editorModelValue?.TemporaryFileId.HasValue is not true && string.IsNullOrEmpty(editorModelValue?.Src) is false)
         {
-            return editorModelValue.Src;
+            if (FileUploadSource.IsAcceptable(editorModelValue.Src, currentValue as string))
+            {
+                return editorModelValue.Src;
+            }
+
+            _logger.LogWarning(
+                "Refused to store the file source '{Source}' while editing content {ContentKey}: it is not a valid file location. The current value is retained.",
+                editorModelValue.Src,
+                editorValue.ContentKey);
+            return currentValue;
         }
 
         // the current editor value (if any) is the path to the file

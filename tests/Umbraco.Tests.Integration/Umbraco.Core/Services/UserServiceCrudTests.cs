@@ -34,6 +34,9 @@ internal sealed partial class UserServiceCrudTests : UmbracoIntegrationTestWithC
         base.ConfigureTestServices(services);
         services.RemoveAll<IInviteUriProvider>();
         services.AddScoped<IInviteUriProvider, TestUriProvider>();
+        services.RemoveAll<IForgotPasswordUriProvider>();
+        services.AddSingleton<TestForgotPasswordUriProviderState>();
+        services.AddScoped<IForgotPasswordUriProvider, TestForgotPasswordUriProvider>();
     }
 
     // This is resolved from the service scope, so we have to add it to the service collection.
@@ -47,10 +50,35 @@ internal sealed partial class UserServiceCrudTests : UmbracoIntegrationTestWithC
         }
     }
 
+    private class TestForgotPasswordUriProviderState
+    {
+        public UserOperationStatus CanCreateStatus { get; set; } = UserOperationStatus.Success;
+    }
+
+    private class TestForgotPasswordUriProvider : IForgotPasswordUriProvider
+    {
+        private readonly TestForgotPasswordUriProviderState _state;
+
+        public TestForgotPasswordUriProvider(TestForgotPasswordUriProviderState state) => _state = state;
+
+        public Task<Attempt<Uri, UserOperationStatus>> CreateForgotPasswordUriAsync(IUser user)
+        {
+            var fakePath = "https://localhost:44331/fakeForgotPasswordEndpoint";
+            Attempt<Uri, UserOperationStatus> attempt = Attempt<Uri, UserOperationStatus>.Succeed(UserOperationStatus.Success, new Uri(fakePath));
+            return Task.FromResult(attempt);
+        }
+
+        public Task<Attempt<UserOperationStatus>> CanCreateForgotPasswordUriAsync()
+            => Task.FromResult(_state.CanCreateStatus == UserOperationStatus.Success
+                ? Attempt.Succeed(UserOperationStatus.Success)
+                : Attempt.Fail(_state.CanCreateStatus));
+    }
+
     private IUserService CreateUserService(
         SecuritySettings? securitySettings = null,
         IUserInviteSender? inviteSender = null,
-        ILocalLoginSettingProvider? localLoginSettingProvider = null)
+        ILocalLoginSettingProvider? localLoginSettingProvider = null,
+        IUserForgotPasswordSender? forgotPasswordSender = null)
     {
         securitySettings ??= GetRequiredService<IOptions<SecuritySettings>>().Value;
         IOptions<SecuritySettings> securityOptions = Options.Create(securitySettings);
@@ -82,7 +110,7 @@ internal sealed partial class UserServiceCrudTests : UmbracoIntegrationTestWithC
             GetRequiredService<IShortStringHelper>(),
             GetRequiredService<IOptions<ContentSettings>>(),
             GetRequiredService<IIsoCodeValidator>(),
-            GetRequiredService<IUserForgotPasswordSender>(),
+            forgotPasswordSender ?? GetRequiredService<IUserForgotPasswordSender>(),
             GetRequiredService<IUserIdKeyResolver>(),
             GetRequiredService<IBackOfficeUserReader>());
     }

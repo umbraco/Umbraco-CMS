@@ -364,6 +364,33 @@ public partial class ContentBlueprintEditingServiceTests
         Assert.IsNull(contentFound);
     }
 
+    [Test]
+    public async Task Cannot_Create_Variant_Without_Name()
+    {
+        var contentType = await CreateVariantContentType(variantTitleAsMandatory: false);
+
+        var createModel = new ContentBlueprintCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants = [],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The invariant title value" },
+            ],
+        };
+
+        var result = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status);
+            Assert.IsNotNull(result.Result);
+        });
+        Assert.IsNull(result.Result.Content);
+    }
+
     [TestCase("English Blueprint", "Unique Danish Name")]
     [TestCase("Unique English Name", "Danish Blueprint")]
     [TestCase("English Blueprint", "Danish Blueprint")]

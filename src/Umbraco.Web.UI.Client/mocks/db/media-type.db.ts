@@ -5,6 +5,7 @@ import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js'
 import { UmbMockEntityNamedItemManager } from './utils/entity/entity-named-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { umbDataTypeMockDb } from './data-type.db.js';
+import { pagedResult } from './utils/paged-result.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	AllowedMediaTypeItemResponseModel,
@@ -21,7 +22,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 class UmbMediaTypeMockDB extends UmbEntityMockDbBase<UmbMockMediaTypeModel> {
-	tree = new UmbMockEntityTreeManager<UmbMockMediaTypeModel>(this, mediaTypeTreeItemMapper);
+	tree = new UmbMockEntityTreeManager<UmbMockMediaTypeModel>(this, (item) => mediaTypeTreeItemMapper(item, this));
 	folder = new UmbMockEntityFolderManager<UmbMockMediaTypeModel>(this, createMockMediaTypeFolderMapper);
 	item = new UmbMockEntityNamedItemManager<UmbMockMediaTypeModel>(this, mediaTypeItemMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockMediaTypeModel>(
@@ -34,19 +35,19 @@ class UmbMediaTypeMockDB extends UmbEntityMockDbBase<UmbMockMediaTypeModel> {
 		super('mediaType', data);
 	}
 
-	getAllowedChildren(id: string): PagedAllowedMediaTypeModel {
+	getAllowedChildren(id: string, skip = 0, take = 100): PagedAllowedMediaTypeModel {
 		const mediaType = this.detail.read(id);
 		const allowedMediaTypes = mediaType.allowedMediaTypes.map((sortModel: MediaTypeSortModel) =>
 			this.detail.read(sortModel.mediaType.id),
 		);
 		const mappedItems = allowedMediaTypes.map((item: UmbMockMediaTypeModel) => allowedMediaTypeMapper(item));
-		return { items: mappedItems, total: mappedItems.length };
+		return pagedResult(mappedItems, skip, take);
 	}
 
-	getAllowedAtRoot(): PagedAllowedMediaTypeModel {
+	getAllowedAtRoot(skip = 0, take = 100): PagedAllowedMediaTypeModel {
 		const mockItems = this.data.filter((item) => item.allowedAsRoot);
 		const mappedItems = mockItems.map((item) => allowedMediaTypeMapper(item));
-		return { items: mappedItems, total: mappedItems.length };
+		return pagedResult(mappedItems, skip, take);
 	}
 
 	getAllowedParents(id: string) {
@@ -56,7 +57,7 @@ class UmbMediaTypeMockDB extends UmbEntityMockDbBase<UmbMockMediaTypeModel> {
 		return { allowedParentIds };
 	}
 
-	getAllowedByFileExtension(fileExtension: string): GetItemMediaTypeAllowedResponse {
+	getAllowedByFileExtension(fileExtension: string, skip = 0, take = 100): GetItemMediaTypeAllowedResponse {
 		const allowedTypes = this.data.filter((field) => {
 			const allProperties = field.properties.flat();
 
@@ -73,7 +74,8 @@ class UmbMediaTypeMockDB extends UmbEntityMockDbBase<UmbMockMediaTypeModel> {
 		});
 
 		const mappedTypes = allowedTypes.map((item) => allowedExtensionMediaTypeItemMapper(item, true));
-		return allowedExtensionMediaTypeMapper(mappedTypes, mappedTypes.length);
+		const paged = pagedResult(mappedTypes, skip, take);
+		return allowedExtensionMediaTypeMapper(paged.items, paged.total);
 	}
 }
 
@@ -153,12 +155,16 @@ const mediaTypeDetailMapper = (item: UmbMockMediaTypeModel): MediaTypeResponseMo
 	};
 };
 
-const mediaTypeTreeItemMapper = (item: UmbMockMediaTypeModel): MediaTypeTreeItemResponseModel => {
+const mediaTypeTreeItemMapper = (
+	item: UmbMockMediaTypeModel,
+	db: UmbMediaTypeMockDB,
+): MediaTypeTreeItemResponseModel => {
 	return {
 		name: item.name,
 		hasChildren: item.hasChildren,
 		id: item.id,
 		parent: item.parent,
+		parentIsFolder: item.parent ? (db.read(item.parent.id)?.isFolder ?? false) : false,
 		isFolder: item.isFolder,
 		icon: item.icon,
 		isDeletable: item.isDeletable,

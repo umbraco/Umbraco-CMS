@@ -32,6 +32,8 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly textAreaTxt: Locator;
   private readonly plusIconBtn: Locator;
   private readonly enterTagTxt: Locator;
+  private readonly documentMenuItem: Locator;
+  private readonly documentRecycleBinMenuItem: Locator;
   private readonly menuItemTree: Locator;
   private readonly hostnameComboBox: Locator;
   private readonly confirmToUnpublishBtn: Locator;
@@ -169,6 +171,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly inlineCreateBtn: Locator;
   private readonly removeAt: Locator;
   private readonly selectAllCheckbox: Locator;
+  private readonly scheduleForAllLanguagesCheckbox: Locator;
   private readonly confirmToPublishBtn: Locator;
   private readonly tiptapStatusbarWordCount: Locator;
   private readonly tiptapStatusbarElementPath: Locator;
@@ -241,7 +244,9 @@ export class ContentUiHelper extends UiBaseLocators {
     this.textAreaTxt = page.locator('umb-property-editor-ui-textarea textarea');
     this.plusIconBtn = page.locator('#icon-add svg');
     this.enterTagTxt = page.getByPlaceholder('Enter tag');
-    this.menuItemTree = page.locator('umb-menu-item-tree-default');
+    this.documentMenuItem = page.locator('[data-mark="menu-item:Umb.MenuItem.Document"]');
+    this.documentRecycleBinMenuItem = page.locator('[data-mark="menu-item:Umb.MenuItem.Document.RecycleBin"]');
+    this.menuItemTree = this.documentMenuItem.or(this.documentRecycleBinMenuItem);
     this.confirmToUnpublishBtn = page.locator('umb-content-unpublish-modal').getByLabel('Unpublish');
     this.dropdown = page.locator("select#native");
     this.splitView = page.locator("#splitViews");
@@ -487,6 +492,9 @@ export class ContentUiHelper extends UiBaseLocators {
       .locator("umb-localize-date");
     this.selectAllCheckbox = this.documentScheduleModal.locator(
       '[label="Select all"]',
+    );
+    this.scheduleForAllLanguagesCheckbox = this.documentScheduleModal.locator(
+      '[label="Schedule for all selected languages"]',
     );
     this.confirmToPublishBtn = page
       .locator("uui-dialog-layout")
@@ -970,6 +978,18 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.page.locator(`[name="${mediaPickerName}"] [label="Remove"] svg`));
     await this.clickConfirmRemoveButton();
     await this.isMediaNameVisible(mediaPickerName, false);
+  }
+
+  async dragMediaPickerItemBefore(draggedMediaId: string, targetMediaId: string) {
+    const draggedItem = this.page.getByTestId(`media:${draggedMediaId}`);
+    const targetItem = this.page.getByTestId(`media:${targetMediaId}`);
+    await this.dragAndDrop(draggedItem, targetItem, 0, -40, 20);
+  }
+
+  async doesMediaPickerHaveItemsInOrder(mediaIds: string[]) {
+    await expect.poll(async () => await this.page.locator('[data-mark^="media:"]').evaluateAll(
+      (items) => items.map((item) => item.getAttribute('data-mark')!.replace('media:', '')),
+    )).toEqual(mediaIds);
   }
 
   async isMediaNameVisible(mediaName: string, isVisible: boolean = true) {
@@ -1703,7 +1723,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickEditBlockListEntryWithName(blockListElementName: string) {
-    await this.click(this.blockListEntry.filter({hasText: blockListElementName}).getByLabel('edit'), {force: true});
+    await this.click(this.blockListEntry.filter({hasText: blockListElementName}).getByLabel('edit'));
   }
 
   async clickEditBlockGridEntryWithName(blockGridElementName: string) {
@@ -1857,25 +1877,25 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async doesClipboardHaveCopiedBlockWithName(contentName: string, propertyName: string, blockName: string, index: number = 0) {
-    await this.isVisible(this.clipboardEntryPicker.getByLabel(`${contentName} - ${propertyName} - ${blockName}`).nth(index));
+    await this.isVisible(this.clipboardEntryPicker.getByTestId(`clipboard-entry:${contentName} - ${propertyName} - ${blockName}`).nth(index));
   }
 
   async doesClipboardHaveCopiedBlocks(contentName: string, propertyName: string, index: number = 0) {
-    await this.isVisible(this.clipboardEntryPicker.getByLabel(`${contentName} - ${propertyName}`).nth(index));
+    await this.isVisible(this.clipboardEntryPicker.getByTestId(`clipboard-entry:${contentName} - ${propertyName}`).nth(index));
   }
 
   async doesClipboardContainCopiedBlocksCount(count: number) {
-    await this.hasCount(this.clipboardEntryPicker.locator(this.menuItem), count);
+    await this.hasCount(this.clipboardEntryPicker.getByTestId(/^clipboard-entry:/), count);
   }
 
   async selectClipboardEntryWithName(contentName: string, propertyName: string, blockName: string, index: number = 0) {
     await this.doesClipboardHaveCopiedBlockWithName(contentName, propertyName, blockName, index);
-    await this.click(this.clipboardEntryPicker.getByLabel(`${contentName} - ${propertyName} - ${blockName}`).nth(index));
+    await this.click(this.clipboardEntryPicker.getByTestId(`clipboard-entry:${contentName} - ${propertyName} - ${blockName}`).nth(index).locator('#select-checkbox'));
   }
 
   async selectClipboardEntriesWithName(contentName: string, propertyName: string, index: number = 0) {
     await this.doesClipboardHaveCopiedBlocks(contentName, propertyName, index);
-    await this.click(this.clipboardEntryPicker.getByLabel(`${contentName} - ${propertyName}`).nth(index));
+    await this.click(this.clipboardEntryPicker.getByTestId(`clipboard-entry:${contentName} - ${propertyName}`).nth(index).locator('#select-checkbox'));
   }
 
   async goToBlockGridBlockWithName(groupName: string, propertyName: string, blockName: string, index: number = 0) {
@@ -2046,6 +2066,15 @@ export class ContentUiHelper extends UiBaseLocators {
     await expect(selectAllInput).toBeChecked({checked: !wasChecked});
   }
 
+  async clickScheduleForAllLanguagesCheckbox() {
+    await this.click(this.scheduleForAllLanguagesCheckbox);
+  }
+
+  async doesPublishTimeHaveValue(time: string, index: number = 0) {
+    const publishAtInput = this.documentScheduleModal.locator('.publish-date').nth(index).locator('uui-form-layout-item').first().locator('#input');
+    await expect(publishAtInput).toHaveValue(time);
+  }
+
   async doesSchedulePublishModalButtonContainDisabledTag(hasDisabledTag: boolean = false) {
     if (!hasDisabledTag) {
       await expect(this.schedulePublishModalBtn).not.toHaveAttribute('disabled', '');
@@ -2143,7 +2172,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickBlockElementInRTEWithName(elementTypeName: string) {
-    const blockElementLocator = this.page.locator('uui-ref-node umb-ufm-render').filter({hasText: elementTypeName});
+    const blockElementLocator = this.page.locator('umb-ref-rte-block umb-ufm-render').filter({hasText: elementTypeName});
     await this.click(blockElementLocator, {force: true});
   }
 

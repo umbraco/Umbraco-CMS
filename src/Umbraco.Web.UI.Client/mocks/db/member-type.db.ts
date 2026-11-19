@@ -3,6 +3,7 @@ import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityNamedItemManager } from './utils/entity/entity-named-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
+import { pagedResult } from './utils/paged-result.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	AllowedMemberTypeModel,
@@ -13,7 +14,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 class UmbMemberTypeMockDB extends UmbEntityMockDbBase<UmbMockMemberTypeModel> {
-	tree = new UmbMockEntityTreeManager<UmbMockMemberTypeModel>(this, memberTypeTreeItemMapper);
+	tree = new UmbMockEntityTreeManager<UmbMockMemberTypeModel>(this, (item) => memberTypeTreeItemMapper(item, this));
 	item = new UmbMockEntityNamedItemManager<UmbMockMemberTypeModel>(this, itemResponseMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockMemberTypeModel>(this, createDetailMockMapper, detailResponseMapper);
 
@@ -21,10 +22,10 @@ class UmbMemberTypeMockDB extends UmbEntityMockDbBase<UmbMockMemberTypeModel> {
 		super('memberType', data);
 	}
 
-	getAllowedAtRoot(): PagedAllowedMemberTypeModel {
+	getAllowedAtRoot(skip = 0, take = 100): PagedAllowedMemberTypeModel {
 		const mockItems = this.data.filter((item) => item.allowedAsRoot);
 		const mappedItems = mockItems.map((item) => allowedMemberTypeMapper(item));
-		return { items: mappedItems, total: mappedItems.length };
+		return pagedResult(mappedItems, skip, take);
 	}
 }
 
@@ -70,12 +71,13 @@ const detailResponseMapper = (item: UmbMockMemberTypeModel): MemberTypeResponseM
 	};
 };
 
-const memberTypeTreeItemMapper = (item: UmbMockMemberTypeModel): any => {
+const memberTypeTreeItemMapper = (item: UmbMockMemberTypeModel, db: UmbMemberTypeMockDB): any => {
 	return {
 		name: item.name,
 		hasChildren: item.hasChildren,
 		id: item.id,
 		parent: item.parent,
+		parentIsFolder: item.parent ? (db.read(item.parent.id)?.isFolder ?? false) : false,
 		isFolder: false,
 		icon: item.icon,
 	};

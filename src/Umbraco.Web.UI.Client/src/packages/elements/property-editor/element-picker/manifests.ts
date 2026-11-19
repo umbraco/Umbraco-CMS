@@ -26,7 +26,7 @@ const propertyEditorUi: ManifestPropertyEditorUi = {
 				{
 					alias: 'validationLimit',
 					label: 'Amount',
-					description: 'Set a required range of items',
+					description: '{#validation_minimumOnlyWhenInUse}',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
 					config: [{ alias: 'validationRange', value: { min: 0, max: Infinity } }],
 					weight: 20,

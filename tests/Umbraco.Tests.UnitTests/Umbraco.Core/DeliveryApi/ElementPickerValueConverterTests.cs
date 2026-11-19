@@ -67,11 +67,8 @@ public class ElementPickerValueConverterTests : PropertyValueConverterTests
         ConfigurePublishedElementMock(publishedElement, key, "The element", contentType.Object, [prop1, prop2]);
 
         PublishedElementCacheMock
-            .Setup(ecc => ecc.GetByIdAsync(key, false))
-            .Returns(Task.FromResult(publishedElement.Object));
-        PublishedElementCacheMock
-            .Setup(ecc => ecc.GetById(false, key))
-            .Returns(publishedElement.Object);
+            .Setup(ecc => ecc.GetByIds(false, It.Is<IReadOnlyCollection<Guid>>(keys => keys.SequenceEqual(new[] { key }))))
+            .Returns([publishedElement.Object]);
 
         var valueConverter = CreateValueConverter();
         Assert.AreEqual(typeof(IEnumerable<IApiElement>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));

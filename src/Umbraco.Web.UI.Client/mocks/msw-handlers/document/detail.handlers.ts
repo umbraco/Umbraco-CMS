@@ -8,12 +8,11 @@ import type {
 	CreateDocumentRequestModel,
 	GetDocumentByIdAvailableSegmentOptionsResponse,
 	GetDocumentByIdReferencedDescendantsResponse,
-	IReferenceResponseModel,
-	PagedIReferenceResponseModel,
 	UpdateAndPublishDocumentRequestModel,
 	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import { getAreReferencedPage, getReferencedByPage, getReferencedDescendantsPage } from '../referenced-by.utils.js';
 
 function getReferenceData() {
 	return umbMockManager.getDataSet().trackedReferenceItems ?? [];
@@ -59,6 +58,10 @@ export const detailHandlers = [
 		return HttpResponse.json(umbDocumentMockDb.getConfiguration());
 	}),
 
+	http.get(umbracoPath(`${UMB_SLUG}/are-referenced`), ({ request }) => {
+		return HttpResponse.json(getAreReferencedPage(request));
+	}),
+
 	http.get(umbracoPath(`${UMB_SLUG}/:id/referenced-by`), ({ request, params }) => {
 		const id = params.id as string;
 		if (!id) return;
@@ -67,26 +70,12 @@ export const detailHandlers = [
 			return new HttpResponse(null, { status: 403 });
 		}
 
-		const url = new URL(request.url);
-		const query = url.searchParams;
-		const skip = query.get('skip') ? parseInt(query.get('skip') as string, 10) : 0;
-		const take = query.get('take') ? parseInt(query.get('take') as string, 10) : 100;
-
-		let data: PagedIReferenceResponseModel['items'] = [];
-
-		if (id === 'all-property-editors-document-id') {
-			data = getReferenceData();
-		}
-
-		const PagedTrackedReference: PagedIReferenceResponseModel = {
-			total: data.length,
-			items: data.slice(skip, skip + take),
-		};
-
-		return HttpResponse.json(PagedTrackedReference);
+		return HttpResponse.json(
+			getReferencedByPage(id, request, () => (id === 'all-property-editors-document-id' ? getReferenceData() : [])),
+		);
 	}),
 
-	http.get(umbracoPath(`${UMB_SLUG}/:id/referenced-descendants`), ({ params }) => {
+	http.get(umbracoPath(`${UMB_SLUG}/:id/referenced-descendants`), ({ request, params }) => {
 		const id = params.id as string;
 		if (!id) return;
 		if (id === 'forbidden') {
@@ -94,10 +83,11 @@ export const detailHandlers = [
 			return new HttpResponse(null, { status: 403 });
 		}
 
-		const ReferencedDescendantsResponse: GetDocumentByIdReferencedDescendantsResponse = {
-			total: 0,
-			items: [],
-		};
+		const ReferencedDescendantsResponse: GetDocumentByIdReferencedDescendantsResponse = getReferencedDescendantsPage(
+			id,
+			request,
+			umbDocumentMockDb.getAll(),
+		);
 
 		return HttpResponse.json(ReferencedDescendantsResponse);
 	}),

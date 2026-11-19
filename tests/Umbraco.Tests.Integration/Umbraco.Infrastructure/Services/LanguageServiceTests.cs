@@ -17,6 +17,10 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
 {
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
+    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
+    private IContentService ContentService => GetRequiredService<IContentService>();
+
     [SetUp]
     public async Task SetUp() => await CreateTestData();
 
@@ -114,6 +118,35 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
         language = await LanguageService.GetAsync("nb-NO");
         Assert.NotNull(language);
         Assert.Null(language.FallbackIsoCode);
+    }
+
+    [Test]
+    public async Task Can_Delete_Language_With_Scheduled_Content()
+    {
+        var contentType = new ContentTypeBuilder()
+            .WithContentVariation(ContentVariation.Culture)
+            .WithAllowAsRoot(true)
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "English Name")
+            .WithCultureName("da-DK", "Danish Name")
+            .Build();
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry("da-DK", DateTime.UtcNow.AddDays(1), null);
+        contentSchedule.Add(new ContentSchedule("en-US", DateTime.UtcNow.AddDays(1), ContentScheduleAction.Release));
+        ContentService.Save(content, contentSchedule: contentSchedule);
+
+        var result = await LanguageService.DeleteAsync("da-DK", Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        var language = await LanguageService.GetAsync("da-DK");
+        Assert.Null(language);
+
+        var schedules = ContentService.GetContentScheduleByContentId(content.Id);
+        Assert.IsEmpty(schedules.GetSchedule("da-DK"));
+        Assert.AreEqual(1, schedules.GetSchedule("en-US").Count());
     }
 
     [Test]

@@ -79,7 +79,7 @@ public class PropertyValueConverterTests : DeliveryApiTests
         var publishedElement = SetupPublishedElement("The element", elementKey, publishedElementType.Object);
         PublishedElement = publishedElement.Object;
 
-        PublishedContentCacheMock = new Mock<IPublishedContentCache>();
+        PublishedContentCacheMock = new Mock<IPublishedContentCache> { CallBase = true };
         PublishedContentCacheMock
             .Setup(pcc => pcc.GetById(contentKey))
             .Returns(publishedContent.Object);
@@ -90,18 +90,15 @@ public class PropertyValueConverterTests : DeliveryApiTests
             .Setup(pcc => pcc.GetById(true, draftContentKey))
             .Returns(draftContent.Object);
 
-        PublishedMediaCacheMock = new Mock<IPublishedMediaCache>();
+        PublishedMediaCacheMock = new Mock<IPublishedMediaCache> { CallBase = true };
         PublishedMediaCacheMock
             .Setup(pcc => pcc.GetById(mediaKey))
             .Returns(publishedMedia.Object);
 
         PublishedElementCacheMock = new Mock<IPublishedElementCache>();
         PublishedElementCacheMock
-            .Setup(ecc => ecc.GetByIdAsync(elementKey, false))
-            .Returns(Task.FromResult(publishedElement.Object));
-        PublishedElementCacheMock
-            .Setup(ecc => ecc.GetById(false, elementKey))
-            .Returns(publishedElement.Object);
+            .Setup(ecc => ecc.GetByIds(false, It.Is<IReadOnlyCollection<Guid>>(keys => keys.SequenceEqual(new[] { elementKey }))))
+            .Returns([publishedElement.Object]);
 
         var cacheMock = new Mock<ICacheManager>();
         cacheMock.SetupGet(cache => cache.Content).Returns(PublishedContentCacheMock.Object);

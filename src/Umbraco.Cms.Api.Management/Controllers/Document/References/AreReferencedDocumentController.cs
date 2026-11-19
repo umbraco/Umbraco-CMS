@@ -1,12 +1,19 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.References;
 
@@ -18,16 +25,39 @@ public class AreReferencedDocumentController : DocumentControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesSkipTakeService;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IAuthorizationService _authorizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Document.References.AreReferencedDocumentController"/> class.
     /// </summary>
     /// <param name="trackedReferencesSkipTakeService">The service used to retrieve tracked references with skip and take (paging) functionality.</param>
     /// <param name="umbracoMapper">The <see cref="IUmbracoMapper"/> instance used for mapping objects within Umbraco.</param>
-    public AreReferencedDocumentController(ITrackedReferencesService trackedReferencesSkipTakeService, IUmbracoMapper umbracoMapper)
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public AreReferencedDocumentController(
+        ITrackedReferencesService trackedReferencesSkipTakeService,
+        IUmbracoMapper umbracoMapper)
+        : this(
+            trackedReferencesSkipTakeService,
+            umbracoMapper,
+            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Document.References.AreReferencedDocumentController"/> class.
+    /// </summary>
+    /// <param name="trackedReferencesSkipTakeService">The service used to retrieve tracked references with skip and take (paging) functionality.</param>
+    /// <param name="umbracoMapper">The <see cref="IUmbracoMapper"/> instance used for mapping objects within Umbraco.</param>
+    /// <param name="authorizationService">The service used to authorize access to the requested items.</param>
+    [ActivatorUtilitiesConstructor]
+    public AreReferencedDocumentController(
+        ITrackedReferencesService trackedReferencesSkipTakeService,
+        IUmbracoMapper umbracoMapper,
+        IAuthorizationService authorizationService)
     {
         _trackedReferencesSkipTakeService = trackedReferencesSkipTakeService;
         _umbracoMapper = umbracoMapper;
+        _authorizationService = authorizationService;
     }
 
     /// <summary>
@@ -53,6 +83,16 @@ public class AreReferencedDocumentController : DocumentControllerBase
         int skip = 0,
         int take = 20)
     {
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ContentPermissionResource.WithKeys(ActionBrowse.ActionLetter, ids),
+            AuthorizationPolicies.ContentPermissionByResource);
+
+        if (authorizationResult.Succeeded is false)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden);
+        }
+
         PagedModel<Guid> distinctByKeyItemsWithReferencedRelations = await _trackedReferencesSkipTakeService.GetPagedKeysWithDependentReferencesAsync(ids, Constants.ObjectTypes.Document, skip, take);
         var pagedViewModel = new PagedViewModel<ReferenceByIdModel>
         {

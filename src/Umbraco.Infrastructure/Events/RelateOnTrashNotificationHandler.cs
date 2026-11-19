@@ -239,6 +239,11 @@ public sealed class RelateOnTrashNotificationHandler :
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
+        // This runs after the move to the recycle bin has committed, so it is a transaction of its own. The write lock
+        // must be taken before anything is read, otherwise a database that serializes writers (such as SQLite) can
+        // refuse the first write once another connection has committed since this transaction started reading.
+        scope.WriteLock(Constants.Locks.Relations);
+
         IRelationType? relationType = _relationService.GetRelationTypeByAlias(originalParentRelationTypeAlias);
 
         // Check that the relation-type exists, if not, then recreate it

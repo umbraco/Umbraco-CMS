@@ -43,6 +43,7 @@ export class UmbDocumentBlueprintWorkspaceViewInfoElement extends UmbLitElement 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('general/:entityType')
 			.onSetup((params) => {
+				this.#workspaceContext?.contentTypeVarianceChangeRedirect.trackVarianceChange();
 				return { data: { entityType: params.entityType, preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
@@ -179,11 +180,6 @@ export class UmbDocumentBlueprintWorkspaceViewInfoElement extends UmbLitElement 
 
 			.general-item:not(:last-child) {
 				margin-bottom: var(--uui-size-space-6);
-			}
-
-			uui-ref-node-document-type[readonly] {
-				padding-top: 7px;
-				padding-bottom: 7px;
 			}
 		`,
 	];

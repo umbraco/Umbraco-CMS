@@ -11,10 +11,15 @@ export interface ManifestWorkspaceActionMenuItem<
 	type: 'workspaceActionMenuItem';
 	/**
 	 * Define which workspace actions this menu item should be shown for.
-	 * @examples [['Umb.WorkspaceAction.Document.Save', 'Umb.WorkspaceAction.Document.SaveAndPublish'], "Umb.WorkspaceAction.Document.Save"]
+	 * @examples [["Umb.WorkspaceAction.Document.Save", "Umb.WorkspaceAction.Document.SaveAndPublish"], "Umb.WorkspaceAction.Document.Save"]
 	 * @required
 	 */
 	forWorkspaceActions: string | string[];
+	/**
+	 * Renders a separator above this action, unless it is the first action in the list.
+	 * The separator belongs to this action, so it is not rendered when the action is not.
+	 */
+	separatorBefore?: boolean;
 	meta: MetaType;
 }
 

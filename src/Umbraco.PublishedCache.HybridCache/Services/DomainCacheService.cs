@@ -84,20 +84,46 @@ public class DomainCacheService : IDomainCacheService
     public IEnumerable<Domain> GetAssigned(int documentId, bool includeWildcards = false)
     {
         InitializeIfMissing();
-        IEnumerable<Domain> list = _domains.Values.Where(x => x.ContentId == documentId);
-        if (includeWildcards == false)
+
+        // Resolving a URL asks this for every ancestor of the content, and most content has no domain assigned, so the
+        // common outcome (no match) is answered without allocating a LINQ pipeline. Enumerate rather than test
+        // IsEmpty or Count, which take every lock of the dictionary and so contend across concurrent requests.
+        List<Domain>? assigned = null;
+        foreach (KeyValuePair<int, Domain> entry in _domains)
         {
-            list = list.Where(x => x.IsWildcard == false);
+            Domain domain = entry.Value;
+            if (domain.ContentId == documentId && (includeWildcards || domain.IsWildcard == false))
+            {
+                (assigned ??= []).Add(domain);
+            }
         }
 
-        return list.OrderBy(x => x.SortOrder);
+        return assigned switch
+        {
+            null => [],
+            { Count: 1 } => assigned,
+            _ => assigned.OrderBy(x => x.SortOrder),
+        };
     }
 
     /// <inheritdoc />
     public bool HasAssigned(int documentId, bool includeWildcards = false)
     {
         InitializeIfMissing();
-        return documentId > 0 && GetAssigned(documentId, includeWildcards).Any();
+        if (documentId <= 0)
+        {
+            return false;
+        }
+
+        foreach (KeyValuePair<int, Domain> entry in _domains)
+        {
+            if (entry.Value.ContentId == documentId && (includeWildcards || entry.Value.IsWildcard == false))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <inheritdoc />
