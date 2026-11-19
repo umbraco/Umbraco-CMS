@@ -23,6 +23,7 @@ public class DataTypeCacheRefresherTests
     private Mock<IElementCacheService> _elementCacheService = null!;
     private Mock<IPublishedContentTypeCache> _publishedContentTypeCache = null!;
     private Mock<IDataTypeConfigurationCache> _dataTypeConfigurationCache = null!;
+    private IAppCache _elementsCache = null!;
 
     private DataTypeCacheRefresher CreateRefresher(IPublishedModelFactory publishedModelFactory)
     {
@@ -51,7 +52,8 @@ public class DataTypeCacheRefresherTests
             _mediaCacheService.Object,
             Mock.Of<IContentTypeCommonRepository>(),
             _dataTypeConfigurationCache.Object,
-            _elementCacheService.Object);
+            _elementCacheService.Object,
+            Mock.Of<ICacheManager>(x => x.ElementsCache == _elementsCache));
     }
 
     [SetUp]
@@ -62,6 +64,7 @@ public class DataTypeCacheRefresherTests
         _elementCacheService = new Mock<IElementCacheService>(MockBehavior.Strict);
         _publishedContentTypeCache = new Mock<IPublishedContentTypeCache>();
         _dataTypeConfigurationCache = new Mock<IDataTypeConfigurationCache>();
+        _elementsCache = new FastDictionaryAppCache();
     }
 
     [Test]
@@ -239,6 +242,38 @@ public class DataTypeCacheRefresherTests
             x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 300)),
             Times.Once);
         VerifyAllConvertedContentCachesClearedOnce();
+    }
+
+    [TestCase(PublishedItemType.Content, false)]
+    [TestCase(PublishedItemType.Element, false)]
+    [TestCase(null, false)]
+    [TestCase(PublishedItemType.Content, true)]
+    [TestCase(PublishedItemType.Media, true)]
+    [TestCase(null, true)]
+    public void Any_Data_Type_Change_Clears_The_Elements_Level_Property_Value_Cache(PublishedItemType? affectedItemType, bool autoFactory)
+    {
+        // Elements-level property values are keyed by content and property, not by data type, so they can hold
+        // values converted with the previous configuration, or built from models the auto factory has discarded.
+        var refresher = CreateRefresher(autoFactory ? CreateAutoFactory() : Mock.Of<IPublishedModelFactory>());
+        if (affectedItemType is null)
+        {
+            SetupClearByDataTypeReturning(42);
+        }
+        else
+        {
+            SetupClearByDataTypeReturning(42, CreatePublishedContentType(100, affectedItemType.Value));
+        }
+
+        _documentCacheService.Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>())).Returns(Task.CompletedTask);
+        _mediaCacheService.Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>())).Returns(Task.CompletedTask);
+        _elementCacheService.Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>())).Returns(Task.CompletedTask);
+        SetupAllConvertedContentCacheClears();
+
+        _elementsCache.Get("property-value", () => new object());
+
+        refresher.Refresh([new DataTypeCacheRefresher.JsonPayload(42, Guid.NewGuid(), false)]);
+
+        Assert.That(_elementsCache.Get("property-value"), Is.Null);
     }
 
     private void SetupAllConvertedContentCacheClears()
