@@ -244,31 +244,6 @@ public class DomainService : RepositoryService, IDomainService
     /// <summary>
     /// Handles deletion of one or more domains incl. notifications
     /// </summary>
-    private bool DeleteAll(IDomain[] domainsToDelete, ICoreScope scope, EventMessages eventMessages)
-    {
-        if (domainsToDelete.Any() == false)
-        {
-            return true;
-        }
-
-        var deletingNotification = new DomainDeletingNotification(domainsToDelete, eventMessages);
-        if (scope.Notifications.PublishCancelable(deletingNotification))
-        {
-            return false;
-        }
-
-        foreach (IDomain domainToDelete in domainsToDelete)
-        {
-            _domainRepository.Delete(domainToDelete);
-        }
-
-        scope.Notifications.Publish(new DomainDeletedNotification(domainsToDelete, eventMessages).WithStateFrom(deletingNotification));
-        return true;
-    }
-
-    /// <summary>
-    /// Handles deletion of one or more domains incl. notifications
-    /// </summary>
     private async Task<bool> DeleteAllAsync(IDomain[] domainsToDelete, ICoreScope scope, EventMessages eventMessages)
     {
         if (domainsToDelete.Any() == false)
@@ -288,31 +263,6 @@ public class DomainService : RepositoryService, IDomainService
         }
 
         scope.Notifications.Publish(new DomainDeletedNotification(domainsToDelete, eventMessages).WithStateFrom(deletingNotification));
-        return true;
-    }
-
-    /// <summary>
-    /// Handles saving of one or more domains incl. notifications
-    /// </summary>
-    private bool SaveAll(IDomain[] domainsToSave, ICoreScope scope, EventMessages eventMessages)
-    {
-        if (domainsToSave.Any() == false)
-        {
-            return true;
-        }
-
-        var savingNotification = new DomainSavingNotification(domainsToSave, eventMessages);
-        if (scope.Notifications.PublishCancelable(savingNotification))
-        {
-            return false;
-        }
-
-        foreach (IDomain assignedDomain in domainsToSave)
-        {
-            _domainRepository.Save(assignedDomain);
-        }
-
-        scope.Notifications.Publish(new DomainSavedNotification(domainsToSave, eventMessages).WithStateFrom(savingNotification));
         return true;
     }
 

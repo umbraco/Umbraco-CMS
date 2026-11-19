@@ -1212,7 +1212,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 copy.ParentId = containerId.Value;
 
                 SavingNotification<TItem> savingNotification = GetSavingNotification(copy, eventMessages);
-                if (scope.Notifications.PublishCancelable(savingNotification))
+                if (await scope.Notifications.PublishCancelableAsync(savingNotification))
                 {
                     scope.Complete();
                     return MapStatusTypeToAttempt(copy, MoveOperationStatusType.FailedCancelledByEvent);
@@ -1222,7 +1222,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
                 ContentTypeChange<TItem>[] changes = ComposeContentTypeChanges(copy).ToArray();
 
-                _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
+                await _eventAggregator.PublishAsync(GetContentTypeRefreshedNotification(changes, eventMessages));
                 scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 
                 SavedNotification<TItem> savedNotification = GetSavedNotification(copy, eventMessages);
@@ -1303,7 +1303,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         {
             var moveEventInfo = new MoveEventInfo<TItem>(toMove, toMove.Path, containerKey);
             MovingNotification<TItem> movingNotification = GetMovingNotification(moveEventInfo, eventMessages);
-            if (scope.Notifications.PublishCancelable(movingNotification))
+            if (await scope.Notifications.PublishCancelableAsync(movingNotification))
             {
                 scope.Complete();
                 return MapStatusTypeToAttempt(toMove, MoveOperationStatusType.FailedCancelledByEvent);
