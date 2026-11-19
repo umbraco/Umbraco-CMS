@@ -168,26 +168,24 @@ See **[Data Flow](./data-flow.md)** for the complete implementation pattern with
 
 ### Separation of Concerns Between Web Components
 
-Each web component owns its own appearance and behavior. A component that hosts another through a slot owns the slot (placement and layout), not what is slotted into it.
+Each web component owns its appearance and behavior. A host owns its slots; the slotted component owns itself.
 
-**Never style a slotted component from the host.** Do not write `::slotted(...)` rules, or any other rule in the host's slot declaration, that set visual declarations (`background-color`, `border-radius`, `color`, …) on the slotted element. That moves the slotted component's implementation into its parent and couples the two.
+- Only set CSS custom properties inside `::slotted`.
+- Apply other styling of slotted content to the `<slot>` or a parent element.
+- Use CSS custom properties for styles the slotted component should inherit.
+- Change a slotted component's look through its public properties (such as `look`). If it has none that fits, add one to that component and document it with `@prop` or `@cssprop` (see [Style Guide](./style-guide.md)).
 
-When a host needs to influence a slotted component, go through what that component exposes:
-
-1. **Public properties**, such as `look` on `<uui-button>` or `<umb-entity-actions-bundle>`.
-2. **CSS custom properties** that the slotted component declares and reads. The host sets the value; the slotted component decides what to do with it, so the style implementation stays in the component that owns it.
-
-If the slotted component exposes neither, add the property or custom property to that component rather than reaching into it from outside. Document them with `@prop` and `@cssprop` (see [Style Guide](./style-guide.md)).
+Existing rules that don't follow this are fixed in their own PR, not in unrelated work.
 
 ```ts
-// Don't — the card decides how the slotted actions look
+// Don't — the host styles the slotted component
 static override styles = css`
 	slot[name='actions']::slotted(*) {
 		background-color: var(--uui-color-surface);
 	}
 `;
 
-// Do — the card picks from what the slotted component offers
+// Do — the host uses what the slotted component exposes
 html`<umb-entity-actions-bundle slot="actions" look="secondary"></umb-entity-actions-bundle>`;
 ```
 
