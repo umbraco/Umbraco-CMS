@@ -152,7 +152,7 @@ test('can publish invariant content node', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickConfirmToPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.nowPubliclyAvailable);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
   // Verify audit trail
@@ -205,7 +205,7 @@ test('can publish variant content node', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickConfirmToPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.nowPubliclyAvailable);
   await expect.poll(async () => (await umbracoApi.document.getByName(contentName)).variants[0].state).toBe('Published');
 });
 

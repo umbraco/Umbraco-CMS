@@ -734,6 +734,8 @@ export default {
 		publishAll: '%0% とそのサブページの全てを公開します',
 		publishHelp:
 			'<em>OK</em> をクリックすると <strong>%0%</strong> を公開。<br/><br />\n      このページとその全ての子ページも公開したければ <em>全ての子ページを公開</em> をチェック。\n      ',
+		publishedNotificationTitle: '公開しました',
+		publishedNotificationDescription: '%0% が公開されました',
 	},
 	colorpicker: {
 		noColors: '設定済みの色はありません。',
@@ -838,6 +840,7 @@ export default {
 		dictionaryItemSaved: 'ディクショナリのアイテムを保存しました',
 		editContentPublishedFailedByParent: '親ページが公開されていないので、公開に失敗しました',
 		editContentPublishedHeader: 'コンテントを公開しました',
+		editElementPublishedHeader: '要素を公開しました',
 		editContentPublishedText: 'と同時にウェブサイトを可視化しました',
 		editContentSavedHeader: 'コンテントを保存しました',
 		editContentSavedText: '変更を適用する為に公開する事を忘れないでください',
@@ -1177,5 +1180,10 @@ export default {
 		browseTab: '参照',
 		searchTab: '検索',
 		selectedCount: (count: number) => `${count}件選択済み`,
+	},
+	elements: {
+		confirmPublishDescription: '公開すると、これが一般公開されます。',
+		confirmBulkPublishDescription: '公開すると、選択した項目が公開されます。',
+		confirmBulkUnpublishDescription: '選択した項目は公開されなくなります。',
 	},
 } as UmbLocalizationDictionary;
