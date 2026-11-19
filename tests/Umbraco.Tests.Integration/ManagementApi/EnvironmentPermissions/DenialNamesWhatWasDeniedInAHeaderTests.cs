@@ -1,0 +1,41 @@
+using System.Linq.Expressions;
+using System.Net;
+using NUnit.Framework;
+using Umbraco.Cms.Api.Management.Controllers.DataType;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Permissions;
+
+namespace Umbraco.Cms.Tests.Integration.ManagementApi.EnvironmentPermissions;
+
+/// <summary>
+/// A denial names the denied permission verb in a header, so it can be told apart from a permission 403.
+/// </summary>
+internal sealed class DenialNamesWhatWasDeniedInAHeaderTests : EnvironmentPermissionsApiTest<DeleteDataTypeController>
+{
+    protected override Expression<Func<DeleteDataTypeController, object>> MethodSelector { get; set; }
+        = x => x.Delete(CancellationToken.None, Guid.Empty);
+
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+        => builder.EnvironmentPermissionsConfigurators().Add<LockDataTypeDeletionConfigurator>();
+
+    [Test]
+    public async Task Forbidden_Response_Names_The_Denied_Permission()
+    {
+        HttpResponseMessage response = await Client.DeleteAsync(Url);
+
+        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.That(
+            response.Headers.GetValues(Constants.Headers.DeniedPermission),
+            Is.EqualTo(new[] { Constants.Permissions.Entities.DataType.Delete }));
+    }
+
+    /// <summary>
+    /// Denies deleting data types, and nothing else.
+    /// </summary>
+    private sealed class LockDataTypeDeletionConfigurator : IEnvironmentPermissionsConfigurator
+    {
+        /// <inheritdoc />
+        public void Configure(IEnvironmentPermissionsBuilder builder)
+            => builder.Deny(Constants.Permissions.Entities.DataType.Delete);
+    }
+}

@@ -85,6 +85,51 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
     }
 
     /// <summary>
+    /// Verifies that a culture-only (wildcard) domain below the hostname domain doesn't become the
+    /// route prefix: incoming requests look redirects up by the node with the hostname.
+    /// </summary>
+    [Test]
+    public void Can_Store_Old_Route_With_Hostname_Domain_Root_Prefix_Below_Wildcard_Domain()
+    {
+        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict = [];
+
+        var redirectTracker = CreateRedirectTracker(new RedirectTrackerSetupOptions
+        {
+            AssignDomain = true,
+            AssignWildcardDomainToTestPage = true,
+            CurrentPublishedSegment = "test-page",
+        });
+
+        redirectTracker.StoreOldRoute(_testPage, dict, isMove: true);
+
+        Assert.AreEqual(1, dict.Count);
+        var key = dict.Keys.First();
+        Assert.AreEqual($"{_rootPage.Id}/new-route", dict[key].OldRoute);
+    }
+
+    /// <summary>
+    /// Verifies that a culture-only (wildcard) domain with no hostname domain above it doesn't prefix the route:
+    /// incoming requests without a matched domain look redirects up by the path alone.
+    /// </summary>
+    [Test]
+    public void Can_Store_Old_Route_Without_Prefix_Below_Wildcard_Domain_Only()
+    {
+        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict = [];
+
+        var redirectTracker = CreateRedirectTracker(new RedirectTrackerSetupOptions
+        {
+            AssignWildcardDomainToTestPage = true,
+            CurrentPublishedSegment = "test-page",
+        });
+
+        redirectTracker.StoreOldRoute(_testPage, dict, isMove: true);
+
+        Assert.AreEqual(1, dict.Count);
+        var key = dict.Keys.First();
+        Assert.AreEqual("/new-route", dict[key].OldRoute);
+    }
+
+    /// <summary>
     /// Verifies that <see cref="IRedirectTracker.CreateRedirects"/> registers a redirect URL
     /// when the old route differs from the new route.
     /// </summary>
@@ -613,6 +658,14 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
             .Setup(x => x.HasAssigned(_rootPage.Id, It.IsAny<bool>()))
             .Returns(options.AssignDomain);
 
+        if (options.AssignWildcardDomainToTestPage)
+        {
+            // A culture-only domain counts only when wildcards are included.
+            Mock.Get(domainCache)
+                .Setup(x => x.HasAssigned(_testPage.Id, true))
+                .Returns(true);
+        }
+
         if (options.IncludeChild)
         {
             Mock.Get(domainCache)
@@ -728,6 +781,12 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         /// Defaults to "/new-route".
         /// </summary>
         public string? RelativeUrl { get; init; }
+
+        /// <summary>
+        /// Gets a value indicating whether the test page has a culture-only (wildcard) domain. Combine with
+        /// <see cref="AssignDomain"/> to place it below a hostname domain on the root node.
+        /// </summary>
+        public bool AssignWildcardDomainToTestPage { get; init; }
 
         /// <summary>
         /// Gets a value indicating whether a child published content node should be added as a

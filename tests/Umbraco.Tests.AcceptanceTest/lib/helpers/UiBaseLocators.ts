@@ -14,6 +14,7 @@ export class UiBaseLocators extends BasePage {
   public readonly addBtn: Locator;
   public readonly updateBtn: Locator;
   public readonly changeBtn: Locator;
+  public readonly replaceBtn: Locator;
   public readonly deleteBtn: Locator;
   public readonly deleteExactBtn: Locator;
   public readonly removeExactBtn: Locator;
@@ -88,7 +89,7 @@ export class UiBaseLocators extends BasePage {
   public readonly property: Locator;
   public readonly addPropertyBtn: Locator;
   public readonly labelAboveBtn: Locator;
-  public readonly propertyEditorChangeBtn: Locator;
+  public readonly propertyEditorReplaceBtn: Locator;
 
   // Group & Tab Management
   public readonly addGroupBtn: Locator;
@@ -282,6 +283,7 @@ export class UiBaseLocators extends BasePage {
     this.addBtn = page.getByRole("button", { name: "Add", exact: true });
     this.updateBtn = page.getByLabel("Update");
     this.changeBtn = page.getByLabel("Change", { exact: true });
+    this.replaceBtn = page.getByLabel("Replace", { exact: true });
     this.deleteBtn = page.getByRole("button", { name: /^Delete(…)?$/ });
     this.deleteExactBtn = page.getByRole("button", {
       name: "Delete",
@@ -382,7 +384,7 @@ export class UiBaseLocators extends BasePage {
       .locator("uui-modal-sidebar")
       .getByTestId("input:propertytype-description")
       .locator("#textarea");
-    this.propertyEditorChangeBtn = page.locator('[label="Property editor"]').getByLabel('Change');
+    this.propertyEditorReplaceBtn = page.locator('[label="Property editor"]').getByLabel('Replace', { exact: true });
     this.property = page.locator("umb-property");
     this.addPropertyBtn = page.getByLabel("Add property", { exact: true });
     this.labelAboveBtn = page
@@ -817,6 +819,10 @@ export class UiBaseLocators extends BasePage {
 
   async clickChangeButton() {
     await this.click(this.changeBtn);
+  }
+
+  async clickReplaceButton() {
+    await this.click(this.replaceBtn);
   }
 
   async clickDeleteButton() {
@@ -1293,7 +1299,7 @@ export class UiBaseLocators extends BasePage {
 
   async updatePropertyEditor(propertyEditorName: string) {
     await this.clickEditorSettingsButton();
-    await this.click(this.propertyEditorChangeBtn);
+    await this.click(this.propertyEditorReplaceBtn);
     await this.searchForTypeToFilterValue(propertyEditorName);
     await this.click(this.page.getByText(propertyEditorName, { exact: true }));
     await this.enterAPropertyName(propertyEditorName);
@@ -1836,8 +1842,13 @@ export class UiBaseLocators extends BasePage {
     // Wait for the backoffice to finish loading; clicking before the current-user extension bundle is ready
     // no-ops, so the modal never opens.
     await this.waitForPageLoad();
-    await this.click(this.currentUserAvatarBtn);
-    await expect(this.currentUserModal).toBeVisible({timeout: ConstantHelper.timeout.long});
+    // Only click while the modal is closed: a click with the modal open closes it.
+    await expect(async () => {
+      if (!(await this.currentUserModal.isVisible())) {
+        await this.click(this.currentUserAvatarBtn);
+      }
+      await expect(this.currentUserModal).toBeVisible({timeout: ConstantHelper.timeout.short});
+    }).toPass({timeout: ConstantHelper.timeout.long});
   }
 
   // Collection Methods
@@ -2320,5 +2331,11 @@ export class UiBaseLocators extends BasePage {
       await this.languageBtn.selectOption(language, {force: true});
       await expect(this.uiCultureInput).toHaveAttribute('value', language.toLowerCase(), {timeout: ConstantHelper.timeout.short});
     }).toPass({timeout: ConstantHelper.timeout.medium});
+  }
+
+  async clickSegmentVariantButton(segmentName: string) {
+    const segmentVariant = this.page.locator('.variant.segment-variant').filter({has: this.page.locator('.variant-name', {hasText: segmentName})});
+    await this.click(segmentVariant.locator('button.switch-button'));
+    await expect(segmentVariant).toContainClass('selected');
   }
 }

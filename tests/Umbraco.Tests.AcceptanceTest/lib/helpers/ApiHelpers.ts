@@ -37,6 +37,7 @@ import {MediaDeliveryApiHelper} from './differentAppSettingsHelpers/MediaDeliver
 import {ContentDeliveryApiHelper} from "./differentAppSettingsHelpers/ContentDeliveryApiHelper";
 import {SmtpApiHelper} from './SmtpApiHelper';
 import {ElementApiHelper} from "./ElementApiHelper";
+import {SearchManagementApiHelper} from './SearchManagementApiHelper';
 import {ServerApiHelper} from './ServerApiHelper';
 
 export class ApiHelpers {
@@ -77,6 +78,7 @@ export class ApiHelpers {
   contentDeliveryApi: ContentDeliveryApiHelper;
   smtp: SmtpApiHelper;
   element: ElementApiHelper;
+  searchManagement: SearchManagementApiHelper;
   server: ServerApiHelper;
 
   constructor(page: Page) {
@@ -116,6 +118,7 @@ export class ApiHelpers {
     this.contentDeliveryApi = new ContentDeliveryApiHelper(this);
     this.smtp = new SmtpApiHelper(this);
     this.element = new ElementApiHelper(this);
+    this.searchManagement = new SearchManagementApiHelper(this);
     this.server = new ServerApiHelper(this);
   }
 

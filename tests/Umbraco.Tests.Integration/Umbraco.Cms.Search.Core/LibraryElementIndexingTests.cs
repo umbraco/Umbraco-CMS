@@ -25,6 +25,8 @@ public class LibraryElementIndexingTests : ContentBaseTestBase
 
     private IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
 
+    private IElementService ElementService => GetRequiredService<IElementService>();
+
     private IElementContainerService ElementContainerService => GetRequiredService<IElementContainerService>();
 
     private IElementPublishingService ElementPublishingService => GetRequiredService<IElementPublishingService>();
@@ -76,7 +78,8 @@ public class LibraryElementIndexingTests : ContentBaseTestBase
 
         TestIndexDocument document = GetElementDocument(element.Key);
         VerifyDocumentStructureValues(document, element.Key, Guid.Empty, [element.Key]);
-        VerifyDocumentSystemValues(document, element, []);
+        IElement persistedElement = ElementService.GetById(element.Key) ?? throw new InvalidOperationException("Element was not found");
+        VerifyDocumentSystemValues(document, persistedElement, []);
     }
 
     [Test]

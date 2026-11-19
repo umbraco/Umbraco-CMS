@@ -140,7 +140,7 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 			<umb-workspace-editor
 				?loading=${this._isLoading}
 				.backPath=${(this.showBackToParentButton ? this._navigationParentItemPath : undefined) ?? this.#backPath}
-				class="${this._exists === false ? 'hide' : ''}">
+				class="${this._exists === false || this._isForbidden ? 'hide' : ''}">
 				<slot name="header" slot="header"></slot>
 				${this.#renderEntityActions()}
 				<slot></slot>

@@ -3,11 +3,12 @@ import {ApiHelpers, UiHelpers} from ".";
 import {ConsoleErrorHelper} from "./ConsoleErrorHelper";
 
 const test = base.extend<{ umbracoApi: ApiHelpers } & { umbracoUi: UiHelpers }>({
-  umbracoApi: async ({page}, use) => {
+  umbracoApi: async ({page}, use, testInfo) => {
     const umbracoApi = new ApiHelpers(page);
     // Keep the shared admin session valid before each umbracoApi test.
     await umbracoApi.isLoginStateValid();
     await use(umbracoApi);
+    await umbracoApi.report.report(testInfo);
     // Persist a valid session for the next test. The storageState save MUST run even when the
     // localStorage clear throws (API-only test that never navigated), or a revoked session leaks on.
     try {

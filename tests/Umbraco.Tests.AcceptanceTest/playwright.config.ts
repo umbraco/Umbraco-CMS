@@ -66,6 +66,17 @@ export default defineConfig({
       }
     },
     {
+      name: 'segments',
+      testMatch: 'Segments/**/*.spec.ts',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
+    },
+    {
       name: 'entityDataPicker',
       testMatch: 'EntityDataPicker/**/*.spec.ts',
       dependencies: ['setup'],

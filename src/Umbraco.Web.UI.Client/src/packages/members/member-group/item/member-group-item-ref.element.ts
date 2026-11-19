@@ -81,7 +81,7 @@ export class UmbMemberGroupItemRefElement extends UmbLitElement {
 				<slot name="actions" slot="actions"></slot>
 				<umb-icon slot="icon" name="icon-users"></umb-icon>
 			</uui-ref-node>
-			<umb-entity-frame><uui-icon name="link"></uui-icon> ${this.item.name}</umb-entity-frame>
+			<umb-entity-frame><uui-icon name="link"></uui-icon></umb-entity-frame>
 		`;
 	}
 

@@ -20,10 +20,9 @@ export declare abstract class UmbEntityItemRefFrameMixinElement extends LitEleme
 	/**
 	 * Renders the entity frame, when {@link isEntityFrameNavigable} is `true`.
 	 * @protected
-	 * @param {string} [name] - The entity name shown in the frame's tab.
 	 * @returns {unknown} The entity frame template, or `nothing` when not navigable.
 	 */
-	protected renderEntityFrame(name?: string): unknown;
+	protected renderEntityFrame(): unknown;
 }
 
 // Constructor type carries `styles` separately, since ClassConstructor<T> only describes instances, not statics.
@@ -45,9 +44,9 @@ export const UmbEntityItemRefFrameMixin = <T extends ClassConstructor<LitElement
 			return false;
 		}
 
-		protected renderEntityFrame(name?: string) {
+		protected renderEntityFrame() {
 			if (!this.isEntityFrameNavigable) return nothing;
-			return html`<umb-entity-frame aria-hidden="true"><uui-icon name="link"></uui-icon> ${name}</umb-entity-frame>`;
+			return html`<umb-entity-frame aria-hidden="true"><uui-icon name="link"></uui-icon></umb-entity-frame>`;
 		}
 
 		static readonly styles: Array<CSSResultGroup> = [

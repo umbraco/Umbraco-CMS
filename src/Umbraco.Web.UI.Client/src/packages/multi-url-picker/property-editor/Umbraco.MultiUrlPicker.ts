@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/prope
 
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
-	name: 'Multi URL Picker',
+	name: 'URL Picker',
 	alias: 'Umbraco.MultiUrlPicker',
 	meta: {
 		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.MultiUrlPicker',

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -40,6 +41,9 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     public void SetUp()
     {
         _mockDatabaseCacheRepository = new Mock<IDatabaseCacheRepository>();
+        _mockDatabaseCacheRepository
+            .Setup(r => r.GetKeysOfEntityTypes(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<ContentCacheDataSerializerEntityType>()))
+            .Returns(new HashSet<Guid>());
 
         var contentData = new ContentData(
             Textpage.Name,
@@ -126,7 +130,8 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             mockedPublishedStatusService.Object,
             new NullLogger<DocumentCacheService>(),
             new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()),
-            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())));
+            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())),
+            Mock.Of<IContentCacheDataSerializerFactory>());
 
         _mockedCache = new DocumentCache(_documentCacheService);
     }
@@ -314,7 +319,8 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             mockedPublishedStatusService.Object,
             new NullLogger<DocumentCacheService>(),
             new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()),
-            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>()) == false));
+            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>()) == false),
+            Mock.Of<IContentCacheDataSerializerFactory>());
     }
 
     [Test]
@@ -496,6 +502,49 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
+    public async Task GetByKeysAsync_Preview_PopulatesHybridCache_SoSubsequentReadsDoNotHitDatabase()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}+draft");
+        var reporter = (IMemoryCacheSizeReporter)_documentCacheService;
+        long convertedCountBefore = reporter.GetApproximateCount();
+
+        IReadOnlyList<IPublishedContent> result = await _documentCacheService.GetByKeysAsync([Textpage.Key], true);
+        Assert.AreEqual(1, result.Count);
+        _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), true), Times.Once);
+
+        // The draft is cached as the per-key read-through caches it, so neither path goes back to the database.
+        result = await _documentCacheService.GetByKeysAsync([Textpage.Key], true);
+        Assert.AreEqual(1, result.Count);
+        _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), true), Times.Once);
+
+        Assert.IsNotNull(await _mockedCache.GetByIdAsync(Textpage.Key, true));
+        _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Never);
+
+        // Drafts are held in the HybridCache only; the converted (L0) cache stays published-only.
+        Assert.AreEqual(convertedCountBefore, reporter.GetApproximateCount());
+    }
+
+    [Test]
+    public async Task GetByKeysAsync_Preview_CachesNull_ForKeysTheDatabaseDoesNotReturn()
+    {
+        Guid missingKey = Guid.NewGuid();
+
+        _mockDatabaseCacheRepository
+            .Setup(x => x.GetDocumentSourcesAsync(It.Is<IEnumerable<Guid>>(keys => keys.Contains(missingKey)), true))
+            .ReturnsAsync(Array.Empty<ContentCacheNode>());
+
+        Assert.IsEmpty(await _documentCacheService.GetByKeysAsync([missingKey], true));
+        _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), true), Times.Once);
+
+        Assert.IsEmpty(await _documentCacheService.GetByKeysAsync([missingKey], true));
+        _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), true), Times.Once);
+
+        Assert.IsNull(await _documentCacheService.GetByKeyAsync(missingKey, true));
+        _mockDatabaseCacheRepository.Verify(x => x.GetDocumentSourceAsync(missingKey, It.IsAny<bool>()), Times.Never);
+    }
+
+    [Test]
     public async Task GetByKeysAsync_DoesNotCacheNull_WhenContentExistsButAncestorCheckFails()
     {
         var ancestorCheckReturnsTrue = false;
@@ -519,7 +568,8 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             controllableMock.Object,
             new NullLogger<DocumentCacheService>(),
             new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()),
-            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())));
+            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())),
+            Mock.Of<IContentCacheDataSerializerFactory>());
 
         var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
         await hybridCache.RemoveAsync($"{Textpage.Key}");
@@ -663,7 +713,8 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             controllableMock.Object,
             new NullLogger<DocumentCacheService>(),
             new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()),
-            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())));
+            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())),
+            Mock.Of<IContentCacheDataSerializerFactory>());
 
         var controlledCache = new DocumentCache(controlledCacheService);
 

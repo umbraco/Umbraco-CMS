@@ -1,7 +1,7 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
-const propertyEditorName = 'Single Dropdown';
+const propertyEditorName = 'Single Select Dropdown';
 const customDataTypeName = 'Custom Single Dropdown';
 const editorAlias = 'Umbraco.DropDown.Single';
 const editorUiAlias = 'Umb.PropertyEditorUi.Dropdown.Single';

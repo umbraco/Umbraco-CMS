@@ -699,7 +699,7 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
             return;
         }
 
-        var allContentTypesByKey = allContentTypeCompositions.ToDictionary(c => c.Key);
+        Dictionary<Guid, IContentTypeComposition> allContentTypesByKey = allContentTypeCompositions.ToDictionary(c => c.Key);
         contentType.AllowedContentTypes = model
             .AllowedContentTypes
             .OrderBy(contentTypeSort => contentTypeSort.SortOrder)
@@ -720,7 +720,7 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
         ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
     {
         // build a dictionary of all data types within the model by their keys (we need it when mapping properties)
-        var dataTypesByKey = (await GetDataTypesAsync(model)).ToDictionary(d => d.Key);
+        Dictionary<Guid, IDataType> dataTypesByKey = (await GetDataTypesAsync(model)).ToDictionary(d => d.Key);
 
         // collect the keys of all parent containers (we need them when mapping property groups)
         var parentContainerKeys = model
@@ -735,11 +735,15 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
         // This ensures we correctly handle property types that may have been filtered out from groups.
         var existingPropertyTypes = contentType.PropertyTypes.ToList();
 
+        // Match all property models before mapping any of them: the removals below must be made by the existing aliases,
+        // before mapping changes them, and a property type matched by key must not be claimed by another model's alias.
+        Dictionary<TPropertyTypeModel, IPropertyType> existingPropertyTypesByModel = MatchExistingPropertyTypes(model.Properties, existingPropertyTypes);
+
         // To ensure correct change tracking, we must explicitly inform the content type of any
         // existing properties that have been removed.
         var removedPropertyTypeAliases = existingPropertyTypes
+            .Except(existingPropertyTypesByModel.Values)
             .Select(pt => pt.Alias)
-            .Except(model.Properties.Select(p => p.Alias))
             .ToArray();
 
         foreach (var removedPropertyTypeAlias in removedPropertyTypeAliases)
@@ -761,7 +765,7 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
                 IPropertyType[] properties = model
                     .Properties
                     .Where(property => property.ContainerKey == container.Key)
-                    .Select(property => MapProperty(contentType, property, propertyGroup, existingPropertyTypes, dataTypesByKey))
+                    .Select(property => MapProperty(property, propertyGroup, existingPropertyTypesByModel.GetValueOrDefault(property), dataTypesByKey))
                     .ToArray();
 
                 if (properties.Any() is false && parentContainerKeys.Contains(container.Key) is false)
@@ -787,7 +791,7 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
 
         // handle orphaned properties
         IEnumerable<TPropertyTypeModel> orphanedPropertyTypeModels = model.Properties.Where(x => x.ContainerKey is null).ToArray();
-        IPropertyType[] orphanedPropertyTypes = orphanedPropertyTypeModels.Select(property => MapProperty(contentType, property, null, existingPropertyTypes, dataTypesByKey)).ToArray();
+        IPropertyType[] orphanedPropertyTypes = orphanedPropertyTypeModels.Select(property => MapProperty(property, null, existingPropertyTypesByModel.GetValueOrDefault(property), dataTypesByKey)).ToArray();
         if (contentType.NoGroupPropertyTypes.SequenceEqual(orphanedPropertyTypes) is false)
         {
             contentType.NoGroupPropertyTypes = new PropertyTypeCollection(SupportsPublishing, orphanedPropertyTypes);
@@ -933,19 +937,60 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
     private static partial Regex PropertyGroupAliasLeadingCapitalsRegex();
 
     /// <summary>
+    ///     Matches the property models to the existing property types they update.
+    /// </summary>
+    /// <param name="properties">The property models.</param>
+    /// <param name="existingPropertyTypes">The existing property types of the content type.</param>
+    /// <returns>The matched existing property types, keyed by property model. Unmatched property models are not included.</returns>
+    /// <remarks>
+    ///     A property model is matched by key first, so an existing property type can have its alias changed while
+    ///     retaining its identity and stored values. A property model whose key matches no existing property type is
+    ///     matched by alias, so callers that do not supply the existing keys update the property type in place rather
+    ///     than replacing it. Each existing property type is matched at most once.
+    /// </remarks>
+    private static Dictionary<TPropertyTypeModel, IPropertyType> MatchExistingPropertyTypes(
+        IEnumerable<TPropertyTypeModel> properties,
+        IEnumerable<IPropertyType> existingPropertyTypes)
+    {
+        var unmatchedPropertyTypes = existingPropertyTypes.ToList();
+        var matches = new Dictionary<TPropertyTypeModel, IPropertyType>();
+        TPropertyTypeModel[] propertyModels = properties.ToArray();
+
+        foreach (TPropertyTypeModel property in propertyModels)
+        {
+            IPropertyType? propertyType = unmatchedPropertyTypes.FirstOrDefault(pt => pt.Key == property.Key);
+            if (propertyType is not null)
+            {
+                matches[property] = propertyType;
+                unmatchedPropertyTypes.Remove(propertyType);
+            }
+        }
+
+        foreach (TPropertyTypeModel property in propertyModels.Where(p => matches.ContainsKey(p) is false))
+        {
+            IPropertyType? propertyType = unmatchedPropertyTypes.FirstOrDefault(pt => pt.Alias == property.Alias);
+            if (propertyType is not null)
+            {
+                matches[property] = propertyType;
+                unmatchedPropertyTypes.Remove(propertyType);
+            }
+        }
+
+        return matches;
+    }
+
+    /// <summary>
     ///     Maps a property model to an <see cref="IPropertyType"/>.
     /// </summary>
-    /// <param name="contentType">The content type the property belongs to.</param>
     /// <param name="property">The property model to map.</param>
     /// <param name="propertyGroup">The property group the property belongs to, or <c>null</c> for ungrouped properties.</param>
-    /// <param name="existingPropertyTypes">Existing property types for reference.</param>
+    /// <param name="existingPropertyType">The existing property type the model updates, or <c>null</c> for a new property type.</param>
     /// <param name="dataTypesByKey">Dictionary of data types keyed by their unique identifier.</param>
     /// <returns>The mapped property type.</returns>
     private IPropertyType MapProperty(
-        TContentType contentType,
         TPropertyTypeModel property,
         PropertyGroup? propertyGroup,
-        IEnumerable<IPropertyType> existingPropertyTypes,
+        IPropertyType? existingPropertyType,
         IDictionary<Guid, IDataType> dataTypesByKey)
     {
         // get the selected data type
@@ -955,14 +1000,13 @@ internal abstract partial class ContentTypeEditingServiceBase<TContentType, TCon
             throw new ArgumentException("One or more data types could not be found", nameof(dataTypesByKey));
         }
 
-        // get the current property type (if it exists)
-        IPropertyType propertyType = existingPropertyTypes.FirstOrDefault(pt => pt.Alias == property.Alias)
-                                      ?? new PropertyType(_shortStringHelper, dataType)
-                                      {
-                                          // We are demanding a property type key in the model, so we should probably
-                                          // ensure that it's the one that's actually used.
-                                          Key = property.Key
-                                      };
+        IPropertyType propertyType = existingPropertyType
+            ?? new PropertyType(_shortStringHelper, dataType)
+            {
+                // We are demanding a property type key in the model, so we should probably
+                // ensure that it's the one that's actually used.
+                Key = property.Key,
+            };
 
         propertyType.Name = property.Name;
         propertyType.DataTypeId = dataType.Id;

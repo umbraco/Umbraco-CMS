@@ -90,7 +90,6 @@ test('can not create unsupported invariant document type with invariant tiptap R
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, tipTapName, tipTapId, documentTypeGroupName);
   contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);

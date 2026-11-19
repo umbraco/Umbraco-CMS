@@ -307,7 +307,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.selectErrorPageElement = page.locator('.select-item').filter({hasText: 'Error Page'}).locator('umb-input-element').locator('#button');
     this.rollbackItem = page.locator('.rollback-item');
     this.activeRollbackItem = page.locator('.rollback-item.active');
-    this.actionsMenu = page.locator('uui-scroll-container');
+    this.actionsMenu = page.locator('umb-entity-action-list');
     this.linkToElementBtn = this.linkPickerModal.getByTestId('action:element').locator('#button');
     this.linkToMediaBtn = this.linkPickerModal.getByTestId('action:media').locator('#button');
     this.linkToManualBtn = this.linkPickerModal.getByTestId('action:external').locator('#button');

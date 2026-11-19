@@ -120,7 +120,8 @@ describe('UmbDocumentItemRefElement', () => {
 			const element = await renderRef();
 
 			await waitUntil(() => !!getFrame(element), 'expected the entity frame to render');
-			expect(getFrame(element)!.textContent).to.contain('English Title');
+			expect(getFrame(element)!.querySelector('uui-icon[name="link"]')).to.not.be.null;
+			expect(getFrame(element)!.textContent?.trim()).to.equal('');
 		});
 
 		it('is not rendered when the user has no access to the section', async () => {
