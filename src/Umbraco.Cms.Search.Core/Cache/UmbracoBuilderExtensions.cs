@@ -98,6 +98,8 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationHandler<ContentTypeChangedNotification, ContentTypeNotificationHandler>();
         builder.AddNotificationHandler<MediaTypeChangedNotification, MediaTypeNotificationHandler>();
         builder.AddNotificationHandler<MemberTypeChangedNotification, MemberTypeNotificationHandler>();
+        builder.AddNotificationHandler<MemberTypeSavingNotification, MemberTypeSensitivePropertyNotificationHandler>();
+        builder.AddNotificationHandler<MemberTypeSavedNotification, MemberTypeSensitivePropertyNotificationHandler>();
         builder.AddNotificationHandler<LanguageDeletedNotification, LanguageNotificationHandler>();
 
         builder.AddNotificationHandler<ElementPublishedNotification, PublishedElementNotificationHandler>();

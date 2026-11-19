@@ -2,7 +2,7 @@ import {AliasHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const contentName = 'Test Rendering Content';
 const documentTypeName = 'TestDocumentTypeForContent';
-const dataTypeName = 'Multi URL Picker';
+const dataTypeName = 'URL Picker';
 const templateName = 'TestTemplateForContent';
 const propertyName = 'Test Member Picker';
 let dataTypeData = null;

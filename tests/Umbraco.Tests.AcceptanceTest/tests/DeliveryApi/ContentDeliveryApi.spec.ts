@@ -1,5 +1,5 @@
 import {expect} from '@playwright/test';
-import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {AliasHelper, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 // Document
 const publishInvariantRootContent = 'Publish Invariant Root';
@@ -25,7 +25,7 @@ const textstringDataTypeName = 'Textstring';
 const trueFalseDataTypeName = 'True/false';
 const numericDataTypeName = 'Numeric';
 const listViewContentTypeName = 'List View - Content';
-const multiUrlPickerDataTypeName = 'Multi URL Picker';
+const multiUrlPickerDataTypeName = 'URL Picker';
 // Property Values
 const textPropertyValue = 'This is an invariant text string value';
 const numericPropertyValue = '1234';
@@ -233,7 +233,7 @@ test.describe('fetch a content item by id', () => {
     expect(contentItem.status()).toBe(200);
     const contentItemJson = await contentItem.json();
     await umbracoApi.contentDeliveryApi.verifyBasicPropertiesForContentItem(contentName, contentItemJson);
-    await umbracoApi.contentDeliveryApi.verifyEditorialPropertiesForContentItemWithMultiURLPicker(contentName, contentItemJson, 'Content');
+    await umbracoApi.contentDeliveryApi.verifyEditorialPropertiesForContentItemWithMultiURLPicker(contentName, contentItemJson, 'Content', AliasHelper.toAlias(multiUrlPickerDataTypeName));
     await umbracoApi.contentDeliveryApi.verifyCulturePropertyForContentItem(contentName, contentItemJson);
 
     // Clean

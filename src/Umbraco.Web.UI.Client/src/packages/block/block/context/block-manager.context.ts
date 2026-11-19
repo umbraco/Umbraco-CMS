@@ -486,6 +486,12 @@ export abstract class UmbBlockManagerContext<
 		);
 	}
 
+	/**
+	 * Observe the first layout entry that references the given content key.
+	 * A content key can be referenced by more than one layout entry, so this does not identify a specific entry.
+	 * @param {string} contentKey The content key to look up.
+	 * @returns {Observable<BlockLayoutType | undefined>} The first matching layout entry.
+	 */
 	layoutOf(contentKey: string) {
 		return this._layouts.asObservablePart((source) => source.find((x) => x.contentKey === contentKey));
 	}
