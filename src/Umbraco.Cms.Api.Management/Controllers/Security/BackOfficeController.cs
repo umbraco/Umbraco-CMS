@@ -381,7 +381,7 @@ public class BackOfficeController : SecurityControllerBase
         HttpContext.SetPrincipalForRequest(cookieAuthResult.Principal);
 
         await _backOfficeSignInManager.SignOutAsync();
-        SignOutSuccessResult signOutResult = _backOfficeUserManager.NotifyLogoutSuccess(cookieAuthResult.Principal ?? User, userId);
+        SignOutSuccessResult signOutResult = await _backOfficeUserManager.NotifyLogoutSuccessAsync(cookieAuthResult.Principal ?? User, userId);
 
         _logger.LogInformation(
             "User {UserName} from IP address {RemoteIpAddress} has logged out",

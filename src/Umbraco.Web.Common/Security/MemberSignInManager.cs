@@ -54,7 +54,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         {
             var ipAddress = _ipResolver.GetCurrentRequestIpAddress();
             var reason = GetFailedLoginReason(result);
-            _eventAggregator.Publish(new MemberLoginFailedNotification(ipAddress, user.Key, reason));
+            await _eventAggregator.PublishAsync(new MemberLoginFailedNotification(ipAddress, user.Key, reason));
         }
 
         return result;
@@ -196,7 +196,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
 
         if (result.RequiresTwoFactor)
         {
-            NotifyRequiresTwoFactor(user);
+            await NotifyRequiresTwoFactorAsync(user);
         }
 
         return result;
@@ -386,7 +386,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         {
             if (user is not null)
             {
-                _eventAggregator.Publish(new MemberLoginSuccessNotification(ipAddress, user.Key));
+                await _eventAggregator.PublishAsync(new MemberLoginSuccessNotification(ipAddress, user.Key));
             }
         }
         else if (result.RequiresTwoFactor is false)
@@ -398,7 +398,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
             // - Failed 2FA verification (user is not null) via TwoFactorSignInAsync
             // Note: password failures for existing users are handled by PasswordSignInAsync(TUser) override.
             var reason = user is null ? MemberLoginFailedReason.MemberNotFound : GetFailedLoginReason(result);
-            _eventAggregator.Publish(new MemberLoginFailedNotification(ipAddress, user?.Key, reason));
+            await _eventAggregator.PublishAsync(new MemberLoginFailedNotification(ipAddress, user?.Key, reason));
         }
 
         return result;
@@ -414,7 +414,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
 
         if (user is not null)
         {
-            _eventAggregator.Publish(new MemberLogoutSuccessNotification(ipAddress, user.Key));
+            await _eventAggregator.PublishAsync(new MemberLogoutSuccessNotification(ipAddress, user.Key));
         }
     }
 
@@ -429,11 +429,28 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         user,
         currentUser => new MemberTwoFactorRequestedNotification(currentUser.Key));
 
+    /// <summary>
+    ///     Publishes a <see cref="MemberTwoFactorRequestedNotification" /> for the specified member.
+    /// </summary>
+    /// <param name="user">The member that is required to complete two-factor authentication.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    protected Task NotifyRequiresTwoFactorAsync(MemberIdentityUser user) => NotifyAsync(
+        user,
+        currentUser => new MemberTwoFactorRequestedNotification(currentUser.Key));
+
     private T Notify<T>(MemberIdentityUser currentUser, Func<MemberIdentityUser, T> createNotification)
         where T : INotification
     {
         T notification = createNotification(currentUser);
         _eventAggregator.Publish(notification);
+        return notification;
+    }
+
+    private async Task<T> NotifyAsync<T>(MemberIdentityUser currentUser, Func<MemberIdentityUser, T> createNotification)
+        where T : INotification
+    {
+        T notification = createNotification(currentUser);
+        await _eventAggregator.PublishAsync(notification);
         return notification;
     }
 
