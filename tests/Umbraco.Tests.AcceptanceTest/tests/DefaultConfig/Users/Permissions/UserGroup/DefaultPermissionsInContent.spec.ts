@@ -267,7 +267,7 @@ test('can publish content with publish permission enabled', {tag: '@release'}, a
   await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.nowPubliclyAvailable);
   expect(await umbracoApi.document.isDocumentPublished(rootDocumentId)).toBeTruthy();
 });
 

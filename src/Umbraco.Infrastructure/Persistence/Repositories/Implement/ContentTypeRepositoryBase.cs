@@ -409,15 +409,13 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         }
 
         // removing a ContentType from a composition (U4-1690): delete the property data of the removed
-        // composition's property types, across all versions of the documents based on this content type
+        // composition's property types, across all versions of the content based on this content type
         if (entity.RemovedContentTypes.Any())
         {
             Sql<ISqlContext> sqlVersionIds = Sql()
                 .Select<ContentVersionDto>(x => x.Id)
                 .From<ContentVersionDto>()
                 .InnerJoin<ContentDto>().On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document)
                 .Where<ContentDto>(x => x.ContentTypeId == entity.Id);
 
             foreach (var key in entity.RemovedContentTypes)

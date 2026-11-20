@@ -114,7 +114,7 @@ test('can publish english variant from actions menu when danish has empty mandat
   await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.nowPubliclyAvailable);
   await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[1].state).toBe('Published');

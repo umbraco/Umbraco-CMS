@@ -50,7 +50,6 @@ export const UmbEntityItemRefFrameMixin = <T extends ClassConstructor<LitElement
 		}
 
 		static readonly styles: Array<CSSResultGroup> = [
-			(superClass as unknown as typeof LitElement).styles ?? [],
 			css`
 				:host {
 					--umb-entity-frame-opacity: 0;
@@ -66,6 +65,7 @@ export const UmbEntityItemRefFrameMixin = <T extends ClassConstructor<LitElement
 					--umb-entity-frame-opacity: 1;
 				}
 			`,
+			(superClass as unknown as typeof LitElement).styles ?? [],
 		];
 	}
 
