@@ -2,10 +2,8 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -33,7 +31,6 @@ public class ChangePasswordCurrentUserController : CurrentUserControllerBase
     /// <param name="userService">Performs user management operations.</param>
     /// <param name="backOfficeUserManager">Manages back office identity users.</param>
     /// <param name="backOfficeSignInManager">Manages the back office sign-in.</param>
-    [ActivatorUtilitiesConstructor]
     public ChangePasswordCurrentUserController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUserService userService,
@@ -44,23 +41,6 @@ public class ChangePasswordCurrentUserController : CurrentUserControllerBase
         _userService = userService;
         _backOfficeUserManager = backOfficeUserManager;
         _backOfficeSignInManager = backOfficeSignInManager;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ChangePasswordCurrentUserController"/> class.
-    /// </summary>
-    /// <param name="backOfficeSecurityAccessor">Accesses the back office security context.</param>
-    /// <param name="userService">Performs user management operations.</param>
-    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
-    public ChangePasswordCurrentUserController(
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUserService userService)
-        : this(
-            backOfficeSecurityAccessor,
-            userService,
-            StaticServiceProvider.Instance.GetRequiredService<IBackOfficeUserManager>(),
-            StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSignInManager>())
-    {
     }
 
     /// <summary>
