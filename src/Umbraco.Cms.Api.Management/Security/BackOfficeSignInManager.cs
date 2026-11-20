@@ -161,16 +161,16 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         {
             if (user != null)
             {
-                _userManager.NotifyLoginSuccess(Context.User, user.Id);
+                await _userManager.NotifyLoginSuccessAsync(Context.User, user.Id);
             }
         }
         else if (result.IsLockedOut)
         {
-            _userManager.NotifyAccountLocked(Context.User, user?.Id);
+            await _userManager.NotifyAccountLockedAsync(Context.User, user?.Id);
         }
         else if (result.RequiresTwoFactor)
         {
-            _userManager.NotifyLoginRequiresVerification(Context.User, user?.Id);
+            await _userManager.NotifyLoginRequiresVerificationAsync(Context.User, user?.Id);
         }
         else if (!result.Succeeded || result.IsNotAllowed)
         {
@@ -329,7 +329,7 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
 
         if (result.RequiresTwoFactor)
         {
-            NotifyRequiresTwoFactor(user);
+            await NotifyRequiresTwoFactorAsync(user);
         }
 
         return result;
@@ -337,11 +337,26 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
 
     protected void NotifyRequiresTwoFactor(BackOfficeIdentityUser user) => Notify(user, currentUser => new UserTwoFactorRequestedNotification(currentUser.Key));
 
+    /// <summary>
+    ///     Publishes a <see cref="UserTwoFactorRequestedNotification" /> for the specified user.
+    /// </summary>
+    /// <param name="user">The user that is required to complete two-factor authentication.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    protected Task NotifyRequiresTwoFactorAsync(BackOfficeIdentityUser user) => NotifyAsync(user, currentUser => new UserTwoFactorRequestedNotification(currentUser.Key));
+
     private T Notify<T>(BackOfficeIdentityUser currentUser, Func<BackOfficeIdentityUser, T> createNotification)
         where T : INotification
     {
         T notification = createNotification(currentUser);
         _eventAggregator.Publish(notification);
+        return notification;
+    }
+
+    private async Task<T> NotifyAsync<T>(BackOfficeIdentityUser currentUser, Func<BackOfficeIdentityUser, T> createNotification)
+        where T : INotification
+    {
+        T notification = createNotification(currentUser);
+        await _eventAggregator.PublishAsync(notification);
         return notification;
     }
 

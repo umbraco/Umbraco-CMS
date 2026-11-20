@@ -120,7 +120,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
 
         // Publish cancelable saving notification.
         var savingNotification = new ExternalMemberSavingNotification(member, evtMsgs);
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             scope.Complete();
             return Attempt.FailWithStatus(ExternalMemberOperationStatus.CancelledByNotification, member);
@@ -188,7 +188,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
 
         // Publish cancelable saving notification.
         var savingNotification = new ExternalMemberSavingNotification(member, evtMsgs);
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             scope.Complete();
             return Attempt.FailWithStatus(ExternalMemberOperationStatus.CancelledByNotification, member);
@@ -234,7 +234,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
         savingNotification.State.Add(Constants.Conventions.Member.LoginPropertiesOnlyStateKey, true);
         savingNotification.State.Add(Constants.Conventions.Member.IndexableFieldsChangedStateKey, false);
 
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             scope.Complete();
             return Attempt.FailWithStatus(ExternalMemberOperationStatus.CancelledByNotification, member);
@@ -265,7 +265,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
 
         // Publish cancelable deleting notification.
         var deletingNotification = new ExternalMemberDeletingNotification(member, evtMsgs);
-        if (scope.Notifications.PublishCancelable(deletingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
         {
             scope.Complete();
             return Attempt.FailWithStatus<ExternalMemberIdentity?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.CancelledByNotification, member);
