@@ -1,3 +1,4 @@
+import { documentItemCache } from '../../item/repository/document-item.server.cache.js';
 import type {
 	UmbRecycleBinDataSource,
 	UmbRecycleBinRestoreRequestArgs,
@@ -15,12 +16,22 @@ export class UmbDocumentRecycleBinServerDataSource implements UmbRecycleBinDataS
 		this.#host = host;
 	}
 
-	trash(args: UmbRecycleBinTrashRequestArgs) {
-		return tryExecute(this.#host, DocumentService.putDocumentByIdMoveToRecycleBin({ path: { id: args.unique } }));
+	// The server event that invalidates a cached item can arrive after the response, so each successful
+	// change removes the affected items from the item cache itself.
+
+	async trash(args: UmbRecycleBinTrashRequestArgs) {
+		const result = await tryExecute(
+			this.#host,
+			DocumentService.putDocumentByIdMoveToRecycleBin({ path: { id: args.unique } }),
+		);
+		if (!result.error) {
+			documentItemCache.delete(args.unique);
+		}
+		return result;
 	}
 
-	restore(args: UmbRecycleBinRestoreRequestArgs) {
-		return tryExecute(
+	async restore(args: UmbRecycleBinRestoreRequestArgs) {
+		const result = await tryExecute(
 			this.#host,
 			DocumentService.putRecycleBinDocumentByIdRestore({
 				path: { id: args.unique },
@@ -29,10 +40,18 @@ export class UmbDocumentRecycleBinServerDataSource implements UmbRecycleBinDataS
 				},
 			}),
 		);
+		if (!result.error) {
+			documentItemCache.delete(args.unique);
+		}
+		return result;
 	}
 
-	empty() {
-		return tryExecute(this.#host, DocumentService.deleteRecycleBinDocument());
+	async empty() {
+		const result = await tryExecute(this.#host, DocumentService.deleteRecycleBinDocument());
+		if (!result.error) {
+			documentItemCache.clear();
+		}
+		return result;
 	}
 
 	async getOriginalParent(args: UmbRecycleBinOriginalParentRequestArgs) {
