@@ -1,5 +1,14 @@
 import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
 import {
+	NESTED_BLOCK_GRID_LEFT_AREA_KEY,
+	NESTED_BLOCK_GRID_RIGHT_AREA_KEY,
+	NESTED_BLOCK_GRID_SECTION_AREA_KEY,
+} from './data-type.data.js';
+import {
+	NESTED_BLOCK_GRID_DOCUMENT_TYPE_ID,
+	NESTED_BLOCK_GRID_SECTION_ELEMENT_TYPE_ID,
+	NESTED_BLOCK_GRID_TEXT_ELEMENT_TYPE_ID,
+	NESTED_BLOCK_GRID_TWO_COLUMNS_ELEMENT_TYPE_ID,
 	NESTED_BLOCK_LIST_DOCUMENT_TYPE_ID,
 	NESTED_BLOCK_LIST_INNER_ELEMENT_TYPE_ID,
 	NESTED_BLOCK_LIST_OUTER_ELEMENT_TYPE_ID,
@@ -11,6 +20,27 @@ import {
 import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
+
+const SECTION_KEY = '1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c01';
+const TWO_COLUMNS_KEY = '2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d02';
+const LEFT_TEXT_KEY = '3c4d5e6f-7a8b-4c9d-8e1f-2a3b4c5d6e03';
+const RIGHT_TEXT_KEY = '4d5e6f7a-8b9c-4d0e-9f2a-3b4c5d6e7f04';
+
+const createGridLayoutEntry = (contentKey: string, areas: Array<{ key: string; items: Array<unknown> }> = []) => ({
+	columnSpan: 12,
+	rowSpan: 1,
+	areas,
+	contentUdi: `umb://element/${contentKey.replaceAll('-', '')}`,
+	settingsUdi: null,
+	contentKey,
+	settingsKey: null,
+});
+
+const createGridContent = (contentTypeKey: string, key: string, title: string) => ({
+	contentTypeKey,
+	key,
+	values: [{ editorAlias: 'Umbraco.TextBox', culture: null, segment: null, alias: 'title', value: title }],
+});
 
 export const data: Array<UmbMockDocumentModel> = [
 	{
@@ -314,6 +344,74 @@ export const data: Array<UmbMockDocumentModel> = [
 						'Umbraco.BlockList': [
 							{ contentKey: '6b8d0f42-1c3e-4a57-9d68-0e1f2a3b4c5d', settingsKey: null },
 							{ contentKey: '8f2a4c61-3e5b-4d79-a0b1-2c3d4e5f6a7b', settingsKey: null },
+						],
+					},
+				},
+			},
+		],
+		flags: [],
+	},
+	{
+		// Section > Two Columns > Text (left and right). The layout has no gap, so the two Text blocks cover the
+		// Two Columns block completely, and the only way to reach it is through the breadcrumb of a Text block.
+		id: 'a9b1c3d5-e7f2-4a58-b0c4-d6e8f1a3b596',
+		createDate: '2024-01-15T10:00:00.000Z',
+		parent: null,
+		ancestors: [],
+		documentType: {
+			id: NESTED_BLOCK_GRID_DOCUMENT_TYPE_ID,
+			icon: 'icon-document',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		template: null,
+		variants: [
+			{
+				state: 'Published' as UmbDocumentVariantState,
+				publishDate: '2024-01-15T10:05:00.000Z',
+				culture: null,
+				segment: null,
+				name: 'Nested Block Grid',
+				createDate: '2024-01-15T10:00:00.000Z',
+				updateDate: '2024-01-15T10:05:00.000Z',
+				id: '0c2e4a6b-8d1f-4b69-a2c4-e6f8a0b2d4c7',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.BlockGrid',
+				alias: 'grid',
+				culture: null,
+				segment: null,
+				value: {
+					contentData: [
+						createGridContent(NESTED_BLOCK_GRID_SECTION_ELEMENT_TYPE_ID, SECTION_KEY, 'Section'),
+						createGridContent(NESTED_BLOCK_GRID_TWO_COLUMNS_ELEMENT_TYPE_ID, TWO_COLUMNS_KEY, 'Two columns'),
+						createGridContent(NESTED_BLOCK_GRID_TEXT_ELEMENT_TYPE_ID, LEFT_TEXT_KEY, 'Left text'),
+						createGridContent(NESTED_BLOCK_GRID_TEXT_ELEMENT_TYPE_ID, RIGHT_TEXT_KEY, 'Right text'),
+					],
+					settingsData: [],
+					expose: [SECTION_KEY, TWO_COLUMNS_KEY, LEFT_TEXT_KEY, RIGHT_TEXT_KEY].map((contentKey) => ({
+						contentKey,
+						culture: null,
+						segment: null,
+					})),
+					layout: {
+						'Umbraco.BlockGrid': [
+							createGridLayoutEntry(SECTION_KEY, [
+								{
+									key: NESTED_BLOCK_GRID_SECTION_AREA_KEY,
+									items: [
+										createGridLayoutEntry(TWO_COLUMNS_KEY, [
+											{ key: NESTED_BLOCK_GRID_LEFT_AREA_KEY, items: [createGridLayoutEntry(LEFT_TEXT_KEY)] },
+											{ key: NESTED_BLOCK_GRID_RIGHT_AREA_KEY, items: [createGridLayoutEntry(RIGHT_TEXT_KEY)] },
+										]),
+									],
+								},
+							]),
 						],
 					},
 				},

@@ -1,11 +1,67 @@
 import type { UmbMockDocumentTypeModel } from '../../mock-data-set.types.js';
 import {
+	NESTED_BLOCK_GRID_DATA_TYPE_ID,
 	NESTED_INNER_BLOCK_LIST_DATA_TYPE_ID,
 	NESTED_OUTER_BLOCK_LIST_DATA_TYPE_ID,
 	TEXTSTRING_DATA_TYPE_ID,
 	VARIANT_BLOCK_LIST_DATA_TYPE_ID,
 	VARIANT_INLINE_BLOCK_LIST_DATA_TYPE_ID,
 } from './data-type.data.js';
+
+export const NESTED_BLOCK_GRID_FOLDER_ID = 'a1d4c8e2-6b3f-4f0a-9d57-3c2e1b8f7a10';
+export const NESTED_BLOCK_GRID_SECTION_ELEMENT_TYPE_ID = 'c3a5d7f9-1e2b-4c84-a6d0-7b9e3f1a2c52';
+export const NESTED_BLOCK_GRID_TWO_COLUMNS_ELEMENT_TYPE_ID = 'd8f1a3c5-7b9e-4d20-b4a6-2c5e8f0d1a63';
+export const NESTED_BLOCK_GRID_TEXT_ELEMENT_TYPE_ID = 'e2b4d6f8-0a1c-4e35-8c7d-9a3b5f1e2d74';
+export const NESTED_BLOCK_GRID_DOCUMENT_TYPE_ID = 'f5c7e9a1-3d4b-4f46-9e8a-1b2d4f6a8c85';
+
+const createNestedBlockGridElementType = (id: string, alias: string, name: string, titlePropertyId: string) =>
+	({
+		id,
+		alias,
+		name,
+		description: null,
+		icon: 'icon-item-arrangement',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: false,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: true,
+		hasChildren: false,
+		parent: { id: NESTED_BLOCK_GRID_FOLDER_ID },
+		isFolder: false,
+		properties: [
+			{
+				id: titlePropertyId,
+				container: null,
+				alias: 'title',
+				name: 'Title',
+				description: null,
+				dataType: { id: TEXTSTRING_DATA_TYPE_ID },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	}) satisfies UmbMockDocumentTypeModel;
 
 export const NESTED_INLINE_BLOCK_LIST_FOLDER_ID = '6a6f0a9a-4294-4d5e-b0e6-4fa779a80957';
 export const NESTED_BLOCK_LIST_DOCUMENT_TYPE_ID = '9ef9a53e-ed33-4583-b104-3c7f062ea168';
@@ -454,6 +510,97 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+				},
+			},
+		],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	},
+	{
+		id: NESTED_BLOCK_GRID_FOLDER_ID,
+		alias: 'nestedBlockGridFolder',
+		name: 'Nested Block Grid',
+		description: null,
+		icon: 'icon-folder',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: true,
+		parent: null,
+		isFolder: true,
+		properties: [],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	},
+	createNestedBlockGridElementType(
+		NESTED_BLOCK_GRID_SECTION_ELEMENT_TYPE_ID,
+		'nestedBlockGridSection',
+		'Section',
+		'8b9c0d1e-2f3a-4b4c-9d6e-7f8a9b0c1d08',
+	),
+	createNestedBlockGridElementType(
+		NESTED_BLOCK_GRID_TWO_COLUMNS_ELEMENT_TYPE_ID,
+		'nestedBlockGridTwoColumns',
+		'Two Columns',
+		'9c0d1e2f-3a4b-4c5d-8e7f-8a9b0c1d2e09',
+	),
+	createNestedBlockGridElementType(
+		NESTED_BLOCK_GRID_TEXT_ELEMENT_TYPE_ID,
+		'nestedBlockGridText',
+		'Text',
+		'0d1e2f3a-4b5c-4d6e-9f8a-9b0c1d2e3f10',
+	),
+	{
+		id: NESTED_BLOCK_GRID_DOCUMENT_TYPE_ID,
+		alias: 'nestedBlockGrid',
+		name: 'Nested Block Grid',
+		description: null,
+		icon: 'icon-document',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: { id: NESTED_BLOCK_GRID_FOLDER_ID },
+		isFolder: false,
+		properties: [
+			{
+				id: 'e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a11',
+				container: null,
+				alias: 'grid',
+				name: 'Grid',
+				description: null,
+				dataType: { id: NESTED_BLOCK_GRID_DATA_TYPE_ID },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: true,
 				},
 			},
 		],
