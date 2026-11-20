@@ -28,3 +28,5 @@ F infrastructure · G `DatabaseCacheRepository`/`IndexDocumentRepository`/`UserI
 **How to apply:** when a campaign starts, set its status in the JSON to `planned`/`in-progress`, add a log row and republish; when it closes, move its repositories to `done` and add the campaign to `done.campaigns`. Refresh line counts from the two greps described in GRAND-PLAN.md rather than guessing.
 
 **20-11-2026 (later):** campaign A split in the JSON: A = media (planned, plan in `ef-core-media-repository/`), A2 = members (proposed, depends on A, retires the NPoco bases and the `Async*` prefixes); H depends on A2 as well. Board for A: [[project_ef_core_media_repository_campaign]].
+
+**20-11-2026 (later still):** campaign A set to `in-progress` on the map (PR 1 of the media campaign open as draft #24724, PR 1b added); the map's `why` text for A now says nine PRs.

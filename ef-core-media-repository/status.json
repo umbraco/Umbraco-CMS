@@ -196,6 +196,7 @@
     }
   ],
   "log": [
+    { "date": "20-11-2026", "text": "PR 1: the review bot's inline suggestion (HasMaxLength on path, already applied in 85857f56562) answered and resolved; Copilot recommends approval. Waiting for human review and the pipeline." },
     { "date": "20-11-2026", "text": "PR 1b added (remove the SQL Server unique index filters) after the independent review of PR 1; PR 1 gets HasMaxLength(255) on the path column and class docs, migration regenerated." },
     { "date": "20-11-2026", "text": "PR 1 opened as draft #24724 (f6392efddba): review clean, mapping test proven red/green, snapshots clean on both providers." },
     { "date": "20-11-2026", "text": "PR 1 started on v20/feature/ef-core-media-repository-1-media-version-dto: DTO, configuration, DbSet, no-op migrations on both providers, plan wiring and the mapping test implemented; snapshots clean. Awaiting review and the draft PR." },

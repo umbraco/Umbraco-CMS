@@ -63,8 +63,8 @@
     {
       "id": "A",
       "title": "Media on the content tier",
-      "status": "planned",
-      "why": "Planned 20-11-2026 as its own campaign (eight PRs): hoist the generic read, write and tree logic down to the wide bases, then add MediaRepository and MediaService as thin subclasses. The publishable base, row and hook shapes, factories and test patterns exist, so media is mostly a hoist and a cutover.",
+      "status": "in-progress",
+      "why": "Planned 20-11-2026 as its own campaign (nine PRs; PR 1 in review as #24724 since the same day): hoist the generic read, write and tree logic down to the wide bases, then add MediaRepository and MediaService as thin subclasses. The publishable base, row and hook shapes, factories and test patterns exist, so media is mostly a hoist and a cutover.",
       "dependsOn": [],
       "repositories": [
         {
@@ -576,6 +576,7 @@
     }
   ],
   "log": [
+    { "date": "20-11-2026", "text": "Campaign A (media) is in progress: PR 1 (MediaVersionDto and the no-op migration) open as draft #24724; PR 1b added for the SQL Server unique index filters." },
     {
       "date": "20-11-2026",
       "text": "Campaign A split: media is planned as its own campaign (plan in ef-core-media-repository/, eight PRs); members become campaign A2, proposed, depending on A. H now depends on A2 as well."
