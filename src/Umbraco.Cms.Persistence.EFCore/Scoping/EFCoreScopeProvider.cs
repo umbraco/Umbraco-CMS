@@ -1,7 +1,10 @@
 using System.Data;
+using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
@@ -29,6 +32,8 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     private readonly IScopeProvider _scopeProvider;
     private readonly IDbContextFactory<TDbContext> _dbContextFactory;
     private readonly bool _shareUmbracoConnection;
+    private readonly IEFCoreSharedConnectionInitializer[] _sharedConnectionInitializers;
+    private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EFCoreScopeProvider{TDbContext}"/> class.
@@ -45,7 +50,9 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
             StaticServiceProvider.Instance.GetRequiredService<FileSystems>(),
             StaticServiceProvider.Instance.GetRequiredService<IScopeProvider>(),
             StaticServiceProvider.Instance.GetRequiredService<IDbContextFactory<TDbContext>>(),
-            StaticServiceProvider.Instance.GetRequiredService<EFCoreScopeConfiguration<TDbContext>>())
+            StaticServiceProvider.Instance.GetRequiredService<EFCoreScopeConfiguration<TDbContext>>(),
+            StaticServiceProvider.Instance.GetServices<IEFCoreSharedConnectionInitializer>(),
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ConnectionStrings>>())
     {
     }
 
@@ -62,6 +69,8 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     /// <param name="scopeProvider">The scope provider.</param>
     /// <param name="dbContextFactory">The DbContext factory.</param>
     /// <param name="scopeConfiguration">The per-DbContext scope configuration.</param>
+    /// <param name="sharedConnectionInitializers">The initializers that prepare a shared connection for the DbContext.</param>
+    /// <param name="connectionStrings">The connection strings, used to select the initializers for the Umbraco database provider.</param>
     internal EFCoreScopeProvider(
         IAmbientEFCoreScopeStack<TDbContext> ambientEfCoreScopeStack,
         ILoggerFactory loggerFactory,
@@ -72,7 +81,9 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
         FileSystems fileSystems,
         IScopeProvider scopeProvider,
         IDbContextFactory<TDbContext> dbContextFactory,
-        EFCoreScopeConfiguration<TDbContext> scopeConfiguration)
+        EFCoreScopeConfiguration<TDbContext> scopeConfiguration,
+        IEnumerable<IEFCoreSharedConnectionInitializer> sharedConnectionInitializers,
+        IOptionsMonitor<ConnectionStrings> connectionStrings)
     {
         _ambientEfCoreScopeStack = ambientEfCoreScopeStack;
         _loggerFactory = loggerFactory;
@@ -84,6 +95,8 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
         _scopeProvider = scopeProvider;
         _dbContextFactory = dbContextFactory;
         _shareUmbracoConnection = scopeConfiguration.ShareUmbracoConnection;
+        _sharedConnectionInitializers = sharedConnectionInitializers.ToArray();
+        _connectionStrings = connectionStrings;
         _fileSystems.IsScoped = () => efCoreScopeAccessor.AmbientScope != null && ((EFCoreScope<TDbContext>)efCoreScopeAccessor.AmbientScope).ScopedFileSystems;
     }
 
@@ -228,6 +241,21 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     /// Removes the current ambient scope from the stack.
     /// </summary>
     public void PopAmbientScope() => _ambientEfCoreScopeStack.Pop();
+
+    /// <summary>
+    /// Prepares a shared connection that has been attached to a DbContext.
+    /// </summary>
+    /// <param name="dbContext">The DbContext the connection has been attached to.</param>
+    /// <param name="connection">The shared connection.</param>
+    internal void InitializeSharedConnection(TDbContext dbContext, DbConnection connection)
+    {
+        string? providerName = _connectionStrings.CurrentValue.ProviderName;
+        foreach (IEFCoreSharedConnectionInitializer initializer in _sharedConnectionInitializers
+            .Where(x => x.ProviderName.CompareProviderNames(providerName)))
+        {
+            initializer.Initialize(dbContext, connection);
+        }
+    }
 
     /// <summary>
     /// Pushes a scope context onto the ambient scope context stack.

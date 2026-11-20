@@ -2,13 +2,14 @@ using System.Data;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Data.Sqlite;
+using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Persistence.Sqlite.Services;
 
 /// <summary>
 /// A wrapper for SQLite connections that forces deferred transaction mode to prevent immediate write locks.
 /// </summary>
-public class SqlitePreferDeferredTransactionsConnection : DbConnection
+public class SqlitePreferDeferredTransactionsConnection : DbConnection, IWrappedDbConnection
 {
     private readonly SqliteConnection _inner;
 
@@ -17,6 +18,9 @@ public class SqlitePreferDeferredTransactionsConnection : DbConnection
     /// </summary>
     /// <param name="inner">The inner SQLite connection to wrap.</param>
     public SqlitePreferDeferredTransactionsConnection(SqliteConnection inner) => _inner = inner;
+
+    /// <inheritdoc />
+    public DbConnection Inner => _inner;
 
     /// <inheritdoc />
     public override string Database

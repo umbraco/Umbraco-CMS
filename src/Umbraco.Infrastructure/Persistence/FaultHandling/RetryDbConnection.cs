@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
 /// <summary>
 /// Provides a database connection implementation that automatically retries operations when transient failures occur, improving reliability.
 /// </summary>
-public class RetryDbConnection : DbConnection
+public class RetryDbConnection : DbConnection, IWrappedDbConnection
 {
     private readonly RetryPolicy? _cmdRetryPolicy;
     private readonly RetryPolicy _conRetryPolicy;
