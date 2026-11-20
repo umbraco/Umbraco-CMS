@@ -112,6 +112,25 @@ describe('UmbSelectionManager', () => {
 				await manager.process({ persistedData: persistedDocument, publishedData: publishedDocument });
 				expect(manager.getVariantsWithChanges()).to.be.an('array').that.is.empty;
 			});
+
+			it('should not have variants with changes when only the variant update date differs', async () => {
+				persistedDocument.variants[0].updateDate = '2024-01-01T00:00:00.000000';
+				await manager.process({ persistedData: persistedDocument, publishedData: publishedDocument });
+				expect(manager.getVariantsWithChanges()).to.be.an('array').that.is.empty;
+			});
+
+			it('should not mutate the data it is given', async () => {
+				persistedDocument.template = { unique: 'template-1' };
+				persistedDocument.values[0].value = 'value';
+				publishedDocument.template = { unique: 'template-2' };
+				const persistedSnapshot = structuredClone(persistedDocument);
+				const publishedSnapshot = structuredClone(publishedDocument);
+
+				await manager.process({ persistedData: persistedDocument, publishedData: publishedDocument });
+
+				expect(persistedDocument).to.deep.equal(persistedSnapshot);
+				expect(publishedDocument).to.deep.equal(publishedSnapshot);
+			});
 		});
 
 		describe('variant data', () => {
