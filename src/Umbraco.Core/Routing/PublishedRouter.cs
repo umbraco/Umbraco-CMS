@@ -44,7 +44,7 @@ public class PublishedRouter : IPublishedRouter
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedRouter" /> class.
     /// </summary>
-    [Obsolete("Use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Use the constructor taking all parameters. Scheduled for removal in Umbraco 20.")]
     public PublishedRouter(
         IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
         ContentFinderCollection contentFinders,
