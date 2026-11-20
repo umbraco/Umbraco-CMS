@@ -34,10 +34,13 @@ public class RemoveLegacyExamineIndexFilesTests
         }
     }
 
-    [Test]
-    public async Task Removes_Existing_Examine_Index_Folder()
+    [TestCase("InternalIndex")]
+    [TestCase("ExternalIndex")]
+    [TestCase("MembersIndex")]
+    [TestCase("DeliveryApiContentIndex")]
+    public async Task Removes_Legacy_Examine_Index_Folder(string legacyIndexName)
     {
-        var indexFolder = Path.Combine(_examineIndexesPath, "InternalIndex");
+        var indexFolder = Path.Combine(_examineIndexesPath, legacyIndexName);
         Directory.CreateDirectory(indexFolder);
         File.WriteAllText(Path.Combine(indexFolder, "segments.gen"), "test");
         File.WriteAllText(Path.Combine(indexFolder, "_0.cfs"), "test");
@@ -86,14 +89,15 @@ public class RemoveLegacyExamineIndexFilesTests
         Assert.That(File.Exists(Path.Combine(currentIndexFolder, "segments.gen")), Is.True);
     }
 
-    [Test]
-    public async Task Deletes_Legacy_Folders_While_Leaving_Current_Index_Folders_In_Place()
+    [TestCase(Constants.Search.IndexAliases.PublishedContent)]
+    [TestCase("MyCustomExamineIndex")]
+    public async Task Deletes_Legacy_Folders_While_Leaving_Other_Index_Folders_In_Place(string otherIndexAlias)
     {
         var legacyFolder = Path.Combine(_examineIndexesPath, "InternalIndex");
         Directory.CreateDirectory(legacyFolder);
         File.WriteAllText(Path.Combine(legacyFolder, "segments.gen"), "test");
 
-        var currentIndexFolder = Path.Combine(_examineIndexesPath, Constants.Search.IndexAliases.PublishedContent);
+        var currentIndexFolder = Path.Combine(_examineIndexesPath, otherIndexAlias);
         Directory.CreateDirectory(currentIndexFolder);
         File.WriteAllText(Path.Combine(currentIndexFolder, "segments.gen"), "test");
 
