@@ -52,11 +52,43 @@ describe('UmbBlockGridEntryElement', () => {
 			expect(parentName).to.be.undefined;
 		});
 
-		it('moves focus to the containing entry', () => {
+		it('pins and returns the containing entry', () => {
+			expect(childContext.pinParentEntry()).to.equal(parent);
+		});
+
+		it('keeps an entry active briefly after the pointer leaves it', async () => {
+			const pointer = (type: string) => child.dispatchEvent(new PointerEvent(type));
+
+			pointer('pointerenter');
+			pointer('pointerleave');
+			await aTimeout(50);
+			expect(child.hasAttribute('ui-active')).to.be.true;
+
+			pointer('pointerenter');
+			await aTimeout(300);
+			expect(child.hasAttribute('ui-active')).to.be.true;
+
+			pointer('pointerleave');
+			await aTimeout(300);
+			expect(child.hasAttribute('ui-active')).to.be.false;
+		});
+
+		it('moves focus to the containing entry when its name is clicked', async () => {
+			const state = child as unknown as Record<string, unknown>;
+			state._contentKey = 'content-key';
+			state._contentTypeAlias = 'content-type-alias';
+			parentContext.setName('Two columns');
+			await aTimeout(0);
+			child.requestUpdate();
+			await child.updateComplete;
+
 			let parentFocused = false;
 			parent.focus = () => (parentFocused = true);
+			parent.scrollIntoView = () => undefined;
 
-			childContext.focusParentEntry();
+			child
+				.shadowRoot!.querySelector('umb-entity-frame uui-button')!
+				.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
 
 			expect(parentFocused).to.be.true;
 		});
@@ -84,21 +116,6 @@ describe('UmbBlockGridEntryElement', () => {
 				expect(parentActive).to.be.false;
 			});
 
-			it('keeps an entry active briefly after the pointer leaves it', async () => {
-				childContext.setHovered(true);
-				childContext.setHovered(false);
-				await aTimeout(50);
-				expect(childActive).to.be.true;
-
-				childContext.setHovered(true);
-				await aTimeout(300);
-				expect(childActive).to.be.true;
-
-				childContext.setHovered(false);
-				await aTimeout(300);
-				expect(childActive).to.be.false;
-			});
-
 			it('is only the innermost entry that has focus', () => {
 				parentContext.setFocusWithin(true);
 				childContext.setFocusWithin(true);
@@ -111,7 +128,7 @@ describe('UmbBlockGridEntryElement', () => {
 				beforeEach(() => {
 					parentContext.setHovered(true);
 					childContext.setHovered(true);
-					childContext.focusParentEntry();
+					childContext.pinParentEntry();
 					parentContext.setFocusWithin(true);
 				});
 
@@ -162,8 +179,8 @@ describe('UmbBlockGridEntryElement', () => {
 			expect(() => {
 				entryContext.setHovered(true);
 				entryContext.setFocusWithin(true);
-				entryContext.focusParentEntry();
 			}).to.not.throw();
+			expect(entryContext.pinParentEntry()).to.be.undefined;
 		});
 	});
 

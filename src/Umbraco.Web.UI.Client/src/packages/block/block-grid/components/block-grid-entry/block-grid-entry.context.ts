@@ -19,12 +19,9 @@ import {
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
-import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-
-const UMB_BLOCK_GRID_ENTRY_HOVER_GRACE_MS = 200;
 
 export class UmbBlockGridEntryContext
 	extends UmbBlockEntryContext<
@@ -93,7 +90,6 @@ export class UmbBlockGridEntryContext
 	#focusWithin = false;
 	#pinned = false;
 	#suppressed = false;
-	readonly #applyLeave = debounce(() => this.#applyHovered(false), UMB_BLOCK_GRID_ENTRY_HOVER_GRACE_MS);
 	readonly #hoveredChildren = new Set<UmbBlockGridEntryContext>();
 	readonly #focusedChildren = new Set<UmbBlockGridEntryContext>();
 
@@ -132,30 +128,27 @@ export class UmbBlockGridEntryContext
 	}
 
 	/**
-	 * Moves focus to the entry that contains this entry, and brings it into view.
-	 * The containing entry then keeps the user's attention until the pointer leaves it or focus moves into an entry inside it.
+	 * Makes the entry that contains this entry keep the user's attention, until the pointer leaves it or focus moves into an entry inside it.
+	 * @internal
+	 * @returns {HTMLElement | undefined} The host element of the containing entry, or undefined when there is none.
 	 */
-	focusParentEntry() {
+	pinParentEntry(): HTMLElement | undefined {
 		if (!this.#parentEntry) return;
-		const parentHost = this.#parentEntry.getHostElement() as HTMLElement;
 		this.#parentEntry.pinUi();
-		parentHost.focus({ preventScroll: true });
-		parentHost.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+		return this.#parentEntry.getHostElement() as HTMLElement;
 	}
 
 	/**
 	 * Report that the pointer entered or left this entry.
-	 * Leaving is delayed briefly, so the pointer can cross from the entry to its frame tab.
 	 * @internal
 	 * @param {boolean} hovered Whether the pointer is over this entry.
 	 */
 	setHovered(hovered: boolean) {
-		if (hovered) {
-			this.#applyLeave.cancel();
-			this.#applyHovered(true);
-			return;
-		}
-		this.#applyLeave();
+		if (this.#hovered === hovered) return;
+		this.#hovered = hovered;
+		if (!hovered) this.#pinned = false;
+		this.#parentEntry?.reportChildHovered(this, hovered);
+		this.#updateUiState();
 	}
 
 	/**
@@ -210,14 +203,6 @@ export class UmbBlockGridEntryContext
 		this.#parentEntry?.reportChildFocusWithin(this, focusWithin);
 	}
 
-	#applyHovered(hovered: boolean) {
-		if (this.#hovered === hovered) return;
-		this.#hovered = hovered;
-		if (!hovered) this.#pinned = false;
-		this.#parentEntry?.reportChildHovered(this, hovered);
-		this.#updateUiState();
-	}
-
 	#updateUiState() {
 		this.#hoverBlocked.setValue(this.#pinned || this.#suppressed);
 		const focusActive = this.#focusWithin && this.#focusedChildren.size === 0;
@@ -226,7 +211,6 @@ export class UmbBlockGridEntryContext
 	}
 
 	override destroy(): void {
-		this.#applyLeave.cancel();
 		this.#reportToParent(false, false);
 		super.destroy();
 	}

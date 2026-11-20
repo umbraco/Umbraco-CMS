@@ -2,7 +2,7 @@ import type { UmbBlockGridLayoutModel } from '../../types.js';
 import { UMB_BLOCK_GRID } from '../../constants.js';
 import { UmbBlockGridEntryContext } from './block-grid-entry.context.js';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { debounce, stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { renderHiddenUfm, renderUfm } from '@umbraco-cms/backoffice/ufm';
 import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -18,6 +18,9 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/propert
 import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
 import '../../../block/action/block-action-list.element.js';
+
+// Leaving is delayed briefly, so the pointer can cross from the entry to its frame tab.
+const UMB_BLOCK_GRID_ENTRY_HOVER_GRACE_MS = 200;
 
 /**
  * @element umb-block-grid-entry
@@ -382,8 +385,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.shadowRoot?.querySelector<HTMLElement>('.umb-block-grid__block')?.focus(options);
 	}
 
-	readonly #onPointerEnter = () => this.#context.setHovered(true);
-	readonly #onPointerLeave = () => this.#context.setHovered(false);
+	readonly #applyLeave = debounce(() => this.#context.setHovered(false), UMB_BLOCK_GRID_ENTRY_HOVER_GRACE_MS);
+
+	readonly #onPointerEnter = () => {
+		this.#applyLeave.cancel();
+		this.#context.setHovered(true);
+	};
+	readonly #onPointerLeave = () => this.#applyLeave();
 	readonly #onFocusIn = () => this.#context.setFocusWithin(true);
 	readonly #onFocusOut = (event: FocusEvent) => {
 		const next = event.relatedTarget as Node | null;
@@ -396,6 +404,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.removeEventListener('pointerleave', this.#onPointerLeave);
 		this.removeEventListener('focusin', this.#onFocusIn);
 		this.removeEventListener('focusout', this.#onFocusOut);
+		this.#applyLeave.cancel();
 		clearTimeout(this.#renderTimeout);
 		this.#layoutContainerResizeObserver.disconnect();
 	}
@@ -569,13 +578,19 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		);
 	}
 
+	readonly #focusParentEntry = () => {
+		const parentHost = this.#context.pinParentEntry();
+		parentHost?.focus({ preventScroll: true });
+		parentHost?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+	};
+
 	#renderFrameLabel() {
 		if (!this._parentName) return this._name;
 		return html`<uui-button
 				compact
 				label=${this._parentName}
 				title=${this.localize.term('blockEditor_focusParentBlock')}
-				@click=${() => this.#context.focusParentEntry()}></uui-button
+				@click=${this.#focusParentEntry}></uui-button
 			><span aria-hidden="true">/</span>${this._name}`;
 	}
 
