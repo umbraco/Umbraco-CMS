@@ -73,6 +73,7 @@ public class SqlServerMigrationProvider : IMigrationProvider
             EFCoreMigration.AddHasAccessToInvariantForVariantToModel => typeof(Migrations.AddHasAccessToInvariantForVariantToModel),
             EFCoreMigration.AddElementDtos => typeof(Migrations.AddElementDtos),
             EFCoreMigration.AddIncludeInvariantForVariantToContentScheduleModel => typeof(Migrations.AddIncludeInvariantForVariantToContentScheduleModel),
+            EFCoreMigration.AddMediaVersionDto => typeof(Migrations.AddMediaVersionDto),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };
 }
