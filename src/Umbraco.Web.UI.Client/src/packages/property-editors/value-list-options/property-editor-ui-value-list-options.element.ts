@@ -18,15 +18,6 @@ export class UmbPropertyEditorUIValueListOptionsElement
 	implements UmbPropertyEditorUiElement
 {
 	/**
-	 * Disables the Value List Options Property Editor UI
-	 * @type {boolean}
-	 * @attr
-	 * @default false
-	 */
-	@property({ type: Boolean, reflect: true })
-	disabled = false;
-
-	/**
 	 * Makes the Value List Options Property Editor UI readonly
 	 * @type {boolean}
 	 * @attr
@@ -59,7 +50,6 @@ export class UmbPropertyEditorUIValueListOptionsElement
 		return html`
 			<umb-input-value-list-options
 				.items=${this.value ?? []}
-				?disabled=${this.disabled}
 				?readonly=${this.readonly}
 				?required=${this.required}
 				@change=${this.#onChange}

@@ -1,9 +1,11 @@
+import type { UmbInputValueListOptionElement } from './input-value-list-option.element.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
+import './input-value-list-option.element.js';
 
 /**
  * An option as it is stored in the configuration of a value list: the value, and the label when it has one.
@@ -18,6 +20,9 @@ interface UmbValueListOptionEntry {
 	value: string;
 	label: string;
 }
+
+// Pressing a button must not blur the field being edited, or an error it then shows can move the button before the click lands.
+const preventFocusLoss = (event: MouseEvent) => event.preventDefault();
 
 /**
  * @element umb-input-value-list-options
@@ -47,13 +52,14 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 	 * @type {Array<UmbValueListOptionConfiguration>}
 	 */
 	@property({ type: Array })
-	public set items(items: Array<UmbValueListOptionConfiguration> | undefined) {
-		this._entries = (items ?? []).map(({ value, label }) => ({
+	public set items(items: Array<UmbValueListOptionConfiguration>) {
+		if (JSON.stringify(items) === JSON.stringify(this.items)) return;
+
+		this._entries = items.map(({ value, label }) => ({
 			id: crypto.randomUUID(),
 			value,
 			label: label ?? '',
 		}));
-		this.value = this._entries.length > 0 ? 'some value' : '';
 		this.#sorter.setModel(this._entries);
 	}
 	public get items(): Array<UmbValueListOptionConfiguration> {
@@ -62,22 +68,6 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 			return trimmedLabel ? { value, label: trimmedLabel } : { value };
 		});
 	}
-
-	/**
-	 * Disables the input
-	 * @type {boolean}
-	 * @attr
-	 * @default
-	 */
-	@property({ type: Boolean, reflect: true })
-	public set disabled(value: boolean) {
-		this.#disabled = value;
-		if (value) this.#sorter.disable();
-	}
-	public get disabled() {
-		return this.#disabled;
-	}
-	#disabled = false;
 
 	/**
 	 * Makes the input readonly
@@ -99,70 +89,55 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 		super();
 
 		this.addValidator(
-			'valueMissing',
-			() => this.localize.term('validation_itemMissingValueMessage', this.#indexOfEmptyValue() + 1),
-			() => this.#indexOfEmptyValue() !== -1,
-		);
-		this.addValidator(
 			'customError',
-			() => this.localize.term('validation_valueMustBeUnique', this.#duplicateValues()[0]),
-			() => this.#duplicateValues().length > 0,
+			() =>
+				this.localize.term(
+					'validation_valueMustBeUnique',
+					escapeHTML(this.#duplicateValues().values().next().value ?? ''),
+				),
+			() => this.#duplicateValues().size > 0,
 		);
-	}
-
-	get #locked() {
-		return this.disabled || this.readonly;
-	}
-
-	#indexOfEmptyValue() {
-		return this._entries.findIndex((entry) => entry.value.trim() === '');
 	}
 
 	#duplicateValues() {
 		const seen = new Set<string>();
 		const duplicates = new Set<string>();
 		for (const { value } of this._entries) {
+			if (value.trim() === '') continue;
 			if (seen.has(value)) duplicates.add(value);
 			seen.add(value);
 		}
-		return Array.from(duplicates);
+		return duplicates;
 	}
 
 	#onAdd() {
 		this._entries = [...this._entries, { id: crypto.randomUUID(), value: '', label: '' }];
 		this.#sorter.setModel(this._entries);
-		this.pristine = false;
 		this.dispatchEvent(new UmbChangeEvent());
 		this.#focusNewEntry();
 	}
 
-	#onValueInput(event: UUIInputEvent, id: string) {
-		event.stopPropagation();
-		this.#updateEntry(id, { value: event.target.value as string });
-	}
-
-	#onLabelInput(event: UUIInputEvent, id: string) {
-		event.stopPropagation();
-		this.#updateEntry(id, { label: event.target.value as string });
-	}
-
-	#updateEntry(id: string, changes: Partial<UmbValueListOptionEntry>) {
-		this._entries = this._entries.map((entry) => (entry.id === id ? { ...entry, ...changes } : entry));
+	#onChange(event: Event, id: string) {
+		const { value, label } = event.currentTarget as UmbInputValueListOptionElement;
+		this._entries = this._entries.map((entry) => (entry.id === id ? { ...entry, value: String(value), label } : entry));
 		this.#sorter.setModel(this._entries);
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	#onOptionFocusOut() {
+		if (this.#duplicateValues().size > 0) this.checkValidity();
 	}
 
 	#onDelete(id: string) {
 		this._entries = this._entries.filter((entry) => entry.id !== id);
 		this.#sorter.setModel(this._entries);
-		this.pristine = false;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	async #focusNewEntry() {
 		await this.updateComplete;
-		const inputs = this.shadowRoot?.querySelectorAll<UUIInputElement>('.option .value');
-		inputs?.[inputs.length - 1]?.focus();
+		const options = this.shadowRoot?.querySelectorAll<UmbInputValueListOptionElement>('.option');
+		await options?.[options.length - 1]?.focus();
 	}
 
 	override getFormElement() {
@@ -175,54 +150,33 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 	}
 
 	#renderEntries() {
-		const duplicates = this.#duplicateValues();
 		return repeat(
 			this._entries,
 			(entry) => entry.id,
 			(entry) => html`
-				<div class="option" data-sort-entry-id=${entry.id}>
-					${this.#locked ? nothing : html`<uui-icon name="icon-grip" class="handle"></uui-icon>`}
-					<uui-input
-						class="value"
-						label=${this.localize.term('general_value')}
-						placeholder=${this.localize.term('general_value')}
-						.value=${entry.value}
-						?error=${duplicates.includes(entry.value) || entry.value.trim() === ''}
-						?disabled=${this.disabled}
-						?readonly=${this.readonly}
-						@input=${(event: UUIInputEvent) => this.#onValueInput(event, entry.id)}></uui-input>
-					<uui-input
-						class="label"
-						label=${this.localize.term('placeholders_label')}
-						placeholder=${this.localize.term('placeholders_label')}
-						.value=${entry.label}
-						?disabled=${this.disabled}
-						?readonly=${this.readonly}
-						@input=${(event: UUIInputEvent) => this.#onLabelInput(event, entry.id)}></uui-input>
-					${this.#locked
-						? nothing
-						: html`<uui-button
-								class="delete"
-								compact
-								look="outline"
-								label=${this.localize.term('actions_delete')}
-								@click=${() => this.#onDelete(entry.id)}>
-								<uui-icon name="icon-trash"></uui-icon>
-							</uui-button>`}
-				</div>
+				<umb-input-value-list-option
+					class="option"
+					data-sort-entry-id=${entry.id}
+					.value=${entry.value}
+					.label=${entry.label}
+					?readonly=${this.readonly}
+					@focusout=${this.#onOptionFocusOut}
+					@change=${(event: Event) => this.#onChange(event, entry.id)}
+					@delete=${() => this.#onDelete(entry.id)}></umb-input-value-list-option>
 			`,
 		);
 	}
 
 	#renderAddButton() {
-		if (this.#locked && this._entries.length > 0) return nothing;
+		if (this.readonly && this._entries.length > 0) return nothing;
 		return html`
 			<uui-button
 				id="action"
 				color="default"
 				look="placeholder"
 				label=${this.localize.term('general_add')}
-				?disabled=${this.#locked}
+				?disabled=${this.readonly}
+				@mousedown=${preventFocusLoss}
 				@click=${this.#onAdd}></uui-button>
 		`;
 	}
@@ -231,25 +185,6 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 		css`
 			#action {
 				display: block;
-			}
-
-			.option {
-				display: flex;
-				align-items: center;
-				gap: var(--uui-size-space-3);
-				margin-bottom: var(--uui-size-space-3);
-			}
-
-			.option uui-input {
-				flex: 1;
-			}
-
-			.handle {
-				cursor: grab;
-			}
-
-			.handle:active {
-				cursor: grabbing;
 			}
 
 			.--umb-sorter-placeholder {
