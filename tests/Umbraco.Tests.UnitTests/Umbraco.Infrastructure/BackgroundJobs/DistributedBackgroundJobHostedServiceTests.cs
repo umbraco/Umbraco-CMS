@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -96,8 +97,41 @@ public class DistributedBackgroundJobHostedServiceTests
         distributedJobService.Verify(x => x.TryTakeRunnableAsync(), Times.Never);
     }
 
+    [Test]
+    public async Task Retries_Server_Role_Check_When_It_Throws()
+    {
+        var databaseReadOnlyAccessor = new Mock<IDatabaseReadOnlyAccessor>();
+        databaseReadOnlyAccessor.Setup(x => x.IsReadOnly()).Returns(false);
+
+        var serverRoleAccessor = new Mock<IServerRoleAccessor>();
+        serverRoleAccessor
+            .SetupSequence(x => x.CurrentServerRole)
+            .Throws(new InvalidOperationException("The server role is unavailable."))
+            .Returns(ServerRole.SchedulingPublisher);
+
+        var jobsEnsured = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var distributedJobService = new Mock<IDistributedJobService>();
+        distributedJobService
+            .Setup(x => x.EnsureJobsAsync())
+            .Callback(jobsEnsured.SetResult)
+            .Returns(Task.CompletedTask);
+
+        var sut = CreateSut(distributedJobService.Object, databaseReadOnlyAccessor.Object, serverRoleAccessor.Object);
+
+        await sut.StartAsync(CancellationToken.None);
+        await Task.WhenAny(jobsEnsured.Task, sut.ExecuteTask!, Task.Delay(_testTimeout));
+        await sut.StopAsync(CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(sut.ExecuteTask!.IsFaulted, Is.False);
+            Assert.That(jobsEnsured.Task.IsCompleted, Is.True);
+        });
+    }
+
     [TestCase(ServerRole.Subscriber)]
     [TestCase(ServerRole.Unknown)]
+    [TestCase((ServerRole)byte.MaxValue)]
     public async Task Does_Not_Ensure_Or_Take_Jobs_On_Role_That_Does_Not_Run_Jobs(ServerRole serverRole)
     {
         const int TicksToObserve = 5;
@@ -105,6 +139,7 @@ public class DistributedBackgroundJobHostedServiceTests
         var databaseReadOnlyAccessor = new Mock<IDatabaseReadOnlyAccessor>();
         databaseReadOnlyAccessor.Setup(x => x.IsReadOnly()).Returns(false);
         var distributedJobService = new Mock<IDistributedJobService>();
+        var logger = new Mock<ILogger<DistributedBackgroundJobHostedService>>();
 
         var roleChecks = 0;
         var ticksObserved = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -121,7 +156,11 @@ public class DistributedBackgroundJobHostedServiceTests
                 return serverRole;
             });
 
-        var sut = CreateSut(distributedJobService.Object, databaseReadOnlyAccessor.Object, serverRoleAccessor.Object);
+        var sut = CreateSut(
+            distributedJobService.Object,
+            databaseReadOnlyAccessor.Object,
+            serverRoleAccessor.Object,
+            logger.Object);
 
         await sut.StartAsync(CancellationToken.None);
         await Task.WhenAny(ticksObserved.Task, sut.ExecuteTask!, Task.Delay(_testTimeout));
@@ -133,6 +172,14 @@ public class DistributedBackgroundJobHostedServiceTests
             Assert.That(ticksObserved.Task.IsCompleted, Is.True);
             distributedJobService.Verify(x => x.EnsureJobsAsync(), Times.Never);
             distributedJobService.Verify(x => x.TryTakeRunnableAsync(), Times.Never);
+            logger.Verify(
+                x => x.Log(
+                    LogLevel.Debug,
+                    It.IsAny<EventId>(),
+                    It.IsAny<It.IsAnyType>(),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
         });
     }
 
@@ -211,7 +258,8 @@ public class DistributedBackgroundJobHostedServiceTests
     private static DistributedBackgroundJobHostedService CreateSut(
         IDistributedJobService distributedJobService,
         IDatabaseReadOnlyAccessor databaseReadOnlyAccessor,
-        IServerRoleAccessor? serverRoleAccessor = null)
+        IServerRoleAccessor? serverRoleAccessor = null,
+        ILogger<DistributedBackgroundJobHostedService>? logger = null)
     {
         if (serverRoleAccessor is null)
         {
@@ -232,7 +280,7 @@ public class DistributedBackgroundJobHostedServiceTests
         settingsMonitor.Setup(x => x.CurrentValue).Returns(settings);
 
         return new DistributedBackgroundJobHostedService(
-            NullLogger<DistributedBackgroundJobHostedService>.Instance,
+            logger ?? NullLogger<DistributedBackgroundJobHostedService>.Instance,
             runtimeState.Object,
             distributedJobService,
             settingsMonitor.Object,

@@ -28,6 +28,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
     private readonly IServerRoleAccessor _serverRoleAccessor;
 
     private DistributedJobSettings _distributedJobSettings;
+    private ServerRole? _lastSkippedServerRole;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedBackgroundJobHostedService"/> class.
@@ -109,7 +110,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
             while (await timer.WaitForNextTickAsync(stoppingToken))
             {
                 // Checked on every tick, as an elected server role can change while the application is running.
-                if (_serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber or ServerRole.Unknown)
+                if (ServerRoleRunsJobs() is false)
                 {
                     continue;
                 }
@@ -155,6 +156,36 @@ public class DistributedBackgroundJobHostedService : BackgroundService
         {
             _logger.LogInformation("Timed Hosted Service is stopping.");
         }
+    }
+
+    private bool ServerRoleRunsJobs()
+    {
+        ServerRole serverRole;
+        try
+        {
+            serverRole = _serverRoleAccessor.CurrentServerRole;
+        }
+        catch (Exception exception)
+        {
+            // We swallow exception here and retry on the next tick, don't want the app to crash if the role can't be determined
+            _logger.LogWarning(exception, "An exception occurred while determining the server role. Retrying on the next tick.");
+            return false;
+        }
+
+        if (serverRole is ServerRole.Single or ServerRole.SchedulingPublisher)
+        {
+            _lastSkippedServerRole = null;
+            return true;
+        }
+
+        // Logged once per role rather than on every tick, to avoid flooding the log.
+        if (_lastSkippedServerRole != serverRole)
+        {
+            _logger.LogDebug("Distributed background jobs do not run on this server while its role is {ServerRole}.", serverRole);
+            _lastSkippedServerRole = serverRole;
+        }
+
+        return false;
     }
 
     private async Task EnsureJobsAsync()
