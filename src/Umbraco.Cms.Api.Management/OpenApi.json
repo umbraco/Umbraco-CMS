@@ -43292,9 +43292,7 @@
           "alias": {
             "type": "string"
           },
-          "value": {
-            "nullable": true
-          }
+          "value": { }
         },
         "additionalProperties": false
       },
@@ -45158,9 +45156,7 @@
             "minLength": 1,
             "type": "string"
           },
-          "value": {
-            "nullable": true
-          }
+          "value": { }
         },
         "additionalProperties": false
       },
@@ -45183,9 +45179,7 @@
             "minLength": 1,
             "type": "string"
           },
-          "value": {
-            "nullable": true
-          },
+          "value": { },
           "editorAlias": {
             "minLength": 1,
             "type": "string"
@@ -46147,9 +46141,7 @@
           },
           "providerProperties": {
             "type": "object",
-            "additionalProperties": {
-              "nullable": true
-            },
+            "additionalProperties": { },
             "nullable": true
           },
           "uniqueKeyFieldName": {
@@ -47611,9 +47603,7 @@
             "minLength": 1,
             "type": "string"
           },
-          "value": {
-            "nullable": true
-          }
+          "value": { }
         },
         "additionalProperties": false
       },
@@ -47636,9 +47626,7 @@
             "minLength": 1,
             "type": "string"
           },
-          "value": {
-            "nullable": true
-          },
+          "value": { },
           "editorAlias": {
             "minLength": 1,
             "type": "string"
@@ -48422,9 +48410,7 @@
             "minLength": 1,
             "type": "string"
           },
-          "value": {
-            "nullable": true
-          }
+          "value": { }
         },
         "additionalProperties": false
       },
@@ -48447,9 +48433,7 @@
             "minLength": 1,
             "type": "string"
           },
-          "value": {
-            "nullable": true
-          },
+          "value": { },
           "editorAlias": {
             "minLength": 1,
             "type": "string"
@@ -50685,9 +50669,7 @@
             "minLength": 1,
             "type": "string"
           },
-          "value": {
-            "nullable": true
-          }
+          "value": { }
         },
         "additionalProperties": false
       },
