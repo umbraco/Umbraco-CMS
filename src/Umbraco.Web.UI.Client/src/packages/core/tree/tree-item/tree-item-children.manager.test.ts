@@ -1,5 +1,6 @@
 import { UmbTreeItemChildrenManager } from './tree-item-children.manager.js';
 import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
+import { UmbTreeItemsNotSupportedError } from '../data/tree-items-not-supported.error.js';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '../types.js';
 import { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import {
@@ -13,16 +14,35 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { aTimeout, expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
-type RequestCall = { parentUnique: string | null; skip?: number; take?: number };
+type RequestCall = { parentUnique: string | null; skip?: number; take?: number; paging?: any };
 
 class UmbTestTreeRepository {
 	public itemsOfCalls: Array<RequestCall> = [];
 	public rootCalls = 0;
+	public itemsCalls: Array<Array<string>> = [];
 	public items: Array<UmbTreeItemModel> = [];
 	public total?: number;
+	/** Items resolvable by unique, used by `requestTreeItems`. */
+	public itemsByUnique: Array<UmbTreeItemModel> = [];
+
+	/** Mirrors UmbTreeRepositoryBase, where the method always exists but reports a data source without support. */
+	public supportsItems = true;
+
+	async requestTreeItems(args: { uniques: Array<string> }) {
+		this.itemsCalls.push(args.uniques);
+
+		if (!this.supportsItems) {
+			return { data: undefined, error: new UmbTreeItemsNotSupportedError() };
+		}
+
+		const data = args.uniques
+			.map((unique) => this.itemsByUnique.find((item) => item.unique === unique))
+			.filter((item): item is UmbTreeItemModel => item !== undefined);
+		return { data };
+	}
 
 	async requestTreeItemsOf(args: any) {
-		this.itemsOfCalls.push({ parentUnique: args.parent.unique, skip: args.skip, take: args.take });
+		this.itemsOfCalls.push({ parentUnique: args.parent.unique, skip: args.skip, take: args.take, paging: args.paging });
 		return {
 			data: { items: this.items, total: this.total ?? this.items.length, totalBefore: 0, totalAfter: 0 },
 		};
@@ -200,6 +220,150 @@ describe('UmbTreeItemChildrenManager', () => {
 		});
 	});
 
+	describe('start nodes', () => {
+		const startNodeA = { unique: 'start-node-a', entityType: 'test-entity-type' };
+		const startNodeB = { unique: 'start-node-b', entityType: 'test-entity-type' };
+		const startNodeC = { unique: 'start-node-c', entityType: 'test-entity-type' };
+
+		const asItem = (node: { unique: string; entityType: string }): UmbTreeItemModel => ({
+			unique: node.unique,
+			entityType: node.entityType,
+			name: node.unique,
+			hasChildren: true,
+			isFolder: false,
+			parent: { unique: null, entityType: 'test-root-entity-type' },
+		});
+
+		// The states emit synchronously on subscribe, so this reads the current children.
+		const currentChildren = () => {
+			let children: Array<UmbTreeItemModel> = [];
+			manager.children.subscribe((items) => (children = items ?? [])).unsubscribe();
+			return children;
+		};
+
+		beforeEach(() => {
+			repository.itemsByUnique = [startNodeA, startNodeB, startNodeC].map(asItem);
+			manager.setTreeItem(treeRoot);
+		});
+
+		it('loads the start nodes themselves as children in a single request', async () => {
+			manager.setStartNodes([startNodeA, startNodeB]);
+
+			await manager.loadChildren();
+
+			expect(repository.itemsCalls).to.have.lengthOf(1);
+			expect(repository.itemsCalls[0]).to.deep.equal([startNodeA.unique, startNodeB.unique]);
+			expect(repository.itemsOfCalls).to.have.lengthOf(0);
+			expect(repository.rootCalls).to.equal(0);
+		});
+
+		it('keeps the requested order and drops start nodes that cannot be resolved', async () => {
+			repository.itemsByUnique = [asItem(startNodeB), asItem(startNodeA)];
+			manager.setStartNodes([startNodeA, startNodeB, startNodeC]);
+
+			await manager.loadChildren();
+
+			expect(currentChildren().map((child) => child.unique)).to.deep.equal([startNodeA.unique, startNodeB.unique]);
+		});
+
+		it('loads the children of a single start node instead of the start node itself', async () => {
+			manager.setStartNodes([startNodeA]);
+
+			await manager.loadChildren();
+
+			expect(repository.itemsCalls).to.have.lengthOf(0);
+			expect(repository.itemsOfCalls).to.have.lengthOf(1);
+			expect(repository.itemsOfCalls[0].parentUnique).to.equal(startNodeA.unique);
+		});
+
+		it('falls back to the first start node when the repository reports it cannot resolve items by unique', async () => {
+			// UmbTreeRepositoryBase always defines requestTreeItems and reports the lack of support through the
+			// returned error, so the fallback has to be driven by that rather than by a missing method.
+			repository.supportsItems = false;
+			manager.setStartNodes([startNodeA, startNodeB]);
+
+			await manager.loadChildren();
+
+			expect(repository.itemsCalls).to.have.lengthOf(1);
+			expect(repository.itemsOfCalls).to.have.lengthOf(1);
+			expect(repository.itemsOfCalls[0].parentUnique).to.equal(startNodeA.unique);
+		});
+
+		it('stays on the fallback for later loads once the repository has reported no support', async () => {
+			repository.supportsItems = false;
+			manager.setStartNodes([startNodeA, startNodeB]);
+
+			await manager.loadChildren();
+			await manager.loadChildren();
+
+			// Only the first load asks for items again; afterwards it goes straight to the children of the first node.
+			expect(repository.itemsCalls).to.have.lengthOf(1);
+			expect(repository.itemsOfCalls).to.have.lengthOf(2);
+		});
+
+		it('falls back when the repository has no support for resolving items by unique at all', async () => {
+			(repository as { requestTreeItems?: unknown }).requestTreeItems = undefined;
+			manager.setStartNodes([startNodeA, startNodeB]);
+
+			await manager.loadChildren();
+
+			expect(repository.itemsOfCalls).to.have.lengthOf(1);
+			expect(repository.itemsOfCalls[0].parentUnique).to.equal(startNodeA.unique);
+		});
+
+		it('paginates the start nodes and appends the next slice', async () => {
+			manager.setTakeSize(2);
+			manager.setStartNodes([startNodeA, startNodeB, startNodeC]);
+
+			await manager.loadChildren();
+
+			expect(repository.itemsCalls[0]).to.deep.equal([startNodeA.unique, startNodeB.unique]);
+			expect(manager.offsetPagination.getTotalItems()).to.equal(3);
+
+			await manager.loadNextChildren();
+
+			expect(repository.itemsCalls[1]).to.deep.equal([startNodeC.unique]);
+			expect(currentChildren()).to.have.lengthOf(3);
+		});
+
+		it('does not request anything above the start nodes', async () => {
+			manager.setStartNodes([startNodeA, startNodeB]);
+			await manager.loadChildren();
+
+			await manager.loadPrevChildren();
+
+			expect(repository.itemsCalls).to.have.lengthOf(1);
+			expect(repository.itemsOfCalls).to.have.lengthOf(0);
+		});
+
+		it('reloads the start nodes when one of them changes structure', async () => {
+			manager.setStartNodes([startNodeA, startNodeB]);
+			await manager.loadChildren();
+
+			actionEventContext.dispatchEvent(
+				new UmbRequestReloadStructureForEntityEvent({
+					entityType: startNodeA.entityType,
+					unique: startNodeA.unique,
+				}),
+			);
+
+			await aTimeout(0);
+
+			expect(repository.itemsCalls).to.have.lengthOf(2);
+		});
+
+		it('returns to the tree root items when the start nodes are removed', async () => {
+			manager.setStartNodes([startNodeA, startNodeB]);
+			await manager.loadChildren();
+
+			manager.setStartNodes(undefined);
+			manager.setTreeItem(undefined);
+			await manager.loadChildren();
+
+			expect(repository.rootCalls).to.equal(1);
+		});
+	});
+
 	describe('load next children', () => {
 		const parentFolder: UmbTreeItemModel = {
 			unique: 'parent-folder-id',
@@ -236,6 +400,72 @@ describe('UmbTreeItemChildrenManager', () => {
 			// would re-request page 1 (skip 0). It must instead reflect the already-loaded children.
 			expect(repository.itemsOfCalls.length).to.equal(2);
 			expect(repository.itemsOfCalls[1].skip).to.equal(firstPage.length);
+		});
+	});
+
+	describe('target window', () => {
+		const collection: UmbTreeItemModel = {
+			unique: 'collection-id',
+			entityType: 'test-entity-type',
+			name: 'Collection',
+			hasChildren: true,
+			isFolder: false,
+			parent: { unique: null, entityType: 'test-root-entity-type' },
+		};
+
+		const children: Array<UmbTreeItemModel> = Array.from({ length: 3 }, (_, i) => ({
+			unique: `child-${i}`,
+			entityType: 'test-entity-type',
+			name: `Child ${i}`,
+			hasChildren: false,
+			isFolder: false,
+			parent: { unique: collection.unique, entityType: collection.entityType },
+		}));
+
+		const reloadChildrenOfCollection = async () => {
+			actionEventContext.dispatchEvent(
+				new UmbRequestReloadChildrenOfEntityEvent({ entityType: collection.entityType, unique: collection.unique }),
+			);
+			await aTimeout(0);
+		};
+
+		beforeEach(() => {
+			repository.items = children;
+			manager.setTreeItem(collection);
+			manager.setTargetTakeSize(0, 0);
+		});
+
+		it('loads no children on reload when there is no target', async () => {
+			await reloadChildrenOfCollection();
+
+			expect(repository.itemsOfCalls.length).to.equal(0);
+			expect(manager.hasLoadedChildren()).to.be.false;
+		});
+
+		it('loads no children when there is no target', async () => {
+			await manager.loadChildren();
+
+			expect(repository.itemsOfCalls.length).to.equal(0);
+			expect(manager.hasLoadedChildren()).to.be.false;
+		});
+
+		it('keeps the children reported by the tree item when nothing is loaded', async () => {
+			await reloadChildrenOfCollection();
+
+			expect(manager.getHasChildren()).to.be.true;
+		});
+
+		it('reloads the target window when the target is not among the loaded items', async () => {
+			manager.targetPagination.setBaseTarget(children[1]);
+
+			await reloadChildrenOfCollection();
+
+			expect(repository.itemsOfCalls.length).to.equal(1);
+			expect(repository.itemsOfCalls[0].paging).to.deep.equal({
+				target: { unique: children[1].unique, entityType: children[1].entityType },
+				takeBefore: 0,
+				takeAfter: 0,
+			});
 		});
 	});
 });

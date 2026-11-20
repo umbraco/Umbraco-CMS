@@ -177,7 +177,121 @@ internal sealed class DomainCacheServiceTests
         });
     }
 
-    private static IDomain CreateDomain(int id, string name, int rootContentId, string culture, bool isWildcard)
+    [Test]
+    public void Can_Get_Assigned_Domains_Sorted_By_Sort_Order()
+    {
+        var domainService = new Mock<IDomainService>();
+        domainService
+#pragma warning disable CS0618 // Type or member is obsolete. This test is for the DomainCacheService, which still calls the obsolete GetAll(bool) method.
+            .Setup(x => x.GetAll(true))
+#pragma warning restore CS0618 // Type or member is obsolete
+            .Returns(
+            [
+                CreateDomain(1, "https://third.example/", 1001, "en-US", isWildcard: false, sortOrder: 2),
+                CreateDomain(2, "*1001", 1001, "da-DK", isWildcard: true, sortOrder: 0),
+                CreateDomain(3, "https://first.example/", 1001, "en-US", isWildcard: false, sortOrder: 1),
+                CreateDomain(4, "https://other-node.example/", 1002, "en-US", isWildcard: false, sortOrder: 0),
+            ]);
+
+        var sut = new DomainCacheService(domainService.Object, CreateScopeProvider());
+
+        int[] withoutWildcards = sut.GetAssigned(1001).Select(x => x.Id).ToArray();
+        int[] withWildcards = sut.GetAssigned(1001, includeWildcards: true).Select(x => x.Id).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(new[] { 3, 1 }, withoutWildcards);
+            Assert.AreEqual(new[] { 2, 3, 1 }, withWildcards);
+            Assert.IsEmpty(sut.GetAssigned(9999, includeWildcards: true));
+        });
+    }
+
+    [Test]
+    public void Can_Determine_Whether_A_Node_Has_Assigned_Domains()
+    {
+        var domainService = new Mock<IDomainService>();
+        domainService
+#pragma warning disable CS0618 // Type or member is obsolete. This test is for the DomainCacheService, which still calls the obsolete GetAll(bool) method.
+            .Setup(x => x.GetAll(true))
+#pragma warning restore CS0618 // Type or member is obsolete
+            .Returns(
+            [
+                CreateDomain(1, "https://site.example/", 1001, "en-US", isWildcard: false),
+                CreateDomain(2, "*1002", 1002, "en-US", isWildcard: true),
+            ]);
+
+        var sut = new DomainCacheService(domainService.Object, CreateScopeProvider());
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(sut.HasAssigned(1001));
+            Assert.IsTrue(sut.HasAssigned(1001, includeWildcards: true));
+            Assert.IsFalse(sut.HasAssigned(1002), "A node with only wildcard domains has no assigned domains when wildcards are excluded.");
+            Assert.IsTrue(sut.HasAssigned(1002, includeWildcards: true));
+            Assert.IsFalse(sut.HasAssigned(9999, includeWildcards: true));
+            Assert.IsFalse(sut.HasAssigned(0, includeWildcards: true));
+        });
+    }
+
+    [Test]
+    public void Can_Refresh_Assigned_Domains_When_A_Domain_Moves_Or_Is_Removed()
+    {
+        var domainService = new Mock<IDomainService>();
+        domainService
+#pragma warning disable CS0618 // Type or member is obsolete. This test is for the DomainCacheService, which still calls the obsolete GetAll(bool) method.
+            .Setup(x => x.GetAll(true))
+#pragma warning restore CS0618 // Type or member is obsolete
+            .Returns(
+            [
+                CreateDomain(1, "https://moving.example/", 1001, "en-US", isWildcard: false),
+                CreateDomain(2, "https://removed.example/", 1001, "en-US", isWildcard: false, sortOrder: 1),
+            ]);
+
+        var sut = new DomainCacheService(domainService.Object, CreateScopeProvider());
+        Assert.AreEqual(2, sut.GetAssigned(1001).Count());
+
+        domainService.Setup(x => x.GetById(1)).Returns(CreateDomain(1, "https://moving.example/", 1002, "en-US", isWildcard: false));
+        sut.Refresh(
+        [
+            new DomainCacheRefresher.JsonPayload(1, DomainChangeTypes.Refresh),
+            new DomainCacheRefresher.JsonPayload(2, DomainChangeTypes.Remove),
+        ]);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsEmpty(sut.GetAssigned(1001), "The moved and removed domains should no longer be assigned to their original node.");
+            Assert.IsFalse(sut.HasAssigned(1001));
+            Assert.AreEqual(new[] { 1 }, sut.GetAssigned(1002).Select(x => x.Id).ToArray(), "The moved domain should be assigned to its new node.");
+            Assert.AreEqual(new[] { 1 }, sut.GetAll(true).Select(x => x.Id).ToArray(), "All domains should reflect the same refresh as the assigned domains.");
+            Assert.AreEqual(1002, sut.GetAll(true).Single().ContentId);
+        });
+    }
+
+    [Test]
+    public void Can_Refresh_Assigned_Domains_On_RefreshAll()
+    {
+        var current = new List<IDomain> { CreateDomain(1, "https://site.example/", 1001, "en-US", isWildcard: false) };
+        var domainService = new Mock<IDomainService>();
+        domainService
+#pragma warning disable CS0618 // Type or member is obsolete. This test is for the DomainCacheService, which still calls the obsolete GetAll(bool) method.
+            .Setup(x => x.GetAll(true))
+#pragma warning restore CS0618 // Type or member is obsolete
+            .Returns(() => current.ToArray());
+
+        var sut = new DomainCacheService(domainService.Object, CreateScopeProvider());
+        Assert.IsTrue(sut.HasAssigned(1001));
+
+        current = [CreateDomain(2, "https://other.example/", 1002, "en-US", isWildcard: false)];
+        sut.Refresh([new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll)]);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(sut.HasAssigned(1001));
+            Assert.AreEqual(new[] { 2 }, sut.GetAssigned(1002).Select(x => x.Id).ToArray());
+        });
+    }
+
+    private static IDomain CreateDomain(int id, string name, int rootContentId, string culture, bool isWildcard, int sortOrder = 0)
     {
         var domain = new Mock<IDomain>();
         domain.SetupGet(x => x.Id).Returns(id);
@@ -185,7 +299,7 @@ internal sealed class DomainCacheServiceTests
         domain.SetupGet(x => x.RootContentId).Returns(rootContentId);
         domain.SetupGet(x => x.LanguageIsoCode).Returns(culture);
         domain.SetupGet(x => x.IsWildcard).Returns(isWildcard);
-        domain.SetupGet(x => x.SortOrder).Returns(0);
+        domain.SetupGet(x => x.SortOrder).Returns(sortOrder);
         return domain.Object;
     }
 

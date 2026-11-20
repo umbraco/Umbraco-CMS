@@ -1,5 +1,6 @@
 import { css, html, nothing, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UmbDataTypeDetailRepository, type UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
@@ -75,7 +76,7 @@ export class UmbPropertyEditorUIMissingBaseElement extends UmbLitElement impleme
 			</p>
 			<p>
 				<strong><umb-localize key="missingEditor_detailsDataType"></umb-localize></strong>:
-				<code>${this._dataTypeDetailModel?.name}</code><br />
+				<code dir="auto">${this._dataTypeDetailModel?.name}</code><br />
 				<strong><umb-localize key="missingEditor_detailsPropertyEditor"></umb-localize></strong>:
 				<code>${this._dataTypeDetailModel?.editorAlias}</code>
 				${this._displayPropertyEditorUi
@@ -93,6 +94,7 @@ export class UmbPropertyEditorUIMissingBaseElement extends UmbLitElement impleme
 	}
 
 	static override styles = [
+		UmbTextStyles,
 		css`
 			:host {
 				display: flex;

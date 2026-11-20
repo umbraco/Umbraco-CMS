@@ -31,7 +31,7 @@ const dataQueryFilter = (filterOptions: UmbDataTypeFilterOptions, item: UmbMockD
 	queryFilter(filterOptions.filter ?? '', item.name);
 
 class UmbDataTypeMockDB extends UmbEntityMockDbBase<UmbMockDataTypeModel> {
-	tree = new UmbMockEntityTreeManager<UmbMockDataTypeModel>(this, treeItemMapper);
+	tree = new UmbMockEntityTreeManager<UmbMockDataTypeModel>(this, (item) => treeItemMapper(item, this));
 	folder = new UmbMockEntityFolderManager<UmbMockDataTypeModel>(this, createFolderMockMapper);
 	item = new UmbMockEntityNamedItemManager<UmbMockDataTypeModel>(this, itemResponseMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockDataTypeModel>(this, createDetailMockMapper, detailResponseMapper);
@@ -63,13 +63,15 @@ class UmbDataTypeMockDB extends UmbEntityMockDbBase<UmbMockDataTypeModel> {
 	}
 }
 
-const treeItemMapper = (model: UmbMockDataTypeModel): DataTypeTreeItemResponseModel => {
+const treeItemMapper = (model: UmbMockDataTypeModel, db: UmbDataTypeMockDB): DataTypeTreeItemResponseModel => {
 	return {
 		name: model.name,
 		hasChildren: model.hasChildren,
 		id: model.id,
 		parent: model.parent,
+		parentIsFolder: model.parent ? (db.read(model.parent.id)?.isFolder ?? false) : false,
 		isFolder: model.isFolder,
+		editorUiAlias: model.editorUiAlias,
 		isDeletable: model.isDeletable,
 		flags: model.flags,
 	};
@@ -124,6 +126,7 @@ const itemResponseMapper = (item: UmbMockDataTypeModel): DataTypeItemResponseMod
 		id: item.id,
 		name: item.name,
 		editorAlias: item.editorAlias,
+		editorUiAlias: item.editorUiAlias,
 		isDeletable: item.isDeletable,
 		flags: item.flags,
 	};

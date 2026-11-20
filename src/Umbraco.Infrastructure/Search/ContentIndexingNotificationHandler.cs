@@ -127,7 +127,7 @@ public sealed class ContentIndexingNotificationHandler :
                     while (page * pageSize < total)
                     {
                         // order by shallowest to deepest, this allows us to check it's published state without checking every item
-                        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(content.Id, page++, pageSize, out total, ordering: Ordering.By("Path"));
+                        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(content.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: Ordering.By("Path"));
 
                         foreach (IContent descendant in descendants)
                         {

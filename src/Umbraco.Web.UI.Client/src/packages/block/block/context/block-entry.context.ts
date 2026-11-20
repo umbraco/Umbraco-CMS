@@ -20,6 +20,7 @@ import {
 import {
 	encodeFilePath,
 	escapeHTML,
+	transformServerPathToClientPath,
 	UmbDeprecation,
 	UmbReadOnlyVariantGuardManager,
 } from '@umbraco-cms/backoffice/utils';
@@ -37,6 +38,7 @@ import type {
 	UmbPropertyTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,
@@ -59,6 +61,8 @@ export abstract class UmbBlockEntryContext<
 	protected _manager?: BlockManagerContextType;
 	protected _entries?: BlockEntriesContextType;
 
+	#serverUrl = '';
+
 	#contentKey?: string;
 	#unsupported = new UmbBooleanState(undefined);
 	readonly unsupported = this.#unsupported.asObservable();
@@ -71,6 +75,12 @@ export abstract class UmbBlockEntryContext<
 
 	#hasExpose = new UmbBooleanState(undefined);
 	readonly hasExpose = this.#hasExpose.asObservable();
+
+	#variesByVariant = new UmbBooleanState(undefined);
+	/**
+	 * Whether the content type of the block varies by culture or segment.
+	 */
+	readonly variesByVariant = this.#variesByVariant.asObservable();
 
 	#actionsVisibility = new UmbBooleanState(true);
 	readonly actionsVisibility = this.#actionsVisibility.asObservable();
@@ -142,6 +152,25 @@ export abstract class UmbBlockEntryContext<
 	public readonly settingsElementTypeKey = this._blockType.asObservablePart((x) =>
 		x ? (x.settingsElementTypeKey ?? undefined) : null,
 	);
+
+	/**
+	 * Returns the thumbnail path as stored in the block type configuration.
+	 * Use {@link getThumbnailUrl} to get the resolved, client-usable URL.
+	 * @returns {string | undefined} The configured thumbnail path, or undefined when the block type has none.
+	 */
+	public getThumbnail(): string | undefined {
+		return this._blockType.getValue()?.thumbnail;
+	}
+
+	/**
+	 * Returns the thumbnail as a resolved, client-usable URL.
+	 * Use {@link getThumbnail} to get the raw path instead.
+	 * @returns {{ src: string } | undefined} The thumbnail URL, or undefined when the block type has no thumbnail.
+	 */
+	public getThumbnailUrl(): { src: string } | undefined {
+		const rawPath = this.getThumbnail();
+		return rawPath ? { src: new URL(transformServerPathToClientPath(rawPath), this.#serverUrl).href } : undefined;
+	}
 
 	protected _layout = new UmbObjectState<BlockLayoutType | undefined>(undefined);
 	public readonly layout = this._layout.asObservable();
@@ -402,6 +431,10 @@ export abstract class UmbBlockEntryContext<
 			this.#gotEntries();
 		});
 
+		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+			this.#serverUrl = instance?.getServerUrl() ?? '';
+		});
+
 		// Observe key:
 		this.observe(
 			this.unique,
@@ -645,6 +678,7 @@ export abstract class UmbBlockEntryContext<
 			([variantId, variesByCulture, variesBySegment]) => {
 				if (!variantId || variesByCulture === undefined || variesBySegment === undefined) return;
 				this.#variantId.setValue(variantId.toVariant(variesByCulture, variesBySegment));
+				this.#variesByVariant.setValue(variesByCulture || variesBySegment);
 				this.#gotVariantId();
 			},
 			'observeVariantId',
@@ -814,6 +848,16 @@ export abstract class UmbBlockEntryContext<
 		const variantId = this.#variantId.getValue();
 		if (!variantId || !this.#contentKey) return;
 		this._manager?.setOneExpose(this.#contentKey, variantId);
+	}
+
+	/**
+	 * Reverts the expose of the block for the current variant, returning it to the not-yet-created state.
+	 * The content values of the variant are kept, so exposing again restores them.
+	 */
+	public unexpose() {
+		const variantId = this.#variantId.getValue();
+		if (!variantId || !this.#contentKey) return;
+		this._manager?.removeOneExpose(this.#contentKey, variantId);
 	}
 
 	/**

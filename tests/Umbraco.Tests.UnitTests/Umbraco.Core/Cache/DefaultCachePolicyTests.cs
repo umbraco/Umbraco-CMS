@@ -142,4 +142,34 @@ public class DefaultCachePolicyTests
             Assert.IsTrue(cacheCleared);
         }
     }
+
+    /// <summary>
+    ///     Repository reads may run while the scope holds a distributed lock, so the policy must check the cache version
+    ///     through the synchronous member and never await the asynchronous one.
+    /// </summary>
+    [Test]
+    public void Get_ChecksTheCacheVersionSynchronously()
+    {
+        var versionService = new Mock<IRepositoryCacheVersionService>(MockBehavior.Strict);
+        versionService.Setup(x => x.IsCacheSynced<AuditItem>()).Returns(true);
+        var cache = new Mock<IAppPolicyCache>();
+        var policy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions(), versionService.Object, Mock.Of<ICacheSyncService>());
+
+        policy.Get(1, id => new AuditItem(1, AuditType.Copy, 123, "test", "blah"), o => null);
+
+        versionService.Verify(x => x.IsCacheSynced<AuditItem>(), Times.Once);
+    }
+
+    [Test]
+    public void Update_RegistersTheCacheChangeSynchronously()
+    {
+        var versionService = new Mock<IRepositoryCacheVersionService>(MockBehavior.Strict);
+        versionService.Setup(x => x.SetCacheUpdated<AuditItem>());
+        var cache = new Mock<IAppPolicyCache>();
+        var policy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions(), versionService.Object, Mock.Of<ICacheSyncService>());
+
+        policy.Update(new AuditItem(1, AuditType.Copy, 123, "test", "blah"), _ => { });
+
+        versionService.Verify(x => x.SetCacheUpdated<AuditItem>(), Times.Once);
+    }
 }

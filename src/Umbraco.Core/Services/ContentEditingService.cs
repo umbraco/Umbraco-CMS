@@ -87,6 +87,20 @@ internal sealed class ContentEditingService
     /// <inheritdoc/>
     protected override string? RelateParentOnDeleteAlias => Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
 
+    /// <inheritdoc/>
+    protected override async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, IContentType contentType)
+    {
+        // Documents cannot be created from element types. They aren't provided as allowed types, but a direct API or service
+        // request could try to create one. An element type can still be flagged as allowed at root or as a child, as these
+        // settings are retained when a content type is converted to an element type.
+        if (contentType.IsElement)
+        {
+            return (null, ContentEditingOperationStatus.NotAllowed);
+        }
+
+        return await base.TryGetAndValidateParentIdAsync(parentKey, contentType);
+    }
+
     /// <inheritdoc />
     public Task<IContent?> GetAsync(Guid key)
     {
@@ -522,7 +536,9 @@ internal sealed class ContentEditingService
         try
         {
             var currentUserId = await GetUserIdAsync(userKey);
-            OperationResult saveResult = ContentService.Save(content, currentUserId);
+            OperationResult saveResult = await ContentWriteGate.Shared.RunAsync(
+                () => ContentService.Save(content, currentUserId),
+                callerIsInScope: CoreScopeProvider.Context is not null);
             return saveResult.Result switch
             {
                 // these are the only result states currently expected from Save
@@ -554,7 +570,9 @@ internal sealed class ContentEditingService
         try
         {
             var currentUserId = await GetUserIdAsync(userKey);
-            PublishResult publishResult = ContentService.SaveAndPublish(content, culturesToPublish.ToArray(), userId: currentUserId);
+            PublishResult publishResult = await ContentWriteGate.Shared.RunAsync(
+                () => ContentService.SaveAndPublish(content, culturesToPublish.ToArray(), userId: currentUserId),
+                callerIsInScope: CoreScopeProvider.Context is not null);
             if (publishResult.Success)
             {
                 return (

@@ -23,6 +23,19 @@ public interface IRepositoryCacheVersionAccessor
     Task<RepositoryCacheVersion?> GetAsync(string cacheKey);
 
     /// <summary>
+    /// Retrieves the cache version for the specified cache key without leaving the calling thread.
+    /// </summary>
+    /// <param name="cacheKey">The unique identifier for the cache entry.</param>
+    /// <returns>The cache version if found, or <see langword="null"/> if the version doesn't exist or the request is a client-side request.</returns>
+    /// <remarks>
+    /// Used on paths that run while a distributed lock is held, where awaiting the database read would hand the
+    /// continuation to another thread-pool thread and lengthen the time the lock is held.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    RepositoryCacheVersion? Get(string cacheKey)
+        => GetAsync(cacheKey).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Notifies of a version change on a given cache key.
     /// </summary>
     /// <param name="cacheKey">Key of the changed version.</param>

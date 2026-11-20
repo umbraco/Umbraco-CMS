@@ -15,6 +15,8 @@ Image processing library using **ImageSharp 3.x** and **ImageSharp.Web** for on-
 - **SixLabors.ImageSharp** - Image processing library
 - **SixLabors.ImageSharp.Web** - ASP.NET Core middleware for query string-based image manipulation
 
+Both packages validate a licence key at build time; the key and its renewal details are in `SIXLABORS-LICENSE.md`.
+
 ### Dependencies
 
 - `Umbraco.Web.Common` - Web infrastructure

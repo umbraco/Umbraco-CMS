@@ -197,6 +197,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -370,6 +376,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -512,6 +524,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -644,6 +662,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -820,6 +844,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -1183,6 +1213,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -1356,6 +1392,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -1497,6 +1539,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DataType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -2352,6 +2400,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DictionaryItem.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -2525,6 +2579,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DictionaryItem.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -2666,6 +2726,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DictionaryItem.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -2882,6 +2948,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DictionaryItem.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -3029,6 +3101,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DictionaryItem.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -5020,6 +5098,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -5167,6 +5251,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -5308,6 +5398,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -5777,6 +5873,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -5984,6 +6086,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -6127,6 +6235,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -6323,6 +6437,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Template.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -6712,6 +6832,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -6885,6 +7011,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -7026,6 +7158,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -7174,6 +7312,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.DocumentType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -13847,6 +13991,14 @@
             }
           },
           {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
             "name": "height",
             "in": "query",
             "schema": {
@@ -14720,6 +14872,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Language.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -14888,6 +15046,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Language.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -15028,6 +15192,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Language.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -16254,6 +16424,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -16401,6 +16577,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -16542,6 +16724,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -16931,6 +17119,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -17138,6 +17332,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -17281,6 +17481,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -17733,6 +17939,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -17906,6 +18118,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -18047,6 +18265,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -18195,6 +18419,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MediaType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -20382,6 +20612,14 @@
                 "format": "uuid"
               }
             }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -21684,6 +21922,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberGroup.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -21846,6 +22090,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberGroup.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -21987,6 +22237,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberGroup.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -22356,6 +22612,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -22503,6 +22765,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -22644,6 +22912,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -22883,6 +23157,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -23090,6 +23370,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -23233,6 +23519,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -23685,6 +23977,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -23858,6 +24156,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -23999,6 +24303,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -24147,6 +24457,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.MemberType.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -26943,6 +27259,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -27114,6 +27436,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -27254,6 +27582,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -27413,6 +27747,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -27560,6 +27900,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -27731,6 +28077,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.PartialView.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -29206,6 +29558,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Script.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -29377,6 +29735,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Script.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -29517,6 +29881,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Script.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -29676,6 +30046,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Script.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -29823,6 +30199,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Script.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -29994,6 +30376,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Script.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -31415,6 +31803,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -31586,6 +31980,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -31726,6 +32126,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -31885,6 +32291,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -32032,6 +32444,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -32203,6 +32621,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Stylesheet.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -33021,6 +33445,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Template.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -33194,6 +33624,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Template.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -33335,6 +33771,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Template.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -39595,6 +40037,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -39796,6 +40241,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Webhook.Create\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -39969,6 +40420,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Webhook.Delete\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -40110,6 +40567,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Denied-Permission": {
+                "description": "Present when environment permissions denied the request, naming the permission verb it was denied, for example \"Umb.Webhook.Update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -42941,7 +43404,8 @@
           "id",
           "isDeletable",
           "isFolder",
-          "name"
+          "name",
+          "parentIsFolder"
         ],
         "type": "object",
         "properties": {
@@ -42974,6 +43438,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "editorUiAlias": {
@@ -43421,6 +43888,7 @@
           "id",
           "isFolder",
           "name",
+          "parentIsFolder",
           "variants"
         ],
         "type": "object",
@@ -43454,6 +43922,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "documentType": {
@@ -44566,7 +45037,8 @@
           "id",
           "isElement",
           "isFolder",
-          "name"
+          "name",
+          "parentIsFolder"
         ],
         "type": "object",
         "properties": {
@@ -44599,6 +45071,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "isElement": {
@@ -47028,7 +47503,8 @@
           "id",
           "isDeletable",
           "isFolder",
-          "name"
+          "name",
+          "parentIsFolder"
         ],
         "type": "object",
         "properties": {
@@ -47061,6 +47537,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "icon": {
@@ -47880,7 +48359,8 @@
           "icon",
           "id",
           "isFolder",
-          "name"
+          "name",
+          "parentIsFolder"
         ],
         "type": "object",
         "properties": {
@@ -47913,6 +48393,9 @@
             "type": "string"
           },
           "isFolder": {
+            "type": "boolean"
+          },
+          "parentIsFolder": {
             "type": "boolean"
           },
           "icon": {
@@ -54508,13 +54991,16 @@
             "type": "string"
           },
           "events": {
-            "type": "string"
+            "type": "string",
+            "deprecated": true
           },
           "url": {
-            "type": "string"
+            "type": "string",
+            "deprecated": true
           },
           "types": {
-            "type": "string"
+            "type": "string",
+            "deprecated": true
           }
         },
         "additionalProperties": false

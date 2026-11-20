@@ -28,6 +28,7 @@ export class UmbManagementApiDetailDataCacheInvalidationManager<DetailResponseMo
 
 			this.consumeContext(UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT, (context) => {
 				this.#serverEventContext = context;
+				this.#observeServerEventsConnection();
 				this.#observeServerEvents();
 			});
 		}
@@ -43,6 +44,19 @@ export class UmbManagementApiDetailDataCacheInvalidationManager<DetailResponseMo
 		this._dataCache.delete(event.key);
 	}
 
+	#observeServerEventsConnection() {
+		this.observe(
+			this.#serverEventContext?.isConnected,
+			(isConnected) => {
+				/* We purposefully ignore the initial value of isConnected.
+				We only care about whether the connection is established or not (true/false) */
+				if (isConnected === undefined) return;
+				this._dataCache.setServerEventsConnected(isConnected);
+			},
+			'umbObserveServerEventsConnection',
+		);
+	}
+
 	#observeServerEvents() {
 		this.observe(
 			this.#serverEventContext?.byEventSourcesAndEventTypes(this.#eventSources, this.#eventTypes),
@@ -55,6 +69,7 @@ export class UmbManagementApiDetailDataCacheInvalidationManager<DetailResponseMo
 	}
 
 	override destroy(): void {
-		this._dataCache.clear();
+		this._dataCache.setServerEventsConnected(false);
+		super.destroy();
 	}
 }

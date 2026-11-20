@@ -19,6 +19,7 @@ import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
 import '@umbraco-cms/backoffice/entity-item';
+import { isAboveZeroAndBelowMinimum } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-user-group-input')
 export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -37,13 +38,13 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 	}
 
 	/**
-	 * Min validation message.
+	 * Min validation message. When not set, a localized message stating the minimum and how many more items are needed is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field needs more items';
+	minMessage?: string;
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -60,13 +61,13 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 	}
 
 	/**
-	 * Max validation message.
+	 * Max validation message. When not set, a localized message stating the maximum and how many items are over it is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'max-message' })
-	maxMessage = 'This field exceeds the allowed amount of items';
+	maxMessage?: string;
 
 	public set selection(ids: Array<string>) {
 		this.#pickerContext.setSelection(ids);
@@ -100,13 +101,25 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 
 		this.addValidator(
 			'rangeUnderflow',
-			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() =>
+				this.minMessage ||
+				this.localize.term(
+					'validation_entriesShort',
+					this.min,
+					(this.min ?? 0) - this.#pickerContext.getSelection().length,
+				),
+			() => isAboveZeroAndBelowMinimum(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(
 			'rangeOverflow',
-			() => this.maxMessage,
+			() =>
+				this.maxMessage ||
+				this.localize.term(
+					'validation_entriesExceed',
+					this.max,
+					this.#pickerContext.getSelection().length - (this.max ?? 0),
+				),
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 

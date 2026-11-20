@@ -1,6 +1,7 @@
 import type { UmbTreeItemPickerBreadcrumbItem } from '../components/tree-item-picker-breadcrumb/index.js';
 import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { ManifestTree } from '../extensions/types.js';
+import { resolveTreeStartNodes } from '../utils/index.js';
 import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -56,7 +57,10 @@ export class UmbTreeItemPickerLocationManager extends UmbControllerBase {
 
 	#interactionMemoryManager?: UmbInteractionMemoryManager;
 	#treeAlias?: string;
+	#configuredStartNode?: UmbTreeStartNode;
+	#configuredStartNodes?: Array<UmbTreeStartNode>;
 	#startNode?: UmbTreeStartNode;
+	#startNodes?: Array<UmbTreeStartNode>;
 	#repository?: UmbTreeRepository;
 	#loaded = false;
 	#loadPromise?: Promise<void>;
@@ -76,7 +80,73 @@ export class UmbTreeItemPickerLocationManager extends UmbControllerBase {
 	 * @memberof UmbTreeItemPickerLocationManager
 	 */
 	setStartNode(startNode: UmbTreeStartNode | undefined) {
+		this.#configuredStartNode = startNode;
+		this.#resolveStartNodes();
+	}
+
+	/**
+	 * Sets several nodes the picker may not browse above, browsed from the tree root. Set it before the tree alias, as
+	 * the alias starts the load. Takes precedence over the start node, and a single node is handled as the start node.
+	 * @param {Array<UmbTreeStartNode>} [startNodes] - The nodes to start from.
+	 * @memberof UmbTreeItemPickerLocationManager
+	 */
+	setStartNodes(startNodes: Array<UmbTreeStartNode> | undefined) {
+		this.#configuredStartNodes = startNodes;
+		this.#resolveStartNodes();
+	}
+
+	/**
+	 * Returns the single node the picker is scoped to.
+	 * @returns {UmbTreeStartNode | undefined} The start node, or undefined when the picker is scoped to several nodes or
+	 * to none.
+	 * @memberof UmbTreeItemPickerLocationManager
+	 */
+	getStartNode(): UmbTreeStartNode | undefined {
+		return this.#startNode;
+	}
+
+	/**
+	 * Returns the nodes the picker is scoped to when it is scoped to more than one.
+	 * @returns {Array<UmbTreeStartNode> | undefined} Two or more start nodes, or undefined otherwise.
+	 * @memberof UmbTreeItemPickerLocationManager
+	 */
+	getStartNodes(): Array<UmbTreeStartNode> | undefined {
+		return this.#startNodes;
+	}
+
+	/**
+	 * Determines whether a node is only there to be browsed into. When the picker is scoped to several start nodes they
+	 * take the place of the tree root, so they cannot be picked themselves.
+	 * @param {string | null} [unique] - The unique of the node.
+	 * @returns {boolean} True when the node is one of several start nodes.
+	 * @memberof UmbTreeItemPickerLocationManager
+	 */
+	isBrowseOnlyStartNode(unique: string | null | undefined): boolean {
+		if (!unique || !this.#startNodes) return false;
+		return this.#startNodes.some((startNode) => startNode.unique === unique);
+	}
+
+	/**
+	 * Determines whether an item that was not reached by browsing the tree, such as a search result, lies within the
+	 * start nodes. With several start nodes the item must have one of them among its ancestors, so an item that carries
+	 * no ancestors is out of scope. With a single start node or none, the scope is applied where the items are fetched,
+	 * so every item is within it.
+	 * @param {{ unique?: string | null; ancestors?: Array<{ unique: string | null }> }} item - The item to check.
+	 * @param {string | null} [item.unique] - The unique of the item.
+	 * @param {Array<{ unique: string | null }>} [item.ancestors] - The ancestors of the item.
+	 * @returns {boolean} True when the item lies within the start nodes.
+	 * @memberof UmbTreeItemPickerLocationManager
+	 */
+	isWithinStartNodes(item: { unique?: string | null; ancestors?: Array<{ unique: string | null }> }): boolean {
+		if (!this.#startNodes) return true;
+		if (this.isBrowseOnlyStartNode(item.unique)) return false;
+		return item.ancestors?.some((ancestor) => this.isBrowseOnlyStartNode(ancestor.unique)) ?? false;
+	}
+
+	#resolveStartNodes() {
+		const { startNode, startNodes } = resolveTreeStartNodes(this.#configuredStartNode, this.#configuredStartNodes);
 		this.#startNode = startNode;
+		this.#startNodes = startNodes;
 	}
 
 	/**
@@ -258,13 +328,26 @@ export class UmbTreeItemPickerLocationManager extends UmbControllerBase {
 	 * @returns {Array<UmbTreeItemPickerLocation>} The trail.
 	 */
 	#toTrail(items: Array<UmbTreeItemModel>): Array<UmbTreeItemPickerLocation> {
-		if (this.#startNode) {
-			const ceilingIndex = items.findIndex((item) => item.unique === this.#startNode!.unique);
-			return ceilingIndex >= 0 ? items.slice(ceilingIndex) : items;
-		}
+		const sliced = this.#sliceToScope(items);
+		if (this.#startNode) return sliced;
 
 		const root = this.#trail.getValue().find((node) => node.unique === null);
-		return root ? [root, ...items] : items;
+		return root ? [root, ...sliced] : sliced;
+	}
+
+	// Ancestors above the scope of the picker must not be reachable from the trail, so the chain is cut at the start
+	// node it belongs to — with multiple start nodes, whichever of them is an ancestor or self.
+	#sliceToScope(items: Array<UmbTreeItemModel>): Array<UmbTreeItemModel> {
+		const scopeUniques = this.#getScopeUniques();
+		if (scopeUniques.length === 0) return items;
+
+		const ceilingIndex = items.findIndex((item) => item.unique !== null && scopeUniques.includes(item.unique));
+		return ceilingIndex >= 0 ? items.slice(ceilingIndex) : items;
+	}
+
+	#getScopeUniques(): Array<string> {
+		if (this.#startNode) return [this.#startNode.unique];
+		return this.#startNodes?.map((startNode) => startNode.unique) ?? [];
 	}
 
 	#setTrail(trail: Array<UmbTreeItemPickerLocation>) {
@@ -310,10 +393,11 @@ export class UmbTreeItemPickerLocationManager extends UmbControllerBase {
 	async #restoreFromMemory(entity: UmbTreeStartNode) {
 		if (!this.#repository) return;
 
-		if (this.#startNode) {
+		const scopeUniques = this.#getScopeUniques();
+		if (scopeUniques.length > 0) {
 			const { data } = await this.#repository.requestTreeItemAncestors({ treeItem: entity });
-			const isWithinStartNode = (data ?? []).some((ancestor) => ancestor.unique === this.#startNode!.unique);
-			if (!isWithinStartNode) return;
+			const isWithinScope = (data ?? []).some((ancestor) => scopeUniques.includes(ancestor.unique));
+			if (!isWithinScope) return;
 		}
 
 		await this.navigateTo(entity);

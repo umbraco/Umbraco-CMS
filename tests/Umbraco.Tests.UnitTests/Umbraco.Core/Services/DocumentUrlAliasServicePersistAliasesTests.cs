@@ -6,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -34,7 +35,6 @@ public class DocumentUrlAliasServicePersistAliasesTests
 
         var languageServiceMock = new Mock<ILanguageService>();
         languageServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(languages ?? []);
-        languageServiceMock.Setup(x => x.GetDefaultIsoCodeAsync()).ReturnsAsync("en-US");
 
         var keyValueServiceMock = new Mock<IKeyValueService>();
         keyValueServiceMock.Setup(x => x.GetValue(DocumentUrlAliasService.RebuildKey)).Returns("1");
@@ -65,7 +65,8 @@ public class DocumentUrlAliasServicePersistAliasesTests
             keyValueServiceMock.Object,
             contentServiceMock.Object,
             Mock.Of<IDocumentNavigationQueryService>(),
-            serverRoleAccessorMock.Object);
+            serverRoleAccessorMock.Object,
+            Mock.Of<IDefaultCultureAccessor>(x => x.DefaultCulture == "en-US"));
 
         return new ServiceUnderTest(service, aliasRepositoryMock, contentServiceMock, coreScopeMock);
     }
@@ -89,6 +90,7 @@ public class DocumentUrlAliasServicePersistAliasesTests
         contentMock.Setup(x => x.Trashed).Returns(trashed);
         contentMock.Setup(x => x.Blueprint).Returns(blueprint);
         contentMock.Setup(x => x.PublishedState).Returns(publishedState);
+        contentMock.Setup(x => x.Published).Returns(publishedState is PublishedState.Published or PublishedState.Publishing);
         contentMock.Setup(x => x.IsPropertyDirty(nameof(IContent.Trashed))).Returns(trashedChanged);
         contentMock.Setup(x => x.ContentType).Returns(contentTypeMock.Object);
         contentMock.Setup(x => x.Properties).Returns(propertyCollectionMock.Object);
@@ -121,6 +123,7 @@ public class DocumentUrlAliasServicePersistAliasesTests
         var contentMock = new Mock<IContent>();
         contentMock.Setup(x => x.Key).Returns(Guid.NewGuid());
         contentMock.Setup(x => x.PublishedState).Returns(publishedState);
+        contentMock.Setup(x => x.Published).Returns(publishedState is PublishedState.Published or PublishedState.Publishing);
         contentMock.Setup(x => x.ContentType).Returns(contentTypeMock.Object);
         contentMock.Setup(x => x.Properties).Returns(propertyCollectionMock.Object);
         contentMock.Setup(x => x.GetValue<string>(

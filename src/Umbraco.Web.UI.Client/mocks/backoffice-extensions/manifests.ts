@@ -13,4 +13,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		element: () => import('./examples-header-app.element.js'),
 		weight: 999,
 	},
+	{
+		type: 'headerApp',
+		alias: 'Mock.HeaderApp.MockUserSwitcher',
+		name: 'Mock User Switcher Header App',
+		element: () => import('./mock-user-header-app.element.js'),
+		weight: 998,
+	},
 ];

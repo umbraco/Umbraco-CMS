@@ -644,6 +644,13 @@ internal partial class UserService : RepositoryService, IUserService
 
         ICoreBackOfficeUserManager userManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
         IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+        IForgotPasswordUriProvider uriProvider = serviceScope.ServiceProvider.GetRequiredService<IForgotPasswordUriProvider>();
+
+        Attempt<UserOperationStatus> canCreateUriAttempt = await uriProvider.CanCreateForgotPasswordUriAsync();
+        if (canCreateUriAttempt.Success is false)
+        {
+            return Attempt.Fail(canCreateUriAttempt.Result);
+        }
 
         IUser? user = await userStore.GetByEmailAsync(userEmail);
 
@@ -652,7 +659,6 @@ internal partial class UserService : RepositoryService, IUserService
             return Attempt.Fail(UserOperationStatus.UserNotFound);
         }
 
-        IForgotPasswordUriProvider uriProvider = serviceScope.ServiceProvider.GetRequiredService<IForgotPasswordUriProvider>();
         Attempt<Uri, UserOperationStatus> uriAttempt = await uriProvider.CreateForgotPasswordUriAsync(user);
         if (uriAttempt.Success is false)
         {
@@ -679,7 +685,7 @@ internal partial class UserService : RepositoryService, IUserService
             return Attempt.Fail(UserOperationStatus.UnknownFailure);
         }
 
-        userManager.NotifyForgotPasswordRequested(new ClaimsPrincipal(), user.Id.ToString()); //A bit of a hack, but since this method will be used without a signed in user, there is no real principal anyway.
+        await userManager.NotifyForgotPasswordRequestedAsync(new ClaimsPrincipal(), user.Id.ToString()); //A bit of a hack, but since this method will be used without a signed in user, there is no real principal anyway.
 
         scope.Complete();
 

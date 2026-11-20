@@ -399,6 +399,40 @@ internal sealed partial class UserServiceCrudTests
         Assert.IsEmpty(updatedUser.StartMediaIds);
     }
 
+    [TestCase(true, false)]
+    [TestCase(false, true)]
+    public async Task Cannot_Assign_Root_As_User_Start_Node_Without_Root_Access(bool contentRootAccess, bool mediaRootAccess)
+    {
+        var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
+        var (performingUser, updateModel, targetUser) = await CreateRestrictedUserAndTargetUser(userService);
+        updateModel.HasContentRootAccess = contentRootAccess;
+        updateModel.HasMediaRootAccess = mediaRootAccess;
+
+        var result = await userService.UpdateAsync(performingUser.Key, updateModel);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserOperationStatus.Unauthorized, result.Status);
+        var updatedUser = await userService.GetAsync(targetUser.Key);
+        Assert.IsNotNull(updatedUser);
+        Assert.IsEmpty(updatedUser.StartContentIds!);
+        Assert.IsEmpty(updatedUser.StartMediaIds!);
+    }
+
+    [Test]
+    public async Task Can_Assign_User_Start_Nodes_Within_Own_Start_Nodes()
+    {
+        var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
+        var (performingUser, updateModel, targetUser) = await CreateRestrictedUserAndTargetUser(userService);
+        updateModel.ContentStartNodeKeys = new HashSet<Guid> { Subpage.Key };
+
+        var result = await userService.UpdateAsync(performingUser.Key, updateModel);
+
+        Assert.IsTrue(result.Success, $"Could not update the user: {result.Status}");
+        var updatedUser = await userService.GetAsync(targetUser.Key);
+        Assert.IsNotNull(updatedUser);
+        CollectionAssert.AreEqual(new[] { Subpage.Id }, updatedUser.StartContentIds);
+    }
+
     [TestCase(false, false)]
     [TestCase(true, true)]
     public async Task Cannot_Remove_Admin_Group_From_Only_Admin_User(bool createAdditionalAdminUser, bool expectSuccess)
@@ -496,5 +530,45 @@ internal sealed partial class UserServiceCrudTests
         var updatedUser = await userService.GetAsync(createdUser.Key);
         Assert.IsNotNull(updatedUser);
         Assert.AreEqual(isoCode, updatedUser.Language);
+    }
+
+    private async Task<(IUser PerformingUser, UserUpdateModel UpdateModel, IUser TargetUser)> CreateRestrictedUserAndTargetUser(IUserService userService)
+    {
+        var mediaService = GetRequiredService<IMediaService>();
+        var mediaStartNode = mediaService.CreateMediaWithIdentity("restricted", Constants.System.Root, Constants.Conventions.MediaTypes.Folder);
+
+        IUserGroup userGroup = new UserGroup(ShortStringHelper)
+        {
+            Alias = "restricted",
+            Name = "Restricted",
+            StartContentId = Textpage.Id,
+            StartMediaId = mediaStartNode.Id,
+        };
+        userGroup.AddAllowedSection(Constants.Applications.Content);
+        userGroup.AddAllowedSection(Constants.Applications.Media);
+        userGroup.AddAllowedSection(Constants.Applications.Users);
+        var userGroupResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
+        Assert.IsTrue(userGroupResult.Success, $"Could not create the user group: {userGroupResult.Status}");
+
+        async Task<IUser> CreateUser(string name)
+        {
+            var createResult = await userService.CreateAsync(
+                Constants.Security.SuperUserKey,
+                new UserCreateModel
+                {
+                    Email = $"{name}@test.com",
+                    UserName = name,
+                    Name = name,
+                    UserGroupKeys = new HashSet<Guid> { userGroupResult.Result.Key },
+                },
+                true);
+            Assert.IsTrue(createResult.Success, $"Could not create the user: {createResult.Status}");
+            return createResult.Result.CreatedUser!;
+        }
+
+        var performingUser = await CreateUser("performing");
+        var targetUser = await CreateUser("target");
+
+        return (performingUser, await MapUserToUpdateModel(targetUser), targetUser);
     }
 }

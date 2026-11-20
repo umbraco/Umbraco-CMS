@@ -38,11 +38,12 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     private readonly ICacheManager _cacheManager;
     private readonly IPublishStatusManagementService _publishStatusManagementService;
     private readonly IIdKeyMap _idKeyMap;
+    private readonly IPublishedContentTypeCache _publishedContentTypeCache;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor also taking IPublishedContentTypeCache. Scheduled for removal in Umbraco 19.")]
     public ContentCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -73,7 +74,48 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             contentService,
             publishStatusManagementService,
             documentCacheService,
-            cacheManager)
+            cacheManager,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentTypeCache>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
+    /// </summary>
+    [Obsolete("Please use the constructor also taking IPublishedContentTypeCache. Scheduled for removal in Umbraco 19.")]
+    public ContentCacheRefresher(
+        AppCaches appCaches,
+        IJsonSerializer serializer,
+        IIdKeyMap idKeyMap,
+        IDomainService domainService,
+        IEventAggregator eventAggregator,
+        ICacheRefresherNotificationFactory factory,
+        IDocumentUrlService documentUrlService,
+        IDocumentUrlAliasService documentUrlAliasService,
+        IDomainCacheService domainCacheService,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IDocumentNavigationManagementService documentNavigationManagementService,
+        IContentService contentService,
+        IPublishStatusManagementService publishStatusManagementService,
+        IDocumentCacheService documentCacheService,
+        ICacheManager cacheManager)
+        : this(
+            appCaches,
+            serializer,
+            idKeyMap,
+            domainService,
+            eventAggregator,
+            factory,
+            documentUrlService,
+            documentUrlAliasService,
+            domainCacheService,
+            documentNavigationQueryService,
+            documentNavigationManagementService,
+            contentService,
+            publishStatusManagementService,
+            documentCacheService,
+            cacheManager,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentTypeCache>())
     {
     }
 
@@ -95,7 +137,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         IContentService contentService,
         IPublishStatusManagementService publishStatusManagementService,
         IDocumentCacheService documentCacheService,
-        ICacheManager cacheManager)
+        ICacheManager cacheManager,
+        IPublishedContentTypeCache publishedContentTypeCache)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
@@ -108,6 +151,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         _contentService = contentService;
         _documentCacheService = documentCacheService;
         _publishStatusManagementService = publishStatusManagementService;
+        _publishedContentTypeCache = publishedContentTypeCache;
 
         // TODO: Ideally we should inject IElementsCache
         // this interface is in infrastructure, and changing this is very breaking
@@ -193,6 +237,15 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     /// <inheritdoc/>
     public override void Refresh(JsonPayload[] payloads)
     {
+        // A "refresh all" is the signal that the in-memory published caches are being rebuilt from the database
+        // cache. Published content types are cached independently of the content they describe, so they have to
+        // be dropped here too - otherwise the rebuilt content is projected through the same definitions as
+        // before and the reload has no effect on anything the content type governs.
+        if (payloads.Any(x => x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll)))
+        {
+            _publishedContentTypeCache.ClearAll();
+        }
+
         var idsRemoved = new HashSet<int>();
 
         foreach (JsonPayload payload in payloads)
@@ -212,7 +265,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             }
 
             HandleNavigation(payload);
-            HandlePublishedAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
+            HandlePublished(payload);
 
             HandleMemoryCache(payload);
 
@@ -268,7 +321,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
-            _documentCacheService.RefreshMemoryCacheAsync(key).GetAwaiter().GetResult();
+            _documentCacheService.RefreshMemoryCache(key);
         }
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
@@ -292,7 +345,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                         continue;
                     }
 
-                    _documentCacheService.RefreshMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
+                    _documentCacheService.RefreshMemoryCache(branchKey);
                 }
             }
         }
@@ -397,7 +450,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 return;
             }
 
-            IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out _);
+            IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out _, propertyAliases: null, filter: null, ordering: null);
             foreach (IContent descendant in content.Yield().Concat(descendants))
             {
                 HandleNavigationForSingleContent(descendant);
@@ -459,11 +512,14 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     private bool ExistsInNavigationBin(Guid contentKey) => _documentNavigationQueryService.TryGetParentKeyInBin(contentKey, out _);
 
-    private async Task HandlePublishedAsync(JsonPayload payload, CancellationToken cancellationToken)
+    // Runs on the saving thread after the commit. The per-document reads are synchronous so they do not need a
+    // second thread-pool thread; the full reload and the removal stay as they are (rare, and in-memory respectively).
+    // TODO (V20): await the async members once locks and notification publishing are asynchronous.
+    private void HandlePublished(JsonPayload payload)
     {
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
-            await _publishStatusManagementService.InitializeAsync(cancellationToken);
+            _publishStatusManagementService.InitializeAsync(CancellationToken.None).GetAwaiter().GetResult();
         }
 
         if (payload.Key.HasValue is false)
@@ -473,15 +529,15 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
         {
-            await _publishStatusManagementService.RemoveAsync(payload.Key.Value, cancellationToken);
+            _publishStatusManagementService.RemoveAsync(payload.Key.Value, CancellationToken.None).GetAwaiter().GetResult();
         }
         else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode) && HasPublishStatusUpdates(payload))
         {
-            await _publishStatusManagementService.AddOrUpdateStatusAsync(payload.Key.Value, cancellationToken);
+            _publishStatusManagementService.AddOrUpdateStatus(payload.Key.Value);
         }
         else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch) && HasPublishStatusUpdates(payload))
         {
-            await _publishStatusManagementService.AddOrUpdateStatusWithDescendantsAsync(payload.Key.Value, cancellationToken);
+            _publishStatusManagementService.AddOrUpdateStatusWithDescendants(payload.Key.Value);
         }
     }
 

@@ -1484,7 +1484,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         while (page * pageSize < total)
         {
             var descendants =
-                ContentService.GetPagedDescendants(parent.Id, page++, pageSize, out total);
+                ContentService.GetPagedDescendants(parent.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
             foreach (var x in descendants)
             {
                 Console.WriteLine("          "[..x.Level] + x.Id);
@@ -2416,7 +2416,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         var descendants = new List<IContent>();
         while (page * pageSize < total)
         {
-            descendants.AddRange(ContentService.GetPagedDescendants(content.Id, page++, pageSize, out total));
+            descendants.AddRange(ContentService.GetPagedDescendants(content.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null));
         }
 
         Assert.AreNotEqual(-20, content.ParentId);
@@ -2431,7 +2431,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         page = 0;
         while (page * pageSize < total)
         {
-            descendants.AddRange(ContentService.GetPagedDescendants(content.Id, page++, pageSize, out total));
+            descendants.AddRange(ContentService.GetPagedDescendants(content.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null));
         }
 
         Assert.AreEqual(-20, content.ParentId);
@@ -2535,7 +2535,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         var total = long.MaxValue;
         while (page * pageSize < total)
         {
-            descendants.AddRange(ContentService.GetPagedDescendants(parentPage.Id, page++, pageSize, out total));
+            descendants.AddRange(ContentService.GetPagedDescendants(parentPage.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null));
         }
 
         Assert.AreEqual(3, descendants.Count);
@@ -2560,7 +2560,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         page = 0;
         while (page * pageSize < total)
         {
-            descendants.AddRange(ContentService.GetPagedDescendants(parentPage2.Id, page++, pageSize, out total));
+            descendants.AddRange(ContentService.GetPagedDescendants(parentPage2.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null));
         }
 
         Assert.AreEqual(3, descendants.Count);

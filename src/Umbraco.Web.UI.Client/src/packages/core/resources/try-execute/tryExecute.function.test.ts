@@ -179,5 +179,26 @@ describe('tryExecute', () => {
 			expect(UmbCancelError.isUmbCancelError(error)).to.be.true;
 			expect(await notificationsShown()).to.equal(0);
 		});
+
+		it('cancels the umbHttpClient request without a notification when its timeout signal fires', async () => {
+			const fetchUntilAborted: typeof fetch = (input) => {
+				const signal = (input as Request).signal;
+				return new Promise((_, reject) => {
+					signal.addEventListener('abort', () => reject(signal.reason), { once: true });
+				});
+			};
+
+			const { error } = await tryExecute(
+				hostElement,
+				umbHttpClient.get({
+					url: '/umbraco/management/api/v1/server/status',
+					signal: AbortSignal.timeout(10),
+					fetch: fetchUntilAborted,
+				}),
+			);
+
+			expect(UmbCancelError.isUmbCancelError(error)).to.be.true;
+			expect(await notificationsShown()).to.equal(0);
+		});
 	});
 });

@@ -6,7 +6,9 @@ import type {
 } from '../../types.js';
 import { UmbDocumentPublishingRepository } from '../repository/index.js';
 import { UmbDocumentPublishedPendingChangesManager } from '../pending-changes/index.js';
+import { computeAncestorPublishCoverage } from '../utils.js';
 import { UMB_DOCUMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
+import type { UmbDocumentAncestorPublishCoverageModel } from '../schedule-publish/types.js';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from '../publish-with-descendants/constants.js';
 import { UmbDocumentUnpublishManifestEntityActionMeta } from '../unpublish/entity-action/constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../../constants.js';
@@ -143,12 +145,16 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const entityType = this.#documentWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
-		const { options, selected } = await this.#determineVariantOptions();
+		const [{ options, selected }, ancestorPublishCoverage] = await Promise.all([
+			this.#determineVariantOptions(),
+			this.#getAncestorPublishCoverage(unique),
+		]);
 
 		const result = await umbOpenModal(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
 			data: {
 				options,
 				activeVariants: selected,
+				currentVariant: this.#getCurrentScheduleVariant(options),
 				pickableFilter: this.#publishableVariantsFilter,
 				prevalues: options.map((option) => ({
 					unique: option.unique,
@@ -157,6 +163,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 						unpublishTime: option.variant?.scheduledUnpublishDate,
 					},
 				})),
+				ancestorPublishCoverage,
 			},
 		}).catch(() => undefined);
 
@@ -591,6 +598,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		this.#eventContext?.dispatchEvent(event);
 	}
 
+	async #getAncestorPublishCoverage(unique: string): Promise<UmbDocumentAncestorPublishCoverageModel | undefined> {
+		const { data, error } = await this.#publishingRepository.ancestorVariantStates(unique);
+		if (error || !data) return undefined;
+		return computeAncestorPublishCoverage(data);
+	}
+
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
 		const variantId = UmbVariantId.Create(option);
 		// If the read only guard is permitted it means the variant is read only
@@ -628,6 +641,19 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			options,
 			selected,
 		};
+	}
+
+	#getCurrentScheduleVariant(options: Array<UmbDocumentVariantOptionModel>): string | undefined {
+		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+		// The schedule dialog lists cultures only, so an active segment variant resolves to its culture.
+		const activeCultures = this.#documentWorkspaceContext.splitView
+			.getActiveVariants()
+			.map((x) => UmbVariantId.Create(x).toSegmentInvariant().toString());
+
+		return activeCultures.find((unique) => {
+			const option = options.find((o) => o.unique === unique);
+			return !!option && this.#publishableVariantsFilter(option);
+		});
 	}
 
 	#getPublishVariantsSelection() {

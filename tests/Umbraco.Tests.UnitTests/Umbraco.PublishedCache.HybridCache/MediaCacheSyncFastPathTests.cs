@@ -8,92 +8,62 @@ using Umbraco.Cms.Infrastructure.HybridCache;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.HybridCache;
 
 /// <summary>
-/// Tests that <see cref="MediaCache"/> consults <see cref="IMediaCacheService.TryGetCached"/>
-/// first and skips the async fallback entirely when the L0 cache has the requested item.
+/// Tests that the synchronous <see cref="MediaCache"/> lookups use the synchronous
+/// <see cref="IMediaCacheService"/> members rather than blocking on the asynchronous ones.
 /// </summary>
 /// <remarks>
-/// The async path (<c>GetByKeyAsync</c>) is the slow case — id/key map lookup + distributed
-/// cache + database + factory work. On a warm site we want the per-key sync calls inside
-/// <c>FilterAvailable</c>'s lazy chain to take the fast path. Because <c>FilterAvailable</c>
-/// binds its method-group call (<c>candidateKeys.Select(GetById)</c>) to the single-argument
-/// <see cref="MediaCache.GetById(Guid)"/> overload, this fixture asserts the fast path fires
-/// for that overload (and the two-argument overload that delegates to it), not only the
-/// two-argument one.
+/// The synchronous service members return converted (L0) cache hits without entering the asynchronous
+/// read logic, and read the database synchronously on a miss. <c>FilterAvailable</c> binds its method-group
+/// call (<c>candidateKeys.Select(GetById)</c>) to the single-argument <see cref="MediaCache.GetById(Guid)"/>
+/// overload, so that overload is covered alongside the two-argument one that delegates to it.
 /// </remarks>
 [TestFixture]
 public class MediaCacheSyncFastPathTests
 {
     [Test]
-    public void GetById_Guid_HitsL0ViaTryGetCached_ReturnsCachedAndSkipsAsync()
+    public void GetById_By_Key_Uses_The_Synchronous_Lookup()
     {
         IPublishedContent expected = Mock.Of<IPublishedContent>();
-        var cacheService = CreateHitCacheService(expected);
+        var key = Guid.NewGuid();
+        Mock<IMediaCacheService> cacheService = CreateCacheService(key, expected);
 
-        MediaCache cache = CreateCache(cacheService);
-
-        IPublishedContent? actual = cache.GetById(Guid.NewGuid());
+        IPublishedContent? actual = CreateCache(cacheService).GetById(key);
 
         Assert.That(actual, Is.SameAs(expected));
-        cacheService.Verify(
-            s => s.GetByKeyAsync(It.IsAny<Guid>()),
-            Times.Never,
-            "Async path should not run when TryGetCached hits");
+        cacheService.Verify(s => s.GetByKeyAsync(It.IsAny<Guid>()), Times.Never);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public void GetById_By_Preview_And_Key_Uses_The_Synchronous_Lookup(bool preview)
+    {
+        IPublishedContent expected = Mock.Of<IPublishedContent>();
+        var key = Guid.NewGuid();
+        Mock<IMediaCacheService> cacheService = CreateCacheService(key, expected);
+
+        IPublishedContent? actual = CreateCache(cacheService).GetById(preview, key);
+
+        Assert.That(actual, Is.SameAs(expected));
+        cacheService.Verify(s => s.GetByKeyAsync(It.IsAny<Guid>()), Times.Never);
     }
 
     [Test]
-    public void GetById_PreviewGuid_HitsL0ViaTryGetCached_ReturnsCachedAndSkipsAsync()
-    {
-        IPublishedContent expected = Mock.Of<IPublishedContent>();
-        var cacheService = CreateHitCacheService(expected);
-
-        MediaCache cache = CreateCache(cacheService);
-
-        IPublishedContent? actual = cache.GetById(preview: true, contentId: Guid.NewGuid());
-
-        Assert.That(actual, Is.SameAs(expected));
-        cacheService.Verify(
-            s => s.GetByKeyAsync(It.IsAny<Guid>()),
-            Times.Never,
-            "Async path should not run when TryGetCached hits");
-    }
-
-    [Test]
-    public void GetById_Guid_MissesL0_FallsThroughToAsyncPath()
+    public void GetById_By_Id_Uses_The_Synchronous_Lookup()
     {
         IPublishedContent expected = Mock.Of<IPublishedContent>();
         var cacheService = new Mock<IMediaCacheService>();
-        cacheService
-            .Setup(s => s.TryGetCached(It.IsAny<Guid>(), out It.Ref<IPublishedContent?>.IsAny))
-            .Returns(new TryGetCachedDelegate((Guid _, out IPublishedContent? content) =>
-            {
-                content = null;
-                return false;
-            }));
-        cacheService
-            .Setup(s => s.GetByKeyAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(expected);
+        cacheService.Setup(s => s.GetById(1234)).Returns(expected);
 
-        MediaCache cache = CreateCache(cacheService);
-
-        IPublishedContent? actual = cache.GetById(Guid.NewGuid());
+        IPublishedContent? actual = CreateCache(cacheService).GetById(1234);
 
         Assert.That(actual, Is.SameAs(expected));
-        cacheService.Verify(
-            s => s.GetByKeyAsync(It.IsAny<Guid>()),
-            Times.Once,
-            "Async path runs exactly once on TryGetCached miss");
+        cacheService.Verify(s => s.GetByIdAsync(It.IsAny<int>()), Times.Never);
     }
 
-    private static Mock<IMediaCacheService> CreateHitCacheService(IPublishedContent expected)
+    private static Mock<IMediaCacheService> CreateCacheService(Guid key, IPublishedContent expected)
     {
         var cacheService = new Mock<IMediaCacheService>();
-        cacheService
-            .Setup(s => s.TryGetCached(It.IsAny<Guid>(), out It.Ref<IPublishedContent?>.IsAny))
-            .Returns(new TryGetCachedDelegate((Guid _, out IPublishedContent? content) =>
-            {
-                content = expected;
-                return true;
-            }));
+        cacheService.Setup(s => s.GetByKey(key)).Returns(expected);
         return cacheService;
     }
 
@@ -102,8 +72,4 @@ public class MediaCacheSyncFastPathTests
             cacheService.Object,
             Mock.Of<IPublishedContentTypeCache>(),
             Mock.Of<IMediaNavigationQueryService>());
-
-    // Moq cannot bind directly to ref / out parameters in the lambda overload, so we
-    // declare a delegate that matches the TryGetCached signature and pass it explicitly.
-    private delegate bool TryGetCachedDelegate(Guid key, out IPublishedContent? content);
 }

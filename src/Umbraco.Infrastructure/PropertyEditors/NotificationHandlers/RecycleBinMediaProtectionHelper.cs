@@ -24,17 +24,21 @@ internal static class RecycleBinMediaProtectionHelper
     /// <param name="mediaFileManager">The media file manager.</param>
     public static void RemoveSuffixFromContainedFiles(IEnumerable<string> filePaths, MediaFileManager mediaFileManager)
     {
-        IEnumerable<string> filePathsToRename = filePaths
-            .Select(x => Path.ChangeExtension(x, Constants.Conventions.Media.TrashedMediaSuffix + Path.GetExtension(x)));
+        IEnumerable<string> filePathsToRename = filePaths.Select(GetTrashedFilePath);
         mediaFileManager.RemoveSuffixFromMediaFiles(filePathsToRename, Constants.Conventions.Media.TrashedMediaSuffix);
     }
 
     /// <summary>
-    /// Deletes all media files, accounting for recycle bin protection (trashed files have .deleted suffix on disk).
+    /// Deletes all media files.
     /// </summary>
     /// <param name="deletedMedia">Deleted media entities.</param>
     /// <param name="containedFilePaths">Function to extract file paths from media entities.</param>
     /// <param name="mediaFileManager">The media file manager.</param>
+    /// <remarks>
+    /// Trashed files have .deleted suffix on disk.
+    /// We delete the file at both its suffixed and original path, to account for cases where protection has
+    /// been toggled with media items already in the recycle bin.
+    /// </remarks>
     public static void DeleteContainedFilesWithProtection(
         IEnumerable<IMedia> deletedMedia,
         Func<IEnumerable<IMedia>, IEnumerable<string>> containedFilePaths,
@@ -46,12 +50,12 @@ internal static class RecycleBinMediaProtectionHelper
         var trashedMedia = deletedMedia.Where(m => m.Trashed).ToList();
         var nonTrashedMedia = deletedMedia.Where(m => !m.Trashed).ToList();
 
-        // Delete trashed media files (with .deleted suffix on disk).
+        // A trashed item's file may not have been renamed, so delete it at either path.
         if (trashedMedia.Count > 0)
         {
-            IEnumerable<string> trashedPaths = containedFilePaths(trashedMedia)
-                .Select(x => Path.ChangeExtension(x, Constants.Conventions.Media.TrashedMediaSuffix + Path.GetExtension(x)));
-            mediaFileManager.DeleteMediaFiles(trashedPaths);
+            var originalPaths = containedFilePaths(trashedMedia).ToList();
+            IEnumerable<string> trashedPaths = originalPaths.Select(GetTrashedFilePath);
+            mediaFileManager.DeleteMediaFiles(trashedPaths.Concat(originalPaths));
         }
 
         // Delete non-trashed media files (original paths).
@@ -60,4 +64,7 @@ internal static class RecycleBinMediaProtectionHelper
             mediaFileManager.DeleteMediaFiles(containedFilePaths(nonTrashedMedia));
         }
     }
+
+    private static string GetTrashedFilePath(string filePath)
+        => Path.ChangeExtension(filePath, Constants.Conventions.Media.TrashedMediaSuffix + Path.GetExtension(filePath));
 }

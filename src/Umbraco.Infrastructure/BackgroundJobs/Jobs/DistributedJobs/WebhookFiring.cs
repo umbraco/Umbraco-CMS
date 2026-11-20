@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text;
 using Microsoft.Extensions.Logging;
@@ -89,6 +90,7 @@ internal class WebhookFiring : IDistributedBackgroundJob
                     IWebhook? webhook = await _webHookService.GetAsync(request.WebhookKey);
                     if (webhook is null)
                     {
+                        await _webhookRequestService.DeleteAsync(request);
                         return;
                     }
 
@@ -121,19 +123,16 @@ internal class WebhookFiring : IDistributedBackgroundJob
         Exception? exception = null;
         try
         {
-            // Add headers
+            request.Content = new StringContent(serializedObject ?? string.Empty, Encoding.UTF8, MediaTypeNames.Application.Json);
+
             request.Headers.Add(Constants.WebhookEvents.HeaderNames.EventName, eventName);
             request.Headers.Add(Constants.WebhookEvents.HeaderNames.RetryCount, retryCount.ToString());
 
             foreach (KeyValuePair<string, string> header in webhook.Headers)
             {
-                request.Headers.Add(header.Key, header.Value);
+                AddCustomHeader(request, header.Key, header.Value);
             }
 
-            // Set content
-            request.Content = new StringContent(serializedObject ?? string.Empty, Encoding.UTF8, MediaTypeNames.Application.Json);
-
-            // Send request
             response = await httpClient.SendAsync(request, cancellationToken);
         }
         catch (Exception ex)
@@ -142,9 +141,41 @@ internal class WebhookFiring : IDistributedBackgroundJob
             _logger.LogError(ex, "Error while sending webhook request for webhook {WebhookKey}.", webhook.Key);
         }
 
-        WebhookLog log = await _webhookLogFactory.CreateAsync(eventName, request, response, retryCount, exception, webhook, cancellationToken);
-        await _webhookLogService.CreateAsync(log);
+        // A failure to log the delivery must not stop the caller from deleting or retrying the request.
+        try
+        {
+            WebhookLog log = await _webhookLogFactory.CreateAsync(eventName, request, response, retryCount, exception, webhook, cancellationToken);
+            await _webhookLogService.CreateAsync(log);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while logging webhook request for webhook {WebhookKey}.", webhook.Key);
+        }
 
         return response;
+    }
+
+    private static void AddCustomHeader(HttpRequestMessage request, string name, string value)
+    {
+        // Headers are added without validation so content headers can be routed to the content collection,
+        // which means line breaks in a value would otherwise be written to the wire as extra header lines.
+        if (value.AsSpan().IndexOfAny('\r', '\n', '\0') >= 0)
+        {
+            throw new InvalidOperationException($"The value of webhook header '{name}' contains a line break or NUL character.");
+        }
+
+        if (request.Headers.TryAddWithoutValidation(name, value))
+        {
+            return;
+        }
+
+        // Content headers (e.g. Content-Type) are rejected by the request header collection. A configured
+        // content header replaces the default rather than adding a second value alongside it.
+        HttpContentHeaders contentHeaders = request.Content!.Headers;
+        contentHeaders.Remove(name);
+        if (contentHeaders.TryAddWithoutValidation(name, value) is false)
+        {
+            throw new InvalidOperationException($"The webhook header '{name}' is not a valid HTTP header.");
+        }
     }
 }

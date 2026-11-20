@@ -5,5 +5,6 @@ export const manifest: UmbMockSetManifest = {
 	label: 'Default',
 	icon: 'icon-home',
 	visible: true,
+	userSwitcher: true,
 	loader: () => import('./index.js') as Promise<UmbMockDataSet>,
 };

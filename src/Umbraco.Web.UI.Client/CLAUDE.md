@@ -6,11 +6,12 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 
 ### Architecture & Design
 
-- **[Architecture](./docs/architecture.md)** - Technology stack, design philosophy, developer roles, package system, import map pipeline, design patterns
+- **[Architecture](./docs/architecture.md)** - Technology stack, design philosophy, developer roles, package system, import map pipeline, design patterns, separation of concerns between web components
 - **[Manifests & Aliases](./docs/manifests.md)** - Manifest shape, alias conventions, alias constants, how aliases connect extensions, registration, registry operations, kind merging
 - **[Entities](./docs/entities.md)** - Entity types, entity context, how entityType connects workspaces/trees/actions/routing
 - **[Workspaces](./docs/workspaces.md)** - Workspace types, base classes, extension points, workspace contexts, save flow, routing
-- **[Core Primitives](./docs/core-primitives.md)** - UmbLitElement, observable state, Context API, controller lifecycle
+- **[Core Primitives](./docs/core-primitives.md)** - UmbLitElement (observe, consume/provide context, localization), observable state overview, controller lifecycle
+- **[Context API](./docs/context-api.md)** - Context tokens, shared aliases, resolution rules, token lookup
 - **[State System](./docs/state-system.md)** - `Umb*State` change-detection contract, per-type comparison semantics, `asObservablePart`, mute/unmute, observer-guard anti-patterns
 - **[Data Flow](./docs/data-flow.md)** - Data flow chain, data sources, tryExecute, generated API clients, stores, complete worked example
 - **[Repositories](./docs/repositories.md)** - Repository categories (detail, item, tree, collection, action-specific), file structure, naming, extension registration, data source delegation
@@ -50,12 +51,14 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | Deprecate or remove a public API              | [docs/deprecation.md](./docs/deprecation.md) — requires **both** `@deprecated` JSDoc **and** runtime `UmbDeprecation` warning |
 | Create a new element or component             | [docs/style-guide.md](./docs/style-guide.md)                                                                                  |
+| Slot one component into another               | [docs/architecture.md](./docs/architecture.md#separation-of-concerns-between-web-components) — only set CSS custom properties in `::slotted`; style the slot or a parent for the rest |
 | Build, style, or write copy for any UI        | [docs/design-choices.md](./docs/design-choices.md) — default to no icon, no colour, terse contextual copy                     |
 | Create a repository or data source            | [docs/repositories.md](./docs/repositories.md) + [docs/data-flow.md](./docs/data-flow.md)                                     |
 | Add error handling or debugging               | [docs/error-handling.md](./docs/error-handling.md)                                                                            |
 | Write or modify tests                         | [docs/testing.md](./docs/testing.md)                                                                                          |
 | Work with auth or security                    | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md)                                           |
 | Scaffold a new package or module              | [docs/package-development.md](./docs/package-development.md)                                                                  |
+| Consume or provide a context, or create a context token | [docs/context-api.md](./docs/context-api.md) — tokens can share an alias; consume the most specific one once |
 | Write or change observers / `Umb*State` usage | [docs/state-system.md](./docs/state-system.md) — states already deduplicate; do not add "is this a re-emit?" guards           |
 
 This is not optional. Skipping these leads to convention violations that are caught in review.
