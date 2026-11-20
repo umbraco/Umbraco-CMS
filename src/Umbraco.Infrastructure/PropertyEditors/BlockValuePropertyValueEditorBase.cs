@@ -650,6 +650,9 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             (targetValue is not null ? BlockEditorValues.DeserializeAndClean(targetValue) : null)
             ?? new BlockEditorData<TValue, TLayout>([], CreateWithLayout(sourceBlockEditorValues.Layout));
 
+        AlignPropertyVariance(sourceBlockEditorValues.BlockValue.ContentData);
+        AlignPropertyVariance(sourceBlockEditorValues.BlockValue.SettingsData);
+
         TValue mergeResult = MergeBlockEditorDataForCulture(sourceBlockEditorValues.BlockValue, targetBlockEditorValues.BlockValue, culture);
         SortBlockItemValuesByCulture(mergeResult);
         return _jsonSerializer.Serialize(mergeResult);
@@ -1018,6 +1021,18 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         // deserialization, so for non-primitive values they are typically boxed JsonElements - a struct
         // whose default equality is not a structural comparison. Round-trip through the serializer instead.
         return _jsonSerializer.Serialize(sourceValue) == _jsonSerializer.Serialize(targetValue);
+    }
+
+    // Values saved before an element type property changed variance are still stored with the old variance. The editor
+    // aligns them when mapping to the editor (see MapBlockItemDataToEditor), so they must be aligned the same way before
+    // publishing too - otherwise a value the editor shows (e.g. an invariant value shown for the default language once the
+    // property varies by culture) is discarded as misaligned by the merge clean-up.
+    private void AlignPropertyVariance(List<BlockItemData> blockItems)
+    {
+        foreach (BlockItemData blockItem in blockItems.Where(item => item.Values.All(value => value.PropertyType is not null)))
+        {
+            blockItem.Values = _blockEditorVarianceHandler.AlignPropertyVarianceAsync(blockItem.Values, null).GetAwaiter().GetResult();
+        }
     }
 
     protected TValue MergeBlockEditorDataForCulture(TValue sourceBlockValue, TValue targetBlockValue, string? culture)
