@@ -32,4 +32,5 @@ public enum EFCoreMigration
     AddHasAccessToInvariantForVariantToModel = 24,
     AddElementDtos = 25,
     AddIncludeInvariantForVariantToContentScheduleModel = 26,
+    AddMediaVersionDto = 27,
 }

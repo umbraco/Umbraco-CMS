@@ -15,7 +15,7 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261109084752_AddIncludeInvariantForVariantToContentScheduleModel";
+    public override string LastMigrationId => "20261120115914_AddMediaVersionDto";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
@@ -1440,6 +1440,27 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
                 b.ToTable("umbracoLongRunningOperation");
             });
 
+        modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.MediaVersionDto", b =>
+            {
+                b.Property<int>("Id")
+                    .HasColumnType("INTEGER")
+                    .HasColumnName("id");
+
+                b.Property<string>("Path")
+                    .HasMaxLength(255)
+                    .HasColumnType("TEXT")
+                    .HasColumnName("path")
+                    .UseCollation("NOCASE");
+
+                b.HasKey("Id");
+
+                b.HasIndex("Id", "Path")
+                    .IsUnique()
+                    .HasDatabaseName("IX_umbracoMediaVersion");
+
+                b.ToTable("umbracoMediaVersion");
+            });
+
         modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.MemberPropertyTypeDto", b =>
             {
                 b.Property<int>("PrimaryKey")
@@ -2723,6 +2744,15 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
                     .OnDelete(DeleteBehavior.NoAction);
 
                 b.Navigation("User");
+            });
+
+        modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.MediaVersionDto", b =>
+            {
+                b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentVersionDto", null)
+                    .WithMany()
+                    .HasForeignKey("Id")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
             });
 
         modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.MemberPropertyTypeDto", b =>

@@ -161,6 +161,7 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_19_0_0.AddHasAccessToInvariantForVariantToModel>("{A08A7C9C-2EDD-4457-8C9F-9D1EAF4FB325}");
         To<V_19_0_0.AddElementDtos>("{1EC33267-3D0C-4D67-BC41-5AA5D0DFF3F2}");
         To<V_19_0_0.AddIncludeInvariantForVariantToContentScheduleModel>("{20E34D98-66A1-41EB-91E9-11CE6BF334C6}");
+        To<V_19_0_0.AddMediaVersionDto>("{1F12CD86-1168-48C2-8B75-B88636A14A33}");
     }
 
     /// <summary>
