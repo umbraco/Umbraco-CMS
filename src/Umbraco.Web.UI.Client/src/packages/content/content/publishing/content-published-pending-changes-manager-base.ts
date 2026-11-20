@@ -40,9 +40,8 @@ export abstract class UmbContentPublishedPendingChangesManagerBase<
 
 		const variantIds = args.persistedData.variants?.map((x) => UmbVariantId.Create(x)) ?? [];
 
-		const publishedData = structuredClone(args.publishedData);
-		// remove dates from the comparison
-		publishedData.variants.forEach((variant) => this.#cleanVariantForComparison(variant));
+		// Values are never mutated during the comparison, so they are shared rather than cloned.
+		const publishedData = this.#cloneForComparison(args.publishedData);
 
 		// Every variant merges the same two lists of values, so index each of them once and share it.
 		// Notice the published data is the persisted side of each merge, and the persisted data is the draft side.
@@ -50,14 +49,15 @@ export abstract class UmbContentPublishedPendingChangesManagerBase<
 		const persistedValuesIndex = new UmbPropertyValueIndex(args.persistedData.values);
 
 		const pendingChangesPromises = variantIds.map((variantId) =>
-			this.#processVariant(args, variantId, publishedValuesIndex, persistedValuesIndex),
+			this.#processVariant(publishedData, args.persistedData, variantId, publishedValuesIndex, persistedValuesIndex),
 		);
 		const variantsWithPendingChanges = (await Promise.all(pendingChangesPromises)).filter((x) => x !== null);
 		this.#variantsWithChanges.setValue(variantsWithPendingChanges);
 	}
 
 	async #processVariant(
-		args: UmbContentPublishedPendingChangesManagerProcessArgs<TDetailModel>,
+		publishedData: TDetailModel,
+		persistedData: TDetailModel,
 		variantId: UmbVariantId,
 		publishedValuesIndex: UmbPropertyValueIndex<UmbElementValueModel>,
 		persistedValuesIndex: UmbPropertyValueIndex<UmbElementValueModel>,
@@ -66,15 +66,13 @@ export abstract class UmbContentPublishedPendingChangesManagerBase<
 		mergeController.setPersistedValuesIndex(publishedValuesIndex);
 		mergeController.setDraftValuesIndex(persistedValuesIndex);
 
-		const publishedData = args.publishedData;
-		const mergedData = await mergeController.process(publishedData, args.persistedData, [variantId], [variantId]);
-		const mergedDataClone = structuredClone(mergedData);
-		// remove dates from the comparison
-		mergedDataClone.variants.forEach((variant) => this.#cleanVariantForComparison(variant));
+		const mergedData = await mergeController.process(publishedData, persistedData, [variantId], [variantId]);
+		const mergedDataClone = this.#cloneForComparison(mergedData);
+		const publishedDataClone = { ...publishedData };
 
-		this.cleanDataBeforeComparison(mergedDataClone, publishedData);
+		this.cleanDataBeforeComparison(mergedDataClone, publishedDataClone);
 
-		const hasChanges = jsonStringComparison(mergedDataClone, publishedData) === false;
+		const hasChanges = jsonStringComparison(mergedDataClone, publishedDataClone) === false;
 		return hasChanges ? { variantId } : null;
 	}
 
@@ -89,6 +87,8 @@ export abstract class UmbContentPublishedPendingChangesManagerBase<
 	/**
 	 * Hook to clean data before comparison. Override to remove properties
 	 * that should not affect the pending-changes calculation.
+	 * Both models are shallow copies that share their `values` with the source data,
+	 * so replace top-level properties rather than mutating nested objects.
 	 * @template {UmbEntityVariantModel} TVariantModel
 	 * @template {UmbContentDetailModel<TVariantModel>} TDetailModel
 	 * @param {TDetailModel} _mergedData - The merged data clone.
@@ -99,13 +99,19 @@ export abstract class UmbContentPublishedPendingChangesManagerBase<
 		// No-op by default. Subclasses can override.
 	}
 
-	#cleanVariantForComparison = (variant: TVariantModel) => {
+	#cloneForComparison(data: TDetailModel): TDetailModel {
+		return { ...data, variants: data.variants.map(this.#cleanVariantForComparison) };
+	}
+
+	#cleanVariantForComparison = (variant: TVariantModel): TVariantModel => {
+		const clone = { ...variant };
 		// The server seems to have some date mismatches when quickly
 		// fetching content after a save and comparing it to the published version.
 		// This is a temporary workaround to not include these dates in the comparison.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-expect-error
-		delete variant.updateDate;
+		delete clone.updateDate;
+		return clone;
 	};
 
 	/**
