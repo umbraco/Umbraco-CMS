@@ -19,6 +19,7 @@ import {
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
+import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -83,7 +84,7 @@ export class UmbBlockGridEntryContext
 
 	readonly scaleManager = new UmbBlockGridScaleManager(this);
 
-	#parentEntry?: typeof UMB_BLOCK_GRID_ENTRY_CONTEXT.TYPE;
+	#parentEntry?: UmbBlockGridEntryContext;
 
 	#parentName = new UmbStringState<string | undefined>(undefined);
 	readonly parentName = this.#parentName.asObservable();
@@ -92,7 +93,7 @@ export class UmbBlockGridEntryContext
 	#focusWithin = false;
 	#pinned = false;
 	#suppressed = false;
-	#hoverTimer?: ReturnType<typeof setTimeout>;
+	readonly #applyLeave = debounce(() => this.#applyHovered(false), UMB_BLOCK_GRID_ENTRY_HOVER_GRACE_MS);
 	readonly #hoveredChildren = new Set<UmbBlockGridEntryContext>();
 	readonly #focusedChildren = new Set<UmbBlockGridEntryContext>();
 
@@ -105,18 +106,19 @@ export class UmbBlockGridEntryContext
 	#hoverBlocked = new UmbBooleanState(false);
 	/**
 	 * Whether hovering the entries inside this entry should be ignored, until the pointer leaves this entry.
+	 * @internal
 	 */
 	readonly hoverBlocked = this.#hoverBlocked.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT, UMB_BLOCK_GRID_ENTRIES_CONTEXT);
 
-		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (parentEntry) => {
-			this.#parentEntry?.reportChildHovered(this, false);
-			this.#parentEntry?.reportChildFocusWithin(this, false);
+		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (consumed) => {
+			// The token alias is shared with the other block editors, so the closest entry may belong to another editor.
+			const parentEntry = consumed instanceof UmbBlockGridEntryContext ? consumed : undefined;
+			this.#reportToParent(false, false);
 			this.#parentEntry = parentEntry;
-			this.#parentEntry?.reportChildHovered(this, this.#hovered);
-			this.#parentEntry?.reportChildFocusWithin(this, this.#focusWithin);
+			this.#reportToParent(this.#hovered, this.#focusWithin);
 			this.observe(parentEntry?.name, (name) => this.#parentName.setValue(name || undefined), 'observeParentName');
 			this.observe(
 				parentEntry?.hoverBlocked,
@@ -134,9 +136,9 @@ export class UmbBlockGridEntryContext
 	 * The containing entry then keeps the user's attention until the pointer leaves it or focus moves into an entry inside it.
 	 */
 	focusParentEntry() {
-		const parentHost = this.#parentEntry?.getHostElement() as HTMLElement | undefined;
-		if (!parentHost) return;
-		this.#parentEntry?.pinUi();
+		if (!this.#parentEntry) return;
+		const parentHost = this.#parentEntry.getHostElement() as HTMLElement;
+		this.#parentEntry.pinUi();
 		parentHost.focus({ preventScroll: true });
 		parentHost.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 	}
@@ -144,19 +146,21 @@ export class UmbBlockGridEntryContext
 	/**
 	 * Report that the pointer entered or left this entry.
 	 * Leaving is delayed briefly, so the pointer can cross from the entry to its frame tab.
+	 * @internal
 	 * @param {boolean} hovered Whether the pointer is over this entry.
 	 */
 	setHovered(hovered: boolean) {
-		clearTimeout(this.#hoverTimer);
 		if (hovered) {
+			this.#applyLeave.cancel();
 			this.#applyHovered(true);
 			return;
 		}
-		this.#hoverTimer = setTimeout(() => this.#applyHovered(false), UMB_BLOCK_GRID_ENTRY_HOVER_GRACE_MS);
+		this.#applyLeave();
 	}
 
 	/**
 	 * Report that focus moved into or out of this entry.
+	 * @internal
 	 * @param {boolean} focusWithin Whether focus is on this entry or on something inside it.
 	 */
 	setFocusWithin(focusWithin: boolean) {
@@ -201,6 +205,11 @@ export class UmbBlockGridEntryContext
 		this.#updateUiState();
 	}
 
+	#reportToParent(hovered: boolean, focusWithin: boolean) {
+		this.#parentEntry?.reportChildHovered(this, hovered);
+		this.#parentEntry?.reportChildFocusWithin(this, focusWithin);
+	}
+
 	#applyHovered(hovered: boolean) {
 		if (this.#hovered === hovered) return;
 		this.#hovered = hovered;
@@ -217,9 +226,8 @@ export class UmbBlockGridEntryContext
 	}
 
 	override destroy(): void {
-		clearTimeout(this.#hoverTimer);
-		this.#parentEntry?.reportChildHovered(this, false);
-		this.#parentEntry?.reportChildFocusWithin(this, false);
+		this.#applyLeave.cancel();
+		this.#reportToParent(false, false);
 		super.destroy();
 	}
 

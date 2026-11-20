@@ -382,26 +382,12 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.shadowRoot?.querySelector<HTMLElement>('.umb-block-grid__block')?.focus(options);
 	}
 
-	#createBeforeHoverTimer?: ReturnType<typeof setTimeout>;
-
-	// The insert line and the frame tab share the top edge of the entry, so the tab steps aside once the pointer rests on the line.
-	// Passing through the line on the way to the tab does not trigger it.
-	readonly #onCreateBeforePointerEnter = () => {
-		clearTimeout(this.#createBeforeHoverTimer);
-		this.#createBeforeHoverTimer = setTimeout(() => this.toggleAttribute('create-hovered', true), 150);
-	};
-	readonly #onCreateBeforePointerLeave = () => {
-		clearTimeout(this.#createBeforeHoverTimer);
-		this.removeAttribute('create-hovered');
-	};
-
 	readonly #onPointerEnter = () => this.#context.setHovered(true);
 	readonly #onPointerLeave = () => this.#context.setHovered(false);
 	readonly #onFocusIn = () => this.#context.setFocusWithin(true);
 	readonly #onFocusOut = (event: FocusEvent) => {
 		const next = event.relatedTarget as Node | null;
-		const focusStaysWithin = !!next && (next === this || this.contains(next));
-		if (!focusStaysWithin) this.#context.setFocusWithin(false);
+		if (!next || !this.contains(next)) this.#context.setFocusWithin(false);
 	};
 
 	override disconnectedCallback(): void {
@@ -410,7 +396,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.removeEventListener('pointerleave', this.#onPointerLeave);
 		this.removeEventListener('focusin', this.#onFocusIn);
 		this.removeEventListener('focusout', this.#onFocusOut);
-		clearTimeout(this.#createBeforeHoverTimer);
 		clearTimeout(this.#renderTimeout);
 		this.#layoutContainerResizeObserver.disconnect();
 	}
@@ -660,9 +645,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			<uui-button-inline-create
 				href=${this._createBeforePath}
 				label=${this.localize.term('blockEditor_addBlock')}
-				style=${this._inlineCreateAboveWidth ? `width: ${this._inlineCreateAboveWidth}` : ''}
-				@pointerenter=${this.#onCreateBeforePointerEnter}
-				@pointerleave=${this.#onCreateBeforePointerLeave}>
+				style=${this._inlineCreateAboveWidth ? `width: ${this._inlineCreateAboveWidth}` : ''}>
 			</uui-button-inline-create>
 		`;
 	}
@@ -811,12 +794,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				--umb-block-grid-entry-tab-pointer-events: auto;
 			}
 
-			:host([create-hovered]) .umb-block-grid__block {
-				--umb-entity-frame-opacity: 0;
-				--umb-block-grid-entry-tab-pointer-events: none;
+			uui-button-inline-create:hover + .umb-block-grid__block umb-entity-frame {
+				visibility: hidden;
+				transition: visibility 0s linear 150ms;
 			}
 
 			umb-entity-frame uui-button {
+				--uui-focus-outline-color: var(--umb-entity-frame-contrast-color);
 				--uui-button-background-color: transparent;
 				--uui-button-background-color-hover: transparent;
 				--uui-button-contrast: var(--umb-entity-frame-contrast-color);
@@ -830,10 +814,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 			umb-entity-frame uui-button:hover {
 				text-decoration: underline;
-			}
-
-			umb-entity-frame uui-button {
-				--uui-focus-outline-color: var(--umb-entity-frame-contrast-color);
 			}
 
 			umb-entity-frame > span {

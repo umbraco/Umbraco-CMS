@@ -2,7 +2,7 @@ import '../block-grid-block/block-grid-block.element.js';
 import { UmbBlockGridEntryElement } from './block-grid-entry.element.js';
 import type { UmbBlockGridEntryContext } from './block-grid-entry.context.js';
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from './block-grid-entry.context-token.js';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
 import { aTimeout, expect, fixture, html } from '@open-wc/testing';
 
 describe('UmbBlockGridEntryElement', () => {
@@ -24,21 +24,14 @@ describe('UmbBlockGridEntryElement', () => {
 		let parentContext: UmbBlockGridEntryContext;
 		let childContext: UmbBlockGridEntryContext;
 
-		const getEntryContext = (host: UmbBlockGridEntryElement) =>
-			new Promise<UmbBlockGridEntryContext>((resolve) => {
-				new UmbContextConsumerController(host, UMB_BLOCK_GRID_ENTRY_CONTEXT, (context) => {
-					if (context) resolve(context);
-				});
-			});
-
 		beforeEach(async () => {
 			const nested = await fixture(
 				html`<umb-block-grid-entry id="parent"><umb-block-grid-entry id="child"></umb-block-grid-entry></umb-block-grid-entry>`,
 			);
 			parent = nested as UmbBlockGridEntryElement;
 			child = parent.querySelector<UmbBlockGridEntryElement>('#child')!;
-			parentContext = await getEntryContext(parent);
-			childContext = await getEntryContext(child);
+			parentContext = (await parent.getContext(UMB_BLOCK_GRID_ENTRY_CONTEXT))!;
+			childContext = (await child.getContext(UMB_BLOCK_GRID_ENTRY_CONTEXT))!;
 		});
 
 		it('exposes the name of the containing entry', async () => {
@@ -114,35 +107,69 @@ describe('UmbBlockGridEntryElement', () => {
 				expect(parentActive).to.be.false;
 			});
 
-			it('ignores hovering inside an entry that was brought into focus from within', () => {
-				parentContext.setHovered(true);
-				childContext.setHovered(true);
-				childContext.focusParentEntry();
-				parentContext.setFocusWithin(true);
+			describe('after the containing entry was brought into focus from within', () => {
+				beforeEach(() => {
+					parentContext.setHovered(true);
+					childContext.setHovered(true);
+					childContext.focusParentEntry();
+					parentContext.setFocusWithin(true);
+				});
 
-				expect(parentActive).to.be.true;
-				expect(childActive).to.be.false;
-			});
+				it('ignores hovering inside it', () => {
+					expect(parentActive).to.be.true;
+					expect(childActive).to.be.false;
+				});
 
-			it('hovers inside an entry again once focus moves into one of its entries', () => {
-				parentContext.setHovered(true);
-				childContext.setHovered(true);
-				childContext.focusParentEntry();
-				parentContext.setFocusWithin(true);
-				childContext.setFocusWithin(true);
+				it('hovers inside it again once focus moves into one of its entries', () => {
+					childContext.setFocusWithin(true);
 
-				childContext.setHovered(false);
-				childContext.setHovered(true);
+					childContext.setHovered(false);
+					childContext.setHovered(true);
 
-				expect(childActive).to.be.true;
-				expect(parentActive).to.be.false;
+					expect(childActive).to.be.true;
+					expect(parentActive).to.be.false;
+				});
 			});
 		});
 	});
 
-	describe('with an insert line above the entry', () => {
+	describe('when contained in an entry of another block editor', () => {
 		let entry: UmbBlockGridEntryElement;
-		let insertLine: Element;
+		let entryContext: UmbBlockGridEntryContext;
+
+		beforeEach(async () => {
+			const wrapper = await fixture<HTMLElement>(html`<div></div>`);
+			const otherEditorEntry = {
+				name: { subscribe: () => ({ unsubscribe: () => undefined }) },
+				getHostElement: () => wrapper,
+			};
+			new UmbContextProvider(wrapper, UMB_BLOCK_GRID_ENTRY_CONTEXT, otherEditorEntry as never).hostConnected();
+
+			entry = document.createElement('umb-block-grid-entry');
+			wrapper.appendChild(entry);
+			entryContext = (await entry.getContext(UMB_BLOCK_GRID_ENTRY_CONTEXT))!;
+		});
+
+		it('has no containing entry', async () => {
+			let parentName: string | undefined = 'unset';
+			entryContext.parentName.subscribe((name) => (parentName = name));
+			await aTimeout(0);
+
+			expect(parentName).to.be.undefined;
+		});
+
+		it('reports hovering and focus without a containing entry to tell', () => {
+			expect(() => {
+				entryContext.setHovered(true);
+				entryContext.setFocusWithin(true);
+				entryContext.focusParentEntry();
+			}).to.not.throw();
+		});
+	});
+
+	describe('with a block rendered', () => {
+		let entry: UmbBlockGridEntryElement;
+		let state: Record<string, unknown>;
 
 		beforeEach(async () => {
 			const wrapper = await fixture(
@@ -150,29 +177,17 @@ describe('UmbBlockGridEntryElement', () => {
 			);
 			entry = wrapper.querySelector('umb-block-grid-entry')!;
 
-			const state = entry as unknown as Record<string, unknown>;
+			state = entry as unknown as Record<string, unknown>;
 			state._contentKey = 'content-key';
 			state._contentTypeAlias = 'content-type-alias';
 			state._createBeforePath = '#create';
 			state._showInlineCreateBefore = true;
+			state._showActions = true;
 			entry.requestUpdate();
 			await entry.updateComplete;
-
-			insertLine = entry.shadowRoot!.querySelector('uui-button-inline-create')!;
 		});
 
-		const pointerOverInsertLine = (type: 'pointerenter' | 'pointerleave') =>
-			insertLine.dispatchEvent(new PointerEvent(type));
-
-		it('renders the insert line', () => {
-			expect(insertLine).to.exist;
-		});
-
-		it('puts the frame and the actions before the block view in the tab order', async () => {
-			(entry as unknown as Record<string, unknown>)._showActions = true;
-			entry.requestUpdate();
-			await entry.updateComplete;
-
+		it('puts the frame and the actions before the block view in the tab order', () => {
 			const block = entry.shadowRoot!.querySelector('.umb-block-grid__block')!;
 			const order = Array.from(block.children, (child) => child.tagName.toLowerCase()).filter((tag) =>
 				['umb-entity-frame', 'umb-block-action-list', 'umb-extension-slot'].includes(tag),
@@ -181,30 +196,10 @@ describe('UmbBlockGridEntryElement', () => {
 			expect(order).to.deep.equal(['umb-entity-frame', 'umb-block-action-list', 'umb-extension-slot']);
 		});
 
-		it('hides the frame tab once the pointer rests on the insert line', async () => {
-			pointerOverInsertLine('pointerenter');
-			expect(entry.hasAttribute('create-hovered')).to.be.false;
+		it('renders the insert line directly before the block, so the frame can step aside for it', () => {
+			const insertLine = entry.shadowRoot!.querySelector('uui-button-inline-create')!;
 
-			await aTimeout(250);
-
-			expect(entry.hasAttribute('create-hovered')).to.be.true;
-		});
-
-		it('keeps the frame tab when the pointer only passes through the insert line', async () => {
-			pointerOverInsertLine('pointerenter');
-			await aTimeout(50);
-			pointerOverInsertLine('pointerleave');
-			await aTimeout(250);
-
-			expect(entry.hasAttribute('create-hovered')).to.be.false;
-		});
-
-		it('shows the frame tab again when the pointer leaves the insert line', async () => {
-			pointerOverInsertLine('pointerenter');
-			await aTimeout(250);
-			pointerOverInsertLine('pointerleave');
-
-			expect(entry.hasAttribute('create-hovered')).to.be.false;
+			expect(insertLine.nextElementSibling).to.equal(entry.shadowRoot!.querySelector('.umb-block-grid__block'));
 		});
 	});
 
