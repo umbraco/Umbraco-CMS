@@ -173,7 +173,8 @@ export class UmbMyController extends UmbControllerBase {
 ### Controller Lifecycle
 
 ```
-host.addUmbController(ctrl)  →  ctrl.hostConnected()
+host.addUmbController(ctrl)    →  ctrl.hostConnected()     (next microtask, if host is connected)
+                                  ctrl.hostDisconnected()  (next microtask, if host has disconnected)
                                        ↓
                               (subscriptions active, DOM events listening)
                                        ↓
@@ -185,6 +186,8 @@ host reconnects to DOM        →  ctrl.hostConnected()
                                        ↓
 host.removeUmbController(ctrl) → ctrl.destroy()
 ```
+
+A controller added to a host that has never been connected receives neither call until the host connects. A controller added to a host that has disconnected receives `hostDisconnected()`, so it ends in the same state as the controllers that were present when the host disconnected. As a result, `hostDisconnected()` can run without an earlier `hostConnected()`, and implementations must handle that.
 
 ### Controller Aliases
 

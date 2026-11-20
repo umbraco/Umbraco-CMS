@@ -166,6 +166,29 @@ No element or context should call the Management API directly. All data flows th
 
 See **[Data Flow](./data-flow.md)** for the complete implementation pattern with base classes, `tryExecute()`, and a worked example.
 
+### Separation of Concerns Between Web Components
+
+Each web component owns its appearance and behavior. A host owns its slots; the slotted component owns itself.
+
+- Only set CSS custom properties inside `::slotted`.
+- Apply other styling of slotted content to the `<slot>` or a parent element.
+- Use CSS custom properties for styles the slotted component should inherit.
+- Change a slotted component's look through its public properties (such as `look`). If it has none that fits, add one to that component and document it with `@prop` or `@cssprop` (see [Style Guide](./style-guide.md)).
+
+Existing rules that don't follow this are fixed in their own PR, not in unrelated work.
+
+```ts
+// Don't — the host styles the slotted component
+static override styles = css`
+	slot[name='actions']::slotted(*) {
+		background-color: var(--uui-color-surface);
+	}
+`;
+
+// Do — the host uses what the slotted component exposes
+html`<umb-entity-actions-bundle slot="actions" look="secondary"></umb-entity-actions-bundle>`;
+```
+
 ---
 
 The backoffice is independently-packaged Web Components glued by the Extension Registry, communicating via the Context API, with state managed through Observables — all built to be replaceable and extensible by default.

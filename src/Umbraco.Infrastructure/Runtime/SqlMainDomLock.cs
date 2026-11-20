@@ -322,7 +322,7 @@ public class SqlMainDomLock : IMainDomLock
 
             // the row
             List<KeyValueDto>? mainDomRows = db.Fetch<KeyValueDto>(
-                "SELECT * FROM umbracoKeyValue WHERE [key] = @key",
+                $"SELECT * FROM {KeyValueTable(db)} WHERE {KeyColumn(db)} = @key",
                 new { key = MainDomKey });
 
             if (mainDomRows.Count == 0 || mainDomRows[0].Value == updatedTempId)
@@ -413,8 +413,15 @@ public class SqlMainDomLock : IMainDomLock
     /// <returns></returns>
     private bool IsMainDomValue(string val, IUmbracoDatabase db) =>
         db.ExecuteScalar<int>(
-            "SELECT COUNT(*) FROM umbracoKeyValue WHERE [key] = @key AND [value] = @val",
+            $"SELECT COUNT(*) FROM {KeyValueTable(db)} WHERE {KeyColumn(db)} = @key AND {ValueColumn(db)} = @val",
             new { key = MainDomKey, val }) == 1;
+
+    private static string KeyValueTable(IUmbracoDatabase db)
+        => db.SqlContext.SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.KeyValue);
+
+    private static string KeyColumn(IUmbracoDatabase db) => db.SqlContext.SqlSyntax.GetQuotedColumnName("key");
+
+    private static string ValueColumn(IUmbracoDatabase db) => db.SqlContext.SqlSyntax.GetQuotedColumnName("value");
 
     #region IDisposable Support
 
@@ -459,14 +466,14 @@ public class SqlMainDomLock : IMainDomLock
                             {
                                 _logger.LogDebug("Releasing MainDom, updating row, new application is booting.");
                                 var count = db.Execute(
-                                    $"UPDATE umbracoKeyValue SET [value] = [value] + '{UpdatedSuffix}' WHERE [key] = @key",
+                                    $"UPDATE {KeyValueTable(db)} SET {ValueColumn(db)} = {db.SqlContext.SqlSyntax.GetConcat(ValueColumn(db), $"'{UpdatedSuffix}'")} WHERE {KeyColumn(db)} = @key",
                                     new { key = MainDomKey });
                             }
                             else
                             {
                                 _logger.LogDebug("Releasing MainDom, deleting row, application is shutting down.");
                                 var count = db.Execute(
-                                    "DELETE FROM umbracoKeyValue WHERE [key] = @key",
+                                    $"DELETE FROM {KeyValueTable(db)} WHERE {KeyColumn(db)} = @key",
                                     new { key = MainDomKey });
                             }
                         }

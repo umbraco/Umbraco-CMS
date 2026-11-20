@@ -650,7 +650,11 @@ export class UmbTableElement extends UmbLitElement {
 			}
 
 			uui-table-head-cell button > span {
-				flex: 1 0 auto;
+				flex: 1 1 auto;
+			}
+
+			uui-table-head-cell button > uui-symbol-sort {
+				flex: none;
 			}
 
 			uui-table-cell umb-icon {

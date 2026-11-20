@@ -1,12 +1,12 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Common.Builders;
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.Services.OperationStatus;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
@@ -49,6 +49,10 @@ public class ImportDictionaryController : DictionaryControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Imports a dictionary.")]
     [EndpointDescription("Imports a dictionary from the provided file upload.")]
+    [RequiresPermissions([
+        Constants.Permissions.Entities.DictionaryItem.Create,
+        Constants.Permissions.Entities.DictionaryItem.Update,
+    ])]
     public async Task<IActionResult> Import(
         CancellationToken cancellationToken,
         ImportDictionaryRequestModel importDictionaryRequestModel)

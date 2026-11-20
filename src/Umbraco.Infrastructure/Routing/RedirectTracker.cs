@@ -71,6 +71,11 @@ internal sealed class RedirectTracker : IRedirectTracker
         Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes,
         bool isMove)
     {
+        if (HasPublishedUrlSegment(entity) is false)
+        {
+            return;
+        }
+
         IPublishedContent? entityContent = _contentCache.GetById(entity.Id);
         if (entityContent is null)
         {
@@ -222,9 +227,11 @@ internal sealed class RedirectTracker : IRedirectTracker
         return domainRootId > 0;
     }
 
+    // Only domains with a hostname count: ContentFinderByRedirectUrl prefixes the route with the id of the
+    // request's domain, and the router picks that among domains without wildcards (culture-only domains).
     private int GetNodeIdWithAssignedDomain(IPublishedContent entityContent) =>
         entityContent.Path.GetIdsFromPathReversed()
-            .FirstOrDefault(x => _domainCache.HasAssigned(x, includeWildcards: true));
+            .FirstOrDefault(x => _domainCache.HasAssigned(x, includeWildcards: false));
 
     private string GetUrl(Guid contentKey, string languageIsoCode) =>
         _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative, languageIsoCode).TrimEnd('/');
@@ -333,6 +340,23 @@ internal sealed class RedirectTracker : IRedirectTracker
     private bool HasPublishedUrlSegment(Guid contentKey, string culture) =>
         _documentUrlService.IsInitialized is false
         || _documentUrlService.GetUrlSegment(contentKey, culture, isDraft: false) is not null;
+
+    // Content without a published URL segment in any culture has no published route to preserve. The document URL
+    // service answers from memory, so deciding this first keeps such content out of the published content cache,
+    // where the lookup could only miss every tier and read through to the database. Invariant content may store a
+    // segment per language, so it is checked per language; that lookup also finds a segment stored once for all.
+    private bool HasPublishedUrlSegment(IContent entity)
+    {
+        if (_documentUrlService.IsInitialized is false)
+        {
+            return true;
+        }
+
+        IEnumerable<string> cultures = entity.AvailableCultures.Any()
+            ? entity.AvailableCultures
+            : _languageService.GetAllIsoCodesAsync().GetAwaiter().GetResult();
+        return cultures.Any(culture => HasPublishedUrlSegment(entity.Key, culture));
+    }
 
     private void RemoveSelfReferencingRedirect(Guid contentKey, string route)
     {
