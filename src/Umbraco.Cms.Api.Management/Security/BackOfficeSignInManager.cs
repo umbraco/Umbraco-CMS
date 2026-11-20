@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -196,12 +195,7 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
 
         ClaimsPrincipal principal = await CreateUserPrincipalAsync(user);
 
-        foreach (Claim claim in new[] { ClaimTypes.AuthenticationMethod, Constants.Security.AuthenticationMethodsReferencesClaimType }
-                     .Select(type => authentication.Principal?.FindFirst(type))
-                     .OfType<Claim>())
-        {
-            principal.Identities.First().AddClaim(claim);
-        }
+        principal.Identities.First().AddClaims(GetAuthenticationMethodClaims(authentication.Principal));
 
         await Context.SignInAsync(AuthenticationType, principal, authentication.Properties);
     }
