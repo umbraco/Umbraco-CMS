@@ -1,6 +1,6 @@
 ---
 name: project_ef_core_media_repository_campaign
-description: "The Media NPoco-to-EF Core campaign (planned 20-11-2026) — where the plan, status file and board live, the eight-PR shape, the hoist-down design in both tiers, and the decisions still awaiting the user's confirmation"
+description: "The Media NPoco-to-EF Core campaign (planned 20-11-2026) — where the plan, status file and board live, the eight-PR shape, the hoist-down design in both tiers, and the decisions the user confirmed on 20-11-2026"
 metadata:
   node_type: memory
   type: project
@@ -27,7 +27,7 @@ Dependencies: 1 ∥ 2 ∥ 5; 3 after 2; 3b after 3; 4 after 1+3b; 6 after 4+5; 7
 - Parity list (§4b): `IsSorting` on the sort saving notification (#24349 handlers skip metadata extraction), one `MediaDeletedNotification` per item deepest-first (deletes files), `MediaRefreshNotification` from the repository, `umbracoMediaVersion.path` from `umbracoFile` via `MediaUrlGeneratorCollection`, tags on every save, version delete is a no-op, Guid-v7 + duplicate-key checks on single save, `DeleteMediaOfTypes` trashes all non-matching descendants, no relation check when emptying the bin.
 - Hazard once PR 6 merges: upstream fixes to the sync `MediaService`/`MediaRepository` must be walked by hand into the async twins on every merge from main ([[project_async_fork_merge_hazard]]).
 
-**Decisions awaiting the user (§8, defaults chosen):** media-only scope (members next), hoist-first in both tiers, tree operations on the wide service base (ElementService inherits them), engine semantics replace media's exceptions/ignored cancels, no relation check on empty-recycle-bin for media, the four file-system members of IMediaService stay sync, `GetMediaByPathAsync` kept though uncalled, `CountNotTrashed` dropped.
+**Decisions confirmed by the user on 20-11-2026 (§8; PR 1, PR 2 and PR 5 unblocked, none started):** media-only scope (members next), hoist-first in both tiers, tree operations on the wide service base (ElementService inherits them), engine semantics replace media's exceptions/ignored cancels, no relation check on empty-recycle-bin for media, the four file-system members of IMediaService stay sync, `GetMediaByPathAsync` kept though uncalled, `CountNotTrashed` dropped.
 
 **Why:** the user asked for the media migration planned the same way as elements, with the branch's contract rules (no ids, no IQuery, async everywhere, Attempt pattern) and the content repository/service as the template.
 

@@ -176,6 +176,7 @@
     }
   ],
   "log": [
+    { "date": "20-11-2026", "text": "All §8 design decisions confirmed by the user (media-only scope, hoist-first in both tiers, tree operations on the wide service base, engine semantics for the §4b change list, no relation check when emptying the media recycle bin, file-system members stay sync, GetMediaByPathAsync kept, CountNotTrashed dropped). PR 1, PR 2 and PR 5 are unblocked and may start in parallel; no branch cut yet." },
     { "date": "20-11-2026", "text": "Campaign planned on 450b951b298 (main merged into the integration branch the same day): eight PRs (1, 2, 3, 3b, 4, 5, 6, 7). Media baseline fully green (562 unit, 697 integration tests named Media), so there is no PR 0. Design decisions awaiting the user's confirmation are listed in CAMPAIGN.md §8." }
   ]
 }
