@@ -1,6 +1,10 @@
 /* eslint-disable local-rules/no-direct-api-import */
 
-import type { UmbElementTreeChildrenOfRequestArgs, UmbElementTreeRootItemsRequestArgs } from './types.js';
+import type {
+	UmbElementTreeChildrenOfRequestArgs,
+	UmbElementTreeItemsRequestArgs,
+	UmbElementTreeRootItemsRequestArgs,
+} from './types.js';
 import { ElementService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbManagementApiTreeDataRequestManager } from '@umbraco-cms/backoffice/management-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -11,6 +15,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type {
 	UmbManagementApiTreeAncestorsOfRequestArgs,
+	UmbManagementApiTreeBatchRequestArgs,
 	UmbManagementApiTreeChildrenOfRequestArgs,
 	UmbManagementApiTreeRootItemsRequestArgs,
 	UmbManagementApiTreeSiblingsFromRequestArgs,
@@ -28,6 +33,9 @@ interface UmbManagementApiElementTreeSiblingsFromRequestArgs extends UmbManageme
 	};
 }
 
+interface UmbManagementApiElementTreeBatchRequestArgs
+	extends UmbManagementApiTreeBatchRequestArgs, Pick<UmbElementTreeItemsRequestArgs, 'dataType'> {}
+
 export class UmbManagementApiElementTreeDataRequestManager extends UmbManagementApiTreeDataRequestManager<
 	ElementTreeItemResponseModel,
 	UmbManagementApiElementTreeRootItemsRequestArgs,
@@ -37,7 +45,8 @@ export class UmbManagementApiElementTreeDataRequestManager extends UmbManagement
 	UmbManagementApiTreeAncestorsOfRequestArgs,
 	Array<ElementTreeItemResponseModel>,
 	UmbManagementApiElementTreeSiblingsFromRequestArgs,
-	SubsetElementTreeItemResponseModel
+	SubsetElementTreeItemResponseModel,
+	UmbManagementApiElementTreeBatchRequestArgs
 > {
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -77,6 +86,14 @@ export class UmbManagementApiElementTreeDataRequestManager extends UmbManagement
 						target: args.paging.target.unique,
 						before: args.paging.takeBefore,
 						after: args.paging.takeAfter,
+					},
+				}),
+
+			getBatch: (args) =>
+				ElementService.getTreeElementBatch({
+					query: {
+						id: args.uniques,
+						dataTypeId: args.dataType?.unique,
 					},
 				}),
 		});

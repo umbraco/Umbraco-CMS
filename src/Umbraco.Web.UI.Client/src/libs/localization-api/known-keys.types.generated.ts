@@ -321,6 +321,7 @@ declare global {
 		blockEditor_rangeAllowed: string;
 		blockEditor_rootValidationEntriesNotAllowed: string;
 		blockEditor_scaleHandlerButtonTitle: string;
+		blockEditor_setUnexpose: string;
 		blockEditor_showSizeOptions: string;
 		blockEditor_sizeOptions: string;
 		blockEditor_sizeOptionsHelp: string;
