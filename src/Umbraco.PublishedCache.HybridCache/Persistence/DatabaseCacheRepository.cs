@@ -143,13 +143,13 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetElementSourceForPublishStatesAsync(Guid key)
-        => ToElementPublishStateNodes(key, await GetElementSourceDto(key));
+        => ToElementPublishStateNodes(await GetElementSourceDto(key));
 
     /// <inheritdoc/>
     public (ContentCacheNode? Draft, ContentCacheNode? Published) GetElementSourceForPublishStates(Guid key)
-        => ToElementPublishStateNodes(key, Read(database => database.FirstOrDefault<ContentSourceDto>(GetElementSourceSql(key))));
+        => ToElementPublishStateNodes(Read(database => database.FirstOrDefault<ContentSourceDto>(GetElementSourceSql(key))));
 
-    private (ContentCacheNode? Draft, ContentCacheNode? Published) ToElementPublishStateNodes(Guid key, ContentSourceDto? dto)
+    private (ContentCacheNode? Draft, ContentCacheNode? Published) ToElementPublishStateNodes(ContentSourceDto? dto)
     {
         if (dto is null)
         {
@@ -158,22 +158,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         ContentCacheNode? draftNode = CreateElementNodeKit(true, dto);
 
-        ContentCacheNode? publishedNode;
-        if (dto.PubDataRaw is null && dto.PubData is null)
-        {
-            publishedNode = null;
-        }
-        else if (dto.Published && dto.PubName is null)
-        {
-            _logger.LogWarning(
-                "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
-                key);
-            publishedNode = null;
-        }
-        else
-        {
-            publishedNode = CreateElementNodeKit(false, dto);
-        }
+        ContentCacheNode? publishedNode = HasUsableSource(dto, false) ? CreateElementNodeKit(false, dto) : null;
 
         return (draftNode, publishedNode);
     }
@@ -296,21 +281,8 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     private ContentCacheNode? CreateDocumentSourceNode(ContentSourceDto? dto, bool preview)
     {
-        if (dto is null)
+        if (dto is null || HasUsableSource(dto, preview) is false)
         {
-            return null;
-        }
-
-        if (preview is false && dto.PubDataRaw is null && dto.PubData is null)
-        {
-            return null;
-        }
-
-        if (preview is false && dto.Published && dto.PubName is null)
-        {
-            _logger.LogWarning(
-                "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
-                dto.Key);
             return null;
         }
 
@@ -319,13 +291,13 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <inheritdoc/>
     public async Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetDocumentSourceForPublishStatesAsync(Guid key)
-        => ToPublishStateNodes(key, await ReadAsync(database => database.FirstOrDefaultAsync<ContentSourceDto>(GetDocumentSourceSql(key))));
+        => ToPublishStateNodes(await ReadAsync(database => database.FirstOrDefaultAsync<ContentSourceDto>(GetDocumentSourceSql(key))));
 
     /// <inheritdoc/>
     public (ContentCacheNode? Draft, ContentCacheNode? Published) GetDocumentSourceForPublishStates(Guid key)
-        => ToPublishStateNodes(key, Read(database => database.FirstOrDefault<ContentSourceDto>(GetDocumentSourceSql(key))));
+        => ToPublishStateNodes(Read(database => database.FirstOrDefault<ContentSourceDto>(GetDocumentSourceSql(key))));
 
-    private (ContentCacheNode? Draft, ContentCacheNode? Published) ToPublishStateNodes(Guid key, ContentSourceDto? dto)
+    private (ContentCacheNode? Draft, ContentCacheNode? Published) ToPublishStateNodes(ContentSourceDto? dto)
     {
         if (dto is null)
         {
@@ -334,22 +306,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         ContentCacheNode? draftNode = CreateDocumentNodeKit(true, dto);
 
-        ContentCacheNode? publishedNode;
-        if (dto.PubDataRaw is null && dto.PubData is null)
-        {
-            publishedNode = null;
-        }
-        else if (dto.Published && dto.PubName is null)
-        {
-            _logger.LogWarning(
-                "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
-                key);
-            publishedNode = null;
-        }
-        else
-        {
-            publishedNode = CreateDocumentNodeKit(false, dto);
-        }
+        ContentCacheNode? publishedNode = HasUsableSource(dto, false) ? CreateDocumentNodeKit(false, dto) : null;
 
         return (draftNode, publishedNode);
     }
@@ -459,7 +416,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     {
         var filtered = dtos
             .Where(x => x is not null)
-            .Where(x => preview || ((x.PubDataRaw is not null || x.PubData is not null) && (!x.Published || x.PubName is not null)))
+            .Where(x => HasUsableSource(x, preview))
             .ToList();
 
         IContentCacheDataSerializer serializer =
