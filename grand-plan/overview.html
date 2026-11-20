@@ -52,7 +52,11 @@
   header { display: grid; gap: 14px; }
   .meta { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 0.9rem; color: var(--muted); }
   .meta span { min-width: 0; overflow-wrap: anywhere; }
-  .totals { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 560px) { .totals { grid-template-columns: 1fr; } }
+  .bars { display: grid; gap: 6px; }
+  .barrow { display: grid; grid-template-columns: 7em 1fr; align-items: center; gap: 10px; }
+  .barlabel { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
   .total { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; display: grid; gap: 4px; }
   .total .n { font-size: 1.7rem; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; }
   .total.efcore .n { color: var(--accent); }
@@ -103,7 +107,10 @@
       <span>Source of truth: <code>grand-plan.json</code></span>
     </div>
     <div class="totals" id="totals"></div>
-    <div class="bar"><span id="barfill" style="width:0%"></span></div>
+    <div class="bars">
+      <div class="barrow"><span class="barlabel">Lines</span><div class="bar"><span id="barfill" style="width:0%"></span></div></div>
+      <div class="barrow"><span class="barlabel">Repositories</span><div class="bar"><span id="barfill-repos" style="width:0%"></span></div></div>
+    </div>
   </header>
 
   <section>
@@ -163,11 +170,18 @@
     var pct = Math.round(100 * doneLines / (doneLines + lines));
     var totals = document.getElementById("totals");
     function total(cls, n, label, sub) { var t = el("div", "total " + cls); t.appendChild(el("div", "n", String(n))); t.appendChild(el("div", "muted", label)); if (sub) t.appendChild(el("div", "sum", sub)); totals.appendChild(t); }
-    total("efcore", doneLines.toLocaleString("en-GB"), "lines on EF Core", doneCount + " repositories and " + d.done.bases.length + " bases");
-    total("npoco", lines.toLocaleString("en-GB"), "lines still on NPoco", todo.length + " repositories and bases");
-    total("", pct + "%", "of repository code migrated, by lines", "");
+    var doneAll = doneCount + d.done.bases.length;
+    var pctRepos = Math.round(100 * doneAll / (doneAll + todo.length));
+    total("efcore", doneLines.toLocaleString("en-GB"), "lines on EF Core", "");
+    total("npoco", lines.toLocaleString("en-GB"), "lines still on NPoco", "");
+    total("", pct + "%", "migrated, by lines", "");
+    total("efcore", doneAll, "repositories and bases on EF Core", doneCount + " repositories, " + d.done.bases.length + " bases");
+    total("npoco", todo.length, "repositories and bases still on NPoco", "");
+    total("", pctRepos + "%", "migrated, by repositories", "");
     document.getElementById("barfill").style.width = pct + "%";
     document.getElementById("barfill").title = pct + "% of lines on EF Core";
+    document.getElementById("barfill-repos").style.width = pctRepos + "%";
+    document.getElementById("barfill-repos").title = pctRepos + "% of repositories on EF Core";
 
     var host = document.getElementById("campaigns");
     d.campaigns.forEach(function (c) {

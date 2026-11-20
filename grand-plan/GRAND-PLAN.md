@@ -68,9 +68,10 @@ The usual rules still apply to each: Guid keys and a trailing `CancellationToken
 
 ## Measuring progress
 
-The page compares lines of repository code, not repository counts: a 66-line repository and a 1,648-line one
-are not the same amount of work. `done.lines` in the JSON is the EF Core side (repositories and bases),
-counted the same way as the NPoco side on the inventory day. Refresh both together.
+The page shows two measures side by side, each with its own bar: lines of repository code, and the number
+of repositories and bases. Lines say how much work is left (a 66-line repository and a 1,648-line one are not
+the same); the count says how many separate cutovers remain. `done.lines` in the JSON is the EF Core side,
+counted the same way as the NPoco side on the inventory day. Refresh both sides together.
 
 ## Rules carried over
 
