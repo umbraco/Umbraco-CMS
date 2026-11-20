@@ -21,5 +21,7 @@ internal sealed partial class PublishStatusServiceTests : UmbracoIntegrationTest
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.AddNotificationHandler<LanguageSavedNotification, LanguageSavedDistributedCacheNotificationHandler>();
         builder.AddNotificationHandler<LanguageDeletedNotification, LanguageDeletedDistributedCacheNotificationHandler>();
+        builder.AddNotificationHandler<DomainSavedNotification, DomainSavedDistributedCacheNotificationHandler>();
+        builder.AddNotificationHandler<DomainDeletedNotification, DomainDeletedDistributedCacheNotificationHandler>();
     }
 }

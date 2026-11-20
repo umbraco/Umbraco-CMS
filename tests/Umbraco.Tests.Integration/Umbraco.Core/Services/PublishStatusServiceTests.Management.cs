@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -67,7 +68,9 @@ internal sealed partial class PublishStatusServiceTests
             GetRequiredService<IPublishStatusRepository>(),
             GetRequiredService<ICoreScopeProvider>(),
             GetRequiredService<ILanguageService>(),
-            GetRequiredService<IDocumentNavigationQueryService>());
+            GetRequiredService<IDocumentNavigationQueryService>(),
+            GetRequiredService<IDomainCacheService>(),
+            GetRequiredService<IIdKeyMap>());
 
         Assert.IsFalse(sut.IsDocumentPublished(Textpage.Key, DefaultCulture));
 
@@ -89,7 +92,9 @@ internal sealed partial class PublishStatusServiceTests
             GetRequiredService<IPublishStatusRepository>(),
             GetRequiredService<ICoreScopeProvider>(),
             GetRequiredService<ILanguageService>(),
-            GetRequiredService<IDocumentNavigationQueryService>());
+            GetRequiredService<IDocumentNavigationQueryService>(),
+            GetRequiredService<IDomainCacheService>(),
+            GetRequiredService<IIdKeyMap>());
 
         Assert.IsFalse(sut.IsDocumentPublished(Textpage.Key, DefaultCulture));
 
@@ -133,5 +138,7 @@ internal sealed partial class PublishStatusServiceTests
             GetRequiredService<IPublishStatusRepository>(),
             GetRequiredService<ICoreScopeProvider>(),
             GetRequiredService<ILanguageService>(),
-            GetRequiredService<IDocumentNavigationQueryService>());
+            GetRequiredService<IDocumentNavigationQueryService>(),
+            GetRequiredService<IDomainCacheService>(),
+            GetRequiredService<IIdKeyMap>());
 }

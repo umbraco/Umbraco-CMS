@@ -45,6 +45,8 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     {
         builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
+        builder.AddNotificationHandler<DomainSavedNotification, DomainSavedDistributedCacheNotificationHandler>();
+        builder.AddNotificationHandler<DomainDeletedNotification, DomainDeletedDistributedCacheNotificationHandler>();
 
         builder.Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlServiceInitializerNotificationHandler>();
 
@@ -451,6 +453,69 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     {
         ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         return DocumentUrlService.GetLegacyRouteFormat(Guid.Parse(documentKey), culture, false);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task GetLegacyRouteFormat_Routes_From_Culture_Domain_Below_Ancestor_Unpublished_In_Culture(bool domainOnBranch)
+    {
+        await LanguageService.CreateAsync(new Language("da-DK", "Danish"), Constants.Security.SuperUserKey);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("variantPage")
+            .WithContentVariation(ContentVariation.Culture)
+            .WithAllowAsRoot(true)
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 1, contentType.Alias)];
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var home = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "Home")
+            .Build();
+        ContentService.Save(home);
+        ContentService.Publish(home, ["en-US"]);
+
+        var branch = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "Branch")
+            .WithCultureName("da-DK", "Gren")
+            .WithParent(home)
+            .Build();
+        ContentService.Save(branch);
+        ContentService.Publish(branch, ["en-US", "da-DK"]);
+
+        var child = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "Child")
+            .WithCultureName("da-DK", "Barn")
+            .WithParent(branch)
+            .Build();
+        ContentService.Save(child);
+        ContentService.Publish(child, ["en-US", "da-DK"]);
+
+        var updateDomainResult = await DomainService.UpdateDomainsAsync(
+            domainOnBranch ? branch.Key : home.Key,
+            new DomainsUpdateModel { Domains = [new DomainModel { DomainName = "example.com/da", IsoCode = "da-DK" }] });
+        Assert.IsTrue(updateDomainResult.Success);
+
+        var branchRoute = DocumentUrlService.GetLegacyRouteFormat(branch.Key, "da-DK", false);
+        var childRoute = DocumentUrlService.GetLegacyRouteFormat(child.Key, "da-DK", false);
+
+        Assert.Multiple(() =>
+        {
+            if (domainOnBranch)
+            {
+                Assert.AreEqual($"{branch.Id}/", branchRoute);
+                Assert.AreEqual($"{branch.Id}/barn", childRoute);
+            }
+            else
+            {
+                Assert.AreEqual(Constants.Routing.Unroutable, branchRoute);
+                Assert.AreEqual(Constants.Routing.Unroutable, childRoute);
+            }
+        });
     }
 
     [TestCase(false)]
