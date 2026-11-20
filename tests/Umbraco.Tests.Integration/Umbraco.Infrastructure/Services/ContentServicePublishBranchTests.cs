@@ -474,6 +474,24 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
             expectedPublishResultTypes);
     }
 
+    [TestCase(1)]
+    [TestCase(2)]
+    public async Task Can_Publish_Invariant_Branch_When_Invariant_Culture_Is_Provided_Any_Number_Of_Times(int count)
+    {
+        var (iContentType, _) = await CreateTypes();
+
+        IContent iRoot = new Content("iroot", -1, iContentType);
+        iRoot.SetValue("ip", "iroot");
+        ContentService.Save(iRoot);
+
+        var cultures = Enumerable.Repeat("invariant", count).ToArray();
+        var result = ContentService.PublishBranch(iRoot, PublishBranchFilter.Default, cultures).ToArray();
+
+        AssertPublishResults(result, x => x.Content.Name, "iroot");
+        AssertPublishResults(result, x => x.Result, PublishResultType.SuccessPublish);
+        Assert.IsTrue(ContentService.GetById(iRoot.Key)!.Published);
+    }
+
     [TestCase("*", PublishBranchFilter.Default)]
     [TestCase("*", PublishBranchFilter.IncludeUnpublished)]
     [TestCase("*", PublishBranchFilter.ForceRepublish)]

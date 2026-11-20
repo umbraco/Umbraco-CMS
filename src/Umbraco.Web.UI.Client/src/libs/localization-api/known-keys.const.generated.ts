@@ -312,6 +312,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'blockEditor_rangeAllowed',
 	'blockEditor_rootValidationEntriesNotAllowed',
 	'blockEditor_scaleHandlerButtonTitle',
+	'blockEditor_setUnexpose',
 	'blockEditor_showSizeOptions',
 	'blockEditor_sizeOptions',
 	'blockEditor_sizeOptionsHelp',

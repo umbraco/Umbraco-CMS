@@ -95,6 +95,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#hasContent = new UmbBooleanState<undefined>(undefined);
 	readonly hasContent = this.#hasContent.asObservable();
 
+	/**
+	 * Whether the block is exposed per variant, which is the case when its content type varies by culture.
+	 * Segments are value variations within a culture and don't have an expose of their own.
+	 */
+	readonly variesByVariant = this.content.structure.variesByCulture;
+
 	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
@@ -646,6 +652,36 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 
 	async submit() {
+		const layoutData = await this.#storeData();
+		this.#expose(layoutData.contentKey);
+		this.setIsNew(false);
+
+		this.#reportValidation();
+	}
+
+	/**
+	 * Stores the edits and sets the block as not exposed for the current variant, without validating.
+	 * The content of the variant is kept, so exposing the block again restores it.
+	 */
+	async submitAndUnexpose() {
+		const layoutData = await this.#storeData();
+		const variantId = this.#variantId.getValue();
+		if (!variantId) throw new Error('Failed to unexpose block, missing variant id.');
+		this.#blockManager?.removeOneExpose(layoutData.contentKey, variantId);
+		this.#clearVariantValidationMessages();
+		this.#reportValidation();
+		this.setIsNew(false);
+		this._closeModal();
+	}
+
+	#clearVariantValidationMessages() {
+		for (const manager of [this.content, this.settings]) {
+			const messages = manager.validation.messages;
+			messages.removeMessageByKeys(messages.getMessages().map((x) => x.key));
+		}
+	}
+
+	async #storeData(): Promise<LayoutDataType> {
 		const layoutData = this.#layout.value;
 		const contentData = this.content.getData();
 		if (!layoutData || !this.#blockManager || !this.#blockEntries || !contentData || !this.#originData) {
@@ -678,10 +714,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			}
 		}
 
-		this.#expose(layoutData.contentKey);
-		this.setIsNew(false);
-
-		this.#reportValidation();
+		return layoutData;
 	}
 
 	#reportValidation() {

@@ -123,6 +123,13 @@ export abstract class UmbBlockEntryContext<
 				: hasExpose,
 	);
 
+	#variesByVariant = new UmbBooleanState(undefined);
+	/**
+	 * Whether the block is exposed per variant, which is the case when its content type varies by culture.
+	 * Segments are value variations within a culture and don't have an expose of their own.
+	 */
+	readonly variesByVariant = this.#variesByVariant.asObservable();
+
 	#actionsVisibility = new UmbBooleanState(true);
 	readonly actionsVisibility = this.#actionsVisibility.asObservable();
 
@@ -772,6 +779,7 @@ export abstract class UmbBlockEntryContext<
 			([variantId, variesByCulture, variesBySegment]) => {
 				if (!variantId || variesByCulture === undefined || variesBySegment === undefined) return;
 				this.#variantId.setValue(variantId.toVariant(variesByCulture, variesBySegment));
+				this.#variesByVariant.setValue(variesByCulture);
 				this.#gotVariantId();
 			},
 			'observeVariantId',
@@ -1003,6 +1011,16 @@ export abstract class UmbBlockEntryContext<
 		const variantId = this.#variantId.getValue();
 		if (!variantId || !this.#contentKey) return;
 		this._manager?.setOneExpose(this.#contentKey, variantId);
+	}
+
+	/**
+	 * Reverts the expose of the block for the current variant, returning it to the not-yet-created state.
+	 * The content values of the variant are kept, so exposing again restores them.
+	 */
+	public unexpose() {
+		const variantId = this.#variantId.getValue();
+		if (!variantId || !this.#contentKey) return;
+		this._manager?.removeOneExpose(this.#contentKey, variantId);
 	}
 
 	/**

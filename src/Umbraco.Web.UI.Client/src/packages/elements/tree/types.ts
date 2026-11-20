@@ -5,6 +5,7 @@ import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeItemModel,
+	UmbTreeItemsRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 	UmbTreeRootModel,
 } from '@umbraco-cms/backoffice/tree';
@@ -44,6 +45,12 @@ export interface UmbElementTreeRootItemsRequestArgs extends UmbTreeRootItemsRequ
 }
 
 export interface UmbElementTreeChildrenOfRequestArgs extends UmbTreeChildrenOfRequestArgs {
+	dataType?: {
+		unique: string;
+	};
+}
+
+export interface UmbElementTreeItemsRequestArgs extends UmbTreeItemsRequestArgs {
 	dataType?: {
 		unique: string;
 	};
