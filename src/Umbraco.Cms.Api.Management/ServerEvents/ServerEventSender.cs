@@ -484,46 +484,54 @@ internal sealed class ServerEventSender :
     private async Task NotifyBlueprintDeletedAsync(params IEnumerable<ContentDeletedBlueprintNotification> notifications)
     {
         var seen = new HashSet<Guid>();
+        var routes = new List<ServerEventRoute>();
         foreach (ContentDeletedBlueprintNotification notification in notifications)
         {
             foreach (IContent entity in notification.DeletedBlueprints)
             {
                 if (seen.Add(entity.Key))
                 {
-                    await RouteDeletedEvent(Constants.ServerEvents.EventSource.DocumentBlueprint, entity);
+                    routes.Add(CreateDeletedRoute(Constants.ServerEvents.EventSource.DocumentBlueprint, entity));
                 }
             }
         }
+
+        await _serverEventRouter.RouteEventsAsync(routes);
     }
 
     private async Task NotifyDeletedAsync<T>(string source, params IEnumerable<DeletedNotification<T>> notifications)
         where T : IEntity
     {
         var seen = new HashSet<Guid>();
+        var routes = new List<ServerEventRoute>();
         foreach (DeletedNotification<T> notification in notifications)
         {
             foreach (T entity in notification.DeletedEntities)
             {
                 if (seen.Add(entity.Key))
                 {
-                    await RouteDeletedEvent(source, entity);
+                    routes.Add(CreateDeletedRoute(source, entity));
                 }
             }
         }
+
+        await _serverEventRouter.RouteEventsAsync(routes);
     }
 
     private async Task NotifyTrashedAsync<T>(string source, params IEnumerable<MovedToRecycleBinNotification<T>> notifications)
         where T : IEntity
     {
         var seen = new HashSet<Guid>();
+        var routes = new List<ServerEventRoute>();
         foreach (MovedToRecycleBinNotification<T> notification in notifications)
         {
             foreach (MoveToRecycleBinEventInfo<T> movedEvent in notification.MoveInfoCollection)
             {
                 if (seen.Add(movedEvent.Entity.Key))
                 {
-                    await _serverEventRouter.RouteEventAsync(
-                        new ServerEvent
+                    routes.Add(new ServerEventRoute
+                    {
+                        ServerEvent = new ServerEvent
                         {
                             EventType = Constants.ServerEvents.EventType.Trashed,
                             EventSource = source,
@@ -533,44 +541,54 @@ internal sealed class ServerEventSender :
                         // Use the pre-trash path: after the move the entity's own Path is under the
                         // recycle bin, which HasPathAccess rejects for every non-root user, so start-node
                         // recipients would never be told their content or media was trashed.
-                        new ServerEventRoutingContext { EntityPath = movedEvent.OriginalPath });
+                        Context = new ServerEventRoutingContext { EntityPath = movedEvent.OriginalPath },
+                    });
                 }
             }
         }
+
+        await _serverEventRouter.RouteEventsAsync(routes);
     }
 
     private async Task NotifyBlueprintSavedAsync(params IEnumerable<ContentSavedBlueprintNotification> notifications)
     {
         var seen = new HashSet<Guid>();
+        var routes = new List<ServerEventRoute>();
         foreach (ContentSavedBlueprintNotification notification in notifications)
         {
             if (seen.Add(notification.SavedBlueprint.Key))
             {
-                await RouteCreatedOrUpdatedEvent(Constants.ServerEvents.EventSource.DocumentBlueprint, notification.SavedBlueprint);
+                routes.Add(CreateCreatedOrUpdatedRoute(Constants.ServerEvents.EventSource.DocumentBlueprint, notification.SavedBlueprint));
             }
         }
+
+        await _serverEventRouter.RouteEventsAsync(routes);
     }
 
     private async Task NotifySavedAsync<T>(string source, params IEnumerable<SavedNotification<T>> notifications)
         where T : IEntity
     {
         var seen = new HashSet<Guid>();
+        var routes = new List<ServerEventRoute>();
         foreach (SavedNotification<T> notification in notifications)
         {
             foreach (T entity in notification.SavedEntities)
             {
                 if (seen.Add(entity.Key))
                 {
-                    await RouteCreatedOrUpdatedEvent(source, entity);
+                    routes.Add(CreateCreatedOrUpdatedRoute(source, entity));
                 }
             }
         }
+
+        await _serverEventRouter.RouteEventsAsync(routes);
     }
 
     private async Task RouteContentTypeChangedEventsAsync<T>(string source, params IEnumerable<ContentTypeChangeNotification<T>> notifications)
         where T : class, IContentTypeComposition
     {
         var seen = new HashSet<Guid>();
+        var routes = new List<ServerEventRoute>();
         foreach (ContentTypeChangeNotification<T> notification in notifications)
         {
             foreach (ContentTypeChange<T> change in notification.Changes)
@@ -588,14 +606,19 @@ internal sealed class ServerEventSender :
                     continue;
                 }
 
-                await _serverEventRouter.RouteEventAsync(new ServerEvent
+                routes.Add(new ServerEventRoute
                 {
-                    EventType = Constants.ServerEvents.EventType.Updated,
-                    Key = change.Item.Key,
-                    EventSource = source,
+                    ServerEvent = new ServerEvent
+                    {
+                        EventType = Constants.ServerEvents.EventType.Updated,
+                        Key = change.Item.Key,
+                        EventSource = source,
+                    },
                 });
             }
         }
+
+        await _serverEventRouter.RouteEventsAsync(routes);
     }
 
     private async Task NotifyPublicAccessEntryDeletedAsync(params IEnumerable<PublicAccessEntryDeletedNotification> notifications)
@@ -653,21 +676,24 @@ internal sealed class ServerEventSender :
         }
     }
 
-    private async Task RouteDeletedEvent<T>(string source, T entity)
+    private static ServerEventRoute CreateDeletedRoute<T>(string source, T entity)
         where T : IEntity
-        => await _serverEventRouter.RouteEventAsync(
-            new ServerEvent
+        => new()
+        {
+            ServerEvent = new ServerEvent
             {
                 EventType = Constants.ServerEvents.EventType.Deleted,
                 EventSource = source,
                 Key = entity.Key,
             },
-            new ServerEventRoutingContext { EntityPath = (entity as IUmbracoEntity)?.Path });
+            Context = new ServerEventRoutingContext { EntityPath = (entity as IUmbracoEntity)?.Path },
+        };
 
-    private async Task RouteCreatedOrUpdatedEvent<T>(string source, T entity)
+    private static ServerEventRoute CreateCreatedOrUpdatedRoute<T>(string source, T entity)
         where T : IEntity
-        => await _serverEventRouter.RouteEventAsync(
-            new ServerEvent
+        => new()
+        {
+            ServerEvent = new ServerEvent
             {
                 EventType = entity.CreateDate == entity.UpdateDate
                     ? Constants.ServerEvents.EventType.Created
@@ -675,11 +701,13 @@ internal sealed class ServerEventSender :
                 Key = entity.Key,
                 EventSource = source,
             },
-            new ServerEventRoutingContext { EntityPath = (entity as IUmbracoEntity)?.Path });
+            Context = new ServerEventRoutingContext { EntityPath = (entity as IUmbracoEntity)?.Path },
+        };
 
     private async Task RouteDocumentUpdatedEventForPublicAccessModification(IEnumerable<PublicAccessEntry> entities)
     {
         var seen = new HashSet<Guid>();
+        var routes = new List<ServerEventRoute>();
         foreach (PublicAccessEntry entity in entities)
         {
             Attempt<Guid> getKeyAttempt = _idKeyMap.GetKeyForId(entity.ProtectedNodeId, UmbracoObjectTypes.Document);
@@ -703,14 +731,18 @@ internal sealed class ServerEventSender :
                     getKeyAttempt.Result);
             }
 
-            await _serverEventRouter.RouteEventAsync(
-                new ServerEvent
+            routes.Add(new ServerEventRoute
+            {
+                ServerEvent = new ServerEvent
                 {
                     EventType = Constants.ServerEvents.EventType.Updated,
                     Key = getKeyAttempt.Result,
                     EventSource = Constants.ServerEvents.EventSource.Document,
                 },
-                new ServerEventRoutingContext { EntityPath = documentEntity?.Path });
+                Context = new ServerEventRoutingContext { EntityPath = documentEntity?.Path },
+            });
         }
+
+        await _serverEventRouter.RouteEventsAsync(routes);
     }
 }

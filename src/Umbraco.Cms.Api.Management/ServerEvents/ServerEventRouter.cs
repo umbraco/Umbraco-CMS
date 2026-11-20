@@ -52,40 +52,43 @@ internal sealed class ServerEventRouter : IServerEventRouter
             return;
         }
 
-        try
-        {
-            await _eventHub.Clients.Group(serverEvent.EventSource).notify(serverEvent);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to route server event {EventType} for {EventSource}", serverEvent.EventType, serverEvent.EventSource);
-        }
+        await SendToSourceGroupAsync(serverEvent);
     }
 
     /// <inheritdoc/>
-    public async Task RouteEventAsync(ServerEvent serverEvent, ServerEventRoutingContext context)
+    public Task RouteEventAsync(ServerEvent serverEvent, ServerEventRoutingContext context)
+        => RouteEventsAsync([new ServerEventRoute { ServerEvent = serverEvent, Context = context }]);
+
+    /// <inheritdoc/>
+    public async Task RouteEventsAsync(IEnumerable<ServerEventRoute> routes)
     {
         if (_runtimeState.Level != RuntimeLevel.Run)
         {
             return;
         }
 
-        // Sources with no registered access filter are broadcast to the whole source group.
-        if (_accessService.AppliesTo(serverEvent.EventSource) is false)
+        var payloads = new List<ServerEventCacheRefresher.JsonPayload>();
+        foreach (ServerEventRoute route in routes)
         {
-            await RouteEventAsync(serverEvent);
-            return;
-        }
+            ServerEvent serverEvent = route.ServerEvent;
 
-        Distribute(
-            serverEvent,
-            new ServerEventCacheRefresher.JsonPayload
+            // Sources with no registered access filter are broadcast to the whole source group.
+            if (route.Context is null || _accessService.AppliesTo(serverEvent.EventSource) is false)
+            {
+                await SendToSourceGroupAsync(serverEvent);
+                continue;
+            }
+
+            payloads.Add(new ServerEventCacheRefresher.JsonPayload
             {
                 EventSource = serverEvent.EventSource,
                 EventType = serverEvent.EventType,
                 Key = serverEvent.Key,
-                EntityPath = context.EntityPath,
+                EntityPath = route.Context.EntityPath,
             });
+        }
+
+        Distribute(payloads);
     }
 
     /// <inheritdoc/>
@@ -97,14 +100,15 @@ internal sealed class ServerEventRouter : IServerEventRouter
         }
 
         Distribute(
-            serverEvent,
+        [
             new ServerEventCacheRefresher.JsonPayload
             {
                 EventSource = serverEvent.EventSource,
                 EventType = serverEvent.EventType,
                 Key = serverEvent.Key,
                 UserKey = userKey,
-            });
+            },
+        ]);
 
         return Task.CompletedTask;
     }
@@ -127,15 +131,32 @@ internal sealed class ServerEventRouter : IServerEventRouter
         }
     }
 
-    private void Distribute(ServerEvent serverEvent, ServerEventCacheRefresher.JsonPayload payload)
+    private async Task SendToSourceGroupAsync(ServerEvent serverEvent)
     {
         try
         {
-            _distributedCache.RefreshByPayload(ServerEventCacheRefresher.UniqueId, new[] { payload });
+            await _eventHub.Clients.Group(serverEvent.EventSource).notify(serverEvent);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Failed to distribute server event {EventType} for {EventSource}", serverEvent.EventType, serverEvent.EventSource);
+            _logger.LogWarning(ex, "Failed to route server event {EventType} for {EventSource}", serverEvent.EventType, serverEvent.EventSource);
+        }
+    }
+
+    private void Distribute(IReadOnlyCollection<ServerEventCacheRefresher.JsonPayload> payloads)
+    {
+        if (payloads.Count == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            _distributedCache.RefreshByPayload(ServerEventCacheRefresher.UniqueId, payloads);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to distribute {Count} server events", payloads.Count);
         }
     }
 }

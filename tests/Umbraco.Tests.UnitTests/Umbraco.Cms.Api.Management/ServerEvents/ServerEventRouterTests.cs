@@ -111,6 +111,45 @@ public class ServerEventRouterTests
     }
 
     [Test]
+    public async Task Can_Distribute_Filtered_Source_Events_Routed_Together_As_One_Instruction()
+    {
+        var (hubMock, hubClientsMock, hubContextMock) = CreateMocks();
+        var filteredSource = Constants.ServerEvents.EventSource.Document;
+        var unfilteredSource = "Unfiltered";
+        hubClientsMock.Setup(x => x.Group(unfilteredSource)).Returns(hubMock.Object);
+
+        var accessServiceMock = CreateAccessServiceMock();
+        accessServiceMock.Setup(x => x.AppliesTo(filteredSource)).Returns(true);
+        accessServiceMock.Setup(x => x.AppliesTo(unfilteredSource)).Returns(false);
+        var messengerMock = new Mock<IServerMessenger>();
+
+        IServerEventRouter sut = CreateSut(hubContextMock.Object, accessServiceMock.Object, messengerMock.Object);
+
+        ServerEventRoute[] filteredRoutes = Enumerable.Range(1, 3)
+            .Select(i => new ServerEventRoute
+            {
+                ServerEvent = new ServerEvent { EventType = "Updated", EventSource = filteredSource, Key = Guid.NewGuid() },
+                Context = new ServerEventRoutingContext { EntityPath = $"-1,{i}" },
+            })
+            .ToArray();
+        var unfilteredEvent = new ServerEvent { EventType = "Updated", EventSource = unfilteredSource, Key = Guid.NewGuid() };
+
+        await sut.RouteEventsAsync([.. filteredRoutes, new ServerEventRoute { ServerEvent = unfilteredEvent, Context = new ServerEventRoutingContext() }]);
+
+        messengerMock.Verify(
+            x => x.QueueRefresh(It.IsAny<ICacheRefresher>(), It.IsAny<ServerEventCacheRefresher.JsonPayload[]>()),
+            Times.Once);
+        messengerMock.Verify(
+            x => x.QueueRefresh(
+                It.Is<ICacheRefresher>(r => r.RefresherUniqueId == ServerEventCacheRefresher.UniqueId),
+                It.Is<ServerEventCacheRefresher.JsonPayload[]>(p =>
+                    p.Select(x => x.Key).SequenceEqual(filteredRoutes.Select(r => r.ServerEvent.Key))
+                    && p.Select(x => x.EntityPath).SequenceEqual(filteredRoutes.Select(r => r.Context!.EntityPath)))),
+            Times.Once);
+        hubMock.Verify(x => x.notify(unfilteredEvent), Times.Once);
+    }
+
+    [Test]
     public async Task Can_Distribute_User_Notification_To_All_Servers()
     {
         var (hubMock, hubClientsMock, hubContextMock) = CreateMocks();

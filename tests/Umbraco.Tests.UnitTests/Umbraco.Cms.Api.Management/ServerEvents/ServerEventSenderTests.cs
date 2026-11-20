@@ -45,6 +45,35 @@ internal sealed class ServerEventSenderTests
     }
 
     [Test]
+    public async Task HandleAsync_ContentSavedNotifications_RoutesAllSavedEntitiesTogether()
+    {
+        // Arrange
+        var now = DateTime.UtcNow;
+        IContent[] contents = Enumerable.Range(1, 3)
+            .Select(i => Mock.Of<IContent>(c =>
+                c.Key == Guid.NewGuid() &&
+                c.CreateDate == now &&
+                c.UpdateDate == now &&
+                c.Path == $"-1,{i}"))
+            .ToArray();
+
+        ContentSavedNotification[] notifications =
+        [
+            new ContentSavedNotification(contents.Take(2), new EventMessages()),
+            new ContentSavedNotification(contents[2], new EventMessages()),
+        ];
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notifications, CancellationToken.None);
+
+        // Assert
+        Assert.That(recordingRouter.RoutedBatches, Has.Count.EqualTo(1));
+        Assert.That(recordingRouter.RoutedBatches[0].Select(x => x.ServerEvent.Key), Is.EqualTo(contents.Select(x => x.Key)));
+    }
+
+    [Test]
     public async Task HandleAsync_ContentSavedNotification_PassesEntityPathInContext()
     {
         // Arrange
@@ -1863,9 +1892,23 @@ internal sealed class ServerEventSenderTests
             return RouteEventAsync(serverEvent);
         }
 
+        public async Task RouteEventsAsync(IEnumerable<ServerEventRoute> routes)
+        {
+            ServerEventRoute[] batch = [.. routes];
+            RoutedBatches.Add(batch);
+            foreach (ServerEventRoute route in batch)
+            {
+                await (route.Context is null
+                    ? RouteEventAsync(route.ServerEvent)
+                    : RouteEventAsync(route.ServerEvent, route.Context));
+            }
+        }
+
         public List<ServerEvent> RoutedEvents { get; } = [];
 
         public List<ServerEventRoutingContext> RoutedContexts { get; } = [];
+
+        public List<ServerEventRoute[]> RoutedBatches { get; } = [];
 
         public Task NotifyUserAsync(ServerEvent serverEvent, Guid userKey)
         {

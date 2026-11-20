@@ -16,6 +16,8 @@ namespace Umbraco.Cms.Api.Management.ServerEvents;
 /// </summary>
 /// <remarks>
 /// The handler runs on every server, so each one only sends to its own connections and no connection receives an event twice.
+/// On the server that raised the events it runs within the synchronous distributed cache call, which waits for local
+/// delivery to complete, so callers should dispatch the events of one operation together.
 /// </remarks>
 internal sealed class ServerEventCacheRefresherNotificationHandler : INotificationAsyncHandler<ServerEventCacheRefresherNotification>
 {
