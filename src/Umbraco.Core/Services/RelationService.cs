@@ -339,7 +339,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public async Task<PagedModel<IRelation>> GetPagedByChildKeyAsync(Guid childKey, int skip, int take, string? relationTypeAlias)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         return await _relationRepository.GetPagedByChildKeyAsync(childKey, skip, take, relationTypeAlias);
     }
 
@@ -685,7 +685,7 @@ public class RelationService : RepositoryService, IRelationService
             return Attempt.FailWithStatus(objectTypeValidationError.Value, relationType);
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             RelationTypeOperationStatus status = operationValidation();
             if (status != RelationTypeOperationStatus.Success)
@@ -750,7 +750,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public async Task<Attempt<IRelationType?, RelationTypeOperationStatus>> DeleteAsync(Guid key, Guid userKey)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IRelationType? relationType = _relationTypeRepository.Get(key);
         if (relationType is null)
         {

@@ -312,7 +312,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     /// <returns>A collection of content types matching the query.</returns>
     public async Task<IEnumerable<IContentType>> GetByQueryAsync(IQuery<IContentType> query, CancellationToken cancellationToken)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         // that one is special because it works across content, media and member types
         scope.ReadLock(Constants.Locks.ContentTypes);
         IEnumerable<IContentType> contentTypes = Repository.Get(query);

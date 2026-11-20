@@ -74,7 +74,7 @@ public class WebhookService : IWebhookService
             return Attempt.FailWithStatus(validationResult, webhook);
         }
 
-        using ICoreScope scope = _provider.CreateCoreScope();
+        await using ICoreScope scope = _provider.CreateCoreScope();
 
         EventMessages eventMessages = _eventMessagesFactory.Get();
         var savingNotification = new WebhookSavingNotification(webhook, eventMessages);
@@ -102,7 +102,7 @@ public class WebhookService : IWebhookService
             return Attempt.FailWithStatus(validationResult, webhook);
         }
 
-        using ICoreScope scope = _provider.CreateCoreScope();
+        await using ICoreScope scope = _provider.CreateCoreScope();
 
         IWebhook? currentWebhook = await _webhookRepository.GetAsync(webhook.Key);
 
@@ -140,7 +140,7 @@ public class WebhookService : IWebhookService
     /// <inheritdoc />
     public async Task<Attempt<IWebhook?, WebhookOperationStatus>> DeleteAsync(Guid key)
     {
-        using ICoreScope scope = _provider.CreateCoreScope();
+        await using ICoreScope scope = _provider.CreateCoreScope();
         IWebhook? webhook = await _webhookRepository.GetAsync(key);
         if (webhook is null)
         {
@@ -167,7 +167,7 @@ public class WebhookService : IWebhookService
     /// <inheritdoc />
     public async Task<IWebhook?> GetAsync(Guid key)
     {
-        using ICoreScope scope = _provider.CreateCoreScope();
+        await using ICoreScope scope = _provider.CreateCoreScope();
         IWebhook? webhook = await _webhookRepository.GetAsync(key);
         scope.Complete();
         return webhook;
@@ -176,7 +176,7 @@ public class WebhookService : IWebhookService
     /// <inheritdoc />
     public async Task<IEnumerable<IWebhook?>> GetMultipleAsync(IEnumerable<Guid> keys)
     {
-        using ICoreScope scope = _provider.CreateCoreScope();
+        await using ICoreScope scope = _provider.CreateCoreScope();
         PagedModel<IWebhook> webhooks = await _webhookRepository.GetByIdsAsync(keys);
         scope.Complete();
 
@@ -186,7 +186,7 @@ public class WebhookService : IWebhookService
     /// <inheritdoc />
     public async Task<PagedModel<IWebhook>> GetAllAsync(int skip, int take)
     {
-        using ICoreScope scope = _provider.CreateCoreScope();
+        await using ICoreScope scope = _provider.CreateCoreScope();
         PagedModel<IWebhook> webhooks = await _webhookRepository.GetAllAsync(skip, take);
         scope.Complete();
 
@@ -196,7 +196,7 @@ public class WebhookService : IWebhookService
     /// <inheritdoc />
     public async Task<IEnumerable<IWebhook>> GetByAliasAsync(string alias)
     {
-        using ICoreScope scope = _provider.CreateCoreScope();
+        await using ICoreScope scope = _provider.CreateCoreScope();
         PagedModel<IWebhook> webhooks = await _webhookRepository.GetByAliasAsync(alias);
         scope.Complete();
 

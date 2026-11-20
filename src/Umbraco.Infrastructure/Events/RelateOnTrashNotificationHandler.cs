@@ -119,7 +119,7 @@ public sealed class RelateOnTrashNotificationHandler :
     /// <inheritdoc />
     public async Task HandleAsync(ContentMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             // This runs after the move to the recycle bin has committed, so it is a transaction of its own. The write lock
             // must be taken before anything is read, otherwise a database that serializes writers (such as SQLite) can
@@ -204,7 +204,7 @@ public sealed class RelateOnTrashNotificationHandler :
     /// <inheritdoc />
     public async Task HandleAsync(MediaMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             // See the equivalent content handler for why the write lock is taken before anything is read.
             scope.WriteLock(Constants.Locks.Relations);

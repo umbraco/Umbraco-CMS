@@ -71,7 +71,7 @@ public class DistributedJobService : IDistributedJobService
     /// <inheritdoc />
     public async Task<IDistributedBackgroundJob?> TryTakeRunnableAsync()
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         scope.EagerWriteLock(Constants.Locks.DistributedJobs);
 
@@ -144,7 +144,7 @@ public class DistributedJobService : IDistributedJobService
     /// <inheritdoc />
     public async Task FinishAsync(string jobName)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         scope.EagerWriteLock(Constants.Locks.DistributedJobs);
         DistributedBackgroundJobModel? job = _distributedJobRepository.GetByName(jobName);
@@ -194,7 +194,7 @@ public class DistributedJobService : IDistributedJobService
             }
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.DistributedJobs);
 
         DistributedBackgroundJobModel[] existingJobs = _distributedJobRepository.GetAll().ToArray();

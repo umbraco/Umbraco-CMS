@@ -102,7 +102,7 @@ internal abstract class TwoFactorLoginServiceBase
         string secret,
         string code)
     {
-        using var scope = _scopeProvider.CreateCoreScope();
+        await using var scope = _scopeProvider.CreateCoreScope();
 
         if ((await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(userOrMemberKey)).Contains(providerName))
         {

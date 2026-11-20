@@ -61,7 +61,7 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
     /// </returns>
     public async Task<Attempt<IDictionaryItem?, DictionaryImportOperationStatus>> ImportDictionaryItemFromUdtFileAsync(Guid fileKey, Guid? parentKey, Guid userKey)
     {
-        using var scope = _scopeProvider.CreateScope();
+        await using var scope = _scopeProvider.CreateScope();
         _temporaryFileService.EnlistDeleteIfScopeCompletes(fileKey, _scopeProvider);
 
         TemporaryFileModel? temporaryFile = await _temporaryFileService.GetAsync(fileKey);

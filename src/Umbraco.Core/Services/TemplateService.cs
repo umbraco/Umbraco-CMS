@@ -156,7 +156,7 @@ public class TemplateService : RepositoryService, ITemplateService
             template.Content = content;
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             var savingEvent = new TemplateSavingNotification(template, eventMessages, true, contentTypeAlias!);
             if (await scope.Notifications.PublishCancelableAsync(savingEvent))
@@ -332,7 +332,7 @@ public class TemplateService : RepositoryService, ITemplateService
             return Attempt.FailWithStatus(TemplateOperationStatus.InvalidAlias, template);
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             TemplateOperationStatus scopeValidatorStatus = scopeValidatorAsync is not null
                 ? await scopeValidatorAsync()
@@ -556,7 +556,7 @@ public class TemplateService : RepositoryService, ITemplateService
     /// <returns>An attempt result containing the deleted template and operation status.</returns>
     private async Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(Func<Task<ITemplate?>> getTemplate, Guid userKey)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             ITemplate? template = await getTemplate();
             if (template == null)

@@ -114,7 +114,7 @@ public sealed class RichTextEditorPastedImages
 
             GuidUdi udi;
 
-            using (IScope scope = _scopeProvider.CreateScope())
+            await using (IScope scope = _scopeProvider.CreateScope())
             {
                 _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFileKey, _scopeProvider);
 

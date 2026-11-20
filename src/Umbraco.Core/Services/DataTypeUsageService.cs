@@ -33,7 +33,7 @@ public class DataTypeUsageService : IDataTypeUsageService
     /// <inheritdoc/>
     public async Task<Attempt<bool, DataTypeOperationStatus>> HasSavedValuesAsync(Guid dataTypeKey)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
         IDataType? dataType = await _dataTypeService.GetAsync(dataTypeKey);
         if (dataType is null)

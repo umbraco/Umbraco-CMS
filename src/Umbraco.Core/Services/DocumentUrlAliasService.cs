@@ -211,7 +211,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             return;
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         if (SkipDatabaseWrites() is false && ShouldRebuildAliases())
         {
@@ -320,7 +320,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// <inheritdoc/>
     public async Task CreateOrUpdateAliasesAsync(Guid documentKey)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         // A save persists its own alias rows under the content tree write lock, so the read lock keeps this
         // write from overlapping one for the same document. Same lock order as RebuildAllAliasesAsync.
@@ -335,7 +335,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// <inheritdoc/>
     public async Task CreateOrUpdateAliasesWithDescendantsAsync(Guid documentKey)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         // A save persists its own alias rows under the content tree write lock, so the read lock keeps this
         // write from overlapping one for the same document. Same lock order as RebuildAllAliasesAsync.
@@ -385,7 +385,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // content tree lock shared, which keeps the write from overlapping a save, and the DocumentUrlAliases lock,
         // which keeps it from overlapping the rebuild, in the rebuild's order. An ambient scope says nothing about
         // which locks are held, so only the caller's word is trusted.
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         if (contentTreeWriteLockHeld is false)
         {
             scope.ReadLock(Constants.Locks.ContentTree);
@@ -413,7 +413,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// <inheritdoc/>
     public async Task UpdateAliasCacheAsync(Guid documentKey)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         await CreateOrUpdateAliasesInternalAsync(documentKey, forceSkipDatabaseWrite: true);
         scope.Complete();
     }
@@ -421,7 +421,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// <inheritdoc/>
     public async Task UpdateAliasCacheWithDescendantsAsync(Guid documentKey)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         var documentKeys = new List<Guid> { documentKey };
         if (_documentNavigationQueryService.TryGetDescendantsKeys(documentKey, out IEnumerable<Guid> descendantKeys))
@@ -513,7 +513,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             return;
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
         // Get all languages for culture-to-languageId mapping

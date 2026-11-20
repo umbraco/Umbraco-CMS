@@ -39,7 +39,7 @@ public class FurthestDescendantOrSelfDynamicRootQueryStep : IDynamicRootQuerySte
             return Attempt<ICollection<Guid>>.Succeed(Array.Empty<Guid>());
         }
 
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
         var result = await _nodeFilterRepository.FurthestDescendantOrSelfAsync(origins, filter);
 
         return Attempt<ICollection<Guid>>.Succeed(result);

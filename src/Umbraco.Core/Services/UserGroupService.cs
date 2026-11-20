@@ -163,7 +163,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return Attempt.FailWithStatus(UserGroupOperationStatus.MissingUser, new PagedModel<IUserGroup>());
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         var groups = _userGroupRepository
             .GetMany()
             .Where(group => filter.IsNullOrWhiteSpace() || group.Name?.InvariantContains(filter) is true)
@@ -207,7 +207,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             }
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         EventMessages eventMessages = EventMessagesFactory.Get();
         var deletingNotification = new UserGroupDeletingNotification(userGroupsToDelete, eventMessages);
 
@@ -251,7 +251,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         ISet<Guid> userKeys,
         Guid? performingUserKey)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         IUser[] users = (await _userService.GetAsync(userKeys)).ToArray();
 
@@ -351,7 +351,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         Guid userKey,
         Guid[]? groupMembersKeys = null)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         IUser? performingUser = await _userService.GetAsync(userKey);
         if (performingUser is null)
@@ -439,7 +439,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         IUserGroup userGroup,
         Guid userKey)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         IUser? performingUser = await _userService.GetAsync(userKey);
         if (performingUser is null)
@@ -494,7 +494,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     /// <inheritdoc />
     public async Task<Attempt<UserGroupOperationStatus>> AddUsersToUserGroupAsync(UsersToUserGroupManipulationModel addUsersModel, Guid performingUserKey)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         Attempt<ResolvedUserToUserGroupManipulationModel?, UserGroupOperationStatus> resolveAttempt = await ResolveUserGroupManipulationModel(addUsersModel, performingUserKey);
 
@@ -525,7 +525,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     /// <inheritdoc />
     public async Task<Attempt<UserGroupOperationStatus>> RemoveUsersFromUserGroupAsync(UsersToUserGroupManipulationModel removeUsersModel, Guid performingUserKey)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         Attempt<ResolvedUserToUserGroupManipulationModel?, UserGroupOperationStatus> resolveAttempt = await ResolveUserGroupManipulationModel(removeUsersModel, performingUserKey);
 

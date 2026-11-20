@@ -185,7 +185,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
     /// <inheritdoc />
     public async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> DeleteAsync(Guid id, Guid userKey)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         WriteLock(scope);
 
         EntityContainer? container = _entityContainerRepository.Get(id);
@@ -229,7 +229,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
             return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.InvalidObjectType, container);
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         WriteLock(scope);
 
         EntityContainerOperationStatus operationValidationStatus = operationValidation();

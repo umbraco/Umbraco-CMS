@@ -178,7 +178,7 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
     /// <returns>The operation status indicating success or failure reason.</returns>
     protected async Task<TOperationStatus> HandleDeleteAsync(string path, Guid userKey)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         TEntity? entity = Repository.Get(path);
         if (entity is null)
@@ -221,7 +221,7 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
             return Attempt.FailWithStatus<TEntity?, TOperationStatus>(InvalidName, default);
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         var path = GetFilePath(parentPath, name);
         try
@@ -270,7 +270,7 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
     /// <returns>An attempt containing the updated entity and operation status.</returns>
     protected async Task<Attempt<TEntity?, TOperationStatus>> HandleUpdateAsync(string path, string content, Guid userKey)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         TEntity? entity = Repository.Get(path);
 
@@ -315,7 +315,7 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
             return Attempt.FailWithStatus<TEntity?, TOperationStatus>(InvalidName, default);
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         TEntity? entity = Repository.Get(path);
 

@@ -675,7 +675,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     /// <inheritdoc />
     public async Task RefreshMemoryCacheAsync(Guid key)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
         (ContentCacheNode? draftNode, ContentCacheNode? publishedNode) = await _databaseCacheRepository.GetContentSourceForPublishStatesAsync(key);
@@ -763,7 +763,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
                 continue;
             }
 
-            using ICoreScope scope = _scopeProvider.CreateCoreScope();
+            await using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             // Materialized because the repository defers deserialization of each node until it is enumerated,
             // and the sequence is walked more than once below.
@@ -875,7 +875,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     /// <inheritdoc />
     public async Task RefreshContentAsync(IContent content)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         if (content.Trashed)
         {
@@ -930,7 +930,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     /// <inheritdoc />
     public async Task DeleteItemAsync(IContentBase content)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
         await _databaseCacheRepository.DeleteContentItemAsync(content.Id);
         scope.Complete();
     }

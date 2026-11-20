@@ -69,6 +69,130 @@ public class ScopedNotificationPublisherTests
         }
     }
 
+    [Test]
+    public async Task Disposing_Scope_Asynchronously_Publishes_Scoped_Notifications_Asynchronously()
+    {
+        var scopeProvider = GetScopeProvider(out var eventAggregatorMock);
+        ICoreScope? ambientScopeDuringPublish = null;
+        eventAggregatorMock
+            .Setup(x => x.PublishAsync<INotification, INotificationHandler>(It.IsAny<IEnumerable<INotification>>(), It.IsAny<CancellationToken>()))
+            .Returns(async () =>
+            {
+                await Task.Yield();
+                ambientScopeDuringPublish = scopeProvider.AmbientScope;
+            });
+
+        await using (ICoreScope scope = scopeProvider.CreateScope())
+        {
+            scope.Notifications.Publish(Mock.Of<INotification>());
+            scope.Complete();
+        }
+
+        eventAggregatorMock.Verify(x => x.PublishAsync<INotification, INotificationHandler>(It.IsAny<IEnumerable<INotification>>(), It.IsAny<CancellationToken>()), Times.Once);
+        eventAggregatorMock.Verify(x => x.Publish<INotification, INotificationHandler>(It.IsAny<IEnumerable<INotification>>()), Times.Never);
+        Assert.IsNull(ambientScopeDuringPublish);
+        Assert.IsNull(scopeProvider.AmbientScope);
+        Assert.IsNull(scopeProvider.AmbientContext);
+    }
+
+    [Test]
+    public void Disposing_Scope_Synchronously_Publishes_Scoped_Notifications_Synchronously()
+    {
+        var scopeProvider = GetScopeProvider(out var eventAggregatorMock);
+
+        using (ICoreScope scope = scopeProvider.CreateScope())
+        {
+            scope.Notifications.Publish(Mock.Of<INotification>());
+            scope.Complete();
+        }
+
+        eventAggregatorMock.Verify(x => x.Publish<INotification, INotificationHandler>(It.IsAny<IEnumerable<INotification>>()), Times.Once);
+        eventAggregatorMock.Verify(x => x.PublishAsync<INotification, INotificationHandler>(It.IsAny<IEnumerable<INotification>>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Test]
+    public async Task Disposing_Uncompleted_Scope_Asynchronously_Does_Not_Publish_Scoped_Notifications()
+    {
+        var scopeProvider = GetScopeProvider(out var eventAggregatorMock);
+
+        await using (ICoreScope scope = scopeProvider.CreateScope())
+        {
+            scope.Notifications.Publish(Mock.Of<INotification>());
+        }
+
+        eventAggregatorMock.Verify(x => x.PublishAsync<INotification, INotificationHandler>(It.IsAny<IEnumerable<INotification>>(), It.IsAny<CancellationToken>()), Times.Never);
+        eventAggregatorMock.Verify(x => x.Publish<INotification, INotificationHandler>(It.IsAny<IEnumerable<INotification>>()), Times.Never);
+        Assert.IsNull(scopeProvider.AmbientScope);
+    }
+
+    [Test]
+    public async Task Disposing_Nested_Scope_Asynchronously_Publishes_Scoped_Notifications_Only_When_The_Outermost_Scope_Exits()
+    {
+        var scopeProvider = GetScopeProvider(out var eventAggregatorMock);
+
+        await using (ICoreScope scope = scopeProvider.CreateScope())
+        {
+            await using (ICoreScope innerScope = scopeProvider.CreateScope())
+            {
+                innerScope.Notifications.Publish(Mock.Of<INotification>());
+                innerScope.Complete();
+            }
+
+            eventAggregatorMock.Verify(x => x.PublishAsync<INotification, INotificationHandler>(It.IsAny<IEnumerable<INotification>>(), It.IsAny<CancellationToken>()), Times.Never);
+            Assert.AreSame(scope, scopeProvider.AmbientScope);
+            scope.Complete();
+        }
+
+        eventAggregatorMock.Verify(x => x.PublishAsync<INotification, INotificationHandler>(It.IsAny<IEnumerable<INotification>>(), It.IsAny<CancellationToken>()), Times.Once);
+        Assert.IsNull(scopeProvider.AmbientScope);
+    }
+
+    [Test]
+    public async Task Disposing_Scope_Asynchronously_Throws_Handler_Exceptions_After_Exiting_The_Scope()
+    {
+        var scopeProvider = GetScopeProvider(out var eventAggregatorMock);
+        var handlerException = new InvalidOperationException("Handler failed.");
+        eventAggregatorMock
+            .Setup(x => x.PublishAsync<INotification, INotificationHandler>(It.IsAny<IEnumerable<INotification>>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(handlerException);
+
+        AggregateException? exception = Assert.ThrowsAsync<AggregateException>(async () =>
+        {
+            await using ICoreScope scope = scopeProvider.CreateScope();
+            scope.Notifications.Publish(Mock.Of<INotification>());
+            scope.Complete();
+        });
+
+        Assert.AreSame(handlerException, exception!.InnerExceptions.Single());
+        Assert.IsNull(scopeProvider.AmbientScope);
+    }
+
+    [Test]
+    public async Task Exiting_Scope_Asynchronously_Uses_Overridden_Synchronous_Publishing()
+    {
+        var eventAggregatorMock = new Mock<IEventAggregator>();
+        var publisher = new SynchronousScopedNotificationPublisher(eventAggregatorMock.Object);
+        publisher.Publish(Mock.Of<INotification>());
+
+        await publisher.ScopeExitAsync(true);
+
+        Assert.AreEqual(1, publisher.PublishedCount);
+        eventAggregatorMock.Verify(x => x.PublishAsync<INotification, INotificationHandler>(It.IsAny<IEnumerable<INotification>>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    private sealed class SynchronousScopedNotificationPublisher : ScopedNotificationPublisher
+    {
+        public SynchronousScopedNotificationPublisher(IEventAggregator eventAggregator)
+            : base(eventAggregator)
+        {
+        }
+
+        public int PublishedCount { get; private set; }
+
+        protected override void PublishScopedNotifications(IList<INotification> notifications)
+            => PublishedCount += notifications.Count;
+    }
+
     private ScopeProvider GetScopeProvider(out Mock<IEventAggregator> eventAggregatorMock)
     {
         var loggerFactory = NullLoggerFactory.Instance;

@@ -365,7 +365,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         bool disabledWhenReferenced,
         ContentEditingOperationStatus referenceFailStatus)
     {
-        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
         if (content == null)
         {
@@ -427,7 +427,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <returns>An attempt containing the content and operation status.</returns>
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey, bool mustBeInRecycleBin = false, bool includeDescendants = true)
     {
-        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
         if (content is null)
         {
@@ -484,7 +484,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <returns>An attempt containing the copied content and operation status.</returns>
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleCopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
     {
-        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
         if (content is null)
         {

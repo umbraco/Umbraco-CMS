@@ -63,7 +63,7 @@ public PublishStatusService(
         //
         // Verified by: PublishStatusServiceTests.Concurrent_Initialize_Never_Transiently_Loses_Published_Status
         IDictionary<Guid, ISet<string>> publishStatus;
-        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
         {
             publishStatus = await _publishStatusRepository.GetAllPublishStatusAsync(cancellationToken);
             scope.Complete();
@@ -80,7 +80,7 @@ public PublishStatusService(
     public async Task RefreshCultureAsync(string culture, CancellationToken cancellationToken)
     {
         HashSet<Guid> publishedKeys;
-        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
         {
             publishedKeys = (await _publishStatusRepository.GetPublishedKeysAsync(culture, cancellationToken)).ToHashSet();
             scope.Complete();
@@ -212,7 +212,7 @@ public PublishStatusService(
     /// <inheritdoc/>
     public async Task AddOrUpdateStatusAsync(Guid documentKey, CancellationToken cancellationToken)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         ISet<string> publishedCultures = await _publishStatusRepository.GetPublishStatusAsync(documentKey, cancellationToken);
         UpdatePublishedCultures(documentKey, publishedCultures);
         scope.Complete();
@@ -238,7 +238,7 @@ public PublishStatusService(
     public async Task AddOrUpdateStatusWithDescendantsAsync(Guid rootDocumentKey, CancellationToken cancellationToken)
     {
         IDictionary<Guid, ISet<string>> publishStatus;
-        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
         {
             publishStatus = await _publishStatusRepository.GetDescendantsOrSelfPublishStatusAsync(rootDocumentKey, cancellationToken);
             scope.Complete();
