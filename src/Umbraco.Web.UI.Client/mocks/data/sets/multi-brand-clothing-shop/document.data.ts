@@ -864,7 +864,7 @@ const buildSite = (site: UmbMbcsSiteCode, pages: Array<UmbMbcsPage>): Array<UmbM
 				...textValue('siteName', name),
 				...mediaPickerValue('logo', logoMediaId(site)),
 				...elementPickerValue('promotions', PROMOTION_IDS[site]),
-				...blockGridValue('content', homeBlocks(site)),
+				...blockGridValue('content', homeBlocks(site), [CULTURE_EN]),
 				...seoValues(name, name, `Welcome to ${name}. Quality clothing, made to last.`, {
 					ogImageId: heroMediaId(site),
 				}),

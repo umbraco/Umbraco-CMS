@@ -227,9 +227,11 @@ internal sealed class RedirectTracker : IRedirectTracker
         return domainRootId > 0;
     }
 
+    // Only domains with a hostname count: ContentFinderByRedirectUrl prefixes the route with the id of the
+    // request's domain, and the router picks that among domains without wildcards (culture-only domains).
     private int GetNodeIdWithAssignedDomain(IPublishedContent entityContent) =>
         entityContent.Path.GetIdsFromPathReversed()
-            .FirstOrDefault(x => _domainCache.HasAssigned(x, includeWildcards: true));
+            .FirstOrDefault(x => _domainCache.HasAssigned(x, includeWildcards: false));
 
     private string GetUrl(Guid contentKey, string languageIsoCode) =>
         _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative, languageIsoCode).TrimEnd('/');

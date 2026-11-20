@@ -143,7 +143,7 @@ public class PackageMigrationRunner
         }
 
         var executedPlansNotification = new MigrationPlansExecutedNotification(results);
-        _eventAggregator.Publish(executedPlansNotification);
+        await _eventAggregator.PublishAsync(executedPlansNotification);
 
         return results;
     }

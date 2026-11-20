@@ -1710,7 +1710,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickEditBlockListEntryWithName(blockListElementName: string) {
-    await this.click(this.blockListEntry.filter({hasText: blockListElementName}).getByLabel('edit'), {force: true});
+    await this.click(this.blockListEntry.filter({hasText: blockListElementName}).getByLabel('edit'));
   }
 
   async clickEditBlockGridEntryWithName(blockGridElementName: string) {

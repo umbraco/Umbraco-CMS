@@ -37,6 +37,45 @@ public interface IElementCacheService : IContentCacheService
         => GetByKeyAsync(key, preview).GetAwaiter().GetResult();
 
     /// <summary>
+    /// Gets multiple published elements by their unique keys, fetching any not already cached
+    /// from the database in a single batched query rather than one at a time.
+    /// </summary>
+    /// <param name="keys">The unique keys of the elements to retrieve.</param>
+    /// <param name="preview">Optional value indicating whether to include unpublished content. If <c>null</c>, uses the default preview setting.</param>
+    /// <returns>The published elements that exist, in the same order as <paramref name="keys"/> (missing elements omitted).</returns>
+    /// <remarks>
+    /// Used to materialise sets of keys without the per-element database round trip of repeated
+    /// <see cref="GetByKeyAsync"/> calls when the cache is cold.
+    /// The default implementation falls back to per-key retrieval so existing implementations keep working.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation and reference to it in the remarks.
+    async Task<IReadOnlyList<IPublishedElement>> GetByKeysAsync(IReadOnlyCollection<Guid> keys, bool? preview = null)
+    {
+        var result = new List<IPublishedElement>(keys.Count);
+        foreach (Guid key in keys)
+        {
+            IPublishedElement? element = await GetByKeyAsync(key, preview);
+            if (element is not null)
+            {
+                result.Add(element);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Gets multiple published elements by their unique keys, for synchronous callers.
+    /// </summary>
+    /// <param name="keys">The unique keys of the elements to retrieve.</param>
+    /// <param name="preview">Optional value indicating whether to include unpublished content. If <c>null</c>, uses the default preview setting.</param>
+    /// <returns>The published elements that exist, in the same order as <paramref name="keys"/> (missing elements omitted).</returns>
+    /// <remarks>See <see cref="GetByKey"/>. The default implementation blocks on <see cref="GetByKeysAsync"/>.</remarks>
+    // TODO (V20): Remove the default implementation and reference to it in the remarks.
+    IReadOnlyList<IPublishedElement> GetByKeys(IReadOnlyCollection<Guid> keys, bool? preview = null)
+        => GetByKeysAsync(keys, preview).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Attempts to retrieve an element from the in-memory converted-content cache without
     /// touching the distributed cache or the database.
     /// </summary>
@@ -64,6 +103,20 @@ public interface IElementCacheService : IContentCacheService
     /// <param name="element">The element to refresh in the cache.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task RefreshElementAsync(IElement element);
+
+    /// <summary>
+    /// Refreshes the cache for the specified element without leaving the calling thread.
+    /// </summary>
+    /// <param name="element">The element to refresh.</param>
+    /// <remarks>
+    /// Runs inside the transaction that persists the element, under the element tree lock. Until the lock wait and
+    /// the notification pipeline are asynchronous, awaiting there needs a second thread-pool thread while the first
+    /// is blocked, which under load stretches the time the lock is held. Implementations should avoid awaiting here
+    /// wherever their backing store allows it.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void RefreshElement(IElement element)
+        => RefreshElementAsync(element).GetAwaiter().GetResult();
 
     /// <summary>
     /// Gets all published elements of the specified content type.

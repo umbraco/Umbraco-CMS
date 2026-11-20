@@ -51,6 +51,9 @@ public sealed class DocumentCache : IPublishedContentCache
     public IPublishedContent? GetById(bool preview, Guid contentId) => _documentCacheService.GetByKey(contentId, preview);
 
     /// <inheritdoc/>
+    public IReadOnlyList<IPublishedContent> GetByIds(bool preview, IReadOnlyCollection<Guid> keys) => _documentCacheService.GetByKeys(keys, preview);
+
+    /// <inheritdoc/>
     public IPublishedContent? GetById(int contentId) => _documentCacheService.GetById(contentId);
 
     /// <inheritdoc/>

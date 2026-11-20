@@ -179,7 +179,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 var moveEventInfo = new MoveEventInfo<IDataType>(toMove, toMove.Path, containerKey);
                 var movingDataTypeNotification = new DataTypeMovingNotification(moveEventInfo, eventMessages);
-                if (scope.Notifications.PublishCancelable(movingDataTypeNotification))
+                if (await scope.Notifications.PublishCancelableAsync(movingDataTypeNotification))
                 {
                     scope.Complete();
                     return Attempt.FailWithStatus(DataTypeOperationStatus.CancelledByNotification, toMove);
