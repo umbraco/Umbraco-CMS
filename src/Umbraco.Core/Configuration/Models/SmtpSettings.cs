@@ -61,6 +61,21 @@ public class SmtpSettings : ValidatableEntryBase
     internal const string StaticDeliveryMethod = "Network";
 
     /// <summary>
+    ///     The default value for whether emails are sent in the background.
+    /// </summary>
+    internal const bool StaticSendInBackground = false;
+
+    /// <summary>
+    ///     The default maximum number of emails waiting to be sent in the background.
+    /// </summary>
+    internal const int StaticBackgroundQueueCapacity = 1000;
+
+    /// <summary>
+    ///     The default maximum total size, in megabytes, of the attachments of emails waiting to be sent in the background.
+    /// </summary>
+    internal const int StaticBackgroundQueueMaximumAttachmentMegabytes = 50;
+
+    /// <summary>
     ///     Gets or sets a value for the SMTP from address to use for messages.
     /// </summary>
     [Required]
@@ -108,4 +123,41 @@ public class SmtpSettings : ValidatableEntryBase
     ///     Gets or sets a value for the time until an email expires.
     /// </summary>
     public TimeSpan? EmailExpiration { get; set; }
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether emails are sent through the SMTP client in the background, rather than
+    ///     while the sender waits.
+    /// </summary>
+    /// <remarks>
+    ///     When enabled, sending an email completes once the email is queued for delivery, so a delivery failure is logged
+    ///     rather than reported to the sender. Queued emails that have not been delivered when the application stops are lost.
+    ///     Delivery runs outside the request that sent the email, so a custom SMTP client cannot rely on the current request
+    ///     or on scoped services from it.
+    /// </remarks>
+    // TODO (V20): Consider enabling this by default.
+    [DefaultValue(StaticSendInBackground)]
+    public bool SendInBackground { get; set; } = StaticSendInBackground;
+
+    /// <summary>
+    ///     Gets or sets the maximum number of emails that can wait to be sent in the background.
+    /// </summary>
+    /// <remarks>
+    ///     Applies when <see cref="SendInBackground"/> is enabled and the default queue is used. When the queue is full, an
+    ///     email is sent while the sender waits instead. Read when the application starts, so a change needs a restart.
+    ///     Values below 1 are treated as 1.
+    /// </remarks>
+    [DefaultValue(StaticBackgroundQueueCapacity)]
+    public int BackgroundQueueCapacity { get; set; } = StaticBackgroundQueueCapacity;
+
+    /// <summary>
+    ///     Gets or sets the maximum total size, in megabytes, of the attachments of emails waiting to be sent in the background.
+    /// </summary>
+    /// <remarks>
+    ///     Applies when <see cref="SendInBackground"/> is enabled and the default queue is used, which holds a copy of each
+    ///     queued email's attachments in memory. An email whose attachments would take the total over this limit is sent
+    ///     while the sender waits instead, as is one with an attachment whose size cannot be determined in advance. Set to
+    ///     0 to send every email with attachments while the sender waits.
+    /// </remarks>
+    [DefaultValue(StaticBackgroundQueueMaximumAttachmentMegabytes)]
+    public int BackgroundQueueMaximumAttachmentMegabytes { get; set; } = StaticBackgroundQueueMaximumAttachmentMegabytes;
 }

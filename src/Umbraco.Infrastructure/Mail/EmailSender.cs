@@ -2,11 +2,13 @@
 // See LICENSE for more details.
 
 using MailKit.Net.Smtp;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.IO;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Models.Email;
@@ -21,12 +23,12 @@ namespace Umbraco.Cms.Infrastructure.Mail;
 /// </summary>
 public class EmailSender : IEmailSender
 {
-    // TODO: This should encapsulate a BackgroundTaskRunner with a queue to send these emails!
     private readonly IEventAggregator _eventAggregator;
     private readonly ILogger<EmailSender> _logger;
     private readonly bool _notificationHandlerRegistered;
     private GlobalSettings _globalSettings;
     private readonly IEmailSenderClient _emailSenderClient;
+    private readonly IEmailDeliveryQueue _emailDeliveryQueue;
     private readonly TimeProvider _timeProvider;
     private readonly Lock _smtpProbeLock = new();
     private Task<bool>? _smtpProbe;
@@ -57,6 +59,7 @@ public class EmailSender : IEmailSender
     /// <param name="emailSenderClient">The client used to send emails and verify the SMTP connection.</param>
     /// <param name="handler1">An optional synchronous handler for <see cref="SendEmailNotification"/>.</param>
     /// <param name="handler2">An optional asynchronous handler for <see cref="SendEmailNotification"/>.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
     public EmailSender(
         ILogger<EmailSender> logger,
         IOptionsMonitor<GlobalSettings> globalSettings,
@@ -64,7 +67,43 @@ public class EmailSender : IEmailSender
         IEmailSenderClient emailSenderClient,
         INotificationHandler<SendEmailNotification>? handler1,
         INotificationAsyncHandler<SendEmailNotification>? handler2)
-        : this(logger, globalSettings, eventAggregator, emailSenderClient, handler1, handler2, TimeProvider.System)
+        : this(
+            logger,
+            globalSettings,
+            eventAggregator,
+            emailSenderClient,
+            StaticServiceProvider.Instance.GetRequiredService<IEmailDeliveryQueue>(),
+            handler1,
+            handler2)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EmailSender"/> class.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="globalSettings">The global settings, including the SMTP configuration.</param>
+    /// <param name="eventAggregator">The event aggregator used to publish <see cref="SendEmailNotification"/>.</param>
+    /// <param name="emailSenderClient">The client used to send emails and verify the SMTP connection.</param>
+    /// <param name="emailDeliveryQueue">The queue used to send emails in the background.</param>
+    /// <param name="handler1">An optional synchronous handler for <see cref="SendEmailNotification"/>.</param>
+    /// <param name="handler2">An optional asynchronous handler for <see cref="SendEmailNotification"/>.</param>
+    public EmailSender(
+        ILogger<EmailSender> logger,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IEventAggregator eventAggregator,
+        IEmailSenderClient emailSenderClient,
+        IEmailDeliveryQueue emailDeliveryQueue,
+        INotificationHandler<SendEmailNotification>? handler1,
+        INotificationAsyncHandler<SendEmailNotification>? handler2)
+        : this(
+            logger,
+            globalSettings,
+            eventAggregator,
+            emailSenderClient,
+            emailDeliveryQueue,
+            handler1 is not null || handler2 is not null,
+            TimeProvider.System)
     {
     }
 
@@ -75,8 +114,8 @@ public class EmailSender : IEmailSender
     /// <param name="globalSettings">The global settings, including the SMTP configuration.</param>
     /// <param name="eventAggregator">The event aggregator used to publish <see cref="SendEmailNotification"/>.</param>
     /// <param name="emailSenderClient">The client used to send emails and verify the SMTP connection.</param>
-    /// <param name="handler1">An optional synchronous handler for <see cref="SendEmailNotification"/>.</param>
-    /// <param name="handler2">An optional asynchronous handler for <see cref="SendEmailNotification"/>.</param>
+    /// <param name="emailDeliveryQueue">The queue used to send emails in the background.</param>
+    /// <param name="notificationHandlerRegistered">Whether a handler for <see cref="SendEmailNotification"/> is registered.</param>
     /// <param name="timeProvider">The time provider used for the SMTP probe cache expiry and timeout.</param>
     /// <remarks>
     /// This constructor is internal because the time provider only exists so tests can control the SMTP probe cache
@@ -88,15 +127,16 @@ public class EmailSender : IEmailSender
         IOptionsMonitor<GlobalSettings> globalSettings,
         IEventAggregator eventAggregator,
         IEmailSenderClient emailSenderClient,
-        INotificationHandler<SendEmailNotification>? handler1,
-        INotificationAsyncHandler<SendEmailNotification>? handler2,
+        IEmailDeliveryQueue emailDeliveryQueue,
+        bool notificationHandlerRegistered,
         TimeProvider timeProvider)
     {
         _logger = logger;
         _eventAggregator = eventAggregator;
         _globalSettings = globalSettings.CurrentValue;
-        _notificationHandlerRegistered = handler1 is not null || handler2 is not null;
+        _notificationHandlerRegistered = notificationHandlerRegistered;
         _emailSenderClient = emailSenderClient;
+        _emailDeliveryQueue = emailDeliveryQueue;
         _timeProvider = timeProvider;
         globalSettings.OnChange(x =>
         {
@@ -283,6 +323,19 @@ public class EmailSender : IEmailSender
                 }
             }
             while (true);
+        }
+
+        if (_globalSettings.Smtp?.SendInBackground is true)
+        {
+            if (await _emailDeliveryQueue.TryEnqueueAsync(message, emailType, expires))
+            {
+                return;
+            }
+
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("The background email queue could not accept a {EmailType} email, so it is being sent immediately.", emailType);
+            }
         }
 
         await _emailSenderClient.SendAsync(message, expires);
