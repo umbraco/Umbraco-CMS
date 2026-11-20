@@ -13,6 +13,8 @@ using Umbraco.Cms.Api.Management.ViewModels.Security;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.User.Current;
 
@@ -32,6 +34,8 @@ public class ChangePasswordCurrentUserSessionTests(bool allowConcurrentLogins)
 {
     private const string NewPassword = "0987654321";
 
+    private static int _loginNotificationCount;
+
     private readonly MutableTimeProvider _clock = new(DateTimeOffset.UtcNow);
 
     protected override Expression<Func<ChangePasswordCurrentUserController, object>> MethodSelector { get; set; } =
@@ -47,6 +51,7 @@ public class ChangePasswordCurrentUserSessionTests(bool allowConcurrentLogins)
     {
         base.CustomTestSetup(builder);
         builder.Services.Configure<SecuritySettings>(x => x.UserAllowConcurrentLogins = allowConcurrentLogins);
+        builder.AddNotificationHandler<UserLoginSuccessNotification, LoginNotificationCounter>();
         builder.Services.RemoveAll<TimeProvider>();
         builder.Services.AddSingleton<TimeProvider>(_clock);
         builder.Services.Configure<CookieAuthenticationOptions>(
@@ -64,6 +69,8 @@ public class ChangePasswordCurrentUserSessionTests(bool allowConcurrentLogins)
         var cookieOfOtherDevice = await LoginAsync(client, email);
         var cookie = await LoginAsync(client, email);
 
+        var loginNotificationsBeforeChange = Volatile.Read(ref _loginNotificationCount);
+
         (HttpStatusCode changeStatusCode, string renewedCookie) = await SendAsync(
             client,
             HttpMethod.Post,
@@ -72,6 +79,10 @@ public class ChangePasswordCurrentUserSessionTests(bool allowConcurrentLogins)
             JsonContent.Create(new ChangePasswordCurrentUserRequestModel { OldPassword = UserPassword, NewPassword = NewPassword }));
         Assert.AreEqual(HttpStatusCode.OK, changeStatusCode);
         Assert.AreNotEqual(cookie, renewedCookie, "The password change did not re-issue the cookie.");
+        Assert.AreEqual(
+            loginNotificationsBeforeChange,
+            Volatile.Read(ref _loginNotificationCount),
+            "Re-issuing the cookie was handled as a login.");
 
         _clock.Advance(ValidationInterval + TimeSpan.FromSeconds(1));
 
@@ -129,6 +140,11 @@ public class ChangePasswordCurrentUserSessionTests(bool allowConcurrentLogins)
         return headers
             .Select(header => header.Split(';')[0])
             .FirstOrDefault(cookie => cookie.StartsWith($"{name}=", StringComparison.Ordinal) && cookie.Length > name.Length + 1);
+    }
+
+    private sealed class LoginNotificationCounter : INotificationHandler<UserLoginSuccessNotification>
+    {
+        public void Handle(UserLoginSuccessNotification notification) => Interlocked.Increment(ref _loginNotificationCount);
     }
 
     private sealed class MutableTimeProvider(DateTimeOffset start) : TimeProvider

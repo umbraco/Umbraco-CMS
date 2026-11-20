@@ -36,7 +36,7 @@ public class ChangePasswordCurrentUserControllerTests
     }
 
     [Test]
-    public async Task Does_Not_Issue_A_Cookie_When_The_Request_Is_Not_Cookie_Authenticated()
+    public async Task Does_Not_Reissue_The_Sign_In_When_The_Request_Is_Not_Cookie_Authenticated()
     {
         _authenticationService
             .Setup(x => x.AuthenticateAsync(It.IsAny<HttpContext>(), Constants.Security.BackOfficeAuthenticationType))
@@ -45,11 +45,11 @@ public class ChangePasswordCurrentUserControllerTests
         IActionResult result = await CreateSut().ChangePassword(CancellationToken.None, new ChangePasswordCurrentUserRequestModel { NewPassword = "0987654321" });
 
         Assert.That(result, Is.InstanceOf<OkResult>());
-        _signInManager.Verify(x => x.RefreshSignInAsync(It.IsAny<BackOfficeIdentityUser>()), Times.Never);
+        _signInManager.Verify(x => x.ReissueSignInAsync(It.IsAny<BackOfficeIdentityUser>()), Times.Never);
     }
 
     [Test]
-    public async Task Refreshes_The_Sign_In_Of_The_Cookie_Principal_When_The_Request_Is_Cookie_Authenticated()
+    public async Task Reissues_The_Sign_In_Of_The_Cookie_Principal_When_The_Request_Is_Cookie_Authenticated()
     {
         var identityUser = new BackOfficeIdentityUser(new GlobalSettings(), 1, []);
         _authenticationService
@@ -63,7 +63,7 @@ public class ChangePasswordCurrentUserControllerTests
         IActionResult result = await CreateSut().ChangePassword(CancellationToken.None, new ChangePasswordCurrentUserRequestModel { NewPassword = "0987654321" });
 
         Assert.That(result, Is.InstanceOf<OkResult>());
-        _signInManager.Verify(x => x.RefreshSignInAsync(identityUser), Times.Once);
+        _signInManager.Verify(x => x.ReissueSignInAsync(identityUser), Times.Once);
     }
 
     private ChangePasswordCurrentUserController CreateSut()

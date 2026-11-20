@@ -30,9 +30,13 @@ public interface IBackOfficeSignInManager : ICoreBackOfficeSignInManager
     /// <summary>
     ///     Re-issues the current sign-in for the user, so it carries the user's current security stamp.
     /// </summary>
-    /// <param name="user">The user to refresh the sign-in for.</param>
+    /// <remarks>
+    ///     This is not a login: it does not publish login notifications, update the last login date or change the
+    ///     security stamp.
+    /// </remarks>
+    /// <param name="user">The user to re-issue the sign-in for.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task RefreshSignInAsync(BackOfficeIdentityUser user);
+    Task ReissueSignInAsync(BackOfficeIdentityUser user);
 
     Task<ClaimsPrincipal> CreateUserPrincipalAsync(BackOfficeIdentityUser user);
 

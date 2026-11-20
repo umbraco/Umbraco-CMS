@@ -211,7 +211,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         IList<Claim> claims = Array.Empty<Claim>();
 
         Claim? authenticationMethod = auth.Principal?.FindFirst(ClaimTypes.AuthenticationMethod);
-        Claim? amr = auth.Principal?.FindFirst("amr");
+        Claim? amr = auth.Principal?.FindFirst(Core.Constants.Security.AuthenticationMethodsReferencesClaimType);
 
         if (authenticationMethod != null || amr != null)
         {
@@ -430,7 +430,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
 
         if (loginProvider == null)
         {
-            await SignInWithClaimsAsync(user, isPersistent, new[] { new Claim("amr", "pwd") });
+            await SignInWithClaimsAsync(user, isPersistent, new[] { new Claim(Core.Constants.Security.AuthenticationMethodsReferencesClaimType, "pwd") });
         }
         else
         {
@@ -501,7 +501,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         // When token is verified correctly, clear the access failed count used for lockout
         await ResetLockout(user);
 
-        var claims = new List<Claim> { new("amr", "mfa") };
+        var claims = new List<Claim> { new(Core.Constants.Security.AuthenticationMethodsReferencesClaimType, "mfa") };
 
         // Cleanup external cookie
         if (twoFactorInfo.LoginProvider != null)
