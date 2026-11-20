@@ -119,9 +119,10 @@ export class UmbInputValueListOptionElement extends UUIFormControlWithBasicsMixi
 	static override styles = [
 		css`
 			:host {
-				display: flex;
-				align-items: flex-start;
-				gap: var(--uui-size-space-3);
+				display: grid;
+				grid-column: 1 / -1;
+				grid-template-columns: subgrid;
+				align-items: start;
 				margin-bottom: var(--uui-size-space-3);
 			}
 
@@ -135,7 +136,8 @@ export class UmbInputValueListOptionElement extends UUIFormControlWithBasicsMixi
 			}
 
 			#validation-message {
-				flex: 1;
+				grid-column: span 2;
+				min-width: 0;
 			}
 
 			#fields {

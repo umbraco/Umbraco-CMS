@@ -145,9 +145,22 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 	}
 
 	override render() {
-		return html`<div id="sorter-wrapper">${this.#renderEntries()}</div>
+		return html`<div id="options">
+				${this.#renderHeader()}
+				<div id="sorter-wrapper">${this.#renderEntries()}</div>
+			</div>
 			${this.#renderAddButton()}
 			<umb-form-validation-message .for=${this}></umb-form-validation-message>`;
+	}
+
+	#renderHeader() {
+		if (this._entries.length === 0) return nothing;
+		return html`
+			<div id="header" aria-hidden="true" inert>
+				<span>${this.localize.term('general_value')}</span>
+				<span>${this.localize.term('general_label')}</span>
+			</div>
+		`;
 	}
 
 	#renderEntries() {
@@ -186,6 +199,37 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 		css`
 			#action {
 				display: block;
+			}
+
+			#options {
+				display: grid;
+				grid-template-columns: auto 1fr 1fr auto;
+				column-gap: var(--uui-size-space-3);
+			}
+
+			:host([readonly]) #options {
+				grid-template-columns: 1fr 1fr;
+			}
+
+			#header,
+			#sorter-wrapper {
+				display: grid;
+				grid-column: 1 / -1;
+				grid-template-columns: subgrid;
+			}
+
+			#header {
+				margin-bottom: var(--uui-size-space-2);
+				color: var(--uui-color-text-alt);
+				font-size: var(--uui-type-small-size);
+			}
+
+			#header span:first-child {
+				grid-column: 2;
+			}
+
+			:host([readonly]) #header span:first-child {
+				grid-column: 1;
 			}
 
 			.--umb-sorter-placeholder {

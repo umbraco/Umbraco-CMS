@@ -75,6 +75,17 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 		expect(rows.map((row) => getField(row, 'label').value)).to.deep.equal(['', 'Bee']);
 	});
 
+	it('names the value and label columns above the options, but only when there are options', async () => {
+		const getHeader = () => getInput().shadowRoot!.querySelector<HTMLElement>('#header');
+
+		await setValue([]);
+		expect(getHeader()).to.equal(null);
+
+		await setValue([{ value: 'a' }]);
+		const columns = Array.from(getHeader()!.querySelectorAll('span')).map((column) => column.textContent!.trim());
+		expect(columns).to.deep.equal(['general_value', 'general_label']);
+	});
+
 	it('emits the edited label next to the value', async () => {
 		await setValue([{ value: 'a' }, { value: 'b', label: 'Bee' }]);
 
