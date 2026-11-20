@@ -27,6 +27,13 @@ public interface IBackOfficeSignInManager : ICoreBackOfficeSignInManager
 
     Task SignInAsync(BackOfficeIdentityUser user, bool isPersistent, string? authenticationMethod = null);
 
+    /// <summary>
+    ///     Re-issues the current sign-in for the user, so it carries the user's current security stamp.
+    /// </summary>
+    /// <param name="user">The user to refresh the sign-in for.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task RefreshSignInAsync(BackOfficeIdentityUser user);
+
     Task<ClaimsPrincipal> CreateUserPrincipalAsync(BackOfficeIdentityUser user);
 
     Task<SignInResult> TwoFactorSignInAsync(string provider, string code, bool isPersistent, bool rememberClient);
