@@ -60,9 +60,9 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
         // the short-circuit for .FirstOrDefault() / .Take(n).
         IEnumerable<Guid> keys = preview
             ? candidateKeysAsArray
-            : candidateKeysAsArray.Where(key =>
-                _publishStatusQueryService.IsPublished(key, culture)
-                && _publishStatusQueryService.HasPublishedAncestorPath(key, culture));
+            : _publishStatusQueryService.WhereAncestorPathPublished(
+                candidateKeysAsArray.Where(key => _publishStatusQueryService.IsPublished(key, culture)),
+                culture);
 
         // Materialise in growing chunks: an all-L0-hit chunk stays fully synchronous (no async, no
         // batch), while a cold set collapses its database access into batched reads. Returned lazily
