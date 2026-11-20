@@ -585,6 +585,10 @@ async loadById(id: string, options?: LoadOptions): Promise<UmbContentModel> {
 
 ### Auth & Cross-tab Coordination
 
+**Safari drops the user gesture across `crypto.subtle.digest`**
+
+A `window.open()` placed after the PKCE challenge await is popup-blocked in Safari, while Chrome allows it. WebKit forwards a click's activation through microtasks, a fast `fetch` and timers under about a second, but not through WebCrypto promises (verified in Safari 26.6). Open the popup first with an empty URL and the target name, before the first `await`, then hand it the URL with `location.replace()`. An empty-URL open returns an already open window of that name untouched. The preview tab uses the same pattern (#22626).
+
 **`window.opener` is set for ANY window opened with `window.open()`**
 
 Not just OAuth popups. The preview window, for example, also has `window.opener` set. Do not use `window.opener` alone as a signal that you are in the OAuth code exchange flow — check the pathname too:
