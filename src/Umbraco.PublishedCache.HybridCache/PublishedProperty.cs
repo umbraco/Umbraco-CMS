@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
@@ -176,7 +175,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
         // produce separate cached values (e.g., block editors filter differently with Fallback.ToLanguage).
         Fallback fallback = _propertyRenderingContextAccessor.PropertyRenderingContext?.Fallback ?? default;
 
-        CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment, fallback);
+        CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment, fallback, GetPreviewContextCulture());
 
         // initial reference cache level always is .Content
         const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
@@ -191,6 +190,11 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
         return cacheValues.ObjectValue;
     }
+
+    // Preview conversions may depend on ambient culture even for invariant properties.
+    // Include it in the instance-local cache key; preserve existing public cache keys.
+    private string? GetPreviewContextCulture()
+        => _isPreviewing ? _variationContextAccessor.VariationContext?.Culture : null;
 
     private CacheValues GetCacheValues(PropertyCacheLevel cacheLevel)
     {
@@ -242,7 +246,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
         _variationContextAccessor.ContextualizeVariation(_variations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment);
 
         object? value;
-        CacheValue cacheValues = GetCacheValues(expanding ? PropertyType.DeliveryApiCacheLevelForExpansion : PropertyType.DeliveryApiCacheLevel).For(culture, segment);
+        CacheValue cacheValues = GetCacheValues(expanding ? PropertyType.DeliveryApiCacheLevelForExpansion : PropertyType.DeliveryApiCacheLevel).For(culture, segment, contextCulture: GetPreviewContextCulture());
 
 
         // initial reference cache level always is .Content
@@ -303,7 +307,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
         private readonly Lock _locko = new();
         private ConcurrentDictionary<CompositeStringArrayKey, CacheValue>? _values;
 
-        public CacheValue For(string? culture, string? segment, Fallback fallback = default)
+        public CacheValue For(string? culture, string? segment, Fallback fallback = default, string? contextCulture = null)
         {
             // As noted on IPropertyValue, null value means invariant
             // But as we need an actual string value to build a cache key
@@ -311,7 +315,8 @@ internal sealed class PublishedProperty : PublishedPropertyBase
             culture ??= string.Empty;
             segment ??= string.Empty;
 
-            if (culture == string.Empty && segment == string.Empty && fallback.HasPolicies is false)
+            bool isInvariant = culture == string.Empty && segment == string.Empty;
+            if (isInvariant && string.IsNullOrEmpty(contextCulture) && fallback.HasPolicies is false)
             {
                 return this;
             }
@@ -324,7 +329,10 @@ internal sealed class PublishedProperty : PublishedPropertyBase
                 }
             }
 
-            var k = new CompositeStringArrayKey(culture, segment, ToFallbackKey(fallback));
+            var fallbackKey = ToFallbackKey(fallback);
+            var k = string.IsNullOrEmpty(contextCulture)
+                ? new CompositeStringArrayKey(culture, segment, fallbackKey)
+                : new CompositeStringArrayKey(culture, segment, fallbackKey, contextCulture);
 
             CacheValue value = _values.GetOrAdd(k, _ => new CacheValue());
 
