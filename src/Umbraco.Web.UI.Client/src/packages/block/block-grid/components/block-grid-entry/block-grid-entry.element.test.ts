@@ -1,3 +1,4 @@
+import '../block-grid-block/block-grid-block.element.js';
 import { UmbBlockGridEntryElement } from './block-grid-entry.element.js';
 import type { UmbBlockGridEntryContext } from './block-grid-entry.context.js';
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from './block-grid-entry.context-token.js';
@@ -59,10 +60,16 @@ describe('UmbBlockGridEntryElement', () => {
 		});
 
 		it('moves focus to the containing entry', () => {
-			child.focus();
+			let parentFocused = false;
+			parent.focus = () => (parentFocused = true);
+
 			childContext.focusParentEntry();
 
-			expect(document.activeElement).to.equal(parent);
+			expect(parentFocused).to.be.true;
+		});
+
+		it('does not take the entry out of the tab order', () => {
+			expect(parent.hasAttribute('tabindex')).to.be.false;
 		});
 
 		describe('which entry shows its UI', () => {
@@ -111,6 +118,7 @@ describe('UmbBlockGridEntryElement', () => {
 				parentContext.setHovered(true);
 				childContext.setHovered(true);
 				childContext.focusParentEntry();
+				parentContext.setFocusWithin(true);
 
 				expect(parentActive).to.be.true;
 				expect(childActive).to.be.false;
@@ -120,6 +128,7 @@ describe('UmbBlockGridEntryElement', () => {
 				parentContext.setHovered(true);
 				childContext.setHovered(true);
 				childContext.focusParentEntry();
+				parentContext.setFocusWithin(true);
 				childContext.setFocusWithin(true);
 
 				childContext.setHovered(false);
@@ -128,6 +137,61 @@ describe('UmbBlockGridEntryElement', () => {
 				expect(childActive).to.be.true;
 				expect(parentActive).to.be.false;
 			});
+		});
+	});
+
+	describe('with an insert line above the entry', () => {
+		let entry: UmbBlockGridEntryElement;
+		let insertLine: Element;
+
+		beforeEach(async () => {
+			const wrapper = await fixture(
+				html`<div style="width: 400px"><umb-block-grid-entry></umb-block-grid-entry></div>`,
+			);
+			entry = wrapper.querySelector('umb-block-grid-entry')!;
+
+			const state = entry as unknown as Record<string, unknown>;
+			state._contentKey = 'content-key';
+			state._contentTypeAlias = 'content-type-alias';
+			state._createBeforePath = '#create';
+			state._showInlineCreateBefore = true;
+			entry.requestUpdate();
+			await entry.updateComplete;
+
+			insertLine = entry.shadowRoot!.querySelector('uui-button-inline-create')!;
+		});
+
+		const pointerOverInsertLine = (type: 'pointerenter' | 'pointerleave') =>
+			insertLine.dispatchEvent(new PointerEvent(type));
+
+		it('renders the insert line', () => {
+			expect(insertLine).to.exist;
+		});
+
+		it('hides the frame tab once the pointer rests on the insert line', async () => {
+			pointerOverInsertLine('pointerenter');
+			expect(entry.hasAttribute('create-hovered')).to.be.false;
+
+			await aTimeout(250);
+
+			expect(entry.hasAttribute('create-hovered')).to.be.true;
+		});
+
+		it('keeps the frame tab when the pointer only passes through the insert line', async () => {
+			pointerOverInsertLine('pointerenter');
+			await aTimeout(50);
+			pointerOverInsertLine('pointerleave');
+			await aTimeout(250);
+
+			expect(entry.hasAttribute('create-hovered')).to.be.false;
+		});
+
+		it('shows the frame tab again when the pointer leaves the insert line', async () => {
+			pointerOverInsertLine('pointerenter');
+			await aTimeout(250);
+			pointerOverInsertLine('pointerleave');
+
+			expect(entry.hasAttribute('create-hovered')).to.be.false;
 		});
 	});
 

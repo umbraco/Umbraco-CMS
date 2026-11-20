@@ -317,7 +317,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	override connectedCallback(): void {
 		super.connectedCallback();
-		this.tabIndex = -1;
 		this.addEventListener('pointerenter', this.#onPointerEnter);
 		this.addEventListener('pointerleave', this.#onPointerLeave);
 		this.addEventListener('focusin', this.#onFocusIn);
@@ -374,6 +373,28 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		}
 	}
 
+	/**
+	 * Focuses the entry itself, without making the entry a tab stop.
+	 * The host cannot take the focus: a shadow host with a negative tabindex removes everything inside it from the tab order.
+	 * @param {FocusOptions} options Passed on to the focus call.
+	 */
+	override focus(options?: FocusOptions) {
+		this.shadowRoot?.querySelector<HTMLElement>('.umb-block-grid__block')?.focus(options);
+	}
+
+	#createBeforeHoverTimer?: ReturnType<typeof setTimeout>;
+
+	// The insert line and the frame tab share the top edge of the entry, so the tab steps aside once the pointer rests on the line.
+	// Passing through the line on the way to the tab does not trigger it.
+	readonly #onCreateBeforePointerEnter = () => {
+		clearTimeout(this.#createBeforeHoverTimer);
+		this.#createBeforeHoverTimer = setTimeout(() => this.toggleAttribute('create-hovered', true), 150);
+	};
+	readonly #onCreateBeforePointerLeave = () => {
+		clearTimeout(this.#createBeforeHoverTimer);
+		this.removeAttribute('create-hovered');
+	};
+
 	readonly #onPointerEnter = () => this.#context.setHovered(true);
 	readonly #onPointerLeave = () => this.#context.setHovered(false);
 	readonly #onFocusIn = () => this.#context.setFocusWithin(true);
@@ -389,6 +410,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.removeEventListener('pointerleave', this.#onPointerLeave);
 		this.removeEventListener('focusin', this.#onFocusIn);
 		this.removeEventListener('focusout', this.#onFocusOut);
+		clearTimeout(this.#createBeforeHoverTimer);
 		clearTimeout(this.#renderTimeout);
 		this.#layoutContainerResizeObserver.disconnect();
 	}
@@ -516,7 +538,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.contentKey && (this._contentTypeAlias || this._unsupported),
 			() => html`
 				${this.#renderCreateBeforeInlineButton()}
-				<div class="umb-block-grid__block" part="umb-block-grid__block">
+				<div class="umb-block-grid__block" part="umb-block-grid__block" tabindex="-1">
 					${when(
 						this._isSortMode,
 						() => this.#renderRefBlock(),
@@ -638,7 +660,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			<uui-button-inline-create
 				href=${this._createBeforePath}
 				label=${this.localize.term('blockEditor_addBlock')}
-				style=${this._inlineCreateAboveWidth ? `width: ${this._inlineCreateAboveWidth}` : ''}>
+				style=${this._inlineCreateAboveWidth ? `width: ${this._inlineCreateAboveWidth}` : ''}
+				@pointerenter=${this.#onCreateBeforePointerEnter}
+				@pointerleave=${this.#onCreateBeforePointerLeave}>
 			</uui-button-inline-create>
 		`;
 	}
@@ -787,6 +811,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				--umb-block-grid-entry-tab-pointer-events: auto;
 			}
 
+			:host([create-hovered]) .umb-block-grid__block {
+				--umb-entity-frame-opacity: 0;
+				--umb-block-grid-entry-tab-pointer-events: none;
+			}
+
 			umb-entity-frame uui-button {
 				--uui-button-background-color: transparent;
 				--uui-button-background-color-hover: transparent;
@@ -807,7 +836,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				margin: 0 var(--uui-size-1);
 			}
 
-			:host(:focus) {
+			.umb-block-grid__block:focus {
 				outline: none;
 			}
 		`,
