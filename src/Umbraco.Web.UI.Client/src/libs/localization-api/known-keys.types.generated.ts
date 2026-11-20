@@ -2742,6 +2742,8 @@ declare global {
 		userPermissions_read_element_folder: string;
 		userPermissions_rollback: string;
 		userPermissions_rollback_element: string;
+		userPermissions_sensitiveData: string;
+		userPermissions_sensitiveData_member: string;
 		userPermissions_unpublish: string;
 		userPermissions_unpublish_element: string;
 		userPermissions_update: string;

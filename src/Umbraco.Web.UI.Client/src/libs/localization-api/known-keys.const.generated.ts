@@ -2715,6 +2715,8 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'userPermissions_read_element_folder',
 	'userPermissions_rollback',
 	'userPermissions_rollback_element',
+	'userPermissions_sensitiveData',
+	'userPermissions_sensitiveData_member',
 	'userPermissions_unpublish',
 	'userPermissions_unpublish_element',
 	'userPermissions_update',

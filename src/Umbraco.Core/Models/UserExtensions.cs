@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
@@ -225,6 +226,10 @@ public static class UserExtensions
     ///     Determines whether this user has access to view sensitive data
     /// </summary>
     /// <param name="user"></param>
+    /// <remarks>
+    ///     Access is granted by any user group that has the <see cref="ActionMemberSensitiveData" /> permission,
+    ///     and by membership of the built-in sensitive data user group.
+    /// </remarks>
     public static bool HasAccessToSensitiveData(this IUser user)
     {
         if (user == null)
@@ -232,7 +237,9 @@ public static class UserExtensions
             throw new ArgumentNullException("user");
         }
 
-        return user.Groups != null && user.Groups.Any(x => x.Key == Constants.Security.SensitiveDataGroupKey);
+        return user.Groups != null && user.Groups.Any(x =>
+            x.Key == Constants.Security.SensitiveDataGroupKey
+            || x.Permissions.Contains(ActionMemberSensitiveData.ActionLetter));
     }
 
     /// <summary>
