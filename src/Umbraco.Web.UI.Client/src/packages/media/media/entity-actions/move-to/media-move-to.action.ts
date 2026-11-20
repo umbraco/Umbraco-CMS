@@ -4,6 +4,7 @@ import { UmbMediaTypeDetailRepository, UmbMediaTypeStructureRepository } from '@
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import { UmbMoveToEntityAction } from '@umbraco-cms/backoffice/tree';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
 class UmbMediaMoveToEntityAction extends UmbMoveToEntityAction {
 	protected override async _getPickableFilter(
@@ -22,7 +23,9 @@ class UmbMediaMoveToEntityAction extends UmbMoveToEntityAction {
 			structureRepository.requestAllowedParentsOf(mediaTypeUnique),
 			typeDetailRepository.requestByUnique(mediaTypeUnique),
 		]);
-		const isAllowedAtRoot = mediaType?.allowedAtRoot ?? false;
+		const currentUserContext = await this.getContext(UMB_CURRENT_USER_CONTEXT);
+		const hasMediaRootAccess = currentUserContext?.getHasMediaRootAccess() !== false;
+		const isAllowedAtRoot = (mediaType?.allowedAtRoot ?? false) && hasMediaRootAccess;
 
 		if (!allowedParents) return undefined;
 

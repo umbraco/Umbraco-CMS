@@ -1,4 +1,5 @@
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_MEDIA_USER_START_NODE_ACCESS_CONDITION_ALIAS } from '../../user-start-node/conditions/constants.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_ENTITY_ACTION_GROUP_CREATE } from '@umbraco-cms/backoffice/entity-action';
 
@@ -20,6 +21,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
+			},
+			{
+				alias: UMB_MEDIA_USER_START_NODE_ACCESS_CONDITION_ALIAS,
 			},
 		],
 	},

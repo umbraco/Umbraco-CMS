@@ -819,6 +819,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			slot="footer-info"
 			.currentMedia=${this._currentMediaEntity}
 			.startNode=${startNode}
+			.noAccess=${this._noAccess}
 			@change=${this.#onPathChange}></umb-media-picker-folder-path>`;
 	}
 
