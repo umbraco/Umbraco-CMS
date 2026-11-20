@@ -136,6 +136,49 @@ public class BackOfficeAuthorizationInitializationMiddlewareTests
             Times.Never);
     }
 
+    [Test]
+    public async Task RuntimeLevel_Upgrading_Skips_Registration_Until_Run()
+    {
+        // Arrange
+        _mockRuntimeState.Setup(x => x.Level).Returns(RuntimeLevel.Upgrading);
+
+        RequestDelegate next = _ => Task.CompletedTask;
+
+        // Act
+        await _middleware.InvokeAsync(CreateBackOfficeHttpContext(), next);
+
+        // Assert
+        _mockBackOfficeApplicationManager.Verify(
+            x => x.EnsureBackOfficeApplicationAsync(It.IsAny<IEnumerable<Uri>>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+
+        // Act - the upgrade completes.
+        _mockRuntimeState.Setup(x => x.Level).Returns(RuntimeLevel.Run);
+        await _middleware.InvokeAsync(CreateBackOfficeHttpContext(), next);
+
+        // Assert
+        _mockBackOfficeApplicationManager.Verify(
+            x => x.EnsureBackOfficeApplicationAsync(It.IsAny<IEnumerable<Uri>>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task RuntimeLevel_Upgrade_Performs_Registration()
+    {
+        // Arrange
+        _mockRuntimeState.Setup(x => x.Level).Returns(RuntimeLevel.Upgrade);
+
+        RequestDelegate next = _ => Task.CompletedTask;
+
+        // Act
+        await _middleware.InvokeAsync(CreateBackOfficeHttpContext(), next);
+
+        // Assert
+        _mockBackOfficeApplicationManager.Verify(
+            x => x.EnsureBackOfficeApplicationAsync(It.IsAny<IEnumerable<Uri>>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
     /// <summary>
     /// Creates an HttpContext with a path that <see cref="UmbracoRequestPaths.IsBackOfficeRequest"/> recognizes.
     /// The Management API path (/umbraco/management/api/) is a backoffice request.
