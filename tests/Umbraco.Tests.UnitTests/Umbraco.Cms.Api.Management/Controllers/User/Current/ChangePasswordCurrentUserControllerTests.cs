@@ -25,6 +25,7 @@ public class ChangePasswordCurrentUserControllerTests
     private Mock<IBackOfficeSignInManager> _signInManager = null!;
     private Mock<IAuthenticationService> _authenticationService = null!;
     private ClaimsPrincipal _cookiePrincipal = null!;
+    private Guid _userKey;
 
     [SetUp]
     public void SetUp()
@@ -33,6 +34,7 @@ public class ChangePasswordCurrentUserControllerTests
         _signInManager = new Mock<IBackOfficeSignInManager>();
         _authenticationService = new Mock<IAuthenticationService>();
         _cookiePrincipal = new ClaimsPrincipal(new ClaimsIdentity("test"));
+        _userKey = Guid.NewGuid();
     }
 
     [Test]
@@ -51,7 +53,7 @@ public class ChangePasswordCurrentUserControllerTests
     [Test]
     public async Task Reissues_The_Sign_In_Of_The_Cookie_Principal_When_The_Request_Is_Cookie_Authenticated()
     {
-        var identityUser = new BackOfficeIdentityUser(new GlobalSettings(), 1, []);
+        var identityUser = new BackOfficeIdentityUser(new GlobalSettings(), 1, []) { Key = _userKey };
         _authenticationService
             .Setup(x => x.AuthenticateAsync(It.IsAny<HttpContext>(), Constants.Security.BackOfficeAuthenticationType))
             .ReturnsAsync(AuthenticateResult.Success(
@@ -66,10 +68,28 @@ public class ChangePasswordCurrentUserControllerTests
         _signInManager.Verify(x => x.ReissueSignInAsync(identityUser), Times.Once);
     }
 
+    [Test]
+    public async Task Does_Not_Reissue_The_Sign_In_Of_Another_User_Than_The_One_Changing_The_Password()
+    {
+        var otherUser = new BackOfficeIdentityUser(new GlobalSettings(), 2, []) { Key = Guid.NewGuid() };
+        _authenticationService
+            .Setup(x => x.AuthenticateAsync(It.IsAny<HttpContext>(), Constants.Security.BackOfficeAuthenticationType))
+            .ReturnsAsync(AuthenticateResult.Success(
+                new AuthenticationTicket(_cookiePrincipal, Constants.Security.BackOfficeAuthenticationType)));
+        _userManager
+            .Setup(x => x.GetUserAsync(_cookiePrincipal))
+            .ReturnsAsync(otherUser);
+
+        IActionResult result = await CreateSut().ChangePassword(CancellationToken.None, new ChangePasswordCurrentUserRequestModel { NewPassword = "0987654321" });
+
+        Assert.That(result, Is.InstanceOf<OkResult>());
+        _signInManager.Verify(x => x.ReissueSignInAsync(It.IsAny<BackOfficeIdentityUser>()), Times.Never);
+    }
+
     private ChangePasswordCurrentUserController CreateSut()
     {
         var user = new Mock<IUser>();
-        user.SetupGet(x => x.Key).Returns(Guid.NewGuid());
+        user.SetupGet(x => x.Key).Returns(_userKey);
         var backOfficeSecurity = new Mock<IBackOfficeSecurity>();
         backOfficeSecurity.SetupGet(x => x.CurrentUser).Returns(user.Object);
         var accessor = new Mock<IBackOfficeSecurityAccessor>();

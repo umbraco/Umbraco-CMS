@@ -104,7 +104,7 @@ public class ChangePasswordCurrentUserController : CurrentUserControllerBase
         if (cookieAuthentication.Succeeded)
         {
             BackOfficeIdentityUser? identityUser = await _backOfficeUserManager.GetUserAsync(cookieAuthentication.Principal!);
-            if (identityUser is not null)
+            if (identityUser?.Key == userKey)
             {
                 await _backOfficeSignInManager.ReissueSignInAsync(identityUser);
             }
