@@ -11,6 +11,8 @@ export type {
 	UmbTreeRootItemsRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeAncestorsOfRequestArgs,
+	UmbAncestorsOfTreeItemsRequestArgs,
+	UmbAncestorsOfTreeItemModel,
 	UmbTreeItemsRequestArgs,
 } from './types.js';
 

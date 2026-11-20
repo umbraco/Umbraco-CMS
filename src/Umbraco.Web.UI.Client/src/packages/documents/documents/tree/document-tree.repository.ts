@@ -6,18 +6,24 @@ import type { UmbDocumentTreeItemModel, UmbDocumentTreeRootModel } from './types
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
 import type {
 	UmbCreateTreeItemDataResolverArgs,
+	UmbAncestorsOfTreeItemsRequestArgs,
+	UmbAncestorsOfTreeItemModel,
 	UmbTreeItemDataResolver,
 	UmbTreeRepository,
 } from '@umbraco-cms/backoffice/tree';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 
 export class UmbDocumentTreeRepository
 	extends UmbTreeRepositoryBase<UmbDocumentTreeItemModel, UmbDocumentTreeRootModel>
 	implements UmbApi, UmbTreeRepository<UmbDocumentTreeItemModel, UmbDocumentTreeRootModel>
 {
+	#documentTreeSource: UmbDocumentTreeServerDataSource;
+
 	constructor(host: UmbControllerHost) {
 		super(host, UmbDocumentTreeServerDataSource, UMB_DOCUMENT_TREE_STORE_CONTEXT);
+		this.#documentTreeSource = this._treeSource as UmbDocumentTreeServerDataSource;
 	}
 
 	async requestTreeRoot() {
@@ -33,6 +39,18 @@ export class UmbDocumentTreeRepository
 		};
 
 		return { data };
+	}
+
+	/**
+	 * Requests the ancestors of each of the given items as entity references, ordered from the root down
+	 * @param {UmbAncestorsOfTreeItemsRequestArgs} args - The request arguments
+	 * @returns {Promise<UmbRepositoryResponse<Array<UmbAncestorsOfTreeItemModel>>>} The ancestors of each item
+	 * @memberof UmbDocumentTreeRepository
+	 */
+	async requestAncestorsOfItems(
+		args: UmbAncestorsOfTreeItemsRequestArgs,
+	): Promise<UmbRepositoryResponse<Array<UmbAncestorsOfTreeItemModel>>> {
+		return this.#documentTreeSource.getAncestorsOfItems(args);
 	}
 
 	createTreeItemDataResolver(

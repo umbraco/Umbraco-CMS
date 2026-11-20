@@ -15,6 +15,21 @@ export const itemHandlers = [
 		return HttpResponse.json(response);
 	}),
 
+	http.get(umbracoPath(`/item${UMB_SLUG}/ancestors`), ({ request }) => {
+		const url = new URL(request.url);
+		const ids = url.searchParams.getAll('id');
+
+		const response = ids.map((id) => ({
+			id,
+			ancestors: umbDocumentMockDb.tree
+				.getAncestorsOf({ descendantId: id })
+				.filter((ancestor) => ancestor.id !== id)
+				.flatMap((ancestor) => umbDocumentMockDb.item.getItems([ancestor.id])),
+		}));
+
+		return HttpResponse.json(response);
+	}),
+
 	http.get(umbracoPath(`/item${UMB_SLUG}`), ({ request }) => {
 		const url = new URL(request.url);
 		const ids = url.searchParams.getAll('id');

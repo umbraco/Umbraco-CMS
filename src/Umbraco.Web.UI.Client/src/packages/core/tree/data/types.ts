@@ -46,6 +46,32 @@ export interface UmbTreeAncestorsOfRequestArgs {
 }
 
 /**
+ * Arguments for requesting the ancestors of several tree items.
+ * @interface UmbAncestorsOfTreeItemsRequestArgs
+ */
+export interface UmbAncestorsOfTreeItemsRequestArgs {
+	/**
+	 * The tree items to request the ancestors of.
+	 */
+	treeItems: Array<{
+		unique: string;
+		entityType: string;
+	}>;
+}
+
+/**
+ * The ancestors of a tree item, ordered from the root down. The item itself is not included.
+ * @interface UmbAncestorsOfTreeItemModel
+ */
+export interface UmbAncestorsOfTreeItemModel {
+	treeItem: {
+		unique: string;
+		entityType: string;
+	};
+	ancestors: Array<UmbEntityModel>;
+}
+
+/**
  * Arguments for requesting specific tree items.
  * @interface UmbTreeItemsRequestArgs
  */
