@@ -12,6 +12,8 @@ export class LogViewerUiHelper extends UiBaseLocators {
   private readonly overviewBtn: Locator;
   private readonly sortLogByTimestampBtn: Locator;
   private readonly firstLogLevelTimestamp: Locator;
+  private readonly logMessages: Locator;
+  private readonly logLevelTags: Locator;
   private readonly firstLogLevelMessage: Locator;
   private readonly firstLogSearchResult: Locator;
   private readonly savedSearchesBtn: Locator;
@@ -28,6 +30,10 @@ export class LogViewerUiHelper extends UiBaseLocators {
     this.overviewBtn = page.getByRole('tab', {name: 'Overview'});
     this.sortLogByTimestampBtn = page.getByLabel('Sort logs');
     this.firstLogLevelTimestamp = page.locator('umb-log-viewer-message #timestamp').first();
+    this.logMessages = page.locator('umb-log-viewer-message');
+    // The level text is templated inside umb-log-viewer-level-tag's own shadow root (nested in a uui-tag), so
+    // textContent/innerText on the host tag itself is always empty; read it off the inner uui-tag instead.
+    this.logLevelTags = page.locator('umb-log-viewer-message').locator('umb-log-viewer-level-tag').locator('uui-tag');
     this.firstLogLevelMessage = page.locator('umb-log-viewer-message #message').first();
     this.firstLogSearchResult = page.getByRole('group').locator('#message').first();
     this.savedSearchesBtn = page.getByLabel('Saved searches');
@@ -35,7 +41,9 @@ export class LogViewerUiHelper extends UiBaseLocators {
   }
 
   async clickSearchButton() {
-    await this.click(this.searchBtn);
+    // Wait for the view's own initial log fetch too: requests are not sequenced, so a sort fired right after
+    // opening Search can resolve first and then be overwritten by this default, descending response.
+    await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.logViewerLog, this.click(this.searchBtn), ConstantHelper.statusCodes.ok);
     await this.waitForVisible(this.searchLogsTxt);
   }
 
@@ -75,12 +83,28 @@ export class LogViewerUiHelper extends UiBaseLocators {
     return this.page.locator('.saved-search-item').filter({has: this.page.getByText(searchName, {exact: true})});
   }
 
-  async clickSortLogByTimestampButton() {
-    await this.click(this.sortLogByTimestampBtn);
+  async clickSortLogByTimestampButton(orderDirection?: 'Ascending' | 'Descending') {
+    if (!orderDirection) {
+      return await this.click(this.sortLogByTimestampBtn);
+    }
+    // The log viewer polls this endpoint on its own timer, so a generic endpoint match can resolve on an unrelated
+    // poll response. Match the orderDirection param/value pair alone to target the response this toggle triggered.
+    return await this.waitForResponseAfterExecutingPromise(`orderDirection=${orderDirection}`, this.click(this.sortLogByTimestampBtn), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.get);
   }
 
   async doesFirstLogHaveTimestamp(timestamp: string) {
     await this.containsText(this.firstLogLevelTimestamp, timestamp);
+  }
+
+  // Reads the raw timestamp property rather than the rendered text, which is formatted in the user's locale.
+  async getLogTimestamps() {
+    await this.waitForVisible(this.firstLogLevelTimestamp);
+    return await this.logMessages.evaluateAll((messages) => messages.map((message) => (message as HTMLElement & {timestamp: string}).timestamp));
+  }
+
+  async getRenderedLogLevels() {
+    await this.waitForVisible(this.firstLogLevelTimestamp);
+    return await this.logLevelTags.allTextContents();
   }
 
   async clickPageNumber(pageNumber: number) {

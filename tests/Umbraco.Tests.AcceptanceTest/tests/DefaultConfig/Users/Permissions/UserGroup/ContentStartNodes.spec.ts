@@ -57,7 +57,7 @@ test('can see root start node and children', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentTwoName);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
+// Product bug (https://github.com/umbraco/Umbraco-CMS/issues/20505): the children of a start node are not rendered in the content tree.
 test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDocumentStartNode(userGroupName, childDocumentOneId);
@@ -70,11 +70,13 @@ test.skip('can see parent of start node but not access it', async ({umbracoApi, 
 
   // Assert
   await umbracoUi.content.isContentInTreeVisible(rootDocumentName);
-  await umbracoUi.content.goToContentWithName(rootDocumentName);
-  await umbracoUi.content.doesDocumentWorkspaceHaveText('Access denied');
+  // A node the user cannot access is rendered disabled, so clicking it must not open its workspace.
+  await umbracoUi.content.goToContentWithName(rootDocumentName, false);
   await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentOneName);
   await umbracoUi.content.isChildContentInTreeVisible(rootDocumentName, childDocumentTwoName, false);
+  // Checked after the tree interaction so a navigation triggered by the click would already have landed.
+  await umbracoUi.content.isDocumentWorkspaceVisible(false);
 });
 
 test('can not see any content when no start nodes specified', async ({umbracoApi, umbracoUi}) => {
