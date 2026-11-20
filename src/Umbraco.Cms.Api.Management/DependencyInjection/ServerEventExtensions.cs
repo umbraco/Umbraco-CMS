@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ServerEvents;
 using Umbraco.Cms.Api.Management.ServerEvents.AccessFilters;
@@ -18,7 +17,8 @@ internal static class ServerEventExtensions
         builder.Services.AddSingleton<IServerEventRouter, ServerEventRouter>();
         builder.Services.AddSingleton<IServerEventUserManager, ServerEventUserManager>();
         builder.Services.AddSingleton<IServerEventAuthorizationService, ServerEventAuthorizationService>();
-        builder.AddNotificationAsyncHandler<UserSavedNotification, UserConnectionRefresher>();
+        builder.AddNotificationAsyncHandler<UserCacheRefresherNotification, UserConnectionRefresher>();
+        builder.AddNotificationAsyncHandler<ServerEventCacheRefresherNotification, ServerEventCacheRefresherNotificationHandler>();
 
         builder
             .AddEvents()
