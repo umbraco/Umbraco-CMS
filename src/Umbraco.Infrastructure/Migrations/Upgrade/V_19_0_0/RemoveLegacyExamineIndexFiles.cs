@@ -22,12 +22,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_0_0;
 /// </remarks>
 public class RemoveLegacyExamineIndexFiles : UnscopedMigrationBase
 {
-    private static readonly HashSet<string> CurrentIndexNames = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly HashSet<string> LegacyIndexNames = new(StringComparer.OrdinalIgnoreCase)
     {
-        Core.Constants.Search.IndexAliases.PublishedContent,
-        Core.Constants.Search.IndexAliases.DraftContent,
-        Core.Constants.Search.IndexAliases.DraftMedia,
-        Core.Constants.Search.IndexAliases.DraftMembers,
+        "InternalIndex",
+        "ExternalIndex",
+        "MembersIndex",
+        "DeliveryApiContentIndex",
     };
 
     private readonly IHostingEnvironment _hostingEnvironment;
@@ -70,14 +70,14 @@ public class RemoveLegacyExamineIndexFiles : UnscopedMigrationBase
         }
 
         var hadFailures = false;
-        var hadCurrentIndexes = false;
+        var hasOtherIndexes = false;
 
         // Each index is a folder of files directly under the root - one level deep, no further nesting.
         foreach (DirectoryInfo indexFolder in root.GetDirectories())
         {
-            if (CurrentIndexNames.Contains(indexFolder.Name))
+            if (LegacyIndexNames.Contains(indexFolder.Name) is false)
             {
-                hadCurrentIndexes = true;
+                hasOtherIndexes = true;
                 continue;
             }
 
@@ -98,7 +98,7 @@ public class RemoveLegacyExamineIndexFiles : UnscopedMigrationBase
             TryDeleteEmptyDirectory(indexFolder, ref hadFailures);
         }
 
-        if (hadCurrentIndexes is false)
+        if (hasOtherIndexes is false)
         {
             TryDeleteEmptyDirectory(root, ref hadFailures);
         }
@@ -109,7 +109,7 @@ public class RemoveLegacyExamineIndexFiles : UnscopedMigrationBase
                 "Could not fully remove the legacy Examine index folder at {Path}. Umbraco no longer reads these files - they can be safely deleted manually.",
                 path);
         }
-        else if (hadCurrentIndexes)
+        else if (hasOtherIndexes)
         {
             _logger.LogInformation("Removed legacy Examine index folders at {Path}, leaving active indexes in place.", path);
         }
