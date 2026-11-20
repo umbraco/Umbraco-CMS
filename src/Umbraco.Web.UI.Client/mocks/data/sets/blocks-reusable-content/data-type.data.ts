@@ -156,6 +156,7 @@ const blockListDefaultConfigDataType: UmbMockDataTypeModel = {
 			value: [
 				{
 					contentElementTypeKey: 'b818bb55-31e1-4537-9c42-17471a176089',
+					settingsElementTypeKey: '5b3e9d7a-2c14-4a68-8f0b-6d1e4a9c7b23',
 					label: 'Element One: {umbValue:title}',
 					editorSize: 'medium',
 					forceHideContentEditorInOverlay: false,

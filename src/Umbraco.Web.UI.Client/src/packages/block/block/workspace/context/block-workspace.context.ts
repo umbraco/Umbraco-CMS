@@ -52,7 +52,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	setOriginData(data: UmbBlockWorkspaceOriginData) {
 		this.#originData = data;
 	}
-	// Cached index of this block in its parent layout list, recomputed only when layouts or contentKey change.
+	// Cached index of this block in its parent layout list, recomputed only when layouts or the layout key change.
 	#index: number | undefined;
 	#modalContext?: typeof UMB_MODAL_CONTEXT.TYPE;
 	#retrieveModalContext;
@@ -67,7 +67,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	#layout = new UmbObjectState<LayoutDataType | undefined>(undefined);
 	readonly layout = this.#layout.asObservable();
-	readonly unique = this.#layout.asObservablePart((x) => x?.contentKey);
+	readonly unique = this.#layout.asObservablePart((x) => x?.key);
 	readonly contentKey = this.#layout.asObservablePart((x) => x?.contentKey);
 
 	readonly content = new UmbBlockElementManager(
@@ -134,9 +134,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			if (context) {
 				this.observe(
 					// TODO: Turn this into a observablePart that is retrievable from the block entries context, so we do not have to observe multiple values here. [NL]
-					observeMultiple([context.layoutEntries, this.contentKey]).pipe(
-						map(([layouts, contentKey]) => {
-							const found = contentKey ? layouts.findIndex((x) => x.contentKey === contentKey) : -1;
+					observeMultiple([context.layoutEntries, this.unique]).pipe(
+						map(([layouts, key]) => {
+							const found = key ? layouts.findIndex((x) => x.key === key) : -1;
 							return found !== -1 ? found : undefined;
 						}),
 						distinctUntilChanged(),
@@ -427,6 +427,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 	}
 
+	/**
+	 * Load the block placement identified by its layout key.
+	 * @param {string} unique The key of the layout entry, not the content key: a content key can be referenced by several placements.
+	 * @returns {Promise<void>}
+	 * @memberof UmbBlockWorkspaceContext
+	 */
 	async load(unique: string) {
 		await this.#retrieveBlockManager;
 		await this.#retrieveBlockEntries;
@@ -435,7 +441,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}
 
 		this.observe(
-			this.#blockEntries.layoutOf(unique),
+			this.#blockEntries.byKey(unique),
 			(layoutData) => {
 				this.#initialLayout ??= layoutData as LayoutDataType;
 				this.removeUmbControllerByAlias('observeLayoutInitially');
@@ -482,7 +488,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				throw new Error('Block Entries could not insert block');
 			}
 
-			const unique = blockCreated.layout.contentKey;
+			const unique = blockCreated.layout.key;
 
 			this.#observeBlockData(unique);
 			this.establishLiveSync();
@@ -500,7 +506,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			throw new Error('Block Entries not found');
 		}
 		this.observe(
-			this.#blockEntries.layoutOf(unique),
+			this.#blockEntries.byKey(unique),
 			(layoutData) => {
 				this.#layout.setValue(layoutData as LayoutDataType);
 
@@ -601,7 +607,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 
 	getUnique() {
-		return this.getData()!.contentKey;
+		return this.getData()!.key;
 	}
 
 	getEntityType() {

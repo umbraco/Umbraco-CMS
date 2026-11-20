@@ -76,7 +76,7 @@ public class DeliveryApiContentQueryProviderTests : TestBase
     }
 
     [Test]
-    public async Task DescendantsSelector_ReturnsDescendants_CurrentlyIncludingSelf()
+    public async Task DescendantsSelector_ReturnsDescendantsExcludingSelf()
     {
         await CreatePublishedSiteStructure();
 
@@ -86,14 +86,10 @@ public class DeliveryApiContentQueryProviderTests : TestBase
             Values = [RootAlphaKey.ToString("D")],
         });
 
-        // NOTE: "ancestorIds" maps to the PathIds system field, which is ancestors-OR-SELF - so the root
-        //       itself is currently included. This pins the known TODO in DeliveryApiContentQueryProvider
-        //       ("PathIds equals ancestors-or-self, but the Delivery API queries for ancestors only").
-        //       If that TODO gets fixed, this test should change to expect only the three descendants.
         Assert.Multiple(() =>
         {
-            Assert.That(result.Total, Is.EqualTo(4));
-            Assert.That(result.Items, Is.EquivalentTo(new[] { RootAlphaKey, ChildBetaKey, ChildGammaKey, GrandchildDeltaKey }));
+            Assert.That(result.Total, Is.EqualTo(3));
+            Assert.That(result.Items, Is.EquivalentTo(new[] { ChildBetaKey, ChildGammaKey, GrandchildDeltaKey }));
         });
     }
 
@@ -248,10 +244,10 @@ public class DeliveryApiContentQueryProviderTests : TestBase
 
         Assert.Multiple(() =>
         {
-            Assert.That(firstPage.Total, Is.EqualTo(4));
-            Assert.That(secondPage.Total, Is.EqualTo(4));
+            Assert.That(firstPage.Total, Is.EqualTo(3));
+            Assert.That(secondPage.Total, Is.EqualTo(3));
             Assert.That(firstPage.Items.Count(), Is.EqualTo(2));
-            Assert.That(secondPage.Items.Count(), Is.EqualTo(2));
+            Assert.That(secondPage.Items.Count(), Is.EqualTo(1));
             Assert.That(firstPage.Items.Concat(secondPage.Items), Is.Unique);
         });
     }

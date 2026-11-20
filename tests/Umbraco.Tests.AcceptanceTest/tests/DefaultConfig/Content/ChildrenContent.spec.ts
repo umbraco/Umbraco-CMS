@@ -122,7 +122,7 @@ test('can publish content with child node', {tag: '@smoke'}, async ({umbracoApi,
   await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.nowPubliclyAvailable);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
   const childContentData = await umbracoApi.document.getByName(childContentName);
