@@ -539,11 +539,12 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			() => html`
 				${this.#renderCreateBeforeInlineButton()}
 				<div class="umb-block-grid__block" part="umb-block-grid__block" tabindex="-1">
+					${when(!this._isSortMode, () => html`<umb-entity-frame>${this.#renderFrameLabel()}</umb-entity-frame>`)}
+					${this.#renderActionBar()}
 					${when(
 						this._isSortMode,
 						() => this.#renderRefBlock(),
 						() => html`
-							<umb-entity-frame>${this.#renderFrameLabel()}</umb-entity-frame>
 							<umb-extension-slot
 								single
 								type="blockEditorCustomView"
@@ -553,7 +554,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 								.props=${this._blockViewProps}></umb-extension-slot>
 						`,
 					)}
-					${this.#renderActionBar()}
 					${when(
 						!this._showContentEdit && this._contentInvalid,
 						() => html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`,
@@ -830,6 +830,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 			umb-entity-frame uui-button:hover {
 				text-decoration: underline;
+			}
+
+			umb-entity-frame uui-button {
+				--uui-focus-outline-color: var(--umb-entity-frame-contrast-color);
 			}
 
 			umb-entity-frame > span {

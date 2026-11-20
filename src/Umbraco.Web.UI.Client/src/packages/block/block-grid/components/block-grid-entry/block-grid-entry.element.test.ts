@@ -168,6 +168,19 @@ describe('UmbBlockGridEntryElement', () => {
 			expect(insertLine).to.exist;
 		});
 
+		it('puts the frame and the actions before the block view in the tab order', async () => {
+			(entry as unknown as Record<string, unknown>)._showActions = true;
+			entry.requestUpdate();
+			await entry.updateComplete;
+
+			const block = entry.shadowRoot!.querySelector('.umb-block-grid__block')!;
+			const order = Array.from(block.children, (child) => child.tagName.toLowerCase()).filter((tag) =>
+				['umb-entity-frame', 'umb-block-action-list', 'umb-extension-slot'].includes(tag),
+			);
+
+			expect(order).to.deep.equal(['umb-entity-frame', 'umb-block-action-list', 'umb-extension-slot']);
+		});
+
 		it('hides the frame tab once the pointer rests on the insert line', async () => {
 			pointerOverInsertLine('pointerenter');
 			expect(entry.hasAttribute('create-hovered')).to.be.false;
