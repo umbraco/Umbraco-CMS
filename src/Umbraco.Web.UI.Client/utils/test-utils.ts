@@ -1,3 +1,9 @@
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { of } from '@umbraco-cms/backoffice/external/rxjs';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+
 export const defaultA11yConfig = {
 	ignoredRules: [],
 };
@@ -24,4 +30,45 @@ export function ignoreResizeObserverLoopErrors(): () => void {
 	return () => {
 		window.onerror = previousHandler;
 	};
+}
+
+/**
+ * Registers an item repository that answers every requested unique with `createItem(unique)`, so a picker
+ * input can render its selection without a server or an item store.
+ * @param {string} alias - The repository alias the picker input resolves.
+ * @param {(unique: string) => { unique: string }} createItem - Builds the item returned for a unique.
+ * @returns {() => void} Unregisters the repository.
+ */
+export function registerTestItemRepository(alias: string, createItem: (unique: string) => { unique: string }) {
+	umbExtensionsRegistry.register({
+		type: 'repository',
+		alias,
+		name: `Test Item Repository: ${alias}`,
+		api: class extends UmbControllerBase {
+			async requestItems(uniques: Array<string>) {
+				const data = uniques.map(createItem);
+				return { data, asObservable: () => of(data) };
+			}
+		},
+	});
+	return () => umbExtensionsRegistry.unregister(alias);
+}
+
+/**
+ * Provides a modal manager to the descendants of `host` that resolves every modal it opens with `value`.
+ * @param {HTMLElement} host - The element whose descendants open modals.
+ * @param {unknown} value - The value each opened modal submits.
+ * @returns {Array<unknown>} The data each opened modal was given, in the order they were opened.
+ */
+export function provideTestModalManager(host: HTMLElement, value: unknown): Array<unknown> {
+	const opened: Array<unknown> = [];
+	const modalManager = {
+		getHostElement: () => host,
+		open: (_host: unknown, _modalAlias: unknown, args?: { data?: unknown }) => {
+			opened.push(args?.data);
+			return { onSubmit: () => Promise.resolve(value) };
+		},
+	};
+	new UmbContextProvider(host, UMB_MODAL_MANAGER_CONTEXT, modalManager as never).hostConnected();
+	return opened;
 }

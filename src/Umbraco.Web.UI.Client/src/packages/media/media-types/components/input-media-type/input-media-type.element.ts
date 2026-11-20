@@ -192,6 +192,11 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 		this.#pickerContext.requestRemoveItem(unique);
 	}
 
+	#renderReplaceAction() {
+		if (this.readonly || this.max !== 1) return nothing;
+		return html`<uui-button label=${this.localize.term('actions_replace')} @click=${this.#openPicker}></uui-button>`;
+	}
+
 	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
@@ -244,7 +249,7 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 								${this.#renderIcon(item)}
 								<uui-action-bar slot="actions">
 									<uui-button href=${href} label=${this.localize.term('general_open')}></uui-button>
-									${this.#renderRemoveButton(unique)}
+									${this.#renderReplaceAction()} ${this.#renderRemoveButton(unique)}
 								</uui-action-bar>
 							</uui-ref-node-document-type>
 						`;
@@ -256,7 +261,9 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 
 	#renderErrorItemActions(unique: string) {
 		if (this.readonly) return nothing;
-		return html`<uui-action-bar slot="actions">${this.#renderRemoveButton(unique)}</uui-action-bar>`;
+		return html`<uui-action-bar slot="actions">
+			${this.#renderReplaceAction()} ${this.#renderRemoveButton(unique)}
+		</uui-action-bar>`;
 	}
 
 	#renderRemoveButton(unique: string) {
