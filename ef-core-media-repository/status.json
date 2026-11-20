@@ -26,7 +26,27 @@
         { "text": "MediaVersionDtoMappingTests green", "done": true }
       ],
       "acceptance": "Solution builds; both snapshots list umbracoMediaVersion with the unique index; migration-plan tests pass; mapping test green; install smoke passes.",
-      "notes": "Started 20-11-2026, cut from 450b951b298. Implemented the same day: DTO, configuration, DbSet, no-op migrations (timestamps 20261120113757 SQL Server / 20261120113817 SQLite; the scaffolder prefixed the class names with the timestamp and they were renamed to the plain name), enum 27, plan GUID {1F12CD86-1168-48C2-8B75-B88636A14A33}, both switch arms; has-pending-model-changes clean on both providers; mapping test (image with a file path and a folder with a null path) green on SQLite after renaming its media type aliases away from the seeded 'image' type. The SQL Server snapshot carries the conventional [path] IS NOT NULL filter on the unique index, like ten existing unique indexes there. Independent review: no must-fix; the save results are now asserted. Red proof: the test fails on a wrong column name. Full --no-incremental solution build clean. Committed as f6392efddba, draft PR #24724.",
+      "notes": "Started 20-11-2026, cut from 450b951b298. Implemented the same day: DTO, configuration, DbSet, no-op migrations (timestamps 20261120113757 SQL Server / 20261120113817 SQLite; the scaffolder prefixed the class names with the timestamp and they were renamed to the plain name), enum 27, plan GUID {1F12CD86-1168-48C2-8B75-B88636A14A33}, both switch arms; has-pending-model-changes clean on both providers; mapping test (image with a file path and a folder with a null path) green on SQLite after renaming its media type aliases away from the seeded 'image' type. The SQL Server snapshot carries the conventional [path] IS NOT NULL filter on the unique index, like ten existing unique indexes there. Independent review: no must-fix; the save results are now asserted. Red proof: the test fails on a wrong column name. Full --no-incremental solution build clean. Committed as f6392efddba, draft PR #24724. Second independent review (umb-review on the PR): approved with two suggestions, both applied in 85857f56562 (HasMaxLength(255) on path, class summaries; migrations regenerated as 20261120115904 / 20261120115914, snapshots clean again, tests green). The unique index filter cleanup became PR 1b.",
+      "mergeCommit": ""
+    },
+    {
+      "id": 9,
+      "slug": "remove-unique-index-filters",
+      "title": "PR 1b: Remove the auto-generated unique index filters from the SQL Server model",
+      "status": "planned",
+      "branch": "",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [1],
+      "summary": "SQL Server customizers re-declaring every unique index over a nullable column with HasFilter(null), so the snapshot stops documenting filtered indexes NPoco never creates (eleven after PR 1, IX_umbracoMediaVersion among them); one no-op migration RemoveUniqueIndexFilters (enum 28). Raised by the review of PR 1; nothing depends on it.",
+      "tasks": [
+        { "text": "Inventory of the HasFilter lines in the SQL Server snapshot and the DTOs they belong to", "done": false },
+        { "text": "One SqlServer*DtoModelCustomizer per affected DTO, registered in AddCustomizers()", "done": false },
+        { "text": "RemoveUniqueIndexFilters no-op migration on both providers, enum 28, plan step, switch arms", "done": false },
+        { "text": "has-pending-model-changes clean on both providers; SQL Server snapshot has no HasFilter", "done": false }
+      ],
+      "acceptance": "Solution builds; both snapshots clean; the SQL Server snapshot diff touches only filter lines and the last migration id.",
+      "notes": "Numbered PR 1b in CAMPAIGN.md.",
       "mergeCommit": ""
     },
     {
@@ -176,6 +196,7 @@
     }
   ],
   "log": [
+    { "date": "20-11-2026", "text": "PR 1b added (remove the SQL Server unique index filters) after the independent review of PR 1; PR 1 gets HasMaxLength(255) on the path column and class docs, migration regenerated." },
     { "date": "20-11-2026", "text": "PR 1 opened as draft #24724 (f6392efddba): review clean, mapping test proven red/green, snapshots clean on both providers." },
     { "date": "20-11-2026", "text": "PR 1 started on v20/feature/ef-core-media-repository-1-media-version-dto: DTO, configuration, DbSet, no-op migrations on both providers, plan wiring and the mapping test implemented; snapshots clean. Awaiting review and the draft PR." },
     { "date": "20-11-2026", "text": "All §8 design decisions confirmed by the user (media-only scope, hoist-first in both tiers, tree operations on the wide service base, engine semantics for the §4b change list, no relation check when emptying the media recycle bin, file-system members stay sync, GetMediaByPathAsync kept, CountNotTrashed dropped). PR 1, PR 2 and PR 5 are unblocked and may start in parallel; no branch cut yet." },

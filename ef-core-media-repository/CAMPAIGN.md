@@ -212,7 +212,7 @@ Change (adopting the engine's behaviour; each is recorded in §8 and gets a test
 
 Branch naming: `v20/feature/ef-core-media-repository-<n>-<slug>`, cut from the latest `origin/v18/feature/ef-core-repositories`. PR target: `v18/feature/ef-core-repositories`. New EF Core migrations stay in the `V_19_0_0` folder like every other migration on the integration branch. PR title prefix: `EF Core:`. Squash-merge. Each PR must build clean and leave the full integration suite green on its own; nothing may depend on an unmerged sibling PR except where stated.
 
-Dependency graph: PR 1, PR 2 and PR 5 are independent of each other and can run in parallel. PR 3 depends on PR 2; PR 3b on PR 3. PR 4 depends on PR 1 and PR 3b. PR 6 depends on PR 4 and PR 5. PR 7 depends on PR 6.
+Dependency graph: PR 1, PR 2 and PR 5 are independent of each other and can run in parallel. PR 1b depends on PR 1 and nothing depends on it. PR 3 depends on PR 2; PR 3b on PR 3. PR 4 depends on PR 1 and PR 3b. PR 6 depends on PR 4 and PR 5. PR 7 depends on PR 6.
 
 ### PR 1: EF Core `MediaVersionDto` and the no-op migration
 
@@ -226,6 +226,17 @@ Scope:
 Acceptance: solution builds; both snapshots list `umbracoMediaVersion` with the unique index name above; the migration-plan tests pass; the mapping test is green; the unattended-install smoke (any one `UmbracoIntegrationTest` with a database) passes.
 
 Out of scope: no repository, no factory changes.
+
+### PR 1b: Remove the auto-generated unique index filters from the SQL Server model (small, after PR 1)
+
+Scope:
+- EF Core's SQL Server provider adds `HasFilter("[column] IS NOT NULL")` to every unique index that contains a nullable column; NPoco creates those indexes unfiltered. After PR 1 the SQL Server snapshot documents eleven such filtered indexes (`IX_umbracoMediaVersion`, the language ISO code, culture and language id indexes, ...) that the database does not have.
+- Add SQL Server customizers (`IEFCoreModelCustomizer<TDto>` in `Umbraco.Cms.Persistence.EFCore.SqlServer/DtoCustomization/`, registered in `UmbracoBuilderExtensions.AddCustomizers()`) that re-declare each affected unique index with `.HasFilter(null)`; one customizer per DTO, following `SqlServerDocumentVersionDtoModelCustomizer`.
+- One no-op migration `RemoveUniqueIndexFilters` on both providers (enum 28, plan step after `AddMediaVersionDto`). The SQLite model does not change; decide in the PR whether the SQLite arm maps to an empty migration or returns null like the SQL Server arm does for `SqliteCollation`.
+
+Acceptance: `has-pending-model-changes` clean on both providers; the SQL Server snapshot contains no `HasFilter`; its diff touches only the filter lines and the last migration id.
+
+Out of scope: no change to the shared configurations, no repository work. Raised by the review of PR 1 (#24724); nothing in the campaign depends on it.
 
 ### PR 2: Hoist the generic read path into `AsyncContentRepositoryBase`
 
@@ -387,6 +398,7 @@ Steps 2 and 10 to 11 of §6 are the points in each PR where this must happen. A 
 | 20-11-2026 | PR 3b (narrowed sibling fetch) is a required step, not backlog. | The NPoco media repository has the optimisation (#23447) and large flat media libraries are its reason; porting media without it would be a regression. |
 | 20-11-2026 | `ContentSaveOperationStatus` gains `InvalidKey` and `DuplicateKey`, and the Guid v7 / duplicate-key checks move into a save validation hook that only `MediaService` implements. | `MediaEditingService` already maps those two outcomes; documents never had the checks and keep not having them. |
 | 20-11-2026 | No PR 0: the media baseline is fully green (§4a). | Verified 20-11-2026 on SQLite. |
+| 20-11-2026 | `MediaVersionDto.Path` is mapped with `HasMaxLength(255)` so the snapshot records the column NPoco creates; the SQL Server provider's automatic `[path] IS NOT NULL` filter on the unique index is left in PR 1 and removed repo-wide in PR 1b. | Raised by the independent review of PR 1: the snapshot otherwise documents `nvarchar(450)` and a filtered index the database does not have. Sibling string columns without a length stay as they are. |
 | 20-11-2026 | The "decouple `MediaByGuidReadRepository` from `MediaRepository`" task is closed by this campaign without being done. | With Guid-only contracts the nested repository has nothing to stand in for; PR 6 deletes it with the file. |
 | 20-11-2026 | The plan, `status.json`, the page source and the memory snapshot stay on the orphan branch `campaign/ef-core-element-repository` in the folder `ef-core-media-repository/`; the memory sync scripts and the `memory/` snapshot moved to the branch root on 20-11-2026 so every campaign shares them. | `LEARNINGS.md` asked for it; renaming the branch would mean a new worktree on every machine. |
 
