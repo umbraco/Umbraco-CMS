@@ -1,0 +1,158 @@
+{
+  "title": "NPoco to EF Core: the grand plan",
+  "updated": "20-11-2026",
+  "integrationBranch": "v18/feature/ef-core-repositories",
+  "inventoryCommit": "450b951b298",
+  "artifact": { "url": "https://claude.ai/artifact/Dnds6W162dYKDBjiZoYZgJ", "title": "EF Core Migration Map" },
+  "planFile": ".claude/campaign/grand-plan/GRAND-PLAN.md",
+  "done": {
+    "note": "Concrete repositories that read and write through UmbracoDbContext on the integration branch.",
+    "repositories": [
+      "AuditEntryRepository", "AuditRepository", "ConsentRepository", "ContentTypeCommonRepository", "ContentTypeRepository",
+      "DictionaryRepository", "DistributedJobRepository", "DocumentBlueprintRepository", "DocumentRepository", "DomainRepository",
+      "ElementRepository", "IdKeyMapRepository", "KeyValueRepository", "LanguageRepository", "LastSyncedRepository",
+      "LongRunningOperationRepository", "MediaTypeRepository", "MemberTypeRepository", "PublicAccessRepository", "RedirectUrlRepository",
+      "RelationRepository", "RelationTypeRepository", "TemplateRepository", "WebhookRepository", "AsyncPermissionRepository"
+    ],
+    "bases": ["PublishableContentRepositoryBase", "AsyncContentRepositoryBase", "AsyncContentTypeRepositoryBase", "AsyncEntityRepositoryBase", "AsyncRepositoryBase"],
+    "campaigns": [
+      { "name": "Document repository", "finished": "22-09-2026", "note": "NPoco DocumentRepository deleted, IPublishableContentService async." },
+      { "name": "Element repository and service", "finished": "19-11-2026", "note": "Nine PRs, last one #24678. Plan under ef-core-element-repository/." }
+    ]
+  },
+  "campaigns": [
+    {
+      "id": "A",
+      "title": "Media and members on the content tier",
+      "status": "proposed-next",
+      "why": "The publishable base, row and hook shapes, factories and test patterns exist, so this is a cutover rather than new design. It is the only step that retires the NPoco ContentRepositoryBase and lets the remaining Async* base names drop their prefix.",
+      "dependsOn": [],
+      "repositories": [
+        { "name": "MediaRepository", "lines": 805, "base": "ContentRepositoryBase<int, IMedia, MediaRepository>", "note": "IMediaService has one async member today." },
+        { "name": "MemberRepository", "lines": 1155, "base": "ContentRepositoryBase<int, IMember, MemberRepository>", "note": "Member search by name/email/login is permission-dependent (#24518, #24534)." },
+        { "name": "MemberFilterRepository", "lines": 370, "base": "IMemberFilterRepository", "note": "Paging tiebreak and LIKE escaping landed upstream in #24647 and #24549." },
+        { "name": "MemberGroupRepository", "lines": 388, "base": "EntityRepositoryBase<int, IMemberGroup>", "note": "" },
+        { "name": "ExternalMemberRepository", "lines": 245, "base": "IExternalMemberRepository", "note": "" },
+        { "name": "ContentRepositoryBase", "lines": 1430, "base": "NPoco base, retired by this campaign", "note": "Keeps the sibling-name prefix fetch (#23447); port it before deleting, see loose ends." }
+      ],
+      "alsoCloses": ["Rename AsyncContentRepositoryBase, AsyncEntityRepositoryBase, AsyncRepositoryBase, AsyncContentTypeRepositoryBase onto the freed names", "IMediaService and IMemberService async tiers (today merge artifacts that delegate to sync members)"]
+    },
+    {
+      "id": "B",
+      "title": "Entity tier",
+      "status": "proposed",
+      "why": "PR 0 of the element campaign left TODOs in RelationRepository that point at the entity repository, and the navigation and URL repositories are request-path hot spots.",
+      "dependsOn": [],
+      "repositories": [
+        { "name": "EntityRepository", "lines": 1648, "base": "RepositoryBase, IEntityRepositoryExtended", "note": "Delete IEntityRepositoryExtended and its sqlCustomization overload; move the paging and entity building out of RelationRepository.GetPagedRelatedEntitiesAsync." },
+        { "name": "ContentNavigationRepository", "lines": 128, "base": "INavigationRepository", "note": "Feeds the navigation services (AsyncContentNavigationServiceBase)." },
+        { "name": "NodeCountRepository", "lines": 66, "base": "INodeCountRepository", "note": "" },
+        { "name": "TrackedReferencesRepository", "lines": 543, "base": "ITrackedReferencesRepository", "note": "" },
+        { "name": "DynamicRootRepository", "lines": 292, "base": "IDynamicRootRepository", "note": "" },
+        { "name": "DocumentUrlRepository", "lines": 139, "base": "IDocumentUrlRepository", "note": "Rebuild write locks before reading (#24603)." },
+        { "name": "DocumentUrlAliasRepository", "lines": 158, "base": "IDocumentUrlAliasRepository", "note": "" },
+        { "name": "PublishStatusRepository", "lines": 265, "base": "IPublishStatusRepository", "note": "Upstream added synchronous members for the write gate (#24292); keep them." }
+      ],
+      "alsoCloses": ["IEntityService async tier"]
+    },
+    {
+      "id": "C",
+      "title": "Versions and containers",
+      "status": "proposed",
+      "why": "Deferred by both content campaigns on purpose. Small, self-contained, and shared by documents and elements.",
+      "dependsOn": [],
+      "repositories": [
+        { "name": "ContentVersionRepositoryBase", "lines": 245, "base": "NPoco base of DocumentVersionRepository and ElementVersionRepository", "note": "Migrate both subclasses together. ContentVersionMeta is int-only; consider a Key populated at the source." },
+        { "name": "EntityContainerRepository", "lines": 411, "base": "EntityRepositoryBase<int, EntityContainer>", "note": "Container moves go through EntityTypeContainerService hooks that are already Guid-keyed and async." },
+        { "name": "DocumentBlueprintContainerRepository", "lines": 59, "base": "EntityContainerRepository", "note": "" },
+        { "name": "ElementContainerRepository", "lines": 61, "base": "EntityContainerRepository", "note": "" },
+        { "name": "Document type, media type, member type and data type container repositories", "lines": null, "base": "EntityContainerRepository", "note": "Thin subclasses; they go with the base." }
+      ],
+      "alsoCloses": []
+    },
+    {
+      "id": "D",
+      "title": "Data types",
+      "status": "proposed",
+      "why": "Data type reads sit on every property editor path; the usage repositories are tiny and go with it.",
+      "dependsOn": [],
+      "repositories": [
+        { "name": "DataTypeRepository", "lines": 720, "base": "EntityRepositoryBase<int, IDataType>", "note": "IDataTypeService already has 12 async members." },
+        { "name": "DataTypeUsageRepository", "lines": 53, "base": "IDataTypeUsageRepository", "note": "" },
+        { "name": "PropertyTypeUsageRepository", "lines": 64, "base": "IPropertyTypeUsageRepository", "note": "" }
+      ],
+      "alsoCloses": []
+    },
+    {
+      "id": "E",
+      "title": "Users and security",
+      "status": "proposed",
+      "why": "The largest remaining NPoco surface after content. IUserService and IUserGroupService contracts are already mostly async, so the service work is small.",
+      "dependsOn": [],
+      "repositories": [
+        { "name": "UserRepository", "lines": 1618, "base": "EntityRepositoryBase<Guid, IUser>", "note": "Reads IsolatedCache directly; upstream added EnsureIsolatedCacheIsSynced for it (#24516)." },
+        { "name": "UserGroupRepository", "lines": 716, "base": "EntityRepositoryBase<int, IUserGroup>", "note": "" },
+        { "name": "UserDataRepository", "lines": 150, "base": "IUserDataRepository", "note": "" },
+        { "name": "PermissionRepository", "lines": 402, "base": "EntityRepositoryBase<int, ContentPermissionSet>", "note": "An EF Core AsyncPermissionRepository already exists; reconcile the two and delete the NPoco one." },
+        { "name": "ExternalLoginRepository", "lines": 410, "base": "EntityRepositoryBase<int, IIdentityUserLogin>", "note": "" },
+        { "name": "TwoFactorLoginRepository", "lines": 174, "base": "EntityRepositoryBase<int, ITwoFactorLogin>", "note": "" },
+        { "name": "NotificationsRepository", "lines": 240, "base": "INotificationsRepository", "note": "User2NodeNotify DTO and configuration already exist on EF Core." }
+      ],
+      "alsoCloses": []
+    },
+    {
+      "id": "F",
+      "title": "Infrastructure and operations",
+      "status": "proposed",
+      "why": "Small, independent repositories with few consumers; good fillers between the larger campaigns or for a newcomer.",
+      "dependsOn": [],
+      "repositories": [
+        { "name": "CacheInstructionRepository", "lines": 121, "base": "ICacheInstructionRepository", "note": "" },
+        { "name": "ServerRegistrationRepository", "lines": 136, "base": "EntityRepositoryBase<int, IServerRegistration>", "note": "" },
+        { "name": "RepositoryCacheVersionRepository", "lines": 86, "base": "RepositoryBase", "note": "Upstream added synchronous members (#24292); keep them." },
+        { "name": "LogViewerQueryRepository", "lines": 167, "base": "EntityRepositoryBase<int, ILogViewerQuery>", "note": "" },
+        { "name": "CreatedPackageSchemaRepository", "lines": 887, "base": "ICreatedPackagesRepository", "note": "Mostly XML and file work around one table." },
+        { "name": "TagRepository", "lines": 658, "base": "EntityRepositoryBase<int, ITag>", "note": "Non-Latin tag groups on SQL Server fixed upstream (#24357); keep the collation handling." },
+        { "name": "WebhookLogRepository", "lines": 119, "base": "IWebhookLogRepository", "note": "" },
+        { "name": "WebhookRequestRepository", "lines": 91, "base": "IWebhookRequestRepository", "note": "The EF Core WebhookRepository issues a raw DELETE on this table today; give it the DTO." }
+      ],
+      "alsoCloses": []
+    },
+    {
+      "id": "G",
+      "title": "Outside the repositories folder",
+      "status": "proposed",
+      "why": "NPoco use that lives in other projects or in services. The published cache repository is the big one and was explicitly out of scope for the content campaigns.",
+      "dependsOn": [],
+      "repositories": [
+        { "name": "DatabaseCacheRepository (HybridCache)", "lines": 2658, "base": "IDatabaseCacheRepository", "note": "Cached SQL templates and batched reads landed upstream in #24671, #24557; the rebuild deadlock fix in #24551." },
+        { "name": "IndexDocumentRepository (Search.Core)", "lines": 141, "base": "IIndexDocumentRepository", "note": "Batched deletes landed upstream in #24612." },
+        { "name": "UserIdKeyResolver (Infrastructure service)", "lines": 140, "base": "IUserIdKeyResolver", "note": "Could become a lookup on the EF Core user repository once E is done." }
+      ],
+      "alsoCloses": []
+    },
+    {
+      "id": "H",
+      "title": "Retire the NPoco repository bases",
+      "status": "last",
+      "why": "The shared bases can only go when their last subclass has gone. This is the closing campaign.",
+      "dependsOn": ["A", "B", "C", "D", "E", "F", "G"],
+      "repositories": [
+        { "name": "EntityRepositoryBase", "lines": 294, "base": "RepositoryBase", "note": "" },
+        { "name": "RepositoryBase", "lines": 105, "base": "IRepository", "note": "" },
+        { "name": "SimpleGetRepository", "lines": 97, "base": "EntityRepositoryBase", "note": "" }
+      ],
+      "alsoCloses": ["NPoco scope plumbing that only repositories used", "IQuery<T> and the NPoco query builder where no caller remains"]
+    }
+  ],
+  "looseEnds": [
+    { "where": "AuditEntryRepository, LanguageRepository, WebhookRepository", "what": "EF Core repositories that still contain NPoco calls (one, two and one). Finish them whenever a PR touches the file." },
+    { "where": "PublishableContentRepositoryBase.ApplyOrdering", "what": "Culture-aware \"published\" ordering: NPoco orders variant content by the culture variation row, EF Core by the table flag only. TODO in code. Upstream #24530 has no EF Core counterpart." },
+    { "where": "PublishableContentRepositoryBase.GetUniqueNodeNameAndSiblingsAsync", "what": "Fetch only siblings sharing the base text (#23447); today every sibling is loaded on each document write. TODO in code." },
+    { "where": "IElementService, IMediaService, IContentTypeService, IMediaTypeService, IMemberTypeService, IEntityService", "what": "Service contracts still sync or barely async although their repositories are on EF Core (or will be). Each campaign above should finish the contract of the services it touches." },
+    { "where": "RelationRepository.GetPagedRelatedEntitiesAsync, EntityRepository", "what": "Node paging and entity building done inside the relation repository until the entity repository is EF Core (campaign B). Both ends carry a TODO." }
+  ],
+  "log": [
+    { "date": "20-11-2026", "text": "Grand plan created from the inventory of merge commit 450b951b298 (main merged into the integration branch the same day). Campaign order A to H is a proposal; the user decides which one starts next." }
+  ]
+}

@@ -1,0 +1,205 @@
+<title>EF Core Migration Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: one centred column. A header with the two totals, a ledger of the proposed campaigns in order
+     (each a table of repositories with their size), then loose ends, then what is already done, then the log. */
+  :root {
+    --bg: #f6f7f5;
+    --surface: #ffffff;
+    --fg: #1d2420;
+    --muted: #5c6661;
+    --line: #d9ded9;
+    --accent: #0f6e63;
+    --accent-soft: #d8ebe7;
+    --npoco: #c6651b;
+    --npoco-soft: #f9e6d6;
+    --tag-next: #e3ecf9;
+    --tag-next-fg: #1f4f8f;
+    --tag-last: #e4e8e5;
+    --tag-last-fg: #4a5551;
+    --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #151917; --surface: #1d2321; --fg: #e6ebe8; --muted: #9aa5a0; --line: #2e3733;
+      --accent: #5fc2b3; --accent-soft: #1d3a36;
+      --npoco: #f0a060; --npoco-soft: #3d2a1a;
+      --tag-next: #1d2d44; --tag-next-fg: #8fb6ee;
+      --tag-last: #2a322e; --tag-last-fg: #b3bdb8;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #151917; --surface: #1d2321; --fg: #e6ebe8; --muted: #9aa5a0; --line: #2e3733;
+    --accent: #5fc2b3; --accent-soft: #1d3a36;
+    --npoco: #f0a060; --npoco-soft: #3d2a1a;
+    --tag-next: #1d2d44; --tag-next-fg: #8fb6ee;
+    --tag-last: #2a322e; --tag-last-fg: #b3bdb8;
+    color-scheme: dark;
+  }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+  .wrap { max-width: 960px; margin: 0 auto; padding-block: 32px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 28px; }
+  h1, h2, h3 { margin: 0; text-wrap: balance; }
+  h1 { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.01em; }
+  h2 { font-size: 1.1rem; font-weight: 600; }
+  h3 { font-size: 1rem; font-weight: 600; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .eyebrow { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .muted { color: var(--muted); }
+  code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+  a { color: var(--accent); }
+  header { display: grid; gap: 14px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 0.9rem; color: var(--muted); }
+  .meta span { min-width: 0; overflow-wrap: anywhere; }
+  .totals { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .total { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; display: grid; gap: 4px; }
+  .total .n { font-size: 1.7rem; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .total.efcore .n { color: var(--accent); }
+  .total.npoco .n { color: var(--npoco); }
+  .bar { height: 8px; border-radius: 4px; background: var(--npoco-soft); overflow: hidden; }
+  .bar > span { display: block; height: 100%; background: var(--accent); }
+  section { display: grid; gap: 14px; }
+  .campaign { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; display: grid; gap: 12px; }
+  .campaign .id { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 1px 7px; }
+  .tag { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 999px; font-weight: 500; }
+  .tag.proposed-next { background: var(--tag-next); color: var(--tag-next-fg); }
+  .tag.proposed { background: var(--accent-soft); color: var(--accent); }
+  .tag.last { background: var(--tag-last); color: var(--tag-last-fg); }
+  .tag.in-progress, .tag.planned { background: var(--tag-next); color: var(--tag-next-fg); }
+  .tag.done { background: var(--accent-soft); color: var(--accent); }
+  .why { margin: 0; max-width: 70ch; }
+  .tablewrap { overflow-x: auto; min-width: 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+  th, td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-weight: 500; color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; padding-right: 14px; white-space: nowrap; }
+  th.num { text-align: right; padding-right: 14px; }
+  td.name { white-space: nowrap; }
+  td.note { color: var(--muted); min-width: 18ch; }
+  tr:last-child td { border-bottom: 0; }
+  .sum { font-size: 0.86rem; color: var(--muted); }
+  .closes { margin: 0; padding-left: 1.2em; font-size: 0.92rem; }
+  .closes li { margin: 2px 0; }
+  .loose { display: grid; gap: 10px; }
+  .loose-item { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--npoco); border-radius: 6px; padding: 10px 14px; display: grid; gap: 2px; }
+  .done-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .done-list span { background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-size: 0.8rem; padding: 2px 8px; border-radius: 4px; }
+  .log { display: grid; gap: 8px; font-size: 0.92rem; }
+  .log div { display: grid; grid-template-columns: 7.5em 1fr; gap: 10px; }
+  .log .d { font-variant-numeric: tabular-nums; color: var(--muted); white-space: nowrap; }
+  .error { background: var(--npoco-soft); color: var(--npoco); padding: 12px 14px; border-radius: 6px; }
+  .note-box { font-size: 0.86rem; color: var(--muted); max-width: 80ch; }
+  @media (max-width: 520px) { .log div { grid-template-columns: 1fr; gap: 0; } td.name { white-space: normal; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Umbraco CMS · integration branch <span class="mono" id="branch"></span></div>
+    <h1 id="title">EF Core Migration Map</h1>
+    <div class="meta">
+      <span>Inventory at commit <code id="commit"></code></span>
+      <span>Updated <span id="updated"></span></span>
+      <span>Source of truth: <code>grand-plan.json</code></span>
+    </div>
+    <div class="totals" id="totals"></div>
+    <div class="bar"><span id="barfill" style="width:0%"></span></div>
+  </header>
+
+  <section>
+    <h2>Proposed campaigns, in order</h2>
+    <p class="note-box">A to G are independent of each other; the order is a recommendation. The last one depends on all of the others. Line counts are file sizes on the inventory day and only indicate relative effort.</p>
+    <div id="campaigns" style="display:grid;gap:14px"></div>
+  </section>
+
+  <section>
+    <h2>Loose ends inside migrated code</h2>
+    <div class="loose" id="loose"></div>
+  </section>
+
+  <section>
+    <h2>Already on EF Core</h2>
+    <div id="done-campaigns" class="log"></div>
+    <div class="done-list" id="done"></div>
+    <p class="note-box" id="done-bases"></p>
+  </section>
+
+  <section>
+    <h2>Log</h2>
+    <div class="log" id="log"></div>
+  </section>
+
+  <p class="note-box">Agents: the data lives in <code>grand-plan.json</code> next to <code>overview.html</code> under <code>.claude/campaign/grand-plan/</code>. Edit the JSON, then republish this page with the Artifact tool to the same URL, passing <code>grand-plan.json</code> in <code>files</code>. <code>GRAND-PLAN.md</code> has the exact steps. The page never holds data itself.</p>
+</div>
+
+<script>
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function fail(msg) { var w = document.querySelector(".wrap"); w.insertBefore(el("div", "error", msg), w.firstChild); }
+  function tagLabel(s) { return ({ "proposed-next": "proposed next", "proposed": "proposed", "planned": "planned", "in-progress": "in progress", "done": "done", "last": "last" })[s] || s; }
+
+  function render(d) {
+    document.getElementById("branch").textContent = d.integrationBranch;
+    document.getElementById("commit").textContent = d.inventoryCommit;
+    document.getElementById("updated").textContent = d.updated;
+    if (d.title) document.title = d.artifact && d.artifact.title ? d.artifact.title : document.title;
+
+    var doneCount = d.done.repositories.length;
+    var todo = [], lines = 0;
+    d.campaigns.forEach(function (c) { c.repositories.forEach(function (r) { todo.push(r); lines += r.lines || 0; }); });
+    var totals = document.getElementById("totals");
+    function total(cls, n, label) { var t = el("div", "total " + cls); t.appendChild(el("div", "n", String(n))); t.appendChild(el("div", "muted", label)); totals.appendChild(t); }
+    total("efcore", doneCount, "repositories on EF Core");
+    total("npoco", todo.length, "repositories and bases still on NPoco");
+    total("", lines.toLocaleString("en-GB"), "lines of NPoco repository code left");
+    document.getElementById("barfill").style.width = Math.round(100 * doneCount / (doneCount + todo.length)) + "%";
+
+    var host = document.getElementById("campaigns");
+    d.campaigns.forEach(function (c) {
+      var box = el("div", "campaign");
+      var h = el("h3");
+      h.appendChild(el("span", "id", c.id));
+      h.appendChild(document.createTextNode(c.title));
+      h.appendChild(el("span", "tag " + c.status, tagLabel(c.status)));
+      box.appendChild(h);
+      box.appendChild(el("p", "why", c.why));
+      if (c.dependsOn && c.dependsOn.length) box.appendChild(el("div", "sum", "Depends on: " + c.dependsOn.join(", ")));
+      var wrap = el("div", "tablewrap");
+      var t = el("table"), thead = el("thead"), hr = el("tr");
+      [["Repository", ""], ["Lines", "num"], ["Base or contract", ""], ["Notes", ""]].forEach(function (x) { var th = el("th", x[1], x[0]); hr.appendChild(th); });
+      thead.appendChild(hr); t.appendChild(thead);
+      var tb = el("tbody"), sum = 0;
+      c.repositories.forEach(function (r) {
+        var tr = el("tr");
+        tr.appendChild(el("td", "name mono", r.name));
+        tr.appendChild(el("td", "num", r.lines == null ? "" : r.lines.toLocaleString("en-GB")));
+        tr.appendChild(el("td", "mono", r.base || ""));
+        tr.appendChild(el("td", "note", r.note || ""));
+        tb.appendChild(tr); sum += r.lines || 0;
+      });
+      t.appendChild(tb); wrap.appendChild(t); box.appendChild(wrap);
+      box.appendChild(el("div", "sum", c.repositories.length + " repositories, " + sum.toLocaleString("en-GB") + " lines"));
+      if (c.alsoCloses && c.alsoCloses.length) {
+        box.appendChild(el("div", "eyebrow", "Also closes"));
+        var ul = el("ul", "closes"); c.alsoCloses.forEach(function (x) { ul.appendChild(el("li", null, x)); }); box.appendChild(ul);
+      }
+      host.appendChild(box);
+    });
+
+    var loose = document.getElementById("loose");
+    d.looseEnds.forEach(function (x) { var b = el("div", "loose-item"); b.appendChild(el("div", "mono", x.where)); b.appendChild(el("div", null, x.what)); loose.appendChild(b); });
+
+    var dc = document.getElementById("done-campaigns");
+    (d.done.campaigns || []).forEach(function (c) { var row = el("div"); row.appendChild(el("span", "d", c.finished)); row.appendChild(el("span", null, c.name + ". " + c.note)); dc.appendChild(row); });
+    var done = document.getElementById("done");
+    d.done.repositories.slice().sort().forEach(function (n) { done.appendChild(el("span", null, n)); });
+    document.getElementById("done-bases").textContent = "EF Core bases: " + d.done.bases.join(", ") + ". " + d.done.note;
+
+    var log = document.getElementById("log");
+    d.log.forEach(function (x) { var row = el("div"); row.appendChild(el("span", "d", x.date)); row.appendChild(el("span", null, x.text)); log.appendChild(row); });
+  }
+
+  fetch("grand-plan.json?t=" + Date.now(), { cache: "no-store" })
+    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then(render)
+    .catch(function (e) { fail("Could not load grand-plan.json (" + e.message + "). Republish the page with grand-plan.json in files."); });
+</script>
