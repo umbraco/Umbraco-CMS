@@ -83,6 +83,7 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
         {
             filters.Add(selectorOptionFilter);
 
+            // PathIds is ancestors-or-self; the descendants selector must exclude the start item itself.
             if (selectorOption.FieldName == DescendantsSelectorIndexer.FieldName)
             {
                 filters.Add(new KeywordFilter(Constants.Search.FieldNames.Id, selectorOption.Values, true));
