@@ -344,6 +344,25 @@ describe('UmbBlockManagerContext', () => {
 			await waitUntil(() => failureOf('a') === 'deleted');
 		});
 	});
+
+	describe('removing an expose', () => {
+		it('removes only the expose of the given variant, leaving other variants and blocks exposed', async () => {
+			const host = await fixture<UmbControllerHostElement>(
+				html`<umb-test-block-manager-host></umb-test-block-manager-host>`,
+			);
+			const manager = new UmbTestBlockManagerContext(host);
+
+			manager.setOneExpose('a', new UmbVariantId('en-us'));
+			manager.setOneExpose('a', new UmbVariantId('da'));
+			manager.setOneExpose('b', new UmbVariantId('da'));
+
+			manager.removeOneExpose('a', new UmbVariantId('da'));
+
+			expect(manager.getExposes().map((x) => `${x.culture}|${x.contentKey}`)).to.deep.equal(['da|b', 'en-us|a']);
+
+			manager.destroy();
+		});
+	});
 });
 
 const ELEMENT_UNIQUE = 'library-element-one-id';
@@ -480,25 +499,6 @@ describe('UmbBlockManagerContext - external content (Library Elements)', () => {
 			const content = await firstValueFrom(manager.contentOf(ELEMENT_UNIQUE).pipe(filter((value) => value !== undefined)));
 			expect(content!.key).to.equal(ELEMENT_UNIQUE);
 			expect(requestCount).to.equal(2);
-		});
-	});
-
-	describe('removing an expose', () => {
-		it('removes only the expose of the given variant, leaving other variants and blocks exposed', async () => {
-			const host = await fixture<UmbControllerHostElement>(
-				html`<umb-test-block-manager-host></umb-test-block-manager-host>`,
-			);
-			const manager = new UmbTestBlockManagerContext(host);
-
-			manager.setOneExpose('a', new UmbVariantId('en-us'));
-			manager.setOneExpose('a', new UmbVariantId('da'));
-			manager.setOneExpose('b', new UmbVariantId('da'));
-
-			manager.removeOneExpose('a', new UmbVariantId('da'));
-
-			expect(manager.getExposes().map((x) => `${x.culture}|${x.contentKey}`)).to.deep.equal(['da|b', 'en-us|a']);
-
-			manager.destroy();
 		});
 	});
 });
