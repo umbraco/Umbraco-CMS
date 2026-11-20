@@ -1967,18 +1967,20 @@ public class ContentService : RepositoryService, IContentService
             if (unpublishResult?.Success ?? false)
             {
                 // events and audit
-                scope.Notifications.Publish(
-                    new ContentUnpublishedNotification(
-                        content,
-                        eventMessages,
-                        BuildCultureMap(content, variesByCulture ? culturesUnpublishing : ["*"]))
-                    .WithState(notificationState));
+                // The tree change goes first, as it does on publish, so that the published caches are refreshed
+                // before the unpublished notification handlers run.
                 scope.Notifications.Publish(new ContentTreeChangeNotification(
                     content,
                     TreeChangeTypes.RefreshBranch,
                     variesByCulture ? culturesPublishing.IsCollectionEmpty() ? null : culturesPublishing : null,
                     variesByCulture ? culturesUnpublishing.IsCollectionEmpty() ? null : culturesUnpublishing : ["*"],
                     eventMessages));
+                scope.Notifications.Publish(
+                    new ContentUnpublishedNotification(
+                        content,
+                        eventMessages,
+                        BuildCultureMap(content, variesByCulture ? culturesUnpublishing : ["*"]))
+                    .WithState(notificationState));
 
                 if (culturesUnpublishing != null)
                 {
