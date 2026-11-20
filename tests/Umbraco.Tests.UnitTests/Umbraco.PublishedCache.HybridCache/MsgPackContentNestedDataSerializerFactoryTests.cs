@@ -113,6 +113,31 @@ public class MsgPackContentNestedDataSerializerFactoryTests
         VerifyCompressionAsked(AddedAlias, Times.Never());
     }
 
+    [TestCase(ContentCacheDataSerializerEntityType.Document)]
+    [TestCase(ContentCacheDataSerializerEntityType.Element)]
+    [TestCase(ContentCacheDataSerializerEntityType.Document | ContentCacheDataSerializerEntityType.Element)]
+    public void Create_Applies_Compression_Options_To_Every_Requested_Entity_Type(ContentCacheDataSerializerEntityType entityType)
+    {
+        const string Alias = "compressed";
+        _contentTypes[0] = CreateContentType(ContentTypeId, "page", Alias);
+        _compressionOptions
+            .Setup(x => x.IsCompressed(It.IsAny<IReadOnlyContentBase>(), It.IsAny<IPropertyType>(), It.IsAny<IDataEditor>(), It.IsAny<bool>()))
+            .Returns(true);
+
+        var content = new Mock<IReadOnlyContentBase>();
+        content.SetupGet(x => x.ContentTypeId).Returns(ContentTypeId);
+        var model = new ContentCacheDataModel
+        {
+            PropertyData = new Dictionary<string, PropertyData[]> { [Alias] = [new PropertyData { Culture = string.Empty, Segment = string.Empty, Value = "value" }] },
+        };
+
+        IContentCacheDataSerializer serializer = _factory.Create(entityType);
+        ContentCacheDataSerializationResult result = serializer.Serialize(content.Object, model, published: true);
+        ContentCacheDataModel? roundTripped = serializer.Deserialize(content.Object, null, result.ByteData, published: true);
+
+        Assert.That(roundTripped?.PropertyData?[Alias][0].Value, Is.InstanceOf<LazyCompressedString>());
+    }
+
     private void SerializeWithProperty(string propertyAlias)
     {
         var content = new Mock<IReadOnlyContentBase>();
