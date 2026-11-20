@@ -5,7 +5,16 @@ import { aTimeout, expect, fixture, html } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState, UmbBooleanState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UmbArrayState,
+	UmbBasicState,
+	UmbBooleanState,
+	UmbNumberState,
+	UmbObjectState,
+} from '@umbraco-cms/backoffice/observable-api';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbDropzoneSubmittedEvent, UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbUploadableItem } from '@umbraco-cms/backoffice/dropzone';
@@ -169,5 +178,64 @@ describe('UmbMediaCollectionElement', () => {
 		expect(emptyStateRect.height, 'empty state height').to.be.at.least(emptyState.scrollHeight);
 		expect(emptyStateRect.top, 'empty state top').to.be.at.least(toolbar.getBoundingClientRect().bottom);
 		expect(emptyStateRect.bottom, 'empty state bottom').to.be.at.most(collectionRect.bottom);
+	});
+});
+
+describe('UmbMediaCollectionElement root access', () => {
+	async function createCollection(entityType: string, hasMediaRootAccess: boolean | undefined) {
+		const host = await fixture<UmbTestMediaCollectionHostElement>(
+			html`<umb-test-media-collection-host>
+				<umb-media-collection></umb-media-collection>
+			</umb-test-media-collection-host>`,
+		);
+
+		const context = new UmbFakeMediaCollectionContext(host);
+		host.provideContext(UMB_MEDIA_COLLECTION_CONTEXT, context as never);
+		host.provideContext(UMB_ACTION_EVENT_CONTEXT, { getHostElement: () => host, dispatchEvent: () => true } as never);
+		host.provideContext(UMB_ENTITY_CONTEXT, {
+			getHostElement: () => host,
+			entityType: new UmbBasicState<string | undefined>(entityType).asObservable(),
+		} as never);
+		host.provideContext(UMB_CURRENT_USER_CONTEXT, {
+			getHostElement: () => host,
+			hasMediaRootAccess: new UmbBasicState<boolean | undefined>(hasMediaRootAccess).asObservable(),
+		} as never);
+
+		const element = host.querySelector('umb-media-collection') as UmbMediaCollectionElement;
+
+		context.setLoading(true);
+		await aTimeout(0);
+		context.setLoading(false);
+		await aTimeout(0);
+		await element.updateComplete;
+
+		return {
+			dropzone: element.shadowRoot!.querySelector('#dropzone') as UmbDropzoneMediaElement,
+			emptyState: element.shadowRoot!.querySelector('umb-empty-media-state'),
+		};
+	}
+
+	it('refuses uploads and offers no upload prompt at the root without root access', async () => {
+		const { dropzone, emptyState } = await createCollection(UMB_MEDIA_ROOT_ENTITY_TYPE, false);
+		expect(dropzone.noAccess).to.be.true;
+		expect(emptyState).to.be.null;
+	});
+
+	it('allows uploads at the root with root access', async () => {
+		const { dropzone, emptyState } = await createCollection(UMB_MEDIA_ROOT_ENTITY_TYPE, true);
+		expect(dropzone.noAccess).to.be.false;
+		expect(emptyState).to.not.be.null;
+	});
+
+	it('allows uploads at the root while root access is not yet known', async () => {
+		const { dropzone, emptyState } = await createCollection(UMB_MEDIA_ROOT_ENTITY_TYPE, undefined);
+		expect(dropzone.noAccess).to.be.false;
+		expect(emptyState).to.not.be.null;
+	});
+
+	it('allows uploads in a folder without root access', async () => {
+		const { dropzone, emptyState } = await createCollection(UMB_MEDIA_ENTITY_TYPE, false);
+		expect(dropzone.noAccess).to.be.false;
+		expect(emptyState).to.not.be.null;
 	});
 });

@@ -5,6 +5,8 @@ import { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.j
 import { customElement, html, ref, state, when, css, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbDropzoneSubmittedEvent } from '@umbraco-cms/backoffice/dropzone';
 import '../components/empty-media-state/index.js';
@@ -18,6 +20,12 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 
 	@state()
 	private _unique: string | null = null;
+
+	@state()
+	private _isRoot = false;
+
+	@state()
+	private _hasMediaRootAccess?: boolean;
 
 	@query('#dropzone')
 	private _dropzone?: UmbDropzoneMediaElement;
@@ -34,6 +42,30 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 				this._unique = unique ?? null;
 			});
 		});
+
+		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
+			this.observe(
+				context?.entityType,
+				(entityType) => {
+					this._isRoot = entityType === UMB_MEDIA_ROOT_ENTITY_TYPE;
+				},
+				'umbMediaCollectionEntityTypeObserver',
+			);
+		});
+
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+			this.observe(
+				context?.hasMediaRootAccess,
+				(hasMediaRootAccess) => {
+					this._hasMediaRootAccess = hasMediaRootAccess;
+				},
+				'umbMediaCollectionRootAccessObserver',
+			);
+		});
+	}
+
+	get #noAccess() {
+		return this._isRoot && this._hasMediaRootAccess === false;
 	}
 
 	#observeProgressItems(dropzone?: Element) {
@@ -95,6 +127,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 				id="dropzone"
 				${ref(this.#observeProgressItems)}
 				multiple
+				.noAccess=${this.#noAccess}
 				.parentUnique=${this._unique}
 				@submitted=${this.#setupPlaceholders}
 				@complete=${this.#onComplete}
@@ -104,6 +137,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 	}
 
 	protected override _renderEmptyState() {
+		if (this.#noAccess) return super._renderEmptyState();
 		return html`<umb-empty-media-state @browse=${() => this._dropzone?.browse()}> </umb-empty-media-state> `;
 	}
 

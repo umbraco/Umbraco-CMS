@@ -1,6 +1,8 @@
 import { UmbInputRichMediaElement } from './input-rich-media.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbClipboardCopyRequestEvent } from '@umbraco-cms/backoffice/clipboard';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbInputRichMediaElement', () => {
@@ -12,6 +14,41 @@ describe('UmbInputRichMediaElement', () => {
 
 	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbInputRichMediaElement);
+	});
+
+	describe('upload access', () => {
+		async function provideRootAccess(hasMediaRootAccess: boolean | undefined) {
+			element.provideContext(UMB_CURRENT_USER_CONTEXT, {
+				getHostElement: () => element,
+				hasMediaRootAccess: new UmbBasicState<boolean | undefined>(hasMediaRootAccess).asObservable(),
+			} as never);
+			await element.updateComplete;
+		}
+
+		function dropzone() {
+			return element.shadowRoot!.querySelector('umb-dropzone-media')!;
+		}
+
+		it('refuses uploads to the root when the user has no root access', async () => {
+			await provideRootAccess(false);
+			expect(dropzone().noAccess).to.be.true;
+		});
+
+		it('allows uploads to the root when the user has root access', async () => {
+			await provideRootAccess(true);
+			expect(dropzone().noAccess).to.be.false;
+		});
+
+		it('allows uploads to the root while root access is not yet known', async () => {
+			await provideRootAccess(undefined);
+			expect(dropzone().noAccess).to.be.false;
+		});
+
+		it('leaves uploads to a start node to the server when the user has no root access', async () => {
+			element.startNode = { unique: 'start-node', entityType: 'media' };
+			await provideRootAccess(false);
+			expect(dropzone().noAccess).to.be.false;
+		});
 	});
 
 	describe('clipboard copy', () => {
