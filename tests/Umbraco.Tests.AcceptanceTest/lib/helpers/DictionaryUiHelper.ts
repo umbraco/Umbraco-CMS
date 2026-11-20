@@ -105,7 +105,7 @@ export class DictionaryUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForDictionaryToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.dictionary, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.dictionary, ConstantHelper.workspaceActions.dictionarySave);
   }
 
   async clickConfirmToDeleteButtonAndWaitForDictionaryToBeDeleted() {

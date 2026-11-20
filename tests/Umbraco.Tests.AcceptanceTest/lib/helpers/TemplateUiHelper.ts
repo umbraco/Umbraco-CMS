@@ -101,7 +101,7 @@ export class TemplateUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForTemplateToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.template, this.clickSaveButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.template, ConstantHelper.workspaceActions.templateSave);
   }
 
   async clickConfirmToDeleteButtonAndWaitForTemplateToBeDeleted() {

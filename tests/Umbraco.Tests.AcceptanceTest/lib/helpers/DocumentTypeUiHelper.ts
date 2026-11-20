@@ -105,7 +105,7 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
   async doesElementTypeNotApplicableMessageExist(isVisible: boolean = true) {
     await this.isVisible(this.elementTypeNotApplicableMessage.first(), isVisible);
   }
-  
+
   async isElementTypeNotApplicableMessageForPropertyWithNameVisible(propertyName: string) {
     await this.containsText(this.page.locator(`umb-property-layout[label="${propertyName}"] .info-message`) , 'This is not applicable for an Element Type.');
   }
@@ -169,7 +169,7 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForDocumentTypeToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentType, this.clickSaveButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.documentType, ConstantHelper.workspaceActions.documentTypeSave);
   }
 
   async clickConfirmToDeleteButtonAndWaitForDocumentTypeToBeDeleted() {

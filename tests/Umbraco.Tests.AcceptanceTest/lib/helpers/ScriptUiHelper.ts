@@ -38,15 +38,15 @@ export class ScriptUiHelper extends UiBaseLocators{
   async clickNewJavascriptFileButton() {
     await this.click(this.newJavascriptFileBtn);
   }
-  
+
   async clickSaveButtonAndWaitForScriptToBeCreated() {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.script, this.clickSaveButton(), ConstantHelper.statusCodes.created);
   }
 
   async clickSaveButtonAndWaitForScriptToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.script, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.script, ConstantHelper.workspaceActions.scriptSave);
   }
-  
+
   // Will only work for root scripts
   async goToScript(scriptName: string) {
     await this.goToSection(ConstantHelper.sections.settings);

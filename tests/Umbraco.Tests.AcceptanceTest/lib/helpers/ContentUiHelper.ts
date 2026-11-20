@@ -769,8 +769,16 @@ export class ContentUiHelper extends UiBaseLocators {
     return contentId;
   }
 
+  private async waitForContentToBeUpdated(save: () => Promise<void>) {
+    return await this.waitForWorkspaceToBeSaved(save, ConstantHelper.apiEndpoints.document, ConstantHelper.workspaceActions.documentSave);
+  }
+
+  private async waitForContentToBePublished(publish: () => Promise<void>) {
+    return await this.waitForWorkspaceToBePublished(publish, "document", ConstantHelper.workspaceActions.documentSaveAndPublish);
+  }
+
   async clickSaveModalButtonAndWaitForContentToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.document, this.clickSaveModalButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForContentToBeUpdated(() => this.click(this.saveModalBtn));
   }
 
   async clickSaveAndPublishButtonAndWaitForContentToBeCreated() {
@@ -782,7 +790,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForContentToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.document, this.clickSaveButtonForContent(), ConstantHelper.statusCodes.ok);
+    return await this.waitForContentToBeUpdated(() => this.click(this.saveContentBtn));
   }
 
   /**
@@ -795,14 +803,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickSaveAndPublishButtonAndWaitForContentToBePublished() {
-    // New content publishes via POST .../document/create-and-publish (201); existing content via
-    // PUT .../document/{id}/update-and-publish (200). A single waiter can't match both, so wait on the
-    // generic document endpoint + 200: the post-publish GET .../document/{id} fires in both cases.
-    return await this.waitForResponseAfterExecutingPromise(
-      ConstantHelper.apiEndpoints.document,
-      this.clickSaveAndPublishButton(),
-      ConstantHelper.statusCodes.ok,
-    );
+    return await this.waitForContentToBePublished(() => this.click(this.saveAndPublishBtn));
   }
 
   private async clickContainerSaveButton() {
@@ -810,19 +811,11 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickContainerSaveButtonAndWaitForContentToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(
-      ConstantHelper.apiEndpoints.document,
-      this.clickContainerSaveButton(),
-      ConstantHelper.statusCodes.ok,
-    );
+    return await this.waitForContentToBeUpdated(() => this.clickContainerSaveButton());
   }
 
   async clickContainerSaveAndPublishButtonAndWaitForContentToBePublished() {
-    return await this.waitForResponseAfterExecutingPromise(
-      ConstantHelper.apiEndpoints.document,
-      this.clickContainerSaveAndPublishButton(),
-      ConstantHelper.statusCodes.ok,
-    );
+    return await this.waitForContentToBePublished(() => this.click(this.containerSaveAndPublishBtn));
   }
 
   async clickDocumentTypeByName(documentTypeName: string) {

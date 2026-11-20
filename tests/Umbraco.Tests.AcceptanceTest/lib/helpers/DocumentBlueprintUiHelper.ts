@@ -47,7 +47,7 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
   }
 
   async clickSaveButtonAndWaitForDocumentBlueprintToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprint, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.documentBlueprint, ConstantHelper.workspaceActions.documentBlueprintSave);
   }
 
   async reloadDocumentBlueprintsTree() {

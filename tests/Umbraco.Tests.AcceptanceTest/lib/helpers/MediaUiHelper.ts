@@ -213,7 +213,7 @@ export class MediaUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForMediaToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.media, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.media, ConstantHelper.workspaceActions.mediaSave);
   }
 
   async clickConfirmTrashButtonAndWaitForMediaToBeTrashed() {

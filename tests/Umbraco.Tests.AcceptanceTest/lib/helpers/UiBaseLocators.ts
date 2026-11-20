@@ -2146,8 +2146,10 @@ export class UiBaseLocators extends BasePage {
     method?: string,
   ) {
     // Prefer the callback form: an already-started promise can complete before the listener attaches.
+    // An explicit timeout makes a missing response fail as such, rather than as the test timeout.
     const responsePromise = this.page.waitForResponse(
       (resp) => resp.url().includes(url) && resp.status() === statusCode && (method === undefined || resp.request().method() === method),
+      {timeout: ConstantHelper.timeout.navigation},
     );
     const [response] = await Promise.all([responsePromise, typeof action === "function" ? action() : action]);
 
@@ -2165,6 +2167,53 @@ export class UiBaseLocators extends BasePage {
    */
   async waitForWorkspaceEditRoute(entityType: 'document' | 'element') {
     await expect(this.page).toHaveURL(new RegExp(`/workspace/${entityType}/edit/`), {timeout: ConstantHelper.timeout.long});
+  }
+
+  /**
+   * Waits until the workspace action with the given alias has completed successfully.
+   * Its button only shows the success state once the whole action has finished - for a save, after the
+   * workspace has re-read and applied the saved entity - so the workspace no longer reports unsaved changes.
+   */
+  async waitForWorkspaceActionToSucceed(actionAlias: string) {
+    await this.isVisible(this.workspaceActionSuccessState(actionAlias), true, ConstantHelper.timeout.long);
+  }
+
+  private workspaceActionSuccessState(actionAlias: string) {
+    return this.page.getByTestId(`workspace-action:${actionAlias}`).and(this.successState);
+  }
+
+  /**
+   * Runs a save in an entity workspace and waits until it has finished: the update response, then the workspace
+   * re-reading the entity. Until that re-read lands the workspace still reports unsaved changes.
+   * @param save - The action that saves, e.g. clicking Save or confirming a save modal
+   * @param updateEndpoint - The endpoint the update is sent to (PUT)
+   * @param saveActionAlias - The alias of the workspace action that performs the save
+   * @returns the trailing segment of the update request URL (the entity id or path).
+   */
+  async waitForWorkspaceToBeSaved(save: () => Promise<void>, updateEndpoint: string, saveActionAlias: string) {
+    const updatedId = await this.waitForResponseAfterExecutingPromise(updateEndpoint, save, ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
+    await this.waitForWorkspaceActionToSucceed(saveActionAlias);
+    return updatedId;
+  }
+
+  async clickSaveButtonAndWaitForWorkspaceToBeSaved(updateEndpoint: string, saveActionAlias: string) {
+    return await this.waitForWorkspaceToBeSaved(() => this.click(this.saveBtn), updateEndpoint, saveActionAlias);
+  }
+
+  /**
+   * Runs a publish in a document or element workspace and waits until the workspace has finished it.
+   * New and existing entities publish through different endpoints, so this waits on the action rather than a response.
+   * @param publish - The action that publishes, e.g. clicking Save and publish or confirming the publish modal
+   * @param entityType - The workspace's entity type
+   * @param publishActionAlias - The alias of the workspace action that performs the publish
+   * @returns the id of the published entity, read from the workspace URL.
+   */
+  async waitForWorkspaceToBePublished(publish: () => Promise<void>, entityType: 'document' | 'element', publishActionAlias: string) {
+    // The button keeps showing a previous action's success for a moment, which would satisfy the wait below at once.
+    await this.isVisible(this.workspaceActionSuccessState(publishActionAlias), false);
+    await publish();
+    await this.waitForWorkspaceActionToSucceed(publishActionAlias);
+    return this.page.url().match(new RegExp(`/workspace/${entityType}/edit/([^/]+)`))?.[1];
   }
 
   /**

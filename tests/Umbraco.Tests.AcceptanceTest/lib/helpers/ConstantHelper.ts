@@ -346,6 +346,30 @@
     delete: 'DELETE'
   }
 
+  public static readonly workspaceActions = {
+    dataTypeSave: 'Umb.WorkspaceAction.DataType.Save',
+    dictionarySave: 'Umb.WorkspaceAction.Dictionary.Save',
+    documentSave: 'Umb.WorkspaceAction.Document.Save',
+    documentSaveAndPublish: 'Umb.WorkspaceAction.Document.SaveAndPublish',
+    documentBlueprintSave: 'Umb.WorkspaceAction.DocumentBlueprint.Save',
+    documentTypeSave: 'Umb.WorkspaceAction.DocumentType.Save',
+    elementSave: 'Umb.WorkspaceAction.Element.Save',
+    elementSaveAndPublish: 'Umb.WorkspaceAction.Element.SaveAndPublish',
+    languageSave: 'Umb.WorkspaceAction.Language.Save',
+    mediaSave: 'Umb.WorkspaceAction.Media.Save',
+    mediaTypeSave: 'Umb.WorkspaceAction.MediaType.Save',
+    memberSave: 'Umb.WorkspaceAction.Member.Save',
+    memberGroupSave: 'Umb.WorkspaceAction.MemberGroup.Save',
+    memberTypeSave: 'Umb.WorkspaceAction.MemberType.Save',
+    partialViewSave: 'Umb.WorkspaceAction.PartialView.Save',
+    scriptSave: 'Umb.WorkspaceAction.Script.Save',
+    stylesheetSave: 'Umb.WorkspaceAction.Stylesheet.Save',
+    templateSave: 'Umb.WorkspaceAction.Template.Save',
+    userSave: 'Umb.WorkspaceAction.User.Save',
+    userGroupSave: 'Umb.WorkspaceAction.UserGroup.Save',
+    webhookSave: 'Umb.WorkspaceAction.Webhook.Save'
+  }
+
   // Matched against response URLs via url().includes(), so entries are either full paths
   // (e.g. '/umbraco/management/api/v1/document') or path fragments.
   public static readonly apiEndpoints = {

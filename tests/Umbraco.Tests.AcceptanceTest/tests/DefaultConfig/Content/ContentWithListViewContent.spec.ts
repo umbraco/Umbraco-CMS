@@ -79,7 +79,7 @@ test('can create content with a child in the list', async ({umbracoApi, umbracoU
   // Act
   await umbracoUi.content.clickCreateContentWithName(childDocumentTypeName);
   await umbracoUi.content.enterContentName(childContentName);
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();

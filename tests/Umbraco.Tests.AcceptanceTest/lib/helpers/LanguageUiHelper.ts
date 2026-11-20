@@ -94,7 +94,7 @@ export class LanguageUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForLanguageToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.language, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.language, ConstantHelper.workspaceActions.languageSave);
   }
 
   async clickConfirmToDeleteButtonAndWaitForLanguageToBeDeleted() {
