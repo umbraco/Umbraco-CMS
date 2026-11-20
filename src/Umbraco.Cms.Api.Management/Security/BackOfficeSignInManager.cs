@@ -188,6 +188,12 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
     public async Task ReissueSignInAsync(BackOfficeIdentityUser user)
     {
         AuthenticateResult authentication = await Context.AuthenticateAsync(AuthenticationType);
+        if (authentication.Succeeded is false
+            || UserManager.GetUserId(authentication.Principal) != user.Id)
+        {
+            return;
+        }
+
         ClaimsPrincipal principal = await CreateUserPrincipalAsync(user);
 
         foreach (Claim claim in new[] { ClaimTypes.AuthenticationMethod, Constants.Security.AuthenticationMethodsReferencesClaimType }
@@ -197,7 +203,7 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
             principal.Identities.First().AddClaim(claim);
         }
 
-        await Context.SignInAsync(AuthenticationType, principal, authentication.Properties ?? new AuthenticationProperties());
+        await Context.SignInAsync(AuthenticationType, principal, authentication.Properties);
     }
 
     /// <summary>
