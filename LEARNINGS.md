@@ -7,13 +7,14 @@ Campaigns so far:
 | Campaign | Folder | Ran | PRs |
 |---|---|---|---|
 | Element repository and service | `ef-core-element-repository/` | 08-10-2026 to 19-11-2026 | Nine, all merged; last one `cfaf78790e7` (#24678) |
+| Media repository and service | `ef-core-media-repository/` | planned 20-11-2026 | Eight planned (1, 2, 3, 3b, 4, 5, 6, 7); none opened yet |
 
 ## How this branch is organised
 
 - One folder per campaign, each with its own `CAMPAIGN.md` (plan), `status.json` (source of truth for progress) and `progress.html` (page source for the board artifact).
 - `grand-plan/` is the map above the campaigns: `GRAND-PLAN.md`, `grand-plan.json` (every repository still on NPoco, grouped into proposed campaigns in order, plus loose ends) and `overview.html` (page source for the "EF Core Migration Map" artifact). Update it when a campaign starts or closes.
 - The branch is an orphan branch checked out as a worktree at `.claude/campaign/` in the main checkout. Nothing here ever goes on a PR branch.
-- `sync-memory.sh` / `sync-memory.ps1` and the `memory/` snapshot currently live in `ef-core-element-repository/`. They are not campaign specific; a new campaign should move them to the branch root rather than copy them.
+- `sync-memory.sh` / `sync-memory.ps1` and the `memory/` snapshot live at the branch root since 20-11-2026 and are shared by every campaign.
 - The branch is still named `campaign/ef-core-element-repository`. Renaming it means a new remote branch and a new `git worktree add` on every machine.
 
 ## What worked

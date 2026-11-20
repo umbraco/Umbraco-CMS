@@ -290,7 +290,7 @@ Status 19-11-2026: merged as `cfaf78790e7` (#24678). The campaign is complete.
 
 ## 6. Per-PR checklist (do all of it, in order, every PR)
 
-0. On a machine that may be behind: `git -C .claude/campaign pull`, then `.claude/campaign/ef-core-element-repository/sync-memory.sh pull` (Windows: `sync-memory.ps1 pull`) so the local Claude memory matches the committed snapshot. Read this file again if the decisions log (§8) has new rows.
+0. On a machine that may be behind: `git -C .claude/campaign pull`, then `.claude/campaign/sync-memory.sh pull` (Windows: `sync-memory.ps1 pull`) so the local Claude memory matches the committed snapshot. Read this file again if the decisions log (§8) has new rows.
 1. `git fetch origin && git checkout -b v20/feature/ef-core-element-repository-<n>-<slug> origin/v18/feature/ef-core-repositories`.
 2. Set the PR's status to `in-progress` in `status.json` and republish the progress page (§7). Note the branch name there.
 3. Research the NPoco reference and the EF Core precedent yourself before writing any brief.
@@ -303,7 +303,7 @@ Status 19-11-2026: merged as `cfaf78790e7` (#24678). The campaign is complete.
 10. Set status to `in-review`, record the PR number and URL in `status.json`, republish the page, append a one-line entry to the `log` array.
 11. On merge: set status `merged`, record the merge commit, republish. If upstream (`v19/dev`) was merged into `ef-core-repositories` since the branch was cut, run the merge audit (memory `project_merge_audit_procedure`) before starting the next PR, and walk every hunk the merge landed in `PublishableContentServiceBase` and `ContentService` into `AsyncPublishableContentServiceBase` by hand (memory `project_merge_up_sync_async_twins_need_manual_port`). The 12-10-2026 merge-up lost the entire invariant-for-variant permission port that way and the compiler did not notice, because `ImpactExplicit(culture, bool)` kept the same shape with a different meaning. Also check whether an open campaign PR added an EF Core migration on the snapshot the merge-up changed; if so, regenerate the PR's migration on top (PR 1 needed this).
 12. Update the memory file `project_ef_core_element_repository_campaign.md` with anything non-obvious learned (decisions, traps), and this document's §8 if a decision changed.
-13. Before the session ends: `.claude/campaign/ef-core-element-repository/sync-memory.sh push` (Windows: `sync-memory.ps1 push`), then commit inside the worktree (`git -C .claude/campaign add -A && git -C .claude/campaign commit`) and push the `campaign/ef-core-element-repository` branch. That commit is the handover; no separate handover document is needed. Never commit this folder on a PR branch.
+13. Before the session ends: `.claude/campaign/sync-memory.sh push` (Windows: `sync-memory.ps1 push`), then commit inside the worktree (`git -C .claude/campaign add -A && git -C .claude/campaign commit`) and push the `campaign/ef-core-element-repository` branch. That commit is the handover; no separate handover document is needed. Never commit this folder on a PR branch.
 
 ## 7. Keeping the progress page current (the artifact)
 
@@ -367,16 +367,16 @@ The folder `ef-core-element-repository/` is the only content of the orphan branc
 | `CAMPAIGN.md` | This plan. |
 | `status.json` | Progress source of truth; rendered by the artifact. |
 | `progress.html` | Page source for the artifact. Only changes when the page layout changes. |
-| `sync-memory.sh`, `sync-memory.ps1` | Same tool for Linux/macOS (bash) and Windows (PowerShell): `pull` copies `memory/*.md` into the local Claude Code memory directory for the main checkout; `push` copies the local directory back. Newer file wins. Both find the main checkout through `git rev-parse --git-common-dir`, so they work from inside the worktree, and both derive the memory directory from that path the way Claude Code names project folders (every non-alphanumeric character becomes `-`). If the derived directory does not exist, pass it explicitly as the second argument (bash) or `-MemoryDir` (PowerShell), or set `CLAUDE_MEMORY_DIR`. |
-| `memory/` | Snapshot of the Claude Code memory files for this repository (`MEMORY.md` index plus one file per memory). Treat it as read-only on disk; edit the live memory and `push`. |
+| `sync-memory.sh`, `sync-memory.ps1` (moved to the branch root on 20-11-2026) | Same tool for Linux/macOS (bash) and Windows (PowerShell): `pull` copies `memory/*.md` into the local Claude Code memory directory for the main checkout; `push` copies the local directory back. Newer file wins. Both find the main checkout through `git rev-parse --git-common-dir`, so they work from inside the worktree, and both derive the memory directory from that path the way Claude Code names project folders (every non-alphanumeric character becomes `-`). If the derived directory does not exist, pass it explicitly as the second argument (bash) or `-MemoryDir` (PowerShell), or set `CLAUDE_MEMORY_DIR`. |
+| `memory/` (moved to the branch root on 20-11-2026) | Snapshot of the Claude Code memory files for this repository (`MEMORY.md` index plus one file per memory). Treat it as read-only on disk; edit the live memory and `push`. |
 
 First-time setup on a machine (run from the main checkout):
 
 ```
 git fetch origin campaign/ef-core-element-repository
 git worktree add .claude/campaign campaign/ef-core-element-repository
-.claude/campaign/ef-core-element-repository/sync-memory.sh pull        # Linux/macOS
-.claude\campaign\ef-core-element-repository\sync-memory.ps1 pull      # Windows (PowerShell)
+.claude/campaign/sync-memory.sh pull        # Linux/macOS
+.claude\campaign\sync-memory.ps1 pull      # Windows (PowerShell)
 ```
 
 Routine: `git -C .claude/campaign pull` and `sync-memory.sh pull` at the start of a session on a machine that may be behind; `sync-memory.sh push`, commit inside the worktree and push the branch at the end of every session (§6 step 13). Status changes travel in the same commit. If two machines both changed `status.json`, keep both sides' task and log updates; the `updated` date is the later one.

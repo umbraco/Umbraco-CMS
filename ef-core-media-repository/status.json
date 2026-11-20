@@ -1,0 +1,181 @@
+{
+  "campaign": "Media Repository Campaign",
+  "targetBranch": "v18/feature/ef-core-repositories",
+  "planFile": ".claude/campaign/ef-core-media-repository/CAMPAIGN.md",
+  "updated": "20-11-2026",
+  "artifact": {
+    "url": "https://claude.ai/artifact/5rY17CDCK6o6AiY7q62bVd",
+    "title": "Media Repository Campaign"
+  },
+  "prs": [
+    {
+      "id": 1,
+      "slug": "media-version-dto",
+      "title": "EF Core MediaVersionDto and the no-op migration",
+      "status": "planned",
+      "branch": "",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [],
+      "summary": "MediaVersionDto (Id, Path) with its configuration (unique index IX_umbracoMediaVersion on id, path; FK to umbracoContentVersion), the MediaVersions DbSet, the AddMediaVersionDto no-op migration on both providers (enum 27), and a mapping test. Independent of every other PR.",
+      "tasks": [
+        { "text": "MediaVersionDto + MediaVersionDtoConfiguration mirroring the NPoco attributes", "done": false },
+        { "text": "UmbracoDbContext.MediaVersions DbSet", "done": false },
+        { "text": "AddMediaVersionDto migration on SQL Server and SQLite, enum 27, UmbracoPlan step, provider switch arms", "done": false },
+        { "text": "has-pending-model-changes clean on both providers", "done": false },
+        { "text": "MediaVersionDtoMappingTests green", "done": false }
+      ],
+      "acceptance": "Solution builds; both snapshots list umbracoMediaVersion with the unique index; migration-plan tests pass; mapping test green; install smoke passes.",
+      "notes": "",
+      "mergeCommit": ""
+    },
+    {
+      "id": 2,
+      "slug": "hoist-read-path",
+      "title": "Hoist the generic read path into AsyncContentRepositoryBase",
+      "status": "planned",
+      "branch": "",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [],
+      "summary": "Two-tier row types (wide rows need no entity DTO and no published flag), the wide base generic over the content type and the rows, the read path, ordering, versions, children, descendants, root, recycle bin, paged-of-types, by-level, ancestors and RecycleBinSmells moved down from the publishable base and DocumentRepository. Behaviour-neutral for documents, blueprints and elements. Spike first on both providers.",
+      "tasks": [
+        { "text": "Spike: two-tier rows, generic BuildBaseQuery and projection, GetAsync only, green on SQLite and SQL Server", "done": false },
+        { "text": "IEntityVersionDto (Id only); IContentVersionDto extends it; wide base takes IAsyncContentTypeRepositoryBase<TContentType>", "done": false },
+        { "text": "ApplyOrdering hoisted with the OrderByPublished hook; ordering unit tests adapted", "done": false },
+        { "text": "PerformGet*, GetManyAsync(keys, aliases), AssembleEntitiesAsync core with the publishing hook, OnEntitiesAssembledAsync hoisted", "done": false },
+        { "text": "Versions, children, descendants, root, recycle bin, paged-of-types, GetByLevelAsync, GetAncestorsAsync, RecycleBinSmellsAsync hoisted; contracts moved to IAsyncContentRepository", "done": false },
+        { "text": "Document, blueprint and element fixtures and the unit project at unchanged counts; snapshots untouched", "done": false }
+      ],
+      "acceptance": "All document, blueprint and element fixtures and the unit project green at unchanged counts; snapshots untouched; PublishableContentRepositoryBase about 900-1100 lines smaller; no publishing reference left on the wide base except the OrderByPublished hook.",
+      "notes": "",
+      "mergeCommit": ""
+    },
+    {
+      "id": 3,
+      "slug": "hoist-write-path",
+      "title": "Hoist the generic write, delete and naming path into AsyncContentRepositoryBase",
+      "status": "planned",
+      "branch": "",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [2],
+      "summary": "Persist skeletons with publishing extension points, node/content/version/property-data persistence, the generic delete (with the entity-specific hook) and invariant unique naming moved to the wide base; the publishable base keeps published state, entity rows, culture variations, flag flips, templates and variant names.",
+      "tasks": [
+        { "text": "Extension-point design agreed before moving code: shared protected steps plus a per-persist options record", "done": false },
+        { "text": "PersistNewItemAsync / PersistUpdatedItemAsync skeletons on the wide base; publishable overrides compose them", "done": false },
+        { "text": "PersistNewNode/Content/Versions, PersistNew/UpdatedPropertyDataAsync, BuildWriteRow hoisted", "done": false },
+        { "text": "PersistDeletedItemAsync hoisted with the PersistEntitySpecificDeleteClausesAsync hook; schedules delete stays publishable", "done": false },
+        { "text": "Invariant naming hoisted (EnsureUniqueNaming, SanitizeNamesAsync core, EnsureUniqueNodeNameAsync, GetUniqueNodeNameAndSiblingsAsync)", "done": false },
+        { "text": "Write-path and delete tests of the document and element fixtures green at unchanged counts", "done": false }
+      ],
+      "acceptance": "As PR 2 plus every write-path test green; the publishable base ends near its publishing-only content; the wide base has no Set<TEntityDto> and no PublishedState reference.",
+      "notes": "",
+      "mergeCommit": ""
+    },
+    {
+      "id": 4,
+      "slug": "narrow-sibling-fetch",
+      "title": "PR 3b: Narrow the unique-name sibling fetch to names sharing the base text",
+      "status": "planned",
+      "branch": "",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [3],
+      "summary": "GetUniqueNodeNameAndSiblingsAsync loads only siblings whose name starts with SimilarNodeName.GetBaseText(name), as NPoco has done since #23447. Required before media lands: large flat media libraries are the case it exists for, and the NPoco media repository has it today.",
+      "tasks": [
+        { "text": "Test red first against the unfiltered fetch (many unrelated siblings, one collision)", "done": false },
+        { "text": "StartsWith filter on the base text; the TODO comment and the grand-plan backlog row removed", "done": false }
+      ],
+      "acceptance": "Document and element fixtures at unchanged counts; the new test green and red first.",
+      "notes": "Numbered 3b in CAMPAIGN.md.",
+      "mergeCommit": ""
+    },
+    {
+      "id": 5,
+      "slug": "async-media-repository",
+      "title": "AsyncMediaRepository (additive, no consumers switched)",
+      "status": "planned",
+      "branch": "",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [1, 4],
+      "summary": "IAsyncMediaRepository : IAsyncContentRepository<IMedia> + GetMediaByPathAsync; AsyncMediaRepository as a thin subclass of the wide base (base query with umbracoMediaVersion, entity from row parts, media version row from the umbracoFile path, delete clauses, MediaRefreshNotification, path lookup); the 29 NPoco repository tests ported to the EF Core harness plus media-specific tests. NPoco repository untouched.",
+      "tasks": [
+        { "text": "IAsyncMediaRepository contract (Guid keys only, trailing CancellationToken)", "done": false },
+        { "text": "AsyncMediaRepository hooks: BuildBaseQuery, BuildEntity, BuildEntityVersionRow, UpdateEntityVersionRowAsync, delete clauses, keys, cache key, refresh notification, no-op version delete", "done": false },
+        { "text": "ContentBaseFactory: BuildEntity(NodeDto, ContentDto, ContentVersionDto, IMediaType) and BuildEFCoreMediaVersionDto", "done": false },
+        { "text": "GetMediaByPathAsync with the resize-suffix stripping", "done": false },
+        { "text": "DI registration; public constructor; resolves through DI in a test", "done": false },
+        { "text": "AsyncMediaRepositoryTest: 29 ported tests (red first) plus media-specific tests, green on SQLite and SQL Server", "done": false }
+      ],
+      "acceptance": "New fixture green on both providers; document and element fixtures still green; no int id, IQuery, out parameter or missing CancellationToken on the two new files.",
+      "notes": "Numbered PR 4 in CAMPAIGN.md.",
+      "mergeCommit": ""
+    },
+    {
+      "id": 6,
+      "slug": "hoist-service-engine",
+      "title": "Hoist the generic service engine into ContentServiceBase<TContent, TContentType>",
+      "status": "planned",
+      "branch": "",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [],
+      "summary": "New wide service base carrying the generic members of PublishableContentServiceBase and the tree operations of ContentService (create, move, recycle bin, sort, children, descendants, ancestors, root, by level), with move/recycle-bin/sorting notification hooks and publishing extension points. PublishableContentServiceBase becomes its subclass; ElementService implements the new hooks. Behaviour-neutral for documents and elements. Independent of PR 2-4.",
+      "tasks": [
+        { "text": "ContentServiceBase<TContent, TContentType> with the hoisted generic members from PublishableContentServiceBase", "done": false },
+        { "text": "Tree operations hoisted from ContentService with the six move/recycle-bin hooks, the nullable sorting hooks and the isSorting saving overload", "done": false },
+        { "text": "Publishing extension points: save validation, delete-unpublished, sort-published, restore-unpublishing, empty-recycle-bin exclusion", "done": false },
+        { "text": "ElementService implements the new hooks and CreateEntity", "done": false },
+        { "text": "Content and element service fixtures and the unit project at unchanged counts; normalised diff of every moved method shows only hook substitutions", "done": false }
+      ],
+      "acceptance": "ContentServiceTests*, ContentPublishingServiceTests*, ContentEditingServiceTests*, ElementServiceTests*, ElementEditingServiceTests*, ElementContainerServiceTests*, the HybridCache fixtures and the unit project green at unchanged counts; ContentService about 700 lines smaller; no document constant left on the base.",
+      "notes": "Numbered PR 5 in CAMPAIGN.md.",
+      "mergeCommit": ""
+    },
+    {
+      "id": 7,
+      "slug": "media-service-cutover",
+      "title": "MediaService onto the engine, IMediaService reshaped, consumers cut over, NPoco repository deleted",
+      "status": "planned",
+      "branch": "",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [5, 6],
+      "summary": "IMediaService in the shape of IContentService minus publishing (Guid keys, async, Attempt statuses, PagedModel paging, no IContentServiceBase); MediaService as a thin subclass with the media hooks (IsSorting, per-item deleted notifications, v7 and duplicate-key checks, DeleteOfTypes semantics, path lookup); 30 src consumer files and about 60 test files ported; NPoco MediaRepository, IMediaRepository, MediaDto, the NPoco media factory builders and MediaRepositoryTest deleted.",
+      "tasks": [
+        { "text": "IMediaService reshaped per the old-to-new table in CAMPAIGN.md §5 PR 6; ContentSaveOperationStatus gains InvalidKey and DuplicateKey", "done": false },
+        { "text": "MediaService : ContentServiceBase<IMedia, IMediaType> with the hooks and the media-only members", "done": false },
+        { "text": "Consumers in Core, Infrastructure, Api.Management and Search.Core cut over (IIdKeyMap only at the edges)", "done": false },
+        { "text": "NPoco MediaRepository, IMediaRepository, MediaDto, factory builders, DI line and MediaRepositoryTest deleted", "done": false },
+        { "text": "Test fixtures ported; UmbracoIntegrationTestWithMediaEditing exposes keys; MediaBuilder gains key helpers", "done": false },
+        { "text": "4b parity tests and 4b change tests green and red first; DI resolves IMediaService", "done": false }
+      ],
+      "acceptance": "Every media fixture green on SQLite; SQL Server differs only by the known-flaky search jobs; no IMediaRepository or IContentServiceBase<IMedia> reference left; no sync public member on MediaService except the constructor and the four file-system members; no OperationResult, int userId, IQuery, int parentId or sync bridge in the three media service files.",
+      "notes": "Numbered PR 6 in CAMPAIGN.md.",
+      "mergeCommit": ""
+    },
+    {
+      "id": 8,
+      "slug": "drop-scaffolding-names",
+      "title": "Drop the scaffolding names",
+      "status": "planned",
+      "branch": "",
+      "pr": "",
+      "prUrl": "",
+      "dependsOn": [7],
+      "summary": "IAsyncMediaRepository to IMediaRepository, AsyncMediaRepository to MediaRepository, the test fixture renamed; campaign bookkeeping (grand plan, learnings, memory). Nothing else can be renamed until the members campaign retires the sync twins.",
+      "tasks": [
+        { "text": "Renames (git mv) and the DI line", "done": false },
+        { "text": "grand-plan.json, LEARNINGS.md and the memory snapshot updated", "done": false }
+      ],
+      "acceptance": "Solution builds; full suites green; grep for AsyncMedia returns nothing.",
+      "notes": "Numbered PR 7 in CAMPAIGN.md.",
+      "mergeCommit": ""
+    }
+  ],
+  "log": [
+    { "date": "20-11-2026", "text": "Campaign planned on 450b951b298 (main merged into the integration branch the same day): eight PRs (1, 2, 3, 3b, 4, 5, 6, 7). Media baseline fully green (562 unit, 697 integration tests named Media), so there is no PR 0. Design decisions awaiting the user's confirmation are listed in CAMPAIGN.md §8." }
+  ]
+}
