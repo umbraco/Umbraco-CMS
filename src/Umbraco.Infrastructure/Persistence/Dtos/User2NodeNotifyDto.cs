@@ -12,6 +12,12 @@ internal sealed class User2NodeNotifyDto
     public const string TableName = Constants.DatabaseSchema.Tables.User2NodeNotify;
     public const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
     public const string ActionColumnName = "action";
+
+    /// <summary>
+    /// The name of the index on the node identifier, used when notifications are deleted for a node.
+    /// </summary>
+    internal const string NodeIdIndexName = "IX_" + TableName + "_" + NodeIdColumnName;
+
     private const string UserIdColumnName = "userId";
 
     /// <summary>
@@ -27,6 +33,7 @@ internal sealed class User2NodeNotifyDto
     /// </summary>
     [Column(NodeIdColumnName)]
     [ForeignKey(typeof(NodeDto))]
+    [Index(IndexTypes.NonClustered, Name = NodeIdIndexName)]
     public int NodeId { get; set; }
 
     /// <summary>
