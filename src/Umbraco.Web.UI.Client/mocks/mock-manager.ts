@@ -31,6 +31,13 @@ class UmbMockManager {
 	}
 
 	/**
+	 * Get the names of the examples that the current mock set loads.
+	 */
+	get currentSetExamples(): Array<string> {
+		return this.#mockSetLoaders[this.#currentSetName]?.examples ?? [];
+	}
+
+	/**
 	 * Get all visible mock sets, without their loaders.
 	 * Only sets with `visible: true` are included.
 	 */

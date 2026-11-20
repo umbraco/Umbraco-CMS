@@ -1,4 +1,5 @@
 import { getSelectedExampleNames, UMB_EXAMPLES_STORAGE_KEY } from '../examples.js';
+import { umbMockManager } from '../mock-manager.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -20,8 +21,12 @@ export class MockExamplesHeaderAppElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [...this.#bootSelection];
 
+	get #lockedExamples(): Set<string> {
+		return new Set([...(LOCKED_EXAMPLE ? [LOCKED_EXAMPLE] : []), ...umbMockManager.currentSetExamples]);
+	}
+
 	get #loadedCount() {
-		return new Set([...this.#bootSelection, ...(LOCKED_EXAMPLE ? [LOCKED_EXAMPLE] : [])]).size;
+		return new Set([...this.#bootSelection, ...this.#lockedExamples]).size;
 	}
 
 	get #hasChanges() {
@@ -45,6 +50,7 @@ export class MockExamplesHeaderAppElement extends UmbLitElement {
 	}
 
 	override render() {
+		const lockedExamples = this.#lockedExamples;
 		return html`
 			<uui-button id="btn" compact label="Examples" look="primary" popovertarget="examples-popover">
 				${when(
@@ -58,7 +64,7 @@ export class MockExamplesHeaderAppElement extends UmbLitElement {
 					<umb-body-layout>
 						<div class="examples-list">
 							${AVAILABLE_EXAMPLES.map((name) => {
-								const locked = name === LOCKED_EXAMPLE;
+								const locked = lockedExamples.has(name);
 								return html`
 									<uui-checkbox
 										label=${name}
