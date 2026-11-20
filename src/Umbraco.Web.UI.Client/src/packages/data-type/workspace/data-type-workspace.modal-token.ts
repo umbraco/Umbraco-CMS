@@ -9,6 +9,7 @@ export const UMB_DATATYPE_WORKSPACE_MODAL = new UmbModalToken<
 	modal: {
 		type: 'sidebar',
 		size: 'large',
+		isReference: true,
 	},
 	data: { entityType: 'data-type', preset: {} },
 	// Recast the type, so the entityType data prop is not required:

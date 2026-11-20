@@ -2,12 +2,11 @@ import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context-tok
 import { UmbMemberKind, type UmbMemberKindType } from '../../../../utils/index.js';
 import { TimeFormatOptions } from './utils.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UMB_MEMBER_TYPE_ENTITY_TYPE, UmbMemberTypeItemRepository } from '@umbraco-cms/backoffice/member-type';
+import { UmbMemberTypeItemRepository } from '@umbraco-cms/backoffice/member-type';
+import type { UmbMemberTypeItemModel } from '@umbraco-cms/backoffice/member-type';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
@@ -18,13 +17,7 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 	private _memberTypeUnique?: string;
 
 	@state()
-	private _memberTypeName = '';
-
-	@state()
-	private _memberTypeIcon = '';
-
-	@state()
-	private _editMemberTypePath = '';
+	private _memberType?: UmbMemberTypeItemModel;
 
 	@state()
 	private _createDate = this.localize.term('general_unknown');
@@ -47,15 +40,6 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 	constructor() {
 		super();
 
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('member-type')
-			.onSetup(() => {
-				return { data: { entityType: UMB_MEMBER_TYPE_ENTITY_TYPE, preset: {} } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._editMemberTypePath = routeBuilder({});
-			});
-
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, async (context) => {
 			this.#workspaceContext = context;
 			this.observe(this.#workspaceContext?.contentTypeUnique, async (unique) => {
@@ -63,10 +47,7 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 				this._memberTypeUnique = unique;
 
 				if (this._memberTypeUnique) {
-					const memberType = (await this.#memberTypeItemRepository.requestItems([this._memberTypeUnique])).data?.[0];
-					if (!memberType) return;
-					this._memberTypeName = memberType.name;
-					this._memberTypeIcon = memberType.icon;
+					this._memberType = (await this.#memberTypeItemRepository.requestItems([this._memberTypeUnique])).data?.[0];
 				}
 			});
 			this.observe(this.#workspaceContext?.createDate, (date) => (this._createDate = this.#setDateFormat(date)));
@@ -115,15 +96,10 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 					? nothing
 					: html`<div>
 							<h4><umb-localize key="content_membertype">Member Type</umb-localize></h4>
-							<uui-ref-node
+							<umb-entity-item-ref
 								standalone
-								.name=${this._memberTypeName}
-								href=${ifDefined(
-									this._hasSettingsAccess ? this._editMemberTypePath + 'edit/' + this._memberTypeUnique : undefined,
-								)}
-								?readonly=${!this._hasSettingsAccess}>
-								<umb-icon slot="icon" .name=${this._memberTypeIcon}></umb-icon>
-							</uui-ref-node>
+								?readonly=${!this._hasSettingsAccess}
+								.item=${this._memberType}></umb-entity-item-ref>
 						</div>`}
 				<div>
 					<h4><umb-localize key="member_kind"></umb-localize></h4>
