@@ -4,6 +4,9 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Configurations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 
+/// <summary>
+/// A row of the media version table, which extends a content version with the path of the file it stores.
+/// </summary>
 [EntityTypeConfiguration(typeof(MediaVersionDtoConfiguration))]
 public class MediaVersionDto
 {

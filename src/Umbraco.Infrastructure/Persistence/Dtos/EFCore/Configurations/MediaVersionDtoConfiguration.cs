@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Configurations;
 
+/// <summary>
+/// Maps <see cref="MediaVersionDto" /> to the media version table.
+/// </summary>
 public class MediaVersionDtoConfiguration : IEntityTypeConfiguration<MediaVersionDto>
 {
     public void Configure(EntityTypeBuilder<MediaVersionDto> builder)
@@ -16,7 +19,8 @@ public class MediaVersionDtoConfiguration : IEntityTypeConfiguration<MediaVersio
             .ValueGeneratedNever();
 
         builder.Property(x => x.Path)
-            .HasColumnName(MediaVersionDto.PathColumnName);
+            .HasColumnName(MediaVersionDto.PathColumnName)
+            .HasMaxLength(255);
 
         // FK: Id -> umbracoContentVersion.id
         builder.HasOne<ContentVersionDto>()

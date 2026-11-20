@@ -11,7 +11,7 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations;
 
 [DbContext(typeof(UmbracoDbContext))]
-[Migration("20261120113817_AddMediaVersionDto")]
+[Migration("20261120115914_AddMediaVersionDto")]
 partial class AddMediaVersionDto
 {
     /// <inheritdoc />
@@ -1445,6 +1445,7 @@ partial class AddMediaVersionDto
                     .HasColumnName("id");
 
                 b.Property<string>("Path")
+                    .HasMaxLength(255)
                     .HasColumnType("TEXT")
                     .HasColumnName("path")
                     .UseCollation("NOCASE");

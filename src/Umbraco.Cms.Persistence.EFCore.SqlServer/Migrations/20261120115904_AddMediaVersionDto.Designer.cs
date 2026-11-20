@@ -12,7 +12,7 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations;
 
 [DbContext(typeof(UmbracoDbContext))]
-[Migration("20261120113757_AddMediaVersionDto")]
+[Migration("20261120115904_AddMediaVersionDto")]
 partial class AddMediaVersionDto
 {
     /// <inheritdoc />
@@ -1419,7 +1419,8 @@ partial class AddMediaVersionDto
                     .HasColumnName("id");
 
                 b.Property<string>("Path")
-                    .HasColumnType("nvarchar(450)")
+                    .HasMaxLength(255)
+                    .HasColumnType("nvarchar(255)")
                     .HasColumnName("path");
 
                 b.HasKey("Id");

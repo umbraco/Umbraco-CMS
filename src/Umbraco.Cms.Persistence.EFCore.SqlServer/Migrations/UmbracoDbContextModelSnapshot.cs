@@ -16,7 +16,7 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261120113757_AddMediaVersionDto";
+    public override string LastMigrationId => "20261120115904_AddMediaVersionDto";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
@@ -1421,7 +1421,8 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
                     .HasColumnName("id");
 
                 b.Property<string>("Path")
-                    .HasColumnType("nvarchar(450)")
+                    .HasMaxLength(255)
+                    .HasColumnType("nvarchar(255)")
                     .HasColumnName("path");
 
                 b.HasKey("Id");
