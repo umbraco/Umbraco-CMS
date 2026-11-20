@@ -157,7 +157,8 @@ export class UmbDocumentPublishingServerDataSource {
 	}
 
 	/**
-	 * Publish variants of a document and all its descendants
+	 * Publish variants of a document and all its descendants. The endpoint publishes by culture, so the
+	 * segments of a culture are covered by sending that culture once.
 	 * @param {string} unique - The unique of the Document
 	 * @param {Array<UmbVariantId>} variantIds - The variants to publish
 	 * @param {boolean} includeUnpublishedDescendants - Whether to include unpublished descendants
@@ -171,7 +172,7 @@ export class UmbDocumentPublishingServerDataSource {
 		if (!unique) throw new Error('Id is missing');
 
 		const body: PublishDocumentWithDescendantsRequestModel = {
-			cultures: variantIds.map((variant) => variant.toCultureString()),
+			cultures: [...new Set(variantIds.map((variant) => variant.toCultureString()))],
 			includeUnpublishedDescendants,
 		};
 

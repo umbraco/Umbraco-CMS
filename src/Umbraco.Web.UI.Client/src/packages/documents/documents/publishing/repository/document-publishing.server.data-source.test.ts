@@ -6,8 +6,12 @@ import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbDocumentServerDataSource } from '../../repository/detail/document-detail.server.data-source.js';
 import { UmbDocumentPublishingServerDataSource } from './document-publishing.server.data-source.js';
-import { resetMockHandlers } from '../../../../../../mocks/index.js';
+import { resetMockHandlers, useMockHandlers } from '../../../../../../mocks/index.js';
 import { useServerAssignedDocumentKey } from '../../../../../../mocks/msw-handlers/document/server-assigned-key.js';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import type { PublishDocumentWithDescendantsRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+
+const { http, HttpResponse } = window.MockServiceWorker;
 
 const SERVER_ASSIGNED_KEY = 'a0000000-0000-4000-8000-000000000001';
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
@@ -117,6 +121,47 @@ describe('UmbDocumentPublishingServerDataSource (create/update-and-publish)', ()
 			const { data: updated } = await detailDataSource.read(INVARIANT_DOCUMENT_ID);
 			const variant = updated!.variants.find((v) => v.culture === null);
 			expect(variant?.state, 'the invariant variant is Published').to.equal('Published');
+		});
+	});
+
+	describe('publishWithDescendants', () => {
+		/**
+		 * Captures the cultures sent to the publish-with-descendants endpoint. The endpoint responds with an
+		 * error so the data source returns without polling for the result.
+		 * @param {Array<UmbVariantId>} variantIds - The variants to publish.
+		 * @returns {Promise<Array<string> | undefined>} The cultures in the request body.
+		 */
+		async function captureCultures(variantIds: Array<UmbVariantId>): Promise<Array<string> | undefined> {
+			let cultures: Array<string> | undefined;
+			useMockHandlers(
+				http.put(umbracoPath('/document/:id/publish-with-descendants'), async ({ request }) => {
+					cultures = ((await request.json()) as PublishDocumentWithDescendantsRequestModel).cultures;
+					return new HttpResponse(null, { status: 400 });
+				}),
+			);
+			await publishingDataSource.publishWithDescendants(INVARIANT_DOCUMENT_ID, variantIds, false);
+			return cultures;
+		}
+
+		it('sends each culture once when the invariant culture is selected with its segments', async () => {
+			const cultures = await captureCultures([
+				UmbVariantId.CreateInvariant(),
+				UmbVariantId.Create({ culture: null, segment: 'vip' }),
+				UmbVariantId.Create({ culture: null, segment: 'members' }),
+			]);
+
+			expect(cultures).to.deep.equal(['invariant']);
+		});
+
+		it('sends each culture once when cultures are selected with their segments', async () => {
+			const cultures = await captureCultures([
+				UmbVariantId.Create({ culture: 'en-US', segment: null }),
+				UmbVariantId.Create({ culture: 'en-US', segment: 'vip' }),
+				UmbVariantId.Create({ culture: 'da', segment: null }),
+				UmbVariantId.Create({ culture: 'da', segment: 'vip' }),
+			]);
+
+			expect(cultures).to.deep.equal(['en-US', 'da']);
 		});
 	});
 });
