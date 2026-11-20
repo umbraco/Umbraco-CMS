@@ -46,6 +46,32 @@ A to G are independent of each other; the order is a recommendation, not a depen
 of them. Status values in the JSON: `proposed-next`, `proposed`, `planned` (a campaign folder exists),
 `in-progress`, `done`, `last`.
 
+## Easy wins
+
+Small repositories that can go one PR at a time, in any order, between or beside the campaigns. They are
+listed in `grand-plan.json` under `easyWins` with the campaign each one also belongs to, so a finished easy
+win is simply removed from its campaign's list.
+
+- **No new DTO needed.** Every table these touch already has an EF Core DTO and configuration, so there is
+  no migration or snapshot work: `DataTypeUsageRepository` and `PropertyTypeUsageRepository` (one PR),
+  `NodeCountRepository`, `CacheInstructionRepository`, `ContentNavigationRepository`, `DocumentUrlRepository`,
+  `DocumentUrlAliasRepository`, `UserIdKeyResolver`, `NotificationsRepository`, `ContentVersionRepositoryBase`
+  with its two subclasses, and the leftover NPoco calls in `AuditEntryRepository`, `LanguageRepository` and
+  `WebhookRepository`.
+- **One new DTO plus a no-op snapshot migration each** (the `umb-ef-core-empty-migration` skill does the
+  plumbing): `RepositoryCacheVersionRepository`, `WebhookRequestRepository`, `WebhookLogRepository`,
+  `ServerRegistrationRepository`, `IndexDocumentRepository` (Search.Core), `UserDataRepository`,
+  `LogViewerQueryRepository`, `TwoFactorLoginRepository`.
+
+The usual rules still apply to each: Guid keys and a trailing `CancellationToken` on the new contract,
+`Attempt` with a status enum on writes, the red-first test, an independent review.
+
+## Measuring progress
+
+The page compares lines of repository code, not repository counts: a 66-line repository and a 1,648-line one
+are not the same amount of work. `done.lines` in the JSON is the EF Core side (repositories and bases),
+counted the same way as the NPoco side on the inventory day. Refresh both together.
+
 ## Rules carried over
 
 Every campaign follows the working agreements in `LEARNINGS.md` at the branch root: small PRs in a fixed

@@ -7,6 +7,8 @@
   "planFile": ".claude/campaign/grand-plan/GRAND-PLAN.md",
   "done": {
     "note": "Concrete repositories that read and write through UmbracoDbContext on the integration branch.",
+    "lines": 12099,
+    "linesNote": "Lines of the EF Core repositories and bases on the inventory day, counted the same way as the NPoco side.",
     "repositories": [
       "AuditEntryRepository", "AuditRepository", "ConsentRepository", "ContentTypeCommonRepository", "ContentTypeRepository",
       "DictionaryRepository", "DistributedJobRepository", "DocumentBlueprintRepository", "DocumentRepository", "DomainRepository",
@@ -145,6 +147,32 @@
       "alsoCloses": ["NPoco scope plumbing that only repositories used", "IQuery<T> and the NPoco query builder where no caller remains"]
     }
   ],
+  "easyWins": {
+    "note": "Small repositories that can go one PR at a time, in any order, outside a campaign. The first group needs no new DTO: every table it touches already has an EF Core DTO and configuration, so there is no migration or snapshot work. The second group needs one new DTO plus a no-op snapshot migration each.",
+    "noNewDto": [
+      { "name": "DataTypeUsageRepository", "lines": 53, "campaign": "D", "note": "Node, PropertyData, PropertyType." },
+      { "name": "PropertyTypeUsageRepository", "lines": 64, "campaign": "D", "note": "Same tables as DataTypeUsageRepository; do both in one PR." },
+      { "name": "NodeCountRepository", "lines": 66, "campaign": "B", "note": "Node, Content, ContentType." },
+      { "name": "CacheInstructionRepository", "lines": 121, "campaign": "F", "note": "CacheInstruction DTO exists." },
+      { "name": "ContentNavigationRepository", "lines": 128, "campaign": "B", "note": "Projects Node and Content into NavigationDto; hot path, keep the query shape." },
+      { "name": "DocumentUrlRepository", "lines": 139, "campaign": "B", "note": "DocumentUrl DTO exists; take the rebuild write lock before reading (#24603)." },
+      { "name": "UserIdKeyResolver", "lines": 140, "campaign": "G", "note": "A lookup over the User DTO; not a repository today." },
+      { "name": "DocumentUrlAliasRepository", "lines": 158, "campaign": "B", "note": "Joins Node, Document, DocumentVersion, PropertyData; all DTOs exist." },
+      { "name": "NotificationsRepository", "lines": 240, "campaign": "E", "note": "User2NodeNotify, User, Node all exist." },
+      { "name": "ContentVersionRepositoryBase and its two subclasses", "lines": 245, "campaign": "C", "note": "ContentVersion, cleanup policy, culture variation, PropertyData, User all exist." },
+      { "name": "AuditEntryRepository, LanguageRepository, WebhookRepository leftovers", "lines": null, "campaign": "", "note": "One, two and one NPoco calls left inside EF Core repositories." }
+    ],
+    "oneNewDto": [
+      { "name": "RepositoryCacheVersionRepository", "lines": 86, "campaign": "F", "note": "Keep the synchronous members upstream added in #24292." },
+      { "name": "WebhookRequestRepository", "lines": 91, "campaign": "F", "note": "Also removes the raw DELETE in the EF Core WebhookRepository." },
+      { "name": "WebhookLogRepository", "lines": 119, "campaign": "F", "note": "" },
+      { "name": "ServerRegistrationRepository", "lines": 136, "campaign": "F", "note": "" },
+      { "name": "IndexDocumentRepository", "lines": 141, "campaign": "G", "note": "Lives in Search.Core with its own table; batched deletes landed upstream in #24612." },
+      { "name": "UserDataRepository", "lines": 150, "campaign": "E", "note": "" },
+      { "name": "LogViewerQueryRepository", "lines": 167, "campaign": "F", "note": "" },
+      { "name": "TwoFactorLoginRepository", "lines": 174, "campaign": "E", "note": "" }
+    ]
+  },
   "looseEnds": [
     { "where": "AuditEntryRepository, LanguageRepository, WebhookRepository", "what": "EF Core repositories that still contain NPoco calls (one, two and one). Finish them whenever a PR touches the file." },
     { "where": "PublishableContentRepositoryBase.ApplyOrdering", "what": "Culture-aware \"published\" ordering: NPoco orders variant content by the culture variation row, EF Core by the table flag only. TODO in code. Upstream #24530 has no EF Core counterpart." },
@@ -153,6 +181,7 @@
     { "where": "RelationRepository.GetPagedRelatedEntitiesAsync, EntityRepository", "what": "Node paging and entity building done inside the relation repository until the entity repository is EF Core (campaign B). Both ends carry a TODO." }
   ],
   "log": [
+    { "date": "20-11-2026", "text": "Easy wins added (small repositories whose tables already have EF Core DTOs, and those needing one new DTO). The totals now compare lines of code, not repository counts." },
     { "date": "20-11-2026", "text": "Grand plan created from the inventory of merge commit 450b951b298 (main merged into the integration branch the same day). Campaign order A to H is a proposal; the user decides which one starts next." }
   ]
 }

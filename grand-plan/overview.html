@@ -113,6 +113,19 @@
   </section>
 
   <section>
+    <h2>Easy wins</h2>
+    <p class="note-box" id="easy-note"></p>
+    <div class="campaign">
+      <h3>No new DTO needed</h3>
+      <div id="easy-nodto" style="display:grid;gap:10px"></div>
+    </div>
+    <div class="campaign">
+      <h3>One new DTO and a no-op snapshot migration each</h3>
+      <div id="easy-onedto" style="display:grid;gap:10px"></div>
+    </div>
+  </section>
+
+  <section>
     <h2>Loose ends inside migrated code</h2>
     <div class="loose" id="loose"></div>
   </section>
@@ -144,14 +157,17 @@
     if (d.title) document.title = d.artifact && d.artifact.title ? d.artifact.title : document.title;
 
     var doneCount = d.done.repositories.length;
+    var doneLines = d.done.lines || 0;
     var todo = [], lines = 0;
     d.campaigns.forEach(function (c) { c.repositories.forEach(function (r) { todo.push(r); lines += r.lines || 0; }); });
+    var pct = Math.round(100 * doneLines / (doneLines + lines));
     var totals = document.getElementById("totals");
-    function total(cls, n, label) { var t = el("div", "total " + cls); t.appendChild(el("div", "n", String(n))); t.appendChild(el("div", "muted", label)); totals.appendChild(t); }
-    total("efcore", doneCount, "repositories on EF Core");
-    total("npoco", todo.length, "repositories and bases still on NPoco");
-    total("", lines.toLocaleString("en-GB"), "lines of NPoco repository code left");
-    document.getElementById("barfill").style.width = Math.round(100 * doneCount / (doneCount + todo.length)) + "%";
+    function total(cls, n, label, sub) { var t = el("div", "total " + cls); t.appendChild(el("div", "n", String(n))); t.appendChild(el("div", "muted", label)); if (sub) t.appendChild(el("div", "sum", sub)); totals.appendChild(t); }
+    total("efcore", doneLines.toLocaleString("en-GB"), "lines on EF Core", doneCount + " repositories and " + d.done.bases.length + " bases");
+    total("npoco", lines.toLocaleString("en-GB"), "lines still on NPoco", todo.length + " repositories and bases");
+    total("", pct + "%", "of repository code migrated, by lines", "");
+    document.getElementById("barfill").style.width = pct + "%";
+    document.getElementById("barfill").title = pct + "% of lines on EF Core";
 
     var host = document.getElementById("campaigns");
     d.campaigns.forEach(function (c) {
@@ -184,6 +200,29 @@
       }
       host.appendChild(box);
     });
+
+    if (d.easyWins) {
+      document.getElementById("easy-note").textContent = d.easyWins.note;
+      function easyTable(hostId, rows) {
+        var wrap = el("div", "tablewrap"), t = el("table"), thead = el("thead"), hr = el("tr");
+        [["Repository", ""], ["Lines", "num"], ["Campaign", ""], ["Notes", ""]].forEach(function (x) { hr.appendChild(el("th", x[1], x[0])); });
+        thead.appendChild(hr); t.appendChild(thead);
+        var tb = el("tbody"), sum = 0;
+        rows.forEach(function (r) {
+          var tr = el("tr");
+          tr.appendChild(el("td", "name mono", r.name));
+          tr.appendChild(el("td", "num", r.lines == null ? "" : r.lines.toLocaleString("en-GB")));
+          tr.appendChild(el("td", "mono", r.campaign || ""));
+          tr.appendChild(el("td", "note", r.note || ""));
+          tb.appendChild(tr); sum += r.lines || 0;
+        });
+        t.appendChild(tb); wrap.appendChild(t);
+        var h = document.getElementById(hostId); h.appendChild(wrap);
+        h.appendChild(el("div", "sum", rows.length + " items, " + sum.toLocaleString("en-GB") + " lines"));
+      }
+      easyTable("easy-nodto", d.easyWins.noNewDto || []);
+      easyTable("easy-onedto", d.easyWins.oneNewDto || []);
+    }
 
     var loose = document.getElementById("loose");
     d.looseEnds.forEach(function (x) { var b = el("div", "loose-item"); b.appendChild(el("div", "mono", x.where)); b.appendChild(el("div", null, x.what)); loose.appendChild(b); });
