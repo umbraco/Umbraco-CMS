@@ -81,6 +81,7 @@ stages:
 
               Write-Host "##vso[task.setvariable variable=kind;isOutput=true]$kind"
               Write-Host "##vso[task.setvariable variable=npmDistTag;isOutput=true]$npmDistTag"
+              Write-Host "##vso[task.setvariable variable=isPrerelease;isOutput=true]$isPrerelease"
               Write-Host "##vso[task.setvariable variable=versionMajor;isOutput=true]$versionMajor"
             name: resolve
             displayName: Parse release metadata
@@ -154,7 +155,7 @@ stages:
       # Public releases are tracked per major version.
       umbracoVersion: $[ stageDependencies.Resolve_Release.Resolve.outputs['resolve.versionMajor'] ]
       # A stable release may become the latest version; the template confirms it is a release of main's major.
-      isStableRelease: $[ eq(stageDependencies.Resolve_Release.Resolve.outputs['resolve.npmDistTag'], 'latest') ]
+      isStableRelease: $[ eq(stageDependencies.Resolve_Release.Resolve.outputs['resolve.isPrerelease'], 'False') ]
     jobs:
       - template: templates/dependency-track.yml
         parameters:
