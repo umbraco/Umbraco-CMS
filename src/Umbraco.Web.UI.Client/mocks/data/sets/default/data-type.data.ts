@@ -423,7 +423,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'items',
-				value: ['First Option', 'Second Option', 'I Am the third Option'],
+				value: [{ value: 'First Option' }, { value: 'Second Option' }, { value: 'I Am the third Option' }],
 			},
 		],
 		noAccess: false,
@@ -442,7 +442,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'items',
-				value: ['First Option', 'Second Option', 'I Am the third Option'],
+				value: [{ value: 'First Option' }, { value: 'Second Option' }, { value: 'I Am the third Option' }],
 			},
 		],
 		noAccess: false,
@@ -465,7 +465,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 			},
 			{
 				alias: 'items',
-				value: ['left', 'center', 'right'],
+				value: [{ value: 'left' }, { value: 'center' }, { value: 'right' }],
 			},
 		],
 		noAccess: false,
@@ -606,7 +606,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'items',
-				value: ['First Option', 'Second Option', 'I Am the third Option'],
+				value: [{ value: 'First Option' }, { value: 'Second Option' }, { value: 'I Am the third Option' }],
 			},
 		],
 		noAccess: false,
@@ -625,7 +625,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'items',
-				value: ['First Option', 'Second Option', 'I Am the third Option'],
+				value: [{ value: 'First Option' }, { value: 'Second Option' }, { value: 'I Am the third Option' }],
 			},
 		],
 		noAccess: false,
