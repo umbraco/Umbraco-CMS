@@ -1,6 +1,7 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Content;
 
@@ -10,7 +11,7 @@ internal static class PublishableVariantStateHelper
         => GetState(
             content,
             culture,
-            content.Edited,
+            content.AvailableCultures.Any() ? content.InvariantEdited : content.Edited,
             content.Published,
             content.Trashed,
             content.AvailableCultures,
@@ -21,7 +22,7 @@ internal static class PublishableVariantStateHelper
         => GetState(
             entity,
             culture,
-            entity.Edited,
+            entity.Variations.VariesByCulture() ? entity.InvariantEdited : entity.Edited,
             entity.Published,
             entity.Trashed,
             entity.CultureNames.Keys,
