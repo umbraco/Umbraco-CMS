@@ -1,5 +1,6 @@
 import type { UmbMediaDetailModel } from '../../types.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
+import { mediaItemCache } from '../item/media-item.server.cache.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	UmbDataSourceErrorResponse,
@@ -145,6 +146,10 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 		);
 
 		if (data && typeof data === 'string') {
+			if (parentUnique) {
+				// The parent's cached item may not yet report that it has children.
+				mediaItemCache.delete(parentUnique);
+			}
 			return this.read(data);
 		}
 
@@ -175,6 +180,8 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 		);
 
 		if (!error) {
+			// The server event that invalidates the cached item can arrive after the update response.
+			mediaItemCache.delete(model.unique);
 			return this.read(model.unique);
 		}
 
@@ -190,6 +197,10 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecute(this, MediaService.deleteMediaById({ path: { id: unique } }));
+		const { error } = await tryExecute(this, MediaService.deleteMediaById({ path: { id: unique } }));
+		if (!error) {
+			mediaItemCache.delete(unique);
+		}
+		return { error };
 	}
 }

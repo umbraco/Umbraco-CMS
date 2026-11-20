@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.ServerEvents;
 using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Core.Services;
@@ -10,34 +9,39 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.ServerEvents;
 
 /// <inheritdoc />
+/// <remarks>
+/// Events broadcast to an event source group rely on the SignalR backplane to reach connections held by other servers.
+/// Events delivered per connection are distributed to every server through the <see cref="ServerEventCacheRefresher"/>,
+/// as each server only knows the connections it holds. <see cref="ServerEventCacheRefresherNotificationHandler"/> delivers them on each server.
+/// </remarks>
 internal sealed class ServerEventRouter : IServerEventRouter
 {
     private readonly IHubContext<ServerEventHub, IServerEventHub> _eventHub;
-    private readonly IUserConnectionManager _connectionManager;
     private readonly IRuntimeState _runtimeState;
     private readonly ILogger<ServerEventRouter> _logger;
     private readonly IServerEventAccessService _accessService;
+    private readonly DistributedCache _distributedCache;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ServerEventRouter"/> class.
     /// </summary>
     /// <param name="eventHub">The SignalR hub context used to send server events to connected clients.</param>
-    /// <param name="connectionManager">Manages user connections for server events.</param>
     /// <param name="runtimeState">Provides information about the current runtime state of the application.</param>
     /// <param name="logger">The logger used for logging events and errors related to the server event router.</param>
-    /// <param name="accessService">Resolves the recipients of an event for sources that are filtered per recipient.</param>
+    /// <param name="accessService">Determines which event sources are filtered per recipient.</param>
+    /// <param name="distributedCache">Distributes events that are delivered per connection to every server.</param>
     public ServerEventRouter(
         IHubContext<ServerEventHub, IServerEventHub> eventHub,
-        IUserConnectionManager connectionManager,
         IRuntimeState runtimeState,
         ILogger<ServerEventRouter> logger,
-        IServerEventAccessService accessService)
+        IServerEventAccessService accessService,
+        DistributedCache distributedCache)
     {
         _eventHub = eventHub;
-        _connectionManager = connectionManager;
         _runtimeState = runtimeState;
         _logger = logger;
         _accessService = accessService;
+        _distributedCache = distributedCache;
     }
 
     /// <inheritdoc/>
@@ -48,74 +52,65 @@ internal sealed class ServerEventRouter : IServerEventRouter
             return;
         }
 
-        try
-        {
-            await _eventHub.Clients.Group(serverEvent.EventSource).notify(serverEvent);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to route server event {EventType} for {EventSource}", serverEvent.EventType, serverEvent.EventSource);
-        }
+        await SendToSourceGroupAsync(serverEvent);
     }
 
     /// <inheritdoc/>
-    public async Task RouteEventAsync(ServerEvent serverEvent, ServerEventRoutingContext context)
+    public Task RouteEventAsync(ServerEvent serverEvent, ServerEventRoutingContext context)
+        => RouteEventsAsync([new ServerEventRoute { ServerEvent = serverEvent, Context = context }]);
+
+    /// <inheritdoc/>
+    public async Task RouteEventsAsync(IEnumerable<ServerEventRoute> routes)
     {
         if (_runtimeState.Level != RuntimeLevel.Run)
         {
             return;
         }
 
-        // Sources with no registered access filter are broadcast to the whole source group.
-        if (_accessService.AppliesTo(serverEvent.EventSource) is false)
+        var payloads = new List<ServerEventCacheRefresher.JsonPayload>();
+        foreach (ServerEventRoute route in routes)
         {
-            await RouteEventAsync(serverEvent);
-            return;
-        }
+            ServerEvent serverEvent = route.ServerEvent;
 
-        // Entity-scoped sources are delivered only to the connections the access service authorizes.
-        // The registered filters are responsible for deciding what to gate on.
-        try
-        {
-            IReadOnlyList<string> connections =
-                await _accessService.GetAuthorizedConnectionsAsync(serverEvent.EventSource, context);
-
-            if (connections.Count == 0)
+            // Sources with no registered access filter are broadcast to the whole source group.
+            if (route.Context is null || _accessService.AppliesTo(serverEvent.EventSource) is false)
             {
-                return;
+                await SendToSourceGroupAsync(serverEvent);
+                continue;
             }
 
-            await _eventHub.Clients.Clients(connections).notify(serverEvent);
+            payloads.Add(new ServerEventCacheRefresher.JsonPayload
+            {
+                EventSource = serverEvent.EventSource,
+                EventType = serverEvent.EventType,
+                Key = serverEvent.Key,
+                EntityPath = route.Context.EntityPath,
+            });
         }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to route server event {EventType} for {EventSource}", serverEvent.EventType, serverEvent.EventSource);
-        }
+
+        DistributeToAllServers(payloads);
     }
 
     /// <inheritdoc/>
-    public async Task NotifyUserAsync(ServerEvent serverEvent, Guid userKey)
+    public Task NotifyUserAsync(ServerEvent serverEvent, Guid userKey)
     {
         if (_runtimeState.Level != RuntimeLevel.Run)
         {
-            return;
+            return Task.CompletedTask;
         }
 
-        ISet<string> userConnections = _connectionManager.GetConnections(userKey);
+        DistributeToAllServers(
+        [
+            new ServerEventCacheRefresher.JsonPayload
+            {
+                EventSource = serverEvent.EventSource,
+                EventType = serverEvent.EventType,
+                Key = serverEvent.Key,
+                UserKey = userKey,
+            },
+        ]);
 
-        if (userConnections.Any() is false)
-        {
-            return;
-        }
-
-        try
-        {
-            await _eventHub.Clients.Clients(userConnections).notify(serverEvent);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to notify user {UserKey} of server event {EventType}", userKey, serverEvent.EventType);
-        }
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc/>
@@ -133,6 +128,35 @@ internal sealed class ServerEventRouter : IServerEventRouter
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Failed to broadcast server event {EventType}", serverEvent.EventType);
+        }
+    }
+
+    private async Task SendToSourceGroupAsync(ServerEvent serverEvent)
+    {
+        try
+        {
+            await _eventHub.Clients.Group(serverEvent.EventSource).notify(serverEvent);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to route server event {EventType} for {EventSource}", serverEvent.EventType, serverEvent.EventSource);
+        }
+    }
+
+    private void DistributeToAllServers(IReadOnlyCollection<ServerEventCacheRefresher.JsonPayload> payloads)
+    {
+        if (payloads.Count == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            _distributedCache.RefreshByPayload(ServerEventCacheRefresher.UniqueId, payloads);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to distribute {Count} server events", payloads.Count);
         }
     }
 }

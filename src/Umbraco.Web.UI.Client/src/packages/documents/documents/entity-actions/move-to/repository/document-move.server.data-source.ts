@@ -1,3 +1,4 @@
+import { documentItemCache } from '../../../item/repository/document-item.server.cache.js';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
@@ -30,7 +31,9 @@ export class UmbMoveDocumentServerDataSource implements UmbMoveDataSource {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 
-		return tryExecute(
+		const previousParentUnique = documentItemCache.get(args.unique)?.parent?.id;
+
+		const { error } = await tryExecute(
 			this.#host,
 			DocumentService.putDocumentByIdMove({
 				path: { id: args.unique },
@@ -39,5 +42,19 @@ export class UmbMoveDocumentServerDataSource implements UmbMoveDataSource {
 				},
 			}),
 		);
+
+		if (!error) {
+			// The server event that invalidates the cached item can arrive after the response. Both parents'
+			// children have changed, though the previous parent is only known when the item was cached.
+			documentItemCache.delete(args.unique);
+			if (previousParentUnique) {
+				documentItemCache.delete(previousParentUnique);
+			}
+			if (args.destination.unique) {
+				documentItemCache.delete(args.destination.unique);
+			}
+		}
+
+		return { error };
 	}
 }

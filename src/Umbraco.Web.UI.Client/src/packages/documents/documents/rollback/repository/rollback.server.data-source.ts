@@ -1,3 +1,4 @@
+import { documentItemCache } from '../../item/repository/document-item.server.cache.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	DocumentVersionService,
@@ -57,10 +58,19 @@ export class UmbRollbackServerDataSource {
 		);
 	}
 
-	rollback(versionId: string, culture?: string) {
-		return tryExecute(
+	async rollback(versionId: string, culture?: string) {
+		const result = await tryExecute(
 			this.#host,
 			DocumentVersionService.postDocumentVersionByIdRollback({ path: { id: versionId }, query: { culture } }),
 		);
+		if (!result.error) {
+			// The server event that invalidates the cached item can arrive after the response. The rollback is
+			// addressed by version, so the version is read to find the document it belongs to.
+			const { data: version } = await this.getVersionById(versionId);
+			if (version?.document) {
+				documentItemCache.delete(version.document.id);
+			}
+		}
+		return result;
 	}
 }
