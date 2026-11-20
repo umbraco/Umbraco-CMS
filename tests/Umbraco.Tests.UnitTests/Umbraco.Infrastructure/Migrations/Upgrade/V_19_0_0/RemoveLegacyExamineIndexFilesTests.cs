@@ -34,10 +34,13 @@ public class RemoveLegacyExamineIndexFilesTests
         }
     }
 
-    [Test]
-    public async Task Removes_Existing_Examine_Index_Folder()
+    [TestCase("InternalIndex")]
+    [TestCase("ExternalIndex")]
+    [TestCase("MembersIndex")]
+    [TestCase("DeliveryApiContentIndex")]
+    public async Task Removes_Legacy_Examine_Index_Folder(string legacyIndexName)
     {
-        var indexFolder = Path.Combine(_examineIndexesPath, "InternalIndex");
+        var indexFolder = Path.Combine(_examineIndexesPath, legacyIndexName);
         Directory.CreateDirectory(indexFolder);
         File.WriteAllText(Path.Combine(indexFolder, "segments.gen"), "test");
         File.WriteAllText(Path.Combine(indexFolder, "_0.cfs"), "test");
