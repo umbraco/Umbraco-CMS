@@ -56,6 +56,8 @@ export const richTextValue = (
 
 export const invariantTextValue = (alias: string, value: string) => invariant('Umbraco.TextBox', alias, value);
 
+export const invariantTextareaValue = (alias: string, value: string) => invariant('Umbraco.TextArea', alias, value);
+
 export const toggleValue = (alias: string, value: boolean) => invariant('Umbraco.TrueFalse', alias, value);
 
 export const decimalValue = (alias: string, value: number) => invariant('Umbraco.Decimal', alias, value);
@@ -77,6 +79,9 @@ export const documentPickerValue = (alias: string, documentIds: Array<string>) =
 		alias,
 		documentIds.map((unique) => ({ type: 'document', unique })),
 	);
+
+export const elementPickerValue = (alias: string, elementIds: Array<string>) =>
+	invariant('Umbraco.ElementPicker', alias, elementIds);
 
 export const mediaPickerValue = (alias: string, mediaId: string) =>
 	invariant('Umbraco.MediaPicker3', alias, [
