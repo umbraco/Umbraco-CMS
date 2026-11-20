@@ -195,12 +195,6 @@ describe('UmbBlockGridEntryElement', () => {
 
 			expect(order).to.deep.equal(['umb-entity-frame', 'umb-block-action-list', 'umb-extension-slot']);
 		});
-
-		it('renders the insert line directly before the block, so the frame can step aside for it', () => {
-			const insertLine = entry.shadowRoot!.querySelector('uui-button-inline-create')!;
-
-			expect(insertLine.nextElementSibling).to.equal(entry.shadowRoot!.querySelector('.umb-block-grid__block'));
-		});
 	});
 
 	describe('when disconnected', () => {

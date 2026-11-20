@@ -794,11 +794,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				--umb-block-grid-entry-tab-pointer-events: auto;
 			}
 
-			uui-button-inline-create:hover + .umb-block-grid__block umb-entity-frame {
-				visibility: hidden;
-				transition: visibility 0s linear 150ms;
-			}
-
 			umb-entity-frame uui-button {
 				--uui-focus-outline-color: var(--umb-entity-frame-contrast-color);
 				--uui-button-background-color: transparent;
