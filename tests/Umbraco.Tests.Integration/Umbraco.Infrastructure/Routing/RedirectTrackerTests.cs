@@ -86,6 +86,51 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
     }
 
     /// <summary>
+    /// Verifies that a culture-only (wildcard) domain below the hostname domain doesn't become the
+    /// route prefix: incoming requests look redirects up by the node with the hostname.
+    /// </summary>
+    [Test]
+    public void Can_Store_Old_Route_With_Hostname_Domain_Root_Prefix_Below_Wildcard_Domain()
+    {
+        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict = [];
+
+        var redirectTracker = CreateRedirectTracker(new RedirectTrackerSetupOptions
+        {
+            AssignDomain = true,
+            AssignWildcardDomainToTestPage = true,
+            CurrentPublishedSegment = "test-page",
+        });
+
+        redirectTracker.StoreOldRoute(_testPage, dict, isMove: true);
+
+        Assert.AreEqual(1, dict.Count);
+        var key = dict.Keys.First();
+        Assert.AreEqual($"{_rootPage.Id}/new-route", dict[key].OldRoute);
+    }
+
+    /// <summary>
+    /// Verifies that a culture-only (wildcard) domain with no hostname domain above it doesn't prefix the route:
+    /// incoming requests without a matched domain look redirects up by the path alone.
+    /// </summary>
+    [Test]
+    public void Can_Store_Old_Route_Without_Prefix_Below_Wildcard_Domain_Only()
+    {
+        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict = [];
+
+        var redirectTracker = CreateRedirectTracker(new RedirectTrackerSetupOptions
+        {
+            AssignWildcardDomainToTestPage = true,
+            CurrentPublishedSegment = "test-page",
+        });
+
+        redirectTracker.StoreOldRoute(_testPage, dict, isMove: true);
+
+        Assert.AreEqual(1, dict.Count);
+        var key = dict.Keys.First();
+        Assert.AreEqual("/new-route", dict[key].OldRoute);
+    }
+
+    /// <summary>
     /// Verifies that <see cref="IRedirectTracker.CreateRedirectsAsync"/> registers a redirect URL
     /// when the old route differs from the new route.
     /// </summary>
@@ -197,6 +242,54 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         redirectTracker.StoreOldRoute(_testPage, dict, isMove: false);
 
         Assert.AreEqual(0, dict.Count, "Old route should not be stored for content that has no published URL.");
+    }
+
+    /// <summary>
+    /// Content without a published URL segment has no published route, so the tracker decides that from the document
+    /// URL service alone and never consults the published content cache for it. That lookup runs inside the content
+    /// transaction and could only miss, so for a first publish it would reach the database for nothing.
+    /// </summary>
+    [TestCase(false)]
+    [TestCase(true)]
+    public void Does_Not_Consult_Published_Cache_For_Content_Without_Published_Url_Segment(bool isMove)
+    {
+        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict = [];
+        var lookups = 0;
+
+        var redirectTracker = CreateRedirectTracker(new RedirectTrackerSetupOptions
+        {
+            DocumentUrlServiceInitialized = true,
+            OnContentCacheLookup = () => lookups++,
+        });
+
+        redirectTracker.StoreOldRoute(_testPage, dict, isMove);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(lookups, Is.Zero, "The published content cache must not be consulted for content without a published URL segment.");
+            Assert.That(dict, Is.Empty);
+        });
+    }
+
+    /// <summary>
+    /// Invariant content stores a published segment per language when a segment provider varies it by language. Such
+    /// content has a published route, so its old route is stored although the invariant lookup finds no segment.
+    /// </summary>
+    [Test]
+    public void Stores_Old_Route_For_Invariant_Content_With_Per_Language_Published_Segments()
+    {
+        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict = [];
+
+        var redirectTracker = CreateRedirectTracker(new RedirectTrackerSetupOptions
+        {
+            DocumentUrlServiceInitialized = true,
+            CurrentPublishedSegment = "test-page",
+            CurrentPublishedSegmentPerLanguageOnly = true,
+        });
+
+        redirectTracker.StoreOldRoute(_testPage, dict, isMove: true);
+
+        Assert.That(dict, Has.Count.EqualTo(1), "The old route must be stored for invariant content whose published segments are stored per language.");
     }
 
     /// <summary>
@@ -473,6 +566,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         IPublishedContentCache contentCache = Mock.Of<IPublishedContentCache>();
         Mock.Get(contentCache)
             .Setup(x => x.GetById(_testPage.Id))
+            .Callback(() => options.OnContentCacheLookup?.Invoke())
             .Returns(content.Object);
         Mock.Get(contentCache)
             .Setup(x => x.GetById(_testPage.Key))
@@ -565,6 +659,14 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
             .Setup(x => x.HasAssigned(_rootPage.Id, It.IsAny<bool>()))
             .Returns(options.AssignDomain);
 
+        if (options.AssignWildcardDomainToTestPage)
+        {
+            // A culture-only domain counts only when wildcards are included.
+            Mock.Get(domainCache)
+                .Setup(x => x.HasAssigned(_testPage.Id, true))
+                .Returns(true);
+        }
+
         if (options.IncludeChild)
         {
             Mock.Get(domainCache)
@@ -627,6 +729,13 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
             documentUrlService
                 .Setup(x => x.GetUrlSegment(It.IsAny<Guid>(), It.IsAny<string>(), false))
                 .Returns(options.CurrentPublishedSegment);
+
+            if (options.CurrentPublishedSegmentPerLanguageOnly)
+            {
+                documentUrlService
+                    .Setup(x => x.GetUrlSegment(It.IsAny<Guid>(), string.Empty, false))
+                    .Returns((string?)null);
+            }
         }
 
         return new RedirectTracker(
@@ -674,6 +783,12 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         /// Defaults to "/new-route".
         /// </summary>
         public string? RelativeUrl { get; init; }
+
+        /// <summary>
+        /// Gets a value indicating whether the test page has a culture-only (wildcard) domain. Combine with
+        /// <see cref="AssignDomain"/> to place it below a hostname domain on the root node.
+        /// </summary>
+        public bool AssignWildcardDomainToTestPage { get; init; }
 
         /// <summary>
         /// Gets a value indicating whether a child published content node should be added as a
@@ -727,6 +842,18 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         /// descendant traversal regardless of segment changes.
         /// </summary>
         public bool DocumentUrlServiceInitialized { get; init; }
+
+        /// <summary>
+        /// Gets a callback invoked whenever the mock <see cref="IPublishedContentCache"/> is asked for the test page.
+        /// </summary>
+        public Action? OnContentCacheLookup { get; init; }
+
+        /// <summary>
+        /// Gets a value indicating whether <see cref="CurrentPublishedSegment"/> is stored per language only, as the
+        /// document URL service stores it for invariant content whose segments differ between languages. The lookup
+        /// for the invariant culture then finds nothing.
+        /// </summary>
+        public bool CurrentPublishedSegmentPerLanguageOnly { get; init; }
 
         /// <summary>
         /// Gets an explicit return value for <see cref="IUrlSegmentProvider.MayAffectDescendantSegments"/>.

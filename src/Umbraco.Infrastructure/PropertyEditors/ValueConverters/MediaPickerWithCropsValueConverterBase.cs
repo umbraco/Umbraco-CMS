@@ -110,12 +110,20 @@ public abstract class MediaPickerWithCropsValueConverterBase : PropertyValueConv
         }
 
         var mediaItems = new List<MediaWithCrops>();
-        IEnumerable<MediaPickerPropertyEditorBase.MediaPickerPropertyValueEditor.MediaWithCropsDto> dtos =
-            MediaPickerPropertyEditorBase.MediaPickerPropertyValueEditor.Deserialize(_jsonSerializer, inter);
+        MediaPickerPropertyEditorBase.MediaPickerPropertyValueEditor.MediaWithCropsDto[] dtos =
+            MediaPickerPropertyEditorBase.MediaPickerPropertyValueEditor.Deserialize(_jsonSerializer, inter).ToArray();
         MediaPickerConfigurationBase? configuration = propertyType.DataType.ConfigurationAs<MediaPickerConfigurationBase>();
+
+        // The media items are read in one batch rather than once per item.
+        var mediaByKey = new Dictionary<Guid, IPublishedContent>();
+        foreach (IPublishedContent item in _publishedMediaCache.GetByIds(dtos.Select(dto => dto.MediaKey).Distinct().ToArray()))
+        {
+            mediaByKey[item.Key] = item;
+        }
+
         foreach (MediaPickerPropertyEditorBase.MediaPickerPropertyValueEditor.MediaWithCropsDto dto in dtos)
         {
-            IPublishedContent? mediaItem = _publishedMediaCache.GetById(preview, dto.MediaKey);
+            IPublishedContent? mediaItem = mediaByKey.GetValueOrDefault(dto.MediaKey);
             if (mediaItem != null)
             {
                 var localCrops = new ImageCropperValue

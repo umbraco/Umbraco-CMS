@@ -234,7 +234,7 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
             // Assert
             Assert.That(dataTypeDefinition, Is.Not.Null);
             Assert.That(dataTypeDefinition.HasIdentity, Is.True);
-            Assert.That(dataTypeDefinition.Name, Is.EqualTo("Dropdown"));
+            Assert.That(dataTypeDefinition.Name, Is.EqualTo("Single Select Dropdown"));
         }
     }
 
@@ -297,7 +297,7 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
             var count = DataTypeRepository.Count(query);
 
             // Assert
-            Assert.That(count, Is.EqualTo(5));
+            Assert.That(count, Is.EqualTo(3));
         }
     }
 

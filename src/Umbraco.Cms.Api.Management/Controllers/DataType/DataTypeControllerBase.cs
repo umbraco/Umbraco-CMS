@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -16,6 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.DataType)]
 [ApiExplorerSettings(GroupName = "Data Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrElementsOrMediaOrMembersOrContentTypes)]
+[RequiresPermissionsFor(Constants.Permissions.Entities.DataType.Resource)]
 public abstract class DataTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult DataTypeOperationStatusResult(DataTypeOperationStatus status) =>

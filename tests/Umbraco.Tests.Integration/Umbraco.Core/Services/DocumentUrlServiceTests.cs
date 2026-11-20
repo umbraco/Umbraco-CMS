@@ -454,6 +454,28 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         return DocumentUrlService.GetLegacyRouteFormat(Guid.Parse(documentKey), culture, false);
     }
 
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task GetLegacyRouteFormat_Hides_Only_The_First_Root_From_The_Path(bool isDraft)
+    {
+        var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
+        await ContentService.SaveAsync(secondRoot, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
+
+        var childOfSecondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Child of Second Root", secondRoot);
+        await ContentService.SaveAsync(childOfSecondRoot, Constants.Security.SuperUserKey, contentSchedule, CancellationToken.None);
+
+        await ContentService.PublishBranchAsync(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        await ContentService.PublishBranchAsync(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("/", DocumentUrlService.GetLegacyRouteFormat(Textpage.Key, "en-US", isDraft));
+            Assert.AreEqual("/second-root", DocumentUrlService.GetLegacyRouteFormat(secondRoot.Key, "en-US", isDraft));
+            Assert.AreEqual("/child-of-second-root", DocumentUrlService.GetLegacyRouteFormat(childOfSecondRoot.Key, "en-US", isDraft));
+        });
+    }
+
     [TestCase(TextpageKey, "en-US", "/")]
     [TestCase(SubPageKey, "en-US", "/text-page-1-custom")]  // Has non-terminating custom URL segment provider.
     [TestCase(SubPage2Key, "en-US", "/text-page-2-custom")] // Has terminating custom URL segment provider.

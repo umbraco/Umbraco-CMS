@@ -915,15 +915,18 @@ public class DocumentUrlServiceTests
         DocumentUrlService Service,
         Mock<IIdKeyMap> IdKeyMap,
         Mock<IDocumentNavigationQueryService> NavigationQueryService,
-        Mock<IDocumentPublishStatusQueryService> PublishStatusQueryService) CreateDocumentUrlServiceForLegacyRouteTests()
+        Mock<IDocumentPublishStatusQueryService> PublishStatusQueryService) CreateDocumentUrlServiceForLegacyRouteTests(
+            Mock<IDomainCacheService>? domainCacheService = null,
+            GlobalSettings? globalSettings = null,
+            IUrlSegmentProvider? urlSegmentProvider = null)
     {
         var loggerMock = Mock.Of<ILogger<DocumentUrlService>>();
         var documentUrlRepositoryMock = Mock.Of<IDocumentUrlRepository>();
         var documentRepositoryMock = Mock.Of<IDocumentRepository>();
-        var globalSettingsMock = Options.Create(new GlobalSettings());
+        var globalSettingsMock = Options.Create(globalSettings ?? new GlobalSettings());
         var webRoutingSettingsMock = Options.Create(new WebRoutingSettings());
         var contentServiceMock = Mock.Of<IContentService>();
-        var urlSegmentProvider = CreateFixedSegmentProvider("test-segment");
+        urlSegmentProvider ??= CreateFixedSegmentProvider("test-segment");
         var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
 
         var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
@@ -934,8 +937,11 @@ public class DocumentUrlServiceTests
         var idKeyMapMock = new Mock<IIdKeyMap>();
         var documentNavigationQueryServiceMock = new Mock<IDocumentNavigationQueryService>();
         var publishStatusQueryServiceMock = new Mock<IDocumentPublishStatusQueryService>();
-        var domainCacheServiceMock = new Mock<IDomainCacheService>();
-        domainCacheServiceMock.Setup(x => x.GetAssigned(It.IsAny<int>(), It.IsAny<bool>())).Returns(Enumerable.Empty<Domain>());
+        var domainCacheServiceMock = domainCacheService ?? new Mock<IDomainCacheService>();
+        if (domainCacheService is null)
+        {
+            domainCacheServiceMock.Setup(x => x.GetAssigned(It.IsAny<int>(), It.IsAny<bool>())).Returns(Enumerable.Empty<Domain>());
+        }
         var defaultCultureAccessorMock = Mock.Of<IDefaultCultureAccessor>(x => x.DefaultCulture == "en-US");
         var serverRoleAccessorMock = Mock.Of<IServerRoleAccessor>();
 
@@ -1107,6 +1113,132 @@ public class DocumentUrlServiceTests
         var result = service.GetLegacyRouteFormat(documentKey, "en-US", isDraft: false);
 
         Assert.AreEqual(SeededLegacyRoute, result);
+    }
+
+    /// <summary>
+    /// Seeds a published hierarchy (the document first, then its ancestors up to the root) with a cached URL segment for
+    /// every document, mapping each document key to an id (1 for the document, 2 for its parent, and so on).
+    /// </summary>
+    private static async Task SetupHierarchyAsync(
+        DocumentUrlService service,
+        Mock<IIdKeyMap> idKeyMap,
+        Mock<IDocumentNavigationQueryService> navigationQueryService,
+        Mock<IDocumentPublishStatusQueryService> publishStatusQueryService,
+        Guid[] documentAndAncestorKeys)
+    {
+        for (var i = 0; i < documentAndAncestorKeys.Length; i++)
+        {
+            idKeyMap.Setup(x => x.GetIdForKeyAsync(documentAndAncestorKeys[i], UmbracoObjectTypes.Document)).ReturnsAsync(Attempt.Succeed(i + 1));
+        }
+
+        IEnumerable<Guid> ancestorsOrSelfKeys = documentAndAncestorKeys;
+        navigationQueryService.Setup(x => x.TryGetAncestorsOrSelfKeys(documentAndAncestorKeys[0], out ancestorsOrSelfKeys)).Returns(true);
+
+        publishStatusQueryService.Setup(x => x.IsPublishedInAnyCulture(documentAndAncestorKeys[0])).Returns(true);
+        publishStatusQueryService.Setup(x => x.HasPublishedAncestorPath(documentAndAncestorKeys[0])).Returns(true);
+
+        await service.CreateOrUpdateUrlSegmentsAsync(
+            documentAndAncestorKeys.Select(key => CreateMockContent(key, variesByCulture: false, isPublished: true).Object));
+    }
+
+    /// <summary>
+    /// Creates the keys of a hierarchy (the document first, then its ancestors up to the root) along with a URL segment
+    /// provider that names each document by its level ("level-1" for the root), so a route shows which segments it kept
+    /// and in which order.
+    /// </summary>
+    private static (Guid[] Keys, IUrlSegmentProvider SegmentProvider) CreateHierarchyWithLevelSegments(int depth)
+    {
+        Guid[] keys = Enumerable.Range(0, depth).Select(_ => Guid.NewGuid()).ToArray();
+        Dictionary<Guid, string> segmentsByKey = keys
+            .Select((key, index) => (Key: key, Segment: $"level-{depth - index}"))
+            .ToDictionary(x => x.Key, x => x.Segment);
+
+        var providerMock = new Mock<IUrlSegmentProvider>();
+        providerMock.Setup(x => x.GetUrlSegment(It.IsAny<IContentBase>(), It.IsAny<bool>(), It.IsAny<string?>()))
+            .Returns<IContentBase, bool, string?>((content, _, _) => segmentsByKey[content.Key]);
+        providerMock.Setup(x => x.AllowAdditionalSegments).Returns(false);
+
+        return (keys, providerMock.Object);
+    }
+
+    [Test]
+    public async Task Can_Get_Legacy_Route_Format_Without_Looking_Up_The_Root_Keys_For_A_Page_Below_The_First_Level()
+    {
+        var (keys, segmentProvider) = CreateHierarchyWithLevelSegments(3);
+        var (service, idKeyMap, navigationQueryService, publishStatusQueryService) = CreateDocumentUrlServiceForLegacyRouteTests(
+            urlSegmentProvider: segmentProvider);
+        await SetupHierarchyAsync(service, idKeyMap, navigationQueryService, publishStatusQueryService, keys);
+
+        var result = service.GetLegacyRouteFormat(keys[0], culture: null, isDraft: false);
+
+        Assert.Multiple(() =>
+        {
+            // The topmost content is hidden from the path by default, which leaves the other two segments.
+            Assert.AreEqual("/level-2/level-3", result);
+            IEnumerable<Guid> rootKeys = [];
+            navigationQueryService.Verify(x => x.TryGetRootKeys(out rootKeys), Times.Never);
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Legacy_Route_Format_With_All_Segments_When_The_Top_Level_Is_Not_Hidden()
+    {
+        var (keys, segmentProvider) = CreateHierarchyWithLevelSegments(3);
+        var (service, idKeyMap, navigationQueryService, publishStatusQueryService) = CreateDocumentUrlServiceForLegacyRouteTests(
+            globalSettings: new GlobalSettings { HideTopLevelNodeFromPath = false },
+            urlSegmentProvider: segmentProvider);
+        await SetupHierarchyAsync(service, idKeyMap, navigationQueryService, publishStatusQueryService, keys);
+
+        var result = service.GetLegacyRouteFormat(keys[0], culture: null, isDraft: false);
+
+        Assert.AreEqual("/level-1/level-2/level-3", result);
+    }
+
+    [TestCase(true, false, "/level-3/level-2")]
+    [TestCase(false, false, "/level-3/level-2/level-1")]
+    [TestCase(true, true, "/level-2/level-3")]
+    public async Task Can_Get_Legacy_Route_Format_For_A_Right_To_Left_Culture(bool hideTopLevelNodeFromPath, bool forceCombineUrlPathLeftToRight, string expectedRoute)
+    {
+        const string rightToLeftCulture = "he-IL";
+        var (keys, segmentProvider) = CreateHierarchyWithLevelSegments(3);
+        var (service, idKeyMap, navigationQueryService, publishStatusQueryService) = CreateDocumentUrlServiceForLegacyRouteTests(
+            globalSettings: new GlobalSettings
+            {
+                HideTopLevelNodeFromPath = hideTopLevelNodeFromPath,
+                ForceCombineUrlPathLeftToRight = forceCombineUrlPathLeftToRight,
+            },
+            urlSegmentProvider: segmentProvider);
+        await SetupHierarchyAsync(service, idKeyMap, navigationQueryService, publishStatusQueryService, keys);
+        publishStatusQueryService.Setup(x => x.IsPublished(keys[0], rightToLeftCulture)).Returns(true);
+        publishStatusQueryService.Setup(x => x.HasPublishedAncestorPath(keys[0], rightToLeftCulture)).Returns(true);
+
+        var result = service.GetLegacyRouteFormat(keys[0], rightToLeftCulture, isDraft: false);
+
+        Assert.AreEqual(expectedRoute, result);
+    }
+
+    [Test]
+    public async Task Can_Get_Legacy_Route_Format_Resolving_Domains_Only_Up_To_The_First_Ancestor_With_A_Domain()
+    {
+        var domainCacheService = new Mock<IDomainCacheService>();
+        domainCacheService.Setup(x => x.GetAssigned(It.IsAny<int>(), It.IsAny<bool>())).Returns([]);
+
+        // The parent (id 2) has a domain, so the grandparent (id 3) is never needed.
+        domainCacheService.Setup(x => x.GetAssigned(2, It.IsAny<bool>())).Returns([new Domain(1, "/site", 2, "en-US", false, 0)]);
+
+        var (service, idKeyMap, navigationQueryService, publishStatusQueryService) = CreateDocumentUrlServiceForLegacyRouteTests(domainCacheService);
+        Guid[] keys = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
+        await SetupHierarchyAsync(service, idKeyMap, navigationQueryService, publishStatusQueryService, keys);
+
+        var result = service.GetLegacyRouteFormat(keys[0], culture: null, isDraft: false);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("2/test-segment", result);
+            domainCacheService.Verify(x => x.GetAssigned(1, It.IsAny<bool>()), Times.Once);
+            domainCacheService.Verify(x => x.GetAssigned(2, It.IsAny<bool>()), Times.Once);
+            domainCacheService.Verify(x => x.GetAssigned(3, It.IsAny<bool>()), Times.Never);
+        });
     }
 
     #endregion

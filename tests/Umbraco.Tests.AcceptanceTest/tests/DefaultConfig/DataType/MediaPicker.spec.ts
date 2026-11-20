@@ -2,10 +2,10 @@
 import {expect} from "@playwright/test";
 
 const mediaPickerTypes = [
-  {type: 'Media Picker', isMultiple: false},
-  {type: 'Multiple Media Picker', isMultiple: true},
-  {type: 'Image Media Picker', isMultiple: false},
-  {type: 'Multiple Image Media Picker', isMultiple: true},
+  {type: 'Single Media Picker', isMultiple: false},
+  {type: 'Media Picker', isMultiple: true},
+  {type: 'Single Image Media Picker', isMultiple: false},
+  {type: 'Image Media Picker', isMultiple: true},
   // There is one media picker editor per number of items it holds, so the built-in data types are on
   // different editors rather than differing by configuration.
 ];

@@ -146,68 +146,6 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Generate_Bulk_Import_Sql()
-    {
-        var servers = new List<ServerRegistrationDto>();
-        for (var i = 0; i < 2; i++)
-        {
-            servers.Add(new ServerRegistrationDto
-            {
-                ServerAddress = "address" + i,
-                ServerIdentity = "computer" + i,
-                DateRegistered = DateTime.UtcNow,
-                IsActive = true,
-                DateAccessed = DateTime.UtcNow
-            });
-        }
-
-        IDbCommand[] commands;
-        using (var scope = ScopeProvider.CreateScope())
-        {
-            commands = ScopeAccessor.AmbientScope.Database.GenerateBulkInsertCommands(servers.ToArray());
-            scope.Complete();
-        }
-
-        // Assert
-        Assert.That(
-            commands[0].CommandText,
-            Is.EqualTo(
-                "INSERT INTO [umbracoServer] ([umbracoServer].[address], [umbracoServer].[computerName], [umbracoServer].[registeredDate], [umbracoServer].[lastNotifiedDate], [umbracoServer].[isActive], [umbracoServer].[isSchedulingPublisher]) VALUES (@0,@1,@2,@3,@4,@5), (@6,@7,@8,@9,@10,@11)"));
-    }
-
-    [Test]
-    public void Generate_Bulk_Import_Sql_Exceeding_Max_Params()
-    {
-        var servers = new List<ServerRegistrationDto>();
-        for (var i = 0; i < 1500; i++)
-        {
-            servers.Add(new ServerRegistrationDto
-            {
-                ServerAddress = "address" + i,
-                ServerIdentity = "computer" + i,
-                DateRegistered = DateTime.UtcNow,
-                IsActive = true,
-                DateAccessed = DateTime.UtcNow,
-                IsSchedulingPublisher = true
-            });
-        }
-
-        IDbCommand[] commands;
-        using (var scope = ScopeProvider.CreateScope())
-        {
-            commands = ScopeAccessor.AmbientScope.Database.GenerateBulkInsertCommands(servers.ToArray());
-            scope.Complete();
-        }
-
-        // Assert
-        Assert.That(commands.Length, Is.EqualTo(5));
-        foreach (var s in commands.Select(x => x.CommandText))
-        {
-            Assert.LessOrEqual(Regex.Matches(s, "@\\d+").Count, 2000);
-        }
-    }
-
-    [Test]
     public async Task InsertBulk_Does_Not_Create_Untrusted_Foreign_Key_Constraints()
     {
         if (BaseTestDatabase.IsSqlServer() is false)

@@ -60,6 +60,28 @@ public class MultipleDocumentPickerValueConverterTests : PropertyValueConverterT
     }
 
     [Test]
+    public void MultipleDocumentPickerValueConverter_ReadsTheDocumentsInOneBatch()
+    {
+        var valueConverter = CreateValueConverter();
+        var missingKey = Guid.NewGuid();
+
+        var result = valueConverter.ConvertIntermediateToObject(
+            Mock.Of<IPublishedElement>(),
+            PropertyType(),
+            PropertyCacheLevel.Element,
+            Serialize(PublishedContent.Key, missingKey, PublishedContent.Key),
+            false) as IEnumerable<IPublishedContent>;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result?.Select(x => x.Key), Is.EqualTo(new[] { PublishedContent.Key, PublishedContent.Key }));
+            PublishedContentCacheMock.Verify(
+                x => x.GetByIds(false, It.Is<IReadOnlyCollection<Guid>>(keys => keys.SequenceEqual(new[] { PublishedContent.Key, missingKey }))),
+                Times.Once);
+        });
+    }
+
+    [Test]
     public void MultipleDocumentPickerValueConverter_DoesNotYieldPickedMedia()
     {
         var valueConverter = CreateValueConverter();

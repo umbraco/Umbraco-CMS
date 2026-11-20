@@ -3115,5 +3115,6 @@ export default {
 		cultureSelectLabel: 'Kultur',
 		searchDisabled: 'Søgning utilgængelig. Indeksstatus:',
 		searchError: 'Søgningen fejlede. Prøv igen.',
+		searchNotAllowed: 'Du har ikke adgang til at søge i dette indeks.',
 	},
 } as UmbLocalizationDictionary;

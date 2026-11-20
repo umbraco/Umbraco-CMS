@@ -390,7 +390,9 @@ internal sealed class ContentEditingService
     {
         try
         {
-            Attempt<ContentSaveOperationStatus> saveResult = await ContentService.SaveAsync(content, userKey, null, CancellationToken.None);
+            Attempt<ContentSaveOperationStatus> saveResult = await ContentWriteGate.Shared.RunAsync(
+                () => ContentService.SaveAsync(content, userKey, null, CancellationToken.None),
+                callerIsInScope: CoreScopeProvider.Context is not null);
             return saveResult.Result switch
             {
                 ContentSaveOperationStatus.Success => ContentEditingOperationStatus.Success,
@@ -420,7 +422,9 @@ internal sealed class ContentEditingService
 
         try
         {
-            PublishResult publishResult = await ContentService.SaveAndPublishAsync(content, [.. culturesToPublish], userKey, CancellationToken.None);
+            PublishResult publishResult = await ContentWriteGate.Shared.RunAsync(
+                () => ContentService.SaveAndPublishAsync(content, [.. culturesToPublish], userKey, CancellationToken.None),
+                callerIsInScope: CoreScopeProvider.Context is not null);
             if (publishResult.Success)
             {
                 return (

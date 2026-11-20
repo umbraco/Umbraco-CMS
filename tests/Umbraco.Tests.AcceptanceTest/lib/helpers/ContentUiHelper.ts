@@ -383,7 +383,7 @@ export class ContentUiHelper extends UiBaseLocators {
       .locator("#button");
     this.rollbackItem = page.locator(".rollback-item");
     this.activeRollbackItem = page.locator(".rollback-item.active");
-    this.actionsMenu = page.locator("uui-scroll-container");
+    this.actionsMenu = page.locator("umb-entity-action-list");
     this.linkToDocumentBtn = this.linkPickerModal
       .getByTestId("action:document")
       .locator("#button");
@@ -629,12 +629,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async openContentCaretButtonForName(name: string) {
-    const menuItem = this.menuItemTree.filter({hasText: name}).last();
-    const isCaretButtonOpen = await menuItem.getAttribute('show-children');
-
-    if (isCaretButtonOpen === null) {
-      await this.clickCaretButtonForContentName(name);
-    }
+    await this.openCaretButtonForName(name);
   }
 
   async clickCaretButtonForContentName(name: string) {
@@ -1222,11 +1217,6 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.page.locator('.variant.culture-variant').filter({hasText: contentName}).locator(this.expandSegmentBtn).click();
   }
 
-  async clickSegmentVariantButton(segmentName: string) {
-    await this.click(this.page.getByRole('button', {name: segmentName}));
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
-  }
-
   async clickVariantAddModeButtonForLanguageName(language: string) {
     await this.click(this.variantAddModeBtn.getByText(language));
     await this.page.waitForTimeout(ConstantHelper.wait.short);
@@ -1716,7 +1706,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickEditBlockListEntryWithName(blockListElementName: string) {
-    await this.click(this.blockListEntry.filter({hasText: blockListElementName}).getByLabel('edit'), {force: true});
+    await this.click(this.blockListEntry.filter({hasText: blockListElementName}).getByLabel('edit'));
   }
 
   async clickEditBlockGridEntryWithName(blockGridElementName: string) {

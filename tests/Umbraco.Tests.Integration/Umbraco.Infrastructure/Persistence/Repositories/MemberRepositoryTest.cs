@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Security;
@@ -176,6 +177,58 @@ internal sealed class MemberRepositoryTest : UmbracoIntegrationTest
             // Assert
             Assert.That(result.Count(), Is.EqualTo(1));
             Assert.That(result.First().Id, Is.EqualTo(member.Id));
+        }
+    }
+
+    [Test]
+    public void Querying_Members_Breaks_Sort_Order_Ties_By_Id()
+    {
+        using (ScopeProvider.CreateScope())
+        {
+            var repository = CreateRepository(ScopeProvider);
+            var memberGroup = new MemberGroup { Name = "Group" };
+            MemberGroupRepository.Save(memberGroup);
+            var byName = ScopeProvider.CreateQuery<IMember>().Where(x => x.Name == "Member");
+            var byProperty = ScopeProvider.CreateQuery<IMember>().Where(x => ((Member)x).PropertyTypeAlias == "alias");
+
+            OrderingAssert.BreaksSortOrderTiesById(ScopeAccessor, () => repository.Get(byName).ToArray());
+            OrderingAssert.BreaksSortOrderTiesById(ScopeAccessor, () => repository.Get(byProperty).ToArray());
+            OrderingAssert.BreaksSortOrderTiesById(ScopeAccessor, () => repository.GetByMemberGroup(memberGroup.Name).ToArray());
+        }
+    }
+
+    [TestCase(null)]
+    [TestCase("name")]
+    [TestCase("memberType")]
+    public void Paging_Members_By_Filter_Orders_Pages_Last_By_Id(string orderBy)
+    {
+        CreateTestMember();
+        using (ScopeProvider.CreateScope())
+        {
+            var repository = CreateRepository(ScopeProvider);
+            var ordering = orderBy is null ? null : Ordering.By(orderBy);
+
+            OrderingAssert.OrdersPagesLastBy(
+                ScopeAccessor,
+                ScopeAccessor.AmbientScope.SqlContext.SqlSyntax.GetFieldName<NodeDto>(x => x.NodeId),
+                () => repository.GetPagedByFilterAsync(new MemberFilter(), 0, 10, ordering).GetAwaiter().GetResult());
+        }
+    }
+
+    [TestCase("userName")]
+    [TestCase("isApproved")]
+    [TestCase("lastLoginDate")]
+    public void Paging_Member_Filter_Items_Orders_Pages_Last_By_Key(string orderBy)
+    {
+        CreateTestMember();
+        using (ScopeProvider.CreateScope())
+        {
+            var repository = GetRequiredService<IMemberFilterRepository>();
+
+            OrderingAssert.OrdersPagesLastBy(
+                ScopeAccessor,
+                ScopeAccessor.AmbientScope.SqlContext.SqlSyntax.GetQuotedColumnName("key"),
+                () => repository.GetPagedByFilterAsync(new MemberFilter(), 0, 10, Ordering.By(orderBy)).GetAwaiter().GetResult());
         }
     }
 

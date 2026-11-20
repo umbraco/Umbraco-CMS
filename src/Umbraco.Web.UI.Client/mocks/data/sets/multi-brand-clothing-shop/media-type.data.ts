@@ -25,6 +25,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		compositions: [],
 		isFolder: true,
 		hasChildren: false,
+		collection: { id: DATA_TYPE_IDS.mediaCollection },
 		isDeletable: false,
 		aliasCanBeChanged: false,
 		allowedInLibrary: false,

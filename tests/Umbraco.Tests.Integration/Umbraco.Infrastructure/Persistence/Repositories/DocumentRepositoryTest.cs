@@ -4592,6 +4592,12 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             "GetAncestorsAsync must include trashed ancestors, unlike GetByLevelAsync's trashed exclusion");
     }
 
+    [Test]
+    [Ignore("The document repository is EF Core on this branch; OrderingAssert inspects NPoco statements.")]
+    public void Querying_Content_Breaks_Sort_Order_Ties_By_Id()
+    {
+    }
+
     /// <summary>
     ///     Deleting must invalidate the cached document, not just the database row. The read and the delete have to
     ///     agree on which cache key identifies the entity, or a deleted document keeps being served.

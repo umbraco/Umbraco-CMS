@@ -33,7 +33,8 @@ test.afterEach(async ({ umbracoApi }) => {
   await umbracoApi.language.ensureNameNotExists(languageData.name);
 });
 
-test('can insert preset value into textstring property that vary by culture and segment in default language', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/24415
+test.skip('can insert preset value into textstring property that vary by culture and segment in default language', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const presetValue = initialPresetValue + varyByCultureText + ' en-US' + varyBySegmentText + ' default';
 
@@ -54,7 +55,8 @@ test('can insert preset value into textstring property that vary by culture and 
   expect(defaultValue.value).toBe(presetValue);
 });
 
-test('can insert preset value into textstring property that vary by culture and segment in segment of default language', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/24415
+test.skip('can insert preset value into textstring property that vary by culture and segment in segment of default language', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const presetValue = initialPresetValue + varyByCultureText + ' en-US' + varyBySegmentText + ' '+ vipMemberSegmentAlias;
 
@@ -77,7 +79,8 @@ test('can insert preset value into textstring property that vary by culture and 
   expect(contentData.values.find(item => item.culture === 'en-US' && item.segment === vipMemberSegmentAlias).value).toBe(presetValue);
 });
 
-test('can insert preset value into textstring property that vary by culture and segment in segment of second language', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/24415
+test.skip('can insert preset value into textstring property that vary by culture and segment in segment of second language', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const presetValue = initialPresetValue + varyByCultureText + ' '+ languageData.isoCode + varyBySegmentText + ' '+ vipMemberSegmentAlias;
 

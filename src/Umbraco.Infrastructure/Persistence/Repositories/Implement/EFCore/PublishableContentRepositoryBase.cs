@@ -240,6 +240,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
                 : source.OrderBy(joined => users.Where(user => user.Id == joined.ContentVersion.UserId).Select(user => user.UserName).FirstOrDefault()),
             // The entity's own published flag, not the current version's - a draft version of a
             // published entity carries Published = false on its version row.
+            // TODO: when ordering.Culture is set, order variant content by whether a culture variation row
+            // exists for that culture (the NPoco ApplySystemOrdering CASE), not by the table flag. [NL]
             "published" => descending
                 ? source.OrderByDescending(joined => joined.Entity.Published)
                 : source.OrderBy(joined => joined.Entity.Published),
@@ -1318,7 +1320,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             // Each batch above is hydrated and returned on its own, so the ordering is applied once, here.
             return entities
                 .OrderBy(entity => entity.Level)
-                .ThenBy(entity => entity.SortOrder);
+                .ThenBy(entity => entity.SortOrder)
+                .ThenBy(entity => entity.Id);
         });
 
     /// <inheritdoc />
@@ -2292,6 +2295,8 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     protected async Task<(string? UniqueName, List<SimilarNodeName> Siblings)> GetUniqueNodeNameAndSiblingsAsync(
         UmbracoDbContext db, int parentId, string? nodeName, int id)
     {
+        // TODO: fetch only siblings whose name starts with SimilarNodeName.GetBaseText(nodeName), as the NPoco
+        // EnsureUniqueNodeName does; loading every sibling makes each write O(siblings) on flat trees. [NL]
         List<SimilarNodeName> siblings = await db.Nodes
             .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentId)
             .Select(node => new SimilarNodeName { Id = node.NodeId, Name = node.Text })

@@ -501,6 +501,18 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Querying_Media_Breaks_Sort_Order_Ties_By_Id()
+    {
+        using (ScopeProvider.CreateScope())
+        {
+            var repository = CreateRepository(ScopeProvider, out _);
+            var query = ScopeProvider.CreateQuery<IMedia>().Where(x => x.Level == 2);
+
+            OrderingAssert.BreaksSortOrderTiesById(ScopeAccessor, () => repository.Get(query).ToArray());
+        }
+    }
+
+    [Test]
     public void QueryMedia_ContentTypeIdFilter()
     {
         // Arrange

@@ -1126,6 +1126,8 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
     /// </returns>
     public IUser? Get(int id)
     {
+        EnsureIsolatedCacheIsSynced();
+
         string cacheKey = RepositoryCacheKeys.GetKey<IUser, int>(id);
         IUser? cachedUser = IsolatedCache.GetCacheItem<IUser>(cacheKey);
         if (cachedUser is not null)

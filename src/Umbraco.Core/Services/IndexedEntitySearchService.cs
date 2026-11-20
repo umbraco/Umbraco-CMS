@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Search.Querying;
 using Umbraco.Cms.Core.Search.Querying.Filtering;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -96,6 +97,15 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
 
         List<Filter> filters = ParseFilters(query, parentId, out var effectiveQuery);
 
+        // Free text matches every textual field of a member, including identifying data such as email, username and
+        // property values. Without access to members, the query only matches the member name, so that a search can't
+        // be used to confirm who is a member.
+        if (objectType is UmbracoObjectTypes.Member && effectiveQuery is not null && CurrentUserHasMembersAccess() is false)
+        {
+            filters.AddRange(NameFilters(effectiveQuery));
+            effectiveQuery = null;
+        }
+
         Guid[]? contentTypeIdsAsArray = contentTypeIds as Guid[] ?? contentTypeIds?.ToArray();
         if (contentTypeIdsAsArray?.Length > 0)
         {
@@ -149,6 +159,16 @@ public sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IInde
 
         return new PagedModel<Guid> { Items = result.Documents.Select(d => d.Id).ToArray(), Total = result.Total };
     }
+
+    private bool CurrentUserHasMembersAccess()
+        => _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasSectionAccess(Constants.Applications.Members) is true;
+
+    // Filters combine with AND, so one filter per term requires every term to match the name, just as free text
+    // requires every term to match some field.
+    private static IEnumerable<Filter> NameFilters(string query)
+        => query
+            .Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries)
+            .Select(term => new TextFilter(Constants.Search.FieldNames.Name, [term], Negate: false));
 
     /// <summary>
     /// Resolves the current backoffice user's start node keys for the given entity type, if any are configured.

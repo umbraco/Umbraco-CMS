@@ -186,13 +186,15 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             return;
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-
+        // The rebuild runs in its own scope rather than inside the caching scope below, so that it can take its write
+        // lock before anything in its transaction reads (see RebuildAllAliasesAsync).
         if (SkipDatabaseWrites() is false && await ShouldRebuildAliases())
         {
             _logger.LogInformation("Rebuilding all document aliases.");
             await RebuildAllAliasesAsync();
         }
+
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         _logger.LogInformation("Caching document aliases.");
 
@@ -476,7 +478,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     public bool HasAny()
     {
         ThrowIfNotInitialized();
-        return _aliasCache.Count > 0;
+        return _aliasCache.IsEmpty is false;
     }
 
     /// <inheritdoc/>
@@ -490,6 +492,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
+
+        // Take the write lock before the first read. Some providers (for example SQLite in WAL mode) cannot let a
+        // transaction that has already read become the writer once another connection has committed.
+        scope.WriteLock(Constants.Locks.DocumentUrlAliases);
 
         // Get all languages for culture-to-languageId mapping
         var languages = (await _languageService.GetAllAsync()).ToList();
@@ -528,8 +534,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                 }
             }
         }
-
-        scope.WriteLock(Constants.Locks.DocumentUrlAliases);
 
         // Clear the table first and repopulate from scratch in case the rebuild no longer includes document URL aliases
         // that are currently stored.

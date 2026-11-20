@@ -201,6 +201,30 @@ export class DocumentBlueprintApiHelper {
     return await this.create(documentBlueprint);
   }
 
+  async createDocumentBlueprintWithMultipleSegmentValues(documentBlueprintName: string, documentTypeId: string, dataTypeName: string, editorAlias: string, values: {value: string, segment: string | null}[]) {
+    await this.ensureNameNotExists(documentBlueprintName);
+
+    const documentBlueprintBuilder = new DocumentBlueprintsBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .addVariant()
+        .withName(documentBlueprintName)
+        .done();
+
+    const alias = AliasHelper.toAlias(dataTypeName);
+    for (const value of values) {
+      const valueBuilder = documentBlueprintBuilder.addValue()
+        .withAlias(alias)
+        .withValue(value.value)
+        .withEditorAlias(editorAlias);
+      if (value.segment !== null) {
+        valueBuilder.withSegment(value.segment);
+      }
+      valueBuilder.done();
+    }
+
+    return await this.create(documentBlueprintBuilder.build());
+  }
+
   async createDefaultDocumentBlueprintWithABlockListEditorAndBlockWithValue(documentBlueprintName: string, documentTypeName: string, blockListDataTypeName: string, elementTypeId: string, elementTypePropertyAlias: string, elementTypePropertyEditorAlias: string, elementTypePropertyValue: string, groupName: string) {
     const crypto = require('crypto');
     const blockContentKey = crypto.randomUUID();

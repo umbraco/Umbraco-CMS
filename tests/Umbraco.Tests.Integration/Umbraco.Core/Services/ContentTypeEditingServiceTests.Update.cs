@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
@@ -582,6 +583,118 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         // expect RefreshOther when changing basic property info (not alias and not variance)
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
+    }
+
+    [Test]
+    public async Task Changing_Property_Alias_Retains_The_Property_Type_And_Its_Values()
+    {
+        var createModel = ContentTypeCreateModel("Test", "test");
+        createModel.AllowedAsRoot = true;
+        createModel.Properties = [ContentTypePropertyTypeModel("Test Property", "oldAlias")];
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+        IPropertyType originalPropertyType = contentType.PropertyTypes.Single();
+
+        Content content = ContentBuilder.CreateBasicContent(contentType);
+        content.SetValue("oldAlias", "The published value");
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+        Assert.IsTrue((await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None)).Success);
+        content.SetValue("oldAlias", "The draft value");
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var updateModel = ContentTypeUpdateModel("Test", "test");
+        updateModel.AllowedAsRoot = true;
+        updateModel.Properties = [ContentTypePropertyTypeModel("Test Property", "newAlias", key: originalPropertyType.Key)];
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        contentType = await ContentTypeService.GetAsync(contentType.Key);
+        IContent? updatedContent = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            IPropertyType propertyType = contentType!.PropertyTypes.Single();
+            Assert.AreEqual("newAlias", propertyType.Alias);
+            Assert.AreEqual(originalPropertyType.Key, propertyType.Key);
+            Assert.AreEqual(originalPropertyType.Id, propertyType.Id);
+
+            Assert.IsNotNull(updatedContent);
+            Assert.IsFalse(updatedContent!.HasProperty("oldAlias"));
+            Assert.AreEqual("The draft value", updatedContent.GetValue("newAlias"));
+            Assert.AreEqual("The published value", updatedContent.GetValue("newAlias", published: true));
+        });
+
+        // expect PropertyAliasChanged (which includes RefreshMain) when changing a property alias
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType!.Id, ContentTypeChangeTypes.PropertyAliasChanged);
+    }
+
+    [Test]
+    public async Task Property_Matched_By_Alias_Keeps_Its_Key_When_The_Model_Has_An_Unknown_Key()
+    {
+        var createModel = ContentTypeCreateModel("Test", "test");
+        createModel.Properties = [ContentTypePropertyTypeModel("Test Property", "testProperty")];
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+        IPropertyType originalPropertyType = contentType.PropertyTypes.Single();
+
+        var updateModel = ContentTypeUpdateModel("Test", "test");
+        updateModel.Properties = [ContentTypePropertyTypeModel("Test Property 2", "testProperty", key: Guid.NewGuid())];
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        contentType = await ContentTypeService.GetAsync(contentType.Key);
+        IPropertyType propertyType = contentType!.PropertyTypes.Single();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Test Property 2", propertyType.Name);
+            Assert.AreEqual(originalPropertyType.Key, propertyType.Key);
+            Assert.AreEqual(originalPropertyType.Id, propertyType.Id);
+        });
+    }
+
+    [Test]
+    public async Task Can_Swap_Property_Aliases()
+    {
+        var createModel = ContentTypeCreateModel("Test", "test");
+        createModel.AllowedAsRoot = true;
+        createModel.Properties =
+        [
+            ContentTypePropertyTypeModel("Property 1", "aliasOne"),
+            ContentTypePropertyTypeModel("Property 2", "aliasTwo"),
+        ];
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+        Guid propertyKeyOne = contentType.PropertyTypes.Single(pt => pt.Alias == "aliasOne").Key;
+        Guid propertyKeyTwo = contentType.PropertyTypes.Single(pt => pt.Alias == "aliasTwo").Key;
+
+        Content content = ContentBuilder.CreateBasicContent(contentType);
+        content.SetValue("aliasOne", "Value 1");
+        content.SetValue("aliasTwo", "Value 2");
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+
+        var updateModel = ContentTypeUpdateModel("Test", "test");
+        updateModel.AllowedAsRoot = true;
+        updateModel.Properties =
+        [
+            ContentTypePropertyTypeModel("Property 1", "aliasTwo", key: propertyKeyOne),
+            ContentTypePropertyTypeModel("Property 2", "aliasOne", key: propertyKeyTwo),
+        ];
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        IContent? updatedContent = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Value 1", updatedContent!.GetValue("aliasTwo"));
+            Assert.AreEqual("Value 2", updatedContent.GetValue("aliasOne"));
+        });
     }
 
     public enum PropertyMoveOperation
@@ -1332,6 +1445,72 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         // expect CompositionRemoved (which includes RefreshMain) when removing compositions
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.CompositionRemoved);
+    }
+
+    [Test]
+    public async Task Updating_Compositions_Deletes_Only_The_Property_Data_Of_The_Removed_Composition()
+    {
+        async Task<IContentType> CreateComposition(string name, string propertyAlias)
+        {
+            var model = ContentTypeCreateModel(name, propertyTypes: [ContentTypePropertyTypeModel(name, propertyAlias)]);
+            return (await ContentTypeEditingService.CreateAsync(model, Constants.Security.SuperUserKey)).Result!;
+        }
+
+        var removedComposition = await CreateComposition("Removed", "removedProperty");
+        var keptComposition = await CreateComposition("Kept", "keptProperty");
+        var addedComposition = await CreateComposition("Added", "addedProperty");
+
+        var ownProperty = ContentTypePropertyTypeModel("Own Property", "ownProperty");
+        var createModel = ContentTypeCreateModel(
+            "Test",
+            "test",
+            propertyTypes: [ownProperty],
+            compositions:
+            [
+                new Composition { Key = removedComposition.Key, CompositionType = CompositionType.Composition },
+                new Composition { Key = keptComposition.Key, CompositionType = CompositionType.Composition },
+            ]);
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        for (var i = 0; i < 2; i++)
+        {
+            var content = ContentBuilder.CreateBasicContent(contentType);
+            content.Name = $"Content {i}";
+            content.SetValue("removedProperty", $"Removed value {i}");
+            content.SetValue("keptProperty", $"Kept value {i}");
+            content.SetValue("ownProperty", $"Own value {i}");
+            await ContentService.SaveAsync(content, Constants.Security.SuperUserKey, null, CancellationToken.None);
+            await ContentService.PublishAsync(content, ["*"], Constants.Security.SuperUserKey, CancellationToken.None);
+        }
+
+        var removedPropertyTypeIds = removedComposition.PropertyTypes.Select(x => x.Id).ToArray();
+        List<PropertyDataDto> before = FetchAllPropertyData();
+        Assert.That(before.Count(x => removedPropertyTypeIds.Contains(x.PropertyTypeId)), Is.GreaterThan(0));
+
+        // Swapping compositions in one save removes before it adds, so the added composition must be unaffected too.
+        var updateModel = ContentTypeUpdateModel(
+            "Test",
+            "test",
+            propertyTypes: [ownProperty],
+            compositions:
+            [
+                new Composition { Key = keptComposition.Key, CompositionType = CompositionType.Composition },
+                new Composition { Key = addedComposition.Key, CompositionType = CompositionType.Composition },
+            ]);
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        var expectedRemainingIds = before
+            .Where(x => removedPropertyTypeIds.Contains(x.PropertyTypeId) is false)
+            .Select(x => x.Id)
+            .ToArray();
+        Assert.That(FetchAllPropertyData().Select(x => x.Id), Is.EquivalentTo(expectedRemainingIds));
+    }
+
+    private List<PropertyDataDto> FetchAllPropertyData()
+    {
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        return scope.Database.Fetch<PropertyDataDto>();
     }
 
     [Test]

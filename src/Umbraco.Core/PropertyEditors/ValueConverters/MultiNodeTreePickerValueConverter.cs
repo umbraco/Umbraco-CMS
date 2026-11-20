@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -115,6 +114,11 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
                 {
                     var multiNodeTreePicker = new List<IPublishedContent>();
 
+                    // The documents and media of the value are each read in one batch, the first time one of them is
+                    // looked up, rather than once per item.
+                    Dictionary<Guid, IPublishedContent>? documents = null;
+                    Dictionary<Guid, IPublishedContent>? media = null;
+
                     UmbracoObjectTypes objectType = UmbracoObjectTypes.Unknown;
                     foreach (Udi udi in udis)
                     {
@@ -123,50 +127,46 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
                             continue;
                         }
 
-                        IPublishedContent? multiNodeTreePickerItem = null;
-                        switch (udi.EntityType)
+                        UmbracoObjectTypes entityObjectType = udi.EntityType switch
                         {
-                            case Constants.UdiEntityType.Document:
-                                multiNodeTreePickerItem = GetPublishedContent(
-                                    udi,
-                                    ref objectType,
-                                    UmbracoObjectTypes.Document,
-                                    id => _contentCache.GetById(preview, guidUdi.Guid));
-                                break;
-                            case Constants.UdiEntityType.Media:
-                                multiNodeTreePickerItem = GetPublishedContent(
-                                    udi,
-                                    ref objectType,
-                                    UmbracoObjectTypes.Media,
-                                    id => _mediaCache.GetById(guidUdi.Guid));
-                                break;
-                            case Constants.UdiEntityType.Member:
-                                multiNodeTreePickerItem = GetPublishedContent(
-                                    udi,
-                                    ref objectType,
-                                    UmbracoObjectTypes.Member,
-                                    id =>
-                                    {
-                                        IMember? m = _memberService.GetById(guidUdi.Guid);
-                                        if (m == null)
-                                        {
-                                            return null;
-                                        }
+                            Constants.UdiEntityType.Document => UmbracoObjectTypes.Document,
+                            Constants.UdiEntityType.Media => UmbracoObjectTypes.Media,
+                            Constants.UdiEntityType.Member => UmbracoObjectTypes.Member,
+                            _ => UmbracoObjectTypes.Unknown,
+                        };
 
-                                        IPublishedContent? member = _memberCache.Get(m);
-                                        return member;
-                                    });
-                                break;
+                        // Once an item has been found, only items of its entity type are considered.
+                        if (entityObjectType == UmbracoObjectTypes.Unknown
+                            || (objectType != UmbracoObjectTypes.Unknown && objectType != entityObjectType))
+                        {
+                            continue;
                         }
 
-                        if (multiNodeTreePickerItem != null &&
-                            multiNodeTreePickerItem.ContentType.ItemType != PublishedItemType.Element)
+                        IPublishedContent? multiNodeTreePickerItem = entityObjectType switch
                         {
-                            multiNodeTreePicker.Add(multiNodeTreePickerItem);
-                            if (isSingleNodePicker)
-                            {
-                                break;
-                            }
+                            UmbracoObjectTypes.Document => (documents ??= ReadBatch(udis, Constants.UdiEntityType.Document, keys => _contentCache.GetByIds(preview, keys)))
+                                .GetValueOrDefault(guidUdi.Guid),
+                            UmbracoObjectTypes.Media => (media ??= ReadBatch(udis, Constants.UdiEntityType.Media, _mediaCache.GetByIds))
+                                .GetValueOrDefault(guidUdi.Guid),
+                            _ => GetMember(guidUdi.Guid),
+                        };
+
+                        if (multiNodeTreePickerItem is null)
+                        {
+                            continue;
+                        }
+
+                        objectType = entityObjectType;
+
+                        if (multiNodeTreePickerItem.ContentType.ItemType == PublishedItemType.Element)
+                        {
+                            continue;
+                        }
+
+                        multiNodeTreePicker.Add(multiNodeTreePickerItem);
+                        if (isSingleNodePicker)
+                        {
+                            break;
                         }
                     }
 
@@ -223,23 +223,40 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
         GuidUdi[] entityTypeUdis = udis.Where(udi => udi.EntityType == entityType).OfType<GuidUdi>().ToArray();
         return entityType switch
         {
-            Constants.UdiEntityType.Document => entityTypeUdis.Select(udi =>
-            {
-                IPublishedContent? content = _contentCache.GetById(preview, udi.Guid);
-                return content != null
-                    ? _apiContentBuilder.Build(content)
-                    : null;
-            }).WhereNotNull().ToArray(),
-            Constants.UdiEntityType.Media => entityTypeUdis.Select(udi =>
-            {
-                IPublishedContent? media = _mediaCache.GetById(udi.Guid);
-                return media != null
-                    ? _apiMediaBuilder.Build(media)
-                    : null;
-            }).WhereNotNull().ToArray(),
+            Constants.UdiEntityType.Document => _contentCache
+                .GetByIds(preview, Array.ConvertAll(entityTypeUdis, udi => udi.Guid))
+                .Select(content => _apiContentBuilder.Build(content))
+                .WhereNotNull()
+                .ToArray(),
+            Constants.UdiEntityType.Media => _mediaCache
+                .GetByIds(Array.ConvertAll(entityTypeUdis, udi => udi.Guid))
+                .Select(media => _apiMediaBuilder.Build(media))
+                .WhereNotNull()
+                .ToArray(),
             Constants.UdiEntityType.Member => "(unsupported)",
             _ => DefaultValue()
         };
+    }
+
+    private static Dictionary<Guid, IPublishedContent> ReadBatch(
+        IEnumerable<Udi> udis,
+        string entityType,
+        Func<IReadOnlyCollection<Guid>, IReadOnlyList<IPublishedContent>> read)
+    {
+        Guid[] keys = udis
+            .OfType<GuidUdi>()
+            .Where(udi => udi.EntityType == entityType)
+            .Select(udi => udi.Guid)
+            .Distinct()
+            .ToArray();
+
+        var items = new Dictionary<Guid, IPublishedContent>(keys.Length);
+        foreach (IPublishedContent item in read(keys))
+        {
+            items[item.Key] = item;
+        }
+
+        return items;
     }
 
     private static bool IsSingleNodePicker(IPublishedPropertyType propertyType) =>
@@ -248,34 +265,9 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
     private static string GetEntityType(IPublishedPropertyType propertyType) =>
         propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>()?.TreeSource?.ObjectType ?? Constants.UdiEntityType.Document;
 
-    /// <summary>
-    ///     Attempt to get an IPublishedContent instance based on ID and content type
-    /// </summary>
-    /// <param name="nodeId">The content node ID</param>
-    /// <param name="actualType">The type of content being requested</param>
-    /// <param name="expectedType">The type of content expected/supported by <paramref name="contentFetcher" /></param>
-    /// <param name="contentFetcher">A function to fetch content of type <paramref name="expectedType" /></param>
-    /// <returns>
-    ///     The requested content, or null if either it does not exist or <paramref name="actualType" /> does not match
-    ///     <paramref name="expectedType" />
-    /// </returns>
-    private IPublishedContent? GetPublishedContent<T>(T nodeId, ref UmbracoObjectTypes actualType, UmbracoObjectTypes expectedType, Func<T, IPublishedContent?> contentFetcher)
+    private IPublishedContent? GetMember(Guid key)
     {
-        // is the actual type supported by the content fetcher?
-        if (actualType != UmbracoObjectTypes.Unknown && actualType != expectedType)
-        {
-            // no, return null
-            return null;
-        }
-
-        // attempt to get the content
-        IPublishedContent? content = contentFetcher(nodeId);
-        if (content != null)
-        {
-            // if we found the content, assign the expected type to the actual type so we don't have to keep looking for other types of content
-            actualType = expectedType;
-        }
-
-        return content;
+        IMember? member = _memberService.GetById(key);
+        return member is null ? null : _memberCache.Get(member);
     }
 }

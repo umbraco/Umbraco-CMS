@@ -149,11 +149,6 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 			h4 {
 				margin: 0;
 			}
-
-			uui-ref-node[readonly] {
-				padding-top: 7px;
-				padding-bottom: 7px;
-			}
 		`,
 	];
 }

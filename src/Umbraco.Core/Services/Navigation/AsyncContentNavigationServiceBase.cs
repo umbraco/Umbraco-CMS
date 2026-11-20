@@ -14,6 +14,8 @@ internal abstract class AsyncContentNavigationServiceBase<TContentType, TContent
     where TContentType : class, IContentTypeComposition
     where TContentTypeService : IAsyncContentTypeBaseService<TContentType>
 {
+    private const int MaxStackAllocatedAncestors = 16;
+
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly INavigationRepository _navigationRepository;
     private readonly TContentTypeService _typeService;
@@ -287,6 +289,18 @@ internal abstract class AsyncContentNavigationServiceBase<TContentType, TContent
     /// <returns><c>true</c> if the child node exists in the structure; otherwise, <c>false</c>.</returns>
     public bool TryGetAncestorsKeys(Guid childKey, out IEnumerable<Guid> ancestorsKeys)
         => TryGetAncestorsKeysFromStructure(_navigation.Structure, childKey, out ancestorsKeys);
+
+    /// <summary>
+    ///     Attempts to get all ancestor node keys of a child node, including the child node itself, in the main navigation structure.
+    /// </summary>
+    /// <param name="childKey">The unique identifier of the child node.</param>
+    /// <param name="ancestorsOrSelfKeys">
+    ///     When this method returns, contains the child's key followed by all its ancestor keys, starting from the
+    ///     immediate parent; or an empty collection if the child doesn't exist.
+    /// </param>
+    /// <returns><c>true</c> if the child node exists in the structure; otherwise, <c>false</c>.</returns>
+    public bool TryGetAncestorsOrSelfKeys(Guid childKey, out IEnumerable<Guid> ancestorsOrSelfKeys)
+        => TryGetAncestorsKeysFromStructure(_navigation.Structure, childKey, out ancestorsOrSelfKeys, includeSelf: true);
 
     /// <summary>
     ///     Attempts to get all ancestor node keys of a specific content type for a given node.
@@ -997,14 +1011,13 @@ internal abstract class AsyncContentNavigationServiceBase<TContentType, TContent
         return true;
     }
 
-    private static bool TryGetAncestorsKeysFromStructure(
+    internal static bool TryGetAncestorsKeysFromStructure(
         ConcurrentDictionary<Guid, NavigationNode> structure,
         Guid childKey,
         out IEnumerable<Guid> ancestorsKeys,
-        Guid? contentTypeKey = null)
+        Guid? contentTypeKey = null,
+        bool includeSelf = false)
     {
-        var ancestors = new List<Guid>();
-
         if (structure.TryGetValue(childKey, out NavigationNode? node) is false)
         {
             // Child doesn't exist
@@ -1012,16 +1025,49 @@ internal abstract class AsyncContentNavigationServiceBase<TContentType, TContent
             return false;
         }
 
+        // Content trees are shallow, so collect the keys on the stack and allocate the result once at its exact size.
+        Span<Guid> keys = stackalloc Guid[MaxStackAllocatedAncestors];
+        var count = 0;
+        List<Guid>? overflow = null;
+
+        if (includeSelf && (contentTypeKey.HasValue is false || node.ContentTypeKey == contentTypeKey.Value))
+        {
+            keys[count++] = childKey;
+        }
+
         while (node.Parent is not null && structure.TryGetValue(node.Parent.Value, out node))
         {
             // Apply contentTypeKey filter
-            if (contentTypeKey.HasValue is false || node.ContentTypeKey == contentTypeKey.Value)
+            if (contentTypeKey.HasValue && node.ContentTypeKey != contentTypeKey.Value)
             {
-                ancestors.Add(node.Key);
+                continue;
+            }
+
+            if (overflow is not null)
+            {
+                overflow.Add(node.Key);
+            }
+            else if (count == keys.Length)
+            {
+                // Overflowing the stack buffer means an unusually deep tree, so reserve several times its size
+                // (a headroom heuristic) instead of regrowing the list as the remaining ancestors are added.
+                overflow = new List<Guid>(MaxStackAllocatedAncestors * 4);
+                overflow.AddRange(keys);
+                overflow.Add(node.Key);
+            }
+            else
+            {
+                keys[count++] = node.Key;
             }
         }
 
-        ancestorsKeys = ancestors;
+        if (overflow is not null)
+        {
+            ancestorsKeys = overflow;
+            return true;
+        }
+
+        ancestorsKeys = count == 0 ? [] : keys[..count].ToArray();
         return true;
     }
 

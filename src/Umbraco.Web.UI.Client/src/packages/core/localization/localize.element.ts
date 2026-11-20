@@ -72,6 +72,11 @@ export class UmbLocalizeElement extends UmbLitElement {
 			:host {
 				display: contents;
 			}
+
+			code:not([dir]) {
+				direction: ltr;
+				unicode-bidi: isolate;
+			}
 		`,
 	];
 }

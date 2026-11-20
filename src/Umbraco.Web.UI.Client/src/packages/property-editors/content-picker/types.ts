@@ -1,5 +1,6 @@
 import type * as DocumentModule from '@umbraco-cms/backoffice/document';
 import type * as DynamicRoot from '@umbraco-cms/backoffice/dynamic-root';
+export type * from './conditions/types.js';
 
 /**
  * @deprecated Deprecated since v19. Import `ManifestDynamicRootOrigin` from `@umbraco-cms/backoffice/dynamic-root` instead. Scheduled for removal in Umbraco 21.

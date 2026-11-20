@@ -6,13 +6,13 @@ const customDataTypeName = 'Custom Dropdown';
 // different editors rather than differing by configuration.
 const dropdowns = [
   {
-    type: 'Dropdown',
+    type: 'Single Select Dropdown',
     editorAlias: 'Umbraco.DropDown.Single',
     editorUiAlias: 'Umb.PropertyEditorUi.Dropdown.Single',
     settings: ConstantHelper.singleDropdownSettings
   },
   {
-    type: 'Dropdown multiple',
+    type: 'Select List',
     editorAlias: 'Umbraco.DropDown.Flexible',
     editorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
     settings: ConstantHelper.dropdownSettings

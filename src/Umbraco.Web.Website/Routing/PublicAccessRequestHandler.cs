@@ -14,6 +14,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Website.Routing;
 
+/// <summary>
+///     Default implementation of <see cref="IPublicAccessRequestHandler" />, which checks the member's access to
+///     protected content and re-routes the request to the login or error page configured for the protecting rule.
+/// </summary>
 public class PublicAccessRequestHandler : IPublicAccessRequestHandler
 {
     private readonly ILogger<PublicAccessRequestHandler> _logger;
@@ -23,6 +27,15 @@ public class PublicAccessRequestHandler : IPublicAccessRequestHandler
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IUmbracoRouteValuesFactory _umbracoRouteValuesFactory;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PublicAccessRequestHandler" /> class.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="publicAccessService">The service used to find the public access rule protecting the content.</param>
+    /// <param name="publicAccessChecker">The checker used to determine whether the current member has access to the content.</param>
+    /// <param name="umbracoContextAccessor">The accessor used to resolve the published login and error pages.</param>
+    /// <param name="umbracoRouteValuesFactory">The factory used to create route values for a re-routed request.</param>
+    /// <param name="publishedRouter">The router used to re-route the request to another page.</param>
     public PublicAccessRequestHandler(
         ILogger<PublicAccessRequestHandler> logger,
         IPublicAccessService publicAccessService,
@@ -171,10 +184,21 @@ public class PublicAccessRequestHandler : IPublicAccessRequestHandler
         if (pageId != publishedRequest?.PublishedContent?.Id)
         {
             IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            IPublishedContent? publishedContent = umbracoContext.Content?.GetById(pageId);
-            if (publishedContent is null || publishedRequest is null)
+            if (publishedRequest is null)
             {
-                throw new InvalidOperationException("No content found by id " + pageId);
+                throw new InvalidOperationException("No published request to re-route to the page with id " + pageId);
+            }
+
+            IPublishedContent? publishedContent = umbracoContext.Content?.GetById(pageId);
+            if (publishedContent is null)
+            {
+                _logger.LogWarning(
+                    "The public access page with id {PageId} has no published content, so the request for the protected page with id {ProtectedPageId} is handled as not found.",
+                    pageId,
+                    publishedRequest.PublishedContent?.Id);
+
+                IPublishedRequest notFound = await CreateNotFoundRequestAsync(publishedRequest);
+                return await _umbracoRouteValuesFactory.CreateAsync(httpContext, notFound);
             }
 
             IPublishedRequest reRouted = await _publishedRouter.UpdateRequestAsync(publishedRequest, publishedContent);
@@ -187,5 +211,28 @@ public class PublicAccessRequestHandler : IPublicAccessRequestHandler
 
         throw new InvalidOperationException(
             "Public Access rule has a redirect node set to itself, nothing can be routed.");
+    }
+
+    private async Task<IPublishedRequest> CreateNotFoundRequestAsync(IPublishedRequest publishedRequest)
+    {
+        IPublishedRequest notFound = await _publishedRouter.UpdateRequestAsync(publishedRequest, null);
+
+        // When no not-found content is resolved, the router restores the content it was given, which here is
+        // the protected page. That must never be served, so fall back to a request without content.
+        if (notFound.PublishedContent is null || notFound.PublishedContent.Id != publishedRequest.PublishedContent?.Id)
+        {
+            return notFound;
+        }
+
+        IPublishedRequestBuilder builder = await _publishedRouter.CreateRequestAsync(publishedRequest.Uri);
+        if (publishedRequest.Domain is not null)
+        {
+            builder.SetDomain(publishedRequest.Domain);
+        }
+
+        builder.SetCulture(publishedRequest.Culture);
+        builder.SetSegment(publishedRequest.Segment);
+        builder.SetIs404();
+        return builder.Build();
     }
 }

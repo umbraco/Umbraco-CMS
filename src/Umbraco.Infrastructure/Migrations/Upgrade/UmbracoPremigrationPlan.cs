@@ -58,9 +58,19 @@ public class UmbracoPremigrationPlan : MigrationPlan
         To<V_17_0_0.AddRepositoryCacheVersionTable>("{A1B3F5D6-4C8B-4E7A-9F8C-1D2B3E4F5A6B}");
         To<V_17_0_0.AddLastSyncedTable>("{72894BCA-9FAD-4CC3-B0D0-D6CDA2FFA636}");
 
+        // To 17.10.0
+        // The lock is required to persist relations after content is saved or trashed, and migrations in the main
+        // plan do so, so it has to exist before that plan runs.
+        To<V_17_10_0.AddRelationsLock>("{D7B2148A-85F4-415C-8574-4A5D8CC10DE1}");
+
         // To 18.0.0
         To<V_18_0_0.AddElements>("{E51033DE-B4F9-45F3-87B3-0E774B2939C2}");
         To<V_18_0_0.AddAllowedInLibraryToContentType>("{31C0D92A-49DD-47EC-B2A7-932A58FF224E}");
+
+        // To 18.5.0
+        // Re-run for sites already past the 18.0.0 steps, which didn't get the 17.10.0 step above. It does nothing when
+        // the lock exists.
+        To<V_17_10_0.AddRelationsLock>("{0B6F4E2A-3C8D-4F71-9A5E-6D2C1B8F7E43}");
 
         // Languages are read through EF Core before the main plan runs (e.g. to initialize the publish status cache),
         // and the EF Core model maps the language key, so the column must exist first.

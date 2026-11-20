@@ -259,9 +259,15 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
     public async Task<PagedModel<IRedirectUrl>> SearchUrlsAsync(string searchTerm, int skip, int take) =>
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            var pattern = $"%{searchTerm.Trim()}%";
+            // The term is matched literally: escape the LIKE wildcards, including the character set opener of SQL Server.
+            var escapedTerm = searchTerm.Trim()
+                .Replace(@"\", @"\\")
+                .Replace("%", @"\%")
+                .Replace("_", @"\_")
+                .Replace("[", @"\[");
+            var pattern = $"%{escapedTerm}%";
 
-            IQueryable<RedirectUrlDto> query = db.RedirectUrls.Where(x => EF.Functions.Like(x.Url, pattern));
+            IQueryable<RedirectUrlDto> query = db.RedirectUrls.Where(x => EF.Functions.Like(x.Url, pattern, @"\"));
 
             var total = await query.LongCountAsync();
 
