@@ -88,7 +88,7 @@ internal sealed class ServerEventRouter : IServerEventRouter
             });
         }
 
-        Distribute(payloads);
+        DistributeToAllServers(payloads);
     }
 
     /// <inheritdoc/>
@@ -99,7 +99,7 @@ internal sealed class ServerEventRouter : IServerEventRouter
             return Task.CompletedTask;
         }
 
-        Distribute(
+        DistributeToAllServers(
         [
             new ServerEventCacheRefresher.JsonPayload
             {
@@ -143,7 +143,7 @@ internal sealed class ServerEventRouter : IServerEventRouter
         }
     }
 
-    private void Distribute(IReadOnlyCollection<ServerEventCacheRefresher.JsonPayload> payloads)
+    private void DistributeToAllServers(IReadOnlyCollection<ServerEventCacheRefresher.JsonPayload> payloads)
     {
         if (payloads.Count == 0)
         {
