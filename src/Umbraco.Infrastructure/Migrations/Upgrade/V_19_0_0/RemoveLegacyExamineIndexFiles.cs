@@ -7,18 +7,16 @@ using Umbraco.Cms.Core.Hosting;
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_0_0;
 
 /// <summary>
-/// Best-effort removal of the on-disk Examine/Lucene index folder, whether or not the Examine search provider
-/// is still installed.
+/// Best-effort removal of the on-disk Examine/Lucene index folders for the indexes that were retired with the
+/// introduction of the search abstraction, whether or not the Examine search provider is still installed.
 /// </summary>
 /// <remarks>
-/// Examine rebuilds its indexes automatically on startup, so unconditionally clearing the folder is safe - the
-/// alternative is that indexes under retired pre-search-abstraction names (e.g. <c>InternalIndex</c>,
-/// <c>ExternalIndex</c>) are never read again by anything and pile up forever, since nothing else cleans them
-/// up. Individual files or folders that cannot be deleted (e.g. because they're locked) are skipped rather than
+/// Indexes under the retired names (<c>InternalIndex</c>, <c>ExternalIndex</c>, <c>MembersIndex</c> and
+/// <c>DeliveryApiContentIndex</c>) are never read again by anything and would otherwise pile up forever.
+/// Any other index folder - current search abstraction indexes as well as custom indexes - is left untouched,
+/// as it may still be in use. The root index folder is only removed if it ends up empty.
+/// Individual files or folders that cannot be deleted (e.g. because they're locked) are skipped rather than
 /// failing the migration; anything left behind is safe to delete manually.
-/// Folders whose name matches one of the current search abstraction index aliases
-/// (<see cref="Core.Constants.Search.IndexAliases"/>) are left untouched, since the Examine search provider still uses
-/// those names for its active indexes.
 /// </remarks>
 public class RemoveLegacyExamineIndexFiles : UnscopedMigrationBase
 {
@@ -106,12 +104,12 @@ public class RemoveLegacyExamineIndexFiles : UnscopedMigrationBase
         if (hadFailures)
         {
             _logger.LogWarning(
-                "Could not fully remove the legacy Examine index folder at {Path}. Umbraco no longer reads these files - they can be safely deleted manually.",
+                "Could not fully remove the legacy Examine index folders at {Path}. Umbraco no longer reads these files - they can be safely deleted manually.",
                 path);
         }
         else if (hasOtherIndexes)
         {
-            _logger.LogInformation("Removed legacy Examine index folders at {Path}, leaving active indexes in place.", path);
+            _logger.LogInformation("Removed legacy Examine index folders at {Path}, leaving other index folders in place.", path);
         }
         else
         {
