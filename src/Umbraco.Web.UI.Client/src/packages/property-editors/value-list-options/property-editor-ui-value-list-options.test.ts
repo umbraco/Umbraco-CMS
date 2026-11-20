@@ -75,7 +75,7 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 		expect(rows.map((row) => getField(row, 'label').value)).to.deep.equal(['', 'Bee']);
 	});
 
-	it('names the value and label columns above the options, but only when there are options', async () => {
+	it('names the label and value columns above the options, but only when there are options', async () => {
 		const getHeader = () => getInput().shadowRoot!.querySelector<HTMLElement>('#header');
 
 		await setValue([]);
@@ -83,7 +83,7 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 
 		await setValue([{ value: 'a' }]);
 		const columns = Array.from(getHeader()!.querySelectorAll('span')).map((column) => column.textContent!.trim());
-		expect(columns).to.deep.equal(['general_value', 'general_label']);
+		expect(columns).to.deep.equal(['general_label', 'general_value']);
 	});
 
 	it('emits the edited label next to the value', async () => {
@@ -207,13 +207,15 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 		expect(getRows()).to.have.lengthOf(2);
 	});
 
-	it('focuses the value of an added option', async () => {
+	it('focuses the first field of an added option', async () => {
 		await setValue([{ value: 'a' }]);
 
 		await add();
 		await new Promise((resolve) => requestAnimationFrame(resolve));
 
-		expect(getInput().shadowRoot!.activeElement).to.equal(getRows()[1]);
+		const row = getRows()[1];
+		expect(getInput().shadowRoot!.activeElement).to.equal(row);
+		expect(row.shadowRoot!.activeElement).to.equal(getField(row, 'label'));
 	});
 
 	it('removes an option', async () => {

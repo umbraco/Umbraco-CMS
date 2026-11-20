@@ -157,8 +157,8 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 		if (this._entries.length === 0) return nothing;
 		return html`
 			<div id="header" aria-hidden="true" inert>
-				<span>${this.localize.term('general_value')}</span>
 				<span>${this.localize.term('general_label')}</span>
+				<span>${this.localize.term('general_value')}</span>
 			</div>
 		`;
 	}

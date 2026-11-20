@@ -29,8 +29,8 @@ export class UmbInputValueListOptionElement extends UUIFormControlWithBasicsMixi
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
-	@query('#value')
-	protected _valueInput?: UUIInputElement;
+	@query('#fields uui-input')
+	protected _firstInput?: UUIInputElement;
 
 	#onValueInput(event: UUIInputEvent) {
 		event.stopPropagation();
@@ -69,8 +69,8 @@ export class UmbInputValueListOptionElement extends UUIFormControlWithBasicsMixi
 
 	public override async focus() {
 		await this.updateComplete;
-		await this._valueInput?.updateComplete;
-		this._valueInput?.focus();
+		await this._firstInput?.updateComplete;
+		this._firstInput?.focus();
 	}
 
 	protected override getFormElement() {
@@ -83,7 +83,13 @@ export class UmbInputValueListOptionElement extends UUIFormControlWithBasicsMixi
 			<umb-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
 				<div id="fields">
 					<uui-input
-						id="value"
+						class="label"
+						label=${this.localize.term('placeholders_label')}
+						placeholder=${this.localize.term('placeholders_label')}
+						.value=${this.label}
+						?readonly=${this.readonly}
+						@input=${this.#onLabelInput}></uui-input>
+					<uui-input
 						class="value"
 						label=${this.localize.term('general_value')}
 						placeholder=${this.localize.term('general_value')}
@@ -93,13 +99,6 @@ export class UmbInputValueListOptionElement extends UUIFormControlWithBasicsMixi
 						required-message=${UMB_VALIDATION_EMPTY_LOCALIZATION_KEY}
 						@input=${this.#onValueInput}
 						@focusout=${this.#onValueFocusOut}></uui-input>
-					<uui-input
-						class="label"
-						label=${this.localize.term('placeholders_label')}
-						placeholder=${this.localize.term('placeholders_label')}
-						.value=${this.label}
-						?readonly=${this.readonly}
-						@input=${this.#onLabelInput}></uui-input>
 				</div>
 			</umb-form-validation-message>
 			${this.readonly
