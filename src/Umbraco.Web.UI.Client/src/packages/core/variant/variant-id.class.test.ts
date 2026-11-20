@@ -15,6 +15,12 @@ describe('UmbVariantId', () => {
 			expect(id.segment).to.equal('xmas');
 		});
 
+		it('normalizes empty-string culture and segment to null', () => {
+			const id = new UmbVariantId('', '');
+			expect(id.culture).to.equal(null);
+			expect(id.segment).to.equal(null);
+		});
+
 		it('keeps non-invariant cultures and segments as given', () => {
 			const id = new UmbVariantId('en', 'xmas');
 			expect(id.culture).to.equal('en');
@@ -155,6 +161,79 @@ describe('UmbVariantId', () => {
 		it('treats the "invariant" culture literal as null culture when comparing', () => {
 			const id = new UmbVariantId(null, null);
 			expect(id.compare({ culture: UMB_INVARIANT_CULTURE, segment: null })).to.be.true;
+		});
+
+		it('treats omitted culture and segment as invariant', () => {
+			expect(new UmbVariantId(null, null).compare({})).to.be.true;
+			expect(new UmbVariantId('en', null).compare({ culture: 'en' })).to.be.true;
+			expect(new UmbVariantId('en', 'xmas').compare({ culture: 'en' })).to.be.false;
+		});
+	});
+
+	describe('Equal', () => {
+		it('treats empty strings, null and omitted values as the same', () => {
+			expect(UmbVariantId.Equal({ culture: 'en', segment: '' }, { culture: 'en', segment: null })).to.equal(true);
+			expect(UmbVariantId.Equal({ culture: 'en', segment: '' }, { culture: 'en' })).to.equal(true);
+			expect(UmbVariantId.Equal({ culture: '', segment: null }, { culture: null, segment: null })).to.equal(true);
+			expect(UmbVariantId.Equal({ culture: '', segment: null }, { culture: UMB_INVARIANT_CULTURE })).to.equal(true);
+		});
+
+		it('agrees with ToString for objects that differ only by empty values', () => {
+			const a = { culture: 'en', segment: '' };
+			const b = { culture: 'en', segment: null };
+			expect(UmbVariantId.ToString(a)).to.equal(UmbVariantId.ToString(b));
+			expect(UmbVariantId.Equal(a, b)).to.equal(true);
+		});
+
+		it('is true for objects with the same culture and segment', () => {
+			expect(UmbVariantId.Equal({ culture: 'en', segment: 'xmas' }, { culture: 'en', segment: 'xmas' })).to.be.true;
+		});
+
+		it('is false when culture or segment differs', () => {
+			expect(UmbVariantId.Equal({ culture: 'en', segment: null }, { culture: 'da', segment: null })).to.be.false;
+			expect(UmbVariantId.Equal({ culture: 'en', segment: 'xmas' }, { culture: 'en', segment: null })).to.be.false;
+		});
+
+		it('treats omitted values, null and the "invariant" culture as the same', () => {
+			expect(UmbVariantId.Equal({}, { culture: null, segment: null })).to.be.true;
+			expect(UmbVariantId.Equal({ culture: undefined }, { culture: UMB_INVARIANT_CULTURE, segment: null })).to.be.true;
+			expect(UmbVariantId.Equal({ culture: 'en' }, { culture: 'en', segment: null })).to.be.true;
+		});
+
+		it('accepts Variant Ids', () => {
+			expect(UmbVariantId.Equal(new UmbVariantId('en', 'xmas'), { culture: 'en', segment: 'xmas' })).to.be.true;
+		});
+	});
+
+	describe('ToString', () => {
+		it('serializes culture and segment like the toString method', () => {
+			for (const [culture, segment] of [
+				[null, null],
+				['en', null],
+				['en', 'xmas'],
+				[null, 'xmas'],
+			] as const) {
+				expect(UmbVariantId.ToString({ culture, segment })).to.equal(new UmbVariantId(culture, segment).toString());
+			}
+		});
+
+		it('uses "invariant" when there is no culture, and omits an absent segment', () => {
+			expect(UmbVariantId.ToString({})).to.equal(UMB_INVARIANT_CULTURE);
+			expect(UmbVariantId.ToString({ culture: 'en' })).to.equal('en');
+			expect(UmbVariantId.ToString({ culture: 'en', segment: 'xmas' })).to.equal('en_xmas');
+		});
+
+		it('gives the same string for objects that are Equal', () => {
+			const a = { culture: UMB_INVARIANT_CULTURE, segment: undefined };
+			const b = { culture: null, segment: null };
+			expect(UmbVariantId.Equal(a, b)).to.be.true;
+			expect(UmbVariantId.ToString(a)).to.equal(UmbVariantId.ToString(b));
+		});
+
+		it('can be parsed back with FromString', () => {
+			const parsed = UmbVariantId.FromString(UmbVariantId.ToString({ culture: 'en', segment: 'xmas' }));
+			expect(parsed.culture).to.equal('en');
+			expect(parsed.segment).to.equal('xmas');
 		});
 	});
 

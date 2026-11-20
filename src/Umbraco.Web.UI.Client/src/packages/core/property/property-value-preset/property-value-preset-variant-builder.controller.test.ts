@@ -600,10 +600,7 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 		it('preserves existing values with segments when using setVariantOptions', async () => {
 			const ctrlHost = new UmbTestControllerHostElement();
 			const ctrl = new UmbPropertyValuePresetVariantBuilderController(ctrlHost);
-			ctrl.setVariantOptions([
-				new UmbVariantId('cultureA', null),
-				new UmbVariantId('cultureA', 'segmentA'),
-			]);
+			ctrl.setVariantOptions([new UmbVariantId('cultureA', null), new UmbVariantId('cultureA', 'segmentA')]);
 			ctrl.setValues([
 				{
 					alias: 'test',
@@ -737,6 +734,47 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 			expect(result[0]?.culture).to.be.equal('cultureA');
 			expect(result[1]?.value).to.be.equal('existing value for cultureB');
 			expect(result[1]?.culture).to.be.equal('cultureB');
+		});
+	});
+	describe('Single use', () => {
+		const propertyTypes: Array<UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel> = [
+			{
+				alias: 'test',
+				propertyEditorUiAlias: 'test-editor-ui',
+				propertyEditorSchemaAlias: 'test-editor-schema',
+				config: [],
+				typeArgs: { variesByCulture: false, variesBySegment: false },
+			},
+		];
+		const createArgs = { entityType: 'test', entityUnique: 'some-unique' };
+
+		it('throws when create is called a second time', async () => {
+			const ctrl = new UmbPropertyValuePresetVariantBuilderController(new UmbTestControllerHostElement());
+			await ctrl.create(propertyTypes, createArgs);
+
+			let error: Error | undefined;
+			try {
+				await ctrl.create(propertyTypes, createArgs);
+			} catch (e) {
+				error = e as Error;
+			}
+
+			expect(error?.message).to.contain('only be called once');
+		});
+
+		it('throws on a second create even when the first is still running', async () => {
+			const ctrl = new UmbPropertyValuePresetVariantBuilderController(new UmbTestControllerHostElement());
+			const first = ctrl.create(propertyTypes, createArgs);
+
+			let error: Error | undefined;
+			try {
+				await ctrl.create(propertyTypes, createArgs);
+			} catch (e) {
+				error = e as Error;
+			}
+			await first;
+
+			expect(error?.message).to.contain('only be called once');
 		});
 	});
 });

@@ -1,9 +1,10 @@
 import { expect } from '@open-wc/testing';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type {
-	ManifestPropertyValueResolver,
-	UmbPropertyValueData,
-	UmbPropertyValueResolver,
+import {
+	UmbPropertyValueIndex,
+	type ManifestPropertyValueResolver,
+	type UmbPropertyValueData,
+	type UmbPropertyValueResolver,
 } from '@umbraco-cms/backoffice/property';
 import { UmbVariantId, type UmbEntityVariantModel, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
 import { UmbMergeContentVariantDataController } from './merge-content-variant-data.controller.js';
@@ -168,6 +169,111 @@ describe('UmbMergeContentVariantDataController', () => {
 			// the block that took the deleted one's position.
 			expect(textOf('block-b', 'da'), 'block-b Danish').to.equal('b-da');
 			expect(textOf('block-c', 'da'), 'block-c Danish').to.equal('c-da');
+		});
+
+		it('pairs a draft value that omits its culture with the persisted value that has a null culture', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			const persistedData: UmbContentLikeDetailModel = {
+				values: [blockValue([block('block-a', { da: 'a-da', de: 'a-de' })])],
+			};
+
+			const draftBlockValue = blockValue([block('block-a', { da: 'a-da', de: 'a-de-edited' })]);
+			const { culture: _omitted, ...draftWithoutCulture } = draftBlockValue;
+			const runtimeData = { values: [draftWithoutCulture] } as unknown as UmbContentLikeDetailModel;
+
+			const variants = [new UmbVariantId('de')];
+			const result = await ctrl.process(persistedData, runtimeData, variants, [
+				...variants,
+				UmbVariantId.CreateInvariant(),
+			]);
+
+			expect(result.values.length).to.equal(1);
+			const blocks = (result.values[0].value as TestBlockValueType).contentData;
+			const textOf = (culture: string) => blocks[0].values.find((v) => v.culture === culture)?.value;
+			expect(textOf('de'), 'German edit').to.equal('a-de-edited');
+			expect(textOf('da'), 'Danish carried over').to.equal('a-da');
+		});
+
+		describe('with supplied value indexes', () => {
+			class UmbCountingValueIndex extends UmbPropertyValueIndex<UmbPotentialContentValueModel> {
+				lookups = 0;
+				override find(alias: string, variantId?: UmbVariantId) {
+					this.lookups++;
+					return super.find(alias, variantId);
+				}
+			}
+
+			const persistedData = (): UmbContentLikeDetailModel => ({
+				values: [
+					blockValue([block('block-a', { da: 'a-da', de: 'a-de' }), block('block-b', { da: 'b-da', de: 'b-de' })]),
+				],
+			});
+			const runtimeData = (): UmbContentLikeDetailModel => ({
+				values: [blockValue([block('block-b', { da: 'b-da', de: 'b-de-edited' })])],
+			});
+			const variants = [new UmbVariantId('de')];
+			const variantsToStore = [...variants, UmbVariantId.CreateInvariant()];
+
+			it('merges to the same result as when it builds its own indexes', async () => {
+				const persisted = persistedData();
+				const runtime = runtimeData();
+
+				const expected = await new UmbMergeContentVariantDataController(new UmbTestControllerHostElement()).process(
+					persisted,
+					runtime,
+					variants,
+					variantsToStore,
+				);
+
+				const ctrl = new UmbMergeContentVariantDataController(new UmbTestControllerHostElement());
+				ctrl.setPersistedValuesIndex(new UmbPropertyValueIndex(persisted.values));
+				ctrl.setDraftValuesIndex(new UmbPropertyValueIndex(runtime.values));
+				const result = await ctrl.process(persisted, runtime, variants, variantsToStore);
+
+				expect(result.values).to.deep.equal(expected.values);
+			});
+
+			it('looks top-level values up in the supplied indexes', async () => {
+				const persisted = persistedData();
+				const runtime = runtimeData();
+				const persistedIndex = new UmbCountingValueIndex(persisted.values);
+				const draftIndex = new UmbCountingValueIndex(runtime.values);
+
+				const ctrl = new UmbMergeContentVariantDataController(new UmbTestControllerHostElement());
+				ctrl.setPersistedValuesIndex(persistedIndex);
+				ctrl.setDraftValuesIndex(draftIndex);
+				await ctrl.process(persisted, runtime, variants, variantsToStore);
+
+				expect(persistedIndex.lookups, 'persisted index lookups').to.be.greaterThan(0);
+				expect(draftIndex.lookups, 'draft index lookups').to.be.greaterThan(0);
+			});
+
+			it('lets several controllers share the same indexes', async () => {
+				const persisted = persistedData();
+				const runtime = runtimeData();
+				const persistedIndex = new UmbPropertyValueIndex(persisted.values);
+				const draftIndex = new UmbPropertyValueIndex(runtime.values);
+
+				const merge = async (variant: UmbVariantId) => {
+					const ctrl = new UmbMergeContentVariantDataController(new UmbTestControllerHostElement());
+					ctrl.setPersistedValuesIndex(persistedIndex);
+					ctrl.setDraftValuesIndex(draftIndex);
+					return ctrl.process(persisted, runtime, [variant], [variant, UmbVariantId.CreateInvariant()]);
+				};
+				const expectedFor = async (variant: UmbVariantId) =>
+					new UmbMergeContentVariantDataController(new UmbTestControllerHostElement()).process(
+						persisted,
+						runtime,
+						[variant],
+						[variant, UmbVariantId.CreateInvariant()],
+					);
+
+				for (const variant of [new UmbVariantId('da'), new UmbVariantId('de')]) {
+					expect((await merge(variant)).values, variant.toString()).to.deep.equal((await expectedFor(variant)).values);
+				}
+			});
 		});
 
 		it('sorts inner block values by culture, invariant first', async () => {

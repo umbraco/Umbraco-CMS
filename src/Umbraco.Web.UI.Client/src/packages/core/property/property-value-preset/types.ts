@@ -4,6 +4,12 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export type * from './property-value-preset.extension.js';
 
+/**
+ * Produces the initial value of a property.
+ *
+ * One instance is shared by every value generated for a property, such as one per variant, and `processValue` is
+ * called for those values concurrently. An implementation must therefore be stateless between calls.
+ */
 export interface UmbPropertyValuePreset<
 	ValueType = unknown,
 	ConfigType extends UmbPropertyEditorConfig = UmbPropertyEditorConfig,

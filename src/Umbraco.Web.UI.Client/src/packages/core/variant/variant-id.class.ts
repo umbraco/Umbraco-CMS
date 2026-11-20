@@ -2,6 +2,11 @@ import type { UmbObjectWithVariantProperties } from './types.js';
 
 export const UMB_INVARIANT_CULTURE = 'invariant';
 
+const normalizeCulture = (culture?: string | null): string | null =>
+	culture === UMB_INVARIANT_CULTURE ? null : culture || null;
+
+const normalizeSegment = (segment?: string | null): string | null => segment || null;
+
 /**
  * An identifier representing a Variant. This is at current state a culture and a segment.
  * The identifier is not specific for ContentType Variants, but is used for many type of identification of a culture and a segment. One case is any property of a ContentType can be resolved into a VariantId depending on their structural settings such as Vary by Culture and Vary by Segmentation.
@@ -31,6 +36,29 @@ export class UmbVariantId {
 	 */
 	public static CreateFromPartial(variantData: Partial<UmbObjectWithVariantProperties>): UmbVariantId {
 		return Object.freeze(new UmbVariantId(variantData.culture, variantData.segment));
+	}
+
+	/**
+	 * Checks whether two objects hold the same culture and segment, without creating Variant Ids.
+	 * Omitted values, `null`, empty strings and the `invariant` culture are treated as invariant.
+	 * @param {Partial<UmbObjectWithVariantProperties>} a - The first object.
+	 * @param {Partial<UmbObjectWithVariantProperties>} b - The second object.
+	 * @returns {boolean} True if both culture and segment match.
+	 */
+	public static Equal(a: Partial<UmbObjectWithVariantProperties>, b: Partial<UmbObjectWithVariantProperties>): boolean {
+		return normalizeCulture(a.culture) === normalizeCulture(b.culture) && normalizeSegment(a.segment) === normalizeSegment(b.segment);
+	}
+
+	/**
+	 * Serializes an object holding a culture and a segment as `culture` or `culture_segment`, using `invariant` when
+	 * there is no culture, without creating a Variant Id. It is the static counterpart of {@link UmbVariantId.toString}.
+	 * The result can be parsed back with {@link UmbVariantId.FromString}.
+	 * @param {Partial<UmbObjectWithVariantProperties>} variantData - The object to read the culture and segment from.
+	 * @returns {string} The string representation.
+	 */
+	public static ToString(variantData: Partial<UmbObjectWithVariantProperties>): string {
+		const segment = normalizeSegment(variantData.segment);
+		return (normalizeCulture(variantData.culture) ?? UMB_INVARIANT_CULTURE) + (segment ? `_${segment}` : '');
 	}
 
 	/**
@@ -68,21 +96,21 @@ export class UmbVariantId {
 	public readonly segment: string | null = null;
 
 	/**
-	 * @param {string | null} [culture] - The culture. `null`, `undefined` and `'invariant'` all mean culture invariant.
-	 * @param {string | null} [segment] - The segment. `null` and `undefined` both mean segment invariant.
+	 * @param {string | null} [culture] - The culture. `null`, `undefined`, an empty string and `'invariant'` all mean culture invariant.
+	 * @param {string | null} [segment] - The segment. `null`, `undefined` and an empty string all mean segment invariant.
 	 */
 	constructor(culture?: string | null, segment?: string | null) {
-		this.culture = (culture === UMB_INVARIANT_CULTURE ? null : culture) ?? null;
-		this.segment = segment ?? null;
+		this.culture = normalizeCulture(culture);
+		this.segment = normalizeSegment(segment);
 	}
 
 	/**
 	 * Checks whether this Variant Id has the same culture and segment as a given object.
-	 * @param {UmbObjectWithVariantProperties} obj - The object to compare with.
+	 * @param {Partial<UmbObjectWithVariantProperties>} obj - The object to compare with. Omitted values are treated as invariant.
 	 * @returns {boolean} True if both culture and segment match.
 	 */
-	public compare(obj: UmbObjectWithVariantProperties): boolean {
-		return this.equal(new UmbVariantId(obj.culture, obj.segment));
+	public compare(obj: Partial<UmbObjectWithVariantProperties>): boolean {
+		return UmbVariantId.Equal(this, obj);
 	}
 
 	/**
@@ -109,8 +137,7 @@ export class UmbVariantId {
 	 * @returns {string} The string representation.
 	 */
 	public toString(): string {
-		// Currently a direct copy of the VariantPropertiesObjectToString method const.
-		return (this.culture || UMB_INVARIANT_CULTURE) + (this.segment ? `_${this.segment}` : '');
+		return UmbVariantId.ToString(this);
 	}
 
 	/**
