@@ -1,4 +1,5 @@
 using System.Net.Sockets;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -61,6 +62,60 @@ internal sealed partial class UserServiceCrudTests
         Assert.AreEqual(UserOperationStatus.UnknownFailure, result.Result);
     }
 
+    [Test]
+    public async Task Reset_Password_With_Token_Unlocks_Locked_Out_User()
+    {
+        var userService = CreateUserService();
+        IUser user = await CreateLockedOutResetPasswordUser(userService);
+        var token = await GeneratePasswordResetToken(user);
+
+        var result = await userService.ResetPasswordAsync(user.Key, token, "N3wP@ssw0rd!");
+
+        Assert.IsTrue(result.Success);
+        IUser? updatedUser = await userService.GetAsync(user.Key);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(updatedUser!.IsLockedOut);
+            Assert.AreEqual(0, updatedUser.FailedPasswordAttempts);
+        });
+    }
+
+    [Test]
+    public async Task Reset_Password_With_Invalid_Token_Does_Not_Unlock_Locked_Out_User()
+    {
+        var userService = CreateUserService();
+        IUser user = await CreateLockedOutResetPasswordUser(userService);
+
+        var result = await userService.ResetPasswordAsync(user.Key, "invalid".ToUrlBase64()!, "N3wP@ssw0rd!");
+
+        Assert.IsFalse(result.Success);
+        IUser? updatedUser = await userService.GetAsync(user.Key);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(updatedUser!.IsLockedOut);
+            Assert.AreEqual(5, updatedUser.FailedPasswordAttempts);
+        });
+    }
+
+    private async Task<IUser> CreateLockedOutResetPasswordUser(IUserService userService)
+    {
+        IUser user = await CreateResetPasswordUser(userService);
+        user.IsLockedOut = true;
+        user.FailedPasswordAttempts = 5;
+        user.LastLockoutDate = DateTime.UtcNow;
+        userService.Save(user);
+        return user;
+    }
+
+    private async Task<string> GeneratePasswordResetToken(IUser user)
+    {
+        using IServiceScope scope = GetRequiredService<IServiceScopeFactory>().CreateScope();
+        ICoreBackOfficeUserManager userManager = scope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
+        Attempt<string, UserOperationStatus> tokenAttempt = await userManager.GeneratePasswordResetTokenAsync(user);
+        Assert.IsTrue(tokenAttempt.Success);
+        return tokenAttempt.Result.ToUrlBase64()!;
+    }
+
     private static Mock<IUserForgotPasswordSender> CreateForgotPasswordSenderMock(bool canSendNow)
     {
         var senderMock = new Mock<IUserForgotPasswordSender>();
@@ -69,7 +124,7 @@ internal sealed partial class UserServiceCrudTests
         return senderMock;
     }
 
-    private async Task CreateResetPasswordUser(IUserService userService)
+    private async Task<IUser> CreateResetPasswordUser(IUserService userService)
     {
         IUserGroup? userGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
         var createModel = new UserCreateModel
@@ -82,5 +137,6 @@ internal sealed partial class UserServiceCrudTests
 
         var createResult = await userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);
         Assert.IsTrue(createResult.Success);
+        return createResult.Result.CreatedUser!;
     }
 }
