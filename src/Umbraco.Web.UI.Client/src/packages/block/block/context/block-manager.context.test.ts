@@ -168,4 +168,22 @@ describe('UmbBlockManagerContext', () => {
 			manager.destroy();
 		});
 	});
+	describe('removing an expose', () => {
+		it('removes only the expose of the given variant, leaving other variants and blocks exposed', async () => {
+			const host = await fixture<UmbControllerHostElement>(
+				html`<umb-test-block-manager-host></umb-test-block-manager-host>`,
+			);
+			const manager = new UmbTestBlockManagerContext(host);
+
+			manager.setOneExpose('a', new UmbVariantId('en-us'));
+			manager.setOneExpose('a', new UmbVariantId('da'));
+			manager.setOneExpose('b', new UmbVariantId('da'));
+
+			manager.removeOneExpose('a', new UmbVariantId('da'));
+
+			expect(manager.getExposes().map((x) => `${x.culture}|${x.contentKey}`)).to.deep.equal(['da|b', 'en-us|a']);
+
+			manager.destroy();
+		});
+	});
 });

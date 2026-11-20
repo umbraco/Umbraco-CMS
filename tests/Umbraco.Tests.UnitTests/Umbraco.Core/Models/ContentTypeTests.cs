@@ -541,6 +541,31 @@ public class ContentTypeTests
     }
 
     [Test]
+    public void Deep_Cloned_Member_Type_Has_Independent_Member_Property_Options()
+    {
+        var contentType = BuildMemberType();
+        var alias = contentType.PropertyTypes.First().Alias;
+        contentType.SetIsSensitiveProperty(alias, false);
+        contentType.SetMemberCanViewProperty(alias, false);
+        contentType.SetMemberCanEditProperty(alias, false);
+
+        var clone = (MemberType)contentType.DeepClone();
+        clone.SetIsSensitiveProperty(alias, true);
+        clone.SetMemberCanViewProperty(alias, true);
+        clone.SetMemberCanEditProperty(alias, true);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(contentType.IsSensitiveProperty(alias));
+            Assert.IsFalse(contentType.MemberCanViewProperty(alias));
+            Assert.IsFalse(contentType.MemberCanEditProperty(alias));
+            Assert.IsTrue(clone.IsSensitiveProperty(alias));
+            Assert.IsTrue(clone.MemberCanViewProperty(alias));
+            Assert.IsTrue(clone.MemberCanEditProperty(alias));
+        });
+    }
+
+    [Test]
     public void Can_Serialize_Member_Type_Without_Error()
     {
         // Arrange

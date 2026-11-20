@@ -249,13 +249,15 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             return dtos;
         });
 
-    private Sql<ISqlContext> GetContentSourceSql(Guid key)
+    // internal so tests can reach it
+    internal Sql<ISqlContext> GetContentSourceSql(Guid key)
         => SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Document))
             .Append(SqlWhereNodeKey(ScopelessSqlContext, key))
             .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
 
-    private Sql<ISqlContext> GetContentSourcesSql(IEnumerable<Guid> keys)
+    // internal so tests can reach it
+    internal Sql<ISqlContext> GetContentSourcesSql(IEnumerable<Guid> keys)
         => SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Document))
             .WhereIn<NodeDto>(x => x.UniqueId, keys)
@@ -438,13 +440,15 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     public ContentCacheNode? GetMediaSource(Guid key)
         => CreateMediaSourceNode(Read(database => database.FirstOrDefault<ContentSourceDto>(GetMediaSourceSql(key))));
 
-    private Sql<ISqlContext> GetMediaSourceSql(Guid key)
+    // internal so tests can reach it
+    internal Sql<ISqlContext> GetMediaSourceSql(Guid key)
         => SqlMediaSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Media))
             .Append(SqlWhereNodeKey(ScopelessSqlContext, key))
             .Append(SqlOrderByLevelIdSortOrder(ScopelessSqlContext));
 
-    private Sql<ISqlContext> GetMediaSourcesSql(IEnumerable<Guid> keys)
+    // internal so tests can reach it
+    internal Sql<ISqlContext> GetMediaSourcesSql(IEnumerable<Guid> keys)
         => SqlMediaSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(ScopelessSqlContext, Constants.ObjectTypes.Media))
             .WhereIn<NodeDto>(x => x.UniqueId, keys)
@@ -1672,7 +1676,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return dto;
     }
 
-    private Sql<ISqlContext> SqlContentSourcesSelect(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
+    private Sql<ISqlContext> SqlContentSourcesSelect()
     {
         SqlTemplate sqlTemplate = ScopelessSqlContext.Templates.Get(
             Constants.SqlTemplates.NuCacheDatabaseDataSource.ContentSourcesSelect,
@@ -1705,36 +1709,28 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                     .AndSelect<ContentNuDto>("nuPub", x => Alias(x.Data, "PubData"))
                     .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.RawData, "EditDataRaw"))
                     .AndSelect<ContentNuDto>("nuPub", x => Alias(x.RawData, "PubDataRaw"))
-                    .From<NodeDto>());
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                    .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId)
+                    .InnerJoin<ContentVersionDto>()
+                    .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+                    .InnerJoin<DocumentVersionDto>()
+                    .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
+                    .LeftJoin<ContentVersionDto>(
+                        j =>
+                            j.InnerJoin<DocumentVersionDto>("pdver")
+                                .On<ContentVersionDto, DocumentVersionDto>(
+                                    (left, right) => left.Id == right.Id && right.Published == true, "pcver", "pdver"),
+                        "pcver")
+                    .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver")
+                    .LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>(
+                        (left, right) => left.NodeId == right.NodeId && right.Published == false, aliasRight: "nuEdit")
+                    .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>(
+                        (left, right) => left.NodeId == right.NodeId && right.Published == true, aliasRight: "nuPub"));
 
-        Sql<ISqlContext>? sql = sqlTemplate.Sql();
-
-        // TODO: I'm unsure how we can format the below into SQL templates also because right.Current and right.Published end up being parameters
-        if (joins != null)
-        {
-            sql = sql.Append(joins(sql.SqlContext));
-        }
-
-        sql = sql
-            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
-            .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId)
-            .InnerJoin<ContentVersionDto>()
-            .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
-            .InnerJoin<DocumentVersionDto>()
-            .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
-            .LeftJoin<ContentVersionDto>(
-                j =>
-                    j.InnerJoin<DocumentVersionDto>("pdver")
-                        .On<ContentVersionDto, DocumentVersionDto>(
-                            (left, right) => left.Id == right.Id && right.Published == true, "pcver", "pdver"),
-                "pcver")
-            .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver")
-            .LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>(
-                (left, right) => left.NodeId == right.NodeId && right.Published == false, aliasRight: "nuEdit")
-            .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>(
-                (left, right) => left.NodeId == right.NodeId && right.Published == true, aliasRight: "nuPub");
-
-        return sql;
+        // The constants in the joins become the template's arguments, which a template needs passed in order:
+        // right.Current, then Published of pdver, nuEdit and nuPub.
+        return sqlTemplate.Sql(true, true, false, true);
     }
 
     private Sql<ISqlContext> SqlWhereNodeKey(ISqlContext sqlContext, Guid key)
@@ -1804,7 +1800,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return sql;
     }
 
-    private Sql<ISqlContext> SqlMediaSourcesSelect(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
+    private Sql<ISqlContext> SqlMediaSourcesSelect()
     {
         SqlTemplate sqlTemplate = ScopelessSqlContext.Templates.Get(
             Constants.SqlTemplates.NuCacheDatabaseDataSource.MediaSourcesSelect, tsql =>
@@ -1825,26 +1821,18 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                         x => Alias(x.UserId, "EditWriterId"))
                     .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.Data, "EditData"))
                     .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.RawData, "EditDataRaw"))
-                    .From<NodeDto>());
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                    .InnerJoin<ContentVersionDto>()
+                    .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+                    .LeftJoin<ContentNuDto>("nuEdit")
+                    .On<NodeDto, ContentNuDto>(
+                        (left, right) => left.NodeId == right.NodeId && !right.Published,
+                        aliasRight: "nuEdit"));
 
-        Sql<ISqlContext>? sql = sqlTemplate.Sql();
-
-        if (joins != null)
-        {
-            sql = sql.Append(joins(sql.SqlContext));
-        }
-
-        // TODO: We can't use a template with this one because of the 'right.Published' ends up being a parameter so not sure how we can do that
-        sql = sql
-            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
-            .InnerJoin<ContentVersionDto>()
-            .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
-            .LeftJoin<ContentNuDto>("nuEdit")
-            .On<NodeDto, ContentNuDto>(
-                (left, right) => left.NodeId == right.NodeId && !right.Published,
-                aliasRight: "nuEdit");
-
-        return sql;
+        // The constants in the joins become the template's arguments, which a template needs passed in order:
+        // right.Current, then !right.Published of nuEdit.
+        return sqlTemplate.Sql(true, false);
     }
 
     private ContentCacheNode? CreateContentNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer, bool preview)
