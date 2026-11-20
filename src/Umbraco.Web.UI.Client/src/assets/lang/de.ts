@@ -1239,6 +1239,9 @@ export default {
 		publishAll: '%0% und alle untergeordneten Elemente veröffentlichen',
 		publishHelp:
 			'\n    Klicken Sie <em>Sichern und Veröffentlichen</em>, um <strong>%0%</strong> zu veröffentlicht und auf der Website sichtbar zu machen.<br><br>\n    Sie können dieses Element mitsamt seinen untergeordneten Elementen veröffentlichen, indem Sie <em>Unveröffentlichte Unterelemente einschließen</em> markieren.\n    ',
+		publishedNotificationTitle: 'Veröffentlicht',
+		publishedNotificationDescription: '%0% ist jetzt öffentlich verfügbar',
+		publishedVariantNotificationDescription: '%1% ist jetzt öffentlich verfügbar in %0%',
 	},
 	colorpicker: {
 		noColors: 'Sie haben keine freigegeben Farben konfiguriert',
@@ -1380,6 +1383,7 @@ export default {
 		dataTypeSaved: 'Datentyp gespeichert',
 		dictionaryItemSaved: 'Wörterbucheintrag gespeichert',
 		editContentPublishedHeader: 'Inhalt veröffentlicht',
+		editElementPublishedHeader: 'Element veröffentlicht',
 		editContentPublishedText: 'und ist auf der Website sichtbar',
 		editMultiContentPublishedText: '%0% Documente veröffentlicht und auf der Website sichtbar',
 		editVariantPublishedText: '%0% veröffentlicht und auf der Website sichtbar',
@@ -2115,5 +2119,10 @@ export default {
 		browseTab: 'Durchsuchen',
 		searchTab: 'Suchen',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'Element' : 'Elemente'} ausgewählt`,
+	},
+	elements: {
+		confirmPublishDescription: 'Durch das Veröffentlichen wird dies öffentlich verfügbar.',
+		confirmBulkPublishDescription: 'Durch das Veröffentlichen werden die ausgewählten Einträge öffentlich verfügbar.',
+		confirmBulkUnpublishDescription: 'Die ausgewählten Einträge sind nicht mehr öffentlich verfügbar.',
 	},
 } as UmbLocalizationDictionary;

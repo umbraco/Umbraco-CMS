@@ -1269,6 +1269,9 @@ export default {
 		invalidPublishBranchPermissions: 'Người dùng không có đủ quyền để xuất bản tất cả tài liệu con',
 		contentPublishedFailedReqCultureValidationError:
 			"Xác thực không thành công đối với ngôn ngữ bắt buộc '%0%'. Ngôn ngữ này đã được lưu nhưng chưa được xuất bản.",
+		publishedNotificationTitle: 'Đã xuất bản',
+		publishedNotificationDescription: '%0% hiện đã có sẵn công khai',
+		publishedVariantNotificationDescription: '%1% hiện đã có sẵn công khai bằng %0%',
 	},
 	colorpicker: {
 		noColors: 'Bạn chưa cấu hình bất kỳ màu nào được phê duyệt',
@@ -1469,6 +1472,7 @@ export default {
 		editContentPublishedFailedByValidation: 'Tài liệu không thể được xuất bản, nhưng chúng tôi đã lưu nó cho bạn',
 		editContentPublishedFailedByParent: 'Tài liệu không thể được xuất bản, vì một trang cha không được xuất bản',
 		editContentPublishedHeader: 'Tài liệu đã được xuất bản',
+		editElementPublishedHeader: 'Phần tử đã được xuất bản',
 		editContentPublishedText: 'và hiện đang hiển thị trên trang web',
 		editContentUnpublishedHeader: 'Tài liệu đã bị hủy xuất bản',
 		editContentUnpublishedText: 'và không còn hiển thị trên trang web',
@@ -2817,5 +2821,10 @@ export default {
 		browseTab: 'Duyệt',
 		searchTab: 'Tìm kiếm',
 		selectedCount: (count: number) => `Đã chọn ${count} mục`,
+	},
+	elements: {
+		confirmPublishDescription: 'Xuất bản sẽ làm cho mục này có sẵn công khai.',
+		confirmBulkPublishDescription: 'Xuất bản sẽ làm cho các mục đã chọn có sẵn công khai.',
+		confirmBulkUnpublishDescription: 'Các mục đã chọn sẽ không còn khả dụng công khai.',
 	},
 } as UmbLocalizationDictionary;

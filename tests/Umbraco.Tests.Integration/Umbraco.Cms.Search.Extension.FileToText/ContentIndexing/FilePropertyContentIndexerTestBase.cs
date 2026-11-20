@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -30,6 +31,8 @@ internal abstract class FilePropertyContentIndexerTestBase : UmbracoIntegrationT
 
     private IMediaImportService MediaImportService => GetRequiredService<IMediaImportService>();
 
+    private IMediaEditingService MediaEditingService => GetRequiredService<IMediaEditingService>();
+
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
@@ -37,6 +40,8 @@ internal abstract class FilePropertyContentIndexerTestBase : UmbracoIntegrationT
     private IContentService ContentService => GetRequiredService<IContentService>();
 
     private MediaFileManager MediaFileManager => GetRequiredService<MediaFileManager>();
+
+    private MediaUrlGeneratorCollection MediaUrlGenerators => GetRequiredService<MediaUrlGeneratorCollection>();
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
@@ -58,6 +63,29 @@ internal abstract class FilePropertyContentIndexerTestBase : UmbracoIntegrationT
         await using FileStream stream = file.OpenRead();
         return await MediaImportService.ImportAsync(file.Name, stream, null, null, CoreConstants.Security.SuperUserKey);
     }
+
+    protected async Task<IMedia> TrashMedia(IMedia media)
+    {
+        Attempt<IMedia?, ContentEditingOperationStatus> result = await MediaEditingService.MoveToRecycleBinAsync(media.Key, CoreConstants.Security.SuperUserKey);
+        Assert.That(result.Success, Is.True, $"Could not move the media to the recycle bin: {result.Status}");
+
+        return await MediaEditingService.GetAsync(media.Key)
+               ?? throw new InvalidOperationException("Could not find the trashed media.");
+    }
+
+    protected string GetMediaFilePath(IMedia media)
+    {
+        IProperty property = media.Properties[CoreConstants.Conventions.Media.File]
+                             ?? throw new InvalidOperationException("Could not find the file property of the media.");
+        Assert.That(
+            MediaUrlGenerators.TryGetMediaPath(property.PropertyType.PropertyEditorAlias, property.GetValue(), out var filePath),
+            Is.True,
+            "Could not get the file path of the media.");
+
+        return filePath!;
+    }
+
+    protected bool MediaFileExists(string filePath) => MediaFileManager.FileSystem.FileExists(filePath);
 
     protected async Task CreateLanguage(string isoCode, string cultureName)
     {

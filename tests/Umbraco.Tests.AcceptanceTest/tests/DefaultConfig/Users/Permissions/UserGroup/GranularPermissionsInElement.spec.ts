@@ -91,7 +91,7 @@ test('can publish a specific element with publish permission enabled', async ({u
   await umbracoUi.library.clickConfirmToPublishButton();
 
   // Assert
-  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.elementPublished);
+  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.nowPubliclyAvailable);
   expect(await umbracoApi.element.isElementPublished(firstElementId)).toBeTruthy();
   await umbracoUi.library.isEntityActionForElementWithNameHidden(secondElementName);
 });

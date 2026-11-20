@@ -183,6 +183,23 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         return result;
     }
 
+    /// <inheritdoc />
+    public async Task ReissueSignInAsync(BackOfficeIdentityUser user)
+    {
+        AuthenticateResult authentication = await Context.AuthenticateAsync(AuthenticationType);
+        if (authentication.Succeeded is false
+            || UserManager.GetUserId(authentication.Principal) != user.Id)
+        {
+            return;
+        }
+
+        ClaimsPrincipal principal = await CreateUserPrincipalAsync(user);
+
+        principal.Identities.First().AddClaims(GetAuthenticationMethodClaims(authentication.Principal));
+
+        await Context.SignInAsync(AuthenticationType, principal, authentication.Properties);
+    }
+
     /// <summary>
     ///     Used for auto linking/creating user accounts for external logins
     /// </summary>

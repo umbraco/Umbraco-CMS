@@ -11,6 +11,7 @@ import {
 	UMB_USER_PERMISSION_ELEMENT_UPDATE,
 } from './constants.js';
 import { manifests as conditions } from './conditions/manifests.js';
+import { manifests as repositoryManifests } from './repository/manifests.js';
 import type {
 	ManifestEntityUserPermission,
 	ManifestGranularUserPermission,
@@ -140,4 +141,9 @@ const granularPermissions: Array<ManifestGranularUserPermission> = [
 	},
 ];
 
-export const manifests: Array<UmbExtensionManifest> = [...conditions, ...entityUserPermissions, ...granularPermissions];
+export const manifests: Array<UmbExtensionManifest> = [
+	...conditions,
+	...entityUserPermissions,
+	...granularPermissions,
+	...repositoryManifests,
+];

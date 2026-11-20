@@ -1,12 +1,13 @@
-﻿using Umbraco.Cms.Search.Extension.FileToText.FileIndexing;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Search.Extension.FileToText.Configuration;
+using Umbraco.Cms.Search.Extension.FileToText.FileIndexing;
 using Umbraco.Extensions;
+using CoreConstants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Search.Extension.FileToText.ContentIndexing;
 
@@ -84,6 +85,8 @@ internal sealed class FilePropertyContentIndexer : IContentIndexer
                       ?? fileValueHandlers.First();
                 try
                 {
+                    filePath = ResolveStoredFilePath(content, filePath);
+
                     if (_indexingOptions.MaxFileSize is not null
                         && _mediaFileManager.FileSystem.GetSize(filePath) > _indexingOptions.MaxFileSize * 1024)
                     {
@@ -119,5 +122,19 @@ internal sealed class FilePropertyContentIndexer : IContentIndexer
         }
 
         return indexFields;
+    }
+
+    // With media recycle bin protection, the files of trashed media are stored with a suffix, while the property
+    // value keeps the original path. Whether a file was suffixed depends on the setting at the time it was trashed,
+    // so the file system is checked rather than the current setting.
+    private string ResolveStoredFilePath(IContentBase content, string filePath)
+    {
+        if (content is not IMedia { Trashed: true })
+        {
+            return filePath;
+        }
+
+        var suffixedFilePath = Path.ChangeExtension(filePath, CoreConstants.Conventions.Media.TrashedMediaSuffix + Path.GetExtension(filePath));
+        return _mediaFileManager.FileSystem.FileExists(suffixedFilePath) ? suffixedFilePath : filePath;
     }
 }

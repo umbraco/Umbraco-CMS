@@ -94,15 +94,39 @@ export abstract class UmbBlockEntriesContext<
 
 	// Public methods:
 
+	/**
+	 * Observe the first layout entry that references the given content key.
+	 * A content key can be referenced by more than one layout entry, so this does not identify a specific entry; use `byKey` for that.
+	 * @param {string} contentKey The content key to look up.
+	 * @returns {Observable<BlockLayoutType | undefined>} The first matching layout entry.
+	 */
 	layoutOf(contentKey: string) {
 		return this._layoutEntries.asObservablePart((source) => source.find((x) => x.contentKey === contentKey));
 	}
+	/**
+	 * Observe the layout entry with the given layout key.
+	 * Unlike a content key, a layout key identifies one specific placement.
+	 * @param {string} key The layout key of the entry.
+	 * @returns {Observable<BlockLayoutType | undefined>} The layout entry, or `undefined` if there is none with that key.
+	 */
 	byKey(key: string) {
 		return this._layoutEntries.asObservablePart((source) => source.find((x) => x.key === key));
 	}
+	/**
+	 * Get the first layout entry that references the given content key.
+	 * A content key can be referenced by more than one layout entry, so this does not identify a specific entry; use `getByKey` for that.
+	 * @param {string} contentKey The content key to look up.
+	 * @returns {BlockLayoutType | undefined} The first matching layout entry.
+	 */
 	getLayoutOf(contentKey: string) {
 		return this._layoutEntries.getValue().find((x) => x.contentKey === contentKey);
 	}
+	/**
+	 * Get the layout entry with the given layout key.
+	 * Unlike a content key, a layout key identifies one specific placement.
+	 * @param {string} key The layout key of the entry.
+	 * @returns {BlockLayoutType | undefined} The layout entry, or `undefined` if there is none with that key.
+	 */
 	getByKey(key: string) {
 		return this._layoutEntries.getValue().find((x) => x.key === key);
 	}

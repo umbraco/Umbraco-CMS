@@ -109,7 +109,7 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 
 		return html`
 			<uui-dialog-layout headline=${headline}>
-				<p><umb-localize key="prompt_confirmPublish"></umb-localize></p>
+				<p>${this.localize.string(this.data?.description || '#prompt_confirmPublish')}</p>
 				${when(
 					!this._isInvariant,
 					() => html`
