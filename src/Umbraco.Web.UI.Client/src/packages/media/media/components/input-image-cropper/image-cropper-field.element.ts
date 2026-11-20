@@ -200,7 +200,17 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 					.focalPoint=${this.focalPoint}
 					.src=${this.source}
 					?active=${this.currentCrop?.alias === crop.alias}
-					@click=${() => this.onCropClick(crop)}>
+					tabindex="0"
+					role="button"
+					aria-label=${crop.alias}
+					@click=${() => this.onCropClick(crop)}
+					@keydown=${(e: KeyboardEvent) => {
+						if (e.key === 'Enter' || e.key === ' ') {
+							e.preventDefault();
+							e.stopPropagation();
+							this.onCropClick(crop);
+						}
+					}}>
 				</umb-image-cropper-preview>
 			`,
 		);
@@ -253,9 +263,16 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 				overflow-y: auto;
 				height: fit-content;
 				max-height: 100%;
+				padding: 4px;
 
 				umb-image-cropper-preview[active] {
 					background-color: var(--uui-color-current);
+				}
+
+				umb-image-cropper-preview:focus-visible {
+					outline: 2px solid var(--uui-color-selected);
+					outline-offset: 2px;
+					border-radius: var(--uui-border-radius);
 				}
 			}
 		`,
