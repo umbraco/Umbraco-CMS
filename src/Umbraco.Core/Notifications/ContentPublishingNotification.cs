@@ -10,8 +10,16 @@ namespace Umbraco.Cms.Core.Notifications;
 ///     Notification that is published before content is published.
 /// </summary>
 /// <remarks>
-///     This notification is cancelable, allowing handlers to prevent the publish operation.
-///     The notification is published by the <see cref="Services.IContentService"/> before content is made publicly available.
+///     <para>
+///         This notification is cancelable, allowing handlers to prevent the publish operation.
+///         The notification is published by the <see cref="Services.IContentService"/> before content is made publicly available.
+///     </para>
+///     <para>
+///         When a branch is published, this notification is raised for each document in the branch and they all share one
+///         <see cref="StatefulNotification.State" /> dictionary with the single <see cref="ContentPublishedNotification" />
+///         raised for the branch. Key any state stored here per document; see
+///         <see cref="Services.IContentService.PublishBranch(IContent, PublishBranchFilter, string[], int)" />.
+///     </para>
 /// </remarks>
 public sealed class ContentPublishingNotification : CancelableEnumerableObjectNotification<IContent>
 {

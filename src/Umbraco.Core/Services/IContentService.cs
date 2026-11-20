@@ -678,6 +678,15 @@ public interface IContentService : IContentServiceBase<IContent>
     ///     <para>
     ///         The root of the branch is always published, regardless of <paramref name="publishBranchFilter" />.
     ///     </para>
+    ///     <para>
+    ///         A <see cref="Notifications.ContentSavingNotification" /> and a <see cref="Notifications.ContentPublishingNotification" />
+    ///         are raised for each document in the branch, followed by a single <see cref="Notifications.ContentPublishedNotification" />
+    ///         for every published document. All of these notifications share one
+    ///         <see cref="Notifications.IStatefulNotification.State" /> dictionary, so a handler that stores state should key it
+    ///         per document (for example, a collection under a single key that each notification adds to) rather than writing a
+    ///         single value under a fixed key, which a later document in the branch would overwrite or, with
+    ///         <see cref="IDictionary{TKey, TValue}.Add(TKey, TValue)" />, fail to add.
+    ///     </para>
     /// </remarks>
     IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId);
 
