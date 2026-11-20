@@ -40,6 +40,10 @@ public static class UmbracoApplicationBuilderExtensions
             return builder;
         }
 
+        // Flag this call so UseBackOfficeEndpoints can warn if it runs after us (which is the wrong order — the backoffice
+        // routes get shadowed by the dynamic content route registered below).
+        builder.AppBuilder.Properties[Constants.Web.Routing.WebsiteEndpointsRegisteredKey] = true;
+
         FrontEndRoutes surfaceRoutes = builder.ApplicationServices.GetRequiredService<FrontEndRoutes>();
         surfaceRoutes.CreateRoutes(builder.EndpointRouteBuilder);
 
