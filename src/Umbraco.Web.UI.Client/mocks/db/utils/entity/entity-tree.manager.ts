@@ -52,6 +52,14 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		return items.reverse().map((item) => this.#treeItemMapper(item));
 	}
 
+	readBatch(ids: Array<string>) {
+		const items = ids
+			.map((id) => this.#db.read(id))
+			.filter((item): item is T => item !== undefined)
+			.map((item) => this.#treeItemMapper(item));
+		return { items, total: items.length };
+	}
+
 	#pagedTreeResult({ items, skip, take }: { items: Array<T>; skip: number; take: number }) {
 		const paged = pagedResult(items, skip, take);
 		const treeItems = paged.items.map((item) => this.#treeItemMapper(item));
