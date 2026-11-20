@@ -318,12 +318,9 @@ internal abstract class ExpressionVisitorBase
         }
 
         // TODO: check !
-        UnaryExpression member = Expression.Convert(newExpression, typeof(object));
-        var lambda = Expression.Lambda<Func<object>>(member);
         try
         {
-            Func<object> getter = lambda.Compile();
-            var o = getter();
+            var o = ExpressionValueEvaluator.GetValue(newExpression)!;
 
             SqlParameters.Add(o);
 
@@ -538,10 +535,7 @@ internal abstract class ExpressionVisitorBase
 
                     // This occurs when we are getting a value from a non constant such as: x => x.Path.StartsWith(content.Path)
                     // So we'll go get the value:
-                    UnaryExpression member = Expression.Convert(methodArgs[0], typeof(object));
-                    var lambda = Expression.Lambda<Func<object>>(member);
-                    Func<object> getter = lambda.Compile();
-                    compareValue = getter().ToString()!;
+                    compareValue = ExpressionValueEvaluator.GetValue(methodArgs[0])!.ToString()!;
                 }
                 else
                 {
@@ -572,10 +566,7 @@ internal abstract class ExpressionVisitorBase
                 {
                     // This occurs when we are getting a value from a non constant such as: x => x.Path.StartsWith(content.Path)
                     // So we'll go get the value:
-                    UnaryExpression member = Expression.Convert(methodArgs[0], typeof(object));
-                    var lambda = Expression.Lambda<Func<object>>(member);
-                    Func<object> getter = lambda.Compile();
-                    searchValue = getter().ToString()!;
+                    searchValue = ExpressionValueEvaluator.GetValue(methodArgs[0])!.ToString()!;
                 }
                 else
                 {
@@ -594,10 +585,7 @@ internal abstract class ExpressionVisitorBase
                 {
                     // This occurs when we are getting a value from a non constant such as: x => x.Path.StartsWith(content.Path)
                     // So we'll go get the value:
-                    UnaryExpression member = Expression.Convert(methodArgs[1], typeof(object));
-                    var lambda = Expression.Lambda<Func<object>>(member);
-                    Func<object> getter = lambda.Compile();
-                    replaceValue = getter().ToString()!;
+                    replaceValue = ExpressionValueEvaluator.GetValue(methodArgs[1])!.ToString()!;
                 }
                 else
                 {
@@ -658,11 +646,7 @@ internal abstract class ExpressionVisitorBase
 
                 var memberAccess = VisitMemberAccess((MemberExpression)methodArgs[0]);
 
-                UnaryExpression inMember = Expression.Convert(methodObject, typeof(object));
-                var inLambda = Expression.Lambda<Func<object>>(inMember);
-                Func<object> inGetter = inLambda.Compile();
-
-                var inArgs = (IEnumerable)inGetter();
+                var inArgs = (IEnumerable)ExpressionValueEvaluator.GetValue(methodObject)!;
 
                 var inBuilder = new StringBuilder();
                 var inFirst = true;
@@ -715,7 +699,7 @@ internal abstract class ExpressionVisitorBase
                         throw new NotSupportedException("Expression is not a proper lambda.");
                     }
 
-                    Func<string, string> ff = fl.Compile();
+                    Func<string, string> ff = fl.Compile(preferInterpretation: true);
                     return ff(n1);
                 }
 
@@ -729,7 +713,7 @@ internal abstract class ExpressionVisitorBase
                         throw new NotSupportedException("Expression is not a proper lambda.");
                     }
 
-                    Func<string, string, string> ff = fl.Compile();
+                    Func<string, string, string> ff = fl.Compile(preferInterpretation: true);
                     return ff(n1, n2);
                 }
 
@@ -737,14 +721,14 @@ internal abstract class ExpressionVisitorBase
                 {
                     var n1 = Visit(m.Arguments[0]);
                     var n2 = Visit(m.Arguments[1]);
-                    var n3 = Visit(m.Arguments[3]);
+                    var n3 = Visit(m.Arguments[2]);
                     Expression f = m.Arguments[3];
                     if (!(f is Expression<Func<string, string, string, string>> fl))
                     {
                         throw new NotSupportedException("Expression is not a proper lambda.");
                     }
 
-                    Func<string, string, string, string> ff = fl.Compile();
+                    Func<string, string, string, string> ff = fl.Compile(preferInterpretation: true);
                     return ff(n1, n2, n3);
                 }
 
