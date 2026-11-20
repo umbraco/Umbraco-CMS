@@ -97,6 +97,38 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     }
 
     /// <summary>
+    /// Gets the tree items identified by the provided keys, in the order requested.
+    /// </summary>
+    /// <param name="ids">The keys of the tree items to retrieve.</param>
+    /// <returns>The tree items that exist and pass the tree's filtering; others are omitted.</returns>
+    protected async Task<ActionResult<BatchResponseModel<TItem>>> GetBatch(Guid[] ids)
+    {
+        if (ids.Length == 0)
+        {
+            return Ok(new BatchResponseModel<TItem>());
+        }
+
+        IEntitySlim[] entities = GetBatchEntities(ids);
+
+        (entities, _) = await FilterTreeEntities(entities, entities.Length);
+
+        Dictionary<int, Guid> parentKeysById = GetParentKeysById(entities);
+        TItem[] treeItemViewModels = OrderByRequestedIds(entities, ids)
+            .SelectMany(entity => MapTreeItemViewModels(
+                parentKeysById.TryGetValue(entity.ParentId, out Guid parentKey) ? parentKey : null,
+                [entity]))
+            .ToArray();
+
+        await PopulateFlags(treeItemViewModels);
+
+        return Ok(new BatchResponseModel<TItem>
+        {
+            Total = treeItemViewModels.Length,
+            Items = treeItemViewModels,
+        });
+    }
+
+    /// <summary>
     /// Filters the specified collection of tree entities and returns the filtered results asynchronously.
     /// </summary>
     /// <param name="entities">An array of entities to be filtered.</param>
@@ -223,6 +255,14 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
                 ordering: ItemOrdering)
             .ToArray();
 
+    /// <summary>
+    /// Gets the entities identified by the provided keys.
+    /// </summary>
+    /// <param name="keys">The keys of the entities to retrieve.</param>
+    /// <returns>The entities that exist, in no particular order.</returns>
+    protected virtual IEntitySlim[] GetBatchEntities(Guid[] keys)
+        => EntityService.GetAll(ItemObjectType, keys).ToArray();
+
     protected virtual IEntitySlim[] GetSiblingEntities(
         Guid target,
         int before,
@@ -242,6 +282,19 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected virtual TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
         => entities.Select(entity => MapTreeItemViewModel(parentKey, entity)).ToArray();
+
+    private Dictionary<int, Guid> GetParentKeysById(IEntitySlim[] entities)
+    {
+        var parentIds = entities
+            .Select(entity => entity.ParentId)
+            .Where(parentId => parentId > 0)
+            .Distinct()
+            .ToArray();
+
+        return parentIds.Length == 0
+            ? []
+            : EntityService.GetAll(ItemObjectType, parentIds).ToDictionary(parent => parent.Id, parent => parent.Key);
+    }
 
     protected virtual async Task PopulateFlags(TItem[] treeItemViewModels)
     {

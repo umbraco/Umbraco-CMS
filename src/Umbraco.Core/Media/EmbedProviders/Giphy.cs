@@ -17,7 +17,7 @@ public class Giphy : OEmbedProviderBase
     }
 
     /// <inheritdoc/>
-    public override string ApiEndpoint => "https://giphy.com/services/oembed?url=";
+    public override string ApiEndpoint => "https://giphy.com/services/oembed";
 
     /// <inheritdoc/>
     public override string[] UrlSchemeRegex =>
