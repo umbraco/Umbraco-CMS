@@ -5,20 +5,11 @@ import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionsManifestCache } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbPropertyValueIndex, type ManifestPropertyValueResolver } from '@umbraco-cms/backoffice/property';
 import {
+	umbVariantObjectCompare,
 	umbVariantObjectSortCompare,
 	type UmbVariantDataModel,
 	type UmbVariantId,
 } from '@umbraco-cms/backoffice/variant';
-
-/**
- * @function defaultCompareVariantMethod
- * @param {UmbVariantDataModel} a - the first variant to compare.
- * @param {UmbVariantDataModel} b - the second variant to compare.
- * @returns {boolean} - true if the two models are equally unique.
- */
-function defaultCompareVariantMethod(a: UmbVariantDataModel, b: UmbVariantDataModel) {
-	return a.culture === b.culture && a.segment === b.segment;
-}
 
 export class UmbMergeContentVariantDataController extends UmbControllerBase {
 	#resolvers = new UmbExtensionsManifestCache<ManifestPropertyValueResolver>(
@@ -81,7 +72,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 				persistedData?.variants,
 				currentData.variants,
 				selectedVariants,
-				defaultCompareVariantMethod,
+				umbVariantObjectCompare,
 			).sort(umbVariantObjectSortCompare);
 		}
 
@@ -227,7 +218,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 						persistedVariants,
 						values,
 						variantsToStore,
-						api.compareVariants ?? defaultCompareVariantMethod,
+						api.compareVariants ?? umbVariantObjectCompare,
 					);
 				})) ?? newValue;
 		}
