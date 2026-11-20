@@ -34,10 +34,10 @@ export class UmbAppLogoElement extends UmbLitElement {
 	private _serverUrl?: string;
 
 	/**
-	 * The theme of the application.
+	 * The color scheme of the application theme.
 	 */
 	@state()
-	private _theme?: string;
+	private _colorScheme?: string;
 
 	constructor() {
 		super();
@@ -48,11 +48,11 @@ export class UmbAppLogoElement extends UmbLitElement {
 
 		this.consumeContext(UMB_THEME_CONTEXT, (context) => {
 			this.observe(
-				context?.theme,
-				(theme) => {
-					this._theme = theme;
+				context?.colorScheme,
+				(colorScheme) => {
+					this._colorScheme = colorScheme;
 				},
-				'_observeTheme',
+				'_observeColorScheme',
 			);
 		});
 	}
@@ -74,7 +74,9 @@ export class UmbAppLogoElement extends UmbLitElement {
 		 * This is a temporary solution until we have a better way to define the logo characteristics.
 		 * TODO: The characteristics of the logo are not defined in any theme meta data, so we have to hardcode the logo file names.
 		 */
-		let logoFile = (this.overrideTheme ?? this._theme) === 'umb-dark-theme' ? 'logo' : 'logo-alternative';
+		let logoFile = (this.overrideTheme ? this.overrideTheme === 'umb-dark-theme' : this._colorScheme === 'dark')
+			? 'logo'
+			: 'logo-alternative';
 
 		if (this.logoType === 'logo') {
 			logoFile = `login-${logoFile}`;
