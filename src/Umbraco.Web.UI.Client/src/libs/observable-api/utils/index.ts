@@ -14,4 +14,5 @@ export * from './push-at-to-unique-array.function.js';
 export * from './push-to-unique-array.function.js';
 export * from './replace-in-unique-array.function.js';
 export * from './simple-hash-code.function.js';
+export * from './stateful-observable.function.js';
 export * from './strict-equality-memoization.function.js';

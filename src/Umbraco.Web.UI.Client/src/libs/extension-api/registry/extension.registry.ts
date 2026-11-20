@@ -5,7 +5,7 @@ import type {
 	UmbConditionConfigBase,
 } from '../types/index.js';
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
-import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBasicState, umbMarkAsStatefulObservable } from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { map, distinctUntilChanged, combineLatest, of, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -419,18 +419,20 @@ export class UmbExtensionRegistry<
 	 * @returns {Observable<ManifestBase | undefined>} - An observable of the extension that matches the alias.
 	 */
 	byAlias<T extends ManifestBase = ManifestBase>(alias: string): Observable<T | undefined> {
-		return this.extensions.pipe(
-			map((exts) => exts.find((ext) => ext.alias === alias)),
-			distinctUntilChanged(extensionSingleMemoization),
-			switchMap((ext) => {
-				if (ext?.kind) {
-					return this.#kindsOfType(ext.type).pipe(map((kinds) => this.#mergeExtensionWithKinds([ext, kinds])));
-				}
-				return of(ext);
-			}),
+		return umbMarkAsStatefulObservable(
+			this.extensions.pipe(
+				map((exts) => exts.find((ext) => ext.alias === alias)),
+				distinctUntilChanged(extensionSingleMemoization),
+				switchMap((ext) => {
+					if (ext?.kind) {
+						return this.#kindsOfType(ext.type).pipe(map((kinds) => this.#mergeExtensionWithKinds([ext, kinds])));
+					}
+					return of(ext);
+				}),
 
-			distinctUntilChanged(extensionAndKindMatchSingleMemoization),
-		) as Observable<T | undefined>;
+				distinctUntilChanged(extensionAndKindMatchSingleMemoization),
+			) as Observable<T | undefined>,
+		);
 	}
 
 	/**
@@ -456,16 +458,18 @@ export class UmbExtensionRegistry<
 		type: Key,
 		alias: string,
 	): Observable<T | undefined> {
-		return combineLatest([
-			this.extensions.pipe(
-				map((exts) => exts.find((ext) => ext.type === type && ext.alias === alias)),
-				distinctUntilChanged(extensionSingleMemoization),
-			),
-			this.#kindsOfType(type),
-		]).pipe(
-			map(this.#mergeExtensionWithKinds),
-			distinctUntilChanged(extensionAndKindMatchSingleMemoization),
-		) as Observable<T | undefined>;
+		return umbMarkAsStatefulObservable(
+			combineLatest([
+				this.extensions.pipe(
+					map((exts) => exts.find((ext) => ext.type === type && ext.alias === alias)),
+					distinctUntilChanged(extensionSingleMemoization),
+				),
+				this.#kindsOfType(type),
+			]).pipe(
+				map(this.#mergeExtensionWithKinds),
+				distinctUntilChanged(extensionAndKindMatchSingleMemoization),
+			) as Observable<T | undefined>,
+		);
 	}
 
 	/**
@@ -478,16 +482,18 @@ export class UmbExtensionRegistry<
 		type: Key,
 		aliases: Array<string>,
 	): Observable<Array<T>> {
-		return combineLatest([
-			this.extensions.pipe(
-				map((exts) => exts.filter((ext) => ext.type === type && aliases.indexOf(ext.alias) !== -1) as unknown as T[]),
-				distinctUntilChanged(extensionArrayMemoization),
-			),
-			this.#kindsOfType(type),
-		]).pipe(
-			map(this.#mergeExtensionsWithKinds),
-			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
-		) as Observable<Array<T>>;
+		return umbMarkAsStatefulObservable(
+			combineLatest([
+				this.extensions.pipe(
+					map((exts) => exts.filter((ext) => ext.type === type && aliases.indexOf(ext.alias) !== -1) as unknown as T[]),
+					distinctUntilChanged(extensionArrayMemoization),
+				),
+				this.#kindsOfType(type),
+			]).pipe(
+				map(this.#mergeExtensionsWithKinds),
+				distinctUntilChanged(extensionAndKindMatchArrayMemoization),
+			) as Observable<Array<T>>,
+		);
 	}
 
 	/**
@@ -502,16 +508,18 @@ export class UmbExtensionRegistry<
 		type: Key,
 		filter: (ext: T) => boolean,
 	): Observable<Array<T>> {
-		return combineLatest([
-			this.extensions.pipe(
-				map((exts) => exts.filter((ext) => ext.type === type && filter(ext as unknown as T)) as unknown as T[]),
-				distinctUntilChanged(extensionArrayMemoization),
-			),
-			this.#kindsOfType(type),
-		]).pipe(
-			map(this.#mergeExtensionsWithKinds),
-			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
-		) as Observable<Array<T>>;
+		return umbMarkAsStatefulObservable(
+			combineLatest([
+				this.extensions.pipe(
+					map((exts) => exts.filter((ext) => ext.type === type && filter(ext as unknown as T)) as unknown as T[]),
+					distinctUntilChanged(extensionArrayMemoization),
+				),
+				this.#kindsOfType(type),
+			]).pipe(
+				map(this.#mergeExtensionsWithKinds),
+				distinctUntilChanged(extensionAndKindMatchArrayMemoization),
+			) as Observable<Array<T>>,
+		);
 	}
 
 	/**
@@ -550,21 +558,23 @@ export class UmbExtensionRegistry<
 		types: string[],
 		filter: (ext: ExtensionTypes) => boolean,
 	): Observable<Array<ExtensionTypes>> {
-		return combineLatest([
-			this.extensions.pipe(
-				map(
-					(exts) =>
-						exts.filter(
-							(ext) => types.indexOf(ext.type) !== -1 && filter(ext as unknown as ExtensionTypes),
-						) as unknown as Array<ExtensionTypes>,
+		return umbMarkAsStatefulObservable(
+			combineLatest([
+				this.extensions.pipe(
+					map(
+						(exts) =>
+							exts.filter(
+								(ext) => types.indexOf(ext.type) !== -1 && filter(ext as unknown as ExtensionTypes),
+							) as unknown as Array<ExtensionTypes>,
+					),
+					distinctUntilChanged(extensionArrayMemoization),
 				),
-				distinctUntilChanged(extensionArrayMemoization),
-			),
-			this.#kindsOfTypes(types),
-		]).pipe(
-			map(this.#mergeExtensionsWithKinds),
-			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
-		) as Observable<Array<ExtensionTypes>>;
+				this.#kindsOfTypes(types),
+			]).pipe(
+				map(this.#mergeExtensionsWithKinds),
+				distinctUntilChanged(extensionAndKindMatchArrayMemoization),
+			) as Observable<Array<ExtensionTypes>>,
+		);
 	}
 
 	/**
@@ -575,10 +585,12 @@ export class UmbExtensionRegistry<
 	byType<Key extends string, T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>>(
 		type: Key,
 	): Observable<Array<T>> {
-		return combineLatest([this.#extensionsOfType(type), this.#kindsOfType(type)]).pipe(
-			map(this.#mergeExtensionsWithKinds),
-			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
-		) as Observable<Array<T>>;
+		return umbMarkAsStatefulObservable(
+			combineLatest([this.#extensionsOfType(type), this.#kindsOfType(type)]).pipe(
+				map(this.#mergeExtensionsWithKinds),
+				distinctUntilChanged(extensionAndKindMatchArrayMemoization),
+			) as Observable<Array<T>>,
+		);
 	}
 
 	/**
@@ -605,10 +617,12 @@ export class UmbExtensionRegistry<
 	 * @returns {Observable<ManifestBase | undefined>} - An observable of the extensions that matches the types.
 	 */
 	byTypes<ExtensionTypes extends ManifestBase = ManifestBase>(types: string[]): Observable<Array<ExtensionTypes>> {
-		return combineLatest([this.#extensionsOfTypes<ExtensionTypes>(types), this.#kindsOfTypes(types)]).pipe(
-			map(this.#mergeExtensionsWithKinds),
-			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
-		) as Observable<Array<ExtensionTypes>>;
+		return umbMarkAsStatefulObservable(
+			combineLatest([this.#extensionsOfTypes<ExtensionTypes>(types), this.#kindsOfTypes(types)]).pipe(
+				map(this.#mergeExtensionsWithKinds),
+				distinctUntilChanged(extensionAndKindMatchArrayMemoization),
+			) as Observable<Array<ExtensionTypes>>,
+		);
 	}
 
 	/**
