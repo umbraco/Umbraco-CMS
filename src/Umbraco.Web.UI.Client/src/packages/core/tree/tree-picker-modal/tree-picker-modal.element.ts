@@ -372,7 +372,17 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	}
 
 	#renderBreadcrumb() {
-		return html`<umb-tree-item-picker-breadcrumb id="breadcrumb"></umb-tree-item-picker-breadcrumb>`;
+		return html`<umb-tree-item-picker-breadcrumb
+			id="breadcrumb"
+			?selectable=${this.#isLocationPickable()}
+			@selected=${this.#onTreeItemSelected}
+			@deselected=${this.#onTreeItemDeselected}></umb-tree-item-picker-breadcrumb>`;
+	}
+
+	#isLocationPickable() {
+		if (!this._currentLocation) return false;
+		if (this._currentLocation.unique === null && this.data?.hideTreeRoot) return false;
+		return this.data?.pickableFilter?.(this._currentLocation as unknown as TreeItemType) ?? true;
 	}
 
 	#renderSelectionCount() {
