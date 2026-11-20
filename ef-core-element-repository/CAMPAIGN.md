@@ -355,6 +355,8 @@ Steps 2 and 10 to 11 of §6 are the points in each PR where this must happen. A 
 - `IDatabaseCacheRepository` (HybridCache) to EF Core.
 - The sync `PublishableContentServiceBase.Audit(...)` has zero callers; it disappears with the file in PR 6 (the async engine only has `AuditAsync`).
 - Branch-publish notification-state TODO at `ContentService.cs` (search for `TODO` near `PublishBranchAsync`).
+- Culture-aware "published" ordering in the EF Core `PublishableContentRepositoryBase.ApplyOrdering`. The `"published"` case orders by `IPublishableContentDto.Published` only; NPoco's `ApplySystemOrdering` orders variant content by whether a `ContentVersionCultureVariation` row exists for the requested culture (invariant types fall back to the table flag). Main's #24530 (provider boolean literals in that CASE) has no EF Core counterpart because the branch never ported the culture branch. Found in the 20-11-2026 merge audit.
+- Narrow the sibling fetch in `PublishableContentRepositoryBase.GetUniqueNodeNameAndSiblingsAsync` to names sharing the base text, as NPoco's `ContentRepositoryBase.EnsureUniqueNodeName` does since #23447 (July 2026, `SimilarNodeName.GetBaseText` + `StartsWith`; EF Core escapes the pattern itself). Today every sibling under the parent is loaded on each document write, so flat document trees pay O(siblings). Media is still NPoco and keeps the optimisation. Found in the 20-11-2026 merge audit.
 
 ## 10. Working across machines (personal handover area)
 
