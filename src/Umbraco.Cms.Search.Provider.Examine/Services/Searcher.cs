@@ -30,6 +30,9 @@ namespace Umbraco.Cms.Search.Provider.Examine.Services;
 public class Searcher : IExamineSearcher
 {
     private readonly IActiveIndexManager _activeIndexManager;
+#pragma warning disable CS0618 // Type or member is obsolete
+    private readonly IStopWordDetector _stopWordDetector;
+#pragma warning restore CS0618 // Type or member is obsolete
     private static readonly ConcurrentDictionary<string, bool> InitializedIndexes = new();
 
     /// <summary>
@@ -38,9 +41,13 @@ public class Searcher : IExamineSearcher
     /// <param name="examineManager">The manager used to resolve the physical index to query.</param>
     /// <param name="searcherOptions">The options configuring search-time behavior such as facet limits and text boost factors.</param>
     /// <param name="activeIndexManager">The manager used to resolve the currently active physical index for an index alias.</param>
-    public Searcher(IExamineManager examineManager, IOptions<SearcherOptions> searcherOptions, IActiveIndexManager activeIndexManager)
+    /// <param name="stopWordDetector">The detector used to find the query terms that the index analyzer leaves out of the index.</param>
+#pragma warning disable CS0618 // Type or member is obsolete
+    public Searcher(IExamineManager examineManager, IOptions<SearcherOptions> searcherOptions, IActiveIndexManager activeIndexManager, IStopWordDetector stopWordDetector)
+#pragma warning restore CS0618 // Type or member is obsolete
     {
         _activeIndexManager = activeIndexManager;
+        _stopWordDetector = stopWordDetector;
         ExamineManager = examineManager;
         SearcherOptions = searcherOptions.Value;
     }
@@ -140,9 +147,15 @@ public class Searcher : IExamineSearcher
                     .Select(term => term.TrimStart('*', '?'))
                     .Where(term => term.Length > 0)
                     .ToArray();
+
+                // the analyzer leaves stop words out of the index, so requiring them would exclude every document.
+                // they are optional whenever the query has other terms to match on, and still add to the relevance
+                // where an analyzer does index them.
+                var hasSignificantTerms = terms.Any(term => _stopWordDetector.IsStopWord(term) is false);
                 foreach (var term in terms)
                 {
-                    searchQuery.And().Group(nestedQuery => CreateAggregatedTextQuery(nestedQuery, term, segment));
+                    IQuery termQuery = hasSignificantTerms && _stopWordDetector.IsStopWord(term) ? searchQuery.Or() : searchQuery.And();
+                    termQuery.Group(nestedQuery => CreateAggregatedTextQuery(nestedQuery, term, segment));
                 }
             }
 
