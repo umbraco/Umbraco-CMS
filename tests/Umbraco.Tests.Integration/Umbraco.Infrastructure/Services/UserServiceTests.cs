@@ -35,6 +35,8 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 
     private IContentService ContentService => GetRequiredService<IContentService>();
 
+    private IUserDataService UserDataService => GetRequiredService<IUserDataService>();
+
     [Test]
     public async Task Get_User_Permissions_For_Unassigned_Permission_Nodes()
     {
@@ -502,6 +504,27 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 
         // Assert
         Assert.That(deleted, Is.Null);
+    }
+
+    [Test]
+    public async Task Can_Delete_User_With_User_Data()
+    {
+        var user = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
+        var userData = new UserData
+        {
+            Key = Guid.NewGuid(),
+            UserKey = user.Key,
+            Group = "test",
+            Identifier = "test",
+            Value = "{}",
+        };
+        var createResult = await UserDataService.CreateAsync(userData);
+        Assert.That(createResult.Success, Is.True);
+
+        UserService.Delete(user, true);
+
+        Assert.That(UserService.GetUserById(user.Id), Is.Null);
+        Assert.That(await UserDataService.GetAsync(userData.Key), Is.Null);
     }
 
     [Test]
