@@ -2496,7 +2496,7 @@ export default {
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
 		entriesExceed: 'Maximum %0% entries, you have entered <strong>%1%</strong> too many.',
 		itemMissingValueMessage: 'Item %0% is missing a value',
-		valueMustBeUnique: 'The value "%0%" must be unique',
+		valueMustBeUnique: 'Values must be unique: "%0%" is used more than once',
 		entriesAreasMismatch: 'The content amount requirements are not met for one or more areas.',
 		minimumOnlyWhenInUse:
 			'The minimum applies once items have been added. To require a value, mark the property as mandatory.',

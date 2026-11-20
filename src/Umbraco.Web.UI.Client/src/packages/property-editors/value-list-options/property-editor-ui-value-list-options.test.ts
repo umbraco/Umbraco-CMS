@@ -117,18 +117,18 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 		expect(hasUniquenessError()).to.be.false;
 	});
 
-	it('raises the duplicate error only once an option is left', async () => {
+	it('shows the uniqueness message in the list once an option is left', async () => {
 		await setValue([{ value: 'a' }, { value: 'b' }]);
-		let invalid = false;
-		getInput().addEventListener('invalid', () => (invalid = true));
+		const message = getInput().shadowRoot!.querySelector('umb-form-validation-message')!;
 
 		await type(getRows()[1], 'value', 'a');
-		await getInput().updateComplete;
-		expect(invalid).to.be.false;
+		await message.updateComplete;
+		expect(message.shadowRoot!.textContent).to.not.contain('MustBeUnique');
 
 		await leave(getRows()[1]);
 		await getInput().updateComplete;
-		expect(invalid).to.be.true;
+		await message.updateComplete;
+		expect(message.shadowRoot!.textContent).to.contain('MustBeUnique');
 	});
 
 	it('dispatches one change for each edit and one for each removal', async () => {

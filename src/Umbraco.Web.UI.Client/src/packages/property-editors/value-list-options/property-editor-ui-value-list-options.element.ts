@@ -35,10 +35,6 @@ export class UmbPropertyEditorUIValueListOptionsElement
 	@property({ type: Boolean, reflect: true })
 	required = false;
 
-	protected override firstUpdated() {
-		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-value-list-options')!);
-	}
-
 	#onChange(event: UmbChangeEvent) {
 		event.stopPropagation();
 		const target = event.currentTarget as UmbInputValueListOptionsElement;

@@ -146,7 +146,8 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 
 	override render() {
 		return html`<div id="sorter-wrapper">${this.#renderEntries()}</div>
-			${this.#renderAddButton()}`;
+			${this.#renderAddButton()}
+			<umb-form-validation-message .for=${this}></umb-form-validation-message>`;
 	}
 
 	#renderEntries() {
