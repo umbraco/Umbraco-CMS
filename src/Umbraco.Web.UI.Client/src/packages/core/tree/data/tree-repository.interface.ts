@@ -86,14 +86,14 @@ export interface UmbTreeRepository<
 	requestTreeItems?: (args: UmbTreeItemsRequestArgs) => Promise<UmbRepositoryResponse<TreeItemType[]>>;
 
 	/**
-	 * Requests the ancestors of each of the given items as entity references, ordered from the root down. Use this to
-	 * look up the structure above several items at once; resolve the data to display for each ancestor separately.
+	 * Requests the ancestors of each of the given items, ordered from the root down. The bulk counterpart of
+	 * `requestTreeItemAncestors`.
 	 * @param {UmbAncestorsOfTreeItemsRequestArgs} args
 	 * @memberof UmbTreeRepository
 	 */
 	requestAncestorsOfItems?: (
 		args: UmbAncestorsOfTreeItemsRequestArgs,
-	) => Promise<UmbRepositoryResponse<Array<UmbAncestorsOfTreeItemModel>>>;
+	) => Promise<UmbRepositoryResponse<Array<UmbAncestorsOfTreeItemModel<TreeItemType>>>>;
 
 	/**
 	 * Returns an observable of the root items of the tree.

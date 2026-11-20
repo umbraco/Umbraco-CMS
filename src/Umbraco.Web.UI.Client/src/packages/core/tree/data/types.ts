@@ -62,13 +62,14 @@ export interface UmbAncestorsOfTreeItemsRequestArgs {
 /**
  * The ancestors of a tree item, ordered from the root down. The item itself is not included.
  * @interface UmbAncestorsOfTreeItemModel
+ * @template TreeItemType
  */
-export interface UmbAncestorsOfTreeItemModel {
+export interface UmbAncestorsOfTreeItemModel<TreeItemType extends UmbTreeItemModel = UmbTreeItemModel> {
 	treeItem: {
 		unique: string;
 		entityType: string;
 	};
-	ancestors: Array<UmbEntityModel>;
+	ancestors: Array<TreeItemType>;
 }
 
 /**
