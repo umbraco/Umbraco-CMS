@@ -3,65 +3,69 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.Migrations;
 
 /// <summary>
-///     Represents a migration plan.
+/// Represents a migration plan.
 /// </summary>
 public class MigrationPlan
 {
     private readonly Dictionary<string, Transition?> _transitions = new(StringComparer.InvariantCultureIgnoreCase);
     private string? _finalState;
-
     private string? _prevState;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="MigrationPlan" /> class.
+    /// Initializes a new instance of the <see cref="MigrationPlan" /> class.
     /// </summary>
     /// <param name="name">The name of the plan.</param>
     public MigrationPlan(string name)
     {
-        if (name == null)
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
-
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentException(
-                "Value can't be empty or consist only of white-space characters.",
-                nameof(name));
-        }
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
         Name = name;
     }
 
     /// <summary>
-    ///     If set to true the plan executor will ignore any current state persisted and
-    ///     run the plan from its initial state to its end state.
+    /// If set to true the plan executor will ignore any current state persisted and
+    /// run the plan from its initial state to its end state.
     /// </summary>
+    /// <value>
+    ///   <c>true</c> if the current state should be ignored; otherwise, <c>false</c>.
+    /// </value>
     public virtual bool IgnoreCurrentState { get; } = false;
 
     /// <summary>
-    ///     Gets the transitions.
+    /// Gets the transitions.
     /// </summary>
+    /// <value>
+    /// The transitions.
+    /// </value>
     public IReadOnlyDictionary<string, Transition?> Transitions => _transitions;
 
     /// <summary>
-    ///     Gets the name of the plan.
+    /// Gets the name of the plan.
     /// </summary>
+    /// <value>
+    /// The name.
+    /// </value>
     public string Name { get; }
 
     /// <summary>
-    ///     Gets the initial state.
+    /// Gets the initial state.
     /// </summary>
+    /// <value>
+    /// The initial state.
+    /// </value>
     /// <remarks>
-    ///     The initial state is the state when the plan has never
-    ///     run. By default, it is the empty string, but plans may override
-    ///     it if they have other ways of determining where to start from.
+    /// The initial state is the state when the plan has never
+    /// run. By default, it is the empty string, but plans may override
+    /// it if they have other ways of determining where to start from.
     /// </remarks>
     public virtual string InitialState => string.Empty;
 
     /// <summary>
-    ///     Gets the final state.
+    /// Gets the final state.
     /// </summary>
+    /// <value>
+    /// The final state.
+    /// </value>
     public string FinalState
     {
         get
@@ -78,44 +82,39 @@ public class MigrationPlan
     }
 
     /// <summary>
-    ///     Adds a transition to the specified target state using an empty (no-operation) migration.
+    /// Adds a transition to the specified target state using an empty (no-operation) migration.
     /// </summary>
     /// <param name="targetState">The target state to transition to.</param>
-    /// <returns>The updated <see cref="MigrationPlan"/> instance.</returns>
+    /// <returns>
+    /// The current <see cref="MigrationPlan" /> instance, allowing for method chaining.
+    /// </returns>
     public MigrationPlan To(string targetState)
         => To<NoopMigration>(targetState);
 
-    // adds a transition
+    /// <summary>
+    /// Adds the specified source state.
+    /// </summary>
+    /// <param name="sourceState">State of the source.</param>
+    /// <param name="targetState">State of the target.</param>
+    /// <param name="migration">The migration.</param>
+    /// <returns>
+    /// The current <see cref="MigrationPlan" /> instance, allowing for method chaining.
+    /// </returns>
     private MigrationPlan Add(string? sourceState, string targetState, Type? migration)
     {
         if (sourceState == null)
         {
-            throw new ArgumentNullException(
-                nameof(sourceState),
-                $"{nameof(sourceState)} is null, {nameof(MigrationPlan)}.{nameof(From)} must not have been called.");
+            throw new ArgumentNullException(nameof(sourceState), $"{nameof(sourceState)} is null, {nameof(MigrationPlan)}.{nameof(From)} must not have been called.");
         }
 
-        if (targetState == null)
-        {
-            throw new ArgumentNullException(nameof(targetState));
-        }
-
-        if (string.IsNullOrWhiteSpace(targetState))
-        {
-            throw new ArgumentException(
-                "Value can't be empty or consist only of white-space characters.",
-                nameof(targetState));
-        }
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetState);
 
         if (sourceState == targetState)
         {
             throw new ArgumentException("Source and target state cannot be identical.");
         }
 
-        if (migration == null)
-        {
-            throw new ArgumentNullException(nameof(migration));
-        }
+        ArgumentNullException.ThrowIfNull(migration);
 
         if (!migration.Implements<AsyncMigrationBase>())
         {
@@ -154,36 +153,44 @@ public class MigrationPlan
     /// Adds a transition to the specified target state through an empty migration.
     /// </summary>
     /// <param name="targetState">The target state to transition to.</param>
-    /// <returns>The updated <see cref="MigrationPlan"/> instance.</returns>
+    /// <returns>
+    /// The current <see cref="MigrationPlan" /> instance, allowing for method chaining.
+    /// </returns>
     public MigrationPlan To(Guid targetState)
         => To<NoopMigration>(targetState.ToString());
 
     /// <summary>
     /// Adds a transition from the current state to the specified target state using the specified migration type.
     /// </summary>
-    /// <typeparam name="TMigration">The type of <see cref="AsyncMigrationBase"/> to execute for the transition.</typeparam>
+    /// <typeparam name="TMigration">The type of <see cref="AsyncMigrationBase" /> to execute for the transition.</typeparam>
     /// <param name="targetState">The name of the target state to transition to.</param>
-    /// <returns>The current <see cref="MigrationPlan"/> instance, allowing for method chaining.</returns>
+    /// <returns>
+    /// The current <see cref="MigrationPlan" /> instance, allowing for method chaining.
+    /// </returns>
     public MigrationPlan To<TMigration>(string targetState)
         where TMigration : AsyncMigrationBase
         => To(targetState, typeof(TMigration));
 
     /// <summary>
-    /// Adds a transition to the specified target state using the given migration type <typeparamref name="TMigration"/>.
+    /// Adds a transition to the specified target state using the given migration type <typeparamref name="TMigration" />.
     /// </summary>
     /// <typeparam name="TMigration">The type of migration to apply for this transition.</typeparam>
     /// <param name="targetState">The unique identifier of the target state.</param>
-    /// <returns>The updated <see cref="MigrationPlan"/> instance.</returns>
+    /// <returns>
+    /// The current <see cref="MigrationPlan" /> instance, allowing for method chaining.
+    /// </returns>
     public MigrationPlan To<TMigration>(Guid targetState)
         where TMigration : AsyncMigrationBase
         => To(targetState, typeof(TMigration));
 
     /// <summary>
-    ///     Adds a transition to a target state through a migration.
+    /// Adds a transition to a target state through a migration.
     /// </summary>
     /// <param name="targetState">The target state to transition to.</param>
-    /// <param name="migration">The type of migration to apply during the transition. This should be a <see cref="Type"/> derived from <c>MigrationBase</c>, or <c>null</c> for no migration.</param>
-    /// <returns>The updated <see cref="MigrationPlan"/> instance.</returns>
+    /// <param name="migration">The type of migration to apply during the transition. This should be a <see cref="Type" /> derived from <c>MigrationBase</c>, or <c>null</c> for no migration.</param>
+    /// <returns>
+    /// The current <see cref="MigrationPlan" /> instance, allowing for method chaining.
+    /// </returns>
     public MigrationPlan To(string targetState, Type? migration)
         => Add(_prevState, targetState, migration);
 
@@ -192,100 +199,79 @@ public class MigrationPlan
     /// </summary>
     /// <param name="targetState">The target state to transition to.</param>
     /// <param name="migration">The type of migration to apply for the transition.</param>
-    /// <returns>The updated <see cref="MigrationPlan"/> instance.</returns>
+    /// <returns>
+    /// The current <see cref="MigrationPlan" /> instance, allowing for method chaining.
+    /// </returns>
     public MigrationPlan To(Guid targetState, Type migration)
         => Add(_prevState, targetState.ToString(), migration);
 
     /// <summary>
-    ///     Specifies the starting state for the migration plan, which determines where migrations begin execution.
+    /// Specifies the starting state for the migration plan, which determines where migrations begin execution.
     /// </summary>
     /// <param name="sourceState">The starting state to set for the migration plan.</param>
-    /// <returns>The current <see cref="MigrationPlan"/> instance, allowing for method chaining.</returns>
+    /// <returns>
+    /// The current <see cref="MigrationPlan" /> instance, allowing for method chaining.
+    /// </returns>
     public MigrationPlan From(string? sourceState)
     {
         _prevState = sourceState ?? throw new ArgumentNullException(nameof(sourceState));
+
         return this;
     }
 
     /// <summary>
-    ///     Adds a transition to a new target state through a migration, replacing a previous migration with a recovery migration for the old state.
+    /// Adds a transition to a new target state through a migration, replacing a previous migration with a recovery migration for the old state.
     /// </summary>
     /// <typeparam name="TMigrationNew">The migration to apply for the new target state.</typeparam>
     /// <typeparam name="TMigrationRecover">The migration to use to recover from the previous target state.</typeparam>
-    /// <param name="recoverState">
-    ///     The previous target state that should be recovered from using
-    ///     <typeparamref name="TMigrationRecover" /> before transitioning to the new target state.
-    /// </param>
+    /// <param name="recoverState">The previous target state that should be recovered from using
+    /// <typeparamref name="TMigrationRecover" /> before transitioning to the new target state.</param>
     /// <param name="targetState">The new target state to transition to.</param>
-    /// <returns>The current <see cref="MigrationPlan" /> instance, allowing for method chaining.</returns>
+    /// <returns>
+    /// The current <see cref="MigrationPlan" /> instance, allowing for method chaining.
+    /// </returns>
     public MigrationPlan ToWithReplace<TMigrationNew, TMigrationRecover>(string recoverState, string targetState)
         where TMigrationNew : AsyncMigrationBase
         where TMigrationRecover : AsyncMigrationBase
     {
         To<TMigrationNew>(targetState);
         From(recoverState).To<TMigrationRecover>(targetState);
+
         return this;
     }
 
     /// <summary>
-    ///     Adds a transition to a new target state using the specified migration, replacing a previous migration for the given state.
+    /// Adds a transition to a new target state using the specified migration, replacing a previous migration for the given state.
     /// </summary>
     /// <typeparam name="TMigrationNew">The migration to apply to reach the new target state.</typeparam>
     /// <param name="recoverState">The previous target state that can be recovered from directly.</param>
     /// <param name="targetState">The new target state to transition to.</param>
-    /// <returns>The <see cref="MigrationPlan"/> instance with the updated transition.</returns>
+    /// <returns>
+    /// The <see cref="MigrationPlan" /> instance with the updated transition.
+    /// </returns>
     public MigrationPlan ToWithReplace<TMigrationNew>(string recoverState, string targetState)
         where TMigrationNew : AsyncMigrationBase
     {
         To<TMigrationNew>(targetState);
         From(recoverState).To(targetState);
+
         return this;
     }
 
     /// <summary>
-    ///     Adds transitions to a <paramref name="targetState"/> by cloning the transition chain from <paramref name="startState"/> up to (but not including) <paramref name="endState"/>.
+    /// Adds transitions to a <paramref name="targetState" /> by cloning the transition chain from <paramref name="startState" /> up to (but not including) <paramref name="endState" />.
     /// </summary>
     /// <param name="startState">The initial state from which the transition chain will be cloned.</param>
     /// <param name="endState">The state at which to stop cloning transitions (exclusive).</param>
-    /// <param name="targetState">The state to which the final cloned transition will point instead of <paramref name="endState"/>.</param>
-    /// <returns>The current <see cref="MigrationPlan"/> instance with the added transitions.</returns>
+    /// <param name="targetState">The state to which the final cloned transition will point instead of <paramref name="endState" />.</param>
+    /// <returns>
+    /// The current <see cref="MigrationPlan" /> instance with the added transitions.
+    /// </returns>
     public MigrationPlan ToWithClone(string startState, string endState, string targetState)
     {
-        if (startState == null)
-        {
-            throw new ArgumentNullException(nameof(startState));
-        }
-
-        if (string.IsNullOrWhiteSpace(startState))
-        {
-            throw new ArgumentException(
-                "Value can't be empty or consist only of white-space characters.",
-                nameof(startState));
-        }
-
-        if (endState == null)
-        {
-            throw new ArgumentNullException(nameof(endState));
-        }
-
-        if (string.IsNullOrWhiteSpace(endState))
-        {
-            throw new ArgumentException(
-                "Value can't be empty or consist only of white-space characters.",
-                nameof(endState));
-        }
-
-        if (targetState == null)
-        {
-            throw new ArgumentNullException(nameof(targetState));
-        }
-
-        if (string.IsNullOrWhiteSpace(targetState))
-        {
-            throw new ArgumentException(
-                "Value can't be empty or consist only of white-space characters.",
-                nameof(targetState));
-        }
+        ArgumentException.ThrowIfNullOrWhiteSpace(startState);
+        ArgumentException.ThrowIfNullOrWhiteSpace(endState);
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetState);
 
         if (startState == endState)
         {
@@ -324,20 +310,24 @@ public class MigrationPlan
     }
 
     /// <summary>
-    ///     Creates a random, unique state as a string in GUID format.
+    /// Creates a random, unique state as a string in GUID format.
     /// </summary>
-    /// <returns>A string containing a randomly generated, unique GUID in braces and uppercase.</returns>
+    /// <returns>
+    /// A string containing a randomly generated, unique GUID in braces and uppercase.
+    /// </returns>
     public virtual string CreateRandomState()
         => Guid.NewGuid().ToString("B").ToUpper();
 
     /// <summary>
-    ///     Initiates the process of merging multiple migration branches into a single branch within the migration plan.
+    /// Initiates the process of merging multiple migration branches into a single branch within the migration plan.
     /// </summary>
-    /// <returns>A <see cref="MergeBuilder" /> instance used to configure and define the merge operation.</returns>
+    /// <returns>
+    /// A <see cref="MergeBuilder" /> instance used to configure and define the merge operation.
+    /// </returns>
     public MergeBuilder Merge() => new(this);
 
     /// <summary>
-    ///     Validates the plan.
+    /// Validates the plan.
     /// </summary>
     public void Validate()
     {
@@ -396,16 +386,32 @@ public class MigrationPlan
     }
 
     /// <summary>
-    ///     Throws an exception when the specified initial state is unknown to the migration plan.
+    /// Determines whether the specified state is a state of this plan.
+    /// </summary>
+    /// <param name="state">The state to check.</param>
+    /// <returns>
+    ///   <c>true</c> if the plan contains the state; otherwise <c>false</c>.
+    /// </returns>
+    public bool IsKnownState(string state) => _transitions.ContainsKey(state);
+
+    /// <summary>
+    /// Throws an exception when the specified initial state is unknown to the migration plan.
     /// </summary>
     /// <param name="state">The initial state value that is not recognized by the migration plan.</param>
     public virtual void ThrowOnUnknownInitialState(string state) =>
         throw new InvalidOperationException($"The migration plan \"{Name}\" does not support migrating from state \"{state}\".");
 
     /// <summary>
-    ///     Follows a path (for tests and debugging).
+    /// Follows a path (for tests and debugging).
     /// </summary>
-    /// <remarks>Does the same thing Execute does, but does not actually execute migrations.</remarks>
+    /// <param name="fromState">From state.</param>
+    /// <param name="toState">To state.</param>
+    /// <returns>
+    /// A read-only list of state names representing the path followed.
+    /// </returns>
+    /// <remarks>
+    /// Does the same thing Execute does, but does not actually execute migrations.
+    /// </remarks>
     internal IReadOnlyList<string> FollowPath(string? fromState = null, string? toState = null)
     {
         toState = toState?.NullOrWhiteSpaceAsNull();
@@ -449,12 +455,12 @@ public class MigrationPlan
     }
 
     /// <summary>
-    ///     Represents a plan transition.
+    /// Represents a plan transition.
     /// </summary>
     public class Transition
     {
         /// <summary>
-        ///     Initializes a new instance of the <see cref="Transition" /> class.
+        /// Initializes a new instance of the <see cref="Transition" /> class.
         /// </summary>
         /// <param name="sourceState">The source state of the transition.</param>
         /// <param name="targetState">The target state of the transition.</param>
@@ -467,24 +473,33 @@ public class MigrationPlan
         }
 
         /// <summary>
-        ///     Gets the source state.
+        /// Gets the source state.
         /// </summary>
+        /// <value>
+        /// The state of the source.
+        /// </value>
         public string SourceState { get; }
 
         /// <summary>
-        ///     Gets the target state.
+        /// Gets the target state.
         /// </summary>
+        /// <value>
+        /// The state of the target.
+        /// </value>
         public string TargetState { get; }
 
         /// <summary>
-        ///     Gets the migration type.
+        /// Gets the migration type.
         /// </summary>
+        /// <value>
+        /// The type of the migration.
+        /// </value>
         public Type MigrationType { get; }
 
         /// <inheritdoc />
-        public override string ToString() =>
-            MigrationType == typeof(NoopMigration)
-                ? $"{(SourceState == string.Empty ? "<empty>" : SourceState)} --> {TargetState}"
-                : $"{SourceState} -- ({MigrationType.FullName}) --> {TargetState}";
+        public override string ToString()
+            => MigrationType == typeof(NoopMigration)
+            ? $"{(SourceState == string.Empty ? "<empty>" : SourceState)} --> {TargetState}"
+            : $"{SourceState} -- ({MigrationType.FullName}) --> {TargetState}";
     }
 }

@@ -2,18 +2,18 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Migrations;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core;
 
@@ -21,6 +21,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class RuntimeStateTests : UmbracoIntegrationTest
 {
+    private const string UnknownState = "{00000000-0000-0000-0000-000000000001}";
+
     private IRuntimeState RuntimeState => Services.GetRequiredService<IRuntimeState>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
@@ -65,6 +67,80 @@ internal sealed class RuntimeStateTests : UmbracoIntegrationTest
         Assert.AreEqual(RuntimeLevel.Run, RuntimeState.Level);
         Assert.AreEqual(RuntimeLevelReason.Run, RuntimeState.Reason);
     }
+
+    [TestCase(null)]
+    [TestCase(UnknownState)]
+    public void GivenPackageMigrationsExist_WhenMigrationBehaviorIsNone_ThenLevelIsRunAndNothingIsPending(string? packageState)
+    {
+        SetPackageState(packageState);
+        SetMigrationBehavior(MigrationBehavior.None);
+
+        RuntimeState.DetermineRuntimeLevel();
+
+        Assert.AreEqual(RuntimeLevel.Run, RuntimeState.Level);
+        Assert.AreEqual(RuntimeLevelReason.Run, RuntimeState.Reason);
+        Assert.IsEmpty(GetPendingPackageMigrations());
+    }
+
+    [Test]
+    public void GivenPackageAtUnknownState_WhenMigrationBehaviorIsUpgrade_ThenLevelIsUpgrading()
+    {
+        SetPackageState(UnknownState);
+
+        RuntimeState.DetermineRuntimeLevel();
+
+        Assert.AreEqual(RuntimeLevel.Upgrading, RuntimeState.Level);
+        Assert.AreEqual(RuntimeLevelReason.UpgradePackageMigrations, RuntimeState.Reason);
+        CollectionAssert.AreEqual(new[] { TestMigrationPlan.TestMigrationPlanName }, GetPendingPackageMigrations());
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public void GivenCorePlanNotAtFinalState_WhenMigrationBehaviorIsNone_ThenLevelIsRun(bool coreStateIsKnown)
+    {
+        SetPackageState(TestMigrationPlan.TestMigrationFinalState.ToString());
+        SetCoreState(coreStateIsKnown);
+        SetMigrationBehavior(MigrationBehavior.None);
+
+        RuntimeState.DetermineRuntimeLevel();
+
+        Assert.AreEqual(RuntimeLevel.Run, RuntimeState.Level);
+        Assert.AreEqual(RuntimeLevelReason.Run, RuntimeState.Reason);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public void GivenCorePlanNotAtFinalState_WhenMigrationBehaviorIsUpgrade_ThenUpgradeIsRequired(bool coreStateIsKnown)
+    {
+        SetPackageState(TestMigrationPlan.TestMigrationFinalState.ToString());
+        SetCoreState(coreStateIsKnown);
+
+        RuntimeState.DetermineRuntimeLevel();
+
+        Assert.AreEqual(RuntimeLevelReason.UpgradeMigrations, RuntimeState.Reason);
+    }
+
+    private void SetMigrationBehavior(MigrationBehavior migrationBehavior)
+        => Services.GetRequiredService<IOptions<RuntimeSettings>>().Value.MigrationBehavior = migrationBehavior;
+
+    private void SetPackageState(string? state)
+    {
+        if (state is not null)
+        {
+            Services.GetRequiredService<IKeyValueService>().SetValue(
+                Constants.Conventions.Migrations.KeyValuePrefix + TestMigrationPlan.TestMigrationPlanName,
+                state);
+        }
+    }
+
+    // The initial state is the lowest the Umbraco plan can upgrade from: known, but behind the final state.
+    private void SetCoreState(bool known)
+        => Services.GetRequiredService<IKeyValueService>().SetValue(
+            Constants.Conventions.Migrations.UmbracoUpgradePlanKey,
+            known ? new UmbracoPlan(Services.GetRequiredService<IUmbracoVersion>()).InitialState : UnknownState);
+
+    private IReadOnlyList<string> GetPendingPackageMigrations()
+        => (IReadOnlyList<string>)RuntimeState.StartupState[global::Umbraco.Cms.Infrastructure.Runtime.RuntimeState.PendingPackageMigrationsStateKey];
 
     private class TestMigrationPlan : PackageMigrationPlan
     {
