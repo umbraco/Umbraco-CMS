@@ -138,6 +138,59 @@ describe('UmbPropertyEditorUiInteractionMemoryManager', () => {
 				await updatePropagated;
 			});
 
+			it('shares memories between differently configured property editors with the same explicit memory key', async () => {
+				const secondManager = new UmbPropertyEditorUiInteractionMemoryManager(hostElement, {
+					memoryUniquePrefix: 'TestPrefix',
+				});
+				const firstConfig = new UmbPropertyEditorConfigCollection([
+					{
+						alias: 'firstAlias',
+						value: 'firstValue',
+					},
+				]);
+				const secondConfig = new UmbPropertyEditorConfigCollection([
+					{
+						alias: 'differentAlias',
+						value: 'differentValue',
+					},
+				]);
+				manager.setPropertyEditorConfig(firstConfig, 'shared');
+				secondManager.setPropertyEditorConfig(secondConfig, 'shared');
+
+				const receivedMemories = new Promise((resolve) => {
+					secondManager.memoriesForPropertyEditor.subscribe((memories) => {
+						if (memories.length > 0) resolve(memories);
+					});
+				});
+
+				await manager.saveMemoriesForPropertyEditor(childMemories);
+
+				expect(await receivedMemories).to.deep.equal(childMemories);
+			});
+
+			it('keeps memories isolated when property editors have different explicit memory keys', async () => {
+				const secondManager = new UmbPropertyEditorUiInteractionMemoryManager(hostElement, {
+					memoryUniquePrefix: 'TestPrefix',
+				});
+				const config = new UmbPropertyEditorConfigCollection([
+					{
+						alias: 'differentAlias',
+						value: 'differentValue',
+					},
+				]);
+				manager.setPropertyEditorConfig(config, 'start-node-a');
+				secondManager.setPropertyEditorConfig(config, 'start-node-b');
+				const observedMemories: Array<Array<(typeof childMemories)[number]>> = [];
+				secondManager.memoriesForPropertyEditor.subscribe((memories) => observedMemories.push(memories));
+
+				await manager.saveMemoriesForPropertyEditor(childMemories);
+
+				expect(observedMemories.some((memories) => memories.length > 0)).to.be.false;
+				expect(interactionMemoryContext.memory.getAllMemories().map((memory) => memory.unique)).to.eql([
+					'TestPrefixPropertyEditorUi-start-node-a',
+				]);
+			});
+
 			it('clears its memories when the context deletes the entry', async () => {
 				await manager.saveMemoriesForPropertyEditor(childMemories);
 
