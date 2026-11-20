@@ -61,6 +61,11 @@ export class UmbDocumentPublishingServerDataSource {
 		// round-trip on top of the reload.
 		const { data, error } = await tryExecute(this.#host, DocumentService.postDocumentCreateAndPublish({ body }));
 
+		if (!error && parentUnique) {
+			// The parent's cached item may not yet report that it has children.
+			documentItemCache.delete(parentUnique);
+		}
+
 		// The generated response type is `unknown` (Swagger has no schema for the empty 201 body), but the
 		// Umb-Generated-Resource interceptor rewrites it to the created document's key at runtime.
 		return { data: data as string | undefined, error };

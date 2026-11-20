@@ -31,6 +31,8 @@ export class UmbMoveMediaServerDataSource implements UmbMoveDataSource {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 
+		const previousParentUnique = mediaItemCache.get(args.unique)?.parent?.id;
+
 		const { error } = await tryExecute(
 			this.#host,
 			MediaService.putMediaByIdMove({
@@ -42,8 +44,15 @@ export class UmbMoveMediaServerDataSource implements UmbMoveDataSource {
 		);
 
 		if (!error) {
-			// The server event that invalidates the cached item can arrive after the response.
+			// The server event that invalidates the cached item can arrive after the response. Both parents'
+			// children have changed, though the previous parent is only known when the item was cached.
 			mediaItemCache.delete(args.unique);
+			if (previousParentUnique) {
+				mediaItemCache.delete(previousParentUnique);
+			}
+			if (args.destination.unique) {
+				mediaItemCache.delete(args.destination.unique);
+			}
 		}
 
 		return { error };

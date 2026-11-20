@@ -17,15 +17,20 @@ export class UmbMediaRecycleBinServerDataSource implements UmbRecycleBinDataSour
 	}
 
 	// The server event that invalidates a cached item can arrive after the response, so each successful
-	// change removes the affected items from the item cache itself.
+	// change removes the affected items, including parents whose children have changed, from the item cache itself.
 
 	async trash(args: UmbRecycleBinTrashRequestArgs) {
+		const previousParentUnique = mediaItemCache.get(args.unique)?.parent?.id;
 		const result = await tryExecute(
 			this.#host,
 			MediaService.putMediaByIdMoveToRecycleBin({ path: { id: args.unique } }),
 		);
 		if (!result.error) {
 			mediaItemCache.delete(args.unique);
+			// The previous parent is only known when the item was cached.
+			if (previousParentUnique) {
+				mediaItemCache.delete(previousParentUnique);
+			}
 		}
 		return result;
 	}
@@ -42,6 +47,9 @@ export class UmbMediaRecycleBinServerDataSource implements UmbRecycleBinDataSour
 		);
 		if (!result.error) {
 			mediaItemCache.delete(args.unique);
+			if (args.destination.unique) {
+				mediaItemCache.delete(args.destination.unique);
+			}
 		}
 		return result;
 	}

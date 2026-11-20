@@ -142,6 +142,10 @@ export class UmbDocumentServerDataSource
 		);
 
 		if (data) {
+			if (parentUnique) {
+				// The parent's cached item may not yet report that it has children.
+				documentItemCache.delete(parentUnique);
+			}
 			return this.read(data as any);
 		}
 

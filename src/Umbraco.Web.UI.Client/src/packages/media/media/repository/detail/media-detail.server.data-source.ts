@@ -146,6 +146,10 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 		);
 
 		if (data && typeof data === 'string') {
+			if (parentUnique) {
+				// The parent's cached item may not yet report that it has children.
+				mediaItemCache.delete(parentUnique);
+			}
 			return this.read(data);
 		}
 
