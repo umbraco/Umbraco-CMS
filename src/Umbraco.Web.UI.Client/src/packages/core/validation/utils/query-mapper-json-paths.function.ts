@@ -34,6 +34,10 @@ export async function umbQueryMapperForJsonPaths<T>(
 
 			// If a number index, then create JSON-Path Query:
 			if (!isNaN(numberPointer)) {
+				if (!scopeData[numberPointer]) {
+					console.error('No data found for index `' + numberPointer + '` in scopeData:', scopeData);
+					throw new Error('No data found for index `' + numberPointer + '`.');
+				}
 				pointer = queryConstructor(scopeData[numberPointer]);
 			}
 
