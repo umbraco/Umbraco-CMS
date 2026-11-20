@@ -23,7 +23,8 @@ export interface MetaLocalization {
 	 * @summary The direction of the localizations (left-to-right or right-to-left).
 	 * @description
 	 * The value is used to describe the direction of the translations according to the extension system
-	 * and it will be set as the `dir` attribute on the `<html>` element. It defaults to `ltr`.
+	 * and it will be set as the `dir` attribute on the `<html>` element. Leave it out to keep the direction that
+	 * other extensions of the language declare, or `ltr` if none of them does.
 	 * @see https://en.wikipedia.org/wiki/Right-to-left
 	 * @example ["ltr"]
 	 * @default "ltr"
