@@ -23,6 +23,7 @@ public class ContentTypeCacheRefresherTests
     private Mock<IDocumentCacheService> _documentCacheService = null!;
     private Mock<IMediaCacheService> _mediaCacheService = null!;
     private Mock<IElementCacheService> _elementCacheService = null!;
+    private IAppCache _elementsCache = null!;
 
     private ContentTypeCacheRefresher CreateRefresher(IPublishedModelFactory publishedModelFactory)
     {
@@ -52,7 +53,8 @@ public class ContentTypeCacheRefresherTests
             _documentCacheService.Object,
             publishedContentTypeCache.Object,
             _mediaCacheService.Object,
-            _elementCacheService.Object);
+            _elementCacheService.Object,
+            Mock.Of<ICacheManager>(x => x.ElementsCache == _elementsCache));
     }
 
     [SetUp]
@@ -61,6 +63,7 @@ public class ContentTypeCacheRefresherTests
         _documentCacheService = new Mock<IDocumentCacheService>(MockBehavior.Strict);
         _mediaCacheService = new Mock<IMediaCacheService>(MockBehavior.Strict);
         _elementCacheService = new Mock<IElementCacheService>(MockBehavior.Strict);
+        _elementsCache = new FastDictionaryAppCache();
     }
 
     [Test]
@@ -343,6 +346,44 @@ public class ContentTypeCacheRefresherTests
 
         // Act
         refresher.Refresh(payloads);
+    }
+
+    [TestCase(nameof(IContentType), ContentTypeChangeTypes.RefreshOther, false, false)]
+    [TestCase(nameof(IContentType), ContentTypeChangeTypes.RefreshMain, false, false)]
+    [TestCase(nameof(IContentType), ContentTypeChangeTypes.RefreshOther, true, false)]
+    [TestCase(nameof(IContentType), ContentTypeChangeTypes.RefreshMain, true, false)]
+    [TestCase(nameof(IMediaType), ContentTypeChangeTypes.RefreshOther, false, false)]
+    [TestCase(nameof(IContentType), ContentTypeChangeTypes.RefreshOther, false, true)]
+    [TestCase(nameof(IContentType), ContentTypeChangeTypes.RefreshMain, true, true)]
+    [TestCase(nameof(IMediaType), ContentTypeChangeTypes.RefreshMain, false, true)]
+    [TestCase(nameof(IMemberType), ContentTypeChangeTypes.RefreshOther, false, true)]
+    public void Any_Type_Change_Clears_The_Elements_Level_Property_Value_Cache(
+        string itemType,
+        ContentTypeChangeTypes changeTypes,
+        bool isElement,
+        bool autoFactory)
+    {
+        // Elements-level property values are keyed by content and property, not by type, so they can hold values
+        // converted for the previous type, or built from models the auto factory has discarded.
+        var refresher = CreateRefresher(autoFactory ? CreateAutoFactory() : Mock.Of<IPublishedModelFactory>());
+        var payloads = new[]
+        {
+            new ContentTypeCacheRefresher.JsonPayload(itemType, 100, changeTypes, isElement),
+        };
+
+        _documentCacheService.Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>())).Returns(Task.CompletedTask);
+        _elementCacheService.Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>())).Returns(Task.CompletedTask);
+        _mediaCacheService.Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>())).Returns(Task.CompletedTask);
+        _documentCacheService.Setup(x => x.ClearConvertedContentCache(It.IsAny<IReadOnlyCollection<int>>()));
+        _elementCacheService.Setup(x => x.ClearConvertedContentCache(It.IsAny<IReadOnlyCollection<int>>()));
+        _mediaCacheService.Setup(x => x.ClearConvertedContentCache(It.IsAny<IReadOnlyCollection<int>>()));
+        SetupAllConvertedContentCacheClears();
+
+        _elementsCache.Get("property-value", () => new object());
+
+        refresher.Refresh(payloads);
+
+        Assert.That(_elementsCache.Get("property-value"), Is.Null);
     }
 
     private static IAutoPublishedModelFactory CreateAutoFactory()
