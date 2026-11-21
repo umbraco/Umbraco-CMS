@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Globalization;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -41,6 +42,27 @@ public class UriUtilityTests
         // Assert
         var expectedUri = new Uri(expectedUrl);
         Assert.AreEqual(expectedUri.ToString(), resultUri.ToString());
+    }
+
+    // "I" lower-cases to the dotless "ı" under a Turkish culture, which no URL segment matches
+    [TestCase("http://LocalHost/Info", "http://localhost/info")]
+    [TestCase("http://LocalHost/INDEX/Item/", "http://localhost/index/item")]
+    public void Uri_To_Umbraco_Lowercases_With_The_Invariant_Culture(string sourceUrl, string expectedUrl)
+    {
+        var culture = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = new CultureInfo("tr-TR");
+            var uriUtility = BuildUriUtility("/");
+
+            var resultUri = uriUtility.UriToUmbraco(new Uri(sourceUrl));
+
+            Assert.AreEqual(new Uri(expectedUrl).ToString(), resultUri.ToString());
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = culture;
+        }
     }
 
     // test directoryUrl true, trailingSlash false
