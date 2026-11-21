@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -89,6 +90,33 @@ internal sealed class UmbracoOperationIdTransformerTests
             CancellationToken.None);
 
         Assert.AreEqual(expected, operation.OperationId);
+    }
+
+    [Test]
+    public async Task Can_Generate_Operation_Id_With_The_Invariant_Culture()
+    {
+        CultureInfo culture = CultureInfo.CurrentCulture;
+        try
+        {
+            // tr-TR upper-cases "i" to a dotted "İ"
+            CultureInfo.CurrentCulture = new CultureInfo("tr-TR");
+            var operation = new OpenApiOperation();
+
+            await new UmbracoOperationIdTransformer().TransformAsync(
+                operation,
+                CreateContext(CreateApiDescription(new OperationIdCase
+                {
+                    HttpMethod = "GET",
+                    RelativePath = "umbraco/management/api/v1/item/document/{id}/info",
+                })),
+                CancellationToken.None);
+
+            Assert.AreEqual("GetItemDocumentByIdInfo", operation.OperationId);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = culture;
+        }
     }
 
     [Test]
