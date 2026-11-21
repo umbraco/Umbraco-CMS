@@ -163,6 +163,30 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task GetByKeyAsync_Reads_Through_A_Cached_Null_Entry()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.SetAsync<ContentCacheNode?>($"{_mediaItem.Key}", null);
+
+        IPublishedContent? media = await _mediaCacheService.GetByKeyAsync(_mediaItem.Key);
+
+        Assert.AreEqual(_mediaItem.Key, media?.Key);
+        _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourceAsync(_mediaItem.Key), Times.Once);
+    }
+
+    [Test]
+    public async Task GetByKeysAsync_Reads_Through_A_Cached_Null_Entry()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.SetAsync<ContentCacheNode?>($"{_mediaItem.Key}", null);
+
+        IReadOnlyList<IPublishedContent> result = await _mediaCacheService.GetByKeysAsync([_mediaItem.Key]);
+
+        Assert.AreEqual(_mediaItem.Key, result.Single().Key);
+        _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourcesAsync(It.IsAny<IEnumerable<Guid>>()), Times.Once);
+    }
+
+    [Test]
     public async Task GetByKeysAsync_BatchesDatabaseRead_AndNeverCallsSinglePerItem()
     {
         var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
@@ -199,23 +223,6 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
         Assert.IsNotNull(again);
         _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourcesAsync(It.IsAny<IEnumerable<Guid>>()), Times.Once);
         _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourceAsync(It.IsAny<Guid>()), Times.Never);
-    }
-
-    [Test]
-    public async Task GetByKeysAsync_HonoursCachedNull_WithoutQueryingDatabase()
-    {
-        Guid missingKey = Guid.NewGuid();
-
-        // Arranged by hand: unlike documents, the media read-through never writes a null node, so this
-        // pins the probe's contract rather than a state media can reach today. The two probes are kept
-        // identical deliberately, and this is what stops the media one drifting out of step.
-        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
-        await hybridCache.SetAsync<ContentCacheNode?>($"{missingKey}", null);
-
-        IReadOnlyList<IPublishedContent> result = await _mediaCacheService.GetByKeysAsync([missingKey]);
-
-        Assert.IsEmpty(result);
-        _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourcesAsync(It.IsAny<IEnumerable<Guid>>()), Times.Never);
     }
 
     [Test]

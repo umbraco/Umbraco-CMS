@@ -274,9 +274,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         return pending;
     }
 
-    // L1/L2 probe without a database hit (same primitive GetNodeAsync uses). An entry holding a null
-    // node accounts for its key and is not passed on to the database read; GetNodeAsync does not write
-    // those for media, but honouring one costs nothing and keeps the two paths in step. Keys are probed
+    // L1/L2 probe without a database hit (same primitive GetNodeAsync uses). Keys are probed
     // one at a time, and the probe is not free even on a hit: TryGetValueAsync takes a per-key lock and
     // goes through GetOrCreateAsync, which on a miss creates and then removes a local entry. With a
     // distributed L2 (e.g. Redis) configured that is a serial round-trip per key, plus a delete for
@@ -288,7 +286,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
         foreach (Guid key in keys)
         {
-            (bool exists, ContentCacheNode? node) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(GetCacheKey(key), CancellationToken.None);
+            (bool exists, ContentCacheNode? node) = await TryGetCachedNodeAsync(GetCacheKey(key));
             if (exists is false)
             {
                 pending.Add(key);
@@ -375,7 +373,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         }
 
         string cacheKey = GetCacheKey(key);
-        (bool exists, ContentCacheNode? contentCacheNode) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
+        (bool exists, ContentCacheNode? contentCacheNode) = await TryGetCachedNodeAsync(cacheKey);
 
         // A value found in the backing store is already current, so it can always populate the caches
         // below; only a value built from the read-through DB fetch needs the generation guard.
@@ -434,6 +432,20 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         }
     }
 
+    // Media is never intentionally cached as null, so a null entry is treated as a miss and evicted rather
+    // than served indefinitely.
+    private async Task<(bool Exists, ContentCacheNode? Node)> TryGetCachedNodeAsync(string cacheKey)
+    {
+        (bool exists, ContentCacheNode? node) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
+        if (exists && node is null)
+        {
+            await _hybridCache.RemoveAsync(cacheKey);
+            return (false, null);
+        }
+
+        return (exists, node);
+    }
+
     // Bumped after every in-memory cache invalidation/refresh so in-flight read-through snapshots
     // (see GetNodeAsync) can detect they have been superseded and skip writing back stale content.
     private void InvalidateMemoryCacheGeneration() => Interlocked.Increment(ref _cacheGeneration);
@@ -450,7 +462,8 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
             return false;
         }
 
-        return await _hybridCache.ExistsAsync<ContentCacheNode?>(GetCacheKey(keyAttempt.Result), CancellationToken.None);
+        (bool exists, _) = await TryGetCachedNodeAsync(GetCacheKey(keyAttempt.Result));
+        return exists;
     }
 
     /// <inheritdoc />
@@ -522,7 +535,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
                     break;
                 }
 
-                var existsInCache = await _hybridCache.ExistsAsync<ContentCacheNode?>(GetCacheKey(key), CancellationToken.None);
+                (bool existsInCache, _) = await TryGetCachedNodeAsync(GetCacheKey(key));
                 if (existsInCache is false)
                 {
                     uncachedKeys.Add(key);
