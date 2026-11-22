@@ -13,6 +13,7 @@ import {
 } from '@umbraco-cms/backoffice/dropzone';
 import { getFileExtension } from '@umbraco-cms/backoffice/utils';
 import {
+	UmbMediaTypeDetailRepository,
 	UmbMediaTypeStructureRepository,
 	type UmbAllowedChildrenOfMediaType,
 	type UmbAllowedMediaTypeModel,
@@ -22,6 +23,7 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { TemporaryFileStatus } from '@umbraco-cms/backoffice/temporary-file';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbApiError } from '@umbraco-cms/backoffice/resources';
 
@@ -39,16 +41,30 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 	// The media types that the parent will allow to be created under it.
 	readonly #allowedChildrenOf = new UmbArrayState<UmbAllowedChildrenOfMediaType>([], (x) => x.mediaTypeUnique);
 
+	// Whether a given media type varies by culture, cached by media type unique.
+	readonly #variesByCultureOf = new UmbArrayState<{ mediaTypeUnique: string; variesByCulture: boolean }>(
+		[],
+		(x) => x.mediaTypeUnique,
+	);
+
 	#mediaTypeStructure = new UmbMediaTypeStructureRepository(this);
+	#mediaTypeDetailRepository = new UmbMediaTypeDetailRepository(this);
 	#mediaDetailRepository = new UmbMediaDetailRepository(this);
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	#localization = new UmbLocalizationController(this);
+	#activeCulture?: string | null;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
 			this.#notificationContext = context;
+		});
+
+		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
+			this.observe(context?.culture, (culture) => {
+				this.#activeCulture = culture;
+			});
 		});
 	}
 
@@ -240,6 +256,16 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 		return data.items;
 	}
 
+	async #getVariesByCulture(mediaTypeUnique: string): Promise<boolean> {
+		const cached = this.#variesByCultureOf.getValue().find((x) => x.mediaTypeUnique === mediaTypeUnique);
+		if (cached) return cached.variesByCulture;
+
+		const { data } = await this.#mediaTypeDetailRepository.requestByUniques([mediaTypeUnique]);
+		const variesByCulture = data?.[0]?.variesByCulture ?? false;
+		this.#variesByCultureOf.appendOne({ mediaTypeUnique, variesByCulture });
+		return variesByCulture;
+	}
+
 	// Scaffold
 	async #getItemScaffold(item: UmbUploadableItem, mediaTypeUnique: string): Promise<UmbMediaDetailModel> {
 		// TODO: Use a scaffolding feature to ensure consistency. [NL]
@@ -252,10 +278,15 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 			segment: null,
 		};
 
+		// A culture-variant media type has no invariant variant — create the variant for the culture the user is
+		// currently working in, rather than an invalid invariant (culture: null) variant.
+		const variesByCulture = await this.#getVariesByCulture(mediaTypeUnique);
+		const culture = variesByCulture ? (this.#activeCulture ?? null) : null;
+
 		const preset: Partial<UmbMediaDetailModel> = {
 			unique: item.unique,
 			mediaType: { unique: mediaTypeUnique, collection: null },
-			variants: [{ culture: null, createDate: null, updateDate: null, flags: [], name }],
+			variants: [{ culture, createDate: null, updateDate: null, flags: [], name }],
 			values: item.temporaryFile ? [umbracoFile] : undefined,
 		};
 		const { data } = await this.#mediaDetailRepository.createScaffold(preset);

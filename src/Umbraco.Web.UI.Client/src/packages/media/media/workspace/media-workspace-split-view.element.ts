@@ -1,4 +1,5 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from './media-workspace.context-token.js';
+import './media-workspace-split-view-variant-selector.element.js';
 import { css, customElement, html, ifDefined, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -68,6 +69,8 @@ export class UmbMediaWorkspaceSplitViewElement extends UmbLitElement {
 									.overrides=${this._overrides}
 									.splitViewIndex=${view.index}>
 									<umb-icon slot="icon" name=${ifDefined(this._icon)}></umb-icon>
+									<umb-media-workspace-split-view-variant-selector
+										slot="variant-selector"></umb-media-workspace-split-view-variant-selector>
 								</umb-workspace-split-view>
 							`,
 						)}

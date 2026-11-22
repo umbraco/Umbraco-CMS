@@ -18,6 +18,7 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 			id: filter.unique ?? '',
 			dataTypeId: filter.dataTypeId,
 			orderBy: filter.orderBy ?? 'updateDate',
+			orderCulture: filter.orderCulture,
 			orderDirection: filter.orderDirection === 'asc' ? DirectionModel.ASCENDING : DirectionModel.DESCENDING,
 			filter: filter.filter,
 			skip: filter.skip ?? 0,
@@ -54,6 +55,9 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 					updater: item.creator, // TODO: Check if the `updater` is available for media items. [LK]
 					values: item.values.map((item) => {
 						return { alias: item.alias, value: item.value as string };
+					}),
+					variants: item.variants.map((variant) => {
+						return { name: variant.name, culture: variant.culture ?? null };
 					}),
 					flags: item.flags,
 				};

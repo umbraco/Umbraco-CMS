@@ -1,5 +1,6 @@
 import { UmbMediaDetailRepository } from '../../repository/index.js';
 import { UmbMediaUrlRepository } from '../../url/index.js';
+import { resolveVariantName } from '../../item/index.js';
 import type {
 	UmbMediaCaptionAltTextModalData,
 	UmbMediaCaptionAltTextModalValue,
@@ -9,6 +10,7 @@ import { imageSize } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbInputDimensionsElement } from '@umbraco-cms/backoffice/components';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-media-caption-alt-text-modal')
 export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
@@ -40,9 +42,13 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 
 		const url = mediaUrlData?.[0].url ?? '';
 
+		const variantContext = await this.getContext(UMB_VARIANT_CONTEXT);
+		const displayCulture = await variantContext?.getDisplayCulture();
+		const fallbackCulture = await variantContext?.getFallbackCulture();
+
 		this.value = {
 			...this.value,
-			altText: this.value?.altText ?? mediaData.variants[0].name,
+			altText: this.value?.altText ?? resolveVariantName(mediaData.variants, displayCulture, fallbackCulture),
 			url,
 		};
 

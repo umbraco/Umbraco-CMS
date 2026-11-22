@@ -1,3 +1,4 @@
+import type { UmbMediaItemVariantModel } from '../../repository/item/types.js';
 import type { UmbCollectionItemModel } from '@umbraco-cms/backoffice/collection';
 import type { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbEntityWithFlags } from '@umbraco-cms/backoffice/entity-flag';
@@ -27,6 +28,7 @@ export interface UmbMediaCollectionItemModel extends UmbCollectionItemModel, Umb
 	updateDate: Date;
 	updater?: string | null;
 	values?: Array<{ alias: string; value: string }>;
+	variants?: Array<UmbMediaItemVariantModel>;
 	url?: string;
 	status?: UmbFileDropzoneItemStatus;
 	/**

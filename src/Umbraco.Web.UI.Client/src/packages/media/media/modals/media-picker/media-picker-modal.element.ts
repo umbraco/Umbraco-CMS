@@ -3,7 +3,13 @@ import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UmbMediaSearchProvider } from '../../search/index.js';
 import type { UmbDropzoneMediaElement } from '../../dropzone/index.js';
-import type { UmbMediaTreeItemModel, UmbMediaSearchItemModel, UmbMediaItemModel } from '../../types.js';
+import type {
+	UmbMediaTreeItemModel,
+	UmbMediaSearchItemModel,
+	UmbMediaItemModel,
+	UmbMediaItemVariantModel,
+} from '../../types.js';
+import { resolveVariantName } from '../../item/index.js';
 import { UmbMediaPickerContext } from './media-picker.context.js';
 import type { UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
@@ -126,6 +132,8 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 	#pagingMap = new Map<string, UmbPaginationManager>();
 	#contextCulture?: string | null;
+	#displayCulture?: string | null;
+	#fallbackCulture?: string | null;
 	#locationInteractionMemoryUnique: string = 'UmbMediaItemPickerLocation';
 	#viewInteractionMemoryUnique: string = 'UmbMediaItemPickerView';
 
@@ -142,6 +150,12 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			this.observe(context?.culture, (culture) => {
 				this.#contextCulture = culture;
 			});
+			this.observe(context?.displayCulture, (displayCulture) => {
+				this.#displayCulture = displayCulture;
+			});
+			this.observe(context?.fallbackCulture, (fallbackCulture) => {
+				this.#fallbackCulture = fallbackCulture;
+			});
 		});
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
@@ -156,6 +170,10 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				'umbCurrentUserMediaAccessObserver',
 			);
 		});
+	}
+
+	#resolveName(variants: Array<UmbMediaItemVariantModel>): string {
+		return resolveVariantName(variants, this.#displayCulture, this.#fallbackCulture);
 	}
 
 	override async connectedCallback(): Promise<void> {
@@ -239,7 +257,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 			if (source) {
 				this._currentMediaEntity = {
-					name: source.name,
+					name: this.#resolveName(source.variants),
 					unique: source.unique,
 					entityType: source.entityType,
 					mediaType: { unique: source.mediaType.unique },
@@ -351,7 +369,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		this.#clearSearch();
 
 		this._currentMediaEntity = {
-			name: item.name,
+			name: this.#resolveName(item.variants),
 			unique: item.unique,
 			entityType: item.entityType,
 			mediaType: { unique: item.mediaType.unique },
@@ -434,7 +452,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			this._currentMediaEntity = newPath.currentMedia;
 		} else if (this._startNode) {
 			this._currentMediaEntity = {
-				name: this._startNode.name,
+				name: this.#resolveName(this._startNode.variants),
 				unique: this._startNode.unique,
 				entityType: this._startNode.entityType,
 			};
@@ -711,11 +729,12 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		const canNavigate = this.#allowNavigateToMedia(item);
 		const selectable = this._selectableFilter(item);
 		const disabled = !(selectable || canNavigate);
+		const name = this.#resolveName(item.variants);
 		return html`
 			<uui-card-media
 				class=${ifDefined(disabled ? 'not-allowed' : undefined)}
-				title=${item.name}
-				.name=${item.name}
+				title=${name}
+				.name=${name}
 				data-mark="${item.entityType}:${item.unique}"
 				@open=${() => this.#onOpen(item)}
 				@selected=${() => this.#onSelected(item.unique!)}
@@ -725,7 +744,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				?select-only=${this._isSelectionMode || canNavigate === false}>
 				<umb-media-thumbnail
 					unique=${item.unique}
-					alt=${item.name}
+					alt=${name}
 					icon=${item.mediaType.icon}
 					file-ext=${ifDefined(item.extension)}></umb-media-thumbnail>
 			</uui-card-media>
@@ -740,7 +759,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			// Mark them as non-selectable so the row doesn't intercept the click for selection.
 			const selectableInTable = this._isSelectionMode ? selectable : !canNavigate && selectable;
 			const nameColumnValue: UmbMediaPickerTableColumnNameValue = {
-				name: item.name,
+				name: this.#resolveName(item.variants),
 				ancestorPath: this.#getAncestorPath(item) || undefined,
 				navigate: canNavigate && !this._isSelectionMode ? () => this.#onOpen(item) : undefined,
 			};
@@ -811,7 +830,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			? {
 					entityType: this._startNode.entityType,
 					unique: this._startNode.unique,
-					name: this._startNode.name,
+					name: this.#resolveName(this._startNode.variants),
 				}
 			: undefined;
 

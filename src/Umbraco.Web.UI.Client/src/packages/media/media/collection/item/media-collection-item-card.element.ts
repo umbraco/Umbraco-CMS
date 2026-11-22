@@ -1,12 +1,14 @@
 import { UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE } from '../../entity.js';
+import { resolveVariantName } from '../../item/index.js';
 import type { UmbMediaCollectionItemModel } from './types.js';
-import { css, customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbEntityCollectionItemElement } from '@umbraco-cms/backoffice/collection';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 import '@umbraco-cms/backoffice/imaging';
 
@@ -15,17 +17,47 @@ export class UmbMediaCollectionItemCardElement extends UmbLitElement implements 
 	#item?: UmbMediaCollectionItemModel | undefined;
 	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
 
+	#displayCulture?: string | null;
+	#fallbackCulture?: string | null;
+
+	@state()
+	private _name = '';
+
 	@property({ type: Object })
 	public get item(): UmbMediaCollectionItemModel | undefined {
 		return this.#item;
 	}
 	public set item(value: UmbMediaCollectionItemModel | undefined) {
 		this.#item = value;
+		this.#updateName();
 
 		const mediaTypeUnique = value?.mediaType?.unique;
 
 		this.#entityContentTypeContext.setEntityType(mediaTypeUnique ? UMB_MEDIA_TYPE_ENTITY_TYPE : undefined);
 		this.#entityContentTypeContext.setUnique(mediaTypeUnique);
+	}
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
+			this.observe(context?.displayCulture, (displayCulture) => {
+				this.#displayCulture = displayCulture;
+				this.#updateName();
+			});
+			this.observe(context?.fallbackCulture, (fallbackCulture) => {
+				this.#fallbackCulture = fallbackCulture;
+				this.#updateName();
+			});
+		});
+	}
+
+	#updateName() {
+		// Placeholders (upload-in-progress items) have no variants — their name is set directly from the uploaded filename.
+		if (this.#item?.entityType === UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE) {
+			this._name = this.#item.name ?? '';
+			return;
+		}
+		this._name = resolveVariantName(this.#item?.variants, this.#displayCulture, this.#fallbackCulture);
 	}
 
 	@property({ type: Boolean })
@@ -63,7 +95,7 @@ export class UmbMediaCollectionItemCardElement extends UmbLitElement implements 
 		}
 		return html`
 			<uui-card-media
-				name=${ifDefined(this.item.name)}
+				name=${this._name}
 				href=${ifDefined(this.href)}
 				data-mark="${this.item.entityType}:${this.item.unique}"
 				?selectable=${this.selectable}
@@ -74,7 +106,7 @@ export class UmbMediaCollectionItemCardElement extends UmbLitElement implements 
 				@deselected=${this.#onDeselected}>
 				<umb-media-thumbnail
 					.unique=${this.item.unique}
-					alt=${ifDefined(this.item.name)}
+					alt=${this._name}
 					icon=${ifDefined(this.item.icon)}
 					.fileExt=${this.item.extension}></umb-media-thumbnail>
 				<slot name="actions" slot="actions"></slot>
@@ -85,7 +117,7 @@ export class UmbMediaCollectionItemCardElement extends UmbLitElement implements 
 	#renderPlaceholder(item: UmbMediaCollectionItemModel) {
 		const complete = item.status === UmbFileDropzoneItemStatus.COMPLETE;
 		const error = item.status !== UmbFileDropzoneItemStatus.WAITING && !complete;
-		return html`<uui-card-media disabled class="media-placeholder-item" name=${ifDefined(item.name)}>
+		return html`<uui-card-media disabled class="media-placeholder-item" name=${this._name}>
 			<umb-temporary-file-badge
 				.progress=${item.progress ?? 0}
 				?complete=${complete}

@@ -27,6 +27,41 @@ function findVariant<T extends UmbMediaItemVariantModel>(variants: Array<T>, cul
 }
 
 /**
+ * Resolves the display name of a media item for a given culture, falling back to the fallback culture, then to any
+ * named variant, then to a placeholder name.
+ * @param {Array<UmbMediaItemVariantModel>} [variants] - The variants of the media item
+ * @param {string | null} [displayCulture] - The culture to resolve the name for
+ * @param {string | null} [fallbackCulture] - The culture to fall back to if the display culture has no name
+ * @returns {string} The resolved name
+ */
+export function resolveVariantName(
+	variants: Array<UmbMediaItemVariantModel> | undefined,
+	displayCulture?: string | null,
+	fallbackCulture?: string | null,
+): string {
+	if (!variants) return '(Untitled)';
+
+	const currentVariant = isVariantsInvariant(variants)
+		? variants[0]
+		: displayCulture
+			? findVariant(variants, displayCulture)
+			: undefined;
+
+	if (currentVariant?.name) {
+		return currentVariant.name;
+	}
+
+	const fallbackName =
+		(fallbackCulture ? findVariant(variants, fallbackCulture)?.name : undefined) ?? variants.find((x) => x.name)?.name;
+
+	if (fallbackName) {
+		return `(${fallbackName})`;
+	}
+
+	return '(Untitled)';
+}
+
+/**
  * A controller for resolving data for a media item
  * @exports
  * @class UmbMediaItemDataResolver
@@ -144,33 +179,6 @@ export class UmbMediaItemDataResolver<MediaItemModel extends UmbMediaItemDataRes
 	}
 
 	#setName() {
-		const variant = this.#getCurrentVariant();
-		if (variant?.name) {
-			this.#name.setValue(variant.name);
-			return;
-		}
-
-		const variants = this.getData()?.variants;
-		if (variants) {
-			const fallbackName = findVariant(variants, this.#fallbackCulture!)?.name ?? variants.find((x) => x.name)?.name;
-
-			if (fallbackName) {
-				this.#name.setValue(`(${fallbackName})`);
-				return;
-			}
-		}
-
-		this.#name.setValue('(Untitled)');
-	}
-
-	#getCurrentVariant() {
-		const variants = this.getData()?.variants;
-		if (!variants) return undefined;
-
-		if (isVariantsInvariant(variants)) {
-			return variants[0];
-		}
-
-		return findVariant(variants, this.#displayCulture!);
+		this.#name.setValue(resolveVariantName(this.getData()?.variants, this.#displayCulture, this.#fallbackCulture));
 	}
 }

@@ -5,7 +5,8 @@ import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from 
 import type { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 	UmbMediaCollectionItemModel,
@@ -14,8 +15,30 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 	#placeholders = new UmbArrayState<UmbMediaCollectionItemModel>([], (x) => x.unique);
 	public readonly placeholders = this.#placeholders.asObservable();
 
+	#variantContext?: typeof UMB_VARIANT_CONTEXT.TYPE;
+	#displayCulture = new UmbStringState(undefined);
+	#displayCultureObservable = this.#displayCulture.asObservable();
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MEDIA_GRID_COLLECTION_VIEW_ALIAS);
+
+		this.consumeContext(UMB_VARIANT_CONTEXT, async (variantContext) => {
+			this.#variantContext = variantContext;
+			this.#observeDisplayCulture();
+		});
+	}
+
+	#observeDisplayCulture() {
+		this.observe(
+			this.#variantContext?.displayCulture,
+			(displayCulture) => {
+				if (!displayCulture) return;
+				if (this.#displayCulture.getValue() === displayCulture) return;
+				this.#displayCulture.setValue(displayCulture);
+				this.setFilter({ orderCulture: displayCulture });
+			},
+			'umbMediaCollectionDisplayCultureObserver',
+		);
 	}
 
 	setPlaceholders(partial: Array<{ unique: string; status: UmbFileDropzoneItemStatus; name?: string }>) {
@@ -47,6 +70,11 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 	updatePlaceholderProgress(unique: string, progress: number) {
 		this._items.updateOne(unique, { progress });
 		this.#placeholders.updateOne(unique, { progress });
+	}
+
+	protected override async _requestCollection() {
+		await this.observe(this.#displayCultureObservable)?.asPromise();
+		return super._requestCollection();
 	}
 
 	protected override _setCollectionData(data: UmbPagedModel<UmbMediaCollectionItemModel>) {

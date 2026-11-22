@@ -50,6 +50,24 @@ export const manifests: Array<UmbExtensionManifest> = [
 		],
 	},
 	{
+		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.MediaType.Settings',
+		name: 'Media Type Workspace Settings View',
+		element: () => import('./views/settings/media-type-workspace-view-settings.element.js'),
+		weight: 600,
+		meta: {
+			label: '#general_settings',
+			pathname: 'settings',
+			icon: 'icon-settings',
+		},
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_MEDIA_TYPE_WORKSPACE_ALIAS,
+			},
+		],
+	},
+	{
 		type: 'workspaceAction',
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.MediaType.Save',

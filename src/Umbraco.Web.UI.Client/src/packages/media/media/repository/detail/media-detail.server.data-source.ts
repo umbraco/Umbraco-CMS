@@ -36,6 +36,8 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 		const mediaTypeIcon = data?.icon ?? null;
 		const mediaTypeCollection = data?.collection ?? null;
 
+		// Culture-variant media types have no single invariant variant to default to — leave the array empty and let
+		// the workspace's variant selector (culture picker) populate it, mirroring how Documents scaffold variants.
 		const defaultData: UmbMediaDetailModel = {
 			entityType: UMB_MEDIA_ENTITY_TYPE,
 			unique: UmbId.new(),
@@ -47,15 +49,17 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 			isTrashed: false,
 			flags: [],
 			values: [],
-			variants: [
-				{
-					culture: null,
-					name: '',
-					createDate: null,
-					updateDate: null,
-					flags: [],
-				},
-			],
+			variants: data?.variesByCulture
+				? []
+				: [
+						{
+							culture: null,
+							name: '',
+							createDate: null,
+							updateDate: null,
+							flags: [],
+						},
+					],
 		};
 
 		const scaffold = umbDeepMerge(preset, defaultData);
