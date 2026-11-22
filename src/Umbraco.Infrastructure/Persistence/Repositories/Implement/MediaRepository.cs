@@ -445,8 +445,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
     {
         entity.AddingEntity();
 
-        // ensure unique name on the same level
-        entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name)!;
+        // sanitize invariant and variant names (existence + uniqueness)
+        SanitizeNames(entity);
 
         // ensure that strings don't contain characters that are invalid in xml
         // TODO: do we really want to keep doing this here?
@@ -534,8 +534,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
         if (!isMoving)
         {
-            // ensure unique name on the same level
-            entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id)!;
+            // sanitize invariant and variant names (existence + uniqueness)
+            SanitizeNames(entity);
 
             // ensure that strings don't contain characters that are invalid in xml
             // TODO: do we really want to keep doing this here?
@@ -597,6 +597,121 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         // Raise event first else potential FK issues
         OnUowRemovingEntity(entity);
         base.PersistDeletedItem(entity);
+    }
+
+    /// <summary>
+    /// Sanitizes invariant and variant names for a media entity, ensuring existence and uniqueness.
+    /// Mirrors the SanitizeNames pattern from <see cref="PublishableContentRepositoryBase{TEntity, TRepository, TEntityDto, TContentVersionDto, TContentCultureVariationDto}"/>.
+    /// </summary>
+    private void SanitizeNames(IMedia entity)
+    {
+        // Step 1: ensure that the invariant name exists
+        EnsureInvariantNameExists(entity);
+
+        // Step 2: ensure that the invariant name is unique among siblings
+        entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
+
+        // Step 3: ensure that each culture name is unique among siblings
+        EnsureVariantNamesAreUnique(entity);
+    }
+
+    /// <summary>
+    /// For culture-variant media, sets the invariant Name from the default culture's name (or first available).
+    /// For invariant media, validates that a name exists.
+    /// </summary>
+    private void EnsureInvariantNameExists(IMedia entity)
+    {
+        if (entity.ContentType.VariesByCulture())
+        {
+            if (entity.CultureInfos is null || entity.CultureInfos.Count == 0)
+            {
+                throw new InvalidOperationException("Cannot save media with an empty name.");
+            }
+
+            // Set invariant name from default culture, or first available culture
+            var defaultCulture = LanguageRepository.GetDefaultIsoCode();
+            entity.Name = defaultCulture != null
+                && entity.CultureInfos.TryGetValue(defaultCulture, out ContentCultureInfos cultureName)
+                    ? cultureName.Name!
+                    : entity.CultureInfos[0].Name!;
+        }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(entity.Name))
+            {
+                throw new InvalidOperationException("Cannot save media with an empty name.");
+            }
+        }
+    }
+
+    private SqlTemplate SqlEnsureVariantNamesAreUnique => SqlContext.Templates.Get(
+        Constants.SqlTemplates.VersionableRepository.EnsureUniqueNodeName + "Media-Variant", tsql => tsql
+            .Select<ContentVersionCultureVariationDto>(x => x.Id, x => x.Name, x => x.LanguageId)
+            .From<ContentVersionCultureVariationDto>()
+            .InnerJoin<ContentVersionDto>()
+            .On<ContentVersionDto, ContentVersionCultureVariationDto>(x => x.Id, x => x.VersionId)
+            .InnerJoin<NodeDto>().On<NodeDto, ContentVersionDto>(x => x.NodeId, x => x.NodeId)
+            .Where<ContentVersionDto>(x => x.Current == SqlTemplate.Arg<bool>("current"))
+            .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") &&
+                                 x.ParentId == SqlTemplate.Arg<int>("parentId") &&
+                                 x.NodeId != SqlTemplate.Arg<int>("id"))
+            .OrderBy<ContentVersionCultureVariationDto>(x => x.LanguageId));
+
+    /// <summary>
+    /// Ensures that each culture-specific name is unique among sibling media at the same level.
+    /// </summary>
+    private void EnsureVariantNamesAreUnique(IMedia entity)
+    {
+        if (!entity.ContentType.VariesByCulture() || entity.CultureInfos is null || entity.CultureInfos.Count == 0)
+        {
+            return;
+        }
+
+        // Get names per culture at the same level (all siblings)
+        Sql<ISqlContext> sql = SqlEnsureVariantNamesAreUnique.Sql(true, NodeObjectTypeId, entity.ParentId, entity.Id);
+        var names = Database.Fetch<CultureNodeName>(sql)
+            .GroupBy(x => x.LanguageId)
+            .ToDictionary(x => x.Key, x => x);
+
+        if (names.Count == 0)
+        {
+            return;
+        }
+
+        foreach (ContentCultureInfos cultureInfo in entity.CultureInfos)
+        {
+            var langId = LanguageRepository.GetIdByIsoCode(cultureInfo.Culture);
+            if (!langId.HasValue)
+            {
+                continue;
+            }
+
+            if (!names.TryGetValue(langId.Value, out IGrouping<int, CultureNodeName>? cultureNames))
+            {
+                continue;
+            }
+
+            // Get a unique name
+            List<SimilarNodeName> otherNames =
+                cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name }).ToList();
+            var uniqueName = SimilarNodeName.GetUniqueName(otherNames, entity.Id, cultureInfo.Name);
+
+            if (uniqueName == entity.GetCultureName(cultureInfo.Culture))
+            {
+                continue;
+            }
+
+            // Update the culture name to be unique
+            entity.SetCultureName(uniqueName, cultureInfo.Culture);
+        }
+    }
+
+    // ReSharper disable once ClassNeverInstantiated.Local
+    private sealed class CultureNodeName
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public int LanguageId { get; set; }
     }
 
     /// <summary>
