@@ -285,6 +285,10 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
     protected override Sql<ISqlContext> GetBaseQuery(QueryType queryType) => GetBaseQuery(queryType);
 
+    private string VariantNameSqlExpression
+        => SqlContext.VisitDto<ContentVersionCultureVariationDto, NodeDto>((ccv, node) => ccv.Name ?? node.Text, "ccv")
+            .Sql;
+
     protected virtual Sql<ISqlContext> GetBaseQuery(QueryType queryType, bool current = true, bool joinMediaVersion = false)
     {
         Sql<ISqlContext> sql = SqlContext.Sql();
@@ -303,9 +307,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
                         r.Select(x => x.NodeDto)
                             .Select(x => x.ContentVersionDto))
 
-                    // ContentRepositoryBase expects a variantName field to order by name
-                    // for now, just return the plain invariant node name
-                    .AndSelect<NodeDto>(x => Alias(x.Text, "variantName"));
+                    // ContentRepositoryBase orders by "variantName" when ordering by name in a culture
+                    .AndSelect(VariantNameSqlExpression + " AS variantName");
                 break;
         }
 
@@ -314,6 +317,22 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
             .InnerJoin<ContentVersionDto>()
             .On<ContentDto, ContentVersionDto>(left => left.NodeId, right => right.NodeId);
+
+        if (queryType is QueryType.Single or QueryType.Many)
+        {
+            // the magic "[[[ISOCODE]]]" parameter value is replaced in ContentRepositoryBase.GetPage() by the ordering culture;
+            // without an ordering culture the join matches nothing and variantName falls back to the invariant name
+            sql.LeftJoin<ContentVersionCultureVariationDto>(
+                    nested => nested.InnerJoin<LanguageDto>("lang")
+                        .On<ContentVersionCultureVariationDto, LanguageDto>(
+                            (ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == "[[[ISOCODE]]]",
+                            "ccv",
+                            "lang"),
+                    "ccv")
+                .On<ContentVersionDto, ContentVersionCultureVariationDto>(
+                    (version, ccv) => version.Id == ccv.VersionId,
+                    aliasRight: "ccv");
+        }
 
         if (joinMediaVersion)
         {
