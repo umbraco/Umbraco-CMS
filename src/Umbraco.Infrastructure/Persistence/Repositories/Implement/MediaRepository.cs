@@ -184,10 +184,16 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             if (temp.Content is not null)
             {
                 temp.Content.Properties = properties[temp.VersionId];
-
-                // reset dirty initial properties (U4-1946)
-                temp.Content.ResetDirtyProperties(false);
             }
+        }
+
+        // load culture variation data for variant media types (batch)
+        LoadCultureVariations(temps);
+
+        // reset dirty initial properties (U4-1946)
+        foreach (TempContent<Core.Models.Media> temp in temps)
+        {
+            temp.Content?.ResetDirtyProperties(false);
         }
 
         return content;
@@ -204,6 +210,9 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         IDictionary<int, PropertyCollection> properties =
             GetPropertyCollections(new List<TempContent<Core.Models.Media>> { temp });
         media.Properties = properties[versionId];
+
+        // load culture variation data for variant media types
+        LoadCultureVariations(media);
 
         // reset dirty initial properties (U4-1946)
         media.ResetDirtyProperties(false);
@@ -348,6 +357,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.MediaVersion)} WHERE id IN
                 (SELECT id FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id)",
             $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.PropertyData)} WHERE {QuoteColumnName("versionId")} IN
+                (SELECT id FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id)",
+            $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation)} WHERE {QuoteColumnName("versionId")} IN
                 (SELECT id FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id)",
             $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id",
             $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Content)} WHERE {nodeId} = @id",
@@ -500,6 +511,9 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         // persist the property data
         InsertPropertyValues(entity, 0, out _, out _);
 
+        // persist culture variation data (for culture-variant media types)
+        PersistCultureVariations(entity);
+
         // set tags
         SetEntityTags(entity, _tagRepository, _serializer);
 
@@ -561,6 +575,9 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             // replace the property data
             ReplacePropertyValues(entity, entity.VersionId, 0, out _, out _);
 
+            // replace culture variation data (for culture-variant media types)
+            ReplaceCultureVariations(entity);
+
             SetEntityTags(entity, _tagRepository, _serializer);
         }
 
@@ -580,6 +597,127 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         // Raise event first else potential FK issues
         OnUowRemovingEntity(entity);
         base.PersistDeletedItem(entity);
+    }
+
+    /// <summary>
+    /// Persists culture variation records for a media entity (insert only, for new items).
+    /// </summary>
+    private void PersistCultureVariations(IMedia entity)
+    {
+        if (entity.CultureInfos is null || entity.CultureInfos.Count == 0)
+        {
+            return;
+        }
+
+        Database.BulkInsertRecords(GetCultureVariationDtos(entity));
+    }
+
+    /// <summary>
+    /// Replaces culture variation records for a media entity (delete existing + re-insert).
+    /// </summary>
+    private void ReplaceCultureVariations(IMedia entity)
+    {
+        // Delete existing culture variation records for this version
+        Sql<ISqlContext> deleteSql = Sql().Delete<ContentVersionCultureVariationDto>()
+            .Where<ContentVersionCultureVariationDto>(x => x.VersionId == entity.VersionId);
+        Database.Execute(deleteSql);
+
+        // Insert new ones
+        PersistCultureVariations(entity);
+    }
+
+    /// <summary>
+    /// Creates ContentVersionCultureVariationDto records from the entity's CultureInfos.
+    /// Media has no publishing, so only the current version's culture data is created.
+    /// </summary>
+    private IEnumerable<ContentVersionCultureVariationDto> GetCultureVariationDtos(IMedia entity)
+    {
+        if (entity.CultureInfos is null)
+        {
+            yield break;
+        }
+
+        foreach (ContentCultureInfos cultureInfo in entity.CultureInfos)
+        {
+            yield return new ContentVersionCultureVariationDto
+            {
+                VersionId = entity.VersionId,
+                LanguageId = LanguageRepository.GetIdByIsoCode(cultureInfo.Culture)
+                    ?? throw new InvalidOperationException($"Culture \"{cultureInfo.Culture}\" does not correspond to an existing language."),
+                Culture = cultureInfo.Culture,
+                Name = cultureInfo.Name,
+                UpdateDate = entity.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue,
+            };
+        }
+    }
+
+    /// <summary>
+    /// Loads culture variation data for a single media entity and populates its CultureInfos.
+    /// </summary>
+    private void LoadCultureVariations(IMedia entity)
+    {
+        if (entity.ContentType?.VariesByCulture() != true)
+        {
+            return;
+        }
+
+        List<ContentVersionCultureVariationDto> dtos = Database.Fetch<ContentVersionCultureVariationDto>(
+            Sql()
+                .Select<ContentVersionCultureVariationDto>()
+                .From<ContentVersionCultureVariationDto>()
+                .Where<ContentVersionCultureVariationDto>(x => x.VersionId == entity.VersionId));
+
+        foreach (ContentVersionCultureVariationDto dto in dtos)
+        {
+            var culture = LanguageRepository.GetIsoCodeById(dto.LanguageId);
+            if (culture is not null)
+            {
+                entity.SetCultureInfo(culture, dto.Name, dto.UpdateDate);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Loads culture variation data for multiple media entities and populates their CultureInfos.
+    /// </summary>
+    private void LoadCultureVariations(IEnumerable<TempContent<Core.Models.Media>> temps)
+    {
+        // Filter to only entities with culture-variant content types
+        var variantTemps = temps.Where(t => t.ContentType?.VariesByCulture() == true && t.Content is not null).ToList();
+        if (variantTemps.Count == 0)
+        {
+            return;
+        }
+
+        var versionIds = variantTemps.Select(t => t.VersionId).ToList();
+
+        IEnumerable<ContentVersionCultureVariationDto> dtos =
+            Database.FetchByGroups<ContentVersionCultureVariationDto, int>(
+                versionIds,
+                Constants.Sql.MaxParameterCount,
+                batch => Sql()
+                    .Select<ContentVersionCultureVariationDto>()
+                    .From<ContentVersionCultureVariationDto>()
+                    .WhereIn<ContentVersionCultureVariationDto>(x => x.VersionId, batch));
+
+        // Group by version ID
+        var variationsByVersion = dtos.GroupBy(x => x.VersionId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        foreach (TempContent<Core.Models.Media> temp in variantTemps)
+        {
+            if (variationsByVersion.TryGetValue(temp.VersionId, out List<ContentVersionCultureVariationDto>? variations))
+            {
+                foreach (ContentVersionCultureVariationDto dto in variations)
+                {
+                    var culture = LanguageRepository.GetIsoCodeById(dto.LanguageId);
+                    if (culture is not null)
+                    {
+                        temp.Content!.SetCultureInfo(culture, dto.Name, dto.UpdateDate);
+                    }
+                }
+            }
+        }
     }
 
     #endregion

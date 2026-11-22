@@ -1126,6 +1126,64 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <summary>
+    /// Builds a single cache DTO for a media item, supporting culture-variant media types.
+    /// Uses content type variations and language mapping to correctly serialize variant property and culture data.
+    /// </summary>
+    private ContentNuDto BuildCacheDtoForMedia(
+        CacheRebuildContentDto content,
+        List<CacheRebuildPropertyDto> allPropertyDtos,
+        List<CacheRebuildCultureDto> allCultureDtos,
+        Dictionary<int, byte> contentTypeVariations,
+        Dictionary<short, string> languageMap,
+        Dictionary<int, List<PropertyTypeInfo>> propertyInfoByContentType,
+        IContentCacheDataSerializer serializer)
+    {
+        // Get content type variation for this media type.
+        byte contentTypeVariation = contentTypeVariations.TryGetValue(content.ContentTypeId, out var variation)
+            ? variation
+            : (byte)0;
+
+        // Get property info for this content type (including compositions).
+        List<PropertyTypeInfo> propertyTypes = propertyInfoByContentType.TryGetValue(content.ContentTypeId, out List<PropertyTypeInfo>? types)
+            ? types
+            : [];
+
+        // Build property data dictionary with variation-aware filtering.
+        Dictionary<string, PropertyData[]> propertyData = BuildPropertyDataDictionary(
+            allPropertyDtos.Where(p => p.VersionId == content.VersionId),
+            languageMap,
+            propertyTypes,
+            contentTypeVariation);
+
+        // Build culture data dictionary from culture variation records.
+        // Media has no document-level culture variation table (no published/edited per culture), so we pass null.
+        Dictionary<string, CultureVariation> cultureData = BuildCultureDataDictionary(
+            allCultureDtos.Where(c => c.VersionId == content.VersionId),
+            documentCultureDtos: null,
+            published: false);
+
+        var cacheData = new ContentCacheDataModel
+        {
+            PropertyData = propertyData,
+            CultureData = cultureData,
+            UrlSegment = cultureData.Count == 0 ? GenerateUrlSegment(content.Name) : null,
+        };
+
+        ContentCacheDataSerializationResult serialized = serializer.Serialize(
+            new CacheRebuildContentAdapter(content),
+            cacheData,
+            published: false);
+
+        return new ContentNuDto
+        {
+            NodeId = content.NodeId,
+            Published = false, // Media doesn't have published state
+            Data = serialized.StringData,
+            RawData = serialized.ByteData,
+        };
+    }
+
+    /// <summary>
     /// Builds property data dictionary from property DTOs for invariant content types (media/members).
     /// Includes empty arrays for all defined property aliases to match original serialization behavior.
     /// </summary>
@@ -1317,6 +1375,10 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             return;
         }
 
+        Dictionary<int, byte>? contentTypeVariations = null;
+        Dictionary<short, string>? languageMap = null;
+        Dictionary<int, List<PropertyTypeInfo>>? propertyInfoByContentType = null;
+
         Guid mediaObjectType = Constants.ObjectTypes.Media;
 
         Dictionary<int, List<string>>? propertyAliasesByContentType = null;
@@ -1332,7 +1394,9 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         executeStep(() =>
         {
-            propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
+            contentTypeVariations = GetContentTypeVariations(contentTypeIds);
+            languageMap = GetLanguageMap();
+            propertyInfoByContentType = GetPropertyInfoByContentType(contentTypeIds);
         });
 
         long processed = 0;
@@ -1352,12 +1416,21 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
                 List<CacheRebuildContentDto> mediaDtos = GetContentMetadataForNodes(nodeIds);
                 List<CacheRebuildPropertyDto> propertyDtos = GetPropertyDataForNodes(nodeIds);
+                List<CacheRebuildCultureDto> cultureDtos = GetCultureDataForNodes(nodeIds);
 
                 var items = mediaDtos
                     .AsParallel()
                     .WithDegreeOfParallelism(Environment.ProcessorCount)
-                    .Select(media => BuildCacheDtoForContent(media, propertyDtos, propertyAliasesByContentType!, serializer))
+                    .Select(media => BuildCacheDtoForMedia(
+                        media,
+                        propertyDtos,
+                        cultureDtos,
+                        contentTypeVariations!,
+                        languageMap!,
+                        propertyInfoByContentType!,
+                        serializer))
                     .ToList();
+
 
                 BulkInsertSkipExisting(items);
 

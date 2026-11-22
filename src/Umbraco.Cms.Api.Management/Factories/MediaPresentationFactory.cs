@@ -60,18 +60,30 @@ internal sealed class MediaPresentationFactory : IMediaPresentationFactory
 
     /// <summary>
     /// Creates a collection of <see cref="VariantItemResponseModel"/> instances for the specified media entity.
+    /// Returns culture-specific variants when the media type varies by culture.
     /// </summary>
     /// <param name="entity">The media entity for which to create variant response models.</param>
     /// <returns>An enumerable containing <see cref="VariantItemResponseModel"/> instances representing the entity's variants.</returns>
     public IEnumerable<VariantItemResponseModel> CreateVariantsItemResponseModels(IMediaEntitySlim entity)
-        =>
+    {
+        if (entity.Variations.VariesByCulture() && entity.CultureNames.Count > 0)
+        {
+            return entity.CultureNames.Select(cn => new VariantItemResponseModel
+            {
+                Name = cn.Value,
+                Culture = cn.Key,
+            });
+        }
+
+        return
         [
             new VariantItemResponseModel
             {
                 Name = entity.Name ?? string.Empty,
-                Culture = null
+                Culture = null,
             }
         ];
+    }
 
     /// <summary>
     /// Maps the specified <see cref="IMediaEntitySlim"/> to a <see cref="MediaTypeReferenceResponseModel"/>.
