@@ -57,6 +57,33 @@ internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, 
         string? filter,
         int skip,
         int take)
+        => await GetListViewItemsByKeyAsync(user, key, dataTypeKey, orderBy, null, orderDirection, filter, skip, take);
+
+    /// <summary>
+    /// Asynchronously retrieves a paged list of media items, filtered and ordered (optionally by a specific culture) according to the specified parameters.
+    /// </summary>
+    /// <param name="user">The user requesting the media list view items.</param>
+    /// <param name="key">An optional key identifying the parent media item to filter by. If null, retrieves from the root.</param>
+    /// <param name="dataTypeKey">An optional data type key to further filter the media items.</param>
+    /// <param name="orderBy">The property name to order the results by.</param>
+    /// <param name="orderCulture">An optional culture code to use for ordering culture-variant properties.</param>
+    /// <param name="orderDirection">The direction to order the results (ascending or descending).</param>
+    /// <param name="filter">An optional filter string to apply to the media items.</param>
+    /// <param name="skip">The number of items to skip for paging.</param>
+    /// <param name="take">The number of items to take for paging.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The result contains an <see cref="Attempt{T, TStatus}"/> with a paged list view model of media items if successful, or a <see cref="ContentCollectionOperationStatus"/> indicating the outcome.
+    /// </returns>
+    public async Task<Attempt<ListViewPagedModel<IMedia>?, ContentCollectionOperationStatus>> GetListViewItemsByKeyAsync(
+        IUser user,
+        Guid? key,
+        Guid? dataTypeKey,
+        string orderBy,
+        string? orderCulture,
+        Direction orderDirection,
+        string? filter,
+        int skip,
+        int take)
     {
         IMedia? media = key.HasValue
             ? _mediaService.GetById(key.Value)
@@ -67,7 +94,7 @@ internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, 
             return Attempt.FailWithStatus<ListViewPagedModel<IMedia>?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.ContentNotFound, null);
         }
 
-        return await GetListViewResultAsync(user, media, dataTypeKey, orderBy, null, orderDirection, filter, skip, take);
+        return await GetListViewResultAsync(user, media, dataTypeKey, orderBy, orderCulture, orderDirection, filter, skip, take);
     }
 
     // We can use an authorizer here, as it already handles all the necessary checks for this filtering.
