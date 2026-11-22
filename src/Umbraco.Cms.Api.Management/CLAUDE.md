@@ -20,7 +20,7 @@ RESTful API for Umbraco backoffice operations. Manages content, media, users, an
 
 ### Key Technologies
 - **Web Framework**: ASP.NET Core MVC with `Asp.Versioning.Mvc` (v1.0 and v1.1)
-- **OpenAPI**: Microsoft.AspNetCore.OpenApi with custom transformers, Swagger UI via Swashbuckle
+- **OpenAPI**: Microsoft.AspNetCore.OpenApi with custom transformers; the UI comes from the registered `IOpenApiUiProvider`
 - **Authentication**: OpenIddict via `Umbraco.Cms.Api.Common` (reference tokens, not JWT)
 - **Authorization**: Policy-based with `IAuthorizationService`
 - **Validation**: FluentValidation via base controllers
@@ -72,7 +72,6 @@ src/Umbraco.Cms.Api.Management/
 - **Umbraco.Infrastructure** - Service implementations, data access
 - **Umbraco.PublishedCache.HybridCache** - Published content queries
 - **Microsoft.AspNetCore.OpenApi** - OpenAPI document generation
-- **Swashbuckle.AspNetCore.SwaggerUI** - Swagger UI
 
 ### Design Patterns
 1. **Controller-per-Operation** - Each endpoint is a separate controller class
@@ -682,7 +681,7 @@ Examples:
 - `PUT /umbraco/management/api/v1/document/{id}` - Update document
 - `DELETE /umbraco/management/api/v1/document/{id}` - Delete document
 
-Full spec: See OpenApi.json or Swagger UI at `/umbraco/openapi/`
+Full spec: See OpenApi.json or the OpenAPI UI at `/umbraco/openapi/`
 
 ### Getting Help
 - **Root Documentation**: `/CLAUDE.md` (repository overview)

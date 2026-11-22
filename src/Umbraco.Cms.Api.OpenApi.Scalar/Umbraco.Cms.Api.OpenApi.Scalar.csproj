@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Title>Umbraco CMS - API - OpenAPI UI - Scalar</Title>
+    <Description>Serves the Umbraco CMS OpenAPI documents with the Scalar API reference.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Scalar.AspNetCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+</Project>

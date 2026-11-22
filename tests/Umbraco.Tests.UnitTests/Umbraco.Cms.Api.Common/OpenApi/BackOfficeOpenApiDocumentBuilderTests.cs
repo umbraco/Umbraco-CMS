@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Swashbuckle.AspNetCore.SwaggerUI;
 using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -81,41 +80,40 @@ public class BackOfficeOpenApiDocumentBuilderTests
     }
 
     [Test]
-    public void WithTitle_Without_WithUiTitle_Uses_Title_As_Swagger_Dropdown_Label()
+    public void WithTitle_Without_WithUiTitle_Uses_Title_As_Ui_Document_Title()
     {
-        SwaggerUIOptions swaggerOptions = BuildAndResolveSwaggerOptions(b => b.WithTitle("My API"));
+        UmbracoOpenApiUiOptions uiOptions = BuildAndResolveUiOptions(b => b.WithTitle("My API"));
 
-        Assert.IsTrue(swaggerOptions.ConfigObject.Urls!.Any(url => url.Name == "My API"));
+        Assert.IsTrue(uiOptions.Documents.Any(document => document.Title == "My API"));
     }
 
     [Test]
-    public void WithUiTitle_Overrides_Swagger_Dropdown_Label_Only()
+    public void WithUiTitle_Overrides_Ui_Document_Title_Only()
     {
-        SwaggerUIOptions swaggerOptions = BuildAndResolveSwaggerOptions(b => b
+        UmbracoOpenApiUiOptions uiOptions = BuildAndResolveUiOptions(b => b
             .WithTitle("Info Title")
             .WithUiTitle("Short Label"));
 
-        Assert.IsTrue(swaggerOptions.ConfigObject.Urls!.Any(url => url.Name == "Short Label"));
-        Assert.IsFalse(swaggerOptions.ConfigObject.Urls!.Any(url => url.Name == "Info Title"));
+        Assert.IsTrue(uiOptions.Documents.Any(document => document.Title == "Short Label"));
+        Assert.IsFalse(uiOptions.Documents.Any(document => document.Title == "Info Title"));
     }
 
     [Test]
-    public void Default_Without_Title_Uses_DocumentName_As_Swagger_Dropdown_Label()
+    public void Default_Without_Title_Uses_DocumentName_As_Ui_Document_Title()
     {
-        SwaggerUIOptions swaggerOptions = BuildAndResolveSwaggerOptions();
+        UmbracoOpenApiUiOptions uiOptions = BuildAndResolveUiOptions();
 
-        Assert.IsTrue(swaggerOptions.ConfigObject.Urls!.Any(url => url.Name == DocumentName));
+        Assert.IsTrue(uiOptions.Documents.Any(document => document.Title == DocumentName));
     }
 
     [Test]
-    public void ExcludeFromUi_Skips_Swagger_Dropdown_Registration()
+    public void ExcludeFromUi_Skips_Ui_Document_Registration()
     {
-        SwaggerUIOptions swaggerOptions = BuildAndResolveSwaggerOptions(b => b
+        UmbracoOpenApiUiOptions uiOptions = BuildAndResolveUiOptions(b => b
             .WithTitle("My API")
             .ExcludeFromUi());
 
-        IEnumerable<UrlDescriptor>? urls = swaggerOptions.ConfigObject.Urls;
-        Assert.IsTrue(urls is null || urls.All(url => url.Name != "My API" && url.Name != DocumentName));
+        Assert.IsEmpty(uiOptions.Documents);
     }
 
     [Test]
@@ -145,11 +143,11 @@ public class BackOfficeOpenApiDocumentBuilderTests
         return provider.GetRequiredService<IOptionsMonitor<OpenApiOptions>>().Get(DocumentName);
     }
 
-    private static SwaggerUIOptions BuildAndResolveSwaggerOptions(Action<BackOfficeOpenApiDocumentBuilder>? configure = null)
+    private static UmbracoOpenApiUiOptions BuildAndResolveUiOptions(Action<BackOfficeOpenApiDocumentBuilder>? configure = null)
     {
         ServiceCollection services = Build(configure);
         ServiceProvider provider = services.BuildServiceProvider();
-        return provider.GetRequiredService<IOptionsMonitor<SwaggerUIOptions>>().CurrentValue;
+        return provider.GetRequiredService<IOptions<UmbracoOpenApiUiOptions>>().Value;
     }
 
     private static ServiceCollection Build(Action<BackOfficeOpenApiDocumentBuilder>? configure = null)

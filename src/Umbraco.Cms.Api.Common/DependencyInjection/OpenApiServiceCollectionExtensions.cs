@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.SwaggerUI;
 using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Extensions;
 
@@ -13,11 +11,11 @@ namespace Umbraco.Cms.Api.Common.DependencyInjection;
 public static class OpenApiServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds an OpenAPI document to the OpenAPI UI document selector dropdown.
+    /// Adds an OpenAPI document to the documents offered by the OpenAPI UI.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> instance.</param>
     /// <param name="documentName">The name/identifier of the OpenAPI document.</param>
-    /// <param name="documentTitle">The title to display in the UI dropdown. Defaults to <paramref name="documentName"/> if not specified.</param>
+    /// <param name="documentTitle">The title to display in the UI. Defaults to <paramref name="documentName"/> if not specified.</param>
     /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
     public static IServiceCollection AddOpenApiDocumentToUi(
         this IServiceCollection services,
@@ -26,24 +24,33 @@ public static class OpenApiServiceCollectionExtensions
         => services.AddOpenApiDocumentToUi(documentName, () => documentTitle);
 
     /// <summary>
-    /// Adds an OpenAPI document to the OpenAPI UI document selector dropdown, resolving the title lazily so
-    /// callers (such as builder-pattern helpers) can defer it until SwaggerUI options are resolved.
+    /// Adds an OpenAPI document to the documents offered by the OpenAPI UI, resolving the title lazily so
+    /// callers (such as builder-pattern helpers) can defer it until the UI options are resolved.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> instance.</param>
     /// <param name="documentName">The name/identifier of the OpenAPI document.</param>
-    /// <param name="documentTitleFactory">Factory invoked when SwaggerUI options are resolved. Returning <c>null</c> falls back to <paramref name="documentName"/>.</param>
+    /// <param name="documentTitleFactory">Factory invoked when the UI options are resolved. Returning <c>null</c> falls back to <paramref name="documentName"/>.</param>
     /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
     internal static IServiceCollection AddOpenApiDocumentToUi(
         this IServiceCollection services,
         string documentName,
         Func<string?> documentTitleFactory)
     {
-        services.AddOptions<SwaggerUIOptions>()
-            .Configure<IOptions<UmbracoOpenApiOptions>>((swaggerUiOptions, openApiOptions) =>
+        services.AddOptions<UmbracoOpenApiUiOptions>()
+            .Configure<IOptions<UmbracoOpenApiOptions>>((uiOptions, openApiOptions) =>
             {
-                var openApiRoute = openApiOptions.Value.RouteTemplate.Replace("{documentName}", documentName).EnsureStartsWith("/");
-                swaggerUiOptions.SwaggerEndpoint(openApiRoute, documentTitleFactory() ?? documentName);
-                swaggerUiOptions.ConfigObject.Urls = swaggerUiOptions.ConfigObject.Urls.OrderBy(x => x.Name);
+                var url = openApiOptions.Value.RouteTemplate.Replace("{documentName}", documentName).EnsureStartsWith("/");
+                var document = new OpenApiUiDocument(documentName, documentTitleFactory() ?? documentName, url);
+
+                OpenApiUiDocument? existing = uiOptions.Documents.FirstOrDefault(x => x.Name == documentName);
+                if (existing is not null)
+                {
+                    uiOptions.Documents[uiOptions.Documents.IndexOf(existing)] = document;
+                }
+                else
+                {
+                    uiOptions.Documents.Add(document);
+                }
             });
 
         return services;

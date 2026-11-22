@@ -19,10 +19,10 @@ public class UmbracoOpenApiOptions
     public bool Enabled { get; set; }
 
     /// <summary>
-    /// Gets or sets whether the default OpenAPI UI is enabled.
+    /// Gets or sets whether the registered <see cref="IOpenApiUiProvider"/> serves its UI.
     /// Only applies when <see cref="Enabled"/> is true.
-    /// Set to false to disable the default UI while keeping OpenAPI documents available,
-    /// allowing you to use an alternative UI.
+    /// Set to false to stop serving the UI while keeping OpenAPI documents available,
+    /// for example to host a UI outside of Umbraco.
     /// Default: true.
     /// </summary>
     public bool DefaultUiEnabled { get; set; } = true;
@@ -38,7 +38,7 @@ public class UmbracoOpenApiOptions
     public string RouteTemplate { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the route prefix for OpenAPI UI.
+    /// Gets or sets the route prefix the OpenAPI UI is served under.
     /// </summary>
     /// <remarks>
     /// Populated by <c>AddUmbracoOpenApi</c> to <c>"{backOfficePath}/openapi"</c>. The initial <see cref="string.Empty"/>

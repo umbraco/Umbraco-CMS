@@ -1,6 +1,6 @@
 # Umbraco CMS - Multi-Project Repository
 
-Enterprise-grade CMS built on .NET 11.0. This repository contains 21 production projects organized in a layered architecture with clear separation of concerns.
+Enterprise-grade CMS built on .NET 11.0. This repository contains 23 production projects organized in a layered architecture with clear separation of concerns.
 
 **Repository**: https://github.com/umbraco/Umbraco-CMS
 **License**: MIT
@@ -12,7 +12,7 @@ Enterprise-grade CMS built on .NET 11.0. This repository contains 21 production 
 
 ### What This Repository Contains
 
-**21 Production Projects** organized in 3 main categories:
+**23 Production Projects** organized in 3 main categories:
 
 1. **Core Architecture** (Domain & Infrastructure)
    - `Umbraco.Core` - Interface contracts, domain models, notifications
@@ -30,6 +30,7 @@ Enterprise-grade CMS built on .NET 11.0. This repository contains 21 production 
    - Caching: `PublishedCache.HybridCache` (in-memory + distributed)
    - Search: `Umbraco.Cms.Search.*` (search abstractions + Examine/Lucene provider)
    - Imaging: `Imaging.ImageSharp` v1 & v2 (image processing)
+   - OpenAPI UI: `Api.OpenApi.SwaggerUI` (default) & `Api.OpenApi.Scalar` (interchangeable UIs for the OpenAPI documents)
    - Other: Static assets, targets, development tools
 
 **6 Test Projects**:
@@ -47,7 +48,7 @@ Enterprise-grade CMS built on .NET 11.0. This repository contains 21 production 
 - **Entity Framework Core** - Modern ORM
 - **OpenIddict** - OAuth 2.0/OpenID Connect authentication
 - **Microsoft.AspNetCore.OpenApi** - OpenAPI document generation
-- **Swashbuckle.AspNetCore.SwaggerUI** - Swagger UI for API documentation
+- **OpenAPI UI** - pluggable via `IOpenApiUiProvider`: Swagger UI (Swashbuckle, the default) or Scalar
 - **Lucene.NET** - Full-text search via Examine
 - **ImageSharp** - Image processing
 
@@ -67,7 +68,7 @@ This repository is a product platform, not an application. Every layer is consum
 
 ```
 Umbraco-CMS/
-├── src/                                    # 21 production projects
+├── src/                                    # 23 production projects
 │   ├── Umbraco.Core/                      # Domain contracts (interfaces only)
 │   │   └── CLAUDE.md                      # ⭐ Core architecture guide
 │   ├── Umbraco.Infrastructure/            # Service implementations
@@ -87,6 +88,8 @@ Umbraco-CMS/
 │   ├── Umbraco.Cms.Persistence.SqlServer/ # Legacy SQL Server
 │   ├── Umbraco.Cms.Imaging.ImageSharp/    # Image processing v1
 │   ├── Umbraco.Cms.Imaging.ImageSharp2/   # Image processing v2
+│   ├── Umbraco.Cms.Api.OpenApi.SwaggerUI/ # OpenAPI UI: Swagger UI (default)
+│   ├── Umbraco.Cms.Api.OpenApi.Scalar/   # OpenAPI UI: Scalar
 │   ├── Umbraco.Cms.StaticAssets/          # Embedded assets
 │   ├── Umbraco.Cms.DevelopmentMode.Backoffice/
 │   ├── Umbraco.Cms.Targets/               # NuGet targets
@@ -464,7 +467,7 @@ APIs use `Asp.Versioning.Mvc`:
 - Management API: `/umbraco/management/api/v{version}/*`
 - Delivery API: `/umbraco/delivery/api/v{version}/*`
 - OpenAPI docs: `/umbraco/openapi/management.json`, `/umbraco/openapi/delivery.json`
-- Swagger UI: `/umbraco/openapi/`
+- OpenAPI UI: `/umbraco/openapi/` (Swagger UI by default; see `IOpenApiUiProvider`)
 
 ### Updating `OpenApi.json` (Management API)
 

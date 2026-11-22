@@ -26,7 +26,6 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="OpenIddict.Abstractions" />
     <PackageReference Include="OpenIddict.AspNetCore" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" />
   </ItemGroup>
 
   <ItemGroup>

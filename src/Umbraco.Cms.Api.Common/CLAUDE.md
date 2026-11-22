@@ -14,7 +14,7 @@ Shared infrastructure for Umbraco CMS REST APIs (Management and Delivery).
 
 - **ASP.NET Core** - Web framework
 - **Microsoft.AspNetCore.OpenApi** - OpenAPI document generation
-- **Swashbuckle.AspNetCore.SwaggerUI** - Swagger UI for browsing API documentation
+- **IOpenApiUiProvider** - Pluggable OpenAPI UI contract (Swagger UI and Scalar ship as separate packages)
 - **OpenIddict** - OAuth 2.0/OpenID Connect authentication
 - **Asp.Versioning** - API versioning
 - **System.Text.Json** - Polymorphic JSON serialization
@@ -110,7 +110,7 @@ dotnet test tests/Umbraco.Tests.Integration/
 
 # Verify OpenAPI generation
 # 1. Run the application: dotnet run --project src/Umbraco.Web.UI
-# 2. Navigate to /umbraco/openapi/ for Swagger UI
+# 2. Navigate to /umbraco/openapi/ for the OpenAPI UI
 # 3. Check schema IDs and operation IDs
 # OpenAPI JSON documents available at:
 #   - /umbraco/openapi/management.json (Management API)
@@ -261,8 +261,11 @@ With Microsoft.AspNetCore.OpenApi, transformers are configured per OpenAPI docum
 - OpenAPI 3.1.1 document generation
 - Custom transformers: `SchemaIdTransformer`, `OperationIdTransformer`, `MimeTypeDocumentTransformer`, `ServerTransformer`
 
-**Swashbuckle.AspNetCore.SwaggerUI**:
-- Swagger UI for browsing and testing API endpoints
+**OpenAPI UI** (no UI dependency in this project):
+- `IOpenApiUiProvider` serves the UI; at most one is registered (`AddOpenApiUi<T>()` replaces, `TryAddOpenApiUi<T>()` only fills an empty slot)
+- `UmbracoOpenApiUiOptions` is the UI-independent description of what to show: the documents (populated by `AddOpenApiDocumentToUi`) and the OAuth security schemes to authorize with the `umbraco-swagger` client
+- `GetOAuthRedirectPaths()` feeds the redirect URIs `BackOfficeApplicationManager` registers for that client; with no provider the client is removed
+- Implementations: `Umbraco.Cms.Api.OpenApi.SwaggerUI` (in the `Umbraco.Cms` meta-package, uses `TryAddOpenApiUi`) and `Umbraco.Cms.Api.OpenApi.Scalar` (installing it replaces Swagger UI)
 - Accessed at `/umbraco/openapi/`
 
 **Asp.Versioning**:
