@@ -32,6 +32,8 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
 
     private IDocumentCacheService DocumentCacheService => GetRequiredService<IDocumentCacheService>();
 
+    private IPublishStatusQueryService PublishStatusQueryService => GetRequiredService<IPublishStatusQueryService>();
+
     private const string NewName = "New Name";
     private const string NewTitle = "New Title";
 
@@ -640,6 +642,85 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
 
         var restoredPublished = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, false);
         Assert.IsNull(restoredPublished, "Restored content should not be in the published cache until it is republished");
+    }
+
+    [Test]
+    public async Task Restored_Published_Descendants_Return_To_Published_Cache_When_Parent_Is_Republished()
+    {
+        Guid childKey = await CreatePublishedChildAsync("Published Child");
+        Assert.IsNotNull(await PublishedContentHybridCache.GetByIdAsync(childKey), "Child should be published before trashing");
+
+        await TrashPublishedTextPageAsync();
+        Assert.IsNull(await PublishedContentHybridCache.GetByIdAsync(childKey), "Trashed child should not be in the published cache");
+
+        await RestorePublishedTextPageAsync(includeDescendants: true);
+        Assert.IsNull(await PublishedContentHybridCache.GetByIdAsync(childKey), "Child should stay hidden while its restored parent is unpublished");
+
+        await RepublishPublishedTextPageAsync();
+
+        var restoredChild = await PublishedContentHybridCache.GetByIdAsync(childKey);
+        Assert.IsNotNull(restoredChild, "Restored published child should be back in the published cache once its parent is republished");
+        Assert.AreEqual("Published Child", restoredChild!.Name);
+    }
+
+    [Test]
+    public async Task Descendant_Unpublished_In_Recycle_Bin_Stays_Out_Of_Published_Cache_When_Parent_Is_Restored_And_Republished()
+    {
+        Guid childKey = await CreatePublishedChildAsync("Published Child");
+        await TrashPublishedTextPageAsync();
+
+        var unpublishChildResult = await ContentPublishingService.UnpublishAsync(childKey, null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(unpublishChildResult.Success);
+
+        await RestorePublishedTextPageAsync(includeDescendants: true);
+        await RepublishPublishedTextPageAsync();
+
+        Assert.IsNull(await PublishedContentHybridCache.GetByIdAsync(childKey), "A child unpublished while in the recycle bin should not return to the published cache");
+    }
+
+    [Test]
+    public async Task Published_Content_Restored_Without_Descendants_Is_Unpublished()
+    {
+        await CreateChildAsync("Unpublished Child");
+        await TrashPublishedTextPageAsync();
+        await RestorePublishedTextPageAsync(includeDescendants: false);
+
+        Assert.IsFalse(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(PublishedTextPage.Key!.Value), "Restored content should not be reported as published until it is republished");
+        Assert.IsNull(await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value), "Restored content should not be in the published cache until it is republished");
+    }
+
+    private async Task<Guid> CreateChildAsync(string name)
+    {
+        var child = ContentEditingBuilder.CreateSimpleContent(ContentType.Key, name, PublishedTextPage.Key);
+        var createChildResult = await ContentEditingService.CreateAsync(child, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createChildResult.Success);
+        return child.Key!.Value;
+    }
+
+    private async Task<Guid> CreatePublishedChildAsync(string name)
+    {
+        Guid childKey = await CreateChildAsync(name);
+        var publishChildResult = await ContentPublishingService.PublishAsync(childKey, CultureAndSchedule, Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishChildResult.Success);
+        return childKey;
+    }
+
+    private async Task TrashPublishedTextPageAsync()
+    {
+        var trashResult = await ContentEditingService.MoveToRecycleBinAsync(PublishedTextPage.Key!.Value, Constants.Security.SuperUserKey);
+        Assert.IsTrue(trashResult.Success);
+    }
+
+    private async Task RestorePublishedTextPageAsync(bool includeDescendants)
+    {
+        var restoreResult = await ContentEditingService.RestoreAsync(PublishedTextPage.Key!.Value, null, Constants.Security.SuperUserKey, includeDescendants: includeDescendants);
+        Assert.IsTrue(restoreResult.Success);
+    }
+
+    private async Task RepublishPublishedTextPageAsync()
+    {
+        var republishResult = await ContentPublishingService.PublishAsync(PublishedTextPage.Key!.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+        Assert.IsTrue(republishResult.Success);
     }
 
     private void AssertTextPage(IPublishedContent textPage)

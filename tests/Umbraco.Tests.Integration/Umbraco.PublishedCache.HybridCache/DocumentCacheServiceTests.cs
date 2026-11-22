@@ -603,6 +603,44 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
             "SqlBulkCopy with SqlBulkCopyOptions.Default causes constraints to become untrusted.");
     }
 
+    [Test]
+    public async Task RefreshContentAsync_Of_Trashed_Published_Content_Keeps_The_Published_Record()
+    {
+        IContent trashedContent = TrashPublishedTextpage();
+
+        await DocumentCacheService.RefreshContentAsync(trashedContent);
+
+        Assert.That(CountPublishedRecords(Textpage.Id), Is.EqualTo(1));
+    }
+
+    [Test]
+    public async Task RefreshContentAsync_Of_Trashed_Content_Being_Unpublished_Removes_The_Published_Record()
+    {
+        IContent trashedContent = TrashPublishedTextpage();
+        trashedContent.PublishedState = PublishedState.Unpublishing;
+
+        await DocumentCacheService.RefreshContentAsync(trashedContent);
+
+        Assert.That(CountPublishedRecords(Textpage.Id), Is.Zero);
+    }
+
+    private IContent TrashPublishedTextpage()
+    {
+        Assert.That(ContentService.Publish(Textpage, ["*"]).Success, Is.True);
+        Assert.That(ContentService.MoveToRecycleBin(Textpage).Success, Is.True);
+        return ContentService.GetById(Textpage.Key)!;
+    }
+
+    private int CountPublishedRecords(int nodeId)
+    {
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        var selectSql = SqlContext.Sql()
+            .SelectCount()
+            .From<ContentNuDto>()
+            .Where<ContentNuDto>(x => x.NodeId == nodeId && x.Published);
+        return ScopeAccessor.AmbientScope!.Database.ExecuteScalar<int>(selectSql);
+    }
+
     [GeneratedRegex(@"""dt"":""[^""]+""")]
     private static partial Regex RemoveDatesFromJsonSerialization();
 }

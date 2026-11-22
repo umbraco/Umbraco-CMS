@@ -80,7 +80,7 @@ internal sealed class DocumentHybridCacheSynchronousPersistenceTests : UmbracoIn
     }
 
     [Test]
-    public void Trash_DeletesTheRows_ThroughTheSynchronousRepositoryMembers_AndClearsTheMemoryCache()
+    public void Trash_KeepsTheRows_AndClearsTheMemoryCache()
     {
         Assert.That(ContentService.Publish(Textpage, ["*"]).Success, Is.True);
         Repository.Reset();
@@ -90,7 +90,7 @@ internal sealed class DocumentHybridCacheSynchronousPersistenceTests : UmbracoIn
         Assert.Multiple(() =>
         {
             Assert.That(Repository.AsynchronousWrites, Is.Zero);
-            Assert.That(Repository.SynchronousWrites, Is.GreaterThan(0));
+            Assert.That(Repository.SynchronousWrites, Is.Zero);
             Assert.That(PublishedContentCache.GetById(Textpage.Key), Is.Null);
         });
     }
