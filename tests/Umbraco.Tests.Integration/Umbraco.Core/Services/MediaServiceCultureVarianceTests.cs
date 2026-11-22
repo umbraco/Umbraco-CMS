@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -420,5 +419,70 @@ internal sealed class MediaServiceCultureVarianceTests : UmbracoIntegrationTest
         var refetched = MediaService.GetById(media.Key)!;
         Assert.AreEqual("My Photo", refetched.GetCultureName("en-US"), "Name should not change on update without rename");
         Assert.AreEqual("Mit Foto", refetched.GetCultureName("da-DK"), "Name should not change on update without rename");
+    }
+
+    [Test]
+    public async Task Switching_Media_Type_To_Culture_Variant_Moves_Invariant_Name_To_Default_Culture()
+    {
+        IMedia media = await CreateInvariantMediaAsync("Existing Photo");
+
+        await SetMediaTypeVariationAsync(media.ContentType.Key, ContentVariation.Culture);
+
+        IMedia fetched = MediaService.GetById(media.Key)!;
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Existing Photo", fetched.GetCultureName("en-US"));
+            Assert.IsNull(fetched.GetCultureName("da-DK"));
+        });
+    }
+
+    [Test]
+    public async Task Can_Save_Existing_Media_After_Media_Type_Is_Switched_To_Culture_Variant()
+    {
+        IMedia media = await CreateInvariantMediaAsync("Existing Photo");
+
+        await SetMediaTypeVariationAsync(media.ContentType.Key, ContentVariation.Culture);
+
+        IMedia fetched = MediaService.GetById(media.Key)!;
+        Attempt<OperationResult?> saveResult = MediaService.Save(fetched);
+
+        IMedia refetched = MediaService.GetById(media.Key)!;
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(saveResult.Success);
+            Assert.AreEqual("Existing Photo", refetched.Name);
+            Assert.AreEqual("Existing Photo", refetched.GetCultureName("en-US"));
+        });
+    }
+
+    [Test]
+    public async Task Switching_Media_Type_Back_To_Invariant_Keeps_Invariant_Name()
+    {
+        IMedia media = await CreateInvariantMediaAsync("Existing Photo");
+
+        await SetMediaTypeVariationAsync(media.ContentType.Key, ContentVariation.Culture);
+        await SetMediaTypeVariationAsync(media.ContentType.Key, ContentVariation.Nothing);
+
+        IMedia fetched = MediaService.GetById(media.Key)!;
+        Assert.AreEqual("Existing Photo", fetched.Name);
+    }
+
+    private async Task<IMedia> CreateInvariantMediaAsync(string name)
+    {
+        var mediaType = MediaTypeBuilder.CreateSimpleMediaType("switchingMedia", "Switching Media");
+        mediaType.AllowedAsRoot = true;
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
+
+        var media = MediaService.CreateMedia(name, Constants.System.Root, mediaType.Alias);
+        MediaService.Save(media);
+        return media;
+    }
+
+    private async Task SetMediaTypeVariationAsync(Guid mediaTypeKey, ContentVariation variation)
+    {
+        IMediaType mediaType = MediaTypeService.Get(mediaTypeKey)!;
+        mediaType.Variations = variation;
+        var result = await MediaTypeService.UpdateAsync(mediaType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, $"Updating the media type variation failed: {result.Result}");
     }
 }
