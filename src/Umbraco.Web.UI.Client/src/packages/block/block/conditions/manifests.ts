@@ -6,6 +6,8 @@ import {
 	UMB_BLOCK_ENTRY_IS_READ_ONLY_CONDITION_ALIAS,
 	UMB_BLOCK_ENTRY_IS_UNSUPPORTED_CONDITION_ALIAS,
 	UMB_BLOCK_WORKSPACE_HAS_CONTENT_CONDITION_ALIAS,
+	UMB_BLOCK_ENTRY_VARIES_BY_VARIANT_CONDITION_ALIAS,
+	UMB_BLOCK_WORKSPACE_VARIES_BY_VARIANT_CONDITION_ALIAS,
 } from './constants.js';
 import UmbBlockEntryHasSettingsCondition from './block-entry-has-settings.condition.js';
 import UmbBlockEntryHasExternalContentCondition from './block-entry-has-external-content.condition.js';
@@ -15,7 +17,9 @@ import UmbBlockEntryIsReadOnlyCondition from './block-entry-is-read-only.conditi
 import UmbBlockEntryIsUnsupportedCondition from './block-entry-is-unsupported.condition.js';
 import UmbBlockEntryShowContentEditCondition from './block-entry-show-content-edit.condition.js';
 import UmbBlockWorkspaceHasContentCondition from './block-workspace-has-content.condition.js';
+import UmbBlockEntryVariesByVariantCondition from './block-entry-varies-by-variant.condition.js';
 import UmbBlockWorkspaceHasSettingsCondition from './block-workspace-has-settings.condition.js';
+import UmbBlockWorkspaceVariesByVariantCondition from './block-workspace-varies-by-variant.condition.js';
 import UmbBlockWorkspaceIsExposedCondition from './block-workspace-is-exposed.condition.js';
 import UmbBlockWorkspaceIsReadOnlyCondition from './block-workspace-is-readonly.condition.js';
 import type { ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
@@ -86,5 +90,17 @@ export const manifests: Array<ManifestCondition> = [
 		name: 'Block Entry Is Unsupported Condition',
 		alias: UMB_BLOCK_ENTRY_IS_UNSUPPORTED_CONDITION_ALIAS,
 		api: UmbBlockEntryIsUnsupportedCondition,
+	},
+	{
+		type: 'condition',
+		name: 'Block Entry Varies By Variant Condition',
+		alias: UMB_BLOCK_ENTRY_VARIES_BY_VARIANT_CONDITION_ALIAS,
+		api: UmbBlockEntryVariesByVariantCondition,
+	},
+	{
+		type: 'condition',
+		name: 'Block Workspace Varies By Variant Condition',
+		alias: UMB_BLOCK_WORKSPACE_VARIES_BY_VARIANT_CONDITION_ALIAS,
+		api: UmbBlockWorkspaceVariesByVariantCondition,
 	},
 ];

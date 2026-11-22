@@ -1833,6 +1833,52 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/tree/data-type/batch": {
+      "get": {
+        "tags": [
+          "Data Type"
+        ],
+        "summary": "Gets multiple data type tree items.",
+        "description": "Gets the data type tree items identified by the provided Ids.",
+        "operationId": "GetTreeDataTypeBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponseModelDataTypeTreeItemResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/data-type/children": {
       "get": {
         "tags": [
@@ -3008,6 +3054,52 @@
                   "items": {
                     "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/tree/dictionary/batch": {
+      "get": {
+        "tags": [
+          "Dictionary"
+        ],
+        "summary": "Gets multiple dictionary tree items.",
+        "description": "Gets the dictionary tree items identified by the provided Ids.",
+        "operationId": "GetTreeDictionaryBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponseModelNamedEntityTreeItemResponseModel"
                 }
               }
             }
@@ -7475,6 +7567,60 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/tree/document/batch": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "summary": "Gets multiple document tree items.",
+        "description": "Gets the document tree items identified by the provided Ids, omitting any the current user cannot see in the tree.",
+        "operationId": "GetTreeDocumentBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponseModelDocumentTreeItemResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/document/children": {
       "get": {
         "tags": [
@@ -9123,6 +9269,52 @@
                   "items": {
                     "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/tree/document-blueprint/batch": {
+      "get": {
+        "tags": [
+          "Document Blueprint"
+        ],
+        "summary": "Gets multiple document blueprint tree items.",
+        "description": "Gets the document blueprint tree items identified by the provided Ids, omitting any the current user cannot see in the tree.",
+        "operationId": "GetTreeDocumentBlueprintBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponseModelDocumentBlueprintTreeItemResponseModel"
                 }
               }
             }
@@ -11852,6 +12044,52 @@
                   "items": {
                     "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/tree/document-type/batch": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "summary": "Gets multiple document type tree items.",
+        "description": "Gets the document type tree items identified by the provided Ids.",
+        "operationId": "GetTreeDocumentTypeBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponseModelDocumentTypeTreeItemResponseModel"
                 }
               }
             }
@@ -16339,6 +16577,60 @@
                   "items": {
                     "$ref": "#/components/schemas/ElementTreeItemResponseModel"
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/tree/element/batch": {
+      "get": {
+        "tags": [
+          "Element"
+        ],
+        "summary": "Gets multiple element tree items.",
+        "description": "Gets the element tree items identified by the provided Ids, omitting any the current user cannot see in the tree.",
+        "operationId": "GetTreeElementBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponseModelElementTreeItemResponseModel"
                 }
               }
             }
@@ -21376,6 +21668,60 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/tree/media/batch": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Gets multiple media tree items.",
+        "description": "Gets the media tree items identified by the provided Ids, omitting any the current user cannot see in the tree.",
+        "operationId": "GetTreeMediaBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponseModelMediaTreeItemResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/media/children": {
       "get": {
         "tags": [
@@ -23891,6 +24237,52 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/tree/media-type/batch": {
+      "get": {
+        "tags": [
+          "Media Type"
+        ],
+        "summary": "Gets multiple media type tree items.",
+        "description": "Gets the media type tree items identified by the provided Ids.",
+        "operationId": "GetTreeMediaTypeBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponseModelMediaTypeTreeItemResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/media-type/children": {
       "get": {
         "tags": [
@@ -25707,6 +26099,52 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/tree/member-group/batch": {
+      "get": {
+        "tags": [
+          "Member Group"
+        ],
+        "summary": "Gets multiple member group tree items.",
+        "description": "Gets the member group tree items identified by the provided Ids.",
+        "operationId": "GetTreeMemberGroupBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponseModelNamedEntityTreeItemResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -27834,6 +28272,52 @@
                   "items": {
                     "$ref": "#/components/schemas/MemberTypeTreeItemResponseModel"
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/tree/member-type/batch": {
+      "get": {
+        "tags": [
+          "Member Type"
+        ],
+        "summary": "Gets multiple member type tree items.",
+        "description": "Gets the member type tree items identified by the provided Ids.",
+        "operationId": "GetTreeMemberTypeBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponseModelMemberTypeTreeItemResponseModel"
                 }
               }
             }
@@ -35342,6 +35826,52 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/tree/template/batch": {
+      "get": {
+        "tags": [
+          "Template"
+        ],
+        "summary": "Gets multiple template tree items.",
+        "description": "Gets the template tree items identified by the provided Ids.",
+        "operationId": "GetTreeTemplateBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponseModelNamedEntityTreeItemResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/template/children": {
       "get": {
         "tags": [
@@ -41660,6 +42190,63 @@
           }
         }
       },
+      "BatchResponseModelDataTypeTreeItemResponseModel": {
+        "required": [
+          "total",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
+            }
+          }
+        }
+      },
+      "BatchResponseModelDocumentBlueprintTreeItemResponseModel": {
+        "required": [
+          "total",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
+            }
+          }
+        }
+      },
+      "BatchResponseModelDocumentTreeItemResponseModel": {
+        "required": [
+          "total",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
+            }
+          }
+        }
+      },
       "BatchResponseModelDocumentTypeResponseModel": {
         "required": [
           "total",
@@ -41675,6 +42262,25 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentTypeResponseModel"
+            }
+          }
+        }
+      },
+      "BatchResponseModelDocumentTypeTreeItemResponseModel": {
+        "required": [
+          "total",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
             }
           }
         }
@@ -41698,6 +42304,44 @@
           }
         }
       },
+      "BatchResponseModelElementTreeItemResponseModel": {
+        "required": [
+          "total",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ElementTreeItemResponseModel"
+            }
+          }
+        }
+      },
+      "BatchResponseModelMediaTreeItemResponseModel": {
+        "required": [
+          "total",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaTreeItemResponseModel"
+            }
+          }
+        }
+      },
       "BatchResponseModelMediaTypeResponseModel": {
         "required": [
           "total",
@@ -41717,6 +42361,25 @@
           }
         }
       },
+      "BatchResponseModelMediaTypeTreeItemResponseModel": {
+        "required": [
+          "total",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+            }
+          }
+        }
+      },
       "BatchResponseModelMemberTypeResponseModel": {
         "required": [
           "total",
@@ -41732,6 +42395,44 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MemberTypeResponseModel"
+            }
+          }
+        }
+      },
+      "BatchResponseModelMemberTypeTreeItemResponseModel": {
+        "required": [
+          "total",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MemberTypeTreeItemResponseModel"
+            }
+          }
+        }
+      },
+      "BatchResponseModelNamedEntityTreeItemResponseModel": {
+        "required": [
+          "total",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
             }
           }
         }

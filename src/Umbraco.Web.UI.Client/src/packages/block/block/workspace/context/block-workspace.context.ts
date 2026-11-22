@@ -52,7 +52,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	setOriginData(data: UmbBlockWorkspaceOriginData) {
 		this.#originData = data;
 	}
-	// Cached index of this block in its parent layout list, recomputed only when layouts or contentKey change.
+	// Cached index of this block in its parent layout list, recomputed only when layouts or the layout key change.
 	#index: number | undefined;
 	#modalContext?: typeof UMB_MODAL_CONTEXT.TYPE;
 	#retrieveModalContext;
@@ -67,7 +67,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	#layout = new UmbObjectState<LayoutDataType | undefined>(undefined);
 	readonly layout = this.#layout.asObservable();
-	readonly unique = this.#layout.asObservablePart((x) => x?.contentKey);
+	readonly unique = this.#layout.asObservablePart((x) => x?.key);
 	readonly contentKey = this.#layout.asObservablePart((x) => x?.contentKey);
 
 	readonly content = new UmbBlockElementManager(
@@ -94,6 +94,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	#hasContent = new UmbBooleanState<undefined>(undefined);
 	readonly hasContent = this.#hasContent.asObservable();
+
+	/**
+	 * Whether the block is exposed per variant, which is the case when its content type varies by culture.
+	 * Segments are value variations within a culture and don't have an expose of their own.
+	 */
+	readonly variesByVariant = this.content.structure.variesByCulture;
 
 	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
@@ -128,9 +134,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			if (context) {
 				this.observe(
 					// TODO: Turn this into a observablePart that is retrievable from the block entries context, so we do not have to observe multiple values here. [NL]
-					observeMultiple([context.layoutEntries, this.contentKey]).pipe(
-						map(([layouts, contentKey]) => {
-							const found = contentKey ? layouts.findIndex((x) => x.contentKey === contentKey) : -1;
+					observeMultiple([context.layoutEntries, this.unique]).pipe(
+						map(([layouts, key]) => {
+							const found = key ? layouts.findIndex((x) => x.key === key) : -1;
 							return found !== -1 ? found : undefined;
 						}),
 						distinctUntilChanged(),
@@ -421,6 +427,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 	}
 
+	/**
+	 * Load the block placement identified by its layout key.
+	 * @param {string} unique The key of the layout entry, not the content key: a content key can be referenced by several placements.
+	 * @returns {Promise<void>}
+	 * @memberof UmbBlockWorkspaceContext
+	 */
 	async load(unique: string) {
 		await this.#retrieveBlockManager;
 		await this.#retrieveBlockEntries;
@@ -429,7 +441,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}
 
 		this.observe(
-			this.#blockEntries.layoutOf(unique),
+			this.#blockEntries.byKey(unique),
 			(layoutData) => {
 				this.#initialLayout ??= layoutData as LayoutDataType;
 				this.removeUmbControllerByAlias('observeLayoutInitially');
@@ -476,7 +488,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				throw new Error('Block Entries could not insert block');
 			}
 
-			const unique = blockCreated.layout.contentKey;
+			const unique = blockCreated.layout.key;
 
 			this.#observeBlockData(unique);
 			this.establishLiveSync();
@@ -494,7 +506,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			throw new Error('Block Entries not found');
 		}
 		this.observe(
-			this.#blockEntries.layoutOf(unique),
+			this.#blockEntries.byKey(unique),
 			(layoutData) => {
 				this.#layout.setValue(layoutData as LayoutDataType);
 
@@ -595,7 +607,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 
 	getUnique() {
-		return this.getData()!.contentKey;
+		return this.getData()!.key;
 	}
 
 	getEntityType() {
@@ -646,6 +658,36 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 
 	async submit() {
+		const layoutData = await this.#storeData();
+		this.#expose(layoutData.contentKey);
+		this.setIsNew(false);
+
+		this.#reportValidation();
+	}
+
+	/**
+	 * Stores the edits and sets the block as not exposed for the current variant, without validating.
+	 * The content of the variant is kept, so exposing the block again restores it.
+	 */
+	async submitAndUnexpose() {
+		const layoutData = await this.#storeData();
+		const variantId = this.#variantId.getValue();
+		if (!variantId) throw new Error('Failed to unexpose block, missing variant id.');
+		this.#blockManager?.removeOneExpose(layoutData.contentKey, variantId);
+		this.#clearVariantValidationMessages();
+		this.#reportValidation();
+		this.setIsNew(false);
+		this._closeModal();
+	}
+
+	#clearVariantValidationMessages() {
+		for (const manager of [this.content, this.settings]) {
+			const messages = manager.validation.messages;
+			messages.removeMessageByKeys(messages.getMessages().map((x) => x.key));
+		}
+	}
+
+	async #storeData(): Promise<LayoutDataType> {
 		const layoutData = this.#layout.value;
 		const contentData = this.content.getData();
 		if (!layoutData || !this.#blockManager || !this.#blockEntries || !contentData || !this.#originData) {
@@ -678,10 +720,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			}
 		}
 
-		this.#expose(layoutData.contentKey);
-		this.setIsNew(false);
-
-		this.#reportValidation();
+		return layoutData;
 	}
 
 	#reportValidation() {

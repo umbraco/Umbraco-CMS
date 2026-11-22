@@ -3,7 +3,7 @@ import { UMB_CURRENT_USER_HISTORY_STORE_CONTEXT } from './current-user-history.s
 import { html, customElement, state, nothing, css, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { truncateString, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
 const PAGE_SIZE = 10;
@@ -57,18 +57,6 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 		return this._history.slice(skip, skip + PAGE_SIZE);
 	}
 
-	#truncate(input: string | undefined, length: number, separator = '...'): string {
-		if (!input) return '';
-		if (input.length <= length) return input;
-
-		const separatorLength = separator.length;
-		const charsToShow = length - separatorLength;
-		const frontChars = Math.ceil(charsToShow / 2);
-		const backChars = Math.floor(charsToShow / 2);
-
-		return input.substring(0, frontChars) + separator + input.substring(input.length - backChars);
-	}
-
 	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('user_yourHistory')}>
@@ -86,7 +74,7 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 
 	#renderItem(item: UmbCurrentUserHistoryItem) {
 		return html`
-			<uui-ref-node name=${item.label} detail=${this.#truncate(item.displayPath, 50)} href=${item.path}>
+			<uui-ref-node name=${item.label} detail=${truncateString(item.displayPath, 50, '...')} href=${item.path}>
 				<uui-icon slot="icon" name="icon-link"></uui-icon>
 			</uui-ref-node>
 		`;

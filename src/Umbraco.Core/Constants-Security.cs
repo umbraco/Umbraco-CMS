@@ -184,6 +184,11 @@ public static partial class Constants
         public const string OpenIdDictSubClaimType = "sub";
 
         /// <summary>
+        ///     The claim type for "Authentication Methods References" (RFC 8176).
+        /// </summary>
+        public const string AuthenticationMethodsReferencesClaimType = "amr";
+
+        /// <summary>
         ///     The algorithm name for ASP.NET Core v3 PBKDF2 password hashing.
         /// </summary>
         public const string AspNetCoreV3PasswordHashAlgorithmName = "PBKDF2.ASPNETCORE.V3";

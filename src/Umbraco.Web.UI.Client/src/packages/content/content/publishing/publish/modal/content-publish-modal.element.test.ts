@@ -2,6 +2,7 @@ import { UmbContentPublishModalElement } from './content-publish-modal.element.j
 import type { UmbContentPublishModalData, UmbContentPublishModalValue } from './types.js';
 import { aTimeout, expect, fixture, html } from '@open-wc/testing';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { umbLocalizationManager, type UmbLocalizationSet } from '@umbraco-cms/backoffice/localization-api';
 import { UmbPublishableVariantState, type UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
 function createOption(culture: string | null): UmbEntityVariantOptionModel {
@@ -42,12 +43,26 @@ function getConfirmButton(element: UmbContentPublishModalElement) {
 	return element.shadowRoot!.querySelector('uui-button[look="primary"]') as HTMLElement & { disabled: boolean };
 }
 
+function getDescription(element: UmbContentPublishModalElement) {
+	return element.shadowRoot!.querySelector('uui-dialog-layout > p')!.textContent?.trim();
+}
+
 function getSelectAllCheckbox(element: UmbContentPublishModalElement) {
 	const picker = element.shadowRoot!.querySelector('umb-content-variant-language-picker')!;
 	return picker.shadowRoot!.querySelector('uui-checkbox') as HTMLElement & { disabled: boolean };
 }
 
 describe('UmbContentPublishModalElement', () => {
+	before(() => {
+		const localization: UmbLocalizationSet = {
+			$code: 'en',
+			$dir: 'ltr',
+			prompt_confirmPublish: 'Default confirmation',
+			testCustomConfirmation: 'Custom confirmation',
+		};
+		umbLocalizationManager.registerLocalization(localization);
+	});
+
 	it('is defined with its own instance', async () => {
 		const element = await createModal({ options: [createOption(null)] }, { selection: [] });
 		expect(element).to.be.instanceOf(UmbContentPublishModalElement);
@@ -93,5 +108,20 @@ describe('UmbContentPublishModalElement', () => {
 		const element = await createModal({ options: [createOption(null)] }, { selection: [] });
 
 		expect(getConfirmButton(element).disabled).to.be.false;
+	});
+
+	it('shows the default confirmation when no description is given', async () => {
+		const element = await createModal({ options: [createOption(null)] }, { selection: [] });
+
+		expect(getDescription(element)).to.equal('Default confirmation');
+	});
+
+	it('shows the given description instead of the default confirmation', async () => {
+		const element = await createModal(
+			{ options: [createOption(null)], description: '#testCustomConfirmation' },
+			{ selection: [] },
+		);
+
+		expect(getDescription(element)).to.equal('Custom confirmation');
 	});
 });

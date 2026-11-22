@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Extensions;
@@ -81,6 +82,12 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
         if (selectorOption.Values.Length > 0 && TryCreateFilter(selectorOption.FieldName, FilterOperation.Is, selectorOption.Values, out Filter? selectorOptionFilter))
         {
             filters.Add(selectorOptionFilter);
+
+            // PathIds is ancestors-or-self; the descendants selector must exclude the start item itself.
+            if (selectorOption.FieldName == DescendantsSelectorIndexer.FieldName)
+            {
+                filters.Add(new KeywordFilter(Constants.Search.FieldNames.Id, selectorOption.Values, true));
+            }
         }
 
         foreach (FilterOption filterOption in filterOptions)
@@ -245,7 +252,6 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
             // ChildrenSelectorIndexer:
             "parentId" => Constants.Search.FieldNames.ParentId,
             // DescendantsSelectorIndexer:
-            // TODO: this is somewhat wrong... PathIds equals ancestors-or-self, but the Delivery API queries for ancestors only
             "ancestorIds" => Constants.Search.FieldNames.PathIds,
             // ContentTypeFilterIndexer:
             "contentType" => Constants.Search.FieldNames.ContentTypeId,

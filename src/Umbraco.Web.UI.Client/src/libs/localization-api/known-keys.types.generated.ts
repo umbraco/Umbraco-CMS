@@ -339,6 +339,7 @@ declare global {
 		blockEditor_rangeAllowed: string;
 		blockEditor_rootValidationEntriesNotAllowed: string;
 		blockEditor_scaleHandlerButtonTitle: string;
+		blockEditor_setUnexpose: string;
 		blockEditor_showSizeOptions: string;
 		blockEditor_sizeOptions: string;
 		blockEditor_sizeOptionsHelp: string;
@@ -1016,6 +1017,9 @@ declare global {
 		editdatatype_rteWidthAndHeight: string;
 		editdatatype_selectFolder: string;
 		editdatatype_wasMoved: string;
+		elements_confirmBulkPublishDescription: string;
+		elements_confirmBulkUnpublishDescription: string;
+		elements_confirmPublishDescription: string;
 		embeddedMedia_dimensionsDescription: string;
 		emptyStates_emptyDictionaryTree: string;
 		entityDetail_forbiddenDescription: (entityType: string) => string;
@@ -1866,6 +1870,9 @@ declare global {
 		publish_nodePublish: string;
 		publish_nodePublishAll: string;
 		publish_publishAll: string;
+		publish_publishedNotificationDescription: string;
+		publish_publishedNotificationTitle: string;
+		publish_publishedVariantNotificationDescription: string;
 		publish_publishHelp: string;
 		recycleBin_contentTrashed: string;
 		recycleBin_itemCannotBeRestored: string;

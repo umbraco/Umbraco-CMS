@@ -3,6 +3,7 @@ import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_ROOT_ENTITY_TYPE, UMB_ELEMENT_FOLD
 import type {
 	UmbElementTreeChildrenOfRequestArgs,
 	UmbElementTreeItemModel,
+	UmbElementTreeItemsRequestArgs,
 	UmbElementTreeRootItemsRequestArgs,
 } from '../types.js';
 import { UmbManagementApiElementTreeDataRequestManager } from './element-tree.server.request-manager.js';
@@ -48,6 +49,14 @@ export class UmbElementTreeServerDataSource
 
 	async getAncestorsOf(args: UmbTreeAncestorsOfRequestArgs) {
 		const { data, error } = await this.#treeRequestManager.getAncestorsOf(args);
+
+		const mappedData = data?.map((item) => this.#mapItem(item));
+
+		return { data: mappedData, error };
+	}
+
+	async getItems(args: UmbElementTreeItemsRequestArgs) {
+		const { data, error } = await this.#treeRequestManager.getBatch(args);
 
 		const mappedData = data?.map((item) => this.#mapItem(item));
 
