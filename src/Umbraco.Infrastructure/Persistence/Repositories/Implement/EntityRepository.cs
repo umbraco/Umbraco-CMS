@@ -208,6 +208,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
         EntitySlim entity = BuildEntity(dto);
 
+        if (entity is MediaEntitySlim mediaEntity)
+        {
+            BuildMediaVariants([mediaEntity]);
+        }
+
         return entity;
     }
 

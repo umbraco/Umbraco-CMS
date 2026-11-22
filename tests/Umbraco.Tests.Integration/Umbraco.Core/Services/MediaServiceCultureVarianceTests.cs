@@ -188,6 +188,49 @@ internal sealed class MediaServiceCultureVarianceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Single_Slim_Entity_By_Key_Has_Culture_Names_For_Variant_Media()
+    {
+        IMedia media = await CreateAndSaveVariantMediaAsync();
+
+        IEntitySlim? entity = EntityService.Get(media.Key, UmbracoObjectTypes.Media);
+
+        AssertHasCultureNames(entity);
+    }
+
+    [Test]
+    public async Task Single_Slim_Entity_By_Id_Has_Culture_Names_For_Variant_Media()
+    {
+        IMedia media = await CreateAndSaveVariantMediaAsync();
+
+        IEntitySlim? entity = EntityService.Get(media.Id, UmbracoObjectTypes.Media);
+
+        AssertHasCultureNames(entity);
+    }
+
+    private async Task<IMedia> CreateAndSaveVariantMediaAsync()
+    {
+        var mediaType = await CreateCultureVariantMediaTypeAync();
+
+        var media = MediaService.CreateMedia("test", Constants.System.Root, mediaType.Alias);
+        media.SetCultureName("EN Single", "en-US");
+        media.SetCultureName("DA Single", "da-DK");
+        MediaService.Save(media);
+        return media;
+    }
+
+    private static void AssertHasCultureNames(IEntitySlim? entity)
+    {
+        Assert.IsNotNull(entity);
+        Assert.IsInstanceOf<IMediaEntitySlim>(entity);
+
+        var mediaSlim = (IMediaEntitySlim)entity!;
+        Assert.AreEqual(ContentVariation.Culture, mediaSlim.Variations);
+        Assert.AreEqual(2, mediaSlim.CultureNames.Count);
+        Assert.AreEqual("EN Single", mediaSlim.CultureNames["en-US"]);
+        Assert.AreEqual("DA Single", mediaSlim.CultureNames["da-DK"]);
+    }
+
+    [Test]
     public async Task Culture_Variant_Media_Can_Be_Deleted()
     {
         var mediaType = await CreateCultureVariantMediaTypeAync();
