@@ -551,28 +551,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     public async Task GetByKeysAsync_DoesNotCacheNull_WhenContentExistsButAncestorCheckFails()
     {
         var ancestorCheckReturnsTrue = false;
-
-        var controllableMock = new Mock<IPublishStatusQueryService>();
-        controllableMock.Setup(x => x.IsDocumentPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
-        controllableMock.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>()))
-            .Returns(() => ancestorCheckReturnsTrue);
-
-        var controlledCacheService = new DocumentCacheService(
-            _mockDatabaseCacheRepository.Object,
-            GetRequiredService<IIdKeyMap>(),
-            GetRequiredService<ICoreScopeProvider>(),
-            GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>(),
-            GetRequiredService<IPublishedContentFactory>(),
-            GetRequiredService<ICacheNodeFactory>(),
-            GetSeedProviders(controllableMock.Object),
-            new OptionsWrapper<CacheSettings>(new CacheSettings()),
-            GetRequiredService<IPublishedModelFactory>(),
-            GetRequiredService<IPreviewService>(),
-            controllableMock.Object,
-            new NullLogger<DocumentCacheService>(),
-            new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()),
-            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())),
-            Mock.Of<IContentCacheDataSerializerFactory>());
+        DocumentCacheService controlledCacheService = CreateControllableCacheService(() => ancestorCheckReturnsTrue);
 
         var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
         await hybridCache.RemoveAsync($"{Textpage.Key}");
@@ -585,6 +564,56 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         IReadOnlyList<IPublishedContent> result = await controlledCacheService.GetByKeysAsync([Textpage.Key], false);
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual(Textpage.Key, result[0].Key);
+    }
+
+    [Test]
+    public async Task SeedAsync_DoesNotCacheNull_WhenContentExistsButAncestorCheckFails()
+    {
+        var ancestorCheckReturnsTrue = false;
+        var seedProvider = new Mock<IDocumentSeedKeyProvider>();
+        seedProvider.Setup(x => x.GetSeedKeys()).Returns(new HashSet<Guid> { Textpage.Key });
+        DocumentCacheService controlledCacheService = CreateControllableCacheService(
+            () => ancestorCheckReturnsTrue,
+            [seedProvider.Object]);
+
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}");
+
+        // The database returns the node during seeding but the ancestor check fails, so nothing is cached.
+        await controlledCacheService.SeedAsync(CancellationToken.None);
+        Assert.IsFalse(await controlledCacheService.HasContentByIdAsync(Textpage.Id));
+
+        // Once the ancestor check passes the node must be found: seeding must not cache null.
+        ancestorCheckReturnsTrue = true;
+        IReadOnlyList<IPublishedContent> result = await controlledCacheService.GetByKeysAsync([Textpage.Key], false);
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual(Textpage.Key, result[0].Key);
+    }
+
+    private DocumentCacheService CreateControllableCacheService(
+        Func<bool> ancestorCheck,
+        IEnumerable<IDocumentSeedKeyProvider>? seedProviders = null)
+    {
+        var controllableMock = new Mock<IPublishStatusQueryService>();
+        controllableMock.Setup(x => x.IsDocumentPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
+        controllableMock.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>())).Returns(ancestorCheck);
+
+        return new DocumentCacheService(
+            _mockDatabaseCacheRepository.Object,
+            GetRequiredService<IIdKeyMap>(),
+            GetRequiredService<ICoreScopeProvider>(),
+            GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>(),
+            GetRequiredService<IPublishedContentFactory>(),
+            GetRequiredService<ICacheNodeFactory>(),
+            seedProviders ?? GetSeedProviders(controllableMock.Object),
+            new OptionsWrapper<CacheSettings>(new CacheSettings()),
+            GetRequiredService<IPublishedModelFactory>(),
+            GetRequiredService<IPreviewService>(),
+            controllableMock.Object,
+            new NullLogger<DocumentCacheService>(),
+            new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()),
+            Mock.Of<IPreviewAccessEvaluator>(evaluator => evaluator.CanPreviewDocument(It.IsAny<IPublishedContent>())),
+            Mock.Of<IContentCacheDataSerializerFactory>());
     }
 
     [Test]
