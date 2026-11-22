@@ -117,9 +117,6 @@ public static partial class UmbracoBuilderExtensions
                         options.AddOperationTransformer<NotificationHeaderTransformer>();
                     }));
 
-            services.Configure<UmbracoOpenApiUiOptions>(options =>
-                options.OAuthSecuritySchemes.Add(ManagementApiConfiguration.ApiSecurityName));
-
             services.Configure<UmbracoPipelineOptions>(options =>
             {
                 options.AddFilter(
