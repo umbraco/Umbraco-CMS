@@ -799,23 +799,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
                 _logger.LogDebug("Document nodes to cache {NodeCount}", cacheNodes.Count);
             }
 
-            // The seeded nodes carry both identifiers, so the id/key map is warmed without any lookups of its own.
-            var idKeyPairs = new List<(int Id, Guid Key)>(cacheNodes.Count);
-
-            foreach (ContentCacheNode cacheNode in cacheNodes)
-            {
-                var cacheKey = GetCacheKey(cacheNode.Key, false);
-                await _hybridCache.SetAsync(
-                    cacheKey,
-                    cacheNode,
-                    GetSeedEntryOptions(),
-                    GenerateTags(cacheNode),
-                    cancellationToken: cancellationToken);
-
-                idKeyPairs.Add((cacheNode.Id, cacheNode.Key));
-            }
-
-            _idKeyMap.PopulateCache(idKeyPairs, UmbracoObjectTypes.Document);
+            await SeedBatchAsync(cacheNodes, cancellationToken);
         }
 
 #if DEBUG
@@ -824,6 +808,35 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 #else
         _logger.LogInformation("Document cache seeding completed with {SeedCount} seed keys.", SeedKeys.Count);
 #endif
+    }
+
+    private async Task SeedBatchAsync(List<ContentCacheNode> cacheNodes, CancellationToken cancellationToken)
+    {
+        // The seeded nodes carry both identifiers, so the id/key map is warmed without any lookups of its own.
+        var idKeyPairs = new List<(int Id, Guid Key)>(cacheNodes.Count);
+
+        foreach (ContentCacheNode cacheNode in cacheNodes)
+        {
+            // Warm the id/key map even for nodes skipped below, as ReadFromDatabaseAsync does.
+            idKeyPairs.Add((cacheNode.Id, cacheNode.Key));
+
+            // Seed keys aren't guaranteed to have a published ancestor path when seeding runs, so a node
+            // is only cached if it would also be visible when read through from the database.
+            if (_publishStatusQueryService.HasPublishedAncestorPath(cacheNode.Key) is false)
+            {
+                continue;
+            }
+
+            var cacheKey = GetCacheKey(cacheNode.Key, false);
+            await _hybridCache.SetAsync(
+                cacheKey,
+                cacheNode,
+                GetSeedEntryOptions(),
+                GenerateTags(cacheNode),
+                cancellationToken: cancellationToken);
+        }
+
+        _idKeyMap.PopulateCache(idKeyPairs, UmbracoObjectTypes.Document);
     }
 
     /// <summary>
