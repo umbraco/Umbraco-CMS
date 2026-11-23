@@ -198,7 +198,7 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 
 		if (specificMatches.length > 1) {
 			// Multiple specific matches — let the user pick
-			return await this.#showMediaTypePicker(specificMatches);
+			return await this.#showMediaTypePicker(specificMatches, file);
 		}
 
 		// All fallbacks — auto-select
@@ -218,8 +218,8 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 		}
 	}
 
-	async #showMediaTypePicker(options: Array<UmbAllowedMediaTypeModel>): Promise<boolean> {
-		return umbOpenModal(this, UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL, { data: { options } }).then(
+	async #showMediaTypePicker(options: Array<UmbAllowedMediaTypeModel>, file: File): Promise<boolean> {
+		return umbOpenModal(this, UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL, { data: { options, files: [file] } }).then(
 			() => true,
 			() => false,
 		);

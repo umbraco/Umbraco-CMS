@@ -31,6 +31,8 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase
 {
 	manifest?: ManifestWorkspaceContextMenuStructureKind;
 
+	#treeRepository?: Promise<UmbTreeRepository>;
+
 	#workspaceContext?: typeof UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT.TYPE;
 	readonly #args: UmbMenuTreeStructureWorkspaceContextBaseArgs;
 
@@ -195,10 +197,12 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase
 			return;
 		}
 
-		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<UmbTreeItemModel, UmbTreeRootModel>>(
-			this,
-			this.#args.treeRepositoryAlias,
-		);
+		const treeRepository = await (this.#treeRepository ??= createExtensionApiByAlias<
+			UmbTreeRepository<UmbTreeItemModel, UmbTreeRootModel>
+		>(this, this.#args.treeRepositoryAlias).catch((error) => {
+			this.#treeRepository = undefined;
+			throw error;
+		}));
 
 		const { data: root } = await treeRepository.requestTreeRoot();
 

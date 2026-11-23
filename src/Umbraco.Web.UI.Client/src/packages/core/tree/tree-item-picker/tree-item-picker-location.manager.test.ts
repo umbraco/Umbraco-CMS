@@ -348,4 +348,92 @@ describe('UmbTreeItemPickerLocationManager', () => {
 			expect(manager.getCurrentLocation()).to.be.null;
 		});
 	});
+
+	describe('resolving the start node configuration', () => {
+		const first = { unique: 'a', entityType: 'test-item' };
+		const second = { unique: 'b', entityType: 'test-item' };
+
+		it('scopes to the start node when no start nodes are set', () => {
+			manager.setStartNode(first);
+
+			expect(manager.getStartNode()).to.deep.equal(first);
+			expect(manager.getStartNodes()).to.be.undefined;
+		});
+
+		it('scopes to a single start node when only one start node is set', () => {
+			manager.setStartNodes([first]);
+
+			expect(manager.getStartNode()).to.deep.equal(first);
+			expect(manager.getStartNodes()).to.be.undefined;
+		});
+
+		it('scopes to several start nodes in preference to the start node', () => {
+			manager.setStartNode(first);
+			manager.setStartNodes([first, second]);
+
+			expect(manager.getStartNode()).to.be.undefined;
+			expect(manager.getStartNodes()).to.deep.equal([first, second]);
+		});
+
+		it('falls back to the start node when the start nodes are cleared', () => {
+			manager.setStartNode(first);
+			manager.setStartNodes([first, second]);
+			manager.setStartNodes(undefined);
+
+			expect(manager.getStartNode()).to.deep.equal(first);
+			expect(manager.getStartNodes()).to.be.undefined;
+		});
+	});
+
+	describe('scoping items to the start nodes', () => {
+		const first = { unique: 'a', entityType: 'test-item' };
+		const second = { unique: 'b', entityType: 'test-item' };
+
+		describe('with several start nodes', () => {
+			beforeEach(() => manager.setStartNodes([first, second]));
+
+			it('treats each start node as browse only', () => {
+				expect(manager.isBrowseOnlyStartNode('a')).to.be.true;
+				expect(manager.isBrowseOnlyStartNode('b')).to.be.true;
+				expect(manager.isBrowseOnlyStartNode('c')).to.be.false;
+				expect(manager.isBrowseOnlyStartNode(null)).to.be.false;
+			});
+
+			it('accepts an item below one of the start nodes', () => {
+				expect(manager.isWithinStartNodes({ unique: 'c', ancestors: [{ unique: 'b' }] })).to.be.true;
+			});
+
+			it('rejects an item below none of the start nodes', () => {
+				expect(manager.isWithinStartNodes({ unique: 'c', ancestors: [{ unique: 'x' }] })).to.be.false;
+			});
+
+			it('rejects an item without ancestors', () => {
+				expect(manager.isWithinStartNodes({ unique: 'c', ancestors: [] })).to.be.false;
+				expect(manager.isWithinStartNodes({ unique: 'c' })).to.be.false;
+			});
+
+			it('rejects a start node itself', () => {
+				expect(manager.isWithinStartNodes({ unique: 'a', ancestors: [{ unique: 'b' }] })).to.be.false;
+			});
+		});
+
+		describe('with a single start node', () => {
+			beforeEach(() => manager.setStartNode(first));
+
+			it('does not treat the start node as browse only', () => {
+				expect(manager.isBrowseOnlyStartNode('a')).to.be.false;
+			});
+
+			it('accepts any item', () => {
+				expect(manager.isWithinStartNodes({ unique: 'c' })).to.be.true;
+			});
+		});
+
+		describe('without a start node', () => {
+			it('accepts any item', () => {
+				expect(manager.isBrowseOnlyStartNode('a')).to.be.false;
+				expect(manager.isWithinStartNodes({ unique: 'c' })).to.be.true;
+			});
+		});
+	});
 });

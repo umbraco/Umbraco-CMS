@@ -13,7 +13,7 @@
 - **Rich Text**: **TipTap 3** — ProseMirror-based editor (see `src/packages/tiptap/`)
 - **Build**: Vite 7 (config in `vite.config.ts`)
 - **State**: RxJS 7 wrapped by UmbState classes — see [Core Primitives](./core-primitives.md)
-- **Context/DI**: DOM-event-based Context API — see [Core Primitives](./core-primitives.md)
+- **Context/DI**: DOM-event-based Context API — see [Context API](./context-api.md)
 - **Testing**: @web/test-runner + Playwright, @open-wc/testing — see [Testing](./testing.md)
 - **Mocking**: MSW 2 — see [Testing](./testing.md)
 - **Code Quality**: ESLint 9 (flat config), Prettier
@@ -150,7 +150,7 @@ export const manifest: UmbExtensionManifestKind = {
 
 ### Context API, Observable State & Controllers
 
-These core primitives are documented in detail in **[Core Primitives](./core-primitives.md)**. In brief:
+These core primitives are documented in detail in **[Core Primitives](./core-primitives.md)** (the Context API and Observable State go deeper in **[Context API](./context-api.md)** and **[State System](./state-system.md)**). In brief:
 
 - **Context API** — DOM-event-based dependency injection. Providers expose typed contexts to descendant elements via `provideContext()`, consumers access them via `consumeContext()` or `getContext()`.
 - **Observable State** — Reactive state containers (`UmbStringState`, `UmbArrayState`, `UmbObjectState`, etc.). Elements subscribe via `this.observe()` which handles lifecycle automatically.
@@ -165,6 +165,29 @@ No element or context should call the Management API directly. All data flows th
 `Element` → observes → `Context` → calls → `Repository` → delegates to → `Data Source` → calls → `Generated API Client`
 
 See **[Data Flow](./data-flow.md)** for the complete implementation pattern with base classes, `tryExecute()`, and a worked example.
+
+### Separation of Concerns Between Web Components
+
+Each web component owns its appearance and behavior. A host owns its slots; the slotted component owns itself.
+
+- Only set CSS custom properties inside `::slotted`.
+- Apply other styling of slotted content to the `<slot>` or a parent element.
+- Use CSS custom properties for styles the slotted component should inherit.
+- Change a slotted component's look through its public properties (such as `look`). If it has none that fits, add one to that component and document it with `@prop` or `@cssprop` (see [Style Guide](./style-guide.md)).
+
+Existing rules that don't follow this are fixed in their own PR, not in unrelated work.
+
+```ts
+// Don't — the host styles the slotted component
+static override styles = css`
+	slot[name='actions']::slotted(*) {
+		background-color: var(--uui-color-surface);
+	}
+`;
+
+// Do — the host uses what the slotted component exposes
+html`<umb-entity-actions-bundle slot="actions" look="secondary"></umb-entity-actions-bundle>`;
+```
 
 ---
 

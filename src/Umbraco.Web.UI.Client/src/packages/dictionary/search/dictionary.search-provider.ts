@@ -19,6 +19,7 @@ export class UmbDictionarySearchProvider
 
 	override destroy(): void {
 		this.#repository.destroy();
+		super.destroy();
 	}
 }
 

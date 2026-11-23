@@ -65,7 +65,7 @@ public class PropertyValueConverterTests : DeliveryApiTests
         var draftContent = SetupPublishedContent("The page (draft)", draftContentKey, PublishedItemType.Content, publishedContentType.Object);
         DraftContent = draftContent.Object;
 
-        PublishedContentCacheMock = new Mock<IPublishedContentCache>();
+        PublishedContentCacheMock = new Mock<IPublishedContentCache> { CallBase = true };
         PublishedContentCacheMock
             .Setup(pcc => pcc.GetById(contentKey))
             .Returns(publishedContent.Object);
@@ -76,7 +76,7 @@ public class PropertyValueConverterTests : DeliveryApiTests
             .Setup(pcc => pcc.GetById(true, draftContentKey))
             .Returns(draftContent.Object);
 
-        PublishedMediaCacheMock = new Mock<IPublishedMediaCache>();
+        PublishedMediaCacheMock = new Mock<IPublishedMediaCache> { CallBase = true };
         PublishedMediaCacheMock
             .Setup(pcc => pcc.GetById(mediaKey))
             .Returns(publishedMedia.Object);

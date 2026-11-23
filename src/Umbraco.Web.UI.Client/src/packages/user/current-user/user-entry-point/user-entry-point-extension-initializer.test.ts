@@ -34,6 +34,7 @@ class UmbTestCurrentUserContext {
 	readonly currentUser = this.#currentUser.asObservable().pipe(filter((user) => !!user));
 	loadOnDemand = true;
 	loadDelayMs = 0;
+	failingLoads = 0;
 	signedInUser = 'test-user';
 	constructor(host: UmbElement) {
 		this.#host = host;
@@ -43,11 +44,18 @@ class UmbTestCurrentUserContext {
 	}
 	#loadPromise?: Promise<void>;
 	load() {
-		return (this.#loadPromise ??= this.#load());
+		return (this.#loadPromise ??= this.#load().catch((error) => {
+			this.#loadPromise = undefined;
+			throw error;
+		}));
 	}
 	async #load() {
 		const user = this.signedInUser;
 		if (this.loadDelayMs) await aTimeout(this.loadDelayMs);
+		if (this.failingLoads > 0) {
+			this.failingLoads--;
+			throw new Error('The current user could not be loaded');
+		}
 		if (this.loadOnDemand) this.setUser(user);
 	}
 	invalidate() {
@@ -231,6 +239,39 @@ describe('UmbUserEntryPointExtensionInitializer', () => {
 		authContext.setAuthorized(true);
 		await aTimeout(80);
 		expect(calls.init).to.equal(2);
+	});
+
+	it('does not run onInit while the current user fails to load, and runs it once a later load succeeds', async () => {
+		const seenUsers: Array<string | undefined> = [];
+		registry.register(createUserReadingManifest('Umb.Test.ReadsUser', currentUserContext, seenUsers));
+		currentUserContext.setUser('previous-user');
+		currentUserContext.signedInUser = 'signed-in-user';
+		currentUserContext.failingLoads = 1;
+		authContext.setAuthorized(true);
+		await aTimeout(50);
+		expect(seenUsers, 'onInit ran although the current user failed to load').to.deep.equal([]);
+
+		await currentUserContext.load();
+		await aTimeout(50);
+		expect(seenUsers).to.deep.equal(['signed-in-user']);
+	});
+
+	it('a failed current user load does not become an unhandled rejection', async () => {
+		const unhandled: PromiseRejectionEvent[] = [];
+		const onUnhandledRejection = (event: PromiseRejectionEvent) => {
+			event.preventDefault();
+			unhandled.push(event);
+		};
+		window.addEventListener('unhandledrejection', onUnhandledRejection);
+		try {
+			registry.register(createManifest('Umb.Test.A', calls));
+			currentUserContext.failingLoads = 1;
+			authContext.setAuthorized(true);
+			await aTimeout(50);
+			expect(unhandled, 'the failed load escaped as an unhandled rejection').to.have.lengthOf(0);
+		} finally {
+			window.removeEventListener('unhandledrejection', onUnhandledRejection);
+		}
 	});
 
 	it('runs onUnload when the manifest is unregistered while active', async () => {

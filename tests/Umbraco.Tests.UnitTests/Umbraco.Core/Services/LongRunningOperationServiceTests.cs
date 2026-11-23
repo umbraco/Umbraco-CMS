@@ -127,6 +127,40 @@ public class LongRunningOperationServiceTests
     }
 
     [Test]
+    public void Run_RecordsFailedStatus_WhenOperationThrows()
+    {
+        SetupScopeProviderMock();
+
+        _timeProviderMock.Setup(repo => repo.GetUtcNow())
+            .Returns(() => DateTime.UtcNow);
+
+        _longRunningOperationRepositoryMock
+            .Setup(repo => repo.CreateAsync(It.IsAny<LongRunningOperation>(), It.IsAny<DateTimeOffset>()))
+            .Returns(Task.CompletedTask);
+
+        _scopeProviderMock.Setup(scopeProvider => scopeProvider.Context)
+            .Returns(default(IScopeContext?));
+
+        var recordedStatuses = new List<LongRunningOperationStatus>();
+        _longRunningOperationRepositoryMock.Setup(repo => repo.UpdateStatusAsync(It.IsAny<Guid>(), It.IsAny<LongRunningOperationStatus>(), It.IsAny<DateTimeOffset>()))
+            .Callback<Guid, LongRunningOperationStatus, DateTimeOffset>((_, status, _) => recordedStatuses.Add(status))
+            .Returns(Task.CompletedTask);
+
+        Assert.CatchAsync(async () => await _longRunningOperationService.RunAsync(
+            "Test",
+            async _ =>
+            {
+                await Task.Yield();
+                throw new InvalidOperationException();
+            },
+            allowConcurrentExecution: true,
+            runInBackground: false));
+
+        Assert.That(recordedStatuses, Does.Not.Contain(LongRunningOperationStatus.Success));
+        Assert.AreEqual(LongRunningOperationStatus.Failed, recordedStatuses.LastOrDefault());
+    }
+
+    [Test]
     public void Run_ThrowsException_WhenAttemptingToRunOperationNotInBackgroundInsideAScope()
     {
         SetupScopeProviderMock();

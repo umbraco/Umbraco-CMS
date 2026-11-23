@@ -1033,7 +1033,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             return ContentTypeOperationStatus.CancelledByNotification;
         }
 
-        PerformDelete(scope, item, deletingNotification, eventMessages, performingUserId);
+        await PerformDeleteAsync(scope, item, deletingNotification, eventMessages, performingUserId);
 
         scope.Complete();
         return ContentTypeOperationStatus.Success;
@@ -1064,6 +1064,26 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     }
 
     private void PerformDelete(ICoreScope scope, TItem item, DeletingNotification<TItem> deletingNotification, EventMessages eventMessages, int userId)
+    {
+        (TItem[] descendantsAndSelf, ContentTypeChange<TItem>[] changes) = DeleteLocked(scope, item, eventMessages);
+
+        // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
+        _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
+
+        PublishDeleted(scope, item, descendantsAndSelf, changes, deletingNotification, eventMessages, userId);
+    }
+
+    private async Task PerformDeleteAsync(ICoreScope scope, TItem item, DeletingNotification<TItem> deletingNotification, EventMessages eventMessages, int userId)
+    {
+        (TItem[] descendantsAndSelf, ContentTypeChange<TItem>[] changes) = DeleteLocked(scope, item, eventMessages);
+
+        // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
+        await _eventAggregator.PublishAsync(GetContentTypeRefreshedNotification(changes, eventMessages));
+
+        PublishDeleted(scope, item, descendantsAndSelf, changes, deletingNotification, eventMessages, userId);
+    }
+
+    private (TItem[] DescendantsAndSelf, ContentTypeChange<TItem>[] Changes) DeleteLocked(ICoreScope scope, TItem item, EventMessages eventMessages)
     {
         scope.WriteLock(WriteLockIds);
 
@@ -1100,8 +1120,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)))
             .ToArray();
 
-        // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
-        _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
+        return (descendantsAndSelf, changes);
+    }
+
+    private void PublishDeleted(ICoreScope scope, TItem item, TItem[] descendantsAndSelf, ContentTypeChange<TItem>[] changes, DeletingNotification<TItem> deletingNotification, EventMessages eventMessages, int userId)
+    {
         scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 
         DeletedNotification<TItem> deletedNotification = GetDeletedNotification(descendantsAndSelf.DistinctBy(x => x.Id), eventMessages);
@@ -1520,7 +1543,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         // that one is special because it works across content, media and member types
         scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
 
-        IEnumerable<TItem> contentTypes = GetAllowedAtRootCandidates();
+        IEnumerable<TItem> contentTypes = GetAllowedAtRootCandidates().Where(candidate => candidate.IsElement is false);
 
         foreach (IContentTypeFilter filter in _contentTypeFilters)
         {
@@ -1576,7 +1599,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             // this to sort the resulting list of allowed children.
             Guid[] sortedKeys = allowedContentTypes.OrderBy(x => x.SortOrder).Select(x => x.Key).ToArray();
 
-            TItem[] allowedChildren = GetMany(sortedKeys).ToArray();
+            TItem[] allowedChildren = GetMany(sortedKeys).Where(candiate => candiate.IsElement is false).ToArray();
             result = new PagedModel<TItem>
             {
                 Items = allowedChildren.OrderBy(x => sortedKeys.IndexOf(x.Key)).Skip(skip).Take(take),

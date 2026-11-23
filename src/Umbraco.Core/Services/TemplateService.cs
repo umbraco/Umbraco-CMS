@@ -573,7 +573,7 @@ public class TemplateService : RepositoryService, ITemplateService
 
             EventMessages eventMessages = EventMessagesFactory.Get();
             var deletingNotification = new TemplateDeletingNotification(template, eventMessages);
-            if (scope.Notifications.PublishCancelable(deletingNotification))
+            if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
             {
                 scope.Complete();
                 return Attempt.FailWithStatus<ITemplate?, TemplateOperationStatus>(TemplateOperationStatus.CancelledByNotification, template);

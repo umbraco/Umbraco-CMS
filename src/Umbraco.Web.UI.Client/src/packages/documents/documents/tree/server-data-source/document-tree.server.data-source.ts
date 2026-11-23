@@ -2,6 +2,7 @@ import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../e
 import type {
 	UmbDocumentTreeChildrenOfRequestArgs,
 	UmbDocumentTreeItemModel,
+	UmbDocumentTreeItemsRequestArgs,
 	UmbDocumentTreeRootItemsRequestArgs,
 } from '../types.js';
 import { UmbManagementApiDocumentTreeDataRequestManager } from './document-tree.server.request-manager.js';
@@ -47,6 +48,14 @@ export class UmbDocumentTreeServerDataSource
 
 	async getAncestorsOf(args: UmbTreeAncestorsOfRequestArgs) {
 		const { data, error } = await this.#treeRequestManager.getAncestorsOf(args);
+
+		const mappedData = data?.map((item) => this.#mapItem(item));
+
+		return { data: mappedData, error };
+	}
+
+	async getItems(args: UmbDocumentTreeItemsRequestArgs) {
+		const { data, error } = await this.#treeRequestManager.getBatch(args);
 
 		const mappedData = data?.map((item) => this.#mapItem(item));
 

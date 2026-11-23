@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -391,6 +389,64 @@ public class UserEditorAuthorizationHelperTests
         var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234 }, new string[0]);
 
         Assert.IsTrue(result.Success);
+    }
+
+    [Test]
+    public void Cannot_Add_Root_Content_Start_Node_On_User_Without_Root_Access()
+    {
+        var currentUser = CreateUser(startContentIds: [9876]);
+        var savingUser = CreateUser();
+
+        var authHelper = CreateRootAccessAuthorizationHelper();
+
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [Constants.System.Root], [], []);
+
+        Assert.IsFalse(result.Success);
+    }
+
+    [Test]
+    public void Cannot_Add_Root_Media_Start_Node_On_User_Without_Root_Access()
+    {
+        var currentUser = CreateUser(startMediaIds: [9876]);
+        var savingUser = CreateUser();
+
+        var authHelper = CreateRootAccessAuthorizationHelper();
+
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [], [Constants.System.Root], []);
+
+        Assert.IsFalse(result.Success);
+    }
+
+    [Test]
+    public void Can_Add_Root_Start_Nodes_On_User_With_Root_Access()
+    {
+        var currentUser = CreateUser(startContentIds: [Constants.System.Root], startMediaIds: [Constants.System.Root]);
+        var savingUser = CreateUser();
+
+        var authHelper = CreateRootAccessAuthorizationHelper();
+
+        var result = authHelper.IsAuthorized(currentUser, savingUser, [Constants.System.Root], [Constants.System.Root], []);
+
+        Assert.IsTrue(result.Success);
+    }
+
+    private static UserEditorAuthorizationHelper CreateRootAccessAuthorizationHelper()
+    {
+        var nodePaths = new Dictionary<int, string>
+        {
+            { Constants.System.Root, Constants.System.RootString }, { 9876, "-1,9876" },
+        };
+
+        var entityService = new Mock<IEntityService>();
+        entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+            .Returns((UmbracoObjectTypes objType, int[] ids) =>
+                ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x }));
+
+        return new UserEditorAuthorizationHelper(
+            Mock.Of<IContentService>(),
+            Mock.Of<IMediaService>(),
+            entityService.Object,
+            AppCaches.Disabled);
     }
 
     private static IUser CreateUser(bool withGroup = false, int[] startContentIds = null, int[] startMediaIds = null)

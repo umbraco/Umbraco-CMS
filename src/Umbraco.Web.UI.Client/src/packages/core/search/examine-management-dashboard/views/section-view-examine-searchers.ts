@@ -7,7 +7,7 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { IndexerService, SearcherService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { tryExecute, UmbApiError } from '@umbraco-cms/backoffice/resources';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
@@ -35,6 +35,9 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 	@state()
 	private _searchLoading = false;
+
+	@state()
+	private _searchForbidden = false;
 
 	@query('#search-input')
 	private _searchInput!: HTMLInputElement;
@@ -110,7 +113,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		if (!this._searchInput.value.length) return;
 		this._searchLoading = true;
 
-		const { data } = await tryExecute(
+		const { data, error } = await tryExecute(
 			this,
 			SearcherService.getSearcherBySearcherNameQuery({
 				path: { searcherName: this.searcherName },
@@ -122,11 +125,18 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 			}),
 		);
 
-		this._searchResults = data?.items ?? [];
+		this._searchLoading = false;
+		this._searchForbidden = UmbApiError.isUmbApiError(error) && error.status === 403;
+
+		if (!data) {
+			this._searchResults = undefined;
+			return;
+		}
+
+		this._searchResults = data.items;
 		this.#paginationManager.setTotalItems(data.total);
 		this._totalNumberOfResults = data.total;
 		this._updateFieldFilter();
-		this._searchLoading = false;
 	}
 
 	private _updateFieldFilter() {
@@ -221,6 +231,9 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 	#renderSearchResults() {
 		if (this._searchLoading) return html`<uui-loader></uui-loader>`;
+		if (this._searchForbidden) {
+			return html`<p>${this.localize.term('examineManagement_searchNotAllowed')}</p>`;
+		}
 		if (!this._searchResults) return nothing;
 		if (!this._searchResults.length) {
 			return html`<p>${this.localize.term('examineManagement_noResults')}</p>`;

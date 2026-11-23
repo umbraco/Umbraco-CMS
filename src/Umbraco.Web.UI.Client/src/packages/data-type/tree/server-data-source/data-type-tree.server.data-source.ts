@@ -14,6 +14,7 @@ import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeDataSource,
+	UmbTreeItemsRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
 
@@ -73,12 +74,24 @@ export class UmbDataTypeTreeServerDataSource
 		return { data: mappedData, error };
 	}
 
+	async getItems(args: UmbTreeItemsRequestArgs) {
+		const { data, error } = await this.#treeRequestManager.getBatch(args);
+
+		const mappedData = data?.map((item) => this.#mapItem(item));
+
+		return { data: mappedData, error };
+	}
+
 	#mapItem(item: DataTypeTreeItemResponseModel): UmbDataTypeTreeItemModel {
 		return {
 			unique: item.id,
 			parent: {
 				unique: item.parent?.id || null,
-				entityType: item.parent ? UMB_DATA_TYPE_ENTITY_TYPE : UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
+				entityType: item.parent
+					? item.parentIsFolder
+						? UMB_DATA_TYPE_FOLDER_ENTITY_TYPE
+						: UMB_DATA_TYPE_ENTITY_TYPE
+					: UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
 			},
 			icon: this.#manifestPropertyEditorUis.find((ui) => ui.alias === item.editorUiAlias)?.meta.icon,
 			name: item.name,

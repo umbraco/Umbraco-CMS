@@ -132,10 +132,13 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			:host {
+				position: sticky;
+				bottom: calc(var(--uui-size-layout-1) * -1);
+				z-index: 10;
+
 				width: 100%;
-				margin-right: calc(
-					-1 * var(--uui-size-space-6)
-				); // compensate for the padding on the container. TODO: make a better solution
+				margin-right: calc(-1 * var(--uui-size-space-6));
+				/* compensate for the padding on the container. TODO: make a better solution */
 			}
 
 			#container {

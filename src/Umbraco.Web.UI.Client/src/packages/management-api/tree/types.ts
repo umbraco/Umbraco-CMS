@@ -2,6 +2,7 @@ import type { UmbOffsetPaginationRequestModel, UmbTargetPaginationRequestModel }
 import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
+	UmbTreeItemsRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
 
@@ -30,3 +31,6 @@ export interface UmbManagementApiTreeSiblingsFromRequestArgs extends UmbTreeRoot
 		takeAfter: UmbTargetPaginationRequestModel['takeAfter'];
 	};
 }
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbManagementApiTreeBatchRequestArgs extends UmbTreeItemsRequestArgs {}

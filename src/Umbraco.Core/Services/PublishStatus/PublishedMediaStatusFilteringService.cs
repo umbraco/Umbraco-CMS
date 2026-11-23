@@ -57,11 +57,9 @@ internal sealed class PublishedMediaStatusFilteringService : IPublishedMediaStat
         }
     }
 
-    // Sync-over-async is intentional: FilterAvailable backs the sync IPublishedContent.Children()/
-    // Descendants() surface, and GetByKeysAsync has no sync counterpart.
     private void ResolvePersistedItems(IReadOnlyCollection<Guid> missedKeys, IDictionary<Guid, IPublishedContent> results)
     {
-        foreach (IPublishedContent content in _mediaCacheService.GetByKeysAsync(missedKeys).GetAwaiter().GetResult())
+        foreach (IPublishedContent content in _mediaCacheService.GetByKeys(missedKeys))
         {
             results[content.Key] = content;
         }
