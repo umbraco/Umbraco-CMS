@@ -26,7 +26,7 @@ export class StylesheetUiHelper extends UiBaseLocators{
     await this.enterFolderName(folderName);
     await this.clickConfirmCreateFolderButton();
   }
-
+  
   async clickActionsMenuAtRoot() {
     await this.clickActionsMenuForStylesheet('Stylesheets');
   }
@@ -50,11 +50,11 @@ export class StylesheetUiHelper extends UiBaseLocators{
   async clickSaveButtonAndWaitForStylesheetToBeUpdated() {
     return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.stylesheet, ConstantHelper.workspaceActions.stylesheetSave);
   }
-
+  
   async enterStylesheetName(stylesheetName: string) {
     await this.enterText(this.stylesheetNameTxt, stylesheetName);
   }
-
+  
   async enterStylesheetContent(stylesheetContent: string) {
     await this.enterMonacoEditorValue(stylesheetContent);
   }

@@ -105,7 +105,7 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
   async doesElementTypeNotApplicableMessageExist(isVisible: boolean = true) {
     await this.isVisible(this.elementTypeNotApplicableMessage.first(), isVisible);
   }
-
+  
   async isElementTypeNotApplicableMessageForPropertyWithNameVisible(propertyName: string) {
     await this.containsText(this.page.locator(`umb-property-layout[label="${propertyName}"] .info-message`) , 'This is not applicable for an Element Type.');
   }
