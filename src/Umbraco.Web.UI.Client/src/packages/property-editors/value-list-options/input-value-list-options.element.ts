@@ -8,11 +8,11 @@ import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import './input-value-list-option.element.js';
 
 /**
- * An option as it is stored in the configuration of a value list: the value, and the label when it has one.
+ * An option as it is stored in the configuration of a value list: the value and the label.
  */
 export interface UmbValueListOptionConfiguration {
 	value: string;
-	label?: string;
+	label: string;
 }
 
 interface UmbValueListOptionEntry {
@@ -48,7 +48,7 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 	private _entries: Array<UmbValueListOptionEntry> = [];
 
 	/**
-	 * The options, each with a value and optionally a label.
+	 * The options, each with a value and a label.
 	 * @type {Array<UmbValueListOptionConfiguration>}
 	 */
 	@property({ type: Array })
@@ -63,10 +63,7 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 		this.#sorter.setModel(this._entries);
 	}
 	public get items(): Array<UmbValueListOptionConfiguration> {
-		return this._entries.map(({ value, label }) => {
-			const trimmedLabel = label.trim();
-			return trimmedLabel ? { value, label: trimmedLabel } : { value };
-		});
+		return this._entries.map(({ value, label }) => ({ value, label }));
 	}
 
 	/**
@@ -125,7 +122,13 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 	}
 
 	#onOptionFocusOut() {
-		if (this.#duplicateValues().size > 0) this.checkValidity();
+		if (this.#duplicateValues().size > 0) super.checkValidity();
+	}
+
+	override checkValidity() {
+		const rows = Array.from(this.shadowRoot?.querySelectorAll<UmbInputValueListOptionElement>('.option') ?? []);
+		const rowsAreValid = rows.map((row) => row.checkValidity()).every(Boolean);
+		return super.checkValidity() && rowsAreValid;
 	}
 
 	#onDelete(id: string) {

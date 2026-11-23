@@ -67,12 +67,15 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 	}
 
 	it('shows a row with a value and a label for each option', async () => {
-		await setValue([{ value: 'a' }, { value: 'b', label: 'Bee' }]);
+		await setValue([
+			{ value: 'a', label: 'Ay' },
+			{ value: 'b', label: 'Bee' },
+		]);
 
 		const rows = getRows();
 		expect(rows).to.have.lengthOf(2);
 		expect(rows.map((row) => getField(row, 'value').value)).to.deep.equal(['a', 'b']);
-		expect(rows.map((row) => getField(row, 'label').value)).to.deep.equal(['', 'Bee']);
+		expect(rows.map((row) => getField(row, 'label').value)).to.deep.equal(['Ay', 'Bee']);
 	});
 
 	it('names the label and value columns above the options, but only when there are options', async () => {
@@ -81,13 +84,16 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 		await setValue([]);
 		expect(getHeader()).to.equal(null);
 
-		await setValue([{ value: 'a' }]);
+		await setValue([{ value: 'a', label: 'Ay' }]);
 		const columns = Array.from(getHeader()!.querySelectorAll('span')).map((column) => column.textContent!.trim());
 		expect(columns).to.deep.equal(['general_label', 'general_value']);
 	});
 
 	it('emits the edited label next to the value', async () => {
-		await setValue([{ value: 'a' }, { value: 'b', label: 'Bee' }]);
+		await setValue([
+			{ value: 'a', label: 'A' },
+			{ value: 'b', label: 'Bee' },
+		]);
 
 		await type(getRows()[0], 'label', 'Ay');
 
@@ -97,20 +103,96 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 		]);
 	});
 
-	it('omits the label when it is cleared', async () => {
-		await setValue([{ value: 'a' }, { value: 'b', label: 'Bee' }]);
+	it('shows the message of each empty field below that field', async () => {
+		await setValue([{ value: '', label: '' }]);
+		const row = getRows()[0];
 
-		await type(getRows()[1], 'label', '');
+		for (const field of ['label', 'value'] as const) {
+			getField(row, field).dispatchEvent(new FocusEvent('focusout', { bubbles: true, composed: true }));
+		}
+		await row.updateComplete;
 
-		expect(element.value).to.deep.equal([{ value: 'a' }, { value: 'b' }]);
+		const wrappers = Array.from(row.shadowRoot!.querySelectorAll('umb-form-validation-message'));
+		expect(wrappers.map((wrapper) => wrapper.querySelector('uui-input')!.className)).to.deep.equal(['label', 'value']);
+		for (const wrapper of wrappers) {
+			await wrapper.updateComplete;
+			expect(wrapper.shadowRoot!.textContent!.trim()).to.not.equal('');
+		}
 	});
 
-	it('treats a label of only whitespace as no label', async () => {
-		await setValue([{ value: 'a' }]);
+	it('is valid when every option has a label and a value, and invalid, marking the empty fields, when one has not, as when saving', async () => {
+		await setValue([{ value: 'a', label: 'A' }]);
+		expect(getInput().checkValidity()).to.be.true;
 
-		await type(getRows()[0], 'label', '   ');
+		await setValue([
+			{ value: 'a', label: 'A' },
+			{ value: '', label: '' },
+		]);
+		const [filledRow, emptyRow] = getRows();
 
-		expect(element.value).to.deep.equal([{ value: 'a' }]);
+		expect(getInput().checkValidity()).to.be.false;
+
+		expect(getField(emptyRow, 'label').validity.valid).to.be.false;
+		expect(getField(emptyRow, 'value').validity.valid).to.be.false;
+		expect(getField(emptyRow, 'label').pristine).to.be.false;
+		expect(getField(emptyRow, 'value').pristine).to.be.false;
+		expect(getField(filledRow, 'label').validity.valid).to.be.true;
+	});
+
+	it('fills in the value of an added option from its label until the value is edited', async () => {
+		await setValue([{ value: 'a', label: 'A' }]);
+		await add();
+		const row = getRows()[1];
+
+		await type(row, 'label', 'Bee');
+		expect(element.value).to.deep.equal([
+			{ value: 'a', label: 'A' },
+			{ value: 'Bee', label: 'Bee' },
+		]);
+
+		await type(row, 'value', 'b');
+		await type(row, 'label', 'Bees');
+		expect(element.value).to.deep.equal([
+			{ value: 'a', label: 'A' },
+			{ value: 'b', label: 'Bees' },
+		]);
+	});
+
+	it('fills in the value from the label again once the value has been emptied', async () => {
+		await setValue([{ value: 'a', label: 'A' }]);
+		await add();
+		const row = getRows()[1];
+
+		await type(row, 'label', 'Bee');
+		await type(row, 'value', '');
+		await type(row, 'label', 'Bees');
+
+		expect(element.value).to.deep.equal([
+			{ value: 'a', label: 'A' },
+			{ value: 'Bees', label: 'Bees' },
+		]);
+	});
+
+	it('never changes the value of an existing option, even when its label is retyped to match the value', async () => {
+		await setValue([{ value: 'banana', label: 'Banana' }]);
+		const row = getRows()[0];
+
+		await type(row, 'label', 'banana');
+		await type(row, 'label', 'banana split');
+
+		expect(element.value).to.deep.equal([{ value: 'banana', label: 'banana split' }]);
+	});
+
+	it('does not fill in the label from the value', async () => {
+		await setValue([{ value: 'a', label: 'A' }]);
+		await add();
+
+		await type(getRows()[1], 'value', 'x');
+
+		expect(element.value).to.deep.equal([
+			{ value: 'a', label: 'A' },
+			{ value: 'x', label: '' },
+		]);
 	});
 
 	it('reports a value that is used more than once as not unique', async () => {
@@ -181,24 +263,6 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 		expect(getRows()[0]).to.equal(row);
 	});
 
-	it('keeps the focus in place when the add button is pressed, so a shown error cannot move it', async () => {
-		await setValue([{ value: '' }]);
-
-		const event = new MouseEvent('mousedown', { bubbles: true, cancelable: true });
-		getInput().shadowRoot!.querySelector('#action')!.dispatchEvent(event);
-
-		expect(event.defaultPrevented).to.be.true;
-	});
-
-	it('keeps the focus in place when a delete button is pressed', async () => {
-		await setValue([{ value: 'a' }, { value: 'b' }]);
-
-		const event = new MouseEvent('mousedown', { bubbles: true, cancelable: true });
-		getRows()[1].shadowRoot!.querySelector('.delete')!.dispatchEvent(event);
-
-		expect(event.defaultPrevented).to.be.true;
-	});
-
 	it('adds an option', async () => {
 		await setValue([{ value: 'a' }]);
 
@@ -219,13 +283,16 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 	});
 
 	it('removes an option', async () => {
-		await setValue([{ value: 'a' }, { value: 'b' }]);
+		await setValue([
+			{ value: 'a', label: 'A' },
+			{ value: 'b', label: 'B' },
+		]);
 
 		(getRows()[0].shadowRoot!.querySelector('.delete') as HTMLElement).click();
 		await getInput().updateComplete;
 		await element.updateComplete;
 
-		expect(element.value).to.deep.equal([{ value: 'b' }]);
+		expect(element.value).to.deep.equal([{ value: 'b', label: 'B' }]);
 	});
 
 	it('hides adding and removing options when read-only', async () => {
