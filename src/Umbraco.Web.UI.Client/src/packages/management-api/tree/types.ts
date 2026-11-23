@@ -34,3 +34,6 @@ export interface UmbManagementApiTreeSiblingsFromRequestArgs extends UmbTreeRoot
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbManagementApiTreeBatchRequestArgs extends UmbTreeItemsRequestArgs {}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbManagementApiTreeAncestorsOfBatchRequestArgs extends UmbTreeItemsRequestArgs {}

@@ -1,5 +1,6 @@
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import type {
+	UmbDocumentAncestorsOfTreeItemsRequestArgs,
 	UmbDocumentTreeChildrenOfRequestArgs,
 	UmbDocumentTreeItemModel,
 	UmbDocumentTreeItemsRequestArgs,
@@ -7,13 +8,13 @@ import type {
 } from '../types.js';
 import { UmbManagementApiDocumentTreeDataRequestManager } from './document-tree.server.request-manager.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { DocumentService, type DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
+import type { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type {
-	UmbAncestorsOfTreeItemsRequestArgs,
+	UmbAncestorsOfTreeItemModel,
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeDataSource,
 } from '@umbraco-cms/backoffice/tree';
+import type { UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Document tree that fetches data from the server
@@ -67,40 +68,24 @@ export class UmbDocumentTreeServerDataSource
 		return { data: mappedData, error };
 	}
 
-	async getAncestorsOfItems(args: UmbAncestorsOfTreeItemsRequestArgs) {
-		const documentUniques = args.treeItems
-			.filter((treeItem) => treeItem.entityType === UMB_DOCUMENT_ENTITY_TYPE)
-			.map((treeItem) => treeItem.unique);
+	async getAncestorsOfItems(
+		args: UmbDocumentAncestorsOfTreeItemsRequestArgs,
+	): Promise<UmbRepositoryResponse<Array<UmbAncestorsOfTreeItemModel<UmbDocumentTreeItemModel>>>> {
+		const treeItemByUnique = new Map(args.treeItems.map((treeItem) => [treeItem.unique, treeItem]));
 
-		// The item ancestors endpoint is the only one that accepts several items. Only the structure is kept, so
-		// consumers resolve the data they display through the item repository and its cache.
-		const requestController = new UmbItemDataApiGetRequestController(this, {
-			uniques: documentUniques,
-			// eslint-disable-next-line local-rules/no-direct-api-import
-			api: ({ uniques }) => DocumentService.getItemDocumentAncestors({ query: { id: uniques } }),
-		});
-		const { data, error } = documentUniques.length ? await requestController.request() : { data: [], error: undefined };
+		const { data, error } = treeItemByUnique.size
+			? await this.#treeRequestManager.getAncestorsOfBatch({
+					uniques: [...treeItemByUnique.keys()],
+					dataType: args.dataType,
+				})
+			: { data: [], error: undefined };
+		if (error || !data) return { error };
 
-		if (error) return { error };
-
-		// A failed batch resolves without rejecting, leaving an `undefined` hole in `data` rather than
-		// surfacing an error, so guard against it before mapping below.
-		if (data?.some((entry) => entry == null))
-			return { error: new Error('Error fetching ancestors for one or more document items.') };
-
-		const ancestorsByUnique = new Map(
-			(data ?? []).map((entry) => [
-				entry.id,
-				entry.ancestors.map((ancestor) => ({ unique: ancestor.id, entityType: UMB_DOCUMENT_ENTITY_TYPE })),
-			]),
-		);
-
-		// Only documents have ancestors in this tree; the document root sits above all of them.
 		return {
-			data: args.treeItems.map((treeItem) => ({
-				treeItem,
-				ancestors: ancestorsByUnique.get(treeItem.unique) ?? [],
-			})),
+			data: data.flatMap((item) => {
+				const treeItem = treeItemByUnique.get(item.id);
+				return treeItem ? [{ treeItem, ancestors: item.ancestors.map((ancestor) => this.#mapItem(ancestor)) }] : [];
+			}),
 		};
 	}
 
