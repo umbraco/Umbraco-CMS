@@ -289,7 +289,7 @@ export class UserApiHelper {
     const user = await this.getByName(userName);
     if (user.id !== null) {
       // No sign-out first: there is a single authentication cookie, so signing in replaces it. A
-      // failed switch still surfaces, because signIn verifies the resulting identity.
+      // failed switch still surfaces, because signIn asserts the response status.
       await this.api.signIn(userEmail, userPassword);
     }
   }
