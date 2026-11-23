@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -83,6 +84,29 @@ internal sealed class OperationIdHandlerTests
     [TestCaseSource(nameof(OperationIdCases))]
     public void Can_Generate_Operation_Id(OperationIdCase testCase, string expected)
         => Assert.AreEqual(expected, CreateSut().Handle(CreateApiDescription(testCase)));
+
+    [Test]
+    public void Can_Generate_Operation_Id_With_The_Invariant_Culture()
+    {
+        CultureInfo culture = CultureInfo.CurrentCulture;
+        try
+        {
+            // tr-TR upper-cases "i" to a dotted "İ"
+            CultureInfo.CurrentCulture = new CultureInfo("tr-TR");
+
+            var operationId = CreateSut().Handle(CreateApiDescription(new OperationIdCase
+            {
+                HttpMethod = "GET",
+                RelativePath = "umbraco/management/api/v1/item/document/{id}/info",
+            }));
+
+            Assert.AreEqual("GetItemDocumentByIdInfo", operationId);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = culture;
+        }
+    }
 
     private static IEnumerable<TestCaseData> CanHandleCases()
     {
