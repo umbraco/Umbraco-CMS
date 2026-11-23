@@ -13,6 +13,21 @@ import {
 
 const variantObjectKey = (variant: UmbVariantDataModel) => `${variant.culture}|${variant.segment}`;
 
+/**
+ * Finds the first variant in `list[0..end)` that `compare` matches with `variant`.
+ * @param {Array<T>} list - The variants to search.
+ * @param {T} variant - The variant to match.
+ * @param {(a: T, b: T) => boolean} compare - Called with the list entry first and `variant` second.
+ * @param {number} end - The index to stop before.
+ * @returns {number} The index of the match, or -1 when there is none.
+ */
+function indexOfMatch<T>(list: Array<T>, variant: T, compare: (a: T, b: T) => boolean, end: number): number {
+	for (let i = 0; i < end; i++) {
+		if (compare(list[i], variant)) return i;
+	}
+	return -1;
+}
+
 export class UmbMergeContentVariantDataController extends UmbControllerBase {
 	#resolvers = new UmbExtensionsManifestCache<ManifestPropertyValueResolver>(
 		this,
@@ -265,37 +280,43 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 			return this.#processVariantsByKey(persistedVariants, draftVariants, variantsToStore, key);
 		}
 
-		const uniqueVariants = [...(persistedVariants ?? []), ...(draftVariants ?? [])].filter(
-			(n, i, self) => i === self.findIndex((v) => compare(v, n)),
-		);
+		const persisted = persistedVariants ?? [];
+		const draft = draftVariants ?? [];
 
 		// Each variant is taken from the draft when its culture and segment are being stored, otherwise from the
 		// persisted data. When the side it should come from does not have it, it is left out.
 		// When a list holds the same variant twice the first one wins.
 		// The result lists persisted variants first, then the draft-only ones.
-		return uniqueVariants
-			.map((value) => {
-				const persistedVariant = persistedVariants?.find((x) => compare(x, value));
+		const result: Array<VariantModel> = [];
 
 		// 1. Every variant in the persisted data, skipping repeats of an earlier persisted variant:
 		//    - being stored: use the first matching draft variant, or leave it out when the draft no longer has it.
 		//    - not being stored: keep the persisted variant.
-				// Should this value be saved?
-				if (variantsToStore.some((x) => x.compare(value))) {
-					const draftVariant = draftVariants?.find((x) => compare(x, value));
+		for (let i = 0; i < persisted.length; i++) {
+			const variant = persisted[i];
+			if (indexOfMatch(persisted, variant, compare, i) !== -1) continue;
 
-					return draftVariant;
-				} else {
+			if (variantsToStore.some((x) => x.compare(variant))) {
+				const draftIndex = indexOfMatch(draft, variant, compare, draft.length);
+				if (draftIndex !== -1) result.push(draft[draftIndex]);
+			} else {
+				result.push(variant);
+			}
+		}
 
 		// 2. Every variant only found in the draft, skipping repeats of an earlier draft variant:
 		//    - being stored: add the draft variant.
 		//    - not being stored: leave it out, as that draft change is not part of this merge.
 		//    The cheap stored check runs first, so variants that are not stored never scan the lists.
-					// TODO: Check if this promise is needed: [NL]
-					return persistedVariant;
+		for (let i = 0; i < draft.length; i++) {
+			const variant = draft[i];
+			if (!variantsToStore.some((x) => x.compare(variant))) continue;
+			if (indexOfMatch(persisted, variant, compare, persisted.length) !== -1) continue;
+			if (indexOfMatch(draft, variant, compare, i) !== -1) continue;
+			result.push(variant);
 		}
-			})
-			.filter((x) => x !== undefined) as Array<VariantModel>;
+
+		return result;
 
 		/*
 		return draftVariants

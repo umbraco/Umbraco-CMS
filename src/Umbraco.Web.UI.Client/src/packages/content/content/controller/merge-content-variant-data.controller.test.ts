@@ -463,8 +463,11 @@ describe('UmbMergeContentVariantDataController', () => {
 		});
 
 		// Covers variants present on both sides, on one side only, in stored and not stored cultures,
-		// and a duplicate on the draft side, where the first occurrence must win.
-		const persistedExpose = expose('persisted', ['a|da', 'a|en', 'b|da', 'b|en', 'c|da', 'e|en']);
+		// and duplicates on both sides, where the first occurrence must win.
+		const persistedExpose = [
+			...expose('persisted', ['a|da', 'a|en', 'b|da', 'b|en', 'c|da', 'e|en']),
+			...expose('persisted-duplicate', ['a|da', 'b|en']),
+		];
 		const draftExpose = [
 			...expose('draft', ['d|en', 'a|da', 'a|en', 'b|en', 'c|da', 'd|da']),
 			...expose('draft-duplicate', ['d|en']),
