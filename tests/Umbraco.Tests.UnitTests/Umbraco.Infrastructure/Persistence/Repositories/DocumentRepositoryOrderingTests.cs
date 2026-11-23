@@ -41,7 +41,7 @@ internal sealed class DocumentRepositoryOrderingTests
         CreateRow(nodeId: 100, sortOrder: 0, path: "-1,999", creatorUserId: 1, writerUserId: 5),
     ];
 
-    private static PublishableContentJoinRow<DocumentDto, DocumentVersionDto> CreateRow(int nodeId, int sortOrder, string path, int creatorUserId = -1, int? writerUserId = null) =>
+    private static PublishableContentJoinRow<DocumentDto, DocumentVersionDto> CreateRow(int nodeId, int sortOrder, string path, int creatorUserId = -1, int? writerUserId = null, bool published = false) =>
         new()
         {
             Node = new NodeDto
@@ -53,7 +53,7 @@ internal sealed class DocumentRepositoryOrderingTests
                 CreateDate = DateTime.MinValue,
                 UserId = creatorUserId,
             },
-            Entity = new DocumentDto { NodeId = nodeId },
+            Entity = new DocumentDto { NodeId = nodeId, Published = published },
             Content = new ContentDto { NodeId = nodeId },
             ContentVersion = new ContentVersionDto { NodeId = nodeId, VersionDate = DateTime.MinValue, UserId = writerUserId },
             EntityVersion = new DocumentVersionDto { Published = false },
@@ -137,6 +137,35 @@ internal sealed class DocumentRepositoryOrderingTests
 
         Assert.That(nodeIds, Is.EqualTo(expectedNodeIds),
             $"{orderBy} must order by the user's name resolved from the users sequence - ordering by the user id the row carries gives the reverse");
+    }
+
+    [TestCase(Direction.Ascending, new[] { 100, 200 })]
+    [TestCase(Direction.Descending, new[] { 200, 100 })]
+    public void ApplyOrdering_ByPublished_UsesTheSelectorTheRepositorySupplies(Direction direction, int[] expectedNodeIds)
+    {
+        List<PublishableContentJoinRow<DocumentDto, DocumentVersionDto>> rows =
+        [
+            CreateRow(nodeId: 200, sortOrder: 0, path: "-1,999", published: true),
+            CreateRow(nodeId: 100, sortOrder: 0, path: "-1,999", published: false),
+        ];
+
+        List<int> nodeIds = DocumentRepository.ApplyOrdering(
+                rows.AsQueryable(),
+                _users.AsQueryable(),
+                Ordering.By("published", direction),
+                joined => joined.Entity.Published)
+            .Select(row => row.Node.NodeId)
+            .ToList();
+
+        Assert.That(nodeIds, Is.EqualTo(expectedNodeIds));
+    }
+
+    [Test]
+    public void ApplyOrdering_ByPublished_WithoutASelector_IsRejected()
+    {
+        Assert.Throws<NotSupportedException>(
+            () => ApplyOrderingAndGetNodeIds(Ordering.By("published")),
+            "an entity kind without a published flag must reject the field rather than quietly serve sort order");
     }
 
     [Test]

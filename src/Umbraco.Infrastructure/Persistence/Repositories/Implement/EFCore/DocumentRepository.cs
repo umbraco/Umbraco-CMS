@@ -158,6 +158,18 @@ internal class DocumentRepository
         => GetDescendantsCoreAsync(ancestorKey, skip, take, ordering, loadTemplates: false, includeTrashed, cancellationToken);
 
     /// <inheritdoc />
+    public Task<PagedModel<IContent>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken) =>
+        GetByLevelCoreAsync(level, skip, take, ordering, cancellationToken);
+
+    /// <inheritdoc />
+    public Task<PagedModel<IContent>> GetAncestorsAsync(Guid key, int skip, int take, CancellationToken cancellationToken) =>
+        GetAncestorsCoreAsync(key, skip, take, cancellationToken);
+
+    /// <inheritdoc />
+    public Task<bool> RecycleBinSmellsAsync(CancellationToken cancellationToken) =>
+        RecycleBinSmellsCoreAsync(cancellationToken);
+
+    /// <inheritdoc />
     protected override Task OnUowRefreshedEntityAsync(IContent entity, CancellationToken cancellationToken)
     {
         // ContentRefreshNotification is [Obsolete] ("use saved notifications instead") but is still the ONLY

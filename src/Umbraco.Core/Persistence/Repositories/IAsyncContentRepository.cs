@@ -222,35 +222,6 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     Task<PagedModel<TEntity>> GetPagedOfContentTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets a paged list of content items at a given tree level, excluding trashed items.
-    /// </summary>
-    /// <param name="level">The tree level to filter by.</param>
-    /// <param name="skip">The number of items to skip.</param>
-    /// <param name="take">The maximum number of items to return.</param>
-    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — callers that don't have an opinion should use a service-layer facade that applies a default.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A paged result containing the matching, non-trashed content items.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
-    Task<PagedModel<TEntity>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
-
-    /// <summary>
-    ///     Gets a paged list of the ancestors of a content item, ordered root-first.
-    /// </summary>
-    /// <param name="key">The Guid key of the content item to retrieve ancestors for.</param>
-    /// <param name="skip">The number of items to skip.</param>
-    /// <param name="take">The maximum number of items to return.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A paged result containing the item's ancestors, root-first. Empty if the key does not resolve to an item of this kind.</returns>
-    Task<PagedModel<TEntity>> GetAncestorsAsync(Guid key, int skip, int take, CancellationToken cancellationToken);
-
-    /// <summary>
-    ///     Returns a value indicating whether the recycle bin of this kind contains anything.
-    /// </summary>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns><c>true</c> if the recycle bin contains at least one item; otherwise, <c>false</c>.</returns>
-    Task<bool> RecycleBinSmellsAsync(CancellationToken cancellationToken);
-
-    /// <summary>
     ///     Checks the data integrity of content items and optionally repairs detected issues.
     /// </summary>
     /// <param name="options">Options controlling the scope and repair behaviour of the check.</param>

@@ -1156,8 +1156,17 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository, TConten
         });
     }
 
-    /// <inheritdoc />
-    public virtual Task<PagedModel<TEntity>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
+    /// <summary>
+    ///     Gets a page of the items of this kind at a tree level, excluding trashed ones, ordered as requested.
+    ///     Exposed by the kinds whose contract has a level concept.
+    /// </summary>
+    /// <param name="level">The tree level.</param>
+    /// <param name="skip">The number of ordered items to skip.</param>
+    /// <param name="take">The number of ordered items to take.</param>
+    /// <param name="ordering">The ordering to apply; must not be <see langword="null" />.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The page of items and the total number of items at the level.</returns>
+    protected Task<PagedModel<TEntity>> GetByLevelCoreAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(ordering);
 
@@ -1233,12 +1242,21 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository, TConten
         });
     }
 
-    /// <inheritdoc />
-    public virtual Task<PagedModel<TEntity>> GetAncestorsAsync(Guid key, int skip, int take, CancellationToken cancellationToken) =>
+    /// <summary>
+    ///     Gets a page of the ancestors of an item of this kind, root-first. Only ancestors of the same kind are
+    ///     returned and counted: a recycle bin or a container on the path is not one. Exposed by the kinds whose
+    ///     contract has an ancestor concept.
+    /// </summary>
+    /// <param name="key">The key of the item.</param>
+    /// <param name="skip">The number of ancestors to skip.</param>
+    /// <param name="take">The number of ancestors to take.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The page of ancestors and their total number; empty when the key is not an item of this kind.</returns>
+    protected Task<PagedModel<TEntity>> GetAncestorsCoreAsync(Guid key, int skip, int take, CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync(async db =>
         {
             var self = await db.Nodes
-                .Where(node => node.UniqueId == key)
+                .Where(node => node.UniqueId == key && node.NodeObjectType == NodeObjectTypeKey)
                 .Select(node => new { node.NodeId, node.Path })
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -1250,9 +1268,20 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository, TConten
             // Path is stored root-first (e.g. "-1,1063,1066,1092"), so splitting it already yields the
             // ancestors in root-first order — excluding the root node itself and the node whose ancestors
             // are being requested, mirroring ContentExtensions.GetAncestorIds().
-            List<int> ancestorNodeIds = [.. self.Path.Split(',')
+            List<int> pathNodeIds = [.. self.Path.Split(',')
                 .Select(segment => int.Parse(segment, CultureInfo.InvariantCulture))
                 .Where(nodeId => nodeId != Constants.System.Root && nodeId != self.NodeId)];
+
+            if (pathNodeIds.Count == 0)
+            {
+                return new PagedModel<TEntity> { Total = 0, Items = [] };
+            }
+
+            List<int> ancestorsOfThisKind = await db.Nodes
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey && pathNodeIds.Contains(node.NodeId))
+                .Select(node => node.NodeId)
+                .ToListAsync(cancellationToken);
+            List<int> ancestorNodeIds = [.. pathNodeIds.Where(ancestorsOfThisKind.Contains)];
 
             int total = ancestorNodeIds.Count;
             if (total == 0)
@@ -1282,11 +1311,16 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository, TConten
             return new PagedModel<TEntity> { Total = total, Items = items };
         });
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Gets whether the recycle bin of this kind holds an item of this kind directly under it. Exposed by the
+    ///     kinds whose bin holds nothing but items of that kind.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns><see langword="true" /> when the bin is not empty.</returns>
     // A direct child of the recycle bin node is what makes the bin non-empty; anything trashed deeper down
     // has such an ancestor. The cached answer is read and then inserted in two steps rather than through
     // IAppPolicyCache.Get, whose factory is synchronous and would force this query to block on its result.
-    public virtual async Task<bool> RecycleBinSmellsAsync(CancellationToken cancellationToken)
+    protected async Task<bool> RecycleBinSmellsCoreAsync(CancellationToken cancellationToken)
     {
         // Answered on every backoffice tree render, so it is cached. The kind's cache refresher clears this
         // key on refresh, so the answer cannot outlive a change to what is in the bin.

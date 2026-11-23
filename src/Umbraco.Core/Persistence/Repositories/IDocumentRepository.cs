@@ -47,6 +47,28 @@ public interface IDocumentRepository : IPublishableContentRepository<IContent>
     Task<PagedModel<IContent>> GetDescendantsWithoutTemplatesAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true);
 
     /// <summary>
+    ///     Gets a paged list of documents at a given tree level, excluding trashed documents.
+    /// </summary>
+    /// <param name="level">The tree level to filter by.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — callers that don't have an opinion should use a service-layer facade that applies a default.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the matching, non-trashed documents.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
+    Task<PagedModel<IContent>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets a paged list of ancestor documents of a document, ordered root-first.
+    /// </summary>
+    /// <param name="key">The Guid key of the document to retrieve ancestors for.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the document's ancestors, root-first. Empty if the key does not resolve to a document.</returns>
+    Task<PagedModel<IContent>> GetAncestorsAsync(Guid key, int skip, int take, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Bulk-replaces all permissions for a content item with the provided permission set.
     /// </summary>
     /// <param name="permissionSet">The new set of permissions to apply, replacing any existing permissions.</param>
@@ -76,4 +98,11 @@ public interface IDocumentRepository : IPublishableContentRepository<IContent>
     /// <param name="permission">The permission to add or update.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     Task AddOrUpdatePermissionsAsync(ContentPermissionSet permission, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Returns a value indicating whether the document recycle bin contains any content.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns><c>true</c> if the recycle bin contains at least one document; otherwise, <c>false</c>.</returns>
+    Task<bool> RecycleBinSmellsAsync(CancellationToken cancellationToken);
 }
