@@ -97,6 +97,7 @@ import type {
 	// Tracked Reference
 	IReferenceResponseModelDefaultReferenceResponseModel,
 	IReferenceResponseModelDocumentReferenceResponseModel,
+	IReferenceResponseModelElementReferenceResponseModel,
 	IReferenceResponseModelMediaReferenceResponseModel,
 	IReferenceResponseModelMemberReferenceResponseModel,
 	// News
@@ -144,6 +145,8 @@ export type UmbMockElementModel = Omit<ElementResponseModel, 'documentType'> &
 		createDate: string;
 		documentType: DocumentTypeReferenceResponseModel | null;
 		variants: Array<ElementVariantResponseModel>;
+		/** Mock-only: the parent before trashing, used to restore it. Not a real response field. */
+		originalParent?: { id: string } | null;
 	};
 
 export type UmbMockLanguageModel = LanguageResponseModel & LanguageItemResponseModel;
@@ -204,6 +207,7 @@ export type UmbMockAuditLogModel = AuditLogResponseModel;
 export type UmbMockTrackedReferenceItemModel =
 	| IReferenceResponseModelDefaultReferenceResponseModel
 	| IReferenceResponseModelDocumentReferenceResponseModel
+	| IReferenceResponseModelElementReferenceResponseModel
 	| IReferenceResponseModelMediaReferenceResponseModel
 	| IReferenceResponseModelMemberReferenceResponseModel;
 

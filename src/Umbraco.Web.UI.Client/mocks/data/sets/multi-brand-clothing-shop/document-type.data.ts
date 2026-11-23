@@ -53,6 +53,8 @@ interface UmbMbcsDocumentTypeOptions {
 	icon: string;
 	allowedAsRoot?: boolean;
 	isElement?: boolean;
+	allowedInLibrary?: boolean;
+	variesByCulture?: boolean;
 	parent?: string;
 	properties?: Array<UmbMbcsPropertyOptions>;
 	containers?: Array<UmbMbcsContainer>;
@@ -70,9 +72,9 @@ const documentType = (options: UmbMbcsDocumentTypeOptions): UmbMockDocumentTypeM
 	allowedTemplates: [],
 	defaultTemplate: null,
 	allowedAsRoot: options.allowedAsRoot ?? false,
-	allowedInLibrary: false,
+	allowedInLibrary: options.allowedInLibrary ?? false,
 	noAccess: false,
-	variesByCulture: true,
+	variesByCulture: options.variesByCulture ?? true,
 	variesBySegment: false,
 	isElement: options.isElement ?? false,
 	hasChildren: false,
@@ -114,6 +116,8 @@ const imageBlockTab = tab('Content');
 const textBlockTab = tab('Content');
 const productTeaserTab = tab('Content');
 const articleTeaserTab = tab('Content');
+const promoBannerTab = tab('Content');
+const sizeGuideTab = tab('Content');
 
 const { textstring, textarea, mediaPicker, toggle } = DATA_TYPE_IDS;
 
@@ -188,6 +192,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		properties: [
 			{ alias: 'siteName', name: 'Site name', dataTypeId: textstring, container: siteTab.id, varies: true },
 			{ alias: 'logo', name: 'Logo', dataTypeId: mediaPicker, container: siteTab.id },
+			{ alias: 'promotions', name: 'Promotions', dataTypeId: DATA_TYPE_IDS.promotionsPicker, container: siteTab.id },
 		],
 		allowedChildren: [
 			DOCUMENT_TYPE_IDS.contentPage,
@@ -215,6 +220,12 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			{ alias: 'title', name: 'Title', dataTypeId: textstring, container: productsTab.id, varies: true },
 			{ alias: 'intro', name: 'Intro', dataTypeId: textarea, container: productsTab.id, varies: true },
 			{ alias: 'heroImage', name: 'Hero image', dataTypeId: mediaPicker, container: productsTab.id },
+			{
+				alias: 'promotions',
+				name: 'Promotions',
+				dataTypeId: DATA_TYPE_IDS.promotionsPicker,
+				container: productsTab.id,
+			},
 		],
 		allowedChildren: [DOCUMENT_TYPE_IDS.product],
 		compositions: [DOCUMENT_TYPE_IDS.seoComposition, DOCUMENT_TYPE_IDS.pageContentComposition],
@@ -260,6 +271,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			{ alias: 'colour', name: 'Colour', dataTypeId: textstring, container: productTab.id, varies: true },
 			{ alias: 'material', name: 'Material', dataTypeId: textstring, container: productTab.id, varies: true },
 			{ alias: 'inStock', name: 'In stock', dataTypeId: DATA_TYPE_IDS.toggleDefaultOn, container: productTab.id },
+			{ alias: 'sizeGuide', name: 'Size guide', dataTypeId: DATA_TYPE_IDS.sizeGuidePicker, container: productTab.id },
 		],
 		allowedChildren: [DOCUMENT_TYPE_IDS.productDocument],
 		compositions: [DOCUMENT_TYPE_IDS.seoComposition],
@@ -463,6 +475,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		name: 'Hero Block',
 		icon: 'icon-picture',
 		isElement: true,
+		allowedInLibrary: true,
 		parent: DOCUMENT_TYPE_IDS.blocksFolder,
 		containers: [heroBlockTab],
 		properties: [
@@ -489,6 +502,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		name: 'Image Block',
 		icon: 'icon-picture',
 		isElement: true,
+		allowedInLibrary: true,
 		parent: DOCUMENT_TYPE_IDS.blocksFolder,
 		containers: [imageBlockTab],
 		properties: [
@@ -502,6 +516,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		name: 'Text Block',
 		icon: 'icon-font',
 		isElement: true,
+		allowedInLibrary: true,
 		parent: DOCUMENT_TYPE_IDS.blocksFolder,
 		containers: [textBlockTab],
 		properties: [
@@ -547,6 +562,43 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: DATA_TYPE_IDS.articlePickerSingle,
 				container: articleTeaserTab.id,
 			},
+		],
+	}),
+	documentType({
+		id: DOCUMENT_TYPE_IDS.promoBanner,
+		alias: 'promoBanner',
+		name: 'Promo Banner',
+		icon: 'icon-megaphone',
+		isElement: true,
+		allowedInLibrary: true,
+		parent: DOCUMENT_TYPE_IDS.blocksFolder,
+		containers: [promoBannerTab],
+		properties: [
+			{ alias: 'headline', name: 'Headline', dataTypeId: textstring, container: promoBannerTab.id, varies: true },
+			{ alias: 'body', name: 'Body', dataTypeId: textarea, container: promoBannerTab.id, varies: true },
+			{ alias: 'image', name: 'Image', dataTypeId: mediaPicker, container: promoBannerTab.id },
+			{
+				alias: 'link',
+				name: 'Link',
+				dataTypeId: DATA_TYPE_IDS.multiUrlPickerSingle,
+				container: promoBannerTab.id,
+			},
+		],
+	}),
+	documentType({
+		id: DOCUMENT_TYPE_IDS.sizeGuide,
+		alias: 'sizeGuide',
+		name: 'Size Guide',
+		icon: 'icon-ruler',
+		isElement: true,
+		allowedInLibrary: true,
+		variesByCulture: false,
+		parent: DOCUMENT_TYPE_IDS.blocksFolder,
+		containers: [sizeGuideTab],
+		properties: [
+			{ alias: 'title', name: 'Title', dataTypeId: textstring, container: sizeGuideTab.id },
+			{ alias: 'chart', name: 'Size chart', dataTypeId: mediaPicker, container: sizeGuideTab.id },
+			{ alias: 'notes', name: 'Notes', dataTypeId: textarea, container: sizeGuideTab.id },
 		],
 	}),
 ];
