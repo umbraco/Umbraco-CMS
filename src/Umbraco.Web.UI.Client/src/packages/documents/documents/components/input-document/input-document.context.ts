@@ -108,12 +108,20 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 		if (!treeItems.length) return;
 		treeItems.forEach((treeItem) => this.#pendingAncestors.add(treeItem.unique));
 
-		const { data } = await this.#treeRepository.requestAncestorsOfTreeItems({ treeItems, dataType: this.#dataType });
+		const dataType = this.#dataType;
+		const { data } = await this.#treeRepository.requestAncestorsOfTreeItems({ treeItems, dataType });
 
 		treeItems.forEach((treeItem) => this.#pendingAncestors.delete(treeItem.unique));
+		const uniques = this.getSelectedItems().map((item) => item.unique);
+
+		// The data type decides which ancestors the user may see, so a response for an outdated one is requested again.
+		if (dataType?.unique !== this.#dataType?.unique) {
+			this.#requestAncestors(treeItems.filter((treeItem) => uniques.includes(treeItem.unique)));
+			return;
+		}
+
 		if (!data) return;
 
-		const uniques = this.getSelectedItems().map((item) => item.unique);
 		const ancestorsByUnique = new Map(data.map((chain) => [chain.treeItem.unique, chain.ancestors]));
 		this.#ancestorChains.append(
 			treeItems

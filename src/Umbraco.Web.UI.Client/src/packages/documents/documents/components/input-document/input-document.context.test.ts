@@ -113,6 +113,8 @@ describe('UmbDocumentPickerInputContext selectedItemsAncestors', () => {
 	let treeItemNames: Record<string, string>;
 	let missingItems: Set<string>;
 	let itemsWithoutAncestors: Set<string>;
+	let itemsOutsideStartNodes: Set<string>;
+	let responseDelay: number;
 	let restoreTreeRepository: () => void;
 	let ancestorRequestEntityTypes: Array<string>;
 
@@ -169,19 +171,23 @@ describe('UmbDocumentPickerInputContext selectedItemsAncestors', () => {
 		treeItemNames = { 'folder-a': 'Folder A', 'folder-b': 'Folder B' };
 		missingItems = new Set();
 		itemsWithoutAncestors = new Set();
+		itemsOutsideStartNodes = new Set();
+		responseDelay = 0;
 		ancestorRequestEntityTypes = [];
-		(DocumentService as any).getTreeDocumentAncestorsBatch = (options: {
+		(DocumentService as any).getTreeDocumentAncestorsBatch = async (options: {
 			query: { id: Array<string>; dataTypeId?: string };
 		}) => {
 			ancestorRequests.push([...options.query.id]);
 			ancestorRequestDataTypeIds.push(options.query.dataTypeId);
+			if (responseDelay) await new Promise((resolve) => setTimeout(resolve, responseDelay));
 			const items = options.query.id
 				.filter((id) => !itemsWithoutAncestors.has(id))
+				.filter((id) => options.query.dataTypeId || !itemsOutsideStartNodes.has(id))
 				.map((id) => ({
 					id,
 					ancestors: parentOf[id] ? [makeTreeItemResponse(parentOf[id])] : [],
 				}));
-			return Promise.resolve({ data: { total: items.length, items } });
+			return { data: { total: items.length, items } };
 		};
 
 		const originalRequestAncestorsOfItems = UmbDocumentTreeRepository.prototype.requestAncestorsOfTreeItems;
@@ -266,6 +272,19 @@ describe('UmbDocumentPickerInputContext selectedItemsAncestors', () => {
 
 		await waitUntil(() => ancestors.length === 2);
 		expect(ancestors.find((entry) => entry.treeItem.unique === 'document-2')?.ancestors).to.be.null;
+	});
+
+	it('requests the ancestors again with the new data type when it changes while a request is in flight', async () => {
+		const propertyContext = new UmbPropertyTypeBasedPropertyContext(hostElement);
+		itemsOutsideStartNodes.add('document-2');
+		responseDelay = 50;
+		context.setSelection(['document-2']);
+		await waitUntil(() => ancestorRequests.length === 1);
+
+		propertyContext.setDataType({ unique: 'data-type-1' });
+
+		await waitUntil(() => ancestorNamesOf('document-2')?.[0] === 'Folder B');
+		expect(ancestorRequestDataTypeIds).to.deep.equal([undefined, 'data-type-1']);
 	});
 
 	it('requests the ancestors again for a selected document that had none to return when the data type changes', async () => {
