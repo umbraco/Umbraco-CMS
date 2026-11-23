@@ -2284,6 +2284,7 @@ export class UiBaseLocators extends BasePage {
     const responsePromises = urlEndings.map((ending) =>
       this.page.waitForResponse(
         (resp) => resp.url().endsWith(ending) && resp.status() === 201,
+        {timeout: ConstantHelper.timeout.navigation},
       ),
     );
 
