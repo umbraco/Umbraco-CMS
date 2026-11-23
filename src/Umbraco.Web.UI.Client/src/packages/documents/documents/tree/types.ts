@@ -66,7 +66,7 @@ export interface UmbDocumentTreeItemsRequestArgs extends UmbTreeItemsRequestArgs
 	};
 }
 
-export interface UmbDocumentAncestorsOfTreeItemsRequestArgs extends UmbAncestorsOfTreeItemsRequestArgs {
+export interface UmbAncestorsOfDocumentTreeItemsRequestArgs extends UmbAncestorsOfTreeItemsRequestArgs {
 	dataType?: {
 		unique: string;
 	};

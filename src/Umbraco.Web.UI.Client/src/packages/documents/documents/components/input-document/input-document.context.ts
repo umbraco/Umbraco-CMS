@@ -108,7 +108,7 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 		if (!treeItems.length) return;
 		treeItems.forEach((treeItem) => this.#pendingAncestors.add(treeItem.unique));
 
-		const { data } = await this.#treeRepository.requestAncestorsOfItems({ treeItems, dataType: this.#dataType });
+		const { data } = await this.#treeRepository.requestAncestorsOfTreeItems({ treeItems, dataType: this.#dataType });
 
 		treeItems.forEach((treeItem) => this.#pendingAncestors.delete(treeItem.unique));
 		if (!data) return;

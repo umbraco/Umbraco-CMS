@@ -91,7 +91,7 @@ export interface UmbTreeRepository<
 	 * @param {UmbAncestorsOfTreeItemsRequestArgs} args
 	 * @memberof UmbTreeRepository
 	 */
-	requestAncestorsOfItems?: (
+	requestAncestorsOfTreeItems?: (
 		args: UmbAncestorsOfTreeItemsRequestArgs,
 	) => Promise<UmbRepositoryResponse<Array<UmbAncestorsOfTreeItemModel<TreeItemType>>>>;
 

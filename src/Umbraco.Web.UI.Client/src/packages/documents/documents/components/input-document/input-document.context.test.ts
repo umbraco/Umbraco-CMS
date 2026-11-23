@@ -184,13 +184,13 @@ describe('UmbDocumentPickerInputContext selectedItemsAncestors', () => {
 			return Promise.resolve({ data: { total: items.length, items } });
 		};
 
-		const originalRequestAncestorsOfItems = UmbDocumentTreeRepository.prototype.requestAncestorsOfItems;
-		UmbDocumentTreeRepository.prototype.requestAncestorsOfItems = function (args) {
+		const originalRequestAncestorsOfItems = UmbDocumentTreeRepository.prototype.requestAncestorsOfTreeItems;
+		UmbDocumentTreeRepository.prototype.requestAncestorsOfTreeItems = function (args) {
 			ancestorRequestEntityTypes.push(...args.treeItems.map((treeItem) => treeItem.entityType));
 			return originalRequestAncestorsOfItems.call(this, args);
 		};
 		restoreTreeRepository = () =>
-			(UmbDocumentTreeRepository.prototype.requestAncestorsOfItems = originalRequestAncestorsOfItems);
+			(UmbDocumentTreeRepository.prototype.requestAncestorsOfTreeItems = originalRequestAncestorsOfItems);
 
 		context = new UmbDocumentPickerInputContext(hostElement);
 		ancestors = [];

@@ -1,6 +1,6 @@
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import type {
-	UmbDocumentAncestorsOfTreeItemsRequestArgs,
+	UmbAncestorsOfDocumentTreeItemsRequestArgs,
 	UmbDocumentTreeChildrenOfRequestArgs,
 	UmbDocumentTreeItemModel,
 	UmbDocumentTreeItemsRequestArgs,
@@ -69,7 +69,7 @@ export class UmbDocumentTreeServerDataSource
 	}
 
 	async getAncestorsOfItems(
-		args: UmbDocumentAncestorsOfTreeItemsRequestArgs,
+		args: UmbAncestorsOfDocumentTreeItemsRequestArgs,
 	): Promise<UmbRepositoryResponse<Array<UmbAncestorsOfTreeItemModel<UmbDocumentTreeItemModel>>>> {
 		const treeItemByUnique = new Map(args.treeItems.map((treeItem) => [treeItem.unique, treeItem]));
 

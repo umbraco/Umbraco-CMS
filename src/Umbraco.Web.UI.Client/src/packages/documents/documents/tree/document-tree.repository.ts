@@ -3,7 +3,7 @@ import { UmbDocumentTreeItemDataResolver } from './document-tree-item-data-resol
 import { UmbDocumentTreeServerDataSource } from './server-data-source/document-tree.server.data-source.js';
 import { UMB_DOCUMENT_TREE_STORE_CONTEXT } from './document-tree.store.context-token.js';
 import type {
-	UmbDocumentAncestorsOfTreeItemsRequestArgs,
+	UmbAncestorsOfDocumentTreeItemsRequestArgs,
 	UmbDocumentTreeItemModel,
 	UmbDocumentTreeRootModel,
 } from './types.js';
@@ -47,12 +47,12 @@ export class UmbDocumentTreeRepository
 	/**
 	 * Requests the ancestors of each of the given items, ordered from the root down. Items whose ancestors cannot be
 	 * returned are left out.
-	 * @param {UmbDocumentAncestorsOfTreeItemsRequestArgs} args - The request arguments
+	 * @param {UmbAncestorsOfDocumentTreeItemsRequestArgs} args - The request arguments
 	 * @returns {Promise<UmbRepositoryResponse<Array<UmbAncestorsOfTreeItemModel<UmbDocumentTreeItemModel>>>>} The ancestors of each item
 	 * @memberof UmbDocumentTreeRepository
 	 */
-	async requestAncestorsOfItems(
-		args: UmbDocumentAncestorsOfTreeItemsRequestArgs,
+	async requestAncestorsOfTreeItems(
+		args: UmbAncestorsOfDocumentTreeItemsRequestArgs,
 	): Promise<UmbRepositoryResponse<Array<UmbAncestorsOfTreeItemModel<UmbDocumentTreeItemModel>>>> {
 		return this.#documentTreeSource.getAncestorsOfItems(args);
 	}
