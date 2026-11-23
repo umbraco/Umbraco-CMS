@@ -24,7 +24,9 @@ export interface BlockWorkspaceIsReadOnlyConditionConfig extends UmbConditionCon
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export type BlockEntryHasSettingsConditionConfig = UmbConditionConfigBase<'Umb.Condition.BlockEntryHasSettings'>;
+export interface BlockEntryHasSettingsConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryHasSettings'> {
+	match?: boolean;
+}
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export interface BlockEntryIsReadOnlyConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryIsReadOnly'> {
@@ -34,6 +36,14 @@ export interface BlockEntryIsReadOnlyConditionConfig extends UmbConditionConfigB
 // NOTE: Named with a `Umb` prefix, as clashed with `BlockEntryIsExposedConditionConfig`,
 // but that one is a misnomer as the condition targets the block workspace. [LK]
 export interface UmbBlockEntryIsExposedConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryIsExposed'> {
+	match?: boolean;
+}
+
+export interface UmbBlockEntryVariesByVariantConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryVariesByVariant'> {
+	match?: boolean;
+}
+
+export interface UmbBlockWorkspaceVariesByVariantConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockWorkspaceVariesByVariant'> {
 	match?: boolean;
 }
 
@@ -47,6 +57,8 @@ declare global {
 			| BlockWorkspaceIsReadOnlyConditionConfig
 			| BlockEntryIsReadOnlyConditionConfig
 			| BlockEntryHasSettingsConditionConfig
-			| UmbBlockEntryIsExposedConditionConfig;
+			| UmbBlockEntryIsExposedConditionConfig
+			| UmbBlockEntryVariesByVariantConditionConfig
+			| UmbBlockWorkspaceVariesByVariantConditionConfig;
 	}
 }

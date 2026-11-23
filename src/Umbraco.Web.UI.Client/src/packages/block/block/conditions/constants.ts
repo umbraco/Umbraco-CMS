@@ -4,3 +4,5 @@ export const UMB_BLOCK_ENTRY_IS_READ_ONLY_CONDITION_ALIAS = 'Umb.Condition.Block
 export const UMB_BLOCK_ENTRY_SHOW_CONTENT_EDIT_CONDITION_ALIAS = 'Umb.Condition.BlockEntryShowContentEdit';
 export const UMB_BLOCK_WORKSPACE_SHOW_CONTENT_EDIT_CONDITION_ALIAS =
 	'Umb.Condition.BlockWorkspaceShowContentEdit';
+export const UMB_BLOCK_ENTRY_VARIES_BY_VARIANT_CONDITION_ALIAS = 'Umb.Condition.BlockEntryVariesByVariant';
+export const UMB_BLOCK_WORKSPACE_VARIES_BY_VARIANT_CONDITION_ALIAS = 'Umb.Condition.BlockWorkspaceVariesByVariant';

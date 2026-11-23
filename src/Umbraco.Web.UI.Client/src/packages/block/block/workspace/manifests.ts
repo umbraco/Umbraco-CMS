@@ -5,9 +5,11 @@ import {
 	UMB_BLOCK_WORKSPACE_VIEW_CONTENT,
 	UMB_BLOCK_WORKSPACE_VIEW_SETTINGS,
 } from './constants.js';
+import { manifests as unexposeMenuItemManifests } from './workspace-action-menu-item/unexpose/manifests.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
+	...unexposeMenuItemManifests,
 	{
 		type: 'workspaceAction',
 		kind: 'default',
