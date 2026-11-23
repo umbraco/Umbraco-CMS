@@ -70,6 +70,7 @@ export interface MetaAuthProvider {
 		 * The features of the popup that is opened when the user logs in.
 		 * @default "width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no"
 		 * @remarks This is the features of the window that is opened when the user logs in.
+		 * `noopener` and `noreferrer` are not supported: the backoffice needs the reference `window.open()` returns to close the popup after sign-in.
 		 * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/open#features
 		 */
 		popupFeatures?: string;

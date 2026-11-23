@@ -45,6 +45,7 @@ export class UmbAuthContext extends UmbContextBase {
 
 	// Cross-tab coordination
 	#channel: BroadcastChannel;
+	#signInPopup?: Window | null;
 
 	// The user the client state of this page belongs to, see bindUser().
 	#boundUser?: string;
@@ -137,6 +138,9 @@ export class UmbAuthContext extends UmbContextBase {
 		this.#channel.onmessage = (evt: MessageEvent) => {
 			switch (evt.data?.type) {
 				case 'authorized': {
+					// Only this window can tell its sign-in popup from a tab the user opened, so it closes it.
+					this.#signInPopup?.close();
+					this.#signInPopup = undefined;
 					// Apply locally — the sender already broadcast to all tabs.
 					void this.#applySession(true, () => this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt));
 					break;
@@ -217,15 +221,15 @@ export class UmbAuthContext extends UmbContextBase {
 		let target: URL;
 		if (identityProvider.toLowerCase() === 'umbraco') {
 			target = new URL(`${this.#serverUrl}/umbraco/login`);
-			// A popup must land on the auth-callback lander (it broadcasts `authorized` and closes the
-			// popup); a full-page redirect returns to the deep link instead.
+			// A popup must land on the auth-callback lander (it broadcasts `authorized`, and this window
+			// closes the popup); a full-page redirect returns to the deep link instead.
 			const returnUrl = redirect ? deepLink : new URL('auth-callback', document.baseURI).pathname;
 			if (returnUrl) {
 				target.searchParams.set('ReturnUrl', returnUrl);
 			}
 		} else {
 			// External login always routes through the server callback to the auth-callback lander;
-			// carry the deep link so the lander's full-page fallback can return there.
+			// carry the deep link so the lander can return a full-page sign-in there.
 			const challengeUrl = new URL(this.#externalLoginEndpoint);
 			challengeUrl.searchParams.set('provider', identityProvider);
 			target = challengeUrl;
@@ -244,7 +248,7 @@ export class UmbAuthContext extends UmbContextBase {
 			manifest?.meta?.behavior?.popupFeatures ??
 			'width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no';
 
-		window.open(target.href, popupTarget, popupFeatures);
+		this.#signInPopup = window.open(target.href, popupTarget, popupFeatures);
 	}
 
 	/**
