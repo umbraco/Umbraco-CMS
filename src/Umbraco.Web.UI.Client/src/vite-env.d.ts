@@ -6,4 +6,5 @@ interface ImportMetaEnv {
 	VITE_UMBRACO_USE_MSW: 'on' | 'off';
 	VITE_UMBRACO_EXTENSION_MOCKS: 'on' | 'off';
 	VITE_MOCK_SET?: string;
+	VITE_EXAMPLES?: string;
 }

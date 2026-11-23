@@ -138,7 +138,7 @@ public sealed class UriUtility
         // so it will be re-encoded anyway
         var path = uri.GetSafeAbsolutePath();
 
-        path = path.ToLower();
+        path = path.ToLowerInvariant();
         path = ToAppRelative(path); // strip vdir if any
 
         if (path != "/")
