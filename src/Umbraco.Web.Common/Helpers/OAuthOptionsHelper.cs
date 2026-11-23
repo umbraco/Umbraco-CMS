@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -59,9 +60,13 @@ public class OAuthOptionsHelper
         .AppendQueryStringToUrl($"provider={providerFriendlyName}")
         .AppendQueryStringToUrl($"callback-event={eventName}");
 
+        // Providers that answer with response_mode=form_post (the OpenID Connect handler's default) send the error in the body.
+        IFormCollection? form = context.Request.GetFormOrNull();
+
         foreach (var oathCallbackErrorParam in _oathCallbackErrorParams)
         {
-            if (context.Request.Query.TryGetValue(oathCallbackErrorParam, out StringValues paramValue))
+            if (context.Request.Query.TryGetValue(oathCallbackErrorParam, out StringValues paramValue)
+                || (form is not null && form.TryGetValue(oathCallbackErrorParam, out paramValue)))
             {
                 callbackPath = callbackPath.AppendQueryStringToUrl($"{oathCallbackErrorParam}={paramValue}");
             }
