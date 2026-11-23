@@ -10,6 +10,7 @@ import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observab
 import { UMB_INTERACTION_MEMORY_SCOPE_CONTEXT } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbPickerContext, UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
 import type { ManifestModal } from '@umbraco-cms/backoffice/modal';
+import { UmbMediaItemRepository, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import type { UmbInputMultiUrlElement } from '../components/input-multi-url/index.js';
@@ -100,8 +101,31 @@ describe('UmbLinkPickerModalElement', () => {
 				await modal.updateComplete;
 			};
 
-			return { state, enterUrl };
+			const pickMedia = async (unique: string) => {
+				const mediaInput = modal.shadowRoot!.querySelector<UmbInputMediaElement>('umb-input-media')!;
+				Object.defineProperty(mediaInput, 'value', { value: unique, configurable: true, writable: true });
+				mediaInput.dispatchEvent(new CustomEvent('change'));
+				await new Promise((resolve) => setTimeout(resolve, 0));
+			};
+
+			return { state, enterUrl, pickMedia };
 		};
+
+		type UmbStubbedRepository = { prototype: { requestItems?: unknown } };
+
+		beforeEach(() => {
+			(UmbMediaItemRepository as unknown as UmbStubbedRepository).prototype.requestItems = async () => ({
+				data: [{ mediaType: { icon: 'icon-picture' }, variants: [{ name: 'Hero image' }] }],
+			});
+			(UmbMediaUrlRepository as unknown as UmbStubbedRepository).prototype.requestItems = async () => ({
+				data: [{ url: '/media/hero.jpg' }],
+			});
+		});
+
+		afterEach(() => {
+			delete (UmbMediaItemRepository as unknown as UmbStubbedRepository).prototype.requestItems;
+			delete (UmbMediaUrlRepository as unknown as UmbStubbedRepository).prototype.requestItems;
+		});
 
 		it('suggests a name from the entered URL', async () => {
 			const { state, enterUrl } = await setupWithConfig({});
@@ -117,6 +141,24 @@ describe('UmbLinkPickerModalElement', () => {
 			await enterUrl('https://example.com/page');
 
 			expect(state.getValue().link.url).to.equal('https://example.com/page');
+			expect(state.getValue().link.name).to.not.be.ok;
+		});
+
+		it('suggests the name of a picked item', async () => {
+			const { state, pickMedia } = await setupWithConfig({});
+
+			await pickMedia('media-1');
+
+			expect(state.getValue().link.name).to.equal('Hero image');
+		});
+
+		it('leaves the name empty when a picked item is selected and name autofill is disabled', async () => {
+			const { state, pickMedia } = await setupWithConfig({ disableNameAutofill: true });
+
+			await pickMedia('media-1');
+
+			expect(state.getValue().link.unique).to.equal('media-1');
+			expect(state.getValue().link.url).to.equal('/media/hero.jpg');
 			expect(state.getValue().link.name).to.not.be.ok;
 		});
 	});
