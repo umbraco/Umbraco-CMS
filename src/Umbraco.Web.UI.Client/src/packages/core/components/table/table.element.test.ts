@@ -295,4 +295,44 @@ describe('UmbTableElement', () => {
 			expect(wrapped).to.equal(unwrapped);
 		});
 	});
+
+	describe('columns wider than the container', () => {
+		let scroller: HTMLElement;
+
+		beforeEach(async () => {
+			scroller = await fixture(html`
+				<div style="width: 320px; height: 200px; overflow: auto;">
+					<umb-table style="display: block;"></umb-table>
+				</div>
+			`);
+			element = scroller.querySelector('umb-table')!;
+			element.config = config;
+			element.columns = ['first', 'second', 'third', 'last'].map((alias) => ({ name: alias, alias }));
+			element.items = Array.from({ length: 10 }, (_, index) =>
+				item(`${index}`, {
+					data: ['first', 'second', 'third', 'last'].map((alias) => ({ columnAlias: alias, value: 'x'.repeat(30) })),
+				}),
+			);
+			await element.updateComplete;
+		});
+
+		it('can scroll every column into view', () => {
+			const table = element.shadowRoot!.querySelector('uui-table')!;
+			const cells = element.shadowRoot!.querySelectorAll('uui-table-row:first-of-type uui-table-cell');
+			const lastCell = cells[cells.length - 1];
+
+			lastCell.scrollIntoView({ block: 'nearest', inline: 'end' });
+
+			const cellRight = lastCell.getBoundingClientRect().right;
+			expect(cellRight, 'inside the table').to.be.at.most(Math.ceil(table.getBoundingClientRect().right));
+			expect(cellRight, 'inside the scroll container').to.be.at.most(Math.ceil(scroller.getBoundingClientRect().right));
+		});
+
+		it('keeps the header in view while the rows scroll vertically', () => {
+			scroller.scrollTop = 150;
+
+			const head = element.shadowRoot!.querySelector('uui-table-head')!;
+			expect(Math.round(head.getBoundingClientRect().top)).to.equal(Math.round(scroller.getBoundingClientRect().top));
+		});
+	});
 });
