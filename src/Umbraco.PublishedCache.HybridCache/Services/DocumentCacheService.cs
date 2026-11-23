@@ -794,11 +794,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
         foreach (ContentCacheNode cacheNode in cacheNodes)
         {
-            // Warm the id/key map even for skipped nodes (matching ReadFromDatabaseAsync), then skip
-            // memory caching when an ancestor is unpublished (seed keys can go stale across reloads
-            // and content-type seeding does not check ancestors).
+            // Warm the id/key map even for nodes skipped below, as ReadFromDatabaseAsync does.
             idKeyPairs.Add((cacheNode.Id, cacheNode.Key));
 
+            // Seed keys aren't guaranteed to have a published ancestor path when seeding runs, so a node
+            // is only cached if it would also be visible when read through from the database.
             if (_publishStatusQueryService.HasPublishedAncestorPath(cacheNode.Key) is false)
             {
                 continue;
