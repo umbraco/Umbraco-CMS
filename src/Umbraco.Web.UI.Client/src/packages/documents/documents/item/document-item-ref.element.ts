@@ -166,7 +166,9 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 				<slot name="actions" slot="actions"></slot>
 				<slot name="detail" slot="detail"></slot>
 				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()}
-				${this._ancestorPath ? html`<span slot="detail" class="ancestor-path">${this._ancestorPath}</span>` : nothing}
+				${this._ancestorPath
+					? html`<span slot="detail" class="ancestor-path"><bdi>${this._ancestorPath}</bdi></span>`
+					: nothing}
 			</uui-ref-node>
 		`;
 	}
