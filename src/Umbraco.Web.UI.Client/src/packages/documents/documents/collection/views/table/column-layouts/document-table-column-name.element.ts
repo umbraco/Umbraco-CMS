@@ -54,6 +54,12 @@ export class UmbDocumentTableColumnNameElement extends UmbLitElement implements 
 
 	static override styles = [
 		css`
+			/* Long names wrap instead of taking the width of the other columns. */
+			:host {
+				display: block;
+				max-inline-size: 300px;
+			}
+
 			uui-button {
 				text-align: left;
 			}

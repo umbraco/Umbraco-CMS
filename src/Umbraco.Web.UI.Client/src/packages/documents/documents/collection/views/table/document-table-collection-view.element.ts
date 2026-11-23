@@ -128,7 +128,6 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 					elementName: item.elementName || 'umb-document-table-column-property-value',
 					labelTemplate: item.nameTemplate,
 					allowSorting: true,
-					clipText: true,
 				};
 			});
 
