@@ -1,6 +1,7 @@
 import type { UmbDocumentEntityType, UmbDocumentRootEntityType } from '../entity.js';
 import type { UmbDocumentVariantState } from '../variant-state.js';
 import type {
+	UmbAncestorsOfTreeItemsRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeItemModel,
 	UmbTreeItemsRequestArgs,
@@ -60,6 +61,12 @@ export interface UmbDocumentTreeChildrenOfRequestArgs extends UmbTreeChildrenOfR
 }
 
 export interface UmbDocumentTreeItemsRequestArgs extends UmbTreeItemsRequestArgs {
+	dataType?: {
+		unique: string;
+	};
+}
+
+export interface UmbDocumentAncestorsOfTreeItemsRequestArgs extends UmbAncestorsOfTreeItemsRequestArgs {
 	dataType?: {
 		unique: string;
 	};
