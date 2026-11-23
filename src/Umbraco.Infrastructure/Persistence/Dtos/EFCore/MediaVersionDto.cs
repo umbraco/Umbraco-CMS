@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 /// A row of the media version table, which extends a content version with the path of the file it stores.
 /// </summary>
 [EntityTypeConfiguration(typeof(MediaVersionDtoConfiguration))]
-public class MediaVersionDto
+public class MediaVersionDto : IEntityVersionDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.MediaVersion;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;

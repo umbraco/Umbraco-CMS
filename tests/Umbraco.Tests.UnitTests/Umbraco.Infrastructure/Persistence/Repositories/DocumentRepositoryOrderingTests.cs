@@ -14,7 +14,7 @@ internal sealed class DocumentRepositoryOrderingTests
     // this: there, NodeId == insertion order == the engine's incidental scan order for freshly-created
     // rows, so a missing tiebreak coincidentally still produces NodeId-ascending output and the bug
     // goes undetected. Here, in-memory sequence order is fully under the test's control.
-    private static List<ContentJoinRow<DocumentDto, DocumentVersionDto>> CreateTiedRows() =>
+    private static List<PublishableContentJoinRow<DocumentDto, DocumentVersionDto>> CreateTiedRows() =>
     [
         CreateRow(nodeId: 200, sortOrder: 0, path: "-1,999"),
         CreateRow(nodeId: 100, sortOrder: 0, path: "-1,999"),
@@ -26,7 +26,7 @@ internal sealed class DocumentRepositoryOrderingTests
     // different from the correct path-tiebreak result of {100, 200}. Reusing CreateTiedRows() here would
     // NOT be discriminating: both rows also share SortOrder there, so the fallback default ordering would
     // coincidentally tiebreak to the same {100, 200} the correct implementation produces.
-    private static List<ContentJoinRow<DocumentDto, DocumentVersionDto>> CreatePathTiedRowsWithDistinctSortOrder() =>
+    private static List<PublishableContentJoinRow<DocumentDto, DocumentVersionDto>> CreatePathTiedRowsWithDistinctSortOrder() =>
     [
         CreateRow(nodeId: 200, sortOrder: 1, path: "-1,999"),
         CreateRow(nodeId: 100, sortOrder: 2, path: "-1,999"),
@@ -35,13 +35,13 @@ internal sealed class DocumentRepositoryOrderingTests
     // The user with the LOWER id has the LATER name, so ordering by user id and ordering by user name give
     // opposite results. Creator and writer are swapped between the two rows, so "owner" and "updater" also
     // disagree with each other, and neither ascending result matches the source sequence order.
-    private static List<ContentJoinRow<DocumentDto, DocumentVersionDto>> CreateRowsWithDistinctCreatorAndWriter() =>
+    private static List<PublishableContentJoinRow<DocumentDto, DocumentVersionDto>> CreateRowsWithDistinctCreatorAndWriter() =>
     [
         CreateRow(nodeId: 200, sortOrder: 0, path: "-1,999", creatorUserId: 5, writerUserId: 1),
         CreateRow(nodeId: 100, sortOrder: 0, path: "-1,999", creatorUserId: 1, writerUserId: 5),
     ];
 
-    private static ContentJoinRow<DocumentDto, DocumentVersionDto> CreateRow(int nodeId, int sortOrder, string path, int creatorUserId = -1, int? writerUserId = null) =>
+    private static PublishableContentJoinRow<DocumentDto, DocumentVersionDto> CreateRow(int nodeId, int sortOrder, string path, int creatorUserId = -1, int? writerUserId = null) =>
         new()
         {
             Node = new NodeDto
@@ -66,12 +66,13 @@ internal sealed class DocumentRepositoryOrderingTests
         new() { Id = 1, UserName = "zzz" },
     ];
 
-    private static List<int> ApplyOrderingAndGetNodeIds(Ordering? ordering, List<ContentJoinRow<DocumentDto, DocumentVersionDto>>? rows = null)
+    private static List<int> ApplyOrderingAndGetNodeIds(Ordering? ordering, List<PublishableContentJoinRow<DocumentDto, DocumentVersionDto>>? rows = null)
     {
-        IOrderedQueryable<ContentJoinRow<DocumentDto, DocumentVersionDto>> ordered = DocumentRepository.ApplyOrdering(
+        IOrderedQueryable<PublishableContentJoinRow<DocumentDto, DocumentVersionDto>> ordered = DocumentRepository.ApplyOrdering(
             (rows ?? CreateTiedRows()).AsQueryable(),
             _users.AsQueryable(),
-            ordering);
+            ordering,
+            publishedSelector: null);
 
         return ordered.Select(row => row.Node.NodeId).ToList();
     }

@@ -112,7 +112,7 @@ internal sealed class ElementRepository
     }
 
     /// <inheritdoc />
-    protected override IElement BuildEntity(ContentRow<ElementDto, ElementVersionDto> row, IContentType contentType) =>
+    protected override IElement BuildEntity(PublishableContentRow<ElementDto, ElementVersionDto> row, IContentType contentType) =>
         ContentBaseFactory.BuildEntity(row.Entity, row.Node, row.ContentVersion, row.PublishedContentVersion, contentType);
 
     /// <inheritdoc />
@@ -129,7 +129,7 @@ internal sealed class ElementRepository
             .SetProperty(elementVersion => elementVersion.Published, entityVersion.Published));
 
     /// <inheritdoc />
-    protected override IQueryable<ContentJoinRow<ElementDto, ElementVersionDto>> BuildBaseQuery(
+    protected override IQueryable<PublishableContentJoinRow<ElementDto, ElementVersionDto>> BuildBaseQuery(
         UmbracoDbContext db,
         IQueryable<NodeDto> nodes,
         IQueryable<ContentVersionDto> contentVersions)
@@ -152,7 +152,7 @@ internal sealed class ElementRepository
             .SelectMany(joined => joined.publishedVersionGroup.DefaultIfEmpty(), (joined, publishedVersion) => new { joined.node, joined.contentVersion, joined.element, joined.content, joined.elementVersion, joined.contentType, publishedVersion })
             .GroupJoin(db.Nodes, joined => joined.node.ParentId, parentNode => parentNode.NodeId, (joined, parentNodeGroup) => new { joined.node, joined.contentVersion, joined.element, joined.content, joined.elementVersion, joined.contentType, joined.publishedVersion, parentNodeGroup })
             .SelectMany(joined => joined.parentNodeGroup.DefaultIfEmpty(), (joined, parentNode) => new { joined.node, joined.contentVersion, joined.element, joined.content, joined.elementVersion, joined.contentType, joined.publishedVersion, parentNode })
-            .Select(joined => new ContentJoinRow<ElementDto, ElementVersionDto>
+            .Select(joined => new PublishableContentJoinRow<ElementDto, ElementVersionDto>
             {
                 Node = joined.node,
                 Entity = joined.element,

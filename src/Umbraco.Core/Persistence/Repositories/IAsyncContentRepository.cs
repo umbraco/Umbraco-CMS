@@ -142,6 +142,17 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     Task<int> CountDescendantsAsync(Guid? parentKey, string contentTypeAlias, CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Gets the entities with the given keys, loading only the properties with the given aliases.
+    /// </summary>
+    /// <param name="keys">The keys of the entities to get.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load, <see langword="null" /> for every property, or empty for none.
+    /// </param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The entities found.</returns>
+    Task<IEnumerable<TEntity>> GetManyAsync(Guid[] keys, string[]? propertyAliases, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Gets a paged list of direct children of a content node.
     /// </summary>
     /// <param name="parentKey">The Guid key of the parent node, or <c>null</c> for the root of the content tree.</param>
@@ -194,6 +205,50 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     /// <returns>A paged result containing the matching recycle bin items and the total record count.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
     Task<PagedModel<TEntity>> GetPagedRecycleBinAsync(int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets a paged list of content items whose content type is one of the specified content type keys.
+    /// </summary>
+    /// <remarks>
+    ///     Trashed items are included — callers that need to exclude them must filter the result.
+    /// </remarks>
+    /// <param name="contentTypeKeys">The Guid keys of the content types to filter by.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — callers that don't have an opinion should use a service-layer facade that applies a default.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the matching content items.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
+    Task<PagedModel<TEntity>> GetPagedOfContentTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets a paged list of content items at a given tree level, excluding trashed items.
+    /// </summary>
+    /// <param name="level">The tree level to filter by.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — callers that don't have an opinion should use a service-layer facade that applies a default.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the matching, non-trashed content items.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
+    Task<PagedModel<TEntity>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets a paged list of the ancestors of a content item, ordered root-first.
+    /// </summary>
+    /// <param name="key">The Guid key of the content item to retrieve ancestors for.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the item's ancestors, root-first. Empty if the key does not resolve to an item of this kind.</returns>
+    Task<PagedModel<TEntity>> GetAncestorsAsync(Guid key, int skip, int take, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Returns a value indicating whether the recycle bin of this kind contains anything.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns><c>true</c> if the recycle bin contains at least one item; otherwise, <c>false</c>.</returns>
+    Task<bool> RecycleBinSmellsAsync(CancellationToken cancellationToken);
 
     /// <summary>
     ///     Checks the data integrity of content items and optionally repairs detected issues.
