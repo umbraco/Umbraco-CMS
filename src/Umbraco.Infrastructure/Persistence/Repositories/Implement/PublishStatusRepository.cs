@@ -166,10 +166,7 @@ public class PublishStatusRepository : IPublishStatusRepository
         {
             case ContentVariation.Culture:
             case ContentVariation.CultureAndSegment:
-                // A variant document whose overall umbracoDocument.published flag is false (e.g. a mandatory
-                // culture was unpublished or a root was restored before culture flags were cleared) has no
-                // published cultures regardless of stale per-culture variation flags.
-                return publishStatusDto.DocumentInvariantPublished && publishStatusDto.DocumentVariantPublishStatus;
+                return publishStatusDto.DocumentVariantPublishStatus;
             case ContentVariation.Nothing:
             case ContentVariation.Segment:
             default:
