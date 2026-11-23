@@ -333,7 +333,7 @@ export class UmbViewController extends UmbControllerBase {
 	public _internal_addChild(child: UmbViewController) {
 		this.#children.push(child);
 		if (this.isActive) {
-			child._internal_activate();
+			child._internal_requestActivate();
 		}
 	}
 	// eslint-disable-next-line @typescript-eslint/naming-convention
