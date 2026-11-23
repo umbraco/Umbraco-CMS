@@ -56,7 +56,9 @@ export class UmbDocumentAncestorPathElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._path ? html`${this._path}` : nothing;
+		// The host is right-to-left so overflow truncates the start of the path; isolating the text keeps its own
+		// direction, so punctuation at either end stays in place.
+		return this._path ? html`<bdi>${this._path}</bdi>` : nothing;
 	}
 
 	static override styles = [
