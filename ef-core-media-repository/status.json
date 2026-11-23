@@ -2,7 +2,7 @@
   "campaign": "Media Repository Campaign",
   "targetBranch": "v18/feature/ef-core-repositories",
   "planFile": ".claude/campaign/ef-core-media-repository/CAMPAIGN.md",
-  "updated": "20-11-2026",
+  "updated": "23-11-2026",
   "artifact": {
     "url": "https://claude.ai/artifact/5rY17CDCK6o6AiY7q62bVd",
     "title": "Media Repository Campaign"
@@ -12,7 +12,7 @@
       "id": 1,
       "slug": "media-version-dto",
       "title": "EF Core MediaVersionDto and the no-op migration",
-      "status": "in-review",
+      "status": "merged",
       "branch": "v20/feature/ef-core-media-repository-1-media-version-dto",
       "pr": "#24724",
       "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24724",
@@ -26,49 +26,49 @@
         { "text": "MediaVersionDtoMappingTests green", "done": true }
       ],
       "acceptance": "Solution builds; both snapshots list umbracoMediaVersion with the unique index; migration-plan tests pass; mapping test green; install smoke passes.",
-      "notes": "Started 20-11-2026, cut from 450b951b298. Implemented the same day: DTO, configuration, DbSet, no-op migrations (timestamps 20261120113757 SQL Server / 20261120113817 SQLite; the scaffolder prefixed the class names with the timestamp and they were renamed to the plain name), enum 27, plan GUID {1F12CD86-1168-48C2-8B75-B88636A14A33}, both switch arms; has-pending-model-changes clean on both providers; mapping test (image with a file path and a folder with a null path) green on SQLite after renaming its media type aliases away from the seeded 'image' type. The SQL Server snapshot carries the conventional [path] IS NOT NULL filter on the unique index, like ten existing unique indexes there. Independent review: no must-fix; the save results are now asserted. Red proof: the test fails on a wrong column name. Full --no-incremental solution build clean. Committed as f6392efddba, draft PR #24724. Second independent review (umb-review on the PR): approved with two suggestions, both applied in 85857f56562 (HasMaxLength(255) on path, class summaries; migrations regenerated as 20261120115904 / 20261120115914, snapshots clean again, tests green). The unique index filter cleanup became PR 1b.",
-      "mergeCommit": ""
+      "notes": "Started 20-11-2026, cut from 450b951b298. Implemented the same day: DTO, configuration, DbSet, no-op migrations (timestamps 20261120113757 SQL Server / 20261120113817 SQLite; the scaffolder prefixed the class names with the timestamp and they were renamed to the plain name), enum 27, plan GUID {1F12CD86-1168-48C2-8B75-B88636A14A33}, both switch arms; has-pending-model-changes clean on both providers; mapping test (image with a file path and a folder with a null path) green on SQLite after renaming its media type aliases away from the seeded 'image' type. The SQL Server snapshot carries the conventional [path] IS NOT NULL filter on the unique index, like ten existing unique indexes there. Independent review: no must-fix; the save results are now asserted. Red proof: the test fails on a wrong column name. Full --no-incremental solution build clean. Committed as f6392efddba, draft PR #24724. Second independent review (umb-review on the PR): approved with two suggestions, both applied in 85857f56562 (HasMaxLength(255) on path, class summaries; migrations regenerated as 20261120115904 / 20261120115914, snapshots clean again, tests green). The unique index filter cleanup became PR 1b. Merged (squash) on 20-11-2026 as 17cdf561180; board updated 23-11-2026.",
+      "mergeCommit": "17cdf561180"
     },
     {
       "id": 9,
       "slug": "remove-unique-index-filters",
       "title": "PR 1b: Remove the auto-generated unique index filters from the SQL Server model",
-      "status": "planned",
-      "branch": "",
-      "pr": "",
-      "prUrl": "",
+      "status": "in-review",
+      "branch": "v20/feature/ef-core-media-repository-1b-remove-unique-index-filters",
+      "pr": "#24758",
+      "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24758",
       "dependsOn": [1],
       "summary": "SQL Server customizers re-declaring every unique index over a nullable column with HasFilter(null), so the snapshot stops documenting filtered indexes NPoco never creates (eleven after PR 1, IX_umbracoMediaVersion among them); one no-op migration RemoveUniqueIndexFilters (enum 28). Raised by the review of PR 1; nothing depends on it.",
       "tasks": [
-        { "text": "Inventory of the HasFilter lines in the SQL Server snapshot and the DTOs they belong to", "done": false },
-        { "text": "One SqlServer*DtoModelCustomizer per affected DTO, registered in AddCustomizers()", "done": false },
-        { "text": "RemoveUniqueIndexFilters no-op migration on both providers, enum 28, plan step, switch arms", "done": false },
-        { "text": "has-pending-model-changes clean on both providers; SQL Server snapshot has no HasFilter", "done": false }
+        { "text": "Inventory of the HasFilter lines in the SQL Server snapshot and the DTOs they belong to", "done": true },
+        { "text": "One SqlServer*DtoModelCustomizer per affected DTO, registered in AddCustomizers()", "done": true },
+        { "text": "RemoveUniqueIndexFilters no-op migration on both providers, enum 28, plan step, switch arms", "done": true },
+        { "text": "has-pending-model-changes clean on both providers; SQL Server snapshot has no HasFilter", "done": true }
       ],
       "acceptance": "Solution builds; both snapshots clean; the SQL Server snapshot diff touches only filter lines and the last migration id.",
-      "notes": "Numbered PR 1b in CAMPAIGN.md.",
+      "notes": "Numbered PR 1b in CAMPAIGN.md. Started 23-11-2026, cut from 17cdf561180 (the PR 1 merge, head of the integration branch). Committed as f064b258d99 and opened as draft PR #24758 on 23-11-2026. Review round 1 (the review bot) applied in cc65832b950: the seven per-DTO customizers became one model-wide SqlServerUniqueIndexFilterModelCustomizer that clears every filter the SQL Server provider convention added on Umbraco entity types (explicit filters and OpenIddict types untouched); PR description rewritten to match. Inventory: ten filtered unique indexes in the SQL Server snapshot, of which three are OpenIddict tables created filtered by their own EF Core migration and stay; seven Umbraco DTOs are in scope (AccessRule, DocumentUrlAlias, Language, MediaVersion, PropertyData, RedirectUrl, Tag).",
       "mergeCommit": ""
     },
     {
       "id": 2,
       "slug": "hoist-read-path",
       "title": "Hoist the generic read path into AsyncContentRepositoryBase",
-      "status": "planned",
-      "branch": "",
-      "pr": "",
-      "prUrl": "",
+      "status": "in-review",
+      "branch": "v20/feature/ef-core-media-repository-2-hoist-read-path",
+      "pr": "#24762",
+      "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24762",
       "dependsOn": [],
       "summary": "Two-tier row types (wide rows need no entity DTO and no published flag), the wide base generic over the content type and the rows, the read path, ordering, versions, children, descendants, root, recycle bin, paged-of-types, by-level, ancestors and RecycleBinSmells moved down from the publishable base and DocumentRepository. Behaviour-neutral for documents, blueprints and elements. Spike first on both providers.",
       "tasks": [
-        { "text": "Spike: two-tier rows, generic BuildBaseQuery and projection, GetAsync only, green on SQLite and SQL Server", "done": false },
-        { "text": "IEntityVersionDto (Id only); IContentVersionDto extends it; wide base takes IAsyncContentTypeRepositoryBase<TContentType>", "done": false },
-        { "text": "ApplyOrdering hoisted with the OrderByPublished hook; ordering unit tests adapted", "done": false },
-        { "text": "PerformGet*, GetManyAsync(keys, aliases), AssembleEntitiesAsync core with the publishing hook, OnEntitiesAssembledAsync hoisted", "done": false },
-        { "text": "Versions, children, descendants, root, recycle bin, paged-of-types, GetByLevelAsync, GetAncestorsAsync, RecycleBinSmellsAsync hoisted; contracts moved to IAsyncContentRepository", "done": false },
-        { "text": "Document, blueprint and element fixtures and the unit project at unchanged counts; snapshots untouched", "done": false }
+        { "text": "Spike: two-tier rows, generic BuildBaseQuery and projection, GetAsync only, green on SQLite and SQL Server", "done": true },
+        { "text": "IEntityVersionDto (Id only); IContentVersionDto extends it; wide base takes IAsyncContentTypeRepositoryBase<TContentType>", "done": true },
+        { "text": "ApplyOrdering hoisted with the OrderByPublished hook; ordering unit tests adapted", "done": true },
+        { "text": "PerformGet*, GetManyAsync(keys, aliases), AssembleEntitiesAsync core with the publishing hook, OnEntitiesAssembledAsync hoisted", "done": true },
+        { "text": "Versions, children, descendants, root, recycle bin, paged-of-types, GetByLevelAsync, GetAncestorsAsync, RecycleBinSmellsAsync hoisted; contracts moved to IAsyncContentRepository", "done": true },
+        { "text": "Document, blueprint and element fixtures and the unit project at unchanged counts; snapshots untouched", "done": true }
       ],
       "acceptance": "All document, blueprint and element fixtures and the unit project green at unchanged counts; snapshots untouched; PublishableContentRepositoryBase about 900-1100 lines smaller; no publishing reference left on the wide base except the OrderByPublished hook.",
-      "notes": "",
+      "notes": "Started 23-11-2026, cut from 17cdf561180. Spike (two-tier rows, generic base query and projection, GetAsync and entity assembly) green on SQLite and SQL Server: 158 repository read tests on each. Phase 2 hoisted ordering, the fetch helpers, versions, children, descendants, root, recycle bin, paged-of-types, by-level, ancestors and RecycleBinSmellsAsync; PublishableContentRepositoryBase went from 2381 to 1478 lines; a normalised diff of every moved member shows only type-parameter and hook substitutions; both snapshots untouched. Decisions in CAMPAIGN.md §8 dated 23-11-2026. Verification: unit project 8236 passed; document, blueprint, element, content service and HybridCache integration fixtures 1029 passed on SQLite; repository fixtures 230 passed on SQL Server (one SQLite-only skip); full --no-incremental solution build clean; independent review found no must-fix, its two should-fix and three nits applied. Committed as 4f5fc0f61d3 and opened as draft PR #24762 on 23-11-2026.",
       "mergeCommit": ""
     },
     {
@@ -196,6 +196,15 @@
     }
   ],
   "log": [
+    { "date": "23-11-2026", "text": "Decision: the wide repository tier keeps the version and recycle bin members for every kind, matching the NPoco shape; the members campaign decides a split for the recycle bin (backlog row added)." },
+    { "date": "23-11-2026", "text": "PR 2 opened as draft #24762 (4f5fc0f61d3)." },
+    { "date": "23-11-2026", "text": "PR 2 implemented and independently reviewed: read path hoisted into AsyncContentRepositoryBase with two-tier rows; publishable base 2381 to 1478 lines; all regression fixtures green on SQLite, repository fixtures green on SQL Server; snapshots untouched. Awaiting the commit and the draft PR." },
+    { "date": "23-11-2026", "text": "PR 1b review round 1 applied in cc65832b950 (one model-wide customizer instead of seven per-DTO ones; tests and snapshots unchanged); PR description updated." },
+    { "date": "23-11-2026", "text": "PR 2 started on v20/feature/ef-core-media-repository-2-hoist-read-path, cut from 17cdf561180; spike first (two-tier rows, generic base query and projection, GetAsync) on both providers." },
+    { "date": "23-11-2026", "text": "PR 1b opened as draft #24758 (f064b258d99)." },
+    { "date": "23-11-2026", "text": "PR 1b implemented and independently reviewed (no must-fix, two doc nits applied): seven HasFilter(null) customizers, empty RemoveUniqueIndexFilters migration on both providers (enum 28), unit test red-first then green, full solution build clean, snapshots clean. Awaiting the commit and the draft PR." },
+    { "date": "23-11-2026", "text": "PR 1 merged on 20-11-2026 as 17cdf561180 (squash of #24724); recorded on the board 23-11-2026. No merge-up since, so no merge audit is due." },
+    { "date": "23-11-2026", "text": "PR 1b started on v20/feature/ef-core-media-repository-1b-remove-unique-index-filters, cut from 17cdf561180." },
     { "date": "20-11-2026", "text": "PR 1: the review bot's inline suggestion (HasMaxLength on path, already applied in 85857f56562) answered and resolved; Copilot recommends approval. Waiting for human review and the pipeline." },
     { "date": "20-11-2026", "text": "PR 1b added (remove the SQL Server unique index filters) after the independent review of PR 1; PR 1 gets HasMaxLength(255) on the path column and class docs, migration regenerated." },
     { "date": "20-11-2026", "text": "PR 1 opened as draft #24724 (f6392efddba): review clean, mapping test proven red/green, snapshots clean on both providers." },
