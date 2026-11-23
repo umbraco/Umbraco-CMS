@@ -122,7 +122,7 @@ stages:
           matrix:
             #            Windows:
             #              vmImage: 'windows-latest'
-            # We split the tests into 4 parts for each OS to reduce the time it takes to run them on the pipeline
+            # We split the tests into 4 parts plus the Search tests for each OS to reduce the time it takes to run them on the pipeline
             LinuxPart1Of4:
               vmImage: "ubuntu-latest"
               # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
