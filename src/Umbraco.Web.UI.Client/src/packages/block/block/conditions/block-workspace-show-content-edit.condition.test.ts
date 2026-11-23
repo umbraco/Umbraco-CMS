@@ -16,7 +16,7 @@ class UmbTestControllerChildElement extends UmbControllerHostElementMixin(HTMLEl
 describe('UmbBlockWorkspaceShowContentEditCondition', () => {
 	let hostElement: UmbTestControllerHostElement;
 	let childElement: UmbTestControllerChildElement;
-	let contentTypeHasProperties: UmbBooleanState<boolean>;
+	let contentTypeHasProperties: UmbBooleanState<boolean | undefined>;
 	let forceHideContentEditorInOverlay: UmbBooleanState<boolean>;
 	let condition: UmbBlockWorkspaceShowContentEditCondition;
 
@@ -26,7 +26,7 @@ describe('UmbBlockWorkspaceShowContentEditCondition', () => {
 		hostElement.appendChild(childElement);
 		document.body.appendChild(hostElement);
 
-		contentTypeHasProperties = new UmbBooleanState(false);
+		contentTypeHasProperties = new UmbBooleanState<boolean | undefined>(undefined);
 		forceHideContentEditorInOverlay = new UmbBooleanState(false);
 		// Same rule as UmbBlockWorkspaceContext.showContentEdit
 		const context = {
@@ -54,7 +54,14 @@ describe('UmbBlockWorkspaceShowContentEditCondition', () => {
 		});
 	}
 
+	it('should not be permitted before the content element type has loaded', async () => {
+		createCondition();
+		await new Promise((resolve) => requestAnimationFrame(resolve));
+		expect(condition.permitted).to.be.false;
+	});
+
 	it('should not be permitted when the content element type has no properties', async () => {
+		contentTypeHasProperties.setValue(false);
 		createCondition();
 		await new Promise((resolve) => requestAnimationFrame(resolve));
 		expect(condition.permitted).to.be.false;
