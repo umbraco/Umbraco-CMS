@@ -128,6 +128,7 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 			this.#onReloadStructureForEntityRequest as EventListener,
 		);
 		this.#actionEventContext = undefined;
+		this.#ancestorChains.destroy();
 		super.destroy();
 	}
 
