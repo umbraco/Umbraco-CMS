@@ -423,7 +423,11 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'items',
-				value: [{ value: 'First Option' }, { value: 'Second Option' }, { value: 'I Am the third Option' }],
+				value: [
+					{ value: 'First Option', label: 'First Option' },
+					{ value: 'Second Option', label: 'Second Option' },
+					{ value: 'I Am the third Option', label: 'I Am the third Option' },
+				],
 			},
 		],
 		noAccess: false,
@@ -442,7 +446,11 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'items',
-				value: [{ value: 'First Option' }, { value: 'Second Option' }, { value: 'I Am the third Option' }],
+				value: [
+					{ value: 'First Option', label: 'First Option' },
+					{ value: 'Second Option', label: 'Second Option' },
+					{ value: 'I Am the third Option', label: 'I Am the third Option' },
+				],
 			},
 		],
 		noAccess: false,
@@ -465,7 +473,11 @@ export const data: Array<UmbMockDataTypeModel> = [
 			},
 			{
 				alias: 'items',
-				value: [{ value: 'left' }, { value: 'center' }, { value: 'right' }],
+				value: [
+					{ value: 'left', label: 'left' },
+					{ value: 'center', label: 'center' },
+					{ value: 'right', label: 'right' },
+				],
 			},
 		],
 		noAccess: false,
@@ -606,7 +618,11 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'items',
-				value: [{ value: 'First Option' }, { value: 'Second Option' }, { value: 'I Am the third Option' }],
+				value: [
+					{ value: 'First Option', label: 'First Option' },
+					{ value: 'Second Option', label: 'Second Option' },
+					{ value: 'I Am the third Option', label: 'I Am the third Option' },
+				],
 			},
 		],
 		noAccess: false,
@@ -625,7 +641,11 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'items',
-				value: [{ value: 'First Option' }, { value: 'Second Option' }, { value: 'I Am the third Option' }],
+				value: [
+					{ value: 'First Option', label: 'First Option' },
+					{ value: 'Second Option', label: 'Second Option' },
+					{ value: 'I Am the third Option', label: 'I Am the third Option' },
+				],
 			},
 		],
 		noAccess: false,
