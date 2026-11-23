@@ -2191,9 +2191,18 @@ export class UiBaseLocators extends BasePage {
    * @returns the trailing segment of the update request URL (the entity id or path).
    */
   async waitForWorkspaceToBeSaved(save: () => Promise<void>, updateEndpoint: string, saveActionAlias: string) {
-    const updatedId = await this.waitForResponseAfterExecutingPromise(updateEndpoint, save, ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
+    // Some workspaces validate first with a PUT to .../{id}/validate, which shares the update endpoint's prefix.
+    const updateResponse = this.page.waitForResponse(
+      (resp) =>
+        resp.url().includes(updateEndpoint) &&
+        !new URL(resp.url()).pathname.endsWith('/validate') &&
+        resp.status() === ConstantHelper.statusCodes.ok &&
+        resp.request().method() === ConstantHelper.httpMethods.put,
+      {timeout: ConstantHelper.timeout.navigation},
+    );
+    const [response] = await Promise.all([updateResponse, save()]);
     await this.waitForWorkspaceActionToSucceed(saveActionAlias);
-    return updatedId;
+    return new URL(response.url()).pathname.split("/").pop();
   }
 
   async clickSaveButtonAndWaitForWorkspaceToBeSaved(updateEndpoint: string, saveActionAlias: string) {
@@ -2213,6 +2222,7 @@ export class UiBaseLocators extends BasePage {
     await this.isVisible(this.workspaceActionSuccessState(publishActionAlias), false);
     await publish();
     await this.waitForWorkspaceActionToSucceed(publishActionAlias);
+    await this.waitForWorkspaceEditRoute(entityType);
     return this.page.url().match(new RegExp(`/workspace/${entityType}/edit/([^/]+)`))?.[1];
   }
 
