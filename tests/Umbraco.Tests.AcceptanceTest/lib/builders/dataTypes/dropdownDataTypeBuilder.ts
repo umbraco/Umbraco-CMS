@@ -1,9 +1,10 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {ValueListOptionBuilder} from './valueListBuilder';
 
 // There is one dropdown editor per number of values it holds, so the two builders differ only in which
 // editor they target - the options are configured the same way.
 export class DropdownDataTypeBuilder extends DataTypeBuilder {
-  items: string[];
+  optionBuilders: ValueListOptionBuilder<DropdownDataTypeBuilder>[] = [];
 
   constructor() {
     super();
@@ -11,17 +12,18 @@ export class DropdownDataTypeBuilder extends DataTypeBuilder {
     this.editorUiAlias = 'Umb.PropertyEditorUi.Dropdown';
   }
 
-  withItems(items: string[]) {
-    this.items = items;
-    return this;
+  addItem() {
+    const builder = new ValueListOptionBuilder<DropdownDataTypeBuilder>(this);
+    this.optionBuilders.push(builder);
+    return builder;
   }
 
   getValues() {
     let values: any[] = [];
-    if (this.items && this.items.length > 0) {
+    if (this.optionBuilders.length > 0) {
       values.push({
         alias: 'items',
-        value: this.items
+        value: this.optionBuilders.map(builder => builder.getValues())
       });
     }
     return values;

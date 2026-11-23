@@ -24,26 +24,26 @@ test('can add option', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.clickAddOptionButton();
-  await umbracoUi.dataType.enterOptionName(optionName);
+  await umbracoUi.dataType.enterOptionLabel(optionName);
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'items', [optionName])).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveOption(customDataTypeName, optionName, optionName)).toBeTruthy();
 });
 
 test('can remove option', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const removedOptionName = 'Removed Option';
   const customDataType = 'Custom Radiobox';
-  await umbracoApi.dataType.createRadioboxDataType(customDataType, [removedOptionName]);
+  await umbracoApi.dataType.createRadioboxDataType(customDataType, [{value: removedOptionName, label: removedOptionName}]);
   await umbracoUi.dataType.goToDataType(customDataType);
 
   // Act
-  await umbracoUi.dataType.removeOptionByName(removedOptionName);
+  await umbracoUi.dataType.removeOption(0);
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataType, 'items', [removedOptionName])).toBeFalsy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveOption(customDataType, removedOptionName)).toBeFalsy();
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataType);
@@ -63,4 +63,92 @@ test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => 
   expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
   expect(dataTypeDefaultData.values).toEqual([]);
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'items')).toBeFalsy();
+});
+
+test('fills in the value from the label of an added option', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.dataType.createRadioboxDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.clickAddOptionButton();
+  await umbracoUi.dataType.enterOptionLabel('Test option');
+
+  // Assert
+  await umbracoUi.dataType.doesLastOptionHaveValueAndLabel('Test option', 'Test option');
+});
+
+test('stops filling in the value once it has been edited', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.dataType.createRadioboxDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.clickAddOptionButton();
+  await umbracoUi.dataType.enterOptionLabel('Test option');
+  await umbracoUi.dataType.enterOptionValue('custom-value');
+  await umbracoUi.dataType.enterOptionLabel('Edited label');
+
+  // Assert
+  await umbracoUi.dataType.doesLastOptionHaveValueAndLabel('custom-value', 'Edited label');
+});
+
+test('does not change the value of a saved option when its label is edited', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, [{value: 'test-option', label: 'Test option'}]);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.enterOptionLabel('Updated label', 0);
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesDataTypeHaveOption(customDataTypeName, 'test-option', 'Updated label')).toBeTruthy();
+});
+
+test('cannot save an option without a label', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.dataType.createRadioboxDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.clickAddOptionButton();
+  await umbracoUi.dataType.enterOptionValue('Test option');
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.doesOptionFieldShowError(0, 'label');
+  expect(await umbracoApi.dataType.doesDataTypeHaveOption(customDataTypeName, 'Test option')).toBeFalsy();
+});
+
+test('cannot save an option without a value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.dataType.createRadioboxDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.clickAddOptionButton();
+  await umbracoUi.dataType.enterOptionLabel('Test option');
+  await umbracoUi.dataType.enterOptionValue('');
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.doesOptionFieldShowError(0, 'value');
+  expect(await umbracoApi.dataType.doesDataTypeHaveOption(customDataTypeName, 'Test option')).toBeFalsy();
+});
+
+test('cannot save two options with the same value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, [{value: 'Test option', label: 'Test option'}]);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.clickAddOptionButton();
+  await umbracoUi.dataType.enterOptionLabel('Test option');
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isValidationMessageVisible(ConstantHelper.validationMessages.valueNotUnique);
+  const dataType = await umbracoApi.dataType.getByName(customDataTypeName);
+  expect(dataType.values.find(item => item.alias === 'items').value).toHaveLength(1);
 });

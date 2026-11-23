@@ -263,12 +263,19 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
-  async createCheckboxListDataType(name: string, options: string[] = []) {
+  async createCheckboxListDataType(name: string, options: Array<{value: string; label: string}> = []) {
     await this.ensureNameNotExists(name);
 
-    const dataType = new CheckboxListDataTypeBuilder()
+    const builder = new CheckboxListDataTypeBuilder();
+    for (const option of options) {
+      builder
+      .addItem()
+        .withValue(option.value)
+        .withLabel(option.label)
+      .done();
+    }
+    const dataType = builder
       .withName(name)
-      .withItems(options)
       .build();
     return await this.save(dataType);
   }
@@ -314,13 +321,19 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
-  async createDropdownDataType(name: string, isMultiple: boolean, options: string[]) {
+  async createDropdownDataType(name: string, isMultiple: boolean, options: Array<{value: string; label: string}>) {
     await this.ensureNameNotExists(name);
 
     const builder = isMultiple ? new DropdownDataTypeBuilder() : new SingleDropdownDataTypeBuilder();
+    for (const option of options) {
+      builder
+        .addItem()
+          .withValue(option.value)
+          .withLabel(option.label)
+        .done();
+    }
     const dataType = builder
       .withName(name)
-      .withItems(options)
       .build();
     return await this.save(dataType);
   }
@@ -1198,12 +1211,19 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
-  async createRadioboxDataType(name: string, options: string[] = []) {
+  async createRadioboxDataType(name: string, options: Array<{value: string; label: string}> = []) {
     await this.ensureNameNotExists(name);
 
-    const dataType = new RadioboxDataTypeBuilder()
+    const builder = new RadioboxDataTypeBuilder();
+    for (const option of options) {
+      builder
+        .addItem()
+          .withValue(option.value)
+          .withLabel(option.label)
+        .done();
+    }
+    const dataType = builder
       .withName(name)
-      .withItems(options)
       .build();
 
     return await this.save(dataType);
@@ -1912,6 +1932,12 @@ export class DataTypeApiHelper {
     return valueData?.value === value;
   }
 
+  async doesDataTypeHaveOption(dataTypeName: string, option: string, label?: string) {
+    const dataType = await this.getByName(dataTypeName);
+    const items = dataType.values.find(item => item.alias === 'items')?.value ?? [];
+    return items.some(item => item.value === option && (label === undefined || item.label === label));
+  }
+
   async doesApprovedColorHaveColor(dataTypeName: string, color: string) {
     const dataTypeData = await this.getByName(dataTypeName);
     const valueData = dataTypeData.values.find(item => item.alias === 'items');
@@ -1967,12 +1993,19 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
-  async createSingleDropdownDataType(name: string, options: string[] = []) {
+  async createSingleDropdownDataType(name: string, options: Array<{value: string; label: string}> = []) {
     await this.ensureNameNotExists(name);
 
-    const dataType = new SingleDropdownDataTypeBuilder()
+    const builder = new SingleDropdownDataTypeBuilder();
+    for (const option of options) {
+      builder
+        .addItem()
+          .withValue(option.value)
+          .withLabel(option.label)
+        .done();
+    }
+    const dataType = builder
       .withName(name)
-      .withItems(options)
       .build();
     return await this.save(dataType);
   }

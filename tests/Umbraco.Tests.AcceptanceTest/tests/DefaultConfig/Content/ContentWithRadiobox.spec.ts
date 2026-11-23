@@ -5,7 +5,7 @@ const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Radiobox';
 const customDataTypeName = 'CustomRadiobox';
-const optionValues = ['testOption1', 'testOption2'];
+const options = [{value: 'testOption1', label: 'Test Option 1'}, {value: 'testOption2', label: 'Test Option 2'}];
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -63,7 +63,7 @@ test('can publish content with the radiobox data type', async ({umbracoApi, umbr
 
 test('can create content with the custom radiobox data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const customDataTypeId = await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, optionValues);
+  const customDataTypeId = await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, options);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
@@ -71,19 +71,19 @@ test('can create content with the custom radiobox data type', async ({umbracoApi
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.chooseRadioboxOption(optionValues[0]);
+  await umbracoUi.content.chooseRadioboxOption(options[0].value);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual(optionValues[0]);
+  expect(contentData.values[0].value).toEqual(options[0].value);
 });
 
 test('can not publish mandatory radiobox with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const customDataTypeId = await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, optionValues);
+  const customDataTypeId = await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, options);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'Test Group', false, false, true);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
@@ -96,21 +96,21 @@ test('can not publish mandatory radiobox with an empty value', {tag: '@release'}
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   // Select a radiobox value and the validation error disappears
-  await umbracoUi.content.chooseRadioboxOption(optionValues[0]);
+  await umbracoUi.content.chooseRadioboxOption(options[0].value);
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual(optionValues[0]);
+  expect(contentData.values[0].value).toEqual(options[0].value);
 });
 
 test('can navigate away from content with a radiobox value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const customDataTypeId = await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, optionValues);
+  const customDataTypeId = await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, options);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
-  await umbracoApi.document.createDocumentWithPropertyValue(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), optionValues[0]);
+  await umbracoApi.document.createDocumentWithPropertyValue(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), options[0].value);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
@@ -125,13 +125,13 @@ test('can navigate away from content with a radiobox value without seeing discar
 
 test('can see discard changes when navigating away from content with a changed radiobox value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const customDataTypeId = await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, optionValues);
+  const customDataTypeId = await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, options);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
-  await umbracoApi.document.createDocumentWithPropertyValue(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), optionValues[0]);
+  await umbracoApi.document.createDocumentWithPropertyValue(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), options[0].value);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.chooseRadioboxOption(optionValues[1]);
+  await umbracoUi.content.chooseRadioboxOption(options[1].value);
 
   // Act
   await umbracoUi.content.goToSection(ConstantHelper.sections.settings);

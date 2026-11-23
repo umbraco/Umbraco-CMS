@@ -21,7 +21,7 @@ const radioboxValues = [
 for (const radiobox of radioboxValues) {
   test(`can render content with ${radiobox.type}`, async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const dataTypeId = await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, [radiobox.value]);
+    const dataTypeId = await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, radiobox.value ? [{value: radiobox.value, label: `${radiobox.value} label`}] : []);
     const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(templateName, AliasHelper.toAlias(propertyName));
     const contentKey = await umbracoApi.document.createPublishedDocumentWithValue(contentName, radiobox.value, dataTypeId, templateId, propertyName, documentTypeName);
     const contentURL = await umbracoApi.document.getDocumentUrl(contentKey);

@@ -14,30 +14,30 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 const dropdownValues = [
-  {type: 'an empty dropdown list', value: [], isMultiple: false},
-  {type: 'a single dropdown value', value: ['Test checkbox'], isMultiple: false},
-  {type: 'multiple dropdown values', value: ['Test option 1', 'Test option 2'], isMultiple: true}
+  {type: 'an empty dropdown list', options: [], isMultiple: false},
+  {type: 'a single dropdown value', options: [{value: 'Test checkbox', label: 'Test checkbox label'}], isMultiple: false},
+  {type: 'multiple dropdown values', options: [{value: 'Test option 1', label: 'Test option 1 label'}, {value: 'Test option 2', label: 'Test option 2 label'}], isMultiple: true}
 ];
 
 for (const dropdown of dropdownValues) {
   test(`can render content with ${dropdown.type}`, async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const dataTypeId = await umbracoApi.dataType.createDropdownDataType(customDataTypeName, dropdown.isMultiple, dropdown.value);
+    const dataTypeId = await umbracoApi.dataType.createDropdownDataType(customDataTypeName, dropdown.isMultiple, dropdown.options);
     let templateId = '';
     if (dropdown.isMultiple) {
       templateId = await umbracoApi.template.createTemplateWithDisplayingMulitpleStringValue(templateName, AliasHelper.toAlias(propertyName));
     } else {
       templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(templateName, AliasHelper.toAlias(propertyName));
     }
-    const contentKey = await umbracoApi.document.createPublishedDocumentWithValue(contentName, dropdown.value, dataTypeId, templateId, propertyName, documentTypeName);
+    const contentKey = await umbracoApi.document.createPublishedDocumentWithValue(contentName, dropdown.options.map(option => option.value), dataTypeId, templateId, propertyName, documentTypeName);
     const contentURL = await umbracoApi.document.getDocumentUrl(contentKey);
 
     // Act
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
     // Assert
-    for (const value of dropdown.value) {
-      await umbracoUi.contentRender.doesContentRenderValueContainText(value);
+    for (const option of dropdown.options) {
+      await umbracoUi.contentRender.doesContentRenderValueContainText(option.value);
     }
   });
 }

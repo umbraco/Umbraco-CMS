@@ -47,6 +47,7 @@
     needMoreItems: 'This field needs more items',
     minimumTwoEntriesRequiresOneMore: 'Minimum 2 entries, requires 1 more.',
     invalidObjectType: 'The selected item is of the wrong type.',
+    valueNotUnique: 'Values must be unique',
   }
 
   public static readonly inputTypes = {
