@@ -1,5 +1,5 @@
-import type { UmbDocumentItemModel } from '../../item/types.js';
-import { UmbDocumentItemDataResolver } from '../../item/document-item-data-resolver.js';
+import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
+import { UmbDocumentTreeItemDataResolver } from '../../tree/document-tree-item-data-resolver.js';
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -12,29 +12,29 @@ const ANCESTOR_PATH_OBSERVER_ALIAS = 'umbObserveAncestorPath';
  */
 @customElement('umb-document-ancestor-path')
 export class UmbDocumentAncestorPathElement extends UmbLitElement {
-	#resolvers: Array<UmbDocumentItemDataResolver<UmbDocumentItemModel>> = [];
+	#resolvers: Array<UmbDocumentTreeItemDataResolver> = [];
 
 	/**
 	 * The ancestors of the document, ordered from the root down.
-	 * @type {Array<UmbDocumentItemModel>}
+	 * @type {Array<UmbDocumentTreeItemModel>}
 	 */
 	@property({ type: Array, attribute: false })
-	public set ancestors(value: Array<UmbDocumentItemModel> | undefined) {
+	public set ancestors(value: Array<UmbDocumentTreeItemModel> | undefined) {
 		this.#ancestors = value;
 		this.#setAncestors(value ?? []);
 	}
-	public get ancestors(): Array<UmbDocumentItemModel> | undefined {
+	public get ancestors(): Array<UmbDocumentTreeItemModel> | undefined {
 		return this.#ancestors;
 	}
-	#ancestors?: Array<UmbDocumentItemModel>;
+	#ancestors?: Array<UmbDocumentTreeItemModel>;
 
 	@state()
 	private _path = '';
 
-	#setAncestors(ancestors: Array<UmbDocumentItemModel>) {
+	#setAncestors(ancestors: Array<UmbDocumentTreeItemModel>) {
 		this.#resolvers.forEach((resolver) => resolver.destroy());
 		this.#resolvers = ancestors.map((ancestor) => {
-			const resolver = new UmbDocumentItemDataResolver<UmbDocumentItemModel>(this);
+			const resolver = new UmbDocumentTreeItemDataResolver(this);
 			resolver.setData(ancestor);
 			return resolver;
 		});

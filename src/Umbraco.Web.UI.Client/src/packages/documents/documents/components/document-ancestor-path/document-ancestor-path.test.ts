@@ -1,7 +1,7 @@
 import { UmbDocumentAncestorPathElement } from './document-ancestor-path.element.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UmbDocumentVariantState } from '../../variant-state.js';
-import type { UmbDocumentItemModel } from '../../item/types.js';
+import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import { expect, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
@@ -10,16 +10,24 @@ import { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
 @customElement('umb-test-document-ancestor-path-host')
 class UmbTestHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-const createAncestor = (unique: string, name: string): UmbDocumentItemModel => ({
+const contentType = { unique: 'dt-1', icon: 'icon-folder', collection: null };
+
+const createAncestor = (unique: string, name: string): UmbDocumentTreeItemModel => ({
 	entityType: UMB_DOCUMENT_ENTITY_TYPE,
 	unique,
-	documentType: { unique: 'dt-1', icon: 'icon-folder', collection: null },
+	name,
+	parent: { entityType: 'document-root', unique: null },
+	ancestors: [],
 	hasChildren: true,
+	isFolder: false,
+	noAccess: false,
 	isProtected: false,
 	isTrashed: false,
-	parent: null,
 	flags: [],
-	variants: [{ culture: null, name, state: UmbDocumentVariantState.PUBLISHED, flags: [] }],
+	contentType,
+	documentType: contentType,
+	createDate: '2024-01-01T00:00:00Z',
+	variants: [{ culture: null, segment: null, name, state: UmbDocumentVariantState.PUBLISHED, flags: [] }],
 });
 
 describe('UmbDocumentAncestorPathElement', () => {
