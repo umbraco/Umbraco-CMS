@@ -1,4 +1,5 @@
 import type { UmbDocumentItemModel } from '../../item/types.js';
+import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import { UmbDocumentPickerInputContext } from './input-document.context.js';
 import '../document-ancestor-path/document-ancestor-path.element.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
@@ -161,7 +162,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 	private _statuses?: Array<UmbRepositoryItemsStatus>;
 
 	@state()
-	private _selectedItemsAncestors = new Map<string, Array<UmbDocumentItemModel>>();
+	private _selectedItemsAncestors = new Map<string, Array<UmbDocumentTreeItemModel> | null>();
 
 	#pickerInputContext = new UmbDocumentPickerInputContext(this);
 	#interactionMemoryManager = new UmbEntityInputInteractionMemoryManager(
@@ -201,7 +202,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 		this.observe(
 			this.#pickerInputContext.selectedItemsAncestors,
 			(ancestors) =>
-				(this._selectedItemsAncestors = new Map(ancestors.map((entry) => [entry.unique, entry.ancestors]))),
+				(this._selectedItemsAncestors = new Map(ancestors.map((entry) => [entry.treeItem.unique, entry.ancestors]))),
 			null,
 		);
 
