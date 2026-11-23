@@ -40,6 +40,8 @@ Stop and report clearly (no partial changes) when any of these hold:
 
 ## Procedure
 
+**Run every command from the repository root, and address the worktree with `git -C ../retarget-{n}`.** Between Bash calls, a `cd` to a folder outside the working directory doesn't persist, and neither do shell variables. A bare `HEAD` or `$mb` in a later step can silently refer to the user's own checkout or be empty. Record the values the steps produce, such as `{oldHead}`, `{mb}` and `{newHead}`, and write them into later commands literally.
+
 ### 1. Gather PR facts
 
 ```bash
@@ -48,7 +50,7 @@ gh pr view {n} --repo umbraco/Umbraco-CMS --json number,title,state,isDraft,base
 git ls-remote --exit-code --heads origin {dest}
 ```
 
-Check the stop conditions that these answer.
+Check the stop conditions that these answer. `headRepository` and `headRepositoryOwner` are objects: the fork is `{headRepositoryOwner.login}/{headRepository.name}`.
 
 Record `headRefOid` as **`{oldHead}`** — it's the lease for the force-push and the rollback point.
 
@@ -56,11 +58,13 @@ Record `headRefOid` as **`{oldHead}`** — it's the lease for the force-push and
 
 ```bash
 git fetch origin {base} {dest}
-git fetch origin pull/{n}/head:retarget-backup/{n}
+git fetch origin +pull/{n}/head:retarget-backup/{n}
 git rev-parse retarget-backup/{n}     # must equal {oldHead}
-mb=$(git merge-base origin/{base} retarget-backup/{n})
-git log --format='%H %P | %an <%ae> | %s' $mb..retarget-backup/{n}
+git merge-base origin/{base} retarget-backup/{n}     # record as {mb}
+git log --format='%H %P | %an <%ae> | %s' {mb}..retarget-backup/{n}
 ```
+
+The `+` lets the fetch replace a `retarget-backup/{n}` kept from an earlier run, which a contributor force-push would otherwise reject as non-fast-forward. Only an attempt that never pushed leaves a backup to replace; after a successful retarget, the old backup is the rollback, so keep it until the user lets it go.
 
 Cross-check that list against the commits in `gh pr view`. Then classify:
 
@@ -68,7 +72,7 @@ Cross-check that list against the commits in `gh pr view`. Then classify:
 - **Merge commits that merge `{base}` into the PR branch** (one parent is on `{base}`) — dropped; they exist only to keep the branch current with the old base. If such a merge contains conflict resolution (`git show --remerge-diff <sha>` is non-empty), those resolutions are lost by dropping it; account for them in step 4 when the replay conflicts in the same places.
 - **Any other merge commit** (merging another feature branch, etc.) — treat as "complicated" and stop unless the user explicitly wants to proceed.
 
-Also note whether commits are signed (`git log --format='%H %G?' $mb..retarget-backup/{n}`). Rewriting a commit always drops its signature, so a "Verified" badge will disappear — mention it in the plan.
+Also note whether commits are signed (`git log --format='%H %G?' {mb}..retarget-backup/{n}`). Rewriting a commit always drops its signature, so a "Verified" badge will disappear — mention it in the plan.
 
 ### 3. Replay onto `{dest}` in a throwaway worktree
 
@@ -80,24 +84,30 @@ If `../retarget-{n}` already exists, it's left over from an earlier run. If `git
 
 Replay each plain commit, oldest first, with the **original committer identity and date** so only the parent changes (`cherry-pick` already preserves author, author date and message; it does not preserve the committer):
 
+Run this as one command; the loop's variables only exist within it:
+
 ```bash
-cd ../retarget-{n}
+wt=../retarget-{n}
 for sha in <plain commits, oldest first>; do
   IFS='|' read -r cn ce cd <<< "$(git log -1 --format='%cn|%ce|%cI' "$sha")"
   GIT_COMMITTER_NAME="$cn" GIT_COMMITTER_EMAIL="$ce" GIT_COMMITTER_DATE="$cd" \
-    git cherry-pick --allow-empty-message "$sha" || break
+    git -C "$wt" cherry-pick --allow-empty-message "$sha" || break
 done
 ```
 
 Don't use `-x`: it appends "cherry picked from" to the message, which the contributor never wrote.
 
-If a pick stops, note the conflicted files (`git status --short`, `git diff`), and keep going only far enough to understand the whole picture (step 4). When resolving a conflict, continue with the same committer variables set for that commit:
+If a pick stops, note the conflicted files (`git -C ../retarget-{n} status --short`, `git -C ../retarget-{n} diff`), and keep going only far enough to understand the whole picture (step 4). Edit the conflicted files by their path under `../retarget-{n}/`. To continue, re-read that commit's committer values (the loop's variables are gone) and pass them literally:
 
 ```bash
-GIT_COMMITTER_NAME="$cn" GIT_COMMITTER_EMAIL="$ce" GIT_COMMITTER_DATE="$cd" git cherry-pick --continue --no-edit
+git log -1 --format='%cn|%ce|%cI' <sha>
+GIT_COMMITTER_NAME="<cn>" GIT_COMMITTER_EMAIL="<ce>" GIT_COMMITTER_DATE="<cd>" \
+  git -C ../retarget-{n} cherry-pick --continue --no-edit
 ```
 
-If a pick reports the commit is now empty, the change already exists on `{dest}` — note it and `git cherry-pick --skip`.
+Then resume the loop from the next commit.
+
+If a pick reports the commit is now empty, the change already exists on `{dest}` — note it and `git -C ../retarget-{n} cherry-pick --skip`.
 
 ### 4. Assess
 
@@ -121,14 +131,17 @@ A clean replay is necessary but not sufficient — the PR was written against `{
 
 **Verify the result builds and its tests pass on `{dest}`:**
 
-- Build every C# project the PR touches (fresh build, no `--no-build`) and run the tests the PR adds or changes, e.g. `dotnet test <test project> --filter "FullyQualifiedName~<TestClass>"`.
+- Build every C# project the PR touches (fresh build, no `--no-build`) and run the tests the PR adds or changes, using paths inside the worktree, e.g. `dotnet test ../retarget-{n}/tests/<test project>.csproj --filter "FullyQualifiedName~<TestClass>"`.
 - For backoffice changes, run the relevant client checks from `src/Umbraco.Web.UI.Client` (typecheck/lint, and the unit tests for the touched area) when `node_modules` is available; otherwise say they weren't run.
 
 **Compare against the original** to see exactly what changed per commit:
 
 ```bash
-git range-diff $mb..retarget-backup/{n} origin/{dest}..HEAD
+git -C ../retarget-{n} rev-parse HEAD        # record as {newHead}
+git range-diff {mb}..retarget-backup/{n} origin/{dest}..{newHead}
 ```
+
+`{newHead}` is what step 7 pushes. If you change the worktree after recording it, record it again.
 
 For a clean replay with no adaptations, each pair shows `=` (identical patch). Pairs marked `!` are your adaptations — every one of them must be intentional and explained in the plan.
 
@@ -152,12 +165,14 @@ Ask the user to confirm before changing anything on GitHub (use `AskUserQuestion
 
 Push first, then change the base. In this order, the PR's diff is only transiently noisy; changing the base first would briefly show every commit between the two branches and auto-request reviews from code owners of all of them.
 
+Push the explicit `{newHead}` SHA, never `HEAD`. The worktree shares the repository's objects, so this runs from the repository root. The lease only proves the remote branch hasn't moved; it can't tell whether you're pushing the right commit.
+
 ```bash
 # Fork PR — push to the contributor's fork, guarded by the lease from step 1
-git push --force-with-lease={headRefName}:{oldHead} \
-  https://github.com/{headRepositoryOwner}/{headRepository}.git HEAD:refs/heads/{headRefName}
+git push --force-with-lease=refs/heads/{headRefName}:{oldHead} \
+  https://github.com/{headRepositoryOwner.login}/{headRepository.name}.git {newHead}:refs/heads/{headRefName}
 # Same-repo PR
-git push --force-with-lease={headRefName}:{oldHead} origin HEAD:refs/heads/{headRefName}
+git push --force-with-lease=refs/heads/{headRefName}:{oldHead} origin {newHead}:refs/heads/{headRefName}
 
 gh pr edit {n} --repo umbraco/Umbraco-CMS --base {dest}
 ```
@@ -170,7 +185,7 @@ If the lease is rejected, the contributor pushed in the meantime: stop, don't re
 gh pr view {n} --repo umbraco/Umbraco-CMS --json baseRefName,headRefOid,commits,files
 ```
 
-Confirm: base is `{dest}`; `headRefOid` is the pushed HEAD; same number of commits (minus dropped merges) with the same authors and messages; the changed-file list matches the original (plus or minus only the adaptations reported). Report the result.
+Confirm: base is `{dest}`; `headRefOid` equals `{newHead}`; same number of commits (minus dropped merges) with the same authors and messages; the changed-file list matches the original (plus or minus only the adaptations reported). Report the result.
 
 Then post a short comment to the contributor (`gh pr comment {n} --repo umbraco/Umbraco-CMS --body "..."`), using the text the user confirmed in step 6:
 

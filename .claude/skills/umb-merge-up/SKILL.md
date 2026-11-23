@@ -44,7 +44,19 @@ git rev-list --count origin/{dest}..origin/{source}   # 0 → nothing to merge; 
 
 If the working tree isn't clean, stop and ask. Don't stash the user's work.
 
-If a local or remote branch with the merge branch's name exists, delete it. But first check for an open PR from it (`gh pr list --head {merge-branch} --state open`). If there is one, that's probably someone's in-progress merge, so ask before deleting: removing the remote branch closes their PR.
+If a local or remote branch with the merge branch's name exists, delete it, after two checks:
+
+1. **Open PR:** `gh pr list --head {merge-branch} --state open`. If there is one, that's probably someone's in-progress merge, so ask before deleting. Removing the remote branch closes their PR.
+2. **Work that exists nowhere else:** list commits on the branch that are in neither the destination nor the source.
+
+   ```bash
+   git log --oneline origin/{merge-branch} --not origin/{dest} origin/{source}            # remote branch
+   git log --oneline {merge-branch} --not origin/{dest} origin/{source} origin/{merge-branch}  # local-only commits
+   ```
+
+   If either lists commits, the branch holds work that would be lost, for example an earlier merge-up's resolutions that never landed. Show the commits and ask before deleting.
+
+Once both checks are clear, or the user has agreed:
 
 ```bash
 git branch -D {merge-branch} 2>/dev/null
@@ -116,7 +128,7 @@ git push -u origin {merge-branch}
 gh pr create --base {dest} --head {merge-branch} --title "<title>" --body-file <scratch file>
 ```
 
-**Title:** `Merge {source} into {dest}`, optionally followed by the headline areas in parentheses when there are notable reconciliations, e.g. `Merge-up: Merge v17/dev into v18/dev (tree batch endpoints, domain routing from publish status)`.
+**Title:** `Merge-up: Merge {source} into {dest}`, following the repository's "Area: Description" PR naming convention. When there are notable reconciliations, add the headline areas in parentheses, e.g. `Merge-up: Merge v17/dev into v18/dev (tree batch endpoints, domain routing from publish status)`.
 
 **Body** (see #24733 for a full example):
 
@@ -160,16 +172,26 @@ Then stop. Don't land the merge. The user will monitor CI, review, possibly buil
 
 ### 9. Merge into the destination and push
 
+Do every check before changing anything locally. Land the commit CI tested: `origin/{merge-branch}`, not the local branch, which may be stale if the user or a reviewer pushed fixes to it.
+
 ```bash
-gh pr checks {pr}                 # confirm the required checks passed; if not, report and stop
 git fetch origin {dest} {merge-branch}
-git switch {dest}
-git merge --ff-only origin/{dest}  # bring the local destination up to date
-git merge {merge-branch}
-git push origin {dest}
+git rev-parse origin/{merge-branch}                    # must equal the PR's head: that's the commit CI tested
+gh pr view {pr} --json headRefOid --jq .headRefOid
+gh pr checks {pr}                                      # required checks passed; if not, report and stop
+git merge-base --is-ancestor origin/{dest} origin/{merge-branch} && echo "dest unchanged"
 ```
 
-If `origin/{dest}` moved since the merge branch was created, the final `git merge` produces a new merge commit that CI hasn't tested. Say so, and ask whether to merge `{dest}` into the PR branch and re-run CI first, or to go ahead.
+If the ancestor check fails, `{dest}` has moved since the merge branch was created, and landing now would create a merge commit CI never tested. Stop and ask: either merge `origin/{dest}` into the merge branch, push it and wait for CI again (going back to steps 4–8 for any new conflicts), or land it anyway with `git merge --no-ff origin/{merge-branch}` in place of the fast-forward below.
+
+When all checks pass:
+
+```bash
+git switch {dest}
+git merge --ff-only origin/{dest}             # bring the local destination up to date
+git merge --ff-only origin/{merge-branch}     # the destination becomes exactly the tested commit
+git push origin {dest}
+```
 
 If the push is rejected (someone pushed in the meantime), fetch and re-assess. Never force-push a shared branch.
 
