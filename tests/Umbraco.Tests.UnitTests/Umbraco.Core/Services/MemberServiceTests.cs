@@ -15,7 +15,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
 [TestFixture]
-public class MemberServiceCultureTests
+public class MemberServiceTests
 {
     // Under a Turkish culture "I" lower-cases to the dotless "ı", so "INFO@EXAMPLE.COM" became "ınfo@example.com"
     [TestCase("INFO@EXAMPLE.COM", "info@example.com")]
