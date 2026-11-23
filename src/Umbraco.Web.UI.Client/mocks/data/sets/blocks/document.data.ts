@@ -7,12 +7,102 @@ import {
 	VARIANT_BLOCK_LIST_DOCUMENT_TYPE_ID,
 	VARIANT_HIDDEN_EDITOR_ELEMENT_TYPE_ID,
 	VARIANT_INLINE_BLOCK_LIST_DOCUMENT_TYPE_ID,
+	VISIBILITY_BLOCK_LIST_DOCUMENT_TYPE_ID,
+	VISIBILITY_CONTENT_ELEMENT_TYPE_ID,
+	VISIBILITY_EMPTY_CONTENT_ELEMENT_TYPE_ID,
+	VISIBILITY_HIDDEN_EDITOR_ELEMENT_TYPE_ID,
+	VISIBILITY_SETTINGS_ELEMENT_TYPE_ID,
 } from './document-type.data.js';
 import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
 
+const visibilityBlocks = [
+	{ contentKey: '1ba5c462-f5e0-46ab-ad8b-5a55956bac68', settingsKey: 'd14bccd1-263d-428f-acdc-53a1a269b46f' },
+	{ contentKey: '405460d3-300b-4bec-a7f3-642407eebd87', settingsKey: 'ca84eaad-2f3e-4e95-9e8c-43e94db7898e' },
+	{ contentKey: '3468f385-fa4c-4273-9015-aa84e8d1ace9', settingsKey: '53193575-1753-4660-8d89-7499190a5aa8' },
+];
+
 export const data: Array<UmbMockDocumentModel> = [
+	{
+		// Every block has settings, so each opens a workspace. "Has properties" shows the Content view, while
+		// "No properties" and "Hidden editor" only show the Settings view.
+		id: '5383f912-fd15-46c8-8dc6-535815c84101',
+		createDate: '2024-01-15T10:00:00.000Z',
+		parent: null,
+		ancestors: [],
+		documentType: {
+			id: VISIBILITY_BLOCK_LIST_DOCUMENT_TYPE_ID,
+			icon: 'icon-document',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		template: null,
+		variants: [
+			{
+				state: 'Published' as UmbDocumentVariantState,
+				publishDate: '2024-01-15T10:05:00.000Z',
+				culture: null,
+				segment: null,
+				name: 'Content Visibility Block List',
+				createDate: '2024-01-15T10:00:00.000Z',
+				updateDate: '2024-01-15T10:05:00.000Z',
+				id: '5276d4b4-cf06-41e0-85fa-a6365b3535da',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.BlockList',
+				alias: 'blocks',
+				culture: null,
+				segment: null,
+				value: {
+					contentData: [
+						{
+							contentTypeKey: VISIBILITY_CONTENT_ELEMENT_TYPE_ID,
+							key: visibilityBlocks[0].contentKey,
+							values: [
+								{ editorAlias: 'Umbraco.TextBox', culture: null, segment: null, alias: 'headline', value: 'Has properties' },
+							],
+						},
+						{
+							contentTypeKey: VISIBILITY_EMPTY_CONTENT_ELEMENT_TYPE_ID,
+							key: visibilityBlocks[1].contentKey,
+							values: [],
+						},
+						{
+							contentTypeKey: VISIBILITY_HIDDEN_EDITOR_ELEMENT_TYPE_ID,
+							key: visibilityBlocks[2].contentKey,
+							values: [
+								{ editorAlias: 'Umbraco.TextBox', culture: null, segment: null, alias: 'headline', value: 'Hidden editor' },
+							],
+						},
+					],
+					settingsData: visibilityBlocks.map((block, index) => ({
+						contentTypeKey: VISIBILITY_SETTINGS_ELEMENT_TYPE_ID,
+						key: block.settingsKey,
+						values: [
+							{
+								editorAlias: 'Umbraco.TextBox',
+								culture: null,
+								segment: null,
+								alias: 'note',
+								value: `Settings ${index + 1}`,
+							},
+						],
+					})),
+					expose: visibilityBlocks.map((block) => ({ contentKey: block.contentKey, culture: null, segment: null })),
+					layout: {
+						'Umbraco.BlockList': visibilityBlocks,
+					},
+				},
+			},
+		],
+		flags: [],
+	},
 	{
 		// Both block lists have inline editing enabled, and the document starts with one outer block
 		// holding one inner block — so an existing inline block can be compared against a newly added one.
