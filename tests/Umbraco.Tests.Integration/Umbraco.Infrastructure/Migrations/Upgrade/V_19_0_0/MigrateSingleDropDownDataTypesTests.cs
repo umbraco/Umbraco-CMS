@@ -64,7 +64,7 @@ internal sealed class MigrateSingleDropDownDataTypesTests : UmbracoIntegrationTe
             multiple: false,
             additionalConfiguration: new Dictionary<string, object>
             {
-                ["items"] = new List<ValueListOption> { new() { Value = "One" }, new() { Value = "Two" }, new() { Value = "Three" } },
+                ["items"] = new List<ValueListOption> { new() { Value = "One", Label = "One" }, new() { Value = "Two", Label = "Two" }, new() { Value = "Three", Label = "Three" } },
             });
 
         await ExecuteMigration();

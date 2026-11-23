@@ -430,7 +430,7 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         Assert.That(contents.Any(), Is.True);
         Assert.That(contents.Count(), Is.EqualTo(numberOfDocs));
         Assert.AreEqual(
-            "{\"items\":[{\"value\":\"test\"},{\"value\":\"test3\"},{\"value\":\"test2\"}]}",
+            "{\"items\":[{\"value\":\"test\",\"label\":\"test\"},{\"value\":\"test3\",\"label\":\"test3\"},{\"value\":\"test2\",\"label\":\"test2\"}]}",
             configuration);
     }
 

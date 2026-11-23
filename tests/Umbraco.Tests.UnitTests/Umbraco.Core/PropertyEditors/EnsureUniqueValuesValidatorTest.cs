@@ -21,7 +21,7 @@ public class EnsureUniqueValuesValidatorTest
         => ConfigurationEditorJsonSerializer().Deserialize<Dictionary<string, object>>($$"""{"items":{{itemsJson}}}""")!["items"];
 
     private static JsonArray Options(params string[] values)
-        => new(values.Select(value => (JsonNode)new JsonObject { ["value"] = value }).ToArray());
+        => new(values.Select(value => (JsonNode)new JsonObject { ["value"] = value, ["label"] = value }).ToArray());
 
     private IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(object? value)
         => new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer())
@@ -54,7 +54,7 @@ public class EnsureUniqueValuesValidatorTest
     [Test]
     public void Handles_Collections_Of_Options()
     {
-        var options = new[] { new ValueListOption { Value = "one" }, new ValueListOption { Value = "two" } };
+        var options = new[] { new ValueListOption { Value = "one", Label = "One" }, new ValueListOption { Value = "two", Label = "Two" } };
 
         Assert.Multiple(() =>
         {
@@ -65,25 +65,27 @@ public class EnsureUniqueValuesValidatorTest
     }
 
     [Test]
-    public void Accepts_Options_With_Labels()
-    {
-        var items = new JsonArray(
-            new JsonObject { ["value"] = "one", ["label"] = "One" },
-            new JsonObject { ["value"] = "two" },
-            new JsonObject { ["value"] = "three", ["label"] = "Three" });
-
-        Assert.AreEqual(0, Validate(items).Count());
-    }
-
-    [Test]
     public void Accepts_Options_As_Read_From_The_Database()
         => Assert.AreEqual(
             0,
-            Validate(DeserializeItems("""[{"value":"one"},{"value":"two","label":"Two"},{"value":"three"}]""")).Count());
+            Validate(DeserializeItems("""[{"value":"one","label":"One"},{"value":"two","label":"Two"},{"value":"three","label":"Three"}]""")).Count());
 
     [Test]
     public void Rejects_Duplicate_Value_With_Different_Labels()
         => Assert.AreEqual(
             2,
-            Validate(DeserializeItems("""[{"value":"one"},{"value":"one","label":"One"},{"value":"two"},{"value":"two"},{"value":"three"}]""")).Count());
+            Validate(DeserializeItems("""[{"value":"one","label":"A"},{"value":"one","label":"B"},{"value":"two","label":"C"},{"value":"two","label":"D"},{"value":"three","label":"E"}]""")).Count());
+
+    [TestCase("""[{"value":"one"}]""")]
+    [TestCase("""[{"value":"one","label":""}]""")]
+    [TestCase("""[{"value":"one","label":"  "}]""")]
+    [TestCase("""[{"value":"one","label":null}]""")]
+    public void Rejects_Option_Without_Label(string itemsJson)
+        => Assert.AreEqual(1, Validate(DeserializeItems(itemsJson)).Count());
+
+    [Test]
+    public void Rejects_Each_Option_Without_Label()
+        => Assert.AreEqual(
+            2,
+            Validate(DeserializeItems("""[{"value":"one","label":"One"},{"value":"two"},{"value":"three","label":""}]""")).Count());
 }

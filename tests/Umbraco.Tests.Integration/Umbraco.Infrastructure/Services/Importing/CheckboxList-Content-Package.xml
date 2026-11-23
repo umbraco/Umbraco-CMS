@@ -54,7 +54,7 @@
   <Languages />
   <DataTypes>
     <DataType Name="NewCheckBox" Id="Umbraco.CheckBoxList" Definition="8dacee1a-1bbd-46c0-b07f-8ffd49fcca7c" DatabaseType="Nvarchar"
-              Configuration="{&quot;items&quot;:[{&quot;value&quot;:&quot;test&quot;},{&quot;value&quot;:&quot;test3&quot;},{&quot;value&quot;:&quot;test2&quot;}]}">
+              Configuration="{&quot;items&quot;:[{&quot;value&quot;:&quot;test&quot;,&quot;label&quot;:&quot;test&quot;},{&quot;value&quot;:&quot;test3&quot;,&quot;label&quot;:&quot;test3&quot;},{&quot;value&quot;:&quot;test2&quot;,&quot;label&quot;:&quot;test2&quot;}]}">
     </DataType>
   </DataTypes>
 </umbPackage>

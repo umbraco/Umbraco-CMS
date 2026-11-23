@@ -44,10 +44,10 @@ public class ValueListConfigurationTests
     {
         var configuration = new ValueListConfiguration
         {
-            Items = [new ValueListOption { Value = "a" }, new ValueListOption { Value = "b", Label = "B" }],
+            Items = [new ValueListOption { Value = "a", Label = "A" }, new ValueListOption { Value = "b", Label = "B" }],
         };
 
-        AssertJsonEquals("""{"items":[{"value":"a","label":null},{"value":"b","label":"B"}]}""", Write(configuration));
+        AssertJsonEquals("""{"items":[{"value":"a","label":"A"},{"value":"b","label":"B"}]}""", Write(configuration));
     }
 
     [Test]
@@ -57,18 +57,6 @@ public class ValueListConfigurationTests
 
         Assert.That(configuration.Items, Is.Empty);
     }
-
-    [Test]
-    public void Keeps_Labels_When_Read_And_Written()
-    {
-        const string Json = """{"items":[{"value":"a","label":"A"},{"value":"b","label":null}]}""";
-
-        AssertJsonEquals(Json, Write(Read(Json)));
-    }
-
-    [Test]
-    public void Treats_Empty_Label_As_No_Label()
-        => Assert.That(new ValueListOption { Value = "a", Label = string.Empty }.Label, Is.Null);
 
     private static IDictionary<string, object> Deserialize(string json)
         => _serializer.Deserialize<Dictionary<string, object>>(json)!;

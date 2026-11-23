@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_20_0_0;
 
 /// <summary>
 ///     Converts the plain string <c>items</c> of the value list editors (Single Dropdown, Multiple Dropdown, Checkbox
-///     List and Radio Button List) to option objects holding a <c>value</c>.
+///     List and Radio Button List) to option objects holding a <c>value</c> and a <c>label</c> that starts out as the value.
 /// </summary>
 /// <remarks>
 ///     Rewrites the stored data type configuration JSON directly, so it does not depend on the typed configuration.
@@ -122,7 +122,7 @@ internal sealed class MigrateValueListItemsToOptions : AsyncMigrationBase
         {
             if (items[i] is JsonValue item && item.TryGetValue(out string? value))
             {
-                items[i] = new JsonObject { ["value"] = value };
+                items[i] = new JsonObject { ["value"] = value, ["label"] = value };
                 changed = true;
             }
         }

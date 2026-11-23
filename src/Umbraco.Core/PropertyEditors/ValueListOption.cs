@@ -11,11 +11,7 @@ public class ValueListOption
     public required string Value { get; set; }
 
     /// <summary>
-    ///     Gets or sets the label shown for the option, or <c>null</c> to show the value. An empty label is treated as no label.
+    ///     Gets or sets the label shown for the option. It must not be empty.
     /// </summary>
-    public string? Label
-    {
-        get;
-        set => field = string.IsNullOrEmpty(value) ? null : value;
-    }
+    public string Label { get; set; } = string.Empty;
 }

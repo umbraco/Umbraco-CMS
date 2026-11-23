@@ -558,7 +558,7 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Save_Value_List_With_Labelled_Options()
     {
-        var dataType = CreateValueListDataType("""[{"value":"a","label":"A"},{"value":"b"}]""");
+        var dataType = CreateValueListDataType("""[{"value":"a","label":"A"},{"value":"b","label":"B"}]""");
 
         var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
@@ -570,9 +570,9 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("a", configuration.Items[0].Value);
         Assert.AreEqual("A", configuration.Items[0].Label);
         Assert.AreEqual("b", configuration.Items[1].Value);
-        Assert.IsNull(configuration.Items[1].Label);
+        Assert.AreEqual("B", configuration.Items[1].Label);
 
-        Assert.IsTrue(JsonNode.DeepEquals(JsonNode.Parse("""[{"value":"a","label":"A"},{"value":"b"}]"""), GetStoredItems(actual.Id)));
+        Assert.IsTrue(JsonNode.DeepEquals(JsonNode.Parse("""[{"value":"a","label":"A"},{"value":"b","label":"B"}]"""), GetStoredItems(actual.Id)));
     }
 
     [Test]
@@ -589,7 +589,19 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Cannot_Save_Value_List_With_Duplicate_Values()
     {
-        var dataType = CreateValueListDataType("""[{"value":"a"},{"value":"a","label":"A"}]""");
+        var dataType = CreateValueListDataType("""[{"value":"a","label":"A"},{"value":"a","label":"B"}]""");
+
+        var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DataTypeOperationStatus.InvalidConfiguration, result.Status);
+    }
+
+    [TestCase("""[{"value":"a"}]""")]
+    [TestCase("""[{"value":"a","label":""}]""")]
+    public async Task Cannot_Save_Value_List_With_Option_Without_Label(string itemsJson)
+    {
+        var dataType = CreateValueListDataType(itemsJson);
 
         var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
 

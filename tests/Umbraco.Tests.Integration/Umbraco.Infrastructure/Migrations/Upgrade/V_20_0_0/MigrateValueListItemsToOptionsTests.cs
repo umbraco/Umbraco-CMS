@@ -25,7 +25,7 @@ internal sealed class MigrateValueListItemsToOptionsTests : MigrateMinMaxToRange
 
         await RunMigration<MigrateValueListItemsToOptions>();
 
-        await AssertConfig(id, """{"items":[{"value":"a"},{"value":"b"}]}""");
+        await AssertConfig(id, """{"items":[{"value":"a","label":"a"},{"value":"b","label":"b"}]}""");
     }
 
     [Test]
@@ -37,7 +37,7 @@ internal sealed class MigrateValueListItemsToOptionsTests : MigrateMinMaxToRange
 
         await RunMigration<MigrateValueListItemsToOptions>();
 
-        await AssertConfig(id, """{"items":[{"value":"a"}],"foo":true}""");
+        await AssertConfig(id, """{"items":[{"value":"a","label":"a"}],"foo":true}""");
     }
 
     [TestCase("{}")]
@@ -59,7 +59,7 @@ internal sealed class MigrateValueListItemsToOptionsTests : MigrateMinMaxToRange
 
         await RunMigration<MigrateValueListItemsToOptions>();
 
-        await AssertConfig(id, """{"Items":[{"value":"a"},{"value":"b"}]}""");
+        await AssertConfig(id, """{"Items":[{"value":"a","label":"a"},{"value":"b","label":"b"}]}""");
     }
 
     [Test]
@@ -81,7 +81,7 @@ internal sealed class MigrateValueListItemsToOptionsTests : MigrateMinMaxToRange
         await RunMigration<MigrateValueListItemsToOptions>();
         await RunMigration<MigrateValueListItemsToOptions>();
 
-        await AssertConfig(id, """{"items":[{"value":"a"}]}""");
+        await AssertConfig(id, """{"items":[{"value":"a","label":"a"}]}""");
     }
 
     private Task AssertConfig(int id, string expectedJson)
