@@ -6,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Services;
 
@@ -14,14 +15,20 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs;
 /// <summary>
 ///    A hosted service that checks for any runnable distributed background jobs on a timer.
 /// </summary>
+/// <remarks>
+///    Only servers with the <see cref="ServerRole.Single" /> or <see cref="ServerRole.SchedulingPublisher" /> role
+///    register and run distributed background jobs.
+/// </remarks>
 public class DistributedBackgroundJobHostedService : BackgroundService
 {
     private readonly ILogger<DistributedBackgroundJobHostedService> _logger;
     private readonly IRuntimeState _runtimeState;
     private readonly IDistributedJobService _distributedJobService;
     private readonly IDatabaseReadOnlyAccessor _databaseReadOnlyAccessor;
+    private readonly IServerRoleAccessor _serverRoleAccessor;
 
     private DistributedJobSettings _distributedJobSettings;
+    private ServerRole? _lastSkippedServerRole;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedBackgroundJobHostedService"/> class.
@@ -31,7 +38,8 @@ public class DistributedBackgroundJobHostedService : BackgroundService
         IRuntimeState runtimeState,
         IDistributedJobService distributedJobService,
         IOptionsMonitor<DistributedJobSettings> distributedJobSettings,
-        IDatabaseReadOnlyAccessor databaseReadOnlyAccessor)
+        IDatabaseReadOnlyAccessor databaseReadOnlyAccessor,
+        IServerRoleAccessor serverRoleAccessor)
     {
         _logger = logger;
         _runtimeState = runtimeState;
@@ -42,6 +50,27 @@ public class DistributedBackgroundJobHostedService : BackgroundService
             _distributedJobSettings = options;
         });
         _databaseReadOnlyAccessor = databaseReadOnlyAccessor;
+        _serverRoleAccessor = serverRoleAccessor;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DistributedBackgroundJobHostedService"/> class.
+    /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 20.")]
+    public DistributedBackgroundJobHostedService(
+        ILogger<DistributedBackgroundJobHostedService> logger,
+        IRuntimeState runtimeState,
+        IDistributedJobService distributedJobService,
+        IOptionsMonitor<DistributedJobSettings> distributedJobSettings,
+        IDatabaseReadOnlyAccessor databaseReadOnlyAccessor)
+        : this(
+            logger,
+            runtimeState,
+            distributedJobService,
+            distributedJobSettings,
+            databaseReadOnlyAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IServerRoleAccessor>())
+    {
     }
 
     /// <summary>
@@ -58,7 +87,8 @@ public class DistributedBackgroundJobHostedService : BackgroundService
             runtimeState,
             distributedJobService,
             distributedJobSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IDatabaseReadOnlyAccessor>())
+            StaticServiceProvider.Instance.GetRequiredService<IDatabaseReadOnlyAccessor>(),
+            StaticServiceProvider.Instance.GetRequiredService<IServerRoleAccessor>())
     {
     }
 
@@ -79,6 +109,12 @@ public class DistributedBackgroundJobHostedService : BackgroundService
         {
             while (await timer.WaitForNextTickAsync(stoppingToken))
             {
+                // Checked on every tick, as an elected server role can change while the application is running.
+                if (ServerRoleRunsJobs() is false)
+                {
+                    continue;
+                }
+
                 if (initialized is false)
                 {
                     try
@@ -120,6 +156,36 @@ public class DistributedBackgroundJobHostedService : BackgroundService
         {
             _logger.LogInformation("Timed Hosted Service is stopping.");
         }
+    }
+
+    private bool ServerRoleRunsJobs()
+    {
+        ServerRole serverRole;
+        try
+        {
+            serverRole = _serverRoleAccessor.CurrentServerRole;
+        }
+        catch (Exception exception)
+        {
+            // We swallow exception here and retry on the next tick, don't want the app to crash if the role can't be determined
+            _logger.LogWarning(exception, "An exception occurred while determining the server role. Retrying on the next tick.");
+            return false;
+        }
+
+        if (serverRole is ServerRole.Single or ServerRole.SchedulingPublisher)
+        {
+            _lastSkippedServerRole = null;
+            return true;
+        }
+
+        // Logged once per role rather than on every tick, to avoid flooding the log.
+        if (_lastSkippedServerRole != serverRole)
+        {
+            _logger.LogInformation("Distributed background jobs do not run on this server while its role is {ServerRole}.", serverRole);
+            _lastSkippedServerRole = serverRole;
+        }
+
+        return false;
     }
 
     private async Task EnsureJobsAsync()
