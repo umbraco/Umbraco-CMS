@@ -28,8 +28,8 @@ export default defineConfig({
   outputDir: "./results",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* Maximum time each action such as `click()` can take. A stuck action then fails with its own error instead of the test timeout. */
-    actionTimeout: 15 * 1000,
+    /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
+    actionTimeout: 0,
     // When working locally it can be a good idea to use trace: 'on-first-retry' instead of 'retain-on-failure', it can cut the local test times in half.
     trace: 'retain-on-failure',
     ignoreHTTPSErrors: true,

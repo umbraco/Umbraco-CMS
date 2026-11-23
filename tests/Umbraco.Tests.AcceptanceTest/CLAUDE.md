@@ -75,6 +75,10 @@ Fixed sleeps (`page.waitForTimeout(...)`, `ConstantHelper.wait.*`) are the singl
 ### `this.click()` vs raw `.click()`
 `BasePage.click()` waits for the element to be visible before clicking. Use it. Reach for a raw locator `.click()` only when you deliberately need to skip that wait.
 
+The `BasePage` action wrappers (`click`, `enterText`, `hover`, `selectOption`, …) also cap the action itself at `ConstantHelper.timeout.action`, so a stuck action fails with its own error. `actionTimeout` in `playwright.config.ts` stays unlimited on purpose: it would also cap API requests, `waitForResponse` and `waitForEvent`. A raw locator action therefore has no limit of its own and runs until the test timeout.
+
+Avoid `{force: true}` unless the element genuinely cannot pass Playwright's checks: a forced click skips the check that the element is the one under the pointer, so it can land on a neighbour while the layout is still settling.
+
 ### Match names exactly to survive leftover data
 Playwright locators run in **strict mode** — if a locator resolves to more than one element, the action throws. Residue from a crashed/partial run (e.g. a leftover `TestUserGroupNameDescription`) makes a substring locator for `TestUserGroupName` match two rows and fail. Match on exact text whenever the value is an entity name:
 

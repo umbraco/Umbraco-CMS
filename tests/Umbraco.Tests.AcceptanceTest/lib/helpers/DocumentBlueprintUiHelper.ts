@@ -23,7 +23,8 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
   }
 
   async clickActionsMenuAtRoot() {
-    await this.click(this.documentBlueprintSidebarHeader.getByTestId('open-dropdown'), {force: true});
+    await this.hover(this.documentBlueprintSidebarHeader);
+    await this.click(this.documentBlueprintSidebarHeader.getByTestId('open-dropdown'));
   }
 
   async isDocumentBlueprintSidebarHeaderVisible(isVisible: boolean = true) {

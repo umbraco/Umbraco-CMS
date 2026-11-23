@@ -40,7 +40,7 @@ export class BasePage {
    */
   async click(locator: Locator, options?: {force?: boolean; timeout?: number}): Promise<void> {
     await expect(locator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.long});
-    await locator.click({force: options?.force});
+    await locator.click({force: options?.force, timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -50,7 +50,7 @@ export class BasePage {
    */
   async doubleClick(locator: Locator, options?: {force?: boolean; timeout?: number}): Promise<void> {
     await expect(locator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
-    await locator.dblclick({force: options?.force});
+    await locator.dblclick({force: options?.force, timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -60,7 +60,7 @@ export class BasePage {
    */
   async rightClick(locator: Locator, options?: {force?: boolean; timeout?: number}): Promise<void> {
     await expect(locator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
-    await locator.click({button: 'right', force: options?.force});
+    await locator.click({button: 'right', force: options?.force, timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -86,9 +86,9 @@ export class BasePage {
   ): Promise<void> {
     await expect(locator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
     if (options?.clearFirst !== false) {
-      await locator.clear();
+      await locator.clear({timeout: ConstantHelper.timeout.action});
     }
-    await locator.fill(text);
+    await locator.fill(text, {timeout: ConstantHelper.timeout.action});
     if (options?.verify) {
       await expect(locator).toHaveValue(text);
     }
@@ -108,9 +108,9 @@ export class BasePage {
   ): Promise<void> {
     await expect(locator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
     if (options?.clearFirst !== false) {
-      await locator.clear();
+      await locator.clear({timeout: ConstantHelper.timeout.action});
     }
-    await locator.pressSequentially(text, {delay: options?.delay ?? 50});
+    await locator.pressSequentially(text, {delay: options?.delay ?? 50, timeout: ConstantHelper.timeout.action});
     if (options?.verify) {
       await expect(locator).toHaveValue(text);
     }
@@ -123,7 +123,7 @@ export class BasePage {
    */
   async clearText(locator: Locator, options?: {timeout?: number}): Promise<void> {
     await expect(locator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
-    await locator.clear();
+    await locator.clear({timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -133,7 +133,7 @@ export class BasePage {
    */
   async pressKey(locator: Locator, key: string, options?: {timeout?: number}): Promise<void> {
     await expect(locator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
-    await locator.press(key);
+    await locator.press(key, {timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -143,7 +143,7 @@ export class BasePage {
    */
   async selectByValue(locator: Locator, value: string, options?: {timeout?: number}): Promise<void> {
     await expect(locator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
-    await locator.selectOption({value});
+    await locator.selectOption({value}, {timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -153,7 +153,7 @@ export class BasePage {
    */
   async selectByText(locator: Locator, text: string, options?: {timeout?: number}): Promise<void> {
     await expect(locator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
-    await locator.selectOption({label: text});
+    await locator.selectOption({label: text}, {timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -163,7 +163,7 @@ export class BasePage {
    */
   async selectByIndex(locator: Locator, index: number, options?: {timeout?: number}): Promise<void> {
     await expect(locator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
-    await locator.selectOption({index});
+    await locator.selectOption({index}, {timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -173,7 +173,7 @@ export class BasePage {
    */
   async selectMultiple(locator: Locator, values: string[], options?: {timeout?: number}): Promise<void> {
     await expect(locator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
-    await locator.selectOption(values);
+    await locator.selectOption(values, {timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -182,7 +182,7 @@ export class BasePage {
    */
   async check(locator: Locator, options?: {force?: boolean; timeout?: number}): Promise<void> {
     await expect(locator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
-    await locator.check({force: options?.force});
+    await locator.check({force: options?.force, timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -191,7 +191,7 @@ export class BasePage {
    */
   async uncheck(locator: Locator, options?: {force?: boolean; timeout?: number}): Promise<void> {
     await expect(locator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
-    await locator.uncheck({force: options?.force});
+    await locator.uncheck({force: options?.force, timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -201,7 +201,7 @@ export class BasePage {
    */
   async setChecked(locator: Locator, checked: boolean, options?: {force?: boolean; timeout?: number}): Promise<void> {
     await expect(locator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
-    await locator.setChecked(checked, {force: options?.force});
+    await locator.setChecked(checked, {force: options?.force, timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -210,7 +210,7 @@ export class BasePage {
    */
   async hover(locator: Locator, options?: {force?: boolean; timeout?: number}): Promise<void> {
     await expect(locator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
-    await locator.hover({force: options?.force});
+    await locator.hover({force: options?.force, timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -219,7 +219,7 @@ export class BasePage {
    */
   async focus(locator: Locator, options?: {timeout?: number}): Promise<void> {
     await expect(locator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
-    await locator.focus();
+    await locator.focus({timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -233,9 +233,9 @@ export class BasePage {
     options?: {force?: boolean; timeout?: number}
   ): Promise<void> {
     await expect(hoverLocator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
-    await hoverLocator.hover();
+    await hoverLocator.hover({timeout: ConstantHelper.timeout.action});
     await expect(clickLocator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
-    await clickLocator.click({force: options?.force});
+    await clickLocator.click({force: options?.force, timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -618,7 +618,7 @@ export class BasePage {
    */
   async scrollIntoView(locator: Locator, options?: {timeout?: number}): Promise<void> {
     await expect(locator).toBeVisible({timeout: options?.timeout ?? ConstantHelper.timeout.medium});
-    await locator.scrollIntoViewIfNeeded();
+    await locator.scrollIntoViewIfNeeded({timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -627,7 +627,7 @@ export class BasePage {
    * @param filePath - Path to the file(s) to set
    */
   async setInputFiles(locator: Locator, filePath: string | string[]): Promise<void> {
-    await locator.setInputFiles(filePath);
+    await locator.setInputFiles(filePath, {timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -635,7 +635,7 @@ export class BasePage {
    * @param locator - The file input element
    */
   async clearInputFiles(locator: Locator): Promise<void> {
-    await locator.setInputFiles([]);
+    await locator.setInputFiles([], {timeout: ConstantHelper.timeout.action});
   }
 
   /**
@@ -648,7 +648,7 @@ export class BasePage {
     target: Locator,
     options?: {sourcePosition?: {x: number; y: number}; targetPosition?: {x: number; y: number}}
   ): Promise<void> {
-    await source.dragTo(target, options);
+    await source.dragTo(target, {timeout: ConstantHelper.timeout.action, ...options});
   }
 
 }
