@@ -726,7 +726,8 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async isElementInTreeVisible(name: string, isVisible: boolean = true) {
-    await this.isVisible(this.elementTreeItem.getByLabel(name, {exact: true}).first(), isVisible);
+    // A collapsed folder keeps its children in the DOM, so a same-named child can precede the item that is shown.
+    await this.isVisible(this.elementTreeItem.getByLabel(name, {exact: true}).filter({visible: true}).first(), isVisible);
   }
 
   async isChildElementInTreeVisible(parentName: string, childName: string, isVisible: boolean = true) {
