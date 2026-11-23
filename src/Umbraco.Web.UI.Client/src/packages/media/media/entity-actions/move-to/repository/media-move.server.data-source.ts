@@ -1,3 +1,4 @@
+import { mediaItemCache } from '../../../repository/item/media-item.server.cache.js';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
@@ -30,7 +31,9 @@ export class UmbMoveMediaServerDataSource implements UmbMoveDataSource {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 
-		return tryExecute(
+		const previousParentUnique = mediaItemCache.get(args.unique)?.parent?.id;
+
+		const { error } = await tryExecute(
 			this.#host,
 			MediaService.putMediaByIdMove({
 				path: { id: args.unique },
@@ -39,5 +42,19 @@ export class UmbMoveMediaServerDataSource implements UmbMoveDataSource {
 				},
 			}),
 		);
+
+		if (!error) {
+			// The server event that invalidates the cached item can arrive after the response. Both parents'
+			// children have changed, though the previous parent is only known when the item was cached.
+			mediaItemCache.delete(args.unique);
+			if (previousParentUnique) {
+				mediaItemCache.delete(previousParentUnique);
+			}
+			if (args.destination.unique) {
+				mediaItemCache.delete(args.destination.unique);
+			}
+		}
+
+		return { error };
 	}
 }

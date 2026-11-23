@@ -26,6 +26,32 @@ public interface IServerEventRouter
         => RouteEventAsync(serverEvent);
 
     /// <summary>
+    /// Route several server events to the users that have permission to see them.
+    /// </summary>
+    /// <remarks>
+    /// Use this when a single operation raises many events, so an implementation can dispatch them together
+    /// rather than one at a time.
+    /// </remarks>
+    /// <param name="routes">The server events to route, each with its routing context or the user to notify.</param>
+    /// <returns>A task that represents the asynchronous routing operation.</returns>
+    // TODO (V20): Remove this default implementation.
+    async Task RouteEventsAsync(IEnumerable<ServerEventRoute> routes)
+    {
+        foreach (ServerEventRoute route in routes)
+        {
+            if (route.UserKey.HasValue)
+            {
+                await NotifyUserAsync(route.ServerEvent, route.UserKey.Value);
+                continue;
+            }
+
+            await (route.Context is null
+                ? RouteEventAsync(route.ServerEvent)
+                : RouteEventAsync(route.ServerEvent, route.Context));
+        }
+    }
+
+    /// <summary>
     /// Notify a specific user about a server event.
     /// <remarks>Does not consider authorization.</remarks>
     /// </summary>

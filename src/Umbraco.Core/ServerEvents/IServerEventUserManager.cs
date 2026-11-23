@@ -18,6 +18,10 @@ public interface IServerEventUserManager
     /// <summary>
     /// Reauthorize the user and removes all connections held by the user from groups they are no longer allowed to access.
     /// </summary>
+    /// <remarks>
+    /// Only the user's connections held by the current server are refreshed. In a load-balanced setup, call this on
+    /// every server, for example from a cache refresher notification handler.
+    /// </remarks>
     /// <param name="user">The user to reauthorize.</param>
     /// <returns></returns>
     Task RefreshGroupsAsync(ClaimsPrincipal user);

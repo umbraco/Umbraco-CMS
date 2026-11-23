@@ -1,5 +1,6 @@
 import type { UmbDocumentDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { documentItemCache } from '../../item/repository/document-item.server.cache.js';
 import { umbMapDocumentCreateRequestBody, umbMapDocumentUpdateRequestBody } from './document-detail-request.mappers.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
@@ -141,6 +142,10 @@ export class UmbDocumentServerDataSource
 		);
 
 		if (data) {
+			if (parentUnique) {
+				// The parent's cached item may not yet report that it has children.
+				documentItemCache.delete(parentUnique);
+			}
 			return this.read(data as any);
 		}
 
@@ -167,6 +172,8 @@ export class UmbDocumentServerDataSource
 		);
 
 		if (!error) {
+			// The server event that invalidates the cached item can arrive after the update response.
+			documentItemCache.delete(model.unique);
 			return this.read(model.unique);
 		}
 
@@ -181,6 +188,10 @@ export class UmbDocumentServerDataSource
 	 */
 	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecute(this, DocumentService.deleteDocumentById({ path: { id: unique } }));
+		const { error } = await tryExecute(this, DocumentService.deleteDocumentById({ path: { id: unique } }));
+		if (!error) {
+			documentItemCache.delete(unique);
+		}
+		return { error };
 	}
 }

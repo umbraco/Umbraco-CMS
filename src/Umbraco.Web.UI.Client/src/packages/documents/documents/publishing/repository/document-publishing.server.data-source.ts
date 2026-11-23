@@ -1,5 +1,6 @@
 import type { UmbDocumentDetailModel, UmbDocumentVariantPublishModel } from '../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { documentItemCache } from '../../item/repository/document-item.server.cache.js';
 import {
 	umbMapDocumentCreateRequestBody,
 	umbMapDocumentUpdateRequestBody,
@@ -60,6 +61,11 @@ export class UmbDocumentPublishingServerDataSource {
 		// round-trip on top of the reload.
 		const { data, error } = await tryExecute(this.#host, DocumentService.postDocumentCreateAndPublish({ body }));
 
+		if (!error && parentUnique) {
+			// The parent's cached item may not yet report that it has children.
+			documentItemCache.delete(parentUnique);
+		}
+
 		// The generated response type is `unknown` (Swagger has no schema for the empty 201 body), but the
 		// Umb-Generated-Resource interceptor rewrites it to the created document's key at runtime.
 		return { data: data as string | undefined, error };
@@ -82,10 +88,26 @@ export class UmbDocumentPublishingServerDataSource {
 
 		// 200 returns only a notification header (no document body). The workspace reloads after this to
 		// refresh its state, so we deliberately do NOT re-read the full document here.
-		return tryExecute(
-			this.#host,
-			DocumentService.putDocumentByIdUpdateAndPublish({ path: { id: model.unique }, body }),
+		return this.#invalidateItemOnSuccess(
+			model.unique,
+			tryExecute(this.#host, DocumentService.putDocumentByIdUpdateAndPublish({ path: { id: model.unique }, body })),
 		);
+	}
+
+	/**
+	 * Removes the Document from the item cache once a change to it succeeds, as the server event that
+	 * invalidates the cached item can arrive after the response.
+	 * @template T
+	 * @param {string} unique - The unique of the changed Document
+	 * @param {Promise<T>} request - The request that changes the Document
+	 * @returns {Promise<T>} The result of the request
+	 */
+	async #invalidateItemOnSuccess<T extends { error?: unknown }>(unique: string, request: Promise<T>): Promise<T> {
+		const result = await request;
+		if (!result.error) {
+			documentItemCache.delete(unique);
+		}
+		return result;
 	}
 
 	/**
@@ -123,7 +145,10 @@ export class UmbDocumentPublishingServerDataSource {
 			publishSchedules,
 		};
 
-		return tryExecute(this.#host, DocumentService.putDocumentByIdPublish({ path: { id: unique }, body: body }));
+		return this.#invalidateItemOnSuccess(
+			unique,
+			tryExecute(this.#host, DocumentService.putDocumentByIdPublish({ path: { id: unique }, body: body })),
+		);
 	}
 
 	/**
@@ -141,19 +166,14 @@ export class UmbDocumentPublishingServerDataSource {
 		// If variants are culture invariant, we need to pass null to the API
 		const hasInvariant = variantIds.some((variant) => variant.isCultureInvariant());
 
-		if (hasInvariant) {
-			const body: UnpublishDocumentRequestModel = {
-				cultures: null,
-			};
-
-			return tryExecute(this.#host, DocumentService.putDocumentByIdUnpublish({ path: { id: unique }, body: body }));
-		}
-
 		const body: UnpublishDocumentRequestModel = {
-			cultures: variantIds.map((variant) => variant.toCultureString()),
+			cultures: hasInvariant ? null : variantIds.map((variant) => variant.toCultureString()),
 		};
 
-		return tryExecute(this.#host, DocumentService.putDocumentByIdUnpublish({ path: { id: unique }, body: body }));
+		return this.#invalidateItemOnSuccess(
+			unique,
+			tryExecute(this.#host, DocumentService.putDocumentByIdUnpublish({ path: { id: unique }, body: body })),
+		);
 	}
 
 	/**
@@ -201,6 +221,8 @@ export class UmbDocumentPublishingServerDataSource {
 			}
 
 			if (data.isComplete) {
+				// Which descendants changed is not known here, so the whole item cache is cleared.
+				documentItemCache.clear();
 				return { error: undefined };
 			}
 		}

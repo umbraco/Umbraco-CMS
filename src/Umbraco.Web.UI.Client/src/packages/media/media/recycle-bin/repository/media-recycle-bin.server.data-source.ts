@@ -1,3 +1,4 @@
+import { mediaItemCache } from '../../repository/item/media-item.server.cache.js';
 import type {
 	UmbRecycleBinDataSource,
 	UmbRecycleBinRestoreRequestArgs,
@@ -15,12 +16,27 @@ export class UmbMediaRecycleBinServerDataSource implements UmbRecycleBinDataSour
 		this.#host = host;
 	}
 
-	trash(args: UmbRecycleBinTrashRequestArgs) {
-		return tryExecute(this.#host, MediaService.putMediaByIdMoveToRecycleBin({ path: { id: args.unique } }));
+	// The server event that invalidates a cached item can arrive after the response, so each successful
+	// change removes the affected items, including parents whose children have changed, from the item cache itself.
+
+	async trash(args: UmbRecycleBinTrashRequestArgs) {
+		const previousParentUnique = mediaItemCache.get(args.unique)?.parent?.id;
+		const result = await tryExecute(
+			this.#host,
+			MediaService.putMediaByIdMoveToRecycleBin({ path: { id: args.unique } }),
+		);
+		if (!result.error) {
+			mediaItemCache.delete(args.unique);
+			// The previous parent is only known when the item was cached.
+			if (previousParentUnique) {
+				mediaItemCache.delete(previousParentUnique);
+			}
+		}
+		return result;
 	}
 
-	restore(args: UmbRecycleBinRestoreRequestArgs) {
-		return tryExecute(
+	async restore(args: UmbRecycleBinRestoreRequestArgs) {
+		const result = await tryExecute(
 			this.#host,
 			MediaService.putRecycleBinMediaByIdRestore({
 				path: { id: args.unique },
@@ -29,10 +45,21 @@ export class UmbMediaRecycleBinServerDataSource implements UmbRecycleBinDataSour
 				},
 			}),
 		);
+		if (!result.error) {
+			mediaItemCache.delete(args.unique);
+			if (args.destination.unique) {
+				mediaItemCache.delete(args.destination.unique);
+			}
+		}
+		return result;
 	}
 
-	empty() {
-		return tryExecute(this.#host, MediaService.deleteRecycleBinMedia());
+	async empty() {
+		const result = await tryExecute(this.#host, MediaService.deleteRecycleBinMedia());
+		if (!result.error) {
+			mediaItemCache.clear();
+		}
+		return result;
 	}
 
 	async getOriginalParent(args: UmbRecycleBinOriginalParentRequestArgs) {
