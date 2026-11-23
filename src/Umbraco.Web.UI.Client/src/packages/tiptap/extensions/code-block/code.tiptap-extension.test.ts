@@ -18,16 +18,18 @@ describe('UmbCode', () => {
 		host.remove();
 	});
 
+	const linkAll = () => editor.chain().selectAll().setUmbLink({ type: 'external', href: 'https://example.com' }).run();
+
 	it('lets a link wrap inline code', () => {
 		editor.commands.setContent('<p><code>snippet</code></p>');
-		editor.chain().selectAll().setUmbLink({ type: 'external', href: 'https://example.com' }).run();
+		linkAll();
 
 		expect(editor.getHTML()).to.equal('<p><a href="https://example.com"><code>snippet</code></a></p>');
 	});
 
 	it('wraps text and inline code in a single link', () => {
 		editor.commands.setContent('<p>See <code>snippet</code> here</p>');
-		editor.chain().selectAll().setUmbLink({ type: 'external', href: 'https://example.com' }).run();
+		linkAll();
 
 		expect(editor.getHTML()).to.equal('<p><a href="https://example.com">See <code>snippet</code> here</a></p>');
 	});
