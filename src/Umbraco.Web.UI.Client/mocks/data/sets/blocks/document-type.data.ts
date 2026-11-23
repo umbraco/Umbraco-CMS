@@ -22,14 +22,19 @@ export const VISIBILITY_HIDDEN_EDITOR_ELEMENT_TYPE_ID = 'fe536b69-3383-4492-bed9
 export const VISIBILITY_SETTINGS_ELEMENT_TYPE_ID = '3a65223f-aaa9-42ea-8282-45b9400f7aac';
 export const VISIBILITY_BLOCK_LIST_DOCUMENT_TYPE_ID = 'cc1ec7d8-bff8-4c9b-8d5c-e03edfd499c5';
 
-const createVisibilityElementType = (
-	id: string,
-	alias: string,
-	name: string,
-	propertyId?: string,
-	propertyAlias = 'headline',
-	propertyName = 'Headline',
-): UmbMockDocumentTypeModel => ({
+type UmbVisibilityElementTypeOptions = {
+	id: string;
+	alias: string;
+	name: string;
+	property?: { id: string; alias: string; name: string };
+};
+
+const createVisibilityElementType = ({
+	id,
+	alias,
+	name,
+	property,
+}: UmbVisibilityElementTypeOptions): UmbMockDocumentTypeModel => ({
 	id,
 	alias,
 	name,
@@ -44,13 +49,13 @@ const createVisibilityElementType = (
 	hasChildren: false,
 	parent: { id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID },
 	isFolder: false,
-	properties: propertyId
+	properties: property
 		? [
 				{
-					id: propertyId,
+					id: property.id,
 					container: null,
-					alias: propertyAlias,
-					name: propertyName,
+					alias: property.alias,
+					name: property.name,
 					description: null,
 					dataType: { id: TEXTSTRING_DATA_TYPE_ID },
 					variesByCulture: false,
@@ -82,31 +87,29 @@ const createVisibilityElementType = (
 export const data: Array<UmbMockDocumentTypeModel> = [
 	// Content Visibility: every block has settings, so each one opens a workspace, and the Content view
 	// is only offered when the content element type has properties and the block type does not hide it.
-	createVisibilityElementType(
-		VISIBILITY_CONTENT_ELEMENT_TYPE_ID,
-		'visibilityContentElement',
-		'Visibility Block (Has Properties)',
-		'7ae8c0ed-36b7-418f-bed6-f15ba97a03bf',
-	),
-	createVisibilityElementType(
-		VISIBILITY_EMPTY_CONTENT_ELEMENT_TYPE_ID,
-		'visibilityEmptyContentElement',
-		'Visibility Block (No Properties)',
-	),
-	createVisibilityElementType(
-		VISIBILITY_HIDDEN_EDITOR_ELEMENT_TYPE_ID,
-		'visibilityHiddenEditorElement',
-		'Visibility Block (Hidden Editor)',
-		'e23bb353-3906-4e9d-879e-8d7181e83b3a',
-	),
-	createVisibilityElementType(
-		VISIBILITY_SETTINGS_ELEMENT_TYPE_ID,
-		'visibilitySettingsElement',
-		'Visibility Block Settings',
-		'747b92c9-03d0-4e50-b106-21fcfff9370b',
-		'note',
-		'Note',
-	),
+	createVisibilityElementType({
+		id: VISIBILITY_CONTENT_ELEMENT_TYPE_ID,
+		alias: 'visibilityContentElement',
+		name: 'Visibility Block (Has Properties)',
+		property: { id: '7ae8c0ed-36b7-418f-bed6-f15ba97a03bf', alias: 'headline', name: 'Headline' },
+	}),
+	createVisibilityElementType({
+		id: VISIBILITY_EMPTY_CONTENT_ELEMENT_TYPE_ID,
+		alias: 'visibilityEmptyContentElement',
+		name: 'Visibility Block (No Properties)',
+	}),
+	createVisibilityElementType({
+		id: VISIBILITY_HIDDEN_EDITOR_ELEMENT_TYPE_ID,
+		alias: 'visibilityHiddenEditorElement',
+		name: 'Visibility Block (Hidden Editor)',
+		property: { id: 'e23bb353-3906-4e9d-879e-8d7181e83b3a', alias: 'headline', name: 'Headline' },
+	}),
+	createVisibilityElementType({
+		id: VISIBILITY_SETTINGS_ELEMENT_TYPE_ID,
+		alias: 'visibilitySettingsElement',
+		name: 'Visibility Block Settings',
+		property: { id: '747b92c9-03d0-4e50-b106-21fcfff9370b', alias: 'note', name: 'Note' },
+	}),
 	{
 		id: VISIBILITY_BLOCK_LIST_DOCUMENT_TYPE_ID,
 		alias: 'visibilityBlockList',

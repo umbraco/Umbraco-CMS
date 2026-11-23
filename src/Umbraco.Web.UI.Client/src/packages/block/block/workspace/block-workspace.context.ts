@@ -292,7 +292,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				this.observe(
 					contentTypeId ? manager.blockTypeOf(contentTypeId) : undefined,
 					async (blockType) => {
-						this.#forceHideContentEditorInOverlay.setValue(blockType?.forceHideContentEditorInOverlay ?? false);
+						this.#setForceHideContentEditorInOverlay(blockType);
 						if (blockType?.editorSize) {
 							const editorConfig = manager.getEditorConfiguration();
 							const useInlineEditing = editorConfig?.find((x) => x.alias === 'useInlineEditingAsDefault')?.value;
@@ -312,6 +312,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			},
 			'observeContentTypeId',
 		);
+	}
+
+	#setForceHideContentEditorInOverlay(blockType: { forceHideContentEditorInOverlay?: boolean } | undefined) {
+		this.#forceHideContentEditorInOverlay.setValue(blockType?.forceHideContentEditorInOverlay ?? false);
 	}
 
 	#gotLabel(label: string | undefined) {
