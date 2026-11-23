@@ -531,6 +531,21 @@ describe('UmbAuthContext', () => {
 			expect(url.searchParams.get('returnUrl')).to.be.null;
 		});
 
+		it('closes the sign-in popup it opened once the session arrives', async () => {
+			let popupClosed = false;
+			window.open = () => ({ closed: false, close: () => (popupClosed = true) }) as unknown as Window;
+			const popup = new BroadcastChannel('umb:auth');
+
+			try {
+				await context.makeAuthorizationRequest('Google', false);
+				popup.postMessage({ type: 'authorized', expiresIn: 300, issuedAt: Math.floor(Date.now() / 1000) });
+
+				await waitUntil(() => popupClosed, 'the sign-in popup was left open');
+			} finally {
+				popup.close();
+			}
+		});
+
 		it('makeAuthorizationRequest (local, popup) opens the server login app with the auth-callback lander as ReturnUrl', async () => {
 			await context.makeAuthorizationRequest('Umbraco', false);
 
