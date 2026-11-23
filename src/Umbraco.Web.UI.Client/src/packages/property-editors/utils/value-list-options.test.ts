@@ -17,13 +17,13 @@ describe('umbParseValueListOptions', () => {
 		expect(umbParseValueListOptions([{ name: 'One', value: 'one' }])).to.deep.equal([{ value: 'one', label: 'One' }]);
 	});
 
-	it('uses the value as the label of an object without one', () => {
+	it('leaves the label empty for an object without one', () => {
 		expect(
 			umbParseValueListOptions([{ value: 'one' }, { value: 'two', label: null }, { value: 'three', label: '' }]),
 		).to.deep.equal([
-			{ value: 'one', label: 'one' },
-			{ value: 'two', label: 'two' },
-			{ value: 'three', label: 'three' },
+			{ value: 'one', label: '' },
+			{ value: 'two', label: '' },
+			{ value: 'three', label: '' },
 		]);
 	});
 

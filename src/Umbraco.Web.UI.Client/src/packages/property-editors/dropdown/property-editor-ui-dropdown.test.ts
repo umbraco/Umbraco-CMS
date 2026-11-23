@@ -262,9 +262,12 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 			} as any;
 		}
 
-		it('shows the label of an option, or its value when it has none, in the single dropdown', async () => {
+		it('shows the label of an option, in the single dropdown', async () => {
 			await createSingleDropdown();
-			setItems(['one', { value: 'two', label: 'Two' }]);
+			setItems([
+				{ value: 'one', label: 'One' },
+				{ value: 'two', label: 'Two' },
+			]);
 			await element.updateComplete;
 			const dropdownInput = getLocalDropdownInput();
 			await dropdownInput?.updateComplete;
@@ -273,26 +276,32 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 				options: Array<{ name: string; value: string }>;
 			};
 			const options = select.options.filter((option) => option.value !== '');
-			expect(options.map((option) => option.name)).to.deep.equal(['one', 'Two']);
+			expect(options.map((option) => option.name)).to.deep.equal(['One', 'Two']);
 			expect(options.map((option) => option.value)).to.deep.equal(['one', 'two']);
 		});
 
-		it('shows the label of an option, or its value when it has none, in the multiple dropdown', async () => {
-			setItems(['one', { value: 'two', label: 'Two' }]);
+		it('shows the label of an option, in the multiple dropdown', async () => {
+			setItems([
+				{ value: 'one', label: 'One' },
+				{ value: 'two', label: 'Two' },
+			]);
 			await element.updateComplete;
 
 			const options = Array.from(getNativeSelectElement()?.options ?? []);
-			expect(options.map((option) => option.textContent)).to.deep.equal(['one', 'Two']);
+			expect(options.map((option) => option.textContent)).to.deep.equal(['One', 'Two']);
 			expect(options.map((option) => option.value)).to.deep.equal(['one', 'two']);
 		});
 
 		it('shows the labels of the selected options when read-only', async () => {
 			element.value = ['one', 'two'];
-			setItems(['one', { value: 'two', label: 'Two' }]);
+			setItems([
+				{ value: 'one', label: 'One' },
+				{ value: 'two', label: 'Two' },
+			]);
 			element.readonly = true;
 			await element.updateComplete;
 
-			expect(element.shadowRoot?.querySelector('div')?.textContent).to.equal('one, Two');
+			expect(element.shadowRoot?.querySelector('div')?.textContent).to.equal('One, Two');
 		});
 	});
 });

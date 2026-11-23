@@ -9,7 +9,7 @@ export interface UmbValueListOption {
 /**
  * Reads the configured items of a value list into options.
  * An item is either a plain string, used as the value, or an object holding a `value` and a `label` (or a `name`).
- * The label of an option without one is its value. Items without a string value are skipped.
+ * A plain string is both the value and the label. The label of an object without one is empty. Items without a string value are skipped.
  * @param {unknown} items - The configured items.
  * @returns {Array<UmbValueListOption>} The options, in the order of the items.
  */
@@ -25,7 +25,7 @@ export function umbParseValueListOptions(items: unknown): Array<UmbValueListOpti
 
 		if (item && typeof item === 'object' && typeof item.value === 'string') {
 			const label = item.label || item.name;
-			options.push({ value: item.value, label: typeof label === 'string' ? label : item.value });
+			options.push({ value: item.value, label: typeof label === 'string' ? label : '' });
 		}
 	}
 

@@ -37,17 +37,23 @@ describe('UmbPropertyEditorUIRadioButtonListElement', () => {
 			>;
 		}
 
-		it('shows the label of an option, or its value when it has none', async () => {
-			setItems(['one', { value: 'two', label: 'Two' }]);
+		it('shows the label of an option', async () => {
+			setItems([
+				{ value: 'one', label: 'One' },
+				{ value: 'two', label: 'Two' },
+			]);
 
 			const radios = await getRadios();
-			expect(radios.map((radio) => radio.label)).to.deep.equal(['one', 'Two']);
+			expect(radios.map((radio) => radio.label)).to.deep.equal(['One', 'Two']);
 			expect(radios.map((radio) => radio.value)).to.deep.equal(['one', 'two']);
 		});
 
 		it('shows a stored value that is not an option by its value', async () => {
 			element.value = 'three';
-			setItems(['one', { value: 'two', label: 'Two' }]);
+			setItems([
+				{ value: 'one', label: 'One' },
+				{ value: 'two', label: 'Two' },
+			]);
 
 			const radios = await getRadios();
 			expect(radios[2].label).to.match(/^three \(/);
