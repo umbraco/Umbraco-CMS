@@ -261,6 +261,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         IEnumerable<string> compositionAliases = compositionContentType.CompositionAliases();
         IEnumerable<IContentTypeComposition> compositions = allContentTypes.Where(x => compositionAliases.Any(y => x.Alias.Equals(y)));
         var propertyTypeAliases = compositionContentType.PropertyTypes.Select(x => x.Alias).ToArray();
+
+        // types outside the saved type's own composition graph (types that compose it, and their other compositions)
+        // also receive the properties of the saved type's compositions, so they are checked against the full set
+        var compositionPropertyTypeAliases = compositionContentType.CompositionPropertyTypes.Select(x => x.Alias).ToArray();
+        var compositionAliasSet = new HashSet<string>(compositionAliases, StringComparer.InvariantCultureIgnoreCase);
         var propertyGroupAliases = compositionContentType.PropertyGroups.ToDictionary(x => x.Alias, x => x.Type, StringComparer.InvariantCultureIgnoreCase);
         IEnumerable<IContentTypeComposition> indirectReferences = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == compositionContentType.Id));
         var comparer = new DelegateEqualityComparer<IContentTypeComposition>((x, y) => x?.Id == y?.Id, x => x.Id);
@@ -319,7 +324,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 continue;
             }
 
-            duplicatePropertyTypeAliases.AddRange(contentTypeDependency.PropertyTypes.Select(x => x.Alias).Intersect(propertyTypeAliases, StringComparer.InvariantCultureIgnoreCase));
+            string[] aliasesToCheck = compositionAliasSet.Contains(contentTypeDependency.Alias) ? propertyTypeAliases : compositionPropertyTypeAliases;
+            duplicatePropertyTypeAliases.AddRange(contentTypeDependency.PropertyTypes.Select(x => x.Alias).Intersect(aliasesToCheck, StringComparer.InvariantCultureIgnoreCase));
             invalidPropertyGroupAliases.AddRange(contentTypeDependency.PropertyGroups.Where(x => propertyGroupAliases.TryGetValue(x.Alias, out PropertyGroupType type) && type != x.Type).Select(x => x.Alias));
         }
 

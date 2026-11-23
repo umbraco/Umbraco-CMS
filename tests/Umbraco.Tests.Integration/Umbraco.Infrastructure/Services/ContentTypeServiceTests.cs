@@ -1343,6 +1343,55 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Cannot_Add_Composition_With_PropertyType_Alias_That_Conflicts_With_Composing_Type()
+    {
+        /*
+         * Child -> Page (composition), Child has 'dup'
+         * Comp :: Composition, has 'dup'
+         *
+         * Adding Comp to Page should fail, as Child would end up with two 'dup' properties
+        */
+
+        // Arrange
+        var page = ContentTypeBuilder.CreateBasicContentType("page", "Page");
+        await ContentTypeService.CreateAsync(page, Constants.Security.SuperUserKey);
+
+        var child = ContentTypeBuilder.CreateBasicContentType("child", "Child");
+        child.AddContentType(page);
+        child.AddPropertyType(CreateDupPropertyType(), "content", "Content");
+        await ContentTypeService.CreateAsync(child, Constants.Security.SuperUserKey);
+
+        var comp = ContentTypeBuilder.CreateBasicContentType("comp", "Comp");
+        comp.AddPropertyType(CreateDupPropertyType(), "comp", "Comp");
+        await ContentTypeService.CreateAsync(comp, Constants.Security.SuperUserKey);
+
+        // Act
+        var compositionAdded = page.AddContentType(comp);
+
+        // Assert
+        Assert.That(compositionAdded, Is.True);
+        Assert.Multiple(() =>
+        {
+            var exception = Assert.ThrowsAsync<InvalidCompositionException>(
+                async () => await ContentTypeService.UpdateAsync(page, Constants.Security.SuperUserKey));
+            Assert.That(exception?.PropertyTypeAliases ?? [], Is.EquivalentTo(new[] { "dup" }));
+
+            var childAliases = ContentTypeService.Get(child.Key)!.CompositionPropertyTypes.Select(x => x.Alias).ToArray();
+            Assert.That(childAliases.Count(x => x == "dup"), Is.EqualTo(1));
+        });
+
+        PropertyType CreateDupPropertyType() =>
+            new(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "dup")
+            {
+                Name = "Dup",
+                Description = string.Empty,
+                Mandatory = false,
+                SortOrder = 1,
+                DataTypeId = -88,
+            };
+    }
+
+    [Test]
     public void Cannot_Save_ContentType_With_Empty_Name()
     {
         // Arrange
