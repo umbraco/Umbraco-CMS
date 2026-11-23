@@ -2134,7 +2134,7 @@ export class UiBaseLocators extends BasePage {
    * `url` is matched with `includes`, so endpoint constants are prefixes of each
    * other (e.g. `.../document` also matches `.../document-type` and `.../document/{id}/publish`).
    * When more than one such call is in flight, pass `method` and/or a more specific
-   * `url` fragment to disambiguate.
+   * `url` fragment to disambiguate, or `excludeUrl` to skip responses whose URL contains it.
    *
    * @returns the trailing path segment of the response URL (the created/affected id),
    *          or the `Location` header's last segment for 201 responses.
@@ -2144,11 +2144,16 @@ export class UiBaseLocators extends BasePage {
     action: Promise<void> | (() => Promise<void>),
     statusCode: number,
     method?: string,
+    excludeUrl?: string,
   ) {
     // Prefer the callback form: an already-started promise can complete before the listener attaches.
     // An explicit timeout makes a missing response fail as such, rather than as the test timeout.
     const responsePromise = this.page.waitForResponse(
-      (resp) => resp.url().includes(url) && resp.status() === statusCode && (method === undefined || resp.request().method() === method),
+      (resp) =>
+        resp.url().includes(url) &&
+        (excludeUrl === undefined || !resp.url().includes(excludeUrl)) &&
+        resp.status() === statusCode &&
+        (method === undefined || resp.request().method() === method),
       {timeout: ConstantHelper.timeout.navigation},
     );
     const [response] = await Promise.all([responsePromise, typeof action === "function" ? action() : action]);
@@ -2192,17 +2197,9 @@ export class UiBaseLocators extends BasePage {
    */
   async waitForWorkspaceToBeSaved(save: () => Promise<void>, updateEndpoint: string, saveActionAlias: string) {
     // Some workspaces validate first with a PUT to .../{id}/validate, which shares the update endpoint's prefix.
-    const updateResponse = this.page.waitForResponse(
-      (resp) =>
-        resp.url().includes(updateEndpoint) &&
-        !new URL(resp.url()).pathname.endsWith('/validate') &&
-        resp.status() === ConstantHelper.statusCodes.ok &&
-        resp.request().method() === ConstantHelper.httpMethods.put,
-      {timeout: ConstantHelper.timeout.navigation},
-    );
-    const [response] = await Promise.all([updateResponse, save()]);
+    const updatedId = await this.waitForResponseAfterExecutingPromise(updateEndpoint, save, ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put, '/validate');
     await this.waitForWorkspaceActionToSucceed(saveActionAlias);
-    return new URL(response.url()).pathname.split("/").pop();
+    return updatedId;
   }
 
   async clickSaveButtonAndWaitForWorkspaceToBeSaved(updateEndpoint: string, saveActionAlias: string) {
