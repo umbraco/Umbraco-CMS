@@ -196,4 +196,43 @@ describe('Document item cache invalidation on writes', () => {
 		expect(documentItemCache.has(DOCUMENT_ID)).to.be.false;
 		expect(documentItemCache.has(OTHER_DOCUMENT_ID)).to.be.true;
 	});
+
+	it('reports no error for a rollback that succeeds when its version cannot be read', async () => {
+		useMockHandlers(
+			http.post(umbracoPath('/document-version/:id/rollback'), () => new HttpResponse(null, { status: 200 })),
+			http.get(umbracoPath('/document-version/:id'), () => new HttpResponse(null, { status: 500 })),
+		);
+		const reportedErrors: unknown[] = [];
+		const originalConsoleError = console.error;
+		console.error = (...args: unknown[]) => reportedErrors.push(args);
+
+		try {
+			const { error } = await new UmbRollbackServerDataSource(hostElement).rollback(UmbId.new());
+
+			expect(error).to.be.undefined;
+			expect(reportedErrors).to.be.empty;
+		} finally {
+			console.error = originalConsoleError;
+		}
+	});
+
+	it('keeps the item when the rollback fails', async () => {
+		useMockHandlers(
+			http.post(umbracoPath('/document-version/:id/rollback'), () => new HttpResponse(null, { status: 500 })),
+			http.get(umbracoPath('/document-version/:id'), () =>
+				HttpResponse.json({ id: 'version', document: { id: DOCUMENT_ID }, documentType: { id: 'type' }, values: [], variants: [] }),
+			),
+		);
+		const originalConsoleError = console.error;
+		console.error = () => {};
+
+		try {
+			const { error } = await new UmbRollbackServerDataSource(hostElement).rollback(UmbId.new());
+
+			expect(error).to.exist;
+			expect(documentItemCache.has(DOCUMENT_ID)).to.be.true;
+		} finally {
+			console.error = originalConsoleError;
+		}
+	});
 });

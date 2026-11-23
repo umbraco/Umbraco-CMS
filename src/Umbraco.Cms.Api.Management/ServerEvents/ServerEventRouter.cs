@@ -72,6 +72,18 @@ internal sealed class ServerEventRouter : IServerEventRouter
         {
             ServerEvent serverEvent = route.ServerEvent;
 
+            if (route.UserKey.HasValue)
+            {
+                payloads.Add(new ServerEventCacheRefresher.JsonPayload
+                {
+                    EventSource = serverEvent.EventSource,
+                    EventType = serverEvent.EventType,
+                    Key = serverEvent.Key,
+                    UserKey = route.UserKey,
+                });
+                continue;
+            }
+
             // Sources with no registered access filter are broadcast to the whole source group.
             if (route.Context is null || _accessService.AppliesTo(serverEvent.EventSource) is false)
             {
@@ -93,25 +105,7 @@ internal sealed class ServerEventRouter : IServerEventRouter
 
     /// <inheritdoc/>
     public Task NotifyUserAsync(ServerEvent serverEvent, Guid userKey)
-    {
-        if (_runtimeState.Level != RuntimeLevel.Run)
-        {
-            return Task.CompletedTask;
-        }
-
-        DistributeToAllServers(
-        [
-            new ServerEventCacheRefresher.JsonPayload
-            {
-                EventSource = serverEvent.EventSource,
-                EventType = serverEvent.EventType,
-                Key = serverEvent.Key,
-                UserKey = userKey,
-            },
-        ]);
-
-        return Task.CompletedTask;
-    }
+        => RouteEventsAsync([new ServerEventRoute { ServerEvent = serverEvent, UserKey = userKey }]);
 
     /// <inheritdoc/>
     public async Task BroadcastEventAsync(ServerEvent serverEvent)

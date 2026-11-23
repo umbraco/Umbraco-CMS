@@ -177,6 +177,47 @@ public class ServerEventRouterTests
     }
 
     [Test]
+    public async Task Can_Distribute_User_Notifications_Routed_Together_With_Filtered_Events_As_One_Instruction()
+    {
+        var (_, _, hubContextMock) = CreateMocks();
+        var filteredSource = Constants.ServerEvents.EventSource.Document;
+        var accessServiceMock = CreateAccessServiceMock();
+        accessServiceMock.Setup(x => x.AppliesTo(filteredSource)).Returns(true);
+        var messengerMock = new Mock<IServerMessenger>();
+
+        IServerEventRouter sut = CreateSut(hubContextMock.Object, accessServiceMock.Object, messengerMock.Object);
+
+        var filteredRoute = new ServerEventRoute
+        {
+            ServerEvent = new ServerEvent { EventType = "Updated", EventSource = filteredSource, Key = Guid.NewGuid() },
+            Context = new ServerEventRoutingContext { EntityPath = "-1,1" },
+        };
+        Guid[] userKeys = [Guid.NewGuid(), Guid.NewGuid()];
+        ServerEventRoute[] userRoutes = userKeys
+            .Select(userKey => new ServerEventRoute
+            {
+                ServerEvent = new ServerEvent { EventType = "Updated", EventSource = "Source", Key = userKey },
+                UserKey = userKey,
+            })
+            .ToArray();
+
+        await sut.RouteEventsAsync([filteredRoute, .. userRoutes]);
+
+        messengerMock.Verify(
+            x => x.QueueRefresh(It.IsAny<ICacheRefresher>(), It.IsAny<ServerEventCacheRefresher.JsonPayload[]>()),
+            Times.Once);
+        messengerMock.Verify(
+            x => x.QueueRefresh(
+                It.Is<ICacheRefresher>(r => r.RefresherUniqueId == ServerEventCacheRefresher.UniqueId),
+                It.Is<ServerEventCacheRefresher.JsonPayload[]>(p =>
+                    p.Length == 3
+                    && p[0].Key == filteredRoute.ServerEvent.Key
+                    && p[0].UserKey == null
+                    && p.Skip(1).Select(x => x.UserKey).SequenceEqual(userKeys.Select(k => (Guid?)k)))),
+            Times.Once);
+    }
+
+    [Test]
     public async Task Cannot_Distribute_When_Not_In_Run_State()
     {
         var (_, _, hubContextMock) = CreateMocks();

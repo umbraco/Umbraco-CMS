@@ -59,17 +59,21 @@ export class UmbRollbackServerDataSource {
 	}
 
 	async rollback(versionId: string, culture?: string) {
+		// The server event that invalidates the cached item can arrive after the response, so the item is removed
+		// here. The rollback is addressed by version, so the version is read first to find the document it belongs
+		// to. That read only serves the cache, so a failure is not reported.
+		const { data: version } = await tryExecute(
+			this.#host,
+			DocumentVersionService.getDocumentVersionById({ path: { id: versionId } }),
+			{ disableNotifications: true },
+		);
+
 		const result = await tryExecute(
 			this.#host,
 			DocumentVersionService.postDocumentVersionByIdRollback({ path: { id: versionId }, query: { culture } }),
 		);
-		if (!result.error) {
-			// The server event that invalidates the cached item can arrive after the response. The rollback is
-			// addressed by version, so the version is read to find the document it belongs to.
-			const { data: version } = await this.getVersionById(versionId);
-			if (version?.document) {
-				documentItemCache.delete(version.document.id);
-			}
+		if (!result.error && version?.document) {
+			documentItemCache.delete(version.document.id);
 		}
 		return result;
 	}

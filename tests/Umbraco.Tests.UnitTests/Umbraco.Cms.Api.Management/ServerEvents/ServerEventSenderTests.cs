@@ -1860,6 +1860,40 @@ internal sealed class ServerEventSenderTests
         });
     }
 
+    [Test]
+    public async Task HandleAsync_UserSavedNotifications_RoutesAllSavedUsersAndTheirNotificationsTogether()
+    {
+        // Arrange
+        var now = DateTime.UtcNow;
+        IUser[] users = Enumerable.Range(1, 3)
+            .Select(_ => Mock.Of<IUser>(u => u.Key == Guid.NewGuid() && u.CreateDate == now.AddDays(-1) && u.UpdateDate == now))
+            .ToArray();
+
+        UserSavedNotification[] notifications =
+        [
+            new UserSavedNotification(users.Take(2), new EventMessages()),
+            new UserSavedNotification(users[2], new EventMessages()),
+        ];
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notifications, CancellationToken.None);
+
+        // Assert
+        Assert.That(recordingRouter.RoutedBatches, Has.Count.EqualTo(1));
+        ServerEventRoute[] batch = recordingRouter.RoutedBatches[0];
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                batch.Where(x => x.UserKey is null).Select(x => (x.ServerEvent.EventSource, x.ServerEvent.Key)),
+                Is.EqualTo(users.Select(x => (Constants.ServerEvents.EventSource.User, x.Key))));
+            Assert.That(
+                batch.Where(x => x.UserKey is not null).Select(x => (x.ServerEvent.EventSource, x.ServerEvent.Key, x.UserKey)),
+                Is.EqualTo(users.Select(x => (Constants.ServerEvents.EventSource.CurrentUser, x.Key, (Guid?)x.Key))));
+        });
+    }
+
     private static ServerEventSender CreateServerEventSender(RecordingServerEventRouter recordingRouter) => new(recordingRouter, Mock.Of<IIdKeyMap>(), Mock.Of<IEntityService>(), Mock.Of<ILogger<ServerEventSender>>());
 
     private static ServerEventSender CreateServerEventSender(RecordingServerEventRouter recordingRouter, IIdKeyMap idKeyMap) => new(recordingRouter, idKeyMap, Mock.Of<IEntityService>(), Mock.Of<ILogger<ServerEventSender>>());
@@ -1898,6 +1932,12 @@ internal sealed class ServerEventSenderTests
             RoutedBatches.Add(batch);
             foreach (ServerEventRoute route in batch)
             {
+                if (route.UserKey.HasValue)
+                {
+                    await NotifyUserAsync(route.ServerEvent, route.UserKey.Value);
+                    continue;
+                }
+
                 await (route.Context is null
                     ? RouteEventAsync(route.ServerEvent)
                     : RouteEventAsync(route.ServerEvent, route.Context));

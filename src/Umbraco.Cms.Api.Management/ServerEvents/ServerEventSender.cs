@@ -4,7 +4,6 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.ServerEvents;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.ServerEvents;
@@ -565,7 +564,11 @@ internal sealed class ServerEventSender :
         await _serverEventRouter.RouteEventsAsync(routes);
     }
 
-    private async Task NotifySavedAsync<T>(string source, params IEnumerable<SavedNotification<T>> notifications)
+    private Task NotifySavedAsync<T>(string source, params IEnumerable<SavedNotification<T>> notifications)
+        where T : IEntity
+        => _serverEventRouter.RouteEventsAsync(CreateSavedRoutes(source, notifications));
+
+    private static List<ServerEventRoute> CreateSavedRoutes<T>(string source, IEnumerable<SavedNotification<T>> notifications)
         where T : IEntity
     {
         var seen = new HashSet<Guid>();
@@ -581,7 +584,7 @@ internal sealed class ServerEventSender :
             }
         }
 
-        await _serverEventRouter.RouteEventsAsync(routes);
+        return routes;
     }
 
     private async Task RouteContentTypeChangedEventsAsync<T>(string source, params IEnumerable<ContentTypeChangeNotification<T>> notifications)
@@ -649,31 +652,20 @@ internal sealed class ServerEventSender :
 
     private async Task NotifyUserSavedAsync(params IEnumerable<UserSavedNotification> notifications)
     {
-        // Materialize so we can iterate twice.
-        IReadOnlyCollection<UserSavedNotification> materialized =
-            notifications as IReadOnlyCollection<UserSavedNotification> ?? notifications.ToList();
-
-        // We still need to notify of saved entities like any other event source.
-        await NotifySavedAsync(Constants.ServerEvents.EventSource.User, materialized);
-
-        // But for users we also want to notify each updated user that they have been updated separately.
-        var seen = new HashSet<Guid>();
-        foreach (IUser user in materialized.SelectMany(x => x.SavedEntities))
+        // Saved users are routed like any other event source, and each one is also told that they have been updated.
+        List<ServerEventRoute> savedRoutes = CreateSavedRoutes(Constants.ServerEvents.EventSource.User, notifications);
+        IEnumerable<ServerEventRoute> currentUserRoutes = savedRoutes.Select(route => new ServerEventRoute
         {
-            if (seen.Add(user.Key) is false)
+            ServerEvent = new ServerEvent
             {
-                continue;
-            }
+                EventType = Constants.ServerEvents.EventType.Updated,
+                Key = route.ServerEvent.Key,
+                EventSource = Constants.ServerEvents.EventSource.CurrentUser,
+            },
+            UserKey = route.ServerEvent.Key,
+        });
 
-            await _serverEventRouter.NotifyUserAsync(
-                new ServerEvent
-                {
-                    EventType = Constants.ServerEvents.EventType.Updated,
-                    Key = user.Key,
-                    EventSource = Constants.ServerEvents.EventSource.CurrentUser,
-                },
-                user.Key);
-        }
+        await _serverEventRouter.RouteEventsAsync([.. savedRoutes, .. currentUserRoutes]);
     }
 
     private static ServerEventRoute CreateDeletedRoute<T>(string source, T entity)

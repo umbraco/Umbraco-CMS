@@ -1,7 +1,7 @@
 namespace Umbraco.Cms.Core.Models.ServerEvents;
 
 /// <summary>
-///     A server event to route, together with the server-side context used to decide who receives it.
+///     A server event to route, together with what decides who receives it: a routing context, or the user to notify.
 /// </summary>
 public sealed class ServerEventRoute
 {
@@ -15,4 +15,10 @@ public sealed class ServerEventRoute
     ///     Not sent to clients.
     /// </summary>
     public ServerEventRoutingContext? Context { get; init; }
+
+    /// <summary>
+    ///     Gets the key of the user to send the event to regardless of authorization, or <c>null</c> to route the event
+    ///     by its source. When set, <see cref="Context"/> is not used.
+    /// </summary>
+    public Guid? UserKey { get; init; }
 }
