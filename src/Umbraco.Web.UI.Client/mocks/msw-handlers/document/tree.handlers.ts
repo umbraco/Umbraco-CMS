@@ -23,6 +23,11 @@ export const treeHandlers = [
 		return HttpResponse.json(response);
 	}),
 
+	http.get(umbracoPath(`/tree${UMB_SLUG}/ancestors/batch`), ({ request }) => {
+		const ids = new URL(request.url).searchParams.getAll('id');
+		return HttpResponse.json(umbDocumentMockDb.tree.getAncestorsOfBatch({ ids }));
+	}),
+
 	http.get(umbracoPath(`/tree${UMB_SLUG}/ancestors`), ({ request }) => {
 		const url = new URL(request.url);
 		const descendantId = url.searchParams.get('descendantId');

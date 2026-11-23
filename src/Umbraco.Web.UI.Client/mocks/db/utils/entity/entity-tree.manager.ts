@@ -21,7 +21,10 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		this.#treeItemMapper = treeItemMapper;
 	}
 
-	/** Excludes trashed items by default (no-op if there's no `isTrashed`). Overridden to show only trashed items. */
+	/**
+	 * Excludes trashed items by default (no-op if there's no `isTrashed`). Overridden to show only trashed items.
+	 * @param item
+	 */
 	protected _isItemVisible(item: T): boolean {
 		return !(item as { isTrashed?: boolean }).isTrashed;
 	}
@@ -60,6 +63,13 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		return { items, total: items.length };
 	}
 
+	getAncestorsOfBatch({ ids }: { ids: Array<string> }) {
+		const items = ids
+			.filter((id) => this.#db.read(id) !== undefined)
+			.map((id) => ({ id, ancestors: this.getAncestorsOf({ descendantId: id }).slice(0, -1) }));
+		return { items, total: items.length };
+	}
+
 	#pagedTreeResult({ items, skip, take }: { items: Array<T>; skip: number; take: number }) {
 		const paged = pagedResult(items, skip, take);
 		const treeItems = paged.items.map((item) => this.#treeItemMapper(item));
@@ -73,7 +83,13 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		return { items: treeItemsHasChildren, total: paged.total };
 	}
 
-	/** Returns `null` (not a hollow empty result) when `targetId` isn't resolvable in this tree, so callers can respond with a proper "not found" instead of masking the failure. */
+	/**
+	 * Returns `null` (not a hollow empty result) when `targetId` isn't resolvable in this tree, so callers can respond with a proper "not found" instead of masking the failure.
+	 * @param root0
+	 * @param root0.targetId
+	 * @param root0.before
+	 * @param root0.after
+	 */
 	getSiblingsOf({
 		targetId,
 		before = 0,
@@ -111,7 +127,11 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		return { items: treeItemsHasChildren, totalBefore, totalAfter };
 	}
 
-	/** A `null`/`undefined` `destinationId` moves the items to the tree root. */
+	/**
+	 * A `null`/`undefined` `destinationId` moves the items to the tree root.
+	 * @param ids
+	 * @param destinationId
+	 */
 	move(ids: Array<string>, destinationId: string | null | undefined) {
 		if (!this.#db.update) throw new Error('move() requires a DB with update() method');
 
@@ -141,7 +161,11 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		}
 	}
 
-	/** A `null`/`undefined` `destinationId` copies the items to the tree root. */
+	/**
+	 * A `null`/`undefined` `destinationId` copies the items to the tree root.
+	 * @param ids
+	 * @param destinationId
+	 */
 	copy(ids: Array<string>, destinationId: string | null | undefined) {
 		if (!this.#db.update || !this.#db.create)
 			throw new Error('copy() requires a DB with update() and create() methods');
