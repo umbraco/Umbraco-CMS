@@ -1732,10 +1732,12 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickBlockElementWithName(elementTypeName: string) {
-    await this.click(
-      this.page.getByRole("link", { name: elementTypeName, exact: true }),
-      { force: true },
-    );
+    await this.click(this.page.getByRole("link", { name: elementTypeName, exact: true }));
+  }
+
+  // The block workspace offers its submit button before its properties, and a property is only validated once its editor is shown.
+  async waitForBlockPropertyEditorToBeVisible() {
+    await this.isVisible(this.sidebarModal.last().locator("umb-property #editor > *").first());
   }
 
   async enterPropertyValue(propertyName: string, value: string) {

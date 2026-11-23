@@ -887,8 +887,7 @@ export class UiBaseLocators extends BasePage {
   }
 
   async clickConfirmCreateFolderButton() {
-    await this.click(this.confirmCreateFolderBtn);
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
+    await this.submitFolderModal(this.confirmCreateFolderBtn);
   }
 
   async clickConfirmRemoveButton() {
@@ -926,8 +925,18 @@ export class UiBaseLocators extends BasePage {
 
   // Folder Methods
   async clickCreateFolderButton() {
-    await this.click(this.createFolderBtn);
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
+    await this.submitFolderModal(this.createFolderBtn);
+  }
+
+  // The folder modal loads its repository lazily and drops a submit made before that has arrived,
+  // so the submit is repeated until the modal closes.
+  private async submitFolderModal(submitButton: Locator) {
+    await expect(async () => {
+      if (await submitButton.isVisible()) {
+        await this.click(submitButton);
+      }
+      await expect(submitButton).toBeHidden({timeout: ConstantHelper.timeout.medium});
+    }).toPass({timeout: ConstantHelper.timeout.veryLong});
   }
 
   async enterFolderName(folderName: string) {
@@ -1266,6 +1275,7 @@ export class UiBaseLocators extends BasePage {
   }
 
   async updateIcon(iconName: string) {
+    await this.waitForContentTypeDesignViewToBeRendered();
     await this.click(this.iconBtn, { force: true });
     await this.searchForTypeToFilterValue(iconName);
     const iconOption = this.page.getByLabel(iconName, {exact: true});
@@ -1482,7 +1492,14 @@ export class UiBaseLocators extends BasePage {
 
   // Composition & Structure Methods
   async clickCompositionsButton() {
+    await this.waitForContentTypeDesignViewToBeRendered();
     await this.click(this.compositionsBtn);
+  }
+
+  // The content type workspace is still routing until the tab content of its design view is rendered,
+  // and a route change that completes closes any modal opened in the meantime.
+  private async waitForContentTypeDesignViewToBeRendered() {
+    await this.isVisible(this.page.locator('umb-content-type-design-editor-tab').first());
   }
 
   async clickAllowAtRootButton() {

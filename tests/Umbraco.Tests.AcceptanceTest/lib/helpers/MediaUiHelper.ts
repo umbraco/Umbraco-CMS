@@ -216,8 +216,11 @@ export class MediaUiHelper extends UiBaseLocators {
     return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.media, ConstantHelper.workspaceActions.mediaSave);
   }
 
-  async clickConfirmTrashButtonAndWaitForMediaToBeTrashed() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.media, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok);
+  async clickConfirmTrashButtonAndWaitForMediaToBeTrashed(expectedCount: number = 1) {
+    if (expectedCount === 1) {
+      return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.media, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok);
+    }
+    return await this.waitForMultipleResponsesAfterExecutingPromise(ConstantHelper.apiEndpoints.media, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok, expectedCount);
   }
 
   async clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied() {
