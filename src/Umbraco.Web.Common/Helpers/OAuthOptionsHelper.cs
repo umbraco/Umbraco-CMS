@@ -68,7 +68,7 @@ public class OAuthOptionsHelper
             if (context.Request.Query.TryGetValue(oathCallbackErrorParam, out StringValues paramValue)
                 || (form is not null && form.TryGetValue(oathCallbackErrorParam, out paramValue)))
             {
-                callbackPath = callbackPath.AppendQueryStringToUrl($"{oathCallbackErrorParam}={paramValue}");
+                callbackPath = callbackPath.AppendQueryStringToUrl($"{oathCallbackErrorParam}={Uri.EscapeDataString(paramValue.ToString())}");
             }
         }
 

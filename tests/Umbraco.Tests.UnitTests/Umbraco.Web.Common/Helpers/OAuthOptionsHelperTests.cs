@@ -50,6 +50,27 @@ public class OAuthOptionsHelperTests
     }
 
     [Test]
+    public void SetUmbracoRedirectWithFilteredParams_Encodes_Forwarded_Error_Values()
+    {
+        const string description = "Cancelled by user & admin (#42 + retry?)";
+        var httpContext = new DefaultHttpContext();
+        httpContext.Request.Method = HttpMethods.Get;
+        httpContext.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
+        {
+            ["error"] = "access_denied",
+            ["error_description"] = description,
+        });
+
+        Dictionary<string, StringValues> redirectQuery = RedirectQuery(httpContext);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("access_denied", redirectQuery.GetValueOrDefault("error").ToString());
+            Assert.AreEqual(description, redirectQuery.GetValueOrDefault("error_description").ToString());
+        });
+    }
+
+    [Test]
     public void SetUmbracoRedirectWithFilteredParams_Redirects_Without_Error_Params_When_The_Form_Cannot_Be_Read()
     {
         var httpContext = new DefaultHttpContext();
@@ -76,8 +97,9 @@ public class OAuthOptionsHelperTests
         helper.SetUmbracoRedirectWithFilteredParams(context, "Test Provider", "OnAccessDenied");
 
         Assert.AreEqual(StatusCodes.Status302Found, httpContext.Response.StatusCode);
-        var location = httpContext.Response.Headers.Location.ToString();
-        return QueryHelpers.ParseQuery(location[location.IndexOf('?')..]);
+        // Resolve the location as a browser would, so a raw '#' starts the fragment.
+        var location = new Uri(new Uri("https://localhost"), httpContext.Response.Headers.Location.ToString());
+        return QueryHelpers.ParseQuery(location.Query);
     }
 
     private static void AssertForwardsErrorParamsOnly(Dictionary<string, StringValues> redirectQuery)
