@@ -25,6 +25,7 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
     private readonly IMediaCacheService _mediaCacheService;
     private readonly IElementCacheService _elementCacheService;
+    private readonly ICacheManager _cacheManager;
     private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
@@ -66,7 +67,8 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
             documentCacheService,
             publishedContentTypeCache,
             mediaCacheService,
-            StaticServiceProvider.Instance.GetRequiredService<IElementCacheService>())
+            StaticServiceProvider.Instance.GetRequiredService<IElementCacheService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ICacheManager>())
     {
     }
 
@@ -85,6 +87,7 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
     /// <param name="publishedContentTypeCache">The published content type cache.</param>
     /// <param name="mediaCacheService">The media cache service.</param>
     /// <param name="elementCacheService">The element cache service.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
     public ContentTypeCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -98,6 +101,53 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         IPublishedContentTypeCache publishedContentTypeCache,
         IMediaCacheService mediaCacheService,
         IElementCacheService elementCacheService)
+        : this(
+            appCaches,
+            serializer,
+            idKeyMap,
+            contentTypeCommonRepository,
+            eventAggregator,
+            factory,
+            publishedModelFactory,
+            publishedContentTypeFactory,
+            documentCacheService,
+            publishedContentTypeCache,
+            mediaCacheService,
+            elementCacheService,
+            StaticServiceProvider.Instance.GetRequiredService<ICacheManager>())
+    {
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentTypeCacheRefresher" /> class.
+    /// </summary>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="serializer">The JSON serializer.</param>
+    /// <param name="idKeyMap">The ID-key mapping service.</param>
+    /// <param name="contentTypeCommonRepository">The content type common repository.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="factory">The cache refresher notification factory.</param>
+    /// <param name="publishedModelFactory">The published model factory.</param>
+    /// <param name="publishedContentTypeFactory">The published content type factory.</param>
+    /// <param name="documentCacheService">The document cache service.</param>
+    /// <param name="publishedContentTypeCache">The published content type cache.</param>
+    /// <param name="mediaCacheService">The media cache service.</param>
+    /// <param name="elementCacheService">The element cache service.</param>
+    /// <param name="cacheManager">The cache manager, providing the elements-level property value cache.</param>
+    public ContentTypeCacheRefresher(
+        AppCaches appCaches,
+        IJsonSerializer serializer,
+        IIdKeyMap idKeyMap,
+        IContentTypeCommonRepository contentTypeCommonRepository,
+        IEventAggregator eventAggregator,
+        ICacheRefresherNotificationFactory factory,
+        IPublishedModelFactory publishedModelFactory,
+        IPublishedContentTypeFactory publishedContentTypeFactory,
+        IDocumentCacheService documentCacheService,
+        IPublishedContentTypeCache publishedContentTypeCache,
+        IMediaCacheService mediaCacheService,
+        IElementCacheService elementCacheService,
+        ICacheManager cacheManager)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
@@ -108,6 +158,7 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         _publishedContentTypeCache = publishedContentTypeCache;
         _mediaCacheService = mediaCacheService;
         _elementCacheService = elementCacheService;
+        _cacheManager = cacheManager;
     }
 
     #region Json
@@ -314,6 +365,11 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
                     _mediaCacheService.ClearConvertedContentCache(convertedOnlyMediaTypeIds);
                 }
             }
+
+            // Elements-level property values are cached by content key and property alias, outside the converted
+            // content caches, so they can hold values converted for the previous type (or, in auto mode, built
+            // from discarded models). There's no way to find the affected entries, so the whole cache is cleared.
+            _cacheManager.ElementsCache.Clear();
         });
 
         // now we can trigger the event
