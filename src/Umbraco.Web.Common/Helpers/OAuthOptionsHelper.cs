@@ -20,10 +20,11 @@ public class OAuthOptionsHelper
 
     private readonly IOptions<SecuritySettings> _securitySettings;
 
-    public OAuthOptionsHelper(IOptions<SecuritySettings> securitySettings)
-    {
-        _securitySettings = securitySettings;
-    }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OAuthOptionsHelper"/> class.
+    /// </summary>
+    /// <param name="securitySettings">The security settings options.</param>
+    public OAuthOptionsHelper(IOptions<SecuritySettings> securitySettings) => _securitySettings = securitySettings;
 
     /// <summary>
     /// Applies SetUmbracoRedirectWithFilteredParams to both OnAccessDenied and OnRemoteFailure
@@ -49,7 +50,9 @@ public class OAuthOptionsHelper
     }
 
     /// <summary>
-    /// Sets the context to redirect to the <see cref="SecuritySettings.AuthorizeCallbackErrorPathName"/> path with all parameters, except state, that are passed to the initial server callback configured for the configured external login provider
+    /// Sets the context to redirect to the <see cref="SecuritySettings.AuthorizeCallbackErrorPathName"/> path, forwarding the
+    /// <c>error</c> and <c>error_description</c> parameters the external login provider sent to the callback, read from the
+    /// query string or, when absent there, from a form post.
     /// </summary>
     public T SetUmbracoRedirectWithFilteredParams<T>(T context, string providerFriendlyName, string eventName)
         where T : HandleRequestContext<RemoteAuthenticationOptions>
@@ -57,8 +60,8 @@ public class OAuthOptionsHelper
         var callbackPath =_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName;
 
         callbackPath = callbackPath.AppendQueryStringToUrl("flow=external-login")
-        .AppendQueryStringToUrl($"provider={providerFriendlyName}")
-        .AppendQueryStringToUrl($"callback-event={eventName}");
+            .AppendQueryStringToUrl($"provider={Uri.EscapeDataString(providerFriendlyName)}")
+            .AppendQueryStringToUrl($"callback-event={Uri.EscapeDataString(eventName)}");
 
         // Providers that answer with response_mode=form_post (the OpenID Connect handler's default) send the error in the body.
         IFormCollection? form = context.Request.GetFormOrNull();
