@@ -1,6 +1,6 @@
 ---
 name: umb-retarget-pr
-description: Retarget an open Umbraco CMS pull request to a different base branch (typically an older maintained line such as v17/dev, so a fix ships in every supported major), keeping the contributor's commits and authorship. Verifies the contributor's branch can be pushed to, replays the PR's commits onto the destination branch in a throwaway worktree, assesses conflicts and branch differences, proposes any adaptations, and — only after the user confirms — force-pushes the rewritten branch and changes the PR's base. Use when the user asks to retarget, rebase or move a PR to another branch, or to get a contributor's fix into an older version by changing its target. Does NOT apply to cherry-picking a merged PR into another branch, or to merge-ups (use umb-merge-up).
+description: Retarget an open Umbraco CMS pull request to a different base branch (typically an older maintained line such as v17/dev, so a fix ships in every supported major), keeping the contributor's commits and authorship. Verifies the contributor's branch can be pushed to, replays the PR's commits onto the destination branch in a throwaway worktree, assesses conflicts and branch differences, proposes any adaptations, and — only after the user confirms — force-pushes the rewritten branch, changes the PR's base and comments to the contributor. Use when the user asks to retarget, rebase or move a PR to another branch, or to get a contributor's fix into an older version by changing its target. Does NOT apply to cherry-picking a merged PR into another branch, or to merge-ups (use umb-merge-up).
 argument-hint: <pr-number-or-url> <destination-branch> (e.g., 24736 v17/dev)
 ---
 
@@ -76,6 +76,8 @@ Also note whether commits are signed (`git log --format='%H %G?' $mb..retarget-b
 git worktree add --detach ../retarget-{n} origin/{dest}
 ```
 
+If `../retarget-{n}` already exists, it's left over from an earlier run. If `git worktree list` shows it, remove it with `git worktree remove --force`; otherwise delete the folder. On Windows, a removed worktree can leave its folder behind (build processes may still hold locks on its output), and that blocks `worktree add`. Don't delete a folder that isn't a `retarget-*` folder this skill created.
+
 Replay each plain commit, oldest first, with the **original committer identity and date** so only the parent changes (`cherry-pick` already preserves author, author date and message; it does not preserve the committer):
 
 ```bash
@@ -144,7 +146,7 @@ Report concisely:
 
 ### 6. Confirm
 
-Ask the user to confirm before changing anything on GitHub (use `AskUserQuestion`: "Push and retarget" / "Don't retarget"). A confirmation applies to this PR and this plan only. If the user declines, go to step 9.
+Ask the user to confirm before changing anything on GitHub (use `AskUserQuestion`: "Push and retarget" / "Don't retarget"). Show the comment you'll post in step 8 as part of the plan, so one confirmation covers the push, the retarget and the comment. A confirmation applies to this PR and this plan only. If the user declines, go to step 9.
 
 ### 7. Execute
 
@@ -170,12 +172,23 @@ gh pr view {n} --repo umbraco/Umbraco-CMS --json baseRefName,headRefOid,commits,
 
 Confirm: base is `{dest}`; `headRefOid` is the pushed HEAD; same number of commits (minus dropped merges) with the same authors and messages; the changed-file list matches the original (plus or minus only the adaptations reported). Report the result.
 
-Then draft — **don't post** — a short comment to the contributor saying the PR was retargeted to `{dest}` so the fix ships in that line and flows up through the merge-ups, that their branch was rebased (they should `git fetch` and `git reset --hard origin/{headRefName}` before pushing anything else), and listing any adaptations. It's an external-facing message: hand it to the user for review and let them post it (often folded into their approval).
+Then post a short comment to the contributor (`gh pr comment {n} --repo umbraco/Umbraco-CMS --body "..."`), using the text the user confirmed in step 6:
+
+> Thanks @{author}. I have retargeted this PR to `{dest}` so the fix ships in {dest major}, and it will reach {newer majors} through our merge-ups. Your branch was rebased onto `{dest}` with your commit unchanged, so please `git fetch` and `git reset --hard origin/{headRefName}` before pushing anything else to it.
+
+Adjust the wording to fit:
+- **Several commits:** say "your commits".
+- **Adaptations:** replace "unchanged" with a sentence listing each adaptation and why `{dest}` needed it.
+- **Not the oldest maintained line** (e.g. retargeted to `v18/dev`): add one sentence saying why the PR can't go further back. For example: "It can't go to 17, because `X` arrived in 18 with Y."
+
+Report the comment link.
 
 ### 9. Clean up
 
 ```bash
 git worktree remove --force ../retarget-{n}
+git worktree prune
+rm -rf ../retarget-{n}    # remove the folder if worktree removal left it behind
 ```
 
 Keep `retarget-backup/{n}` until the user is satisfied — it's the rollback (push `{oldHead}` back with `--force-with-lease` and restore the base with `gh pr edit --base {base}`). Tell the user it exists and that `git branch -D retarget-backup/{n}` removes it.
