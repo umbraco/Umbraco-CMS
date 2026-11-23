@@ -160,7 +160,7 @@ describe('UmbDocumentItemRefElement', () => {
 		}
 
 		const getAncestorPath = (element: UmbDocumentItemRefElement) =>
-			element.shadowRoot?.querySelector('umb-document-ancestor-path')?.shadowRoot?.textContent?.trim();
+			element.shadowRoot?.querySelector('.ancestor-path')?.textContent;
 
 		it('uses the ancestor names for the current culture rather than the first variant', async () => {
 			await variantContext.setCulture('da-DK');

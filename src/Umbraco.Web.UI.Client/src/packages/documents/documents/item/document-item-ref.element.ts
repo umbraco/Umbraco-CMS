@@ -3,8 +3,8 @@ import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import type { UmbDocumentSearchItemModel } from '../search/types.js';
 import type { UmbDocumentItemModel } from './types.js';
 import { UmbDocumentItemDataResolver } from './document-item-data-resolver.js';
-import '../components/document-ancestor-path/document-ancestor-path.element.js';
-import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -14,14 +14,17 @@ import { UMB_WORKSPACE_MODAL, umbGenerateWorkspaceLink } from '@umbraco-cms/back
 import type { UUISelectableEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
+const ANCESTOR_PATH_OBSERVER_ALIAS = 'umbObserveAncestorPath';
+
 @customElement('umb-document-item-ref')
 export class UmbDocumentItemRefElement extends UmbLitElement {
 	#item = new UmbDocumentItemDataResolver<UmbDocumentItemModel>(this);
+	#ancestorResolvers: Array<UmbDocumentItemDataResolver<UmbDocumentItemModel>> = [];
 
 	@property({ type: Object })
 	public set item(value: UmbDocumentItemModel | undefined) {
 		this.#item.setData(value);
-		this._ancestors = (value as UmbDocumentSearchItemModel | undefined)?.ancestors;
+		this.#setAncestors((value as UmbDocumentSearchItemModel | undefined)?.ancestors);
 	}
 	public get item(): UmbDocumentItemModel | undefined {
 		return this.#item.getData();
@@ -64,7 +67,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	private _editPath = '';
 
 	@state()
-	private _ancestors?: Array<UmbDocumentItemModel>;
+	private _ancestorPath = '';
 
 	@state()
 	private _userHasSectionAccess = false;
@@ -97,6 +100,30 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		this.#item.observe(this.#item.icon, (icon) => (this._icon = icon ?? ''));
 		this.#item.observe(this.#item.isTrashed, (isTrashed) => (this._isTrashed = isTrashed ?? false));
 		this.#item.observe(this.#item.isDraft, (isDraft) => (this._isDraft = isDraft ?? false));
+	}
+
+	#setAncestors(ancestors: Array<UmbDocumentItemModel> | undefined) {
+		this.#ancestorResolvers.forEach((resolver) => resolver.destroy());
+		this.#ancestorResolvers = (ancestors ?? []).map((ancestor) => {
+			const resolver = new UmbDocumentItemDataResolver<UmbDocumentItemModel>(this);
+			resolver.setData(ancestor);
+			return resolver;
+		});
+
+		if (this.#ancestorResolvers.length === 0) {
+			this.removeUmbControllerByAlias(ANCESTOR_PATH_OBSERVER_ALIAS);
+			this._ancestorPath = '';
+			return;
+		}
+
+		this.observe(
+			mergeObservables(
+				this.#ancestorResolvers.map((resolver) => resolver.name),
+				(names) => (names.every(Boolean) ? names.join(' / ') : ''),
+			),
+			(ancestorPath) => (this._ancestorPath = ancestorPath),
+			ANCESTOR_PATH_OBSERVER_ALIAS,
+		);
 	}
 
 	#getLink() {
@@ -138,14 +165,10 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 				@deselected=${this.#onDeselected}>
 				<slot name="actions" slot="actions"></slot>
 				<slot name="detail" slot="detail"></slot>
-				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()} ${this.#renderAncestorPath()}
+				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()}
+				${this._ancestorPath ? html`<span slot="detail" class="ancestor-path">${this._ancestorPath}</span>` : nothing}
 			</uui-ref-node>
 		`;
-	}
-
-	#renderAncestorPath() {
-		if (!this._ancestors?.length) return nothing;
-		return html`<umb-document-ancestor-path slot="detail" .ancestors=${this._ancestors}></umb-document-ancestor-path>`;
 	}
 
 	#renderIcon() {
@@ -162,6 +185,19 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		if (!this._isDraft) return nothing;
 		return html`<uui-tag size="s" slot="tag" look="secondary" color="default">Draft</uui-tag>`;
 	}
+
+	static override styles = [
+		css`
+			.ancestor-path {
+				display: block;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				direction: rtl;
+				text-align: left;
+			}
+		`,
+	];
 }
 
 export { UmbDocumentItemRefElement as element };
