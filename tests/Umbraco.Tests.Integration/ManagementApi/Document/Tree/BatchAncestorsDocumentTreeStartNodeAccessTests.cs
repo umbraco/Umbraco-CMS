@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document.Tree;
 
 /// <summary>
 /// Asserts that the bulk document tree ancestors endpoint applies the user's content start nodes, unless the
-/// requesting data type ignores them, and the user's browse permissions.
+/// requesting data type ignores them, but not the user's browse permissions.
 /// </summary>
 public class BatchAncestorsDocumentTreeStartNodeAccessTests : StartNodeAccessTestBase<BatchAncestorsDocumentTreeController>
 {
@@ -87,22 +87,22 @@ public class BatchAncestorsDocumentTreeStartNodeAccessTests : StartNodeAccessTes
     }
 
     [Test]
-    public async Task Omits_Ancestors_The_User_Cannot_Browse()
+    public async Task Returns_Ancestors_The_User_Cannot_Browse()
     {
         BatchResponseModel<DocumentTreeAncestorsResponseModel> result = await GetAncestorsAsync([_browsable.Key]);
 
         CollectionAssert.AreEqual(
-            new[] { _siteRoot.Key, _startNode.Key },
+            new[] { _siteRoot.Key, _startNode.Key, _unbrowsable.Key },
             result.Items.Single().Ancestors.Select(ancestor => ancestor.Id));
     }
 
     [Test]
-    public async Task Omits_Items_The_User_Cannot_Browse()
+    public async Task Returns_Items_The_User_Cannot_Browse()
     {
         BatchResponseModel<DocumentTreeAncestorsResponseModel> result =
             await GetAncestorsAsync([_unbrowsable.Key, _insideChild.Key]);
 
-        CollectionAssert.AreEqual(new[] { _insideChild.Key }, result.Items.Select(chain => chain.Id));
+        CollectionAssert.AreEqual(new[] { _unbrowsable.Key, _insideChild.Key }, result.Items.Select(chain => chain.Id));
     }
 
     [Test]

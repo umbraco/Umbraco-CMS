@@ -51,13 +51,13 @@ public class BatchAncestorsDocumentTreeController : DocumentTreeControllerBase
     /// <param name="dataTypeId">The optional Id of a data type whose configuration may bypass user start nodes.</param>
     /// <returns>
     /// The ancestors of each document tree item, in the requested order, omitting the items and ancestors the user
-    /// cannot see in the tree.
+    /// cannot access.
     /// </returns>
     [HttpGet("ancestors/batch")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(BatchResponseModel<DocumentTreeAncestorsResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets the ancestors of multiple document tree items.")]
-    [EndpointDescription("Gets the ancestors of each document tree item identified by the provided Ids, ordered from the root down and excluding the item itself. Items and ancestors the current user cannot see in the tree are omitted.")]
+    [EndpointDescription("Gets the ancestors of each document tree item identified by the provided Ids, ordered from the root down and excluding the item itself. Items and ancestors the current user cannot access are omitted.")]
     public async Task<ActionResult<BatchResponseModel<DocumentTreeAncestorsResponseModel>>> AncestorsBatch(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids,

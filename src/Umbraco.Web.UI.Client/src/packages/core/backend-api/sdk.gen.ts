@@ -2052,7 +2052,7 @@ export class DocumentService {
     /**
      * Gets the ancestors of multiple document tree items.
      *
-     * Gets the ancestors of each document tree item identified by the provided Ids, ordered from the root down and excluding the item itself. Items and ancestors the current user cannot see in the tree are omitted.
+     * Gets the ancestors of each document tree item identified by the provided Ids, ordered from the root down and excluding the item itself. Items and ancestors the current user cannot access are omitted.
      */
     public static getTreeDocumentAncestorsBatch<ThrowOnError extends boolean = true>(options?: Options<GetTreeDocumentAncestorsBatchData, ThrowOnError>): RequestResult<GetTreeDocumentAncestorsBatchResponses, GetTreeDocumentAncestorsBatchErrors, ThrowOnError> {
         return (options?.client ?? client).get<GetTreeDocumentAncestorsBatchResponses, GetTreeDocumentAncestorsBatchErrors, ThrowOnError>({

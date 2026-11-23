@@ -142,8 +142,8 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     /// <param name="descendantKeys">The keys of the tree items to get the ancestors of.</param>
     /// <returns>
     /// The ancestors of each tree item, ordered from the root down and excluding the item itself, in the order
-    /// requested. Tree items that do not exist or do not pass the tree's filtering are omitted, as are ancestors that
-    /// do not pass it.
+    /// requested. Tree items that do not exist or that the current user cannot access are omitted, as are ancestors
+    /// the current user cannot access.
     /// </returns>
     protected async Task<IEnumerable<(Guid DescendantKey, TItem[] Ancestors)>> GetAncestorsOfItems(Guid[] descendantKeys)
     {
@@ -157,7 +157,6 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         IEntitySlim[] fetched = descendants.Concat(ancestors).DistinctBy(entity => entity.Key).ToArray();
 
         IEntitySlim[] visible = FilterEntitiesByUserAccess(fetched);
-        (visible, _) = await FilterTreeEntities(visible, visible.Length);
 
         Dictionary<int, IEntitySlim> visibleById = visible.ToDictionary(entity => entity.Id);
         Dictionary<int, Guid> keysById = fetched.ToDictionary(entity => entity.Id, entity => entity.Key);
@@ -203,10 +202,10 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     }
 
     /// <summary>
-    /// Filters the specified entities to those the current user can see in the tree.
+    /// Filters the specified entities to those the current user can access.
     /// </summary>
     /// <param name="entities">The entities to filter.</param>
-    /// <returns>The entities the current user can see in the tree.</returns>
+    /// <returns>The entities the current user can access.</returns>
     /// <remarks>
     /// The default implementation returns the entities unchanged.
     /// </remarks>
