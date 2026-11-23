@@ -9,8 +9,10 @@ using Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -21,7 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document.Tree;
 
 /// <summary>
 /// Asserts that the bulk document tree ancestors endpoint applies the user's content start nodes, unless the
-/// requesting data type ignores them.
+/// requesting data type ignores them, and the user's browse permissions.
 /// </summary>
 public class BatchAncestorsDocumentTreeStartNodeAccessTests : StartNodeAccessTestBase<BatchAncestorsDocumentTreeController>
 {
@@ -45,6 +47,10 @@ public class BatchAncestorsDocumentTreeStartNodeAccessTests : StartNodeAccessTes
     private IContent _insideChild = null!;
     private IContent _insideGrandchild = null!;
 
+    // startNode > unbrowsable > browsable, where the user cannot browse unbrowsable but can browse browsable.
+    private IContent _unbrowsable = null!;
+    private IContent _browsable = null!;
+
     // outsideRoot > outsideChild, outside the user's start nodes.
     private IContent _outsideRoot = null!;
     private IContent _outsideChild = null!;
@@ -64,11 +70,39 @@ public class BatchAncestorsDocumentTreeStartNodeAccessTests : StartNodeAccessTes
         _startNode = await CreateDocumentAsync(contentType.Key, _siteRoot.Key);
         _insideChild = await CreateDocumentAsync(contentType.Key, _startNode.Key);
         _insideGrandchild = await CreateDocumentAsync(contentType.Key, _insideChild.Key);
+        _unbrowsable = await CreateDocumentAsync(contentType.Key, _startNode.Key);
+        _browsable = await CreateDocumentAsync(contentType.Key, _unbrowsable.Key);
 
         _outsideRoot = await CreateDocumentAsync(contentType.Key, Constants.System.RootKey);
         _outsideChild = await CreateDocumentAsync(contentType.Key, _outsideRoot.Key);
 
-        await AuthenticateRestrictedUserAsync([Constants.Applications.Content], startContentId: _startNode.Id);
+        await AuthenticateRestrictedUserAsync(
+            [Constants.Applications.Content],
+            startContentId: _startNode.Id,
+            granularPermissions:
+            [
+                new DocumentGranularPermission { Key = _unbrowsable.Key, Permission = ActionUpdate.ActionLetter },
+                new DocumentGranularPermission { Key = _browsable.Key, Permission = ActionBrowse.ActionLetter },
+            ]);
+    }
+
+    [Test]
+    public async Task Omits_Ancestors_The_User_Cannot_Browse()
+    {
+        BatchResponseModel<DocumentTreeAncestorsResponseModel> result = await GetAncestorsAsync([_browsable.Key]);
+
+        CollectionAssert.AreEqual(
+            new[] { _siteRoot.Key, _startNode.Key },
+            result.Items.Single().Ancestors.Select(ancestor => ancestor.Id));
+    }
+
+    [Test]
+    public async Task Omits_Items_The_User_Cannot_Browse()
+    {
+        BatchResponseModel<DocumentTreeAncestorsResponseModel> result =
+            await GetAncestorsAsync([_unbrowsable.Key, _insideChild.Key]);
+
+        CollectionAssert.AreEqual(new[] { _insideChild.Key }, result.Items.Select(chain => chain.Id));
     }
 
     [Test]
