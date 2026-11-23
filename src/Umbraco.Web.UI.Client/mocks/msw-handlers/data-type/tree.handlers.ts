@@ -40,4 +40,10 @@ export const treeHandlers = [
 		if (!response) return new HttpResponse(null, { status: 404, statusText: 'target not found' });
 		return HttpResponse.json(response);
 	}),
+
+	http.get(umbracoPath(`/tree${UMB_SLUG}/batch`), ({ request }) => {
+		const ids = new URL(request.url).searchParams.getAll('id');
+		const response = umbDataTypeMockDb.tree.getItems({ ids });
+		return HttpResponse.json(response);
+	}),
 ];
