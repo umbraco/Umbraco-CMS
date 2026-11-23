@@ -406,8 +406,104 @@ describe('UmbMergeContentVariantDataController', () => {
 		});
 	});
 
+	describe('Inner variants', () => {
+		type TestExposeModel = UmbVariantDataModel & { contentKey: string; source: string };
+		type TestExposeValueType = { expose: Array<TestExposeModel> };
+
+		class TestExposeResolver implements UmbPropertyValueResolver<
+			UmbPropertyValueData<TestExposeValueType>,
+			UmbPotentialContentValueModel,
+			TestExposeModel
+		> {
+			static compareCalls = 0;
+
+			async processVariants(
+				property: UmbPropertyValueData<TestExposeValueType>,
+				variantsCallback: (values: Array<TestExposeModel>) => Promise<Array<TestExposeModel> | undefined>,
+			) {
+				if (!property.value) return property;
+				const expose = (await variantsCallback(property.value.expose)) ?? [];
+				return { ...property, value: { ...property.value, expose } };
+			}
+
+			compareVariants(a: TestExposeModel, b: TestExposeModel) {
+				TestExposeResolver.compareCalls++;
+				return a.contentKey === b.contentKey && a.culture === b.culture && a.segment === b.segment;
+			}
+
+			destroy(): void {}
+		}
+
+		class TestKeyedExposeResolver extends TestExposeResolver {
+			variantKey(variant: TestExposeModel) {
+				return `${variant.contentKey}|${variant.culture}|${variant.segment}`;
+			}
+		}
+
+		useResolver('Umb.Test.Resolver.Expose', TestExposeResolver, 'test-expose-editor');
+		useResolver('Umb.Test.Resolver.KeyedExpose', TestKeyedExposeResolver, 'test-keyed-expose-editor');
+
+		beforeEach(() => {
+			TestExposeResolver.compareCalls = 0;
+		});
+
+		const expose = (source: string, entries: Array<string>): Array<TestExposeModel> =>
+			entries.map((entry) => {
+				const [contentKey, culture] = entry.split('|');
+				return { contentKey, culture, segment: null, source };
+			});
+
+		const exposeValue = (editorAlias: string, value: Array<TestExposeModel>) => ({
+			editorAlias,
+			alias: 'blocks',
+			culture: null,
+			segment: null,
+			entityType: '',
+			value: { expose: value },
+		});
+
+		// Covers variants present on both sides, on one side only, in stored and not stored cultures,
+		// and a duplicate on the draft side, where the first occurrence must win.
+		const persistedExpose = expose('persisted', ['a|da', 'a|en', 'b|da', 'b|en', 'c|da', 'e|en']);
+		const draftExpose = [
+			...expose('draft', ['d|en', 'a|da', 'a|en', 'b|en', 'c|da', 'd|da']),
+			...expose('draft-duplicate', ['d|en']),
+		];
+
+		const merge = async (editorAlias: string) => {
+			const ctrl = new UmbMergeContentVariantDataController(new UmbTestControllerHostElement());
+			const result = await ctrl.process(
+				{ values: [exposeValue(editorAlias, persistedExpose)] },
+				{ values: [exposeValue(editorAlias, draftExpose)] },
+				[],
+				[UmbVariantId.CreateInvariant(), new UmbVariantId('en')],
+			);
+			return (result.values[0].value as TestExposeValueType).expose;
+		};
+
+		it('merges to the same result whether variants are matched by key or by comparing pairs', async () => {
+			const byKey = await merge('test-keyed-expose-editor');
+			const byPairs = await merge('test-expose-editor');
+
+			expect(byKey).to.deep.equal(byPairs);
+			expect(byKey.map((x) => `${x.contentKey}|${x.culture}|${x.source}`)).to.deep.equal([
+				'a|da|persisted',
+				'a|en|draft',
+				'b|da|persisted',
+				'b|en|draft',
+				'c|da|persisted',
+				'd|en|draft',
+			]);
+		});
+
+		it('matches variants by key without comparing pairs when the resolver supplies a key', async () => {
+			await merge('test-keyed-expose-editor');
+			expect(TestExposeResolver.compareCalls).to.equal(0);
+		});
+	});
+
 	describe('Variant ordering', () => {
-		const variant = (culture: string | null, segment: string | null = null) =>
+		const variant =(culture: string | null, segment: string | null = null) =>
 			({ culture, segment, name: `${culture}-${segment}` }) as unknown as UmbEntityVariantModel;
 
 		it('places a draft-only culture by culture, not at the end', async () => {

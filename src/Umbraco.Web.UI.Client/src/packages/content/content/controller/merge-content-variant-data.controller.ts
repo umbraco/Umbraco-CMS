@@ -11,6 +11,8 @@ import {
 	type UmbVariantId,
 } from '@umbraco-cms/backoffice/variant';
 
+const variantObjectKey = (variant: UmbVariantDataModel) => `${variant.culture}|${variant.segment}`;
+
 export class UmbMergeContentVariantDataController extends UmbControllerBase {
 	#resolvers = new UmbExtensionsManifestCache<ManifestPropertyValueResolver>(
 		this,
@@ -73,6 +75,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 				currentData.variants,
 				selectedVariants,
 				umbVariantObjectCompare,
+				variantObjectKey,
 			).sort(umbVariantObjectSortCompare);
 		}
 
@@ -219,6 +222,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 						values,
 						variantsToStore,
 						api.compareVariants ?? umbVariantObjectCompare,
+						api.compareVariants ? api.variantKey : variantObjectKey,
 					);
 				})) ?? newValue;
 		}
@@ -247,6 +251,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 	 * @param {Array<UmbVariantDataModel>} draftVariants - The draft value.
 	 * @param {Array<UmbVariantId>} variantsToStore - The variants to be stored.
 	 * @param {(UmbVariantDataModel, UmbVariantDataModel) => boolean} compare - The compare method, which compares the unique properties of the variants.
+	 * @param {(UmbVariantDataModel) => string} [key] - Returns a key that is equal exactly when `compare` considers two variants equal. When given, variants are matched by lookup instead of comparing every pair.
 	 * @returns {UmbVariantDataModel[]} A new array of variants.
 	 */
 	#processVariants<VariantModel extends UmbVariantDataModel = UmbVariantDataModel>(
@@ -254,7 +259,12 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 		draftVariants: Array<VariantModel>,
 		variantsToStore: Array<UmbVariantId>,
 		compare: (a: VariantModel, b: VariantModel) => boolean,
+		key?: (variant: VariantModel) => string,
 	): Array<VariantModel> {
+		if (key) {
+			return this.#processVariantsByKey(persistedVariants, draftVariants, variantsToStore, key);
+		}
+
 		const uniqueVariants = [...(persistedVariants ?? []), ...(draftVariants ?? [])].filter(
 			(n, i, self) => i === self.findIndex((v) => compare(v, n)),
 		);
@@ -288,5 +298,48 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 			})
 			.filter((x) => x !== undefined) as Array<VariantModel>;
 			*/
+	}
+
+	#processVariantsByKey<VariantModel extends UmbVariantDataModel>(
+		persistedVariants: Array<VariantModel> | undefined,
+		draftVariants: Array<VariantModel>,
+		variantsToStore: Array<UmbVariantId>,
+		key: (variant: VariantModel) => string,
+	): Array<VariantModel> {
+		// Index both lists by key. When a list holds the same key twice the first one wins, and the maps
+		// keep the order of the lists, so iterating them below follows the original order.
+		const persistedByKey = this.#mapFirstByKey(persistedVariants ?? [], key);
+		const draftByKey = this.#mapFirstByKey(draftVariants ?? [], key);
+
+		// Each variant is taken from the draft when its culture and segment are being stored, otherwise from the
+		// persisted data. When the side it should come from does not have it, it is left out.
+		// The result keeps the order of the pairwise path: persisted variants first, then the draft-only ones.
+		const result: Array<VariantModel> = [];
+
+		// 1. Every variant in the persisted data:
+		//    - being stored: use the draft variant with the same key, or leave it out when the draft no longer has it.
+		//    - not being stored: keep the persisted variant.
+		for (const [variantKey, variant] of persistedByKey) {
+			const picked = variantsToStore.some((x) => x.compare(variant)) ? draftByKey.get(variantKey) : variant;
+			if (picked) result.push(picked);
+		}
+
+		// 2. Every variant only found in the draft (keys present in the persisted data were handled in step 1):
+		//    - being stored: add the draft variant.
+		//    - not being stored: leave it out, as that draft change is not part of this merge.
+		for (const [variantKey, variant] of draftByKey) {
+			if (persistedByKey.has(variantKey)) continue;
+			if (variantsToStore.some((x) => x.compare(variant))) result.push(variant);
+		}
+		return result;
+	}
+
+	#mapFirstByKey<VariantModel>(variants: Array<VariantModel>, key: (variant: VariantModel) => string) {
+		const map = new Map<string, VariantModel>();
+		for (const variant of variants) {
+			const variantKey = key(variant);
+			if (!map.has(variantKey)) map.set(variantKey, variant);
+		}
+		return map;
 	}
 }
