@@ -33,4 +33,5 @@ public enum EFCoreMigration
     AddElementDtos = 25,
     AddIncludeInvariantForVariantToContentScheduleModel = 26,
     AddMediaVersionDto = 27,
+    RemoveUniqueIndexFilters = 28,
 }

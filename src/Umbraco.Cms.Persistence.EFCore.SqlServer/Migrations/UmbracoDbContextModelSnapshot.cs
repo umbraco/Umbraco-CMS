@@ -16,7 +16,7 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261120115904_AddMediaVersionDto";
+    public override string LastMigrationId => "20261123084601_RemoveUniqueIndexFilters";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
@@ -311,8 +311,7 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
 
                 b.HasIndex("RuleValue", "RuleType", "AccessId")
                     .IsUnique()
-                    .HasDatabaseName("IX_umbracoAccessRule")
-                    .HasFilter("[ruleValue] IS NOT NULL AND [ruleType] IS NOT NULL");
+                    .HasDatabaseName("IX_umbracoAccessRule");
 
                 b.ToTable("umbracoAccessRule");
             });
@@ -977,8 +976,7 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
 
                 b.HasIndex("UniqueId", "LanguageId", "Alias")
                     .IsUnique()
-                    .HasDatabaseName("IX_umbracoDocumentUrlAlias_Unique")
-                    .HasFilter("[languageId] IS NOT NULL");
+                    .HasDatabaseName("IX_umbracoDocumentUrlAlias_Unique");
 
                 b.ToTable("umbracoDocumentUrlAlias");
             });
@@ -1251,8 +1249,7 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
                 b.HasIndex("FallbackLanguageId");
 
                 b.HasIndex("IsoCode")
-                    .IsUnique()
-                    .HasFilter("[languageISOCode] IS NOT NULL");
+                    .IsUnique();
 
                 b.HasIndex("LanguageKey")
                     .IsUnique();
@@ -1429,8 +1426,7 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
 
                 b.HasIndex("Id", "Path")
                     .IsUnique()
-                    .HasDatabaseName("IX_umbracoMediaVersion")
-                    .HasFilter("[path] IS NOT NULL");
+                    .HasDatabaseName("IX_umbracoMediaVersion");
 
                 b.ToTable("umbracoMediaVersion");
             });
@@ -1634,8 +1630,7 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
 
                 b.HasIndex("VersionId", "PropertyTypeId", "LanguageId", "Segment")
                     .IsUnique()
-                    .HasDatabaseName("IX_umbracoPropertyData_VersionId")
-                    .HasFilter("[languageId] IS NOT NULL AND [segment] IS NOT NULL");
+                    .HasDatabaseName("IX_umbracoPropertyData_VersionId");
 
                 b.ToTable("umbracoPropertyData");
             });
@@ -1816,8 +1811,7 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
 
                 b.HasIndex("UrlHash", "ContentKey", "Culture", "CreateDateUtc")
                     .IsUnique()
-                    .HasDatabaseName("IX_umbracoRedirectUrl")
-                    .HasFilter("[culture] IS NOT NULL");
+                    .HasDatabaseName("IX_umbracoRedirectUrl");
 
                 b.ToTable("umbracoRedirectUrl");
             });
@@ -1961,8 +1955,7 @@ partial class UmbracoDbContextModelSnapshot : ModelSnapshot
 
                 b.HasIndex("Group", "Text", "LanguageId")
                     .IsUnique()
-                    .HasDatabaseName("IX_cmsTags")
-                    .HasFilter("[languageId] IS NOT NULL");
+                    .HasDatabaseName("IX_cmsTags");
 
                 b.ToTable("cmsTags");
             });
