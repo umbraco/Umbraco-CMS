@@ -1,3 +1,4 @@
+import type { UMB_BLOCK_WORKSPACE_SHOW_CONTENT_EDIT_CONDITION_ALIAS } from './constants.js';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -43,11 +44,16 @@ export interface UmbBlockWorkspaceVariesByVariantConditionConfig extends UmbCond
 	match?: boolean;
 }
 
+export type UmbBlockWorkspaceShowContentEditConditionConfig = UmbConditionConfigBase<
+	typeof UMB_BLOCK_WORKSPACE_SHOW_CONTENT_EDIT_CONDITION_ALIAS
+>;
+
 declare global {
 	interface UmbExtensionConditionConfigMap {
 		umbBlock:
 			| BlockEntryShowContentEditConditionConfig
 			| BlockWorkspaceHasSettingsConditionConfig
+			| UmbBlockWorkspaceShowContentEditConditionConfig
 			| BlockEntryIsExposedConditionConfig
 			| BlockWorkspaceIsReadOnlyConditionConfig
 			| BlockEntryIsReadOnlyConditionConfig

@@ -5,6 +5,7 @@ import {
 	TEXTSTRING_DATA_TYPE_ID,
 	VARIANT_BLOCK_LIST_DATA_TYPE_ID,
 	VARIANT_INLINE_BLOCK_LIST_DATA_TYPE_ID,
+	VISIBILITY_BLOCK_LIST_DATA_TYPE_ID,
 } from './data-type.data.js';
 
 export const NESTED_INLINE_BLOCK_LIST_FOLDER_ID = '6a6f0a9a-4294-4d5e-b0e6-4fa779a80957';
@@ -15,8 +16,147 @@ export const VARIANT_BLOCK_ELEMENT_TYPE_ID = '086f0418-9ab5-4eef-8073-98e57f0a4c
 export const VARIANT_HIDDEN_EDITOR_ELEMENT_TYPE_ID = '45bb055d-f580-45f6-95d8-6807a6841b03';
 export const VARIANT_BLOCK_LIST_DOCUMENT_TYPE_ID = '63661a2d-173f-4961-a71c-69338bf50568';
 export const VARIANT_INLINE_BLOCK_LIST_DOCUMENT_TYPE_ID = '414f5e98-8759-43bb-8d95-f2cc22fba799';
+export const VISIBILITY_CONTENT_ELEMENT_TYPE_ID = '96eaca75-c166-4845-941f-f54d6570a41b';
+export const VISIBILITY_EMPTY_CONTENT_ELEMENT_TYPE_ID = '8727fa49-b253-4621-9f21-cce9c6103240';
+export const VISIBILITY_HIDDEN_EDITOR_ELEMENT_TYPE_ID = 'fe536b69-3383-4492-bed9-bea2333b2c8c';
+export const VISIBILITY_SETTINGS_ELEMENT_TYPE_ID = '3a65223f-aaa9-42ea-8282-45b9400f7aac';
+export const VISIBILITY_BLOCK_LIST_DOCUMENT_TYPE_ID = 'cc1ec7d8-bff8-4c9b-8d5c-e03edfd499c5';
+
+type UmbVisibilityElementTypeOptions = {
+	id: string;
+	alias: string;
+	name: string;
+	property?: { id: string; alias: string; name: string };
+};
+
+const createVisibilityElementType = ({
+	id,
+	alias,
+	name,
+	property,
+}: UmbVisibilityElementTypeOptions): UmbMockDocumentTypeModel => ({
+	id,
+	alias,
+	name,
+	description: null,
+	icon: 'icon-item-arrangement',
+	allowedTemplates: [],
+	defaultTemplate: null,
+	allowedAsRoot: false,
+	variesByCulture: false,
+	variesBySegment: false,
+	isElement: true,
+	hasChildren: false,
+	parent: { id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID },
+	isFolder: false,
+	properties: property
+		? [
+				{
+					id: property.id,
+					container: null,
+					alias: property.alias,
+					name: property.name,
+					description: null,
+					dataType: { id: TEXTSTRING_DATA_TYPE_ID },
+					variesByCulture: false,
+					variesBySegment: false,
+					sortOrder: 0,
+					validation: {
+						mandatory: false,
+						mandatoryMessage: null,
+						regEx: null,
+						regExMessage: null,
+					},
+					appearance: {
+						labelOnTop: false,
+					},
+				},
+			]
+		: [],
+	containers: [],
+	allowedDocumentTypes: [],
+	compositions: [],
+	cleanup: {
+		preventCleanup: false,
+		keepAllVersionsNewerThanDays: null,
+		keepLatestVersionPerDayForDays: null,
+	},
+	flags: [],
+});
 
 export const data: Array<UmbMockDocumentTypeModel> = [
+	// Content Visibility: every block has settings, so each one opens a workspace, and the Content view
+	// is only offered when the content element type has properties and the block type does not hide it.
+	createVisibilityElementType({
+		id: VISIBILITY_CONTENT_ELEMENT_TYPE_ID,
+		alias: 'visibilityContentElement',
+		name: 'Visibility Block (Has Properties)',
+		property: { id: '7ae8c0ed-36b7-418f-bed6-f15ba97a03bf', alias: 'headline', name: 'Headline' },
+	}),
+	createVisibilityElementType({
+		id: VISIBILITY_EMPTY_CONTENT_ELEMENT_TYPE_ID,
+		alias: 'visibilityEmptyContentElement',
+		name: 'Visibility Block (No Properties)',
+	}),
+	createVisibilityElementType({
+		id: VISIBILITY_HIDDEN_EDITOR_ELEMENT_TYPE_ID,
+		alias: 'visibilityHiddenEditorElement',
+		name: 'Visibility Block (Hidden Editor)',
+		property: { id: 'e23bb353-3906-4e9d-879e-8d7181e83b3a', alias: 'headline', name: 'Headline' },
+	}),
+	createVisibilityElementType({
+		id: VISIBILITY_SETTINGS_ELEMENT_TYPE_ID,
+		alias: 'visibilitySettingsElement',
+		name: 'Visibility Block Settings',
+		property: { id: '747b92c9-03d0-4e50-b106-21fcfff9370b', alias: 'note', name: 'Note' },
+	}),
+	{
+		id: VISIBILITY_BLOCK_LIST_DOCUMENT_TYPE_ID,
+		alias: 'visibilityBlockList',
+		name: 'Content Visibility Block List',
+		description: null,
+		icon: 'icon-document',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: { id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID },
+		isFolder: false,
+		properties: [
+			{
+				id: '78665655-2a07-4bd0-a82f-373082e7af77',
+				container: null,
+				alias: 'blocks',
+				name: 'Blocks',
+				description: null,
+				dataType: { id: VISIBILITY_BLOCK_LIST_DATA_TYPE_ID },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	},
 	{
 		id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID,
 		alias: 'nestedInlineBlockListFolder',

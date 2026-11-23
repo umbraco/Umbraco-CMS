@@ -21,6 +21,7 @@ import {
 	UmbClassState,
 	UmbObjectState,
 	UmbStringState,
+	mergeObservables,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -91,6 +92,17 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	#exposed = new UmbBooleanState<undefined>(undefined);
 	readonly exposed = this.#exposed.asObservable();
+
+	#forceHideContentEditorInOverlay = new UmbBooleanState(false);
+
+	/**
+	 * Whether the content editor view should be shown: the content element type has properties
+	 * and the block type does not hide the content editor.
+	 */
+	readonly showContentEdit = mergeObservables(
+		[this.content.structure.contentTypeHasProperties, this.#forceHideContentEditorInOverlay.asObservable()],
+		([hasProperties, forceHide]) => hasProperties === true && forceHide === false,
+	);
 
 	/**
 	 * Whether the content type of the block varies by culture or segment.
@@ -280,6 +292,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				this.observe(
 					contentTypeId ? manager.blockTypeOf(contentTypeId) : undefined,
 					async (blockType) => {
+						this.#setForceHideContentEditorInOverlay(blockType);
 						if (blockType?.editorSize) {
 							const editorConfig = manager.getEditorConfiguration();
 							const useInlineEditing = editorConfig?.find((x) => x.alias === 'useInlineEditingAsDefault')?.value;
@@ -299,6 +312,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			},
 			'observeContentTypeId',
 		);
+	}
+
+	#setForceHideContentEditorInOverlay(blockType: { forceHideContentEditorInOverlay?: boolean } | undefined) {
+		this.#forceHideContentEditorInOverlay.setValue(blockType?.forceHideContentEditorInOverlay ?? false);
 	}
 
 	#gotLabel(label: string | undefined) {

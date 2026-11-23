@@ -63,6 +63,13 @@ export class UmbManagementApiMediaTypeTreeDataRequestManager extends UmbManageme
 						after: args.paging.takeAfter,
 					},
 				}),
+
+			getBatch: (args) =>
+				MediaTypeService.getTreeMediaTypeBatch({
+					query: {
+						id: args.uniques,
+					},
+				}),
 		});
 	}
 }

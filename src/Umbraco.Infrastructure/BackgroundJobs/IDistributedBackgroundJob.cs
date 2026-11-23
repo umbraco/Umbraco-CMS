@@ -4,6 +4,10 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs;
 /// A background job that will be executed by an available server. With a single server setup this will always be the same.
 /// With a load balanced setup, the executing server might change every time this needs to be executed.
 /// </summary>
+/// <remarks>
+/// Only servers with the <see cref="Umbraco.Cms.Core.Sync.ServerRole.Single" /> or
+/// <see cref="Umbraco.Cms.Core.Sync.ServerRole.SchedulingPublisher" /> role execute distributed background jobs.
+/// </remarks>
 public interface IDistributedBackgroundJob
 {
     /// <summary>
