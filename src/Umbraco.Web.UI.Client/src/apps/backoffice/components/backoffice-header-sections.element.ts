@@ -99,7 +99,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	#navigate(event: PointerEvent, path: string | undefined) {
 		const previousUrl = window.location.href;
 		history.pushState(null, '', path);
-		// The tab group activates the clicked tab on its own, so stop it when the navigation was cancelled.
+		// The tab group activates the clicked tab from its own click listener on the tab, registered after ours, so stop it when the navigation was cancelled.
 		if (window.location.href === previousUrl) {
 			event.stopImmediatePropagation();
 		}
