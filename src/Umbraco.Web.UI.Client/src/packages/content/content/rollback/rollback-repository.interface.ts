@@ -5,6 +5,8 @@ export interface UmbContentRollbackRepository extends UmbApi {
 	requestVersionsByEntityId(
 		id: string,
 		culture?: string,
+		skip?: number,
+		take?: number,
 	): Promise<{ data?: { items: Array<UmbContentRollbackVersionItemModel>; total: number }; error?: unknown }>;
 
 	requestVersionById(id: string): Promise<{ data?: UmbContentRollbackVersionDetailModel; error?: unknown }>;

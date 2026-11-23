@@ -21,8 +21,10 @@ export class UmbDocumentRollbackRepository extends UmbControllerBase implements 
 	async requestVersionsByEntityId(
 		id: string,
 		culture?: string,
+		skip?: number,
+		take?: number,
 	): Promise<{ data?: { items: Array<UmbContentRollbackVersionItemModel>; total: number }; error?: unknown }> {
-		const { data, error } = await this.#dataSource.getVersionsByDocumentId(id, culture);
+		const { data, error } = await this.#dataSource.getVersionsByDocumentId(id, culture, skip, take);
 
 		if (data) {
 			return {

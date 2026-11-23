@@ -3,7 +3,7 @@ import { UmbRollbackRepository } from '../repository/rollback.repository.js';
 import { UmbDocumentDetailRepository } from '../../repository/index.js';
 import type { UmbDocumentDetailModel } from '../../types.js';
 import type { UmbRollbackModalData, UmbRollbackModalValue } from './types.js';
-import { diffWords, type UmbDiffChange } from '@umbraco-cms/backoffice/utils';
+import { diffWords, UMB_DATE_TIME_FORMAT_OPTIONS, type UmbDiffChange } from '@umbraco-cms/backoffice/utils';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -61,13 +61,6 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 	#rollbackRepository = new UmbRollbackRepository(this);
 	#userItemRepository = new UmbUserItemRepository(this);
-
-	#localizeDateOptions: Intl.DateTimeFormatOptions = {
-		day: 'numeric',
-		month: 'long',
-		hour: 'numeric',
-		minute: '2-digit',
-	};
 
 	#currentDocument: UmbDocumentDetailModel | undefined;
 	#currentAppCulture: string | undefined;
@@ -317,7 +310,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 							class="rollback-item ${this._selectedVersion?.id === item.id ? 'active' : ''}">
 							<div>
 								<p class="rollback-item-date">
-									<umb-localize-date date="${item.date}" .options=${this.#localizeDateOptions}></umb-localize-date>
+									<umb-localize-date date="${item.date}" .options=${UMB_DATE_TIME_FORMAT_OPTIONS}></umb-localize-date>
 								</p>
 								<p>${item.user}</p>
 								<p>${item.isCurrentlyPublishedVersion ? this.localize.term('rollback_currentPublishedVersion') : ''}</p>
@@ -430,7 +423,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 	get currentVersionHeader() {
 		return (
-			this.localize.date(this._selectedVersion?.date ?? new Date(), this.#localizeDateOptions) +
+			this.localize.date(this._selectedVersion?.date ?? new Date(), UMB_DATE_TIME_FORMAT_OPTIONS) +
 			' - ' +
 			this._selectedVersion?.user
 		);
