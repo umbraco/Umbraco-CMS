@@ -265,9 +265,26 @@ export class ApiHelpers {
   /**
    * Signs the given user in. The server sets the httpOnly authentication cookie on the browser
    * context, which is the sole credential for every subsequent request.
+   *
+   * Every authenticated response re-issues the cookie of the session that made the request, so a
+   * response still in flight for the previous session would replace the cookie this sign-in sets.
+   * The page therefore leaves the back office first, and the resulting identity is verified.
    */
   async signIn(userEmail: string, userPassword: string) {
+    if (this.page.url().startsWith(this.baseUrl)) {
+      await this.page.goto('about:blank');
+    }
+
     await this.login.login(userEmail, userPassword);
+
+    await expect(async () => {
+      const response = await this.get(this.baseUrl + ConstantHelper.apiEndpoints.currentUser);
+      const signedInAs = (await response.json()).email?.toLowerCase();
+      if (signedInAs !== userEmail.toLowerCase()) {
+        await this.login.login(userEmail, userPassword);
+      }
+      expect(signedInAs, `Signed in as ${userEmail}`).toBe(userEmail.toLowerCase());
+    }).toPass({timeout: ConstantHelper.timeout.veryLong});
   }
 
   /**

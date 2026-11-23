@@ -1,4 +1,5 @@
 import {test as base} from "@playwright/test"
+import * as fs from "fs";
 import {ApiHelpers, UiHelpers} from ".";
 import {ConsoleErrorHelper} from "./ConsoleErrorHelper";
 
@@ -9,17 +10,13 @@ const test = base.extend<{ umbracoApi: ApiHelpers } & { umbracoUi: UiHelpers }>(
     await umbracoApi.isLoginStateValid();
     await use(umbracoApi);
     await umbracoApi.report.report(testInfo);
-    // Persist a valid session for the next test. The storageState save MUST run even when the
-    // localStorage clear throws (API-only test that never navigated), or a revoked session leaks on.
+    // Persist a valid session for the next test. Only the cookies carry over: the back office's
+    // localStorage (e.g. the chosen app language) must not, whichever page the test ended on.
     try {
       const filePath = process.env.STORAGE_STATE_PATH;
       if (filePath) {
-        try {
-          await page.evaluate(() => localStorage.clear());
-        } catch {
-          // Not on an app origin (API-only test) - nothing to clear.
-        }
-        await page.context().storageState({path: filePath});
+        const state = await page.context().storageState();
+        fs.writeFileSync(filePath, JSON.stringify({...state, origins: []}));
       }
     } catch {
       // Page may already be closed after a timeout.
