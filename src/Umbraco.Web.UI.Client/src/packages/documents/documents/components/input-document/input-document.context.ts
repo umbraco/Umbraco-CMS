@@ -64,6 +64,9 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 			);
 		});
 
+		// TODO: Receive the data type from the consumer instead, so the picker does not depend on property contexts. The
+		// picker modal's tree and picker contexts consume it the same way and need a fallback and deprecation period to
+		// move with it. [MR]
 		this.consumeContext(UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT, (context) => {
 			this.observe(
 				context?.dataType,
