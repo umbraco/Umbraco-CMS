@@ -129,6 +129,82 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     }
 
     /// <summary>
+    /// Gets the ancestors of each of the tree items identified by the provided keys.
+    /// </summary>
+    /// <param name="descendantKeys">The keys of the tree items to get the ancestors of.</param>
+    /// <returns>
+    /// The ancestors of each tree item, ordered from the root down and excluding the item itself, in the order
+    /// requested. Tree items that do not exist or do not pass the tree's filtering are omitted, as are ancestors that
+    /// do not pass it.
+    /// </returns>
+    protected async Task<IEnumerable<(Guid DescendantKey, TItem[] Ancestors)>> GetAncestorsOfItems(Guid[] descendantKeys)
+    {
+        if (descendantKeys.Length == 0)
+        {
+            return [];
+        }
+
+        IEntitySlim[] descendants = GetEntitiesByKeys(descendantKeys);
+        IEntitySlim[] ancestors = GetEntitiesByIds(descendants.SelectMany(descendant => descendant.AncestorIds()).ToArray());
+        IEntitySlim[] fetched = descendants.Concat(ancestors).DistinctBy(entity => entity.Key).ToArray();
+
+        IEntitySlim[] visible = FilterEntitiesByUserAccess(fetched);
+        (visible, _) = await FilterTreeEntities(visible, visible.Length);
+
+        Dictionary<int, IEntitySlim> visibleById = visible.ToDictionary(entity => entity.Id);
+        Dictionary<int, Guid> keysById = fetched.ToDictionary(entity => entity.Id, entity => entity.Key);
+        Dictionary<Guid, IEntitySlim> descendantsByKey = descendants.ToDictionary(entity => entity.Key);
+        var viewModelsByKey = new Dictionary<Guid, TItem>();
+
+        TItem? GetViewModel(IEntitySlim entity)
+        {
+            if (viewModelsByKey.TryGetValue(entity.Key, out TItem? viewModel) is false)
+            {
+                Guid? parentKey = keysById.TryGetValue(entity.ParentId, out Guid key) ? key : null;
+                viewModel = MapTreeItemViewModels(parentKey, [entity]).FirstOrDefault();
+                if (viewModel is not null)
+                {
+                    viewModelsByKey[entity.Key] = viewModel;
+                }
+            }
+
+            return viewModel;
+        }
+
+        var result = new List<(Guid DescendantKey, TItem[] Ancestors)>();
+        foreach (Guid descendantKey in descendantKeys.Distinct())
+        {
+            if (descendantsByKey.TryGetValue(descendantKey, out IEntitySlim? descendant) is false
+                || visibleById.ContainsKey(descendant.Id) is false)
+            {
+                continue;
+            }
+
+            TItem[] chain = descendant.AncestorIds()
+                .Select(id => visibleById.GetValueOrDefault(id))
+                .WhereNotNull()
+                .Select(GetViewModel)
+                .WhereNotNull()
+                .ToArray();
+            result.Add((descendantKey, chain));
+        }
+
+        await PopulateFlags(viewModelsByKey.Values.ToArray());
+
+        return result;
+    }
+
+    /// <summary>
+    /// Filters the specified entities to those the current user can see in the tree.
+    /// </summary>
+    /// <param name="entities">The entities to filter.</param>
+    /// <returns>The entities the current user can see in the tree.</returns>
+    /// <remarks>
+    /// The default implementation returns the entities unchanged.
+    /// </remarks>
+    protected virtual IEntitySlim[] FilterEntitiesByUserAccess(IEntitySlim[] entities) => entities;
+
+    /// <summary>
     /// Filters the specified collection of tree entities and returns the filtered results asynchronously.
     /// </summary>
     /// <param name="entities">An array of entities to be filtered.</param>
@@ -282,6 +358,22 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected virtual TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
         => entities.Select(entity => MapTreeItemViewModel(parentKey, entity)).ToArray();
+
+    private IEntitySlim[] GetEntitiesByKeys(Guid[] keys)
+        => keys
+            .Distinct()
+            .InGroupsOf(Constants.Sql.MaxParameterCount)
+            .SelectMany(group => EntityService.GetAll(ItemObjectType, group.ToArray()))
+            .ToArray();
+
+    private IEntitySlim[] GetEntitiesByIds(int[] ids)
+        => ids.Length == 0
+            ? []
+            : ids
+                .Distinct()
+                .InGroupsOf(Constants.Sql.MaxParameterCount)
+                .SelectMany(group => EntityService.GetAll(ItemObjectType, group.ToArray()))
+                .ToArray();
 
     private Dictionary<int, Guid> GetParentKeysById(IEntitySlim[] entities)
     {

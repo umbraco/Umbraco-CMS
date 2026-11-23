@@ -13209,6 +13209,65 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/tree/document/ancestors/batch": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "summary": "Gets the ancestors of multiple document tree items.",
+        "description": "Gets the ancestors of each document tree item identified by the provided Ids, ordered from the root down and excluding the item itself. Items and ancestors the current user cannot see in the tree are omitted.",
+        "operationId": "GetTreeDocumentAncestorsBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/BatchResponseModelDocumentTreeAncestorsResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/document/batch": {
       "get": {
         "tags": [
@@ -41120,6 +41179,30 @@
         },
         "additionalProperties": false
       },
+      "BatchResponseModelDocumentTreeAncestorsResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTreeAncestorsResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "BatchResponseModelDocumentTreeItemResponseModel": {
         "required": [
           "items",
@@ -44466,6 +44549,30 @@
           },
           "isTrashed": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DocumentTreeAncestorsResponseModel": {
+        "required": [
+          "ancestors",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
