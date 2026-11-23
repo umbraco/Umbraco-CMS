@@ -56,7 +56,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedBackgroundJobHostedService"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 20.")]
     public DistributedBackgroundJobHostedService(
         ILogger<DistributedBackgroundJobHostedService> logger,
         IRuntimeState runtimeState,
@@ -181,7 +181,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
         // Logged once per role rather than on every tick, to avoid flooding the log.
         if (_lastSkippedServerRole != serverRole)
         {
-            _logger.LogDebug("Distributed background jobs do not run on this server while its role is {ServerRole}.", serverRole);
+            _logger.LogInformation("Distributed background jobs do not run on this server while its role is {ServerRole}.", serverRole);
             _lastSkippedServerRole = serverRole;
         }
 
