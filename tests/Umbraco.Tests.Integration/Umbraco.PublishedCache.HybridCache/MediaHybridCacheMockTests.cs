@@ -68,6 +68,9 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
 
         _mockDatabaseCacheRepository = new Mock<IDatabaseCacheRepository>();
         _mockDatabaseCacheRepository
+            .Setup(r => r.GetKeysOfEntityTypes(It.IsAny<IReadOnlyCollection<Guid>>(), It.IsAny<ContentCacheDataSerializerEntityType>()))
+            .Returns(new HashSet<Guid>());
+        _mockDatabaseCacheRepository
             .Setup(r => r.GetMediaSourceAsync(It.IsAny<Guid>()))
             .ReturnsAsync(mediaCacheNode);
         _mockDatabaseCacheRepository

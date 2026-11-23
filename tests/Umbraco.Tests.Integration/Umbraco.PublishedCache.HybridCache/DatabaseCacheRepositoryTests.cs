@@ -346,6 +346,27 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
+    public void GetKeysOfEntityTypes_Returns_Only_The_Keys_Of_The_Given_Entity_Types()
+    {
+        Guid[] keys = [Textpage.Key, MediaItem1.Key, Textpage.ContentType.Key, Guid.NewGuid()];
+
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        ISet<Guid> result = DatabaseCacheRepository.GetKeysOfEntityTypes(keys, ContentCacheDataSerializerEntityType.Media);
+
+        Assert.That(result, Is.EquivalentTo(new[] { MediaItem1.Key }));
+    }
+
+    [Test]
+    public void GetKeysOfEntityTypes_Without_An_Ambient_Scope_Returns_Matching_Keys()
+    {
+        ISet<Guid> result = DatabaseCacheRepository.GetKeysOfEntityTypes(
+            [MediaItem1.Key, MediaItem2.Key],
+            ContentCacheDataSerializerEntityType.Media);
+
+        Assert.That(result, Is.EquivalentTo(new[] { MediaItem1.Key, MediaItem2.Key }));
+    }
+
+    [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureSmallDeleteBatchSize))]
     public void Rebuild_Deletes_Stale_Rows_In_Batches_And_Repopulates()
     {
