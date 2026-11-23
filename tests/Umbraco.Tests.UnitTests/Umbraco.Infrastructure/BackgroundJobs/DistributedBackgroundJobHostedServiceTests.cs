@@ -174,9 +174,9 @@ public class DistributedBackgroundJobHostedServiceTests
             distributedJobService.Verify(x => x.TryTakeRunnableAsync(), Times.Never);
             logger.Verify(
                 x => x.Log(
-                    LogLevel.Debug,
+                    LogLevel.Information,
                     It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
+                    It.Is<It.IsAnyType>((state, _) => state.ToString()!.Contains("do not run on this server")),
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 Times.Once);
