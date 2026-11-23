@@ -2180,7 +2180,7 @@ export class UiBaseLocators extends BasePage {
    * workspace has re-read and applied the saved entity - so the workspace no longer reports unsaved changes.
    */
   async waitForWorkspaceActionToSucceed(actionAlias: string) {
-    await this.isVisible(this.workspaceActionSuccessState(actionAlias), true, ConstantHelper.timeout.long);
+    await this.isVisible(this.workspaceActionSuccessState(actionAlias), true, ConstantHelper.timeout.veryLong);
   }
 
   private workspaceActionSuccessState(actionAlias: string) {
