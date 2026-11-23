@@ -21,10 +21,7 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		this.#treeItemMapper = treeItemMapper;
 	}
 
-	/**
-	 * Excludes trashed items by default (no-op if there's no `isTrashed`). Overridden to show only trashed items.
-	 * @param item
-	 */
+	/** Excludes trashed items by default (no-op if there's no `isTrashed`). Overridden to show only trashed items. */
 	protected _isItemVisible(item: T): boolean {
 		return !(item as { isTrashed?: boolean }).isTrashed;
 	}
@@ -83,13 +80,7 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		return { items: treeItemsHasChildren, total: paged.total };
 	}
 
-	/**
-	 * Returns `null` (not a hollow empty result) when `targetId` isn't resolvable in this tree, so callers can respond with a proper "not found" instead of masking the failure.
-	 * @param root0
-	 * @param root0.targetId
-	 * @param root0.before
-	 * @param root0.after
-	 */
+	/** Returns `null` (not a hollow empty result) when `targetId` isn't resolvable in this tree, so callers can respond with a proper "not found" instead of masking the failure. */
 	getSiblingsOf({
 		targetId,
 		before = 0,
@@ -127,11 +118,7 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		return { items: treeItemsHasChildren, totalBefore, totalAfter };
 	}
 
-	/**
-	 * A `null`/`undefined` `destinationId` moves the items to the tree root.
-	 * @param ids
-	 * @param destinationId
-	 */
+	/** A `null`/`undefined` `destinationId` moves the items to the tree root. */
 	move(ids: Array<string>, destinationId: string | null | undefined) {
 		if (!this.#db.update) throw new Error('move() requires a DB with update() method');
 
@@ -161,11 +148,7 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		}
 	}
 
-	/**
-	 * A `null`/`undefined` `destinationId` copies the items to the tree root.
-	 * @param ids
-	 * @param destinationId
-	 */
+	/** A `null`/`undefined` `destinationId` copies the items to the tree root. */
 	copy(ids: Array<string>, destinationId: string | null | undefined) {
 		if (!this.#db.update || !this.#db.create)
 			throw new Error('copy() requires a DB with update() and create() methods');
