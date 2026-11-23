@@ -81,18 +81,27 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		// Or if the clicked section is the current active one, then navigate to the section root
 		if (manifest?.meta.preventUrlRetention === true || this._currentSectionAlias === clickedSectionAlias) {
 			const sectionPath = this.#getSectionPath(manifest);
-			history.pushState(null, '', sectionPath);
+			this.#navigate(event, sectionPath);
 			return;
 		}
 
 		// Check if we have a stored path for the clicked section
 		if (this.#sectionPathMap.has(clickedSectionAlias)) {
 			const storedPath = this.#sectionPathMap.get(clickedSectionAlias);
-			history.pushState(null, '', storedPath);
+			this.#navigate(event, storedPath);
 		} else {
 			// Nothing stored, so we navigate to the regular section path
 			const sectionPath = this.#getSectionPath(manifest);
-			history.pushState(null, '', sectionPath);
+			this.#navigate(event, sectionPath);
+		}
+	}
+
+	#navigate(event: PointerEvent, path: string | undefined) {
+		const previousUrl = window.location.href;
+		history.pushState(null, '', path);
+		// The tab group activates the clicked tab on its own, so stop it when the navigation was cancelled.
+		if (window.location.href === previousUrl) {
+			event.stopImmediatePropagation();
 		}
 	}
 
