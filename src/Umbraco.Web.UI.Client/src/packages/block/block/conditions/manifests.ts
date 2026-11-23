@@ -10,12 +10,12 @@ import UmbBlockEntryHasSettingsCondition from './block-entry-has-settings.condit
 import UmbBlockEntryIsExposedCondition from './block-entry-is-exposed.condition.js';
 import UmbBlockEntryIsReadOnlyCondition from './block-entry-is-read-only.condition.js';
 import UmbBlockEntryShowContentEditCondition from './block-entry-show-content-edit.condition.js';
-import UmbBlockWorkspaceShowContentEditCondition from './block-workspace-show-content-edit.condition.js';
 import UmbBlockEntryVariesByVariantCondition from './block-entry-varies-by-variant.condition.js';
 import UmbBlockWorkspaceHasSettingsCondition from './block-workspace-has-settings.condition.js';
-import UmbBlockWorkspaceVariesByVariantCondition from './block-workspace-varies-by-variant.condition.js';
 import UmbBlockWorkspaceIsExposedCondition from './block-workspace-is-exposed.condition.js';
 import UmbBlockWorkspaceIsReadOnlyCondition from './block-workspace-is-readonly.condition.js';
+import UmbBlockWorkspaceShowContentEditCondition from './block-workspace-show-content-edit.condition.js';
+import UmbBlockWorkspaceVariesByVariantCondition from './block-workspace-varies-by-variant.condition.js';
 import type { ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
 export const manifests: Array<ManifestCondition> = [

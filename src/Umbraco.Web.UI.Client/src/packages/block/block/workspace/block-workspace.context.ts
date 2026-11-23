@@ -94,6 +94,11 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	readonly exposed = this.#exposed.asObservable();
 
 	#forceHideContentEditorInOverlay = new UmbBooleanState(false);
+
+	/**
+	 * Whether the content editor view should be shown: the content element type has properties
+	 * and the block type does not hide the content editor.
+	 */
 	readonly showContentEdit = mergeObservables(
 		[this.content.structure.contentTypeHasProperties, this.#forceHideContentEditorInOverlay.asObservable()],
 		([hasProperties, forceHide]) => hasProperties === true && forceHide === false,
