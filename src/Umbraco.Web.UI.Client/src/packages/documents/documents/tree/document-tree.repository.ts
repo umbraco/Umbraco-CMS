@@ -45,7 +45,8 @@ export class UmbDocumentTreeRepository
 	}
 
 	/**
-	 * Requests the ancestors of each of the given items, ordered from the root down
+	 * Requests the ancestors of each of the given items, ordered from the root down. Items whose ancestors cannot be
+	 * returned are left out.
 	 * @param {UmbDocumentAncestorsOfTreeItemsRequestArgs} args - The request arguments
 	 * @returns {Promise<UmbRepositoryResponse<Array<UmbAncestorsOfTreeItemModel<UmbDocumentTreeItemModel>>>>} The ancestors of each item
 	 * @memberof UmbDocumentTreeRepository

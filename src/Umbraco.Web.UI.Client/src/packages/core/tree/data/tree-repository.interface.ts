@@ -86,8 +86,8 @@ export interface UmbTreeRepository<
 	requestTreeItems?: (args: UmbTreeItemsRequestArgs) => Promise<UmbRepositoryResponse<TreeItemType[]>>;
 
 	/**
-	 * Requests the ancestors of each of the given items, ordered from the root down. The bulk counterpart of
-	 * `requestTreeItemAncestors`.
+	 * Requests the ancestors of each of the given items, ordered from the root down. Items whose ancestors cannot be
+	 * returned are left out. The bulk counterpart of `requestTreeItemAncestors`.
 	 * @param {UmbAncestorsOfTreeItemsRequestArgs} args
 	 * @memberof UmbTreeRepository
 	 */
