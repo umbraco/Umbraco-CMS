@@ -102,6 +102,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		this.#item.observe(this.#item.isDraft, (isDraft) => (this._isDraft = isDraft ?? false));
 	}
 
+	// TODO: Render the path with umb-document-ancestor-path once the ancestors are tree items. [MR]
 	#setAncestors(ancestors: Array<UmbDocumentItemModel> | undefined) {
 		this.#ancestorResolvers.forEach((resolver) => resolver.destroy());
 		this.#ancestorResolvers = (ancestors ?? []).map((ancestor) => {
