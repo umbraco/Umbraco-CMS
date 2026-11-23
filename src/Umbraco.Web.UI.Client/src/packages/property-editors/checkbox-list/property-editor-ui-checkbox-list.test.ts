@@ -164,7 +164,7 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 			setupBasicStringConfig(element, [
 				{ value: 'one', label: 'One' },
 				{ value: 'two', label: 'Two' },
-			] as Array<string>);
+			]);
 			await element.updateComplete;
 		});
 
@@ -181,7 +181,7 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 			setupBasicStringConfig(element, [
 				{ value: 'one', label: 'One' },
 				{ value: 'two', label: 'Two' },
-			] as Array<string>);
+			]);
 			await element.updateComplete;
 			await getCheckboxListElement(element)?.updateComplete;
 

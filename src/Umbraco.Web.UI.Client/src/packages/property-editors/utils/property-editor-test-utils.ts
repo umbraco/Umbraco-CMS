@@ -30,7 +30,10 @@ export type UmbCSSSelector = 'uui-select' | 'umb-input-checkbox-list' | 'umb-inp
  * @param {UmbPropertyEditorElement} element - The property editor element to configure
  * @param {string[]} items - Array of string items for configuration
  */
-export function setupBasicStringConfig(element: UmbPropertyEditorElement, items: string[] = ['Red', 'Green', 'Blue']) {
+export function setupBasicStringConfig(
+	element: UmbPropertyEditorElement,
+	items: Array<string | { value: string; label: string }> = ['Red', 'Green', 'Blue'],
+) {
 	element.config = {
 		getValueByAlias: (alias: UmbConfigAlias) => {
 			if (alias === 'items') {
