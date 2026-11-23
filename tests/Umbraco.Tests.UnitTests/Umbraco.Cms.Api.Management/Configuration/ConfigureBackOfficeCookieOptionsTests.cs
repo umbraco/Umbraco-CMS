@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Api.Management.Configuration;
 using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Api.Management.Controllers.Security;
@@ -74,15 +73,48 @@ public class ConfigureBackOfficeCookieOptionsTests
         // Act
         await onValidatePrincipal(context);
 
-        // Assert: the session still gets refreshed on activity (ExpiresUtc slides forward), but
-        // IssuedUtc must be left untouched - resetting it here would reset the SecurityStampValidator's
-        // interval clock on every request and stop it from ever re-checking the stamp again during an
-        // active session (e.g. a password change or a disabled account would go unnoticed).
+        // Assert: the session is renewed on activity, which the cookie middleware does as
+        // now + (ExpiresUtc - IssuedUtc), so that span must equal the timeout. The time of the last stamp
+        // validation is carried over, as IssuedUtc itself is reset by every renewal.
         Assert.Multiple(() =>
         {
             Assert.That(context.ShouldRenew, Is.True);
             Assert.That(context.Properties.IssuedUtc, Is.EqualTo(originalIssuedUtc));
-            Assert.That(context.Properties.ExpiresUtc, Is.EqualTo(_now.Add(_globalSettings.TimeOut)));
+            Assert.That(
+                context.Properties.ExpiresUtc - context.Properties.IssuedUtc,
+                Is.EqualTo(_globalSettings.TimeOut));
+            Assert.That(GetLastStampValidationUtc(context), Is.EqualTo(originalIssuedUtc));
+        });
+    }
+
+    [Test]
+    public async Task Measures_The_Stamp_Validation_Interval_From_The_Last_Validation_Rather_Than_The_Last_Renewal()
+    {
+        // Arrange: the ticket was renewed one minute ago, but the stamp was last validated 25 minutes ago.
+        var lastValidatedUtc = _now.AddMinutes(-25);
+        DateTimeOffset? issuedUtcSeenByValidator = null;
+        _mockStampValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<CookieValidatePrincipalContext>()))
+            .Callback<CookieValidatePrincipalContext>(ctx => issuedUtcSeenByValidator = ctx.Properties.IssuedUtc)
+            .Returns(Task.CompletedTask);
+
+        CookieValidatePrincipalContext context = CreateValidatePrincipalContext(
+            _now.AddMinutes(-1),
+            _now.AddMinutes(59),
+            "/umbraco/management/api/v1/document");
+        context.Properties.Items[LastStampValidationUtcKey] = lastValidatedUtc.ToString("o");
+
+        // Act
+        await GetOnValidatePrincipal()(context);
+
+        // Assert: the validator sees the time of the last validation, and it is kept for the next request.
+        Assert.Multiple(() =>
+        {
+            Assert.That(issuedUtcSeenByValidator, Is.EqualTo(lastValidatedUtc));
+            Assert.That(GetLastStampValidationUtc(context), Is.EqualTo(lastValidatedUtc));
+            Assert.That(
+                context.Properties.ExpiresUtc - context.Properties.IssuedUtc,
+                Is.EqualTo(_globalSettings.TimeOut));
         });
     }
 
@@ -133,12 +165,13 @@ public class ConfigureBackOfficeCookieOptionsTests
         // Act
         await onValidatePrincipal(context);
 
-        // Assert: timestamps should be reset to now + TimeOut
+        // Assert: timestamps should be reset to now + TimeOut, and a new validation interval starts now
         Assert.Multiple(() =>
         {
             Assert.That(context.ShouldRenew, Is.True);
             Assert.That(context.Properties.IssuedUtc, Is.EqualTo(_now));
             Assert.That(context.Properties.ExpiresUtc, Is.EqualTo(_now.Add(_globalSettings.TimeOut)));
+            Assert.That(GetLastStampValidationUtc(context), Is.EqualTo(_now));
         });
     }
 
@@ -275,6 +308,11 @@ public class ConfigureBackOfficeCookieOptionsTests
             new AuthenticationProperties(),
             $"/umbraco/login?ReturnUrl={Uri.EscapeDataString(path)}");
     }
+
+    private const string LastStampValidationUtcKey = ".umb.stamp-validated";
+
+    private static DateTimeOffset GetLastStampValidationUtc(CookieValidatePrincipalContext context)
+        => DateTimeOffset.Parse(context.Properties.Items[LastStampValidationUtcKey]!, null, System.Globalization.DateTimeStyles.RoundtripKind);
 
     private Func<CookieValidatePrincipalContext, Task> GetOnValidatePrincipal()
         => ConfigureOptions().Events.OnValidatePrincipal;

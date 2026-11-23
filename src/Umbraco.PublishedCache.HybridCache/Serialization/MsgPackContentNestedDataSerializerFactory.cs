@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
@@ -45,7 +45,9 @@ internal sealed class MsgPackContentNestedDataSerializerFactory : IContentCacheD
     private IContentCacheDataSerializer CreateSerializer(ContentCacheDataSerializerEntityType types, TypeSnapshot snapshot)
     {
         var contentTypes = new Dictionary<int, IContentTypeComposition>();
-        if ((types & ContentCacheDataSerializerEntityType.Document) == ContentCacheDataSerializerEntityType.Document)
+
+        // Element types are content types flagged as elements, so they are part of the same definitions as document types.
+        if ((types & (ContentCacheDataSerializerEntityType.Document | ContentCacheDataSerializerEntityType.Element)) != 0)
         {
             foreach (KeyValuePair<int, IContentTypeComposition> ct in snapshot.DocumentTypes.Value)
             {

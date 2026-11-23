@@ -22,8 +22,10 @@ export interface BlockWorkspaceIsReadOnlyConditionConfig extends UmbConditionCon
 	match?: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-empty-object-type
-export interface BlockEntryHasSettingsConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryHasSettings'> {}
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export interface BlockEntryHasSettingsConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryHasSettings'> {
+	match?: boolean;
+}
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export interface BlockEntryHasExternalContentConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryHasExternalContent'> {
@@ -51,6 +53,14 @@ export interface UmbBlockEntryIsExposedConditionConfig extends UmbConditionConfi
 	match?: boolean;
 }
 
+export interface UmbBlockEntryVariesByVariantConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryVariesByVariant'> {
+	match?: boolean;
+}
+
+export interface UmbBlockWorkspaceVariesByVariantConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockWorkspaceVariesByVariant'> {
+	match?: boolean;
+}
+
 declare global {
 	interface UmbExtensionConditionConfigMap {
 		umbBlock:
@@ -64,6 +74,8 @@ declare global {
 			| BlockEntryHasSettingsConditionConfig
 			| BlockEntryIsAllowedInLibraryConditionConfig
 			| BlockEntryIsUnsupportedConditionConfig
-			| UmbBlockEntryIsExposedConditionConfig;
+			| UmbBlockEntryIsExposedConditionConfig
+			| UmbBlockEntryVariesByVariantConditionConfig
+			| UmbBlockWorkspaceVariesByVariantConditionConfig;
 	}
 }

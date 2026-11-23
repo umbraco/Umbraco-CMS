@@ -60,6 +60,13 @@ export class UmbManagementApiTemplateTreeDataRequestManager extends UmbManagemen
 						after: args.paging.takeAfter,
 					},
 				}),
+
+			getBatch: (args) =>
+				TemplateService.getTreeTemplateBatch({
+					query: {
+						id: args.uniques,
+					},
+				}),
 		});
 	}
 }

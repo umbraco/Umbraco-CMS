@@ -123,6 +123,13 @@ export abstract class UmbBlockEntryContext<
 				: hasExpose,
 	);
 
+	#variesByVariant = new UmbBooleanState(undefined);
+	/**
+	 * Whether the block is exposed per variant, which is the case when its content type varies by culture.
+	 * Segments are value variations within a culture and don't have an expose of their own.
+	 */
+	readonly variesByVariant = this.#variesByVariant.asObservable();
+
 	#actionsVisibility = new UmbBooleanState(true);
 	readonly actionsVisibility = this.#actionsVisibility.asObservable();
 
@@ -246,11 +253,11 @@ export abstract class UmbBlockEntryContext<
 		this.#name.setValue(text);
 	}
 
-	#generateWorkspaceEditContentPath = (path?: string, contentKey?: string) =>
-		path && contentKey ? path + 'edit/' + encodeFilePath(contentKey) + '/view/content' : '';
+	#generateWorkspaceEditContentPath = (path?: string, key?: string) =>
+		path && key ? path + 'edit/' + encodeFilePath(key) + '/view/content' : '';
 
-	#generateWorkspaceEditSettingsPath = (path?: string, contentKey?: string) =>
-		path && contentKey ? path + 'edit/' + encodeFilePath(contentKey) + '/view/settings' : '';
+	#generateWorkspaceEditSettingsPath = (path?: string, key?: string) =>
+		path && key ? path + 'edit/' + encodeFilePath(key) + '/view/settings' : '';
 
 	#workspacePath = new UmbStringState(undefined);
 	public readonly workspacePath = this.#workspacePath.asObservable();
@@ -258,18 +265,23 @@ export abstract class UmbBlockEntryContext<
 	#externalContentWorkspacePath = new UmbStringState(undefined);
 
 	public readonly workspaceEditContentPath = mergeObservables(
-		[this.contentKey, this.workspacePath, this.isExternalContent, this.#externalContentWorkspacePath.asObservable()],
-		([contentKey, path, isExternalContent, externalContentPath]) => {
+		[
+			this.contentKey,
+			this.unique,
+			this.workspacePath,
+			this.isExternalContent,
+			this.#externalContentWorkspacePath.asObservable(),
+		],
+		([contentKey, layoutKey, path, isExternalContent, externalContentPath]) => {
 			if (!contentKey) return '';
 			if (isExternalContent && externalContentPath) {
 				return externalContentPath + UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: contentKey });
 			}
-			return this.#generateWorkspaceEditContentPath(path, contentKey);
+			return this.#generateWorkspaceEditContentPath(path, layoutKey);
 		},
 	);
-	public readonly workspaceEditSettingsPath = mergeObservables(
-		[this.contentKey, this.workspacePath],
-		([contentKey, path]) => this.#generateWorkspaceEditSettingsPath(path, contentKey),
+	public readonly workspaceEditSettingsPath = mergeObservables([this.unique, this.workspacePath], ([key, path]) =>
+		this.#generateWorkspaceEditSettingsPath(path, key),
 	);
 
 	#contentStructure?: UmbContentTypeStructureManager;
@@ -772,6 +784,7 @@ export abstract class UmbBlockEntryContext<
 			([variantId, variesByCulture, variesBySegment]) => {
 				if (!variantId || variesByCulture === undefined || variesBySegment === undefined) return;
 				this.#variantId.setValue(variantId.toVariant(variesByCulture, variesBySegment));
+				this.#variesByVariant.setValue(variesByCulture);
 				this.#gotVariantId();
 			},
 			'observeVariantId',
@@ -907,18 +920,10 @@ export abstract class UmbBlockEntryContext<
 
 	//activate
 	public edit() {
-		window.history.pushState(
-			{},
-			'',
-			this.#generateWorkspaceEditContentPath(this.#workspacePath.value, this.getContentKey()),
-		);
+		window.history.pushState({}, '', this.#generateWorkspaceEditContentPath(this.#workspacePath.value, this.getKey()));
 	}
 	public editSettings() {
-		window.history.pushState(
-			{},
-			'',
-			this.#generateWorkspaceEditSettingsPath(this.#workspacePath.value, this.getContentKey()),
-		);
+		window.history.pushState({}, '', this.#generateWorkspaceEditSettingsPath(this.#workspacePath.value, this.getKey()));
 	}
 
 	async requestDelete() {
@@ -1003,6 +1008,16 @@ export abstract class UmbBlockEntryContext<
 		const variantId = this.#variantId.getValue();
 		if (!variantId || !this.#contentKey) return;
 		this._manager?.setOneExpose(this.#contentKey, variantId);
+	}
+
+	/**
+	 * Reverts the expose of the block for the current variant, returning it to the not-yet-created state.
+	 * The content values of the variant are kept, so exposing again restores them.
+	 */
+	public unexpose() {
+		const variantId = this.#variantId.getValue();
+		if (!variantId || !this.#contentKey) return;
+		this._manager?.removeOneExpose(this.#contentKey, variantId);
 	}
 
 	/**

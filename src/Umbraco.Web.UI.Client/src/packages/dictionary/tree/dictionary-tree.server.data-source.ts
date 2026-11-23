@@ -3,6 +3,7 @@ import type { UmbDictionaryTreeItemModel } from './types.js';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
+	UmbTreeItemsRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
 import type { UmbOffsetPaginationRequestModel } from '@umbraco-cms/backoffice/utils';
@@ -10,6 +11,7 @@ import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DictionaryService } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 
 /**
  * A data source for the Dictionary tree that fetches data from the server
@@ -32,6 +34,22 @@ export class UmbDictionaryTreeServerDataSource extends UmbTreeServerDataSourceBa
 			getAncestorsOf,
 			mapper,
 		});
+	}
+
+	async getItems(args: UmbTreeItemsRequestArgs) {
+		const controller = new UmbItemDataApiGetRequestController(this, {
+			api: async ({ uniques }) => {
+				// eslint-disable-next-line local-rules/no-direct-api-import
+				const response = await DictionaryService.getTreeDictionaryBatch({ query: { id: uniques } });
+				return { data: response.data?.items ?? [] };
+			},
+			uniques: args.uniques,
+		});
+
+		const { data, error } = await controller.request();
+		controller.destroy();
+
+		return { data: data?.map((item) => mapper(item)), error };
 	}
 }
 

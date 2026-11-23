@@ -226,6 +226,18 @@ describe('UmbBlockManagerContext', () => {
 			await waitUntil(() => !hasContent('e1'));
 			expect(hasContent('e2')).to.be.true;
 		});
+
+		it('never stores content or expose state for external content', () => {
+			manager.setLayouts([layout('l1', 'e1'), { key: 'l2', contentKey: 'local-content' }]);
+
+			manager.setOneContent(blockData('e1'));
+			manager.setOneExpose('e1', new UmbVariantId(null));
+			manager.setOneContent(blockData('local-content'));
+			manager.setOneExpose('local-content', new UmbVariantId(null));
+
+			expect(manager.getContents().map((x) => x.key)).to.deep.equal(['local-content']);
+			expect(manager.getExposes().map((x) => x.contentKey)).to.deep.equal(['local-content']);
+		});
 	});
 
 	describe('expose ordering', () => {
@@ -342,6 +354,25 @@ describe('UmbBlockManagerContext', () => {
 			manager.setLayouts([externalLayout('a'), externalLayout('b')]);
 
 			await waitUntil(() => failureOf('a') === 'deleted');
+		});
+	});
+
+	describe('removing an expose', () => {
+		it('removes only the expose of the given variant, leaving other variants and blocks exposed', async () => {
+			const host = await fixture<UmbControllerHostElement>(
+				html`<umb-test-block-manager-host></umb-test-block-manager-host>`,
+			);
+			const manager = new UmbTestBlockManagerContext(host);
+
+			manager.setOneExpose('a', new UmbVariantId('en-us'));
+			manager.setOneExpose('a', new UmbVariantId('da'));
+			manager.setOneExpose('b', new UmbVariantId('da'));
+
+			manager.removeOneExpose('a', new UmbVariantId('da'));
+
+			expect(manager.getExposes().map((x) => `${x.culture}|${x.contentKey}`)).to.deep.equal(['da|b', 'en-us|a']);
+
+			manager.destroy();
 		});
 	});
 });
