@@ -13,15 +13,8 @@ public class SqlServerRedirectUrlDtoModelCustomizer : IEFCoreModelCustomizer<Red
 {
     public string? ProviderName => Constants.ProviderNames.EFCore.SQLServer;
 
-    public void Customize(EntityTypeBuilder<RedirectUrlDto> builder)
-    {
+    public void Customize(EntityTypeBuilder<RedirectUrlDto> builder) =>
         builder.HasIndex(x => x.CreateDateUtc)
             .HasDatabaseName($"IX_{RedirectUrlDto.TableName}_culture_hash")
             .IncludeProperties(x => new { x.Culture, x.Url, x.UrlHash, x.ContentKey });
-
-        builder.HasIndex(x => new { x.UrlHash, x.ContentKey, x.Culture, x.CreateDateUtc })
-            .IsUnique()
-            .HasDatabaseName($"IX_{RedirectUrlDto.TableName}")
-            .HasFilter(null);
-    }
 }

@@ -14,14 +14,7 @@ public class SqlServerDocumentUrlAliasDtoModelCustomizer : IEFCoreModelCustomize
 {
     public string? ProviderName => Constants.ProviderNames.EFCore.SQLServer;
 
-    public void Customize(EntityTypeBuilder<DocumentUrlAliasDto> builder)
-    {
+    public void Customize(EntityTypeBuilder<DocumentUrlAliasDto> builder) =>
         builder.HasKey(x => x.Id)
             .IsClustered(false);
-
-        builder.HasIndex(x => new { x.UniqueId, x.LanguageId, x.Alias })
-            .IsUnique()
-            .HasDatabaseName($"IX_{DocumentUrlAliasDto.TableName}_Unique")
-            .HasFilter(null);
-    }
 }

@@ -19,10 +19,5 @@ public class SqlServerTagDtoModelCustomizer : IEFCoreModelCustomizer<TagDto>
         builder.HasIndex(x => new { x.LanguageId, x.Group })
             .HasDatabaseName($"IX_{TagDto.TableName}_languageId_group")
             .IncludeProperties(x => new { x.Id, x.Text });
-
-        builder.HasIndex(x => new { x.Group, x.Text, x.LanguageId })
-            .IsUnique()
-            .HasDatabaseName($"IX_{TagDto.TableName}")
-            .HasFilter(null);
     }
 }

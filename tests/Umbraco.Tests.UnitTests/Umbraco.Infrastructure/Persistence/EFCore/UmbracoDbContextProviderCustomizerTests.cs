@@ -133,7 +133,7 @@ public class UmbracoDbContextProviderCustomizerTests
         using UmbracoDbContext context = CreateSqlServerContext();
 
         IEnumerable<string> filteredIndexes = DesignTimeModel(context).GetEntityTypes()
-            .Where(entityType => entityType.ClrType.Namespace == typeof(NodeDto).Namespace)
+            .Where(entityType => entityType.ClrType.Assembly == typeof(UmbracoDbContext).Assembly)
             .SelectMany(entityType => entityType.GetIndexes())
             .Where(index => index.GetFilter() is not null)
             .Select(index => $"{index.DeclaringEntityType.ClrType.Name}.{index.GetDatabaseName()}");
