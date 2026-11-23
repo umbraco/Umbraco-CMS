@@ -1,17 +1,16 @@
 import type { Editor } from '../../externals.js';
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
 import { UmbLink } from './link.tiptap-extension.js';
-import { linkFromAttributes } from './link-attributes.function.js';
+import { attributesFromLink, linkFromAttributes } from './link-attributes.function.js';
 import { UMB_LINK_PICKER_MODAL } from '@umbraco-cms/backoffice/multi-url-picker';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import type { UmbLinkPickerLink } from '@umbraco-cms/backoffice/multi-url-picker';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarElementApiBase {
 	override async execute(editor?: Editor) {
 		const attrs = editor?.getAttributes(UmbLink.name) ?? {};
 		const link = linkFromAttributes(attrs);
-		const data = { config: {}, index: null, isNew: link?.url === undefined };
+		const data = { config: { disableNameAutofill: true }, index: null, isNew: link?.url === undefined };
 		const value = { link };
 
 		const overlaySize = this.configuration?.getValueByAlias<UUIModalSidebarSize>('overlaySize') ?? 'small';
@@ -21,115 +20,12 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 		);
 		if (!result?.link) return;
 
-		const linkAttrs = this.#parseLinkData(result.link);
+		const linkAttrs = attributesFromLink(result.link);
 
 		if (linkAttrs) {
 			editor?.chain().focus().extendMarkRange(UmbLink.name).setUmbLink(linkAttrs).run();
 		} else {
 			editor?.chain().focus().extendMarkRange(UmbLink.name).unsetLink().run();
 		}
-	}
-
-	#parseLinkData(link: UmbLinkPickerLink) {
-		const { name, target, type, unique, culture } = link;
-		let { queryString, url } = link;
-
-		// If an anchor exists, check that it is appropriately prefixed
-		queryString = this.#queryStringFromUrl(queryString);
-
-		// The href might be an external url, so check the value for an anchor/querystring;
-		// `href` has the anchor re-appended later, hence the reset here to avoid duplicating the anchor
-		if (!queryString) {
-			const extractedInfo = this.#extractUrlAndQueryString(url, queryString);
-			url = extractedInfo.url;
-			queryString = extractedInfo.queryString;
-		}
-
-		// If we have a unique id, it must be a `/{localLink:guid}`
-		if (unique) {
-			url = `/{localLink:${unique}}`;
-		} else {
-			// If it's an email address and not `//user@domain.com` and protocol (e.g. mailto:, sip:) is not specified;
-			// then we'll assume it should be a "mailto" link.
-			url = this.#transformURLToMailto(url);
-
-			url = this.#ensureHttpProtocol(url);
-		}
-
-		const anchor = this.#getAnchorFromQueryString(queryString);
-
-		if (anchor) {
-			url = (url ?? '') + anchor;
-		}
-
-		if (!url) return null;
-
-		return {
-			// Only a local link carries its entity type on the anchor; see the `type` attribute on `UmbLink`.
-			type: unique ? type : null,
-			href: url,
-			'data-anchor': anchor,
-			target,
-			title: name ?? url,
-			'data-culture': culture,
-		};
-	}
-
-	#extractUrlAndQueryString(url: string | null | undefined, queryString: string | null) {
-		const urlParts = url?.split(/([#?])/);
-		if (urlParts?.length === 3) {
-			url = urlParts[0];
-			queryString = urlParts[1] + urlParts[2];
-		}
-		return { url, queryString };
-	}
-
-	/**
-	 * If the URL is prefixed "www.", then prepend "http://" protocol scheme.
-	 * @param {string | null | undefined} url - The URL to check
-	 * @returns {string | null} The URL with the protocol scheme prepended, if applicable
-	 */
-	#ensureHttpProtocol(url: string | null | undefined) {
-		if (!url) return null;
-		if (/^\s*www\./i.test(url)) {
-			url = `http://${url}`;
-		}
-		return url;
-	}
-
-	/**
-	 * If the URL is an email address, then prepend "mailto:" protocol scheme.
-	 * @param {string | null | undefined} url - The URL to check
-	 * @returns {string | null} The URL with the "mailto:" scheme prepended, if applicable
-	 */
-	#transformURLToMailto(url: string | null | undefined) {
-		if (!url) return null;
-		if (url?.includes('@') && !url.includes('//') && !url.includes(':')) {
-			url = `mailto:${url}`;
-		}
-		return url;
-	}
-
-	/**
-	 * If the URL contains an anchor, then return the anchor.
-	 * @param {string | null} queryString - The query string to check
-	 * @returns {string | null} The anchor, if present
-	 */
-	#getAnchorFromQueryString(queryString: string | null) {
-		if (!queryString) return null;
-		return queryString.startsWith('#') || queryString.startsWith('?') ? queryString : null;
-	}
-
-	/**
-	 * If the query string does not start with "?" or "#", then prepend it.
-	 * @param {string | null | undefined} queryString - The query string to normalize
-	 * @returns {string | null} The normalized query string
-	 */
-	#queryStringFromUrl(queryString: string | null | undefined) {
-		if (!queryString) return null;
-		if (!queryString.startsWith('?') && !queryString.startsWith('#')) {
-			queryString = (queryString.startsWith('=') ? '#' : '?') + queryString;
-		}
-		return queryString;
 	}
 }
