@@ -247,13 +247,13 @@
           "name": "DataTypeUsageRepository",
           "lines": 53,
           "base": "IDataTypeUsageRepository",
-          "note": ""
+          "note": "EF Core port in review as draft #24780."
         },
         {
           "name": "PropertyTypeUsageRepository",
           "lines": 64,
           "base": "IPropertyTypeUsageRepository",
-          "note": ""
+          "note": "EF Core port in review as draft #24780."
         }
       ],
       "alsoCloses": []
@@ -444,13 +444,13 @@
         "name": "DataTypeUsageRepository",
         "lines": 53,
         "campaign": "D",
-        "note": "Node, PropertyData, PropertyType."
+        "note": "Node, PropertyData, PropertyType. In review as draft #24780 (24-11-2026)."
       },
       {
         "name": "PropertyTypeUsageRepository",
         "lines": 64,
         "campaign": "D",
-        "note": "Same tables as DataTypeUsageRepository; do both in one PR."
+        "note": "Same tables as DataTypeUsageRepository; do both in one PR. In review as draft #24780 (24-11-2026)."
       },
       {
         "name": "NodeCountRepository",
@@ -577,6 +577,10 @@
     }
   ],
   "log": [
+    {
+      "date": "24-11-2026",
+      "text": "Easy win opened: DataTypeUsageRepository and PropertyTypeUsageRepository on EF Core, draft #24780 (13 new tests, contracts gain a trailing CancellationToken). Remove both from the lists when it merges."
+    },
     {
       "date": "24-11-2026",
       "text": "Loose end closed: the sibling-name prefix fetch (#23447) is on the EF Core wide base (media PR 3b). Easy win in progress: DataTypeUsageRepository and PropertyTypeUsageRepository to EF Core."

@@ -197,6 +197,7 @@
     }
   ],
   "log": [
+    { "date": "24-11-2026", "text": "Easy win from the map opened as draft #24780 (usage repositories to EF Core), outside the campaign numbering." },
     { "date": "24-11-2026", "text": "PR 3b opened as draft #24779 (d4dfd1720d8), stacked on PR 3." },
     { "date": "24-11-2026", "text": "PR 3b started on v20/feature/ef-core-media-repository-3b-narrow-sibling-fetch, stacked on PR 3. An easy win from the migration map (DataTypeUsageRepository + PropertyTypeUsageRepository to EF Core) delegated to an agent in a separate worktree." },
     { "date": "24-11-2026", "text": "PR 3 review round 1 applied: delete order kept through an intermediate delete-clauses hook; PR 4 gains an explicit test list for the wide base's plain persist flow." },
