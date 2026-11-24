@@ -128,3 +128,27 @@ test('cancelling the rollback modal leaves the content unchanged', async ({umbra
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.publish);
   await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSavedAndPublished);
 });
+
+test('can rollback content to a version on a later page of versions', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  // More published versions than fit on one page of the rollback modal.
+  const texts = Array.from({length: 25}, (_, index) => `Version ${index + 1} text`);
+  const documentId = await umbracoApi.document.createDocumentWithPublishedTextVersions(contentName, documentTypeName, dataTypeName, texts);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickInfoTab();
+  await umbracoUi.content.clickRollbackButton();
+  await umbracoUi.content.waitForRollbackItems();
+  await umbracoUi.content.goToLastRollbackPage();
+  await umbracoUi.content.clickOldestRollbackItemOnPage();
+  await umbracoUi.content.clickRollbackContainerButton(documentId);
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.clickContentTab();
+  await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, texts[0]);
+  await umbracoApi.document.doesDocumentWithCultureHaveValue(documentId, texts[0], null);
+});

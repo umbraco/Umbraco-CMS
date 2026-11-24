@@ -109,6 +109,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly selectErrorPageDocument: Locator;
   private readonly rollbackItem: Locator;
   private readonly activeRollbackItem: Locator;
+  private readonly rollbackLastPaginationBtn: Locator;
   private readonly actionsMenu: Locator;
   private readonly linkToDocumentBtn: Locator;
   private readonly linkToMediaBtn: Locator;
@@ -351,6 +352,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.publishModalBtn = this.backofficeModalContainer.getByLabel('Publish', {exact: true});
     this.unpublishModalBtn = this.backofficeModalContainer.getByLabel('Unpublish', {exact: true});
     this.activeRollbackItem = page.locator('.rollback-item.active');
+    this.rollbackLastPaginationBtn = page.locator('umb-content-rollback-modal uui-pagination').getByLabel('Last', {exact: true});
     //Block Grid - Block List
     this.blockListEditor = page.locator('umb-property-editor-ui-block-list');
     this.blockGridEditor = page.locator('umb-property-editor-ui-block-grid');
@@ -1377,6 +1379,20 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async waitForRollbackItems() {
     await expect(this.rollbackItem).not.toHaveCount(0);
+  }
+
+  async goToLastRollbackPage() {
+    // Wait for the modal's async pre-selection of the current version, otherwise it clobbers our pick.
+    await expect(this.activeRollbackItem).toBeVisible();
+    const firstVersionDate = await this.rollbackItem.first().locator('umb-localize-date').getAttribute('date');
+    await this.click(this.rollbackLastPaginationBtn);
+    await expect(this.rollbackItem.first().locator('umb-localize-date')).not.toHaveAttribute('date', firstVersionDate ?? '');
+  }
+
+  async clickOldestRollbackItemOnPage() {
+    const oldestVersion = this.rollbackItem.last();
+    await this.click(oldestVersion);
+    await expect(oldestVersion).toHaveClass(/active/);
   }
 
   async clickRollbackCancelButton() {

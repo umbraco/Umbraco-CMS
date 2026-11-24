@@ -1840,6 +1840,27 @@ export class DocumentApiHelper {
     return documentId;
   }
 
+  /**
+   * Creates a document and publishes it once per text, in order, so that each text is held by its own version.
+   * @param documentName - name of the document
+   * @param documentTypeName - name of the document type to create, with a single property of the given data type
+   * @param dataTypeName - name of a text data type
+   * @param texts - the property value of each published version, oldest first
+   */
+  async createDocumentWithPublishedTextVersions(documentName: string, documentTypeName: string, dataTypeName: string, texts: string[]) {
+    const dataTypeData = await this.api.dataType.getByName(dataTypeName);
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+    const documentId = await this.createDocumentWithTextContent(documentName, documentTypeId, texts[0], dataTypeName);
+    await this.publish(documentId);
+    for (const text of texts.slice(1)) {
+      const documentData = await this.get(documentId);
+      documentData.values[0].value = text;
+      await this.update(documentId, documentData);
+      await this.publish(documentId);
+    }
+    return documentId;
+  }
+
   async doesDocumentWithCultureHaveValue(documentId: string, expectedValue: string, culture: string | null) {
     const documentData = await this.get(documentId);
     const valueEntry = documentData.values.find(v => v.culture === culture);
