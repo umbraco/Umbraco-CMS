@@ -5,6 +5,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-image-cropper-preview')
 export class UmbImageCropperPreviewElement extends UmbLitElement {
+	static override shadowRootOptions = { ...UmbLitElement.shadowRootOptions, delegatesFocus: true };
+
 	@query('#image') imageElement!: HTMLImageElement;
 	@query('#container') imageContainerElement!: HTMLImageElement;
 
@@ -16,6 +18,9 @@ export class UmbImageCropperPreviewElement extends UmbLitElement {
 
 	@property({ type: String })
 	label?: string;
+
+	@property({ type: Boolean, reflect: true })
+	active = false;
 
 	@property({ attribute: false })
 	set focalPoint(value) {
@@ -143,6 +148,12 @@ export class UmbImageCropperPreviewElement extends UmbLitElement {
 	}
 
 	override render() {
+		return html`
+			<button id="button" type="button" aria-current=${this.active ? 'true' : nothing}>${this.#renderContent()}</button>
+		`;
+	}
+
+	#renderContent() {
 		if (!this.crop) {
 			return html`<span id="label">${this.label}</span>`;
 		}
@@ -160,17 +171,35 @@ export class UmbImageCropperPreviewElement extends UmbLitElement {
 				: nothing}
 		`;
 	}
+
 	static override styles = css`
 		:host {
 			display: flex;
-			flex-direction: column;
-			padding: var(--uui-size-space-4);
 			border-radius: var(--uui-border-radius);
 			background-color: var(--uui-color-surface);
-			cursor: pointer;
 		}
 		:host(:hover) {
 			background-color: var(--uui-color-surface-alt);
+		}
+		#button {
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			min-width: 0;
+			box-sizing: border-box;
+			margin: 0;
+			padding: var(--uui-size-space-4);
+			border: none;
+			border-radius: inherit;
+			background: none;
+			color: inherit;
+			font: inherit;
+			text-align: start;
+			cursor: pointer;
+		}
+		#button:focus-visible {
+			outline: 2px solid var(--uui-color-focus);
+			outline-offset: -2px;
 		}
 		#container {
 			display: flex;

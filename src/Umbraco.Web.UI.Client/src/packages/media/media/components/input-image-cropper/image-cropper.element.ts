@@ -10,6 +10,7 @@ export class UmbImageCropperElement extends UmbLitElement {
 	@query('#viewport') viewportElement!: HTMLElement;
 	@query('#mask') maskElement!: HTMLElement;
 	@query('#image') imageElement!: HTMLImageElement;
+	@query('#slider') sliderElement?: HTMLElement;
 
 	@property({ type: Object, attribute: false }) value?: UmbImageCropperCrop;
 	@property({ type: String }) src: string = '';
@@ -58,6 +59,12 @@ export class UmbImageCropperElement extends UmbLitElement {
 		await this.updateComplete;
 		this.imageElement.addEventListener('mousedown', this.#onStartDrag);
 		this.addEventListener('wheel', this.#onWheel, { passive: false }); //
+	}
+
+	// Move focus to the zoom slider, the first focusable control of the cropper.
+	override async focus(options?: FocusOptions) {
+		await this.updateComplete;
+		this.sliderElement?.focus(options);
 	}
 
 	#removeEventListeners() {
@@ -325,6 +332,7 @@ export class UmbImageCropperElement extends UmbLitElement {
 			<uui-slider
 				@input=${this.#onSliderUpdate}
 				.value=${this.zoom.toString()}
+				label=${this.localize.term('imagecropper_zoom')}
 				hide-step-values
 				id="slider"
 				type="range"
