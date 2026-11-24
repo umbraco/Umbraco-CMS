@@ -25,7 +25,7 @@ public static class VariationContextAccessorExtensions
         string? propertyAlias,
         ref string? culture,
         ref string? segment)
-        => variationContextAccessor.ContextualizeVariation(variations, null, propertyAlias, ref culture, ref segment);
+        => variationContextAccessor.ContextualizeVariation(variations, null, propertyAlias, ref culture, ref segment, null);
 
     /// <summary>
     ///     Contextualizes the variation based on the content variation settings, content ID, and property alias.
@@ -43,7 +43,27 @@ public static class VariationContextAccessorExtensions
         string? propertyAlias,
         ref string? culture,
         ref string? segment)
-        => variationContextAccessor.ContextualizeVariation(variations, (int?)contentId, propertyAlias, ref culture, ref segment);
+        => variationContextAccessor.ContextualizeVariation(variations, (int?)contentId, propertyAlias, ref culture, ref segment, null);
+
+    /// <summary>
+    ///     Contextualizes the variation based on the content variation settings, content ID, and property alias.
+    /// </summary>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
+    /// <param name="variations">The content variation settings.</param>
+    /// <param name="contentId">The content ID.</param>
+    /// <param name="propertyAlias">The property alias.</param>
+    /// <param name="culture">The culture, which may be set based on the variation context.</param>
+    /// <param name="segment">The segment, which may be set based on the variation context.</param>
+    /// <param name="propertySegmentsForCulture">A factory method to resolve the available property value segments for a given culture at source level, or null if none is available.</param>
+    public static void ContextualizeVariation(
+        this IVariationContextAccessor variationContextAccessor,
+        ContentVariation variations,
+        int contentId,
+        string? propertyAlias,
+        ref string? culture,
+        ref string? segment,
+        Func<string?, IEnumerable<string>?>? propertySegmentsForCulture)
+        => variationContextAccessor.ContextualizeVariation(variations, (int?)contentId, propertyAlias, ref culture, ref segment, propertySegmentsForCulture);
 
     private static void ContextualizeVariation(
         this IVariationContextAccessor variationContextAccessor,
@@ -51,7 +71,8 @@ public static class VariationContextAccessorExtensions
         int? contentId,
         string? propertyAlias,
         ref string? culture,
-        ref string? segment)
+        ref string? segment,
+        Func<string?, IEnumerable<string>?>? propertySegmentsForCulture)
     {
         if (culture != null && segment != null)
         {
@@ -72,9 +93,14 @@ public static class VariationContextAccessorExtensions
                 }
                 else
                 {
+                    var effectiveCulture = culture;
+
                     segment = propertyAlias == null ?
                         publishedVariationContext?.GetSegment(contentId.Value) :
-                        publishedVariationContext?.GetSegment(contentId.Value, propertyAlias);
+                        publishedVariationContext?.GetSegment(
+                            contentId.Value,
+                            propertyAlias,
+                            () => propertySegmentsForCulture?.Invoke(effectiveCulture));
                 }
             }
             else

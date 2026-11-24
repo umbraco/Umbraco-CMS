@@ -36,6 +36,8 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     private readonly Lock _locko = new();
     private ConcurrentDictionary<CompositeStringStringKey, SourceInterValue>? _sourceValues;
 
+    private Dictionary<string, string[]>? _sourceSegmentsByCulture;
+
     // initializes a published content property with a value
     public PublishedProperty(
         IPublishedPropertyType propertyType,
@@ -103,7 +105,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     // determines whether a property has value
     public override bool HasValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_variations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment, SourceSegmentsForCulture);
 
         var value = GetSourceValue(culture, segment);
         var isValue = PropertyType.IsValue(value, PropertyValueLevel.Source);
@@ -127,7 +129,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetSourceValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_sourceVariations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_sourceVariations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment, SourceSegmentsForCulture);
 
         // source values are tightly bound to the property/schema culture and segment configurations, so we need to
         // sanitize the contextualized culture/segment states before using them to access the source values.
@@ -170,7 +172,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_variations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment, SourceSegmentsForCulture);
 
         // Include the fallback policy in the cache key so that different fallback strategies
         // produce separate cached values (e.g., block editors filter differently with Fallback.ToLanguage).
@@ -239,7 +241,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_variations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment, SourceSegmentsForCulture);
 
         object? value;
         CacheValue cacheValues = GetCacheValues(expanding ? PropertyType.DeliveryApiCacheLevelForExpansion : PropertyType.DeliveryApiCacheLevel).For(culture, segment);
@@ -394,4 +396,46 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     }
 
     private int ContentIdForContextualization => _owningContentId ?? _element.Id;
+
+    private IEnumerable<string>? SourceSegmentsForCulture(string? culture)
+    {
+        if (_sourceValues is null)
+        {
+            return null;
+        }
+
+        // Computed lazily on this hot path (property rendering) to avoid adding memory to every published property,
+        // even when segments are not in play. Source values are only populated by the constructor, so the result
+        // never goes stale.
+        if (_sourceSegmentsByCulture is null)
+        {
+            var segmentsByCulture = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+            foreach (SourceInterValue sourceValue in _sourceValues.Values)
+            {
+                var valueCulture = sourceValue.Culture ?? Constants.System.InvariantCulture;
+                if (segmentsByCulture.TryGetValue(valueCulture, out List<string>? segments) is false)
+                {
+                    segments = new List<string>();
+                    segmentsByCulture[valueCulture] = segments;
+                }
+
+                if (sourceValue.Segment.IsNullOrWhiteSpace() is false)
+                {
+                    segments.Add(sourceValue.Segment);
+                }
+            }
+
+            var sourceSegmentsByCulture = new Dictionary<string, string[]>(segmentsByCulture.Count, StringComparer.OrdinalIgnoreCase);
+            foreach (KeyValuePair<string, List<string>> segmentsForCulture in segmentsByCulture)
+            {
+                sourceSegmentsByCulture[segmentsForCulture.Key] = segmentsForCulture.Value.ToArray();
+            }
+
+            _sourceSegmentsByCulture = sourceSegmentsByCulture;
+        }
+
+        return _sourceSegmentsByCulture.TryGetValue(culture ?? Constants.System.InvariantCulture, out var sourceSegmentsForCulture)
+            ? sourceSegmentsForCulture
+            : null;
+    }
 }
