@@ -316,12 +316,12 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 		this._selectedVersion = undefined;
 		this._diffs = [];
 		this.#pagination.setCurrentPageNumber(1);
-		this.#requestVersions();
+		void this.#requestVersions();
 	}
 
 	#onPageChange(event: UUIPaginationEvent) {
 		this.#pagination.setCurrentPageNumber(event.target.current);
-		this.#requestVersions();
+		void this.#requestVersions();
 	}
 
 	#onToggleDiff(event: Event) {
