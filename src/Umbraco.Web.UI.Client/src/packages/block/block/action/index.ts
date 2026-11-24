@@ -5,6 +5,7 @@ export * from './common/delete/constants.js';
 export * from './common/edit-content/constants.js';
 export * from './common/edit-settings/constants.js';
 export * from './common/expose-content/constants.js';
+export * from './common/unexpose-content/constants.js';
 export * from './default/default.action.kind.js';
 
 export type * from './types.js';

@@ -1,6 +1,10 @@
 /* eslint-disable local-rules/no-direct-api-import */
 
-import type { UmbMediaTreeChildrenOfRequestArgs, UmbMediaTreeRootItemsRequestArgs } from '../types.js';
+import type {
+	UmbMediaTreeChildrenOfRequestArgs,
+	UmbMediaTreeItemsRequestArgs,
+	UmbMediaTreeRootItemsRequestArgs,
+} from '../types.js';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbManagementApiTreeDataRequestManager } from '@umbraco-cms/backoffice/management-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -11,6 +15,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type {
 	UmbManagementApiTreeAncestorsOfRequestArgs,
+	UmbManagementApiTreeBatchRequestArgs,
 	UmbManagementApiTreeChildrenOfRequestArgs,
 	UmbManagementApiTreeRootItemsRequestArgs,
 	UmbManagementApiTreeSiblingsFromRequestArgs,
@@ -28,6 +33,9 @@ interface UmbManagementApiMediaTreeSiblingsFromRequestArgs extends UmbManagement
 	};
 }
 
+interface UmbManagementApiMediaTreeBatchRequestArgs
+	extends UmbManagementApiTreeBatchRequestArgs, Pick<UmbMediaTreeItemsRequestArgs, 'dataType'> {}
+
 export class UmbManagementApiMediaTreeDataRequestManager extends UmbManagementApiTreeDataRequestManager<
 	MediaTreeItemResponseModel,
 	UmbManagementApiMediaTreeRootItemsRequestArgs,
@@ -37,7 +45,8 @@ export class UmbManagementApiMediaTreeDataRequestManager extends UmbManagementAp
 	UmbManagementApiTreeAncestorsOfRequestArgs,
 	Array<MediaTreeItemResponseModel>,
 	UmbManagementApiMediaTreeSiblingsFromRequestArgs,
-	SubsetMediaTreeItemResponseModel
+	SubsetMediaTreeItemResponseModel,
+	UmbManagementApiMediaTreeBatchRequestArgs
 > {
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -74,6 +83,14 @@ export class UmbManagementApiMediaTreeDataRequestManager extends UmbManagementAp
 						target: args.paging.target.unique,
 						before: args.paging.takeBefore,
 						after: args.paging.takeAfter,
+					},
+				}),
+
+			getBatch: (args) =>
+				MediaService.getTreeMediaBatch({
+					query: {
+						id: args.uniques,
+						dataTypeId: args.dataType?.unique,
 					},
 				}),
 		});

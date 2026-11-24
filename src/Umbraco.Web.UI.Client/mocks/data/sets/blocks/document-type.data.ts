@@ -3,14 +3,160 @@ import {
 	NESTED_INNER_BLOCK_LIST_DATA_TYPE_ID,
 	NESTED_OUTER_BLOCK_LIST_DATA_TYPE_ID,
 	TEXTSTRING_DATA_TYPE_ID,
+	VARIANT_BLOCK_LIST_DATA_TYPE_ID,
+	VARIANT_INLINE_BLOCK_LIST_DATA_TYPE_ID,
+	VISIBILITY_BLOCK_LIST_DATA_TYPE_ID,
 } from './data-type.data.js';
 
 export const NESTED_INLINE_BLOCK_LIST_FOLDER_ID = '6a6f0a9a-4294-4d5e-b0e6-4fa779a80957';
 export const NESTED_BLOCK_LIST_DOCUMENT_TYPE_ID = '9ef9a53e-ed33-4583-b104-3c7f062ea168';
 export const NESTED_BLOCK_LIST_OUTER_ELEMENT_TYPE_ID = '9c86f35b-42d9-480f-bc4a-f8475fde6999';
 export const NESTED_BLOCK_LIST_INNER_ELEMENT_TYPE_ID = '9ad6ab46-3eef-4561-bb1c-98ec3026e18a';
+export const VARIANT_BLOCK_ELEMENT_TYPE_ID = '086f0418-9ab5-4eef-8073-98e57f0a4cd8';
+export const VARIANT_HIDDEN_EDITOR_ELEMENT_TYPE_ID = '45bb055d-f580-45f6-95d8-6807a6841b03';
+export const VARIANT_BLOCK_LIST_DOCUMENT_TYPE_ID = '63661a2d-173f-4961-a71c-69338bf50568';
+export const VARIANT_INLINE_BLOCK_LIST_DOCUMENT_TYPE_ID = '414f5e98-8759-43bb-8d95-f2cc22fba799';
+export const VISIBILITY_CONTENT_ELEMENT_TYPE_ID = '96eaca75-c166-4845-941f-f54d6570a41b';
+export const VISIBILITY_EMPTY_CONTENT_ELEMENT_TYPE_ID = '8727fa49-b253-4621-9f21-cce9c6103240';
+export const VISIBILITY_HIDDEN_EDITOR_ELEMENT_TYPE_ID = 'fe536b69-3383-4492-bed9-bea2333b2c8c';
+export const VISIBILITY_SETTINGS_ELEMENT_TYPE_ID = '3a65223f-aaa9-42ea-8282-45b9400f7aac';
+export const VISIBILITY_BLOCK_LIST_DOCUMENT_TYPE_ID = 'cc1ec7d8-bff8-4c9b-8d5c-e03edfd499c5';
+
+type UmbVisibilityElementTypeOptions = {
+	id: string;
+	alias: string;
+	name: string;
+	property?: { id: string; alias: string; name: string };
+};
+
+const createVisibilityElementType = ({
+	id,
+	alias,
+	name,
+	property,
+}: UmbVisibilityElementTypeOptions): UmbMockDocumentTypeModel => ({
+	id,
+	alias,
+	name,
+	description: null,
+	icon: 'icon-item-arrangement',
+	allowedTemplates: [],
+	defaultTemplate: null,
+	allowedAsRoot: false,
+	variesByCulture: false,
+	variesBySegment: false,
+	isElement: true,
+	hasChildren: false,
+	parent: { id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID },
+	isFolder: false,
+	properties: property
+		? [
+				{
+					id: property.id,
+					container: null,
+					alias: property.alias,
+					name: property.name,
+					description: null,
+					dataType: { id: TEXTSTRING_DATA_TYPE_ID },
+					variesByCulture: false,
+					variesBySegment: false,
+					sortOrder: 0,
+					validation: {
+						mandatory: false,
+						mandatoryMessage: null,
+						regEx: null,
+						regExMessage: null,
+					},
+					appearance: {
+						labelOnTop: false,
+					},
+				},
+			]
+		: [],
+	containers: [],
+	allowedDocumentTypes: [],
+	compositions: [],
+	cleanup: {
+		preventCleanup: false,
+		keepAllVersionsNewerThanDays: null,
+		keepLatestVersionPerDayForDays: null,
+	},
+	flags: [],
+});
 
 export const data: Array<UmbMockDocumentTypeModel> = [
+	// Content Visibility: every block has settings, so each one opens a workspace, and the Content view
+	// is only offered when the content element type has properties and the block type does not hide it.
+	createVisibilityElementType({
+		id: VISIBILITY_CONTENT_ELEMENT_TYPE_ID,
+		alias: 'visibilityContentElement',
+		name: 'Visibility Block (Has Properties)',
+		property: { id: '7ae8c0ed-36b7-418f-bed6-f15ba97a03bf', alias: 'headline', name: 'Headline' },
+	}),
+	createVisibilityElementType({
+		id: VISIBILITY_EMPTY_CONTENT_ELEMENT_TYPE_ID,
+		alias: 'visibilityEmptyContentElement',
+		name: 'Visibility Block (No Properties)',
+	}),
+	createVisibilityElementType({
+		id: VISIBILITY_HIDDEN_EDITOR_ELEMENT_TYPE_ID,
+		alias: 'visibilityHiddenEditorElement',
+		name: 'Visibility Block (Hidden Editor)',
+		property: { id: 'e23bb353-3906-4e9d-879e-8d7181e83b3a', alias: 'headline', name: 'Headline' },
+	}),
+	createVisibilityElementType({
+		id: VISIBILITY_SETTINGS_ELEMENT_TYPE_ID,
+		alias: 'visibilitySettingsElement',
+		name: 'Visibility Block Settings',
+		property: { id: '747b92c9-03d0-4e50-b106-21fcfff9370b', alias: 'note', name: 'Note' },
+	}),
+	{
+		id: VISIBILITY_BLOCK_LIST_DOCUMENT_TYPE_ID,
+		alias: 'visibilityBlockList',
+		name: 'Content Visibility Block List',
+		description: null,
+		icon: 'icon-document',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: { id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID },
+		isFolder: false,
+		properties: [
+			{
+				id: '78665655-2a07-4bd0-a82f-373082e7af77',
+				container: null,
+				alias: 'blocks',
+				name: 'Blocks',
+				description: null,
+				dataType: { id: VISIBILITY_BLOCK_LIST_DATA_TYPE_ID },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	},
 	{
 		id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID,
 		alias: 'nestedInlineBlockListFolder',
@@ -246,6 +392,197 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				name: 'Blocks',
 				description: null,
 				dataType: { id: NESTED_OUTER_BLOCK_LIST_DATA_TYPE_ID },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	},
+	{
+		// Block-level variance: the element type (and its property) vary by culture while the block list
+		// property itself is invariant, so each block is exposed per culture.
+		id: VARIANT_BLOCK_ELEMENT_TYPE_ID,
+		alias: 'variantBlockElement',
+		name: 'Variant Block',
+		description: null,
+		icon: 'icon-item-arrangement',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: false,
+		variesByCulture: true,
+		variesBySegment: false,
+		isElement: true,
+		hasChildren: false,
+		parent: { id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID },
+		isFolder: false,
+		properties: [
+			{
+				id: '51e7a568-1559-4d09-bf96-2b0b94a5f884',
+				container: null,
+				alias: 'headline',
+				name: 'Headline',
+				description: null,
+				dataType: { id: TEXTSTRING_DATA_TYPE_ID },
+				variesByCulture: true,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	},
+	{
+		// Same shape as the Variant Block, but the block list hides its content editor, so it has no workspace to open.
+		id: VARIANT_HIDDEN_EDITOR_ELEMENT_TYPE_ID,
+		alias: 'variantHiddenEditorElement',
+		name: 'Variant Block (Hidden Editor)',
+		description: null,
+		icon: 'icon-item-arrangement',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: false,
+		variesByCulture: true,
+		variesBySegment: false,
+		isElement: true,
+		hasChildren: false,
+		parent: { id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID },
+		isFolder: false,
+		properties: [
+			{
+				id: '4e3b36f0-27f5-4a24-b1b5-317521f44637',
+				container: null,
+				alias: 'headline',
+				name: 'Headline',
+				description: null,
+				dataType: { id: TEXTSTRING_DATA_TYPE_ID },
+				variesByCulture: true,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	},
+	{
+		id: VARIANT_INLINE_BLOCK_LIST_DOCUMENT_TYPE_ID,
+		alias: 'variantInlineBlockList',
+		name: 'Variant Inline Block List',
+		description: null,
+		icon: 'icon-document',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: true,
+		variesByCulture: true,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: { id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID },
+		isFolder: false,
+		properties: [
+			{
+				id: '75337bab-ae33-4c1c-9e81-b53a2cb34086',
+				container: null,
+				alias: 'blocks',
+				name: 'Blocks',
+				description: null,
+				dataType: { id: VARIANT_INLINE_BLOCK_LIST_DATA_TYPE_ID },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	},
+	{
+		id: VARIANT_BLOCK_LIST_DOCUMENT_TYPE_ID,
+		alias: 'variantBlockList',
+		name: 'Variant Block List',
+		description: null,
+		icon: 'icon-document',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: true,
+		variesByCulture: true,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: { id: NESTED_INLINE_BLOCK_LIST_FOLDER_ID },
+		isFolder: false,
+		properties: [
+			{
+				id: '94acce87-8728-4493-a967-f0539451b8ff',
+				container: null,
+				alias: 'blocks',
+				name: 'Blocks',
+				description: null,
+				dataType: { id: VARIANT_BLOCK_LIST_DATA_TYPE_ID },
 				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 0,

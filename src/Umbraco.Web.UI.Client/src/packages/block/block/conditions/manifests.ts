@@ -2,14 +2,20 @@ import {
 	UMB_BLOCK_ENTRY_HAS_SETTINGS_CONDITION_ALIAS,
 	UMB_BLOCK_ENTRY_IS_EXPOSED_CONDITION_ALIAS,
 	UMB_BLOCK_ENTRY_IS_READ_ONLY_CONDITION_ALIAS,
+	UMB_BLOCK_WORKSPACE_SHOW_CONTENT_EDIT_CONDITION_ALIAS,
+	UMB_BLOCK_ENTRY_VARIES_BY_VARIANT_CONDITION_ALIAS,
+	UMB_BLOCK_WORKSPACE_VARIES_BY_VARIANT_CONDITION_ALIAS,
 } from './constants.js';
 import UmbBlockEntryHasSettingsCondition from './block-entry-has-settings.condition.js';
 import UmbBlockEntryIsExposedCondition from './block-entry-is-exposed.condition.js';
 import UmbBlockEntryIsReadOnlyCondition from './block-entry-is-read-only.condition.js';
 import UmbBlockEntryShowContentEditCondition from './block-entry-show-content-edit.condition.js';
+import UmbBlockEntryVariesByVariantCondition from './block-entry-varies-by-variant.condition.js';
 import UmbBlockWorkspaceHasSettingsCondition from './block-workspace-has-settings.condition.js';
 import UmbBlockWorkspaceIsExposedCondition from './block-workspace-is-exposed.condition.js';
 import UmbBlockWorkspaceIsReadOnlyCondition from './block-workspace-is-readonly.condition.js';
+import UmbBlockWorkspaceShowContentEditCondition from './block-workspace-show-content-edit.condition.js';
+import UmbBlockWorkspaceVariesByVariantCondition from './block-workspace-varies-by-variant.condition.js';
 import type { ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
 export const manifests: Array<ManifestCondition> = [
@@ -18,6 +24,12 @@ export const manifests: Array<ManifestCondition> = [
 		name: 'Block Has Settings Condition',
 		alias: 'Umb.Condition.BlockWorkspaceHasSettings',
 		api: UmbBlockWorkspaceHasSettingsCondition,
+	},
+	{
+		type: 'condition',
+		name: 'Block Workspace Show Content Edit Condition',
+		alias: UMB_BLOCK_WORKSPACE_SHOW_CONTENT_EDIT_CONDITION_ALIAS,
+		api: UmbBlockWorkspaceShowContentEditCondition,
 	},
 	{
 		type: 'condition',
@@ -54,5 +66,17 @@ export const manifests: Array<ManifestCondition> = [
 		name: 'Block Entry Is ReadOnly Condition',
 		alias: UMB_BLOCK_ENTRY_IS_READ_ONLY_CONDITION_ALIAS,
 		api: UmbBlockEntryIsReadOnlyCondition,
+	},
+	{
+		type: 'condition',
+		name: 'Block Entry Varies By Variant Condition',
+		alias: UMB_BLOCK_ENTRY_VARIES_BY_VARIANT_CONDITION_ALIAS,
+		api: UmbBlockEntryVariesByVariantCondition,
+	},
+	{
+		type: 'condition',
+		name: 'Block Workspace Varies By Variant Condition',
+		alias: UMB_BLOCK_WORKSPACE_VARIES_BY_VARIANT_CONDITION_ALIAS,
+		api: UmbBlockWorkspaceVariesByVariantCondition,
 	},
 ];
