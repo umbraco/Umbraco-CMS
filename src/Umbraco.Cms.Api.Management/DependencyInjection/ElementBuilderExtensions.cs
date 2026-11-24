@@ -22,6 +22,7 @@ internal static class ElementBuilderExtensions
         builder.Services.AddTransient<IElementPresentationFactory, ElementPresentationFactory>();
         builder.Services.AddTransient<IElementEditingPresentationFactory, ElementEditingPresentationFactory>();
         builder.Services.AddTransient<IElementVersionPresentationFactory, ElementVersionPresentationFactory>();
+        builder.Services.AddTransient<IElementDraftBranchPresentationFactory, ElementDraftBranchPresentationFactory>();
         builder.Services.AddScoped<IElementPermissionFilterService, ElementPermissionFilterService>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()

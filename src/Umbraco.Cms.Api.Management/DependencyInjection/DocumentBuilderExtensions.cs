@@ -21,6 +21,7 @@ internal static class DocumentBuilderExtensions
         builder.Services.AddTransient<IPublicAccessPresentationFactory, PublicAccessPresentationFactory>();
         builder.Services.AddTransient<IDomainPresentationFactory, DomainPresentationFactory>();
         builder.Services.AddTransient<IDocumentVersionPresentationFactory, DocumentVersionPresentationFactory>();
+        builder.Services.AddTransient<IDocumentDraftBranchPresentationFactory, DocumentDraftBranchPresentationFactory>();
         builder.Services.AddTransient<IDocumentCollectionPresentationFactory, DocumentCollectionPresentationFactory>();
         builder.Services.AddTransient<IDocumentPatcher, DocumentPatcher>();
 
