@@ -32,7 +32,9 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 				return keep;
 			});
 
-			const hasDiff = contextsToKeep.length !== manifests.length;
+			// A diff is both a removed view (its context was just destroyed above) and a manifest without a context yet.
+			// Without the first check a destroyed context stays in the list, and is reused if its manifest returns.
+			const hasDiff = contextsToKeep.length !== contexts.length || contextsToKeep.length !== manifests.length;
 			if (hasDiff) {
 				contexts = [...contextsToKeep];
 
