@@ -64,7 +64,7 @@
       "id": "A",
       "title": "Media on the content tier",
       "status": "in-progress",
-      "why": "Planned 20-11-2026 as its own campaign (nine PRs; PR 1 in review as #24724 since the same day): hoist the generic read, write and tree logic down to the wide bases, then add MediaRepository and MediaService as thin subclasses. The publishable base, row and hook shapes, factories and test patterns exist, so media is mostly a hoist and a cutover.",
+      "why": "Planned 20-11-2026 as its own campaign (nine PRs; PR 1 in review as #24724 since the same day): hoist the generic read, write and tree logic down to the wide bases, then add MediaRepository and MediaService as thin subclasses. The publishable base, row and hook shapes, factories and test patterns exist, so media is mostly a hoist and a cutover. Progress 24-11-2026: PR 1 (media DTO), PR 1b (SQL Server index filters) and PR 2 (read-path hoist) merged; PR 3 (write-path hoist, #24776) open; PR 3b, 4, 5, 6 and 7 to go.",
       "dependsOn": [],
       "repositories": [
         {
@@ -581,6 +581,10 @@
     }
   ],
   "log": [
+    {
+      "date": "24-11-2026",
+      "text": "Media (A): PR 1 (#24724), PR 1b (#24758) and PR 2 (#24762) merged into v18/feature/ef-core-repositories; PR 3 (#24776) open and reviewed. The wide base now owns the generic read and write paths; the publishable base keeps publishing only."
+    },
     {
       "date": "24-11-2026",
       "text": "Members (A2): three known gaps recorded from the media PR 2 review, to be settled at the members cutover: recycle bin and tree members on the wide contract, a hook for member ordering fields, and the document-only cores."
