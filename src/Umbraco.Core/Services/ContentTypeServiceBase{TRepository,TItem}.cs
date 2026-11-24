@@ -248,69 +248,90 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// </summary>
     /// <param name="compositionContentType">The content type to validate.</param>
     /// <exception cref="InvalidCompositionException">Thrown when the composition is invalid.</exception>
+    /// <remarks>
+    /// Performs business-level validation of the composition, to ensure it is safe to save. For example, a property
+    /// may have been added with an alias that doesn't conflict with the type's compositions but does conflict with a
+    /// type that composes it, or a composition may have been added whose properties conflict with a type that composes
+    /// this one.
+    /// </remarks>
     protected void ValidateLocked(TItem compositionContentType)
     {
-        // performs business-level validation of the composition
-        // should ensure that it is absolutely safe to save the composition
-
-        // eg maybe a property has been added, with an alias that's OK (no conflict with ancestors)
-        // but that cannot be used (conflict with descendants)
-
+        // Load every stored type of this kind, to find the types related to the saved one.
         IContentTypeComposition[] allContentTypes = Repository.GetMany(Array.Empty<int>()).Cast<IContentTypeComposition>().ToArray();
 
+        // Find the types the saved type composes, directly or through another composition.
         IEnumerable<string> compositionAliases = compositionContentType.CompositionAliases();
         IEnumerable<IContentTypeComposition> compositions = allContentTypes.Where(x => compositionAliases.Any(y => x.Alias.Equals(y)));
+
+        // Gather the aliases of the saved type's own properties.
         var propertyTypeAliases = compositionContentType.PropertyTypes.Select(x => x.Alias).ToArray();
 
-        // types outside the saved type's own composition graph (types that compose it, and their other compositions)
-        // also receive the properties of the saved type's compositions, so they are checked against the full set
-        var compositionPropertyTypeAliases = compositionContentType.CompositionPropertyTypes.Select(x => x.Alias).ToArray();
-        var compositionAliasSet = new HashSet<string>(compositionAliases, StringComparer.InvariantCultureIgnoreCase);
+        // Map each of the saved type's own group aliases to its kind of container (a tab or a group).
         var propertyGroupAliases = compositionContentType.PropertyGroups.ToDictionary(x => x.Alias, x => x.Type, StringComparer.InvariantCultureIgnoreCase);
-        IEnumerable<IContentTypeComposition> indirectReferences = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == compositionContentType.Id));
-        var comparer = new DelegateEqualityComparer<IContentTypeComposition>((x, y) => x?.Id == y?.Id, x => x.Id);
-        var dependencies = new HashSet<IContentTypeComposition>(compositions, comparer);
 
+        // Find the types that compose the saved type directly.
+        IEnumerable<IContentTypeComposition> composingTypes = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == compositionContentType.Id));
+
+        // Store the types the saved type composes, the types that compose it, and those types' other compositions.
+        // Use a comparer that compares types by ID, so a type reached through more than one route is only stored once.
+        var dependencies = new HashSet<IContentTypeComposition>(
+            compositions,
+            new DelegateEqualityComparer<IContentTypeComposition>((x, y) => x?.Id == y?.Id, x => x.Id));
+
+        // Start from the types that compose the saved type directly. A stack is used, rather than recursion, so the types
+        // that compose those can be added as they are found.
         var stack = new Stack<IContentTypeComposition>();
-        foreach (IContentTypeComposition indirectReference in indirectReferences)
+        foreach (IContentTypeComposition composingType in composingTypes)
         {
-            stack.Push(indirectReference); // push indirect references to a stack, so we can add recursively
+            stack.Push(composingType);
         }
 
+        // Walk up through every type that composes the saved type, directly or through another type, adding each one to
+        // the dependencies along with its other compositions and everything they compose. Those types end up with the
+        // saved type's properties alongside their own and their other compositions', so any of those could conflict with the
+        // saved type's.
         while (stack.Count > 0)
         {
-            IContentTypeComposition indirectReference = stack.Pop();
-            dependencies.Add(indirectReference);
+            IContentTypeComposition composingType = stack.Pop();
+            dependencies.Add(composingType);
 
-            // get all compositions for the current indirect reference
-            IEnumerable<IContentTypeComposition> directReferences = indirectReference.ContentTypeComposition;
-            foreach (IContentTypeComposition directReference in directReferences)
+            foreach (IContentTypeComposition otherComposition in composingType.ContentTypeComposition)
             {
-                if (directReference.Id == compositionContentType.Id || directReference.Alias.Equals(compositionContentType.Alias))
+                if (otherComposition.Id == compositionContentType.Id || otherComposition.Alias.Equals(compositionContentType.Alias))
                 {
                     continue;
                 }
 
-                dependencies.Add(directReference);
+                dependencies.Add(otherComposition);
 
-                // a direct reference has compositions of its own - these also need to be taken into account
-                IEnumerable<string> directReferenceGraph = directReference.CompositionAliases();
-                foreach (IContentTypeComposition c in allContentTypes.Where(x => directReferenceGraph.Any(y => x.Alias.Equals(y, StringComparison.InvariantCultureIgnoreCase))))
+                // The other composition's own compositions end up on the composing type too.
+                IEnumerable<string> otherCompositionGraph = otherComposition.CompositionAliases();
+                foreach (IContentTypeComposition c in allContentTypes.Where(x => otherCompositionGraph.Any(y => x.Alias.Equals(y, StringComparison.InvariantCultureIgnoreCase))))
                 {
                     dependencies.Add(c);
                 }
             }
 
-            // recursive lookup of indirect references
-            foreach (IContentTypeComposition c in allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == indirectReference.Id)))
+            // Queue the types that compose this one, so their compositions are added too.
+            foreach (IContentTypeComposition c in allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == composingType.Id)))
             {
                 stack.Push(c);
             }
         }
 
+        // Gather the aliases of all the properties the saved type has, its own and those from its compositions.
+        var compositionPropertyTypeAliases = compositionContentType.CompositionPropertyTypes.Select(x => x.Alias).ToArray();
+
+        // Gather the aliases of every type the saved type composes, directly or through another composition.
+        var compositionAliasSet = new HashSet<string>(compositionAliases, StringComparer.InvariantCultureIgnoreCase);
+
         var duplicatePropertyTypeAliases = new List<string>();
         var invalidPropertyGroupAliases = new List<string>();
 
+        // Each dependency's properties and groups end up on a content type together with the saved type's: on the saved
+        // type itself, or on a type that composes it. Collect every property alias that would then appear twice, and
+        // every group alias that is used for a different kind of container (a tab and a group), so the save can be
+        // rejected with all the conflicts before anything is written.
         foreach (IContentTypeComposition dependency in dependencies)
         {
             if (dependency.Id == compositionContentType.Id)
@@ -324,13 +345,18 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 continue;
             }
 
+            // A dependency that the saved type composes is checked against the saved type's own properties only. The full set
+            // of the saved type's properties already includes this dependency's properties, so checking against it would
+            // report every one of them as a duplicate.
+            // Any other dependency is a type that composes the saved type, or another composition of such a type. That
+            // type ends up with all of the saved type's properties, so the dependency is checked against all of them.
             string[] aliasesToCheck = compositionAliasSet.Contains(contentTypeDependency.Alias) ? propertyTypeAliases : compositionPropertyTypeAliases;
             duplicatePropertyTypeAliases.AddRange(contentTypeDependency.PropertyTypes.Select(x => x.Alias).Intersect(aliasesToCheck, StringComparer.InvariantCultureIgnoreCase));
             invalidPropertyGroupAliases.AddRange(contentTypeDependency.PropertyGroups.Where(x => propertyGroupAliases.TryGetValue(x.Alias, out PropertyGroupType type) && type != x.Type).Select(x => x.Alias));
         }
 
+        // If any conflicts were found, throw an exception with all the conflicting aliases.
         if (duplicatePropertyTypeAliases.Count > 0 || invalidPropertyGroupAliases.Count > 0)
-
         {
             throw new InvalidCompositionException(compositionContentType.Alias, null, duplicatePropertyTypeAliases.Distinct().ToArray(), invalidPropertyGroupAliases.Distinct().ToArray());
         }
