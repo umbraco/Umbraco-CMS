@@ -155,7 +155,7 @@ export class PackageUiHelper extends UiBaseLocators {
 
   // Downloads the package and converts it to a string
   async downloadPackage(packageId: string) {
-    const responsePromise = this.page.waitForResponse(`${umbracoConfig.environment.baseUrl}/umbraco/management/api/v1/package/created/${packageId}/download`);
+    const responsePromise = this.waitForResponse(`${umbracoConfig.environment.baseUrl}/umbraco/management/api/v1/package/created/${packageId}/download`);
     await this.click(this.downloadPackageBtn);
     const response = await responsePromise;
     const body = await response.body();

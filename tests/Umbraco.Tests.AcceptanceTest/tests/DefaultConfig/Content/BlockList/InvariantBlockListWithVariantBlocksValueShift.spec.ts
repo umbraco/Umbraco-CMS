@@ -83,6 +83,8 @@ test('does not move inner block values onto another block when deleting a block 
   await umbracoUi.content.doesBlockListPropertyHaveBlockAmount(documentTypeGroupName, blockListName, 1);
 
   await umbracoUi.content.goToBlockListBlockWithName(documentTypeGroupName, blockListName, blockName, 0);
+  // The block shows its text field before its stored value, and a value typed in the meantime is overwritten when that arrives.
+  await umbracoUi.content.doesPropertyContainValue(textStringName, secondEnglishText);
   await umbracoUi.content.enterTextstring(secondEnglishTextEdited);
   await umbracoUi.content.clickUpdateButton();
   // "Save..." opens the variant picker, which defaults to the active language only.

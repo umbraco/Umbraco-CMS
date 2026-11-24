@@ -108,6 +108,7 @@ export class UiBaseLocators extends BasePage {
 
   // Composition & Structure
   public readonly compositionsBtn: Locator;
+  private readonly contentTypeDesignEditorTab: Locator;
   public readonly allowAtRootBtn: Locator;
   public readonly allowedChildNodesModal: Locator;
   public readonly addCollectionBtn: Locator;
@@ -416,6 +417,7 @@ export class UiBaseLocators extends BasePage {
 
     // Composition & Structure
     this.compositionsBtn = page.getByTestId("edit-compositions");
+    this.contentTypeDesignEditorTab = page.locator("umb-content-type-design-editor-tab").first();
     this.allowAtRootBtn = page
       .locator("label")
       .filter({ hasText: "Allow at root" });
@@ -887,8 +889,7 @@ export class UiBaseLocators extends BasePage {
   }
 
   async clickConfirmCreateFolderButton() {
-    await this.click(this.confirmCreateFolderBtn);
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
+    await this.submitFolderModal(this.confirmCreateFolderBtn);
   }
 
   async clickConfirmRemoveButton() {
@@ -926,8 +927,20 @@ export class UiBaseLocators extends BasePage {
 
   // Folder Methods
   async clickCreateFolderButton() {
-    await this.click(this.createFolderBtn);
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
+    await this.submitFolderModal(this.createFolderBtn);
+  }
+
+  // The folder modal loads its repository lazily and drops a submit made before that has arrived,
+  // so the submit is repeated until the modal closes.
+  // TODO: replace with a single click once #23789 is fixed.
+  private async submitFolderModal(submitButton: Locator) {
+    await this.waitForVisible(submitButton);
+    await expect(async () => {
+      if (await submitButton.isVisible()) {
+        await this.click(submitButton);
+      }
+      await expect(submitButton).toBeHidden({timeout: ConstantHelper.timeout.medium});
+    }).toPass({timeout: ConstantHelper.timeout.veryLong});
   }
 
   async enterFolderName(folderName: string) {
@@ -1266,6 +1279,7 @@ export class UiBaseLocators extends BasePage {
   }
 
   async updateIcon(iconName: string) {
+    await this.waitForContentTypeDesignViewToBeRendered();
     await this.click(this.iconBtn, { force: true });
     await this.searchForTypeToFilterValue(iconName);
     const iconOption = this.page.getByLabel(iconName, {exact: true});
@@ -1482,7 +1496,14 @@ export class UiBaseLocators extends BasePage {
 
   // Composition & Structure Methods
   async clickCompositionsButton() {
+    await this.waitForContentTypeDesignViewToBeRendered();
     await this.click(this.compositionsBtn);
+  }
+
+  // The content type workspace is still routing until the tab content of its design view is rendered,
+  // and a route change that completes closes any modal opened in the meantime.
+  private async waitForContentTypeDesignViewToBeRendered() {
+    await this.isVisible(this.contentTypeDesignEditorTab);
   }
 
   async clickAllowAtRootButton() {
@@ -2134,7 +2155,7 @@ export class UiBaseLocators extends BasePage {
    * `url` is matched with `includes`, so endpoint constants are prefixes of each
    * other (e.g. `.../document` also matches `.../document-type` and `.../document/{id}/publish`).
    * When more than one such call is in flight, pass `method` and/or a more specific
-   * `url` fragment to disambiguate.
+   * `url` fragment to disambiguate, or `excludeUrl` to skip responses whose URL contains it.
    *
    * @returns the trailing path segment of the response URL (the created/affected id),
    *          or the `Location` header's last segment for 201 responses.
@@ -2144,10 +2165,17 @@ export class UiBaseLocators extends BasePage {
     action: Promise<void> | (() => Promise<void>),
     statusCode: number,
     method?: string,
+    excludeUrl?: string,
   ) {
     // Prefer the callback form: an already-started promise can complete before the listener attaches.
+    // An explicit timeout makes a missing response fail as such, rather than as the test timeout.
     const responsePromise = this.page.waitForResponse(
-      (resp) => resp.url().includes(url) && resp.status() === statusCode && (method === undefined || resp.request().method() === method),
+      (resp) =>
+        resp.url().includes(url) &&
+        (excludeUrl === undefined || !resp.url().includes(excludeUrl)) &&
+        resp.status() === statusCode &&
+        (method === undefined || resp.request().method() === method),
+      {timeout: ConstantHelper.timeout.navigation},
     );
     const [response] = await Promise.all([responsePromise, typeof action === "function" ? action() : action]);
 
@@ -2168,8 +2196,57 @@ export class UiBaseLocators extends BasePage {
   }
 
   /**
+   * Waits until the workspace action with the given alias has completed successfully.
+   * Its button only shows the success state once the whole action has finished - for a save, after the
+   * workspace has re-read and applied the saved entity - so the workspace no longer reports unsaved changes.
+   */
+  async waitForWorkspaceActionToSucceed(actionAlias: string) {
+    await this.isVisible(this.workspaceActionSuccessState(actionAlias), true, ConstantHelper.timeout.veryLong);
+  }
+
+  private workspaceActionSuccessState(actionAlias: string) {
+    return this.page.getByTestId(`workspace-action:${actionAlias}`).and(this.successState);
+  }
+
+  /**
+   * Runs a save in an entity workspace and waits until it has finished: the update response, then the workspace
+   * re-reading the entity. Until that re-read lands the workspace still reports unsaved changes.
+   * @param save - The action that saves, e.g. clicking Save or confirming a save modal
+   * @param updateEndpoint - The endpoint the update is sent to (PUT)
+   * @param saveActionAlias - The alias of the workspace action that performs the save
+   * @returns the trailing segment of the update request URL (the entity id or path).
+   */
+  async waitForWorkspaceToBeSaved(save: () => Promise<void>, updateEndpoint: string, saveActionAlias: string) {
+    // Some workspaces validate first with a PUT to .../{id}/validate, which shares the update endpoint's prefix.
+    const updatedId = await this.waitForResponseAfterExecutingPromise(updateEndpoint, save, ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put, '/validate');
+    await this.waitForWorkspaceActionToSucceed(saveActionAlias);
+    return updatedId;
+  }
+
+  async clickSaveButtonAndWaitForWorkspaceToBeSaved(updateEndpoint: string, saveActionAlias: string) {
+    return await this.waitForWorkspaceToBeSaved(() => this.click(this.saveBtn), updateEndpoint, saveActionAlias);
+  }
+
+  /**
+   * Runs a publish in a document or element workspace and waits until the workspace has finished it.
+   * New and existing entities publish through different endpoints, so this waits on the action rather than a response.
+   * @param publish - The action that publishes, e.g. clicking Save and publish or confirming the publish modal
+   * @param entityType - The workspace's entity type
+   * @param publishActionAlias - The alias of the workspace action that performs the publish
+   * @returns the id of the published entity, read from the workspace URL.
+   */
+  async waitForWorkspaceToBePublished(publish: () => Promise<void>, entityType: 'document' | 'element', publishActionAlias: string) {
+    // The button keeps showing a previous action's success for a moment, which would satisfy the wait below at once.
+    await this.isVisible(this.workspaceActionSuccessState(publishActionAlias), false);
+    await publish();
+    await this.waitForWorkspaceActionToSucceed(publishActionAlias);
+    await this.waitForWorkspaceEditRoute(entityType);
+    return this.page.url().match(new RegExp(`/workspace/${entityType}/edit/([^/]+)`))?.[1];
+  }
+
+  /**
    * Runs an action that triggers several matching API calls (e.g. moving multiple
-   * items) and resolves once `expectedCount` responses matching `url` + `statusCode`
+   * items) and resolves once `expectedCount` responses matching `url` + `statusCode` (+ `method`, when given)
    * have arrived. Uses the same loose `includes` URL matching as
    * {@link waitForResponseAfterExecutingPromise}.
    *
@@ -2180,6 +2257,7 @@ export class UiBaseLocators extends BasePage {
     promise: Promise<void>,
     statusCode: number,
     expectedCount: number,
+    method?: string,
   ) {
     const responses: Response[] = [];
 
@@ -2190,7 +2268,7 @@ export class UiBaseLocators extends BasePage {
     // Named handler so it can be removed afterwards — otherwise every call leaks a
     // listener that keeps mutating this (and prior calls') response arrays.
     const onResponse = (resp) => {
-      if (resp.url().includes(url) && resp.status() === statusCode) {
+      if (resp.url().includes(url) && resp.status() === statusCode && (method === undefined || resp.request().method() === method)) {
         responses.push(resp);
         if (responses.length >= expectedCount) {
           resolveResponses();
@@ -2228,6 +2306,7 @@ export class UiBaseLocators extends BasePage {
     const responsePromises = urlEndings.map((ending) =>
       this.page.waitForResponse(
         (resp) => resp.url().endsWith(ending) && resp.status() === 201,
+        {timeout: ConstantHelper.timeout.navigation},
       ),
     );
 

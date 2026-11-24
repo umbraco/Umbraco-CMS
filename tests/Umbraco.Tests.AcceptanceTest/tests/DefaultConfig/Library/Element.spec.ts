@@ -4,17 +4,23 @@ import {expect} from "@playwright/test";
 let elementTypeId = '';
 let elementId = '';
 const elementName = 'TestElement';
+const duplicatedElementName = elementName + ' (1)';
+const elementFolderName = 'TestElementFolder';
 const elementTypeName = 'TestElementTypeForElement3';
 const dataTypeName = 'Textstring';
 const elementText = 'This is test element text';
 
 test.beforeEach(async ({umbracoApi}) => {
+  await umbracoApi.element.ensureNameNotExists(elementFolderName);
+  await umbracoApi.element.ensureNameNotExists(duplicatedElementName);
   await umbracoApi.element.ensureNameNotExists(elementName);
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   elementTypeId = await umbracoApi.documentType.createElementTypeWithPropertyInTab(elementTypeName, 'TestTab', 'TestGroup', dataTypeName, dataTypeData.id);
 });
 
 test.afterEach(async ({umbracoApi}) => {
+  await umbracoApi.element.ensureNameNotExists(elementFolderName);
+  await umbracoApi.element.ensureNameNotExists(duplicatedElementName);
   await umbracoApi.element.ensureNameNotExists(elementName);
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
@@ -178,7 +184,6 @@ test('can unpublish element', async ({umbracoApi, umbracoUi}) => {
 
 test('can duplicate a element node to root', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const duplicatedElementName = elementName + ' (1)';
   elementId = await umbracoApi.element.createElementWithTextContent(elementName, elementTypeId, elementText, dataTypeName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
@@ -206,14 +211,10 @@ test('can duplicate a element node to root', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementCopied);
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
-
-  // Clean
-  await umbracoApi.element.ensureNameNotExists(duplicatedElementName);
 });
 
 test('can duplicate a element node to other parent', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const elementFolderName = 'TestElementFolder';
   const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
   elementId = await umbracoApi.element.createElementWithTextContent(elementName, elementTypeId, elementText, dataTypeName);
   await umbracoUi.goToBackOffice();
@@ -236,14 +237,10 @@ test('can duplicate a element node to other parent', async ({umbracoApi, umbraco
   await umbracoUi.library.isChildElementInTreeVisible(elementFolderName, elementName, true);
   await umbracoUi.library.isCaretButtonVisibleForElementName(elementName, false);
   await expect.poll(() => umbracoApi.element.getChildrenAmount(elementFolderId)).toEqual(1);
-
-  // Clean
-  await umbracoApi.element.ensureNameNotExists(elementFolderName);
 });
 
 test('can move a element node to other parent', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const elementFolderName = 'TestElementFolder';
   const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
   elementId = await umbracoApi.element.createElementWithTextContent(elementName, elementTypeId, elementText, dataTypeName);
   await umbracoUi.goToBackOffice();

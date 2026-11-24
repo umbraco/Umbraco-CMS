@@ -1240,7 +1240,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForDataTypeToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.dataType, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.dataType, ConstantHelper.workspaceActions.dataTypeSave);
   }
 
   async clickConfirmToDeleteButtonAndWaitForDataTypeToBeDeleted() {

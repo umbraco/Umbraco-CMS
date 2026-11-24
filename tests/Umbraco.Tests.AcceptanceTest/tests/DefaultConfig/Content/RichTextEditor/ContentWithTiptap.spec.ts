@@ -111,7 +111,7 @@ test('can save a variant content node after removing embedded block in RTE', asy
 
   // Act
   await umbracoUi.content.clickInsertBlockButton();
-  await umbracoUi.content.clickBlockElementWithName(elementTypeName);
+  await umbracoUi.content.clickBlockElementWithNameInRichTextEditor(elementTypeName);
   await umbracoUi.content.enterTextstring(textStringValue);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButtonForContent();

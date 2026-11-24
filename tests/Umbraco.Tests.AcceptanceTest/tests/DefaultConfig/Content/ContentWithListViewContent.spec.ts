@@ -79,7 +79,7 @@ test('can create content with a child in the list', async ({umbracoApi, umbracoU
   // Act
   await umbracoUi.content.clickCreateContentWithName(childDocumentTypeName);
   await umbracoUi.content.enterContentName(childContentName);
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
@@ -208,7 +208,7 @@ test('can publish child content from list', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.nowPubliclyAvailable);
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(1);
   const childContentData = await umbracoApi.document.getByName(childContentName);
   expect(childContentData.variants[0].state).toBe(expectedState);

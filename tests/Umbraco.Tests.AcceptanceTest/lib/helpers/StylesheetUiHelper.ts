@@ -48,7 +48,7 @@ export class StylesheetUiHelper extends UiBaseLocators{
   }
 
   async clickSaveButtonAndWaitForStylesheetToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.stylesheet, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.stylesheet, ConstantHelper.workspaceActions.stylesheetSave);
   }
   
   async enterStylesheetName(stylesheetName: string) {

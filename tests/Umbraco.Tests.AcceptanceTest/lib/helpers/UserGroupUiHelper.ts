@@ -227,7 +227,7 @@ export class UserGroupUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForUserGroupToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.userGroup, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.userGroup, ConstantHelper.workspaceActions.userGroupSave);
   }
 
   async clickConfirmToDeleteButtonAndWaitForUserGroupToBeDeleted() {

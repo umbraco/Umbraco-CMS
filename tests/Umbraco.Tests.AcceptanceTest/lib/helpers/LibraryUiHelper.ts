@@ -579,8 +579,16 @@ export class LibraryUiHelper extends UiBaseLocators {
     return elementId;
   }
 
+  private async waitForElementToBeUpdated(save: () => Promise<void>) {
+    return await this.waitForWorkspaceToBeSaved(save, ConstantHelper.apiEndpoints.element, ConstantHelper.workspaceActions.elementSave);
+  }
+
+  private async waitForElementToBePublished(publish: () => Promise<void>) {
+    return await this.waitForWorkspaceToBePublished(publish, "element", ConstantHelper.workspaceActions.elementSaveAndPublish);
+  }
+
   async clickSaveModalButtonAndWaitForElementToBeUpdated(){
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickSaveModalButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
+    return await this.waitForElementToBeUpdated(() => this.click(this.saveModalBtn));
   }
 
   async clickSaveAndPublishButtonAndWaitForElementToBeCreated(){
@@ -592,15 +600,15 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForElementToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickSaveButtonForElement(), ConstantHelper.statusCodes.ok);
+    return await this.waitForElementToBeUpdated(() => this.click(this.saveElementBtn));
   }
 
   async clickSaveAndPublishButtonAndWaitForElementToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickSaveAndPublishButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForElementToBePublished(() => this.click(this.saveAndPublishBtn));
   }
 
   async clickSaveAndPublishButtonAndWaitForElementToBePublished() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickSaveAndPublishButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForElementToBePublished(() => this.click(this.saveAndPublishBtn));
   }
 
   private async clickContainerSaveButton() {
@@ -608,11 +616,11 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async clickContainerSaveButtonAndWaitForElementToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickContainerSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForElementToBeUpdated(() => this.clickContainerSaveButton());
   }
 
   async clickContainerSaveAndPublishButtonAndWaitForElementToBePublished() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickContainerSaveAndPublishButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForElementToBePublished(() => this.click(this.containerSaveAndPublishBtn));
   }
 
   async clickElementTypeByName(elementTypeName: string) {
@@ -718,7 +726,8 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async isElementInTreeVisible(name: string, isVisible: boolean = true) {
-    await this.isVisible(this.elementTreeItem.getByLabel(name, {exact: true}).first(), isVisible);
+    // A collapsed folder keeps its children in the DOM, so a same-named child can precede the item that is shown.
+    await this.isVisible(this.elementTreeItem.getByLabel(name, {exact: true}).filter({visible: true}).first(), isVisible);
   }
 
   async isChildElementInTreeVisible(parentName: string, childName: string, isVisible: boolean = true) {
