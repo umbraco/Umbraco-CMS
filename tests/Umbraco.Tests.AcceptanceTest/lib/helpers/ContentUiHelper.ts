@@ -9,6 +9,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly unpublishBtn: Locator;
   private readonly actionMenuForContentBtn: Locator;
   private readonly textstringTxt: Locator;
+  private readonly blockPropertyEditor: Locator;
   private readonly infoTab: Locator;
   private readonly linkContent: Locator;
   private readonly historyItems: Locator;
@@ -235,6 +236,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.unpublishBtn = page.getByLabel(/^Unpublish(…)?$/);
     this.actionMenuForContentBtn = page.locator('#header').getByTestId('open-dropdown');
     this.textstringTxt = page.locator('umb-property-editor-ui-text-box #input');
+    this.blockPropertyEditor = this.sidebarModal.last().locator('umb-property #editor > *').first();
     this.reloadChildrenThreeDotsBtn = page.getByRole('button', {
       name: 'Reload children…',
     });
@@ -769,8 +771,16 @@ export class ContentUiHelper extends UiBaseLocators {
     return contentId;
   }
 
+  private async waitForContentToBeUpdated(save: () => Promise<void>) {
+    return await this.waitForWorkspaceToBeSaved(save, ConstantHelper.apiEndpoints.document, ConstantHelper.workspaceActions.documentSave);
+  }
+
+  private async waitForContentToBePublished(publish: () => Promise<void>) {
+    return await this.waitForWorkspaceToBePublished(publish, "document", ConstantHelper.workspaceActions.documentSaveAndPublish);
+  }
+
   async clickSaveModalButtonAndWaitForContentToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.document, this.clickSaveModalButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForContentToBeUpdated(() => this.click(this.saveModalBtn));
   }
 
   async clickSaveAndPublishButtonAndWaitForContentToBeCreated() {
@@ -782,7 +792,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForContentToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.document, this.clickSaveButtonForContent(), ConstantHelper.statusCodes.ok);
+    return await this.waitForContentToBeUpdated(() => this.click(this.saveContentBtn));
   }
 
   /**
@@ -795,14 +805,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickSaveAndPublishButtonAndWaitForContentToBePublished() {
-    // New content publishes via POST .../document/create-and-publish (201); existing content via
-    // PUT .../document/{id}/update-and-publish (200). A single waiter can't match both, so wait on the
-    // generic document endpoint + 200: the post-publish GET .../document/{id} fires in both cases.
-    return await this.waitForResponseAfterExecutingPromise(
-      ConstantHelper.apiEndpoints.document,
-      this.clickSaveAndPublishButton(),
-      ConstantHelper.statusCodes.ok,
-    );
+    return await this.waitForContentToBePublished(() => this.click(this.saveAndPublishBtn));
   }
 
   private async clickContainerSaveButton() {
@@ -810,19 +813,11 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickContainerSaveButtonAndWaitForContentToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(
-      ConstantHelper.apiEndpoints.document,
-      this.clickContainerSaveButton(),
-      ConstantHelper.statusCodes.ok,
-    );
+    return await this.waitForContentToBeUpdated(() => this.clickContainerSaveButton());
   }
 
   async clickContainerSaveAndPublishButtonAndWaitForContentToBePublished() {
-    return await this.waitForResponseAfterExecutingPromise(
-      ConstantHelper.apiEndpoints.document,
-      this.clickContainerSaveAndPublishButton(),
-      ConstantHelper.statusCodes.ok,
-    );
+    return await this.waitForContentToBePublished(() => this.click(this.containerSaveAndPublishBtn));
   }
 
   async clickDocumentTypeByName(documentTypeName: string) {
@@ -1739,10 +1734,17 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickBlockElementWithName(elementTypeName: string) {
-    await this.click(
-      this.page.getByRole("link", { name: elementTypeName, exact: true }),
-      { force: true },
-    );
+    await this.click(this.page.getByRole("link", { name: elementTypeName, exact: true }));
+  }
+
+  // With a single block type the rich text editor can open the block workspace on top of the catalogue, which only a forced click tolerates.
+  async clickBlockElementWithNameInRichTextEditor(elementTypeName: string) {
+    await this.click(this.page.getByRole("link", { name: elementTypeName, exact: true }), { force: true });
+  }
+
+  // The block workspace offers its submit button before its properties, and a property is only validated once its editor is shown.
+  async waitForBlockPropertyEditorToBeVisible() {
+    await this.isVisible(this.blockPropertyEditor);
   }
 
   async enterPropertyValue(propertyName: string, value: string) {

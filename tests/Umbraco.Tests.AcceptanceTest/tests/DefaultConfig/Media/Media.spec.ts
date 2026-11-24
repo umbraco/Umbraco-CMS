@@ -304,7 +304,7 @@ test('can bulk trash media nodes with a relation', async ({umbracoApi, umbracoUi
   await umbracoUi.media.doesReferenceItemsHaveCount(2);
   await umbracoUi.media.isReferenceItemNameVisible(firstMediaFileName);
   await umbracoUi.media.isReferenceItemNameVisible(secondMediaFileName);
-  await umbracoUi.media.clickConfirmTrashButtonAndWaitForMediaToBeTrashed();
+  await umbracoUi.media.clickConfirmTrashButtonAndWaitForMediaToBeTrashed(2);
 
   // Assert
   expect(await umbracoApi.media.doesNameExist(firstMediaFileName)).toBeFalsy();

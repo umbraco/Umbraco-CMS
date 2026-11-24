@@ -280,7 +280,7 @@ export class UserUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForUserToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.user, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.user, ConstantHelper.workspaceActions.userSave);
   }
 
   async clickConfirmToDeleteButtonAndWaitForUserToBeDeleted() {

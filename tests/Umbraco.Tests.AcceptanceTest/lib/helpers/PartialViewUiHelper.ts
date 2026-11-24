@@ -37,7 +37,7 @@ export class PartialViewUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForPartialViewToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.partialView, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.partialView, ConstantHelper.workspaceActions.partialViewSave);
   }
 
   async clickNewEmptyPartialViewButton() {

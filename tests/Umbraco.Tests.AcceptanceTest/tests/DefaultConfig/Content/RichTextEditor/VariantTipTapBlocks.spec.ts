@@ -52,7 +52,7 @@ test('invariant document type with invariant tiptap RTE with invariant block wit
 
   // Act
   await umbracoUi.content.clickInsertBlockButton();
-  await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.clickBlockElementWithNameInRichTextEditor(blockName);
   await umbracoUi.content.enterTextstring(textStringText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
@@ -114,7 +114,7 @@ test('variant document type with variant tiptap RTE with variant block with an v
 
   // Act
   await umbracoUi.content.clickInsertBlockButton();
-  await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.clickBlockElementWithNameInRichTextEditor(blockName);
   await umbracoUi.content.enterTextstring(textStringText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
@@ -139,7 +139,7 @@ test('variant document type with invariant tiptap RTE with variant block with an
 
   // Act
   await umbracoUi.content.clickInsertBlockButton();
-  await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.clickBlockElementWithNameInRichTextEditor(blockName);
   await umbracoUi.content.enterTextstring(textStringText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
@@ -164,7 +164,7 @@ test('variant document type with invariant tiptap RTE with variant block with an
 
   // Act
   await umbracoUi.content.clickInsertBlockButton();
-  await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.clickBlockElementWithNameInRichTextEditor(blockName);
   await umbracoUi.content.enterTextstring(textStringText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();

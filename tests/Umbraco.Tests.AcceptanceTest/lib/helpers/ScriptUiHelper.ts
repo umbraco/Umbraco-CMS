@@ -44,7 +44,7 @@ export class ScriptUiHelper extends UiBaseLocators{
   }
 
   async clickSaveButtonAndWaitForScriptToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.script, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.script, ConstantHelper.workspaceActions.scriptSave);
   }
   
   // Will only work for root scripts
