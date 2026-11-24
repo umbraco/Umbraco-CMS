@@ -17,28 +17,28 @@ internal sealed class NotificationStateRecorder
     public List<IStatefulNotification> Starting { get; } = [];
 
     public List<IStatefulNotification> Ending { get; } = [];
-}
 
-/// <summary>
-///     Writes a unique value into the state of a starting notification and records the notification.
-/// </summary>
-internal sealed class NotificationStateWritingHandler<TNotification>(NotificationStateRecorder recorder)
-    : INotificationHandler<TNotification>
-    where TNotification : IStatefulNotification
-{
-    public void Handle(TNotification notification)
+    /// <summary>
+    ///     Writes a unique value into the state of a starting notification and records the notification.
+    /// </summary>
+    internal sealed class WritingHandler<TNotification>(NotificationStateRecorder recorder)
+        : INotificationHandler<TNotification>
+        where TNotification : IStatefulNotification
     {
-        notification.State[NotificationStateRecorder.StateKey] = Guid.NewGuid();
-        recorder.Starting.Add(notification);
+        public void Handle(TNotification notification)
+        {
+            notification.State[StateKey] = Guid.NewGuid();
+            recorder.Starting.Add(notification);
+        }
     }
-}
 
-/// <summary>
-///     Records an ending notification so its state can be inspected.
-/// </summary>
-internal sealed class NotificationStateReadingHandler<TNotification>(NotificationStateRecorder recorder)
-    : INotificationHandler<TNotification>
-    where TNotification : IStatefulNotification
-{
-    public void Handle(TNotification notification) => recorder.Ending.Add(notification);
+    /// <summary>
+    ///     Records an ending notification so its state can be inspected.
+    /// </summary>
+    internal sealed class ReadingHandler<TNotification>(NotificationStateRecorder recorder)
+        : INotificationHandler<TNotification>
+        where TNotification : IStatefulNotification
+    {
+        public void Handle(TNotification notification) => recorder.Ending.Add(notification);
+    }
 }
