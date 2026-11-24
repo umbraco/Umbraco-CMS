@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
@@ -19,8 +20,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_20_0_0;
 /// </remarks>
 internal sealed class MigrateValueListItemsToOptions : AsyncMigrationBase
 {
-    private const string ItemsKey = "items";
-
     private static readonly string[] _editorAliases =
     [
         Constants.PropertyEditors.Aliases.SingleDropDown,
@@ -86,7 +85,9 @@ internal sealed class MigrateValueListItemsToOptions : AsyncMigrationBase
                 continue;
             }
 
-            if (TryMigrateItems(configuration) is false)
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (LegacyValueListItemsHelper.TryConvertPlainStringItems(configuration) is false)
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 unchanged++;
                 continue;
@@ -108,28 +109,4 @@ internal sealed class MigrateValueListItemsToOptions : AsyncMigrationBase
 
         return Task.CompletedTask;
     }
-
-    private static bool TryMigrateItems(JsonObject configuration)
-    {
-        var itemsName = FindKey(configuration, ItemsKey);
-        if (itemsName is null || configuration[itemsName] is not JsonArray items)
-        {
-            return false;
-        }
-
-        var changed = false;
-        for (var i = 0; i < items.Count; i++)
-        {
-            if (items[i] is JsonValue item && item.TryGetValue(out string? value))
-            {
-                items[i] = new JsonObject { ["value"] = value, ["label"] = value };
-                changed = true;
-            }
-        }
-
-        return changed;
-    }
-
-    private static string? FindKey(JsonObject jsonObject, string key)
-        => jsonObject.Select(pair => pair.Key).FirstOrDefault(existing => existing.InvariantEquals(key));
 }

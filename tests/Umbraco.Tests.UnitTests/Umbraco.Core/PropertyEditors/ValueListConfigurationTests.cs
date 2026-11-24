@@ -58,6 +58,25 @@ public class ValueListConfigurationTests
         Assert.That(configuration.Items, Is.Empty);
     }
 
+    private static IEnumerable<TestCaseData> ValueListConfigurationEditors()
+    {
+        yield return new TestCaseData(new ValueListConfigurationEditor(Mock.Of<IIOHelper>(), _serializer)).SetArgDisplayNames("ValueList");
+        yield return new TestCaseData(new DropDownFlexibleConfigurationEditor(Mock.Of<IIOHelper>(), _serializer)).SetArgDisplayNames("DropDownFlexible");
+        yield return new TestCaseData(new SingleDropDownConfigurationEditor(Mock.Of<IIOHelper>(), _serializer)).SetArgDisplayNames("SingleDropDown");
+    }
+
+    [TestCaseSource(nameof(ValueListConfigurationEditors))]
+    public void Reads_Plain_String_Items_As_Options_Labelled_With_Their_Value(IConfigurationEditor configurationEditor)
+        => AssertJsonEquals(
+            """{"items":[{"value":"a","label":"a"},{"value":"b","label":"b"}],"other":1}""",
+            _serializer.Serialize(configurationEditor.FromDatabase("""{"items":["a","b"],"other":1}""", _serializer)));
+
+    [TestCaseSource(nameof(ValueListConfigurationEditors))]
+    public void Reads_Option_Objects_As_They_Are(IConfigurationEditor configurationEditor)
+        => AssertJsonEquals(
+            """{"items":[{"value":"a","label":"a"},{"value":"b","label":"B"},{"value":"c"}]}""",
+            _serializer.Serialize(configurationEditor.FromDatabase("""{"items":["a",{"value":"b","label":"B"},{"value":"c"}]}""", _serializer)));
+
     private static IDictionary<string, object> Deserialize(string json)
         => _serializer.Deserialize<Dictionary<string, object>>(json)!;
 

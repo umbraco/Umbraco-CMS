@@ -414,24 +414,31 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
                             where (string)doc.Attribute("isDoc") == string.Empty
                             select doc).Count();
 
-        string configuration;
+        Dictionary<string, string?> configurations;
         using (var scope = ScopeProvider.CreateScope())
         {
-            var dtos = ScopeAccessor.AmbientScope.Database.Fetch<DataTypeDto>("WHERE nodeId = @Id", new { dataTypeDefinitions.First().Id });
-            configuration = dtos.Single().Configuration;
+            configurations = dataTypeDefinitions.ToDictionary(
+                dataType => dataType.Name!,
+                dataType => ScopeAccessor.AmbientScope.Database
+                    .Fetch<DataTypeDto>("WHERE nodeId = @Id", new { dataType.Id })
+                    .Single()
+                    .Configuration);
         }
 
         // Assert
         Assert.That(dataTypeDefinitions, Is.Not.Null);
-        Assert.That(dataTypeDefinitions.Any(), Is.True);
-        Assert.AreEqual(Constants.PropertyEditors.Aliases.CheckBoxList, dataTypeDefinitions.First().EditorAlias);
+        Assert.That(dataTypeDefinitions.Count(), Is.EqualTo(2));
+        Assert.That(dataTypeDefinitions.All(x => x.EditorAlias == Constants.PropertyEditors.Aliases.CheckBoxList), Is.True);
         Assert.That(contents, Is.Not.Null);
         Assert.That(contentTypes.Any(), Is.True);
         Assert.That(contents.Any(), Is.True);
         Assert.That(contents.Count(), Is.EqualTo(numberOfDocs));
         Assert.AreEqual(
             "{\"items\":[{\"value\":\"test\",\"label\":\"test\"},{\"value\":\"test3\",\"label\":\"test3\"},{\"value\":\"test2\",\"label\":\"test2\"}]}",
-            configuration);
+            configurations["NewCheckBox"]);
+        Assert.AreEqual(
+            "{\"items\":[{\"value\":\"first\",\"label\":\"First option\"},{\"value\":\"second\",\"label\":\"Second option\"}]}",
+            configurations["NewCheckBoxWithLabels"]);
     }
 
     [Test]
