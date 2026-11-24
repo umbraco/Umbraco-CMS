@@ -191,6 +191,17 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
                 .ToArray()))
             .ToArray();
 
+        foreach (IEntitySlim descendant in visibleDescendants)
+        {
+            int[] missingAncestorIds = descendant.AncestorIds()
+                .Where(id => id > 0 && keysById.ContainsKey(id) is false)
+                .ToArray();
+            if (missingAncestorIds.Length > 0)
+            {
+                LogMissingAncestors(missingAncestorIds, descendant.Key);
+            }
+        }
+
         await PopulateFlags([.. viewModelsByKey.Values]);
 
         return result;
@@ -276,15 +287,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         if (missingParentIds is not null)
         {
-            // Will use the static logger factory here, given this is an exception case and to avoid having to
-            // make widespread changes to support logging in the base controller.
-            ILogger logger = StaticApplicationLogging.CreateLogger<EntityTreeControllerBase<TItem>>();
-            logger.LogWarning(
-                "Ancestor(s) with ID(s) {MissingAncestorIds} not found in the ancestors collection for descendant {DescendantKey}. "
-                + "This indicates a data integrity issue in the entity path; consider running the database integrity health check "
-                + "and/or moving the entity to another location and back to rebuild its path.",
-                missingParentIds,
-                descendantKey);
+            LogMissingAncestors(missingParentIds, descendantKey);
         }
 
         await PopulateFlags(treeItemViewModels);
@@ -360,6 +363,19 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected virtual TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
         => entities.Select(entity => MapTreeItemViewModel(parentKey, entity)).ToArray();
+
+    private static void LogMissingAncestors(IEnumerable<int> missingAncestorIds, Guid descendantKey)
+    {
+        // Will use the static logger factory here, given this is an exception case and to avoid having to
+        // make widespread changes to support logging in the base controller.
+        ILogger logger = StaticApplicationLogging.CreateLogger<EntityTreeControllerBase<TItem>>();
+        logger.LogWarning(
+            "Ancestor(s) with ID(s) {MissingAncestorIds} not found in the ancestors collection for descendant {DescendantKey}. "
+            + "This indicates a data integrity issue in the entity path; consider running the database integrity health check "
+            + "and/or moving the entity to another location and back to rebuild its path.",
+            missingAncestorIds,
+            descendantKey);
+    }
 
     private IEntitySlim[] GetEntitiesByKeys(Guid[] keys)
         => keys
