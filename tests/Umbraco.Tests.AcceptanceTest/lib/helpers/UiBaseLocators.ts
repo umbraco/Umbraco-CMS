@@ -932,7 +932,7 @@ export class UiBaseLocators extends BasePage {
 
   // The folder modal loads its repository lazily and drops a submit made before that has arrived,
   // so the submit is repeated until the modal closes.
-  // TODO: replace with a single click once #24772 is fixed.
+  // TODO: replace with a single click once #23789 is fixed.
   private async submitFolderModal(submitButton: Locator) {
     await this.waitForVisible(submitButton);
     await expect(async () => {
