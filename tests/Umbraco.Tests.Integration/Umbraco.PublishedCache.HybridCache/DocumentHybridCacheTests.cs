@@ -731,7 +731,9 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     private int CountPublishedDatabaseCacheRecords(Guid documentKey)
     {
         using var scope = ScopeProvider.CreateScope(autoComplete: true);
-        var nodeId = GetRequiredService<IIdKeyMap>().GetIdForKey(documentKey, UmbracoObjectTypes.Document).Result;
+        Attempt<int> idLookup = GetRequiredService<IIdKeyMap>().GetIdForKey(documentKey, UmbracoObjectTypes.Document);
+        Assert.IsTrue(idLookup.Success, "The document should resolve to a node ID");
+        var nodeId = idLookup.Result;
         var selectSql = GetRequiredService<ISqlContext>().Sql()
             .SelectCount()
             .From<ContentNuDto>()
