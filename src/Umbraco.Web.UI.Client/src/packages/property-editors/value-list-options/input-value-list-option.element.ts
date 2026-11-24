@@ -89,7 +89,7 @@ export class UmbInputValueListOptionElement extends UUIFormControlWithBasicsMixi
 	public override async focus() {
 		await this.updateComplete;
 		await this._firstInput?.updateComplete;
-		this._firstInput?.focus();
+		await this._firstInput?.focus();
 	}
 
 	protected override getFormElement() {

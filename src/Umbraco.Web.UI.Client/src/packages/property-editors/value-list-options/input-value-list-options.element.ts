@@ -111,7 +111,7 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 		this._entries = [...this._entries, { id: crypto.randomUUID(), value: '', label: '' }];
 		this.#sorter.setModel(this._entries);
 		this.dispatchEvent(new UmbChangeEvent());
-		this.#focusNewEntry();
+		void this.#focusNewEntry();
 	}
 
 	#onChange(event: Event, id: string) {
