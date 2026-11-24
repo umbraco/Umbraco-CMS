@@ -35,12 +35,12 @@ internal sealed class ContentServiceNotificationStateTests : UmbracoIntegrationT
     {
         builder.Services.AddSingleton<NotificationStateRecorder>();
         builder
-            .AddNotificationHandler<ContentDeletingNotification, NotificationStateWritingHandler<ContentDeletingNotification>>()
-            .AddNotificationHandler<ContentDeletedNotification, NotificationStateReadingHandler<ContentDeletedNotification>>()
-            .AddNotificationHandler<ContentPublishingNotification, NotificationStateWritingHandler<ContentPublishingNotification>>()
-            .AddNotificationHandler<ContentPublishedNotification, NotificationStateReadingHandler<ContentPublishedNotification>>()
-            .AddNotificationHandler<ContentDeletingVersionsNotification, NotificationStateWritingHandler<ContentDeletingVersionsNotification>>()
-            .AddNotificationHandler<ContentDeletedVersionsNotification, NotificationStateReadingHandler<ContentDeletedVersionsNotification>>();
+            .AddNotificationHandler<ContentDeletingNotification, NotificationStateRecorder.WritingHandler<ContentDeletingNotification>>()
+            .AddNotificationHandler<ContentDeletedNotification, NotificationStateRecorder.ReadingHandler<ContentDeletedNotification>>()
+            .AddNotificationHandler<ContentPublishingNotification, NotificationStateRecorder.WritingHandler<ContentPublishingNotification>>()
+            .AddNotificationHandler<ContentPublishedNotification, NotificationStateRecorder.ReadingHandler<ContentPublishedNotification>>()
+            .AddNotificationHandler<ContentDeletingVersionsNotification, NotificationStateRecorder.WritingHandler<ContentDeletingVersionsNotification>>()
+            .AddNotificationHandler<ContentDeletedVersionsNotification, NotificationStateRecorder.ReadingHandler<ContentDeletedVersionsNotification>>();
     }
 
     [Test]

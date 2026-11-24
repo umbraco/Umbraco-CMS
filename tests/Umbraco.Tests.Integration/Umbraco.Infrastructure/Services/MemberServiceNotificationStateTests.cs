@@ -32,10 +32,10 @@ internal sealed class MemberServiceNotificationStateTests : UmbracoIntegrationTe
     {
         builder.Services.AddSingleton<NotificationStateRecorder>();
         builder
-            .AddNotificationHandler<MemberDeletingNotification, NotificationStateWritingHandler<MemberDeletingNotification>>()
-            .AddNotificationHandler<MemberDeletedNotification, NotificationStateReadingHandler<MemberDeletedNotification>>()
-            .AddNotificationHandler<ExternalMemberDeletingNotification, NotificationStateWritingHandler<ExternalMemberDeletingNotification>>()
-            .AddNotificationHandler<ExternalMemberDeletedNotification, NotificationStateReadingHandler<ExternalMemberDeletedNotification>>();
+            .AddNotificationHandler<MemberDeletingNotification, NotificationStateRecorder.WritingHandler<MemberDeletingNotification>>()
+            .AddNotificationHandler<MemberDeletedNotification, NotificationStateRecorder.ReadingHandler<MemberDeletedNotification>>()
+            .AddNotificationHandler<ExternalMemberDeletingNotification, NotificationStateRecorder.WritingHandler<ExternalMemberDeletingNotification>>()
+            .AddNotificationHandler<ExternalMemberDeletedNotification, NotificationStateRecorder.ReadingHandler<ExternalMemberDeletedNotification>>();
     }
 
     [Test]

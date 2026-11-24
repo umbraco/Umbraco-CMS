@@ -40,10 +40,10 @@ internal sealed class ElementServiceNotificationStateTests : UmbracoIntegrationT
     {
         builder.Services.AddSingleton<NotificationStateRecorder>();
         builder
-            .AddNotificationHandler<ElementDeletingNotification, NotificationStateWritingHandler<ElementDeletingNotification>>()
-            .AddNotificationHandler<ElementDeletedNotification, NotificationStateReadingHandler<ElementDeletedNotification>>()
-            .AddNotificationHandler<EntityContainerDeletingNotification, NotificationStateWritingHandler<EntityContainerDeletingNotification>>()
-            .AddNotificationHandler<EntityContainerDeletedNotification, NotificationStateReadingHandler<EntityContainerDeletedNotification>>();
+            .AddNotificationHandler<ElementDeletingNotification, NotificationStateRecorder.WritingHandler<ElementDeletingNotification>>()
+            .AddNotificationHandler<ElementDeletedNotification, NotificationStateRecorder.ReadingHandler<ElementDeletedNotification>>()
+            .AddNotificationHandler<EntityContainerDeletingNotification, NotificationStateRecorder.WritingHandler<EntityContainerDeletingNotification>>()
+            .AddNotificationHandler<EntityContainerDeletedNotification, NotificationStateRecorder.ReadingHandler<EntityContainerDeletedNotification>>();
     }
 
     public static void ConfigureCancelContainerDeleting(IUmbracoBuilder builder)

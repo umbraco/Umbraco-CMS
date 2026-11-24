@@ -137,6 +137,7 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     protected override void DeleteLocked(ICoreScope scope, IElement content, EventMessages evtMsgs)
         => DeleteLocked(scope, content, evtMsgs, null);
 
+    /// <inheritdoc />
     protected override void DeleteLocked(ICoreScope scope, IElement content, EventMessages evtMsgs, IDictionary<string, object?>? notificationState)
     {
         _elementRepository.Delete(content);

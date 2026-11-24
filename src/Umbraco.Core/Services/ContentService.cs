@@ -2342,6 +2342,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     protected override void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs)
         => DeleteLocked(scope, content, evtMsgs, null);
 
+    /// <inheritdoc />
     protected override void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs, IDictionary<string, object?>? notificationState)
     {
         void DoDelete(IContent c)

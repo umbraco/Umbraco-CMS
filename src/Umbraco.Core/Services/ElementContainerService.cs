@@ -274,6 +274,10 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
 
         scope.Complete();
         return Attempt.Succeed(EntityContainerOperationStatus.Success);
+
+        // Paths of items in the recycle bin start with the root and the recycle bin, followed by the root-most item in the bin.
+        static int GetRecycleBinRootId(IEntitySlim item)
+            => int.Parse(item.Path.Split(Constants.CharArrays.Comma)[2], CultureInfo.InvariantCulture);
     }
 
     private async Task<Attempt<EntityContainerOperationStatus>> MoveLockedAsync<TNotification>(
@@ -514,7 +518,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         return deletedElements;
     }
 
-    private IEnumerable<EntityContainer> GetRecycleBinRootContainers(int pageSize)
+    private List<EntityContainer> GetRecycleBinRootContainers(int pageSize)
     {
         var rootContainers = new List<EntityContainer>();
         long pageIndex = 0;
@@ -530,10 +534,6 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
 
         return rootContainers;
     }
-
-    // Paths of items in the recycle bin start with the root and the recycle bin, followed by the root-most item in the bin.
-    private static int GetRecycleBinRootId(IEntitySlim item)
-        => int.Parse(item.Path.Split(Constants.CharArrays.Comma)[2], CultureInfo.InvariantCulture);
 
     private IUmbracoEntity DeleteItem(ICoreScope scope, IEntitySlim descendant, EventMessages eventMessages, IDictionary<string, object?> notificationState)
     {

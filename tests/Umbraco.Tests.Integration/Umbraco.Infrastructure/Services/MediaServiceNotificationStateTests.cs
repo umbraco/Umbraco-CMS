@@ -30,8 +30,8 @@ internal sealed class MediaServiceNotificationStateTests : UmbracoIntegrationTes
     {
         builder.Services.AddSingleton<NotificationStateRecorder>();
         builder
-            .AddNotificationHandler<MediaDeletingNotification, NotificationStateWritingHandler<MediaDeletingNotification>>()
-            .AddNotificationHandler<MediaDeletedNotification, NotificationStateReadingHandler<MediaDeletedNotification>>();
+            .AddNotificationHandler<MediaDeletingNotification, NotificationStateRecorder.WritingHandler<MediaDeletingNotification>>()
+            .AddNotificationHandler<MediaDeletedNotification, NotificationStateRecorder.ReadingHandler<MediaDeletedNotification>>();
     }
 
     [Test]
