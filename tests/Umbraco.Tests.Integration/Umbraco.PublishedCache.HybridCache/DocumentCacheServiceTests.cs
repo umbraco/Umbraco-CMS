@@ -610,18 +610,20 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
 
         await DocumentCacheService.RefreshContentAsync(trashedContent);
 
-        Assert.That(CountPublishedRecords(Textpage.Id), Is.EqualTo(1));
+        Assert.That(CountRecords(Textpage.Id, published: true), Is.EqualTo(1));
     }
 
     [Test]
     public async Task RefreshContentAsync_Of_Trashed_Content_Being_Unpublished_Removes_The_Published_Record()
     {
         IContent trashedContent = TrashPublishedTextpage();
+        Assert.That(CountRecords(Textpage.Id, published: true), Is.EqualTo(1), "The published record should still be there after the move to the recycle bin");
         trashedContent.PublishedState = PublishedState.Unpublishing;
 
         await DocumentCacheService.RefreshContentAsync(trashedContent);
 
-        Assert.That(CountPublishedRecords(Textpage.Id), Is.Zero);
+        Assert.That(CountRecords(Textpage.Id, published: true), Is.Zero);
+        Assert.That(CountRecords(Textpage.Id, published: false), Is.EqualTo(1), "The draft record should stay");
     }
 
     private IContent TrashPublishedTextpage()
@@ -631,13 +633,13 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
         return ContentService.GetById(Textpage.Key)!;
     }
 
-    private int CountPublishedRecords(int nodeId)
+    private int CountRecords(int nodeId, bool published)
     {
         using var scope = ScopeProvider.CreateScope(autoComplete: true);
         var selectSql = SqlContext.Sql()
             .SelectCount()
             .From<ContentNuDto>()
-            .Where<ContentNuDto>(x => x.NodeId == nodeId && x.Published);
+            .Where<ContentNuDto>(x => x.NodeId == nodeId && x.Published == published);
         return ScopeAccessor.AmbientScope!.Database.ExecuteScalar<int>(selectSql);
     }
 

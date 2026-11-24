@@ -3002,11 +3002,18 @@ public class ContentService : RepositoryService, IContentService
     // it cannot move back as published but has to be unpublished first - that's for the
     // root content, everything underneath will retain its published status. Unpublish all
     // cultures and report them on the tree change so publish status and memory cache update.
+    // A restored root that is already unpublished reports an empty set instead of null: no culture
+    // is unpublished here, but saving the root rewrites its culture flags, so publish status must be read again.
     private static string[]? UnpublishRestoredRoot(IContent content)
     {
-        if ((content.Trashed && content.Published) is false)
+        if (content.Trashed is false)
         {
             return null;
+        }
+
+        if (content.Published is false)
+        {
+            return [];
         }
 
         string[] unpublishedCultures = content.ContentType.VariesByCulture()

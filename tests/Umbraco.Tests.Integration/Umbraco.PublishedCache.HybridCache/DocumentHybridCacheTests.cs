@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -9,6 +10,8 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -668,9 +671,11 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     {
         Guid childKey = await CreatePublishedChildAsync("Published Child");
         await TrashPublishedTextPageAsync();
+        Assert.AreEqual(1, CountPublishedDatabaseCacheRecords(childKey), "The child's published record should still be there after the move to the recycle bin");
 
         var unpublishChildResult = await ContentPublishingService.UnpublishAsync(childKey, null, Constants.Security.SuperUserKey);
         Assert.IsTrue(unpublishChildResult.Success);
+        Assert.AreEqual(0, CountPublishedDatabaseCacheRecords(childKey), "Unpublishing in the recycle bin should remove the child's published record");
 
         await RestorePublishedTextPageAsync(includeDescendants: true);
         await RepublishPublishedTextPageAsync();
@@ -721,6 +726,17 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     {
         var republishResult = await ContentPublishingService.PublishAsync(PublishedTextPage.Key!.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
         Assert.IsTrue(republishResult.Success);
+    }
+
+    private int CountPublishedDatabaseCacheRecords(Guid documentKey)
+    {
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        var nodeId = GetRequiredService<IIdKeyMap>().GetIdForKey(documentKey, UmbracoObjectTypes.Document).Result;
+        var selectSql = GetRequiredService<ISqlContext>().Sql()
+            .SelectCount()
+            .From<ContentNuDto>()
+            .Where<ContentNuDto>(x => x.NodeId == nodeId && x.Published);
+        return ScopeAccessor.AmbientScope!.Database.ExecuteScalar<int>(selectSql);
     }
 
     private void AssertTextPage(IPublishedContent textPage)

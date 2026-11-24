@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -44,6 +45,8 @@ internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrati
     private IEntityService EntityService => GetRequiredService<IEntityService>();
 
     private IPublishedContentCache PublishedContentCache => GetRequiredService<IPublishedContentCache>();
+
+    private IPublishStatusQueryService PublishStatusQueryService => GetRequiredService<IPublishStatusQueryService>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -167,6 +170,30 @@ internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrati
         Assert.IsNotNull(publishedChild);
         Assert.IsTrue(publishedChild!.IsPublished(_englishIsoCode));
         Assert.IsFalse(publishedChild.IsPublished(_danishIsoCode), "A culture unpublished while in the recycle bin should not return to the published cache");
+    }
+
+    [Test]
+    public async Task Descendants_Stay_Hidden_When_Root_Unpublished_In_Recycle_Bin_By_Mandatory_Culture_Is_Restored()
+    {
+        await MakeDanishMandatoryAsync();
+        await PublishAndTrashBranchAsync();
+
+        // Unpublishing a mandatory culture unpublishes the whole document and leaves the other culture flagged as published.
+        var unpublishAttempt = await ContentPublishingService.UnpublishAsync(rootContent.Key, new HashSet<string> { _danishIsoCode }, Constants.Security.SuperUserKey);
+        Assert.IsTrue(unpublishAttempt.Success);
+
+        await RestoreRootAsync();
+
+        Assert.IsFalse(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(rootContent.Key), "A root restored as unpublished should not be reported as published in any culture");
+        Assert.IsNull(await PublishedContentCache.GetByIdAsync(childNode.Key, false), "Child should stay hidden while its restored parent is unpublished");
+    }
+
+    private async Task MakeDanishMandatoryAsync()
+    {
+        ILanguage danish = (await LanguageService.GetAsync(_danishIsoCode))!;
+        danish.IsMandatory = true;
+        var updateAttempt = await LanguageService.UpdateAsync(danish, Constants.Security.SuperUserKey);
+        Assert.IsTrue(updateAttempt.Success);
     }
 
     private async Task PublishAndTrashBranchAsync()
