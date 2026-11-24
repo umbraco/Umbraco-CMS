@@ -72,9 +72,7 @@ public interface IContentEditingService
     /// <param name="content">The content item to apply the update model onto.</param>
     /// <param name="updateModel">The model containing the updated content data.</param>
     /// <returns>An attempt containing the update result (with validation result) or an error status.</returns>
-    // TODO (V19): Remove default implementation.
-    Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> MapUpdateAsync(IContent content, ContentUpdateModel updateModel)
-        => throw new NotImplementedException();
+    Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> MapUpdateAsync(IContent content, ContentUpdateModel updateModel);
 
     /// <summary>
     ///     Updates and publishes an existing content item.

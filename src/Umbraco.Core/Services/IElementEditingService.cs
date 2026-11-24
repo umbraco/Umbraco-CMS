@@ -69,9 +69,7 @@ public interface IElementEditingService
     /// <param name="element">The element to apply the update model onto.</param>
     /// <param name="updateModel">The model containing the updated element data.</param>
     /// <returns>An attempt containing the update result (with validation result) or an error status.</returns>
-    // TODO (V20): Remove default implementation.
-    Task<Attempt<ElementUpdateResult, ContentEditingOperationStatus>> MapUpdateAsync(IElement element, ElementUpdateModel updateModel)
-        => throw new NotImplementedException();
+    Task<Attempt<ElementUpdateResult, ContentEditingOperationStatus>> MapUpdateAsync(IElement element, ElementUpdateModel updateModel);
 
     /// <summary>
     ///     Updates and publishes an existing element.
