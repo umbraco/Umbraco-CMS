@@ -12,6 +12,7 @@ public interface IPropertyTypeUsageService
     /// </summary>
     /// <param name="contentTypeKey">The key of the content type to check.</param>
     /// <param name="propertyAlias">The alias of the property to check.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An attempt with status and result if the property type has any property values, otherwise false.</returns>
-    Task<Attempt<bool, PropertyTypeOperationStatus>> HasSavedPropertyValuesAsync(Guid contentTypeKey, string propertyAlias);
+    Task<Attempt<bool, PropertyTypeOperationStatus>> HasSavedPropertyValuesAsync(Guid contentTypeKey, string propertyAlias, CancellationToken cancellationToken);
 }

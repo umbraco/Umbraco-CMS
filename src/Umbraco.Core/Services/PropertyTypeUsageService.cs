@@ -22,11 +22,11 @@ public class PropertyTypeUsageService : IPropertyTypeUsageService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<bool, PropertyTypeOperationStatus>> HasSavedPropertyValuesAsync(Guid contentTypeKey, string propertyAlias)
+    public async Task<Attempt<bool, PropertyTypeOperationStatus>> HasSavedPropertyValuesAsync(Guid contentTypeKey, string propertyAlias, CancellationToken cancellationToken)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
-        var contentTypeExists = await _propertyTypeUsageRepository.ContentTypeExistAsync(contentTypeKey);
+        var contentTypeExists = await _propertyTypeUsageRepository.ContentTypeExistAsync(contentTypeKey, cancellationToken);
 
         if (contentTypeExists is false)
         {
@@ -34,7 +34,7 @@ public class PropertyTypeUsageService : IPropertyTypeUsageService
         }
 
 
-        var hasSavedPropertyValues = await _propertyTypeUsageRepository.HasSavedPropertyValuesAsync(contentTypeKey, propertyAlias);
+        var hasSavedPropertyValues = await _propertyTypeUsageRepository.HasSavedPropertyValuesAsync(contentTypeKey, propertyAlias, cancellationToken);
 
         return Attempt.SucceedWithStatus(PropertyTypeOperationStatus.Success, hasSavedPropertyValues);
     }

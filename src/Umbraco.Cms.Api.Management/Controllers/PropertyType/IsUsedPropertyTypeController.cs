@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -42,7 +41,7 @@ public class IsUsedPropertyTypeController : PropertyTypeControllerBase
     [EndpointDescription("Checks if the property type identified by the provided content type id and property alias is used in any content, media, or members.")]
     public async Task<IActionResult> Get(CancellationToken cancellationToken, Guid contentTypeId, string propertyAlias)
     {
-        Attempt<bool, PropertyTypeOperationStatus> result = await _propertyTypeUsageService.HasSavedPropertyValuesAsync(contentTypeId, propertyAlias);
+        Attempt<bool, PropertyTypeOperationStatus> result = await _propertyTypeUsageService.HasSavedPropertyValuesAsync(contentTypeId, propertyAlias, cancellationToken);
 
         return result.Success
             ? Ok(result.Result)

@@ -9,9 +9,10 @@ public interface IDataTypeUsageRepository
     ///     Determines whether there are any saved property values using the specified data type.
     /// </summary>
     /// <param name="dataTypeKey">The unique key of the data type.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>
     ///     A task that represents the asynchronous operation. The task result is <c>true</c> if there are saved values;
     ///     otherwise, <c>false</c>.
     /// </returns>
-    Task<bool> HasSavedValuesAsync(Guid dataTypeKey);
+    Task<bool> HasSavedValuesAsync(Guid dataTypeKey, CancellationToken cancellationToken);
 }
