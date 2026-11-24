@@ -82,7 +82,7 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 		const getHeader = () => getInput().shadowRoot!.querySelector<HTMLElement>('#header');
 
 		await setValue([]);
-		expect(getHeader()).to.equal(null);
+		expect(getHeader()).to.be.null;
 
 		await setValue([{ value: 'a', label: 'Ay' }]);
 		const columns = Array.from(getHeader()!.querySelectorAll('span')).map((column) => column.textContent!.trim());
@@ -299,8 +299,8 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 		element.readonly = true;
 		await setValue([{ value: 'a' }]);
 
-		expect(getInput().shadowRoot!.querySelector('#action')).to.equal(null);
-		expect(getRows()[0].shadowRoot!.querySelector('.delete')).to.equal(null);
+		expect(getInput().shadowRoot!.querySelector('#action')).to.be.null;
+		expect(getRows()[0].shadowRoot!.querySelector('.delete')).to.be.null;
 	});
 
 	it('shows a disabled add button when read-only and there are no options', async () => {

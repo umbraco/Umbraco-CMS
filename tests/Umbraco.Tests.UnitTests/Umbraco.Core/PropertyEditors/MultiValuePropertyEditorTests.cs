@@ -187,7 +187,7 @@ public class MultiValuePropertyEditorTests
             .FromConfigurationObject(
                 new ValueListConfiguration
                 {
-                    Items = [new() { Value = "Value 1" }, new() { Value = "Value 2" }, new() { Value = "Value 3" }]
+                    Items = [new() { Value = "Value 1" }, new() { Value = "Value 2" }, new() { Value = "Value 3" }],
                 },
                 serializer);
         return dataType;

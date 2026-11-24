@@ -26,8 +26,8 @@ public class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfigu
         items.Validators.Add(new ValueListUniqueValueValidator(configurationEditorJsonSerializer));
     }
 
-    // TODO (V22): Remove this override along with LegacyValueListItemsHelper.
     /// <inheritdoc />
+    // TODO (V22): Remove this override along with LegacyValueListItemsHelper.
     public override IDictionary<string, object> FromDatabase(string? configuration, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
 #pragma warning disable CS0618 // Type or member is obsolete
         => base.FromDatabase(LegacyValueListItemsHelper.ConvertPlainStringItems(configuration), configurationEditorJsonSerializer);

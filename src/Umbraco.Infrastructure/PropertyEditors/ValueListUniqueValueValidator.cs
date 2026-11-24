@@ -13,6 +13,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class ValueListUniqueValueValidator : IValueValidator
 {
+    private static readonly string[] _itemsMemberNames = ["items"];
+
     private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
 
     /// <summary>
@@ -57,7 +59,7 @@ public class ValueListUniqueValueValidator : IValueValidator
 
         if (options is null)
         {
-            yield return new ValidationResult($"The configuration value {value} is not a valid value list configuration", ["items"]);
+            yield return new ValidationResult($"The configuration value {value} is not a valid value list configuration", _itemsMemberNames);
             yield break;
         }
 
@@ -70,12 +72,12 @@ public class ValueListUniqueValueValidator : IValueValidator
 
         foreach (var duplicateValue in duplicateValues)
         {
-            yield return new ValidationResult($"The value \"{duplicateValue}\" must be unique", new[] { "items" });
+            yield return new ValidationResult($"The value \"{duplicateValue}\" must be unique", _itemsMemberNames);
         }
 
         foreach (ValueListOption option in options.Where(option => string.IsNullOrWhiteSpace(option.Label)))
         {
-            yield return new ValidationResult($"The value \"{option.Value}\" must have a label", new[] { "items" });
+            yield return new ValidationResult($"The value \"{option.Value}\" must have a label", _itemsMemberNames);
         }
     }
 }

@@ -427,7 +427,7 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
 
         // Assert
         Assert.That(dataTypeDefinitions, Is.Not.Null);
-        Assert.That(dataTypeDefinitions.Count(), Is.EqualTo(2));
+        Assert.That(dataTypeDefinitions, Has.Count.EqualTo(2));
         Assert.That(dataTypeDefinitions.All(x => x.EditorAlias == Constants.PropertyEditors.Aliases.CheckBoxList), Is.True);
         Assert.That(contents, Is.Not.Null);
         Assert.That(contentTypes.Any(), Is.True);
