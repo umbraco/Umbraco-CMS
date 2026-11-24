@@ -2,7 +2,7 @@
   "campaign": "Media Repository Campaign",
   "targetBranch": "v18/feature/ef-core-repositories",
   "planFile": ".claude/campaign/ef-core-media-repository/CAMPAIGN.md",
-  "updated": "23-11-2026",
+  "updated": "24-11-2026",
   "artifact": {
     "url": "https://claude.ai/artifact/5rY17CDCK6o6AiY7q62bVd",
     "title": "Media Repository Campaign"
@@ -196,6 +196,7 @@
     }
   ],
   "log": [
+    { "date": "24-11-2026", "text": "Members campaign gaps from the PR 2 review recorded on the grand plan (A2 known gaps: recycle bin and tree on the wide contract, versions as a split candidate, member ordering fields, document-only cores) and in this plan's backlog." },
     { "date": "23-11-2026", "text": "PR 2 review round 1 applied: the three tree/bin members stay on IDocumentRepository (elements must not expose them); ancestor total fixed for the recycle bin case; decision row added, PR 4 contract note widened." },
     { "date": "23-11-2026", "text": "Decision: the wide repository tier keeps the version and recycle bin members for every kind, matching the NPoco shape; the members campaign decides a split for the recycle bin (backlog row added)." },
     { "date": "23-11-2026", "text": "PR 2 opened as draft #24762 (4f5fc0f61d3)." },
