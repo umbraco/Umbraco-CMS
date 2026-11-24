@@ -1936,6 +1936,7 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository, TConten
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             await PersistEntitySpecificDeleteClausesAsync(db, nodeId);
+            await PersistIntermediateDeleteClausesAsync(db, nodeId);
 
             await db.User2NodeNotifies.Where(notification => notification.NodeId == nodeId).ExecuteDeleteAsync();
 
@@ -1975,6 +1976,16 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository, TConten
     /// <param name="db">The EF Core context for the ambient scope.</param>
     /// <param name="nodeId">The node identifier of the content being deleted.</param>
     protected abstract Task PersistEntitySpecificDeleteClausesAsync(UmbracoDbContext db, int nodeId);
+
+    /// <summary>
+    ///     Deletes the rows in tables an intermediate base adds for its kinds (e.g. the schedules of publishable
+    ///     content) that reference the node being deleted. Called by <see cref="PersistDeletedItemAsync" /> after
+    ///     the entity-specific clauses and before the tables shared across all content kinds. Does nothing by
+    ///     default.
+    /// </summary>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="nodeId">The node identifier of the content being deleted.</param>
+    protected virtual Task PersistIntermediateDeleteClausesAsync(UmbracoDbContext db, int nodeId) => Task.CompletedTask;
 
     /// <inheritdoc />
     protected override async Task PersistNewItemAsync(TEntity item) =>

@@ -199,21 +199,9 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         return calculateSortOrder ? await GetNewChildSortOrderAsync(db, item.ParentId, 0) : item.SortOrder;
     }
 
-    /// <summary>
-    ///     Deletes the schedules of the node before the base deletes the rows every content kind shares.
-    /// </summary>
-    protected override async Task PersistDeletedItemAsync(TEntity entity)
-    {
-        var nodeId = entity.Id;
-
-        await AmbientScope.ExecuteWithContextAsync(async db =>
-        {
-            await db.ContentSchedules.Where(contentSchedule => contentSchedule.NodeId == nodeId).ExecuteDeleteAsync();
-            return true;
-        });
-
-        await base.PersistDeletedItemAsync(entity);
-    }
+    /// <inheritdoc />
+    protected override Task PersistIntermediateDeleteClausesAsync(UmbracoDbContext db, int nodeId) =>
+        db.ContentSchedules.Where(contentSchedule => contentSchedule.NodeId == nodeId).ExecuteDeleteAsync();
 
     /// <inheritdoc />
     protected override async Task PersistNewItemAsync(TEntity item) =>
