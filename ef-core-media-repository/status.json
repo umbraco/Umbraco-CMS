@@ -97,18 +97,18 @@
       "id": 4,
       "slug": "narrow-sibling-fetch",
       "title": "PR 3b: Narrow the unique-name sibling fetch to names sharing the base text",
-      "status": "planned",
-      "branch": "",
-      "pr": "",
-      "prUrl": "",
+      "status": "in-review",
+      "branch": "v20/feature/ef-core-media-repository-3b-narrow-sibling-fetch",
+      "pr": "#24779",
+      "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24779",
       "dependsOn": [3],
       "summary": "GetUniqueNodeNameAndSiblingsAsync loads only siblings whose name starts with SimilarNodeName.GetBaseText(name), as NPoco has done since #23447. Required before media lands: large flat media libraries are the case it exists for, and the NPoco media repository has it today.",
       "tasks": [
-        { "text": "Test red first against the unfiltered fetch (many unrelated siblings, one collision)", "done": false },
-        { "text": "StartsWith filter on the base text; the TODO comment and the grand-plan backlog row removed", "done": false }
+        { "text": "Test red first against the unfiltered fetch (many unrelated siblings, one collision)", "done": true },
+        { "text": "StartsWith filter on the base text; the TODO comment and the grand-plan backlog row removed", "done": true }
       ],
       "acceptance": "Document and element fixtures at unchanged counts; the new test green and red first.",
-      "notes": "Numbered 3b in CAMPAIGN.md.",
+      "notes": "Numbered 3b in CAMPAIGN.md. Started 24-11-2026, stacked on PR 3 at 68ac4cb2f45. Design: the wide default EnsureUniqueNodeNameAsync fetches only siblings whose name starts with SimilarNodeName.GetBaseText(name), as NPoco's virtual EnsureUniqueNodeName does; GetUniqueNodeNameAndSiblingsAsync keeps the full fetch for DocumentRepository's URL-segment check, as NPoco's out-siblings variant does. Implemented 24-11-2026: element test proven red (no LIKE in any save command) then green; naming fixtures 73 green on SQLite, element and document insert fixtures 49 green on SQL Server; full solution build clean; independent review found only nits (comment grammar, presence instead of a count assertion), applied. Grand plan loose end #23447 closed. Committed as d4dfd1720d8 and opened as draft PR #24779 against PR 3's branch on 24-11-2026; rebase onto the integration branch once #24776 merges.",
       "mergeCommit": ""
     },
     {
@@ -197,6 +197,8 @@
     }
   ],
   "log": [
+    { "date": "24-11-2026", "text": "PR 3b opened as draft #24779 (d4dfd1720d8), stacked on PR 3." },
+    { "date": "24-11-2026", "text": "PR 3b started on v20/feature/ef-core-media-repository-3b-narrow-sibling-fetch, stacked on PR 3. An easy win from the migration map (DataTypeUsageRepository + PropertyTypeUsageRepository to EF Core) delegated to an agent in a separate worktree." },
     { "date": "24-11-2026", "text": "PR 3 review round 1 applied: delete order kept through an intermediate delete-clauses hook; PR 4 gains an explicit test list for the wide base's plain persist flow." },
     { "date": "24-11-2026", "text": "PR 1b merged as 042dd9ebb81 and PR 2 merged as 1aae294e917 (squash). PR 3 rebased onto the integration branch (3ed1a87f678) and retargeted; now the only open PR." },
     { "date": "24-11-2026", "text": "PR 2 approved by a maintainer; IContentVersionDto renamed to IPublishableVersionDto (0c5aa93e53e). PR 3 rebased onto it (833801a54ef) and force-pushed with a lease." },

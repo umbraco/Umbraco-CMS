@@ -117,7 +117,7 @@
           "name": "ContentRepositoryBase",
           "lines": 1430,
           "base": "NPoco base, retired by this campaign",
-          "note": "Keeps the sibling-name prefix fetch (#23447); port it before deleting, see loose ends."
+          "note": "The sibling-name prefix fetch (#23447) is ported to the EF Core wide base in media PR 3b; nothing left to port before deleting."
         }
       ],
       "alsoCloses": [
@@ -568,10 +568,6 @@
       "what": "Culture-aware \"published\" ordering: NPoco orders variant content by the culture variation row, EF Core by the table flag only. TODO in code. Upstream #24530 has no EF Core counterpart."
     },
     {
-      "where": "PublishableContentRepositoryBase.GetUniqueNodeNameAndSiblingsAsync",
-      "what": "Fetch only siblings sharing the base text (#23447); today every sibling is loaded on each document write. TODO in code."
-    },
-    {
       "where": "IElementService, IMediaService, IContentTypeService, IMediaTypeService, IMemberTypeService, IEntityService",
       "what": "Service contracts still sync or barely async although their repositories are on EF Core (or will be). Each campaign above should finish the contract of the services it touches."
     },
@@ -581,6 +577,10 @@
     }
   ],
   "log": [
+    {
+      "date": "24-11-2026",
+      "text": "Loose end closed: the sibling-name prefix fetch (#23447) is on the EF Core wide base (media PR 3b). Easy win in progress: DataTypeUsageRepository and PropertyTypeUsageRepository to EF Core."
+    },
     {
       "date": "24-11-2026",
       "text": "Media (A): PR 1 (#24724), PR 1b (#24758) and PR 2 (#24762) merged into v18/feature/ef-core-repositories; PR 3 (#24776) open and reviewed. The wide base now owns the generic read and write paths; the publishable base keeps publishing only."
