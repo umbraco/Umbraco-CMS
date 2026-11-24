@@ -218,9 +218,9 @@ export class MediaUiHelper extends UiBaseLocators {
 
   async clickConfirmTrashButtonAndWaitForMediaToBeTrashed(expectedCount: number = 1) {
     if (expectedCount === 1) {
-      return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.media, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok);
+      return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.media, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
     }
-    return await this.waitForMultipleResponsesAfterExecutingPromise(ConstantHelper.apiEndpoints.media, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok, expectedCount);
+    return await this.waitForMultipleResponsesAfterExecutingPromise(ConstantHelper.apiEndpoints.media, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok, expectedCount, ConstantHelper.httpMethods.put);
   }
 
   async clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied() {

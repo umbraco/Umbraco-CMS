@@ -28,6 +28,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(blockName);
   await umbracoApi.dataType.ensureNameNotExists(blockGridName);
+  await umbracoApi.language.ensureIsoCodeNotExists('da');
 });
 
 test('cannot publish a block grid with a mandatory radiobox without a value', async ({umbracoApi, umbracoUi}) => {

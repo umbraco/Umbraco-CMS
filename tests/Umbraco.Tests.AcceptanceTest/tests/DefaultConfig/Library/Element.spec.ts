@@ -211,7 +211,6 @@ test('can duplicate a element node to root', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementCopied);
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
-
 });
 
 test('can duplicate a element node to other parent', async ({umbracoApi, umbracoUi}) => {
@@ -238,7 +237,6 @@ test('can duplicate a element node to other parent', async ({umbracoApi, umbraco
   await umbracoUi.library.isChildElementInTreeVisible(elementFolderName, elementName, true);
   await umbracoUi.library.isCaretButtonVisibleForElementName(elementName, false);
   await expect.poll(() => umbracoApi.element.getChildrenAmount(elementFolderId)).toEqual(1);
-
 });
 
 test('can move a element node to other parent', async ({umbracoApi, umbracoUi}) => {

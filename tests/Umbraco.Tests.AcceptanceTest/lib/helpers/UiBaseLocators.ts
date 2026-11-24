@@ -108,6 +108,7 @@ export class UiBaseLocators extends BasePage {
 
   // Composition & Structure
   public readonly compositionsBtn: Locator;
+  private readonly contentTypeDesignEditorTab: Locator;
   public readonly allowAtRootBtn: Locator;
   public readonly allowedChildNodesModal: Locator;
   public readonly addCollectionBtn: Locator;
@@ -416,6 +417,7 @@ export class UiBaseLocators extends BasePage {
 
     // Composition & Structure
     this.compositionsBtn = page.getByTestId("edit-compositions");
+    this.contentTypeDesignEditorTab = page.locator("umb-content-type-design-editor-tab").first();
     this.allowAtRootBtn = page
       .locator("label")
       .filter({ hasText: "Allow at root" });
@@ -930,7 +932,9 @@ export class UiBaseLocators extends BasePage {
 
   // The folder modal loads its repository lazily and drops a submit made before that has arrived,
   // so the submit is repeated until the modal closes.
+  // TODO: replace with a single click once #24772 is fixed.
   private async submitFolderModal(submitButton: Locator) {
+    await this.waitForVisible(submitButton);
     await expect(async () => {
       if (await submitButton.isVisible()) {
         await this.click(submitButton);
@@ -1499,7 +1503,7 @@ export class UiBaseLocators extends BasePage {
   // The content type workspace is still routing until the tab content of its design view is rendered,
   // and a route change that completes closes any modal opened in the meantime.
   private async waitForContentTypeDesignViewToBeRendered() {
-    await this.isVisible(this.page.locator('umb-content-type-design-editor-tab').first());
+    await this.isVisible(this.contentTypeDesignEditorTab);
   }
 
   async clickAllowAtRootButton() {
@@ -2242,7 +2246,7 @@ export class UiBaseLocators extends BasePage {
 
   /**
    * Runs an action that triggers several matching API calls (e.g. moving multiple
-   * items) and resolves once `expectedCount` responses matching `url` + `statusCode`
+   * items) and resolves once `expectedCount` responses matching `url` + `statusCode` (+ `method`, when given)
    * have arrived. Uses the same loose `includes` URL matching as
    * {@link waitForResponseAfterExecutingPromise}.
    *
@@ -2253,6 +2257,7 @@ export class UiBaseLocators extends BasePage {
     promise: Promise<void>,
     statusCode: number,
     expectedCount: number,
+    method?: string,
   ) {
     const responses: Response[] = [];
 
@@ -2263,7 +2268,7 @@ export class UiBaseLocators extends BasePage {
     // Named handler so it can be removed afterwards — otherwise every call leaks a
     // listener that keeps mutating this (and prior calls') response arrays.
     const onResponse = (resp) => {
-      if (resp.url().includes(url) && resp.status() === statusCode) {
+      if (resp.url().includes(url) && resp.status() === statusCode && (method === undefined || resp.request().method() === method)) {
         responses.push(resp);
         if (responses.length >= expectedCount) {
           resolveResponses();

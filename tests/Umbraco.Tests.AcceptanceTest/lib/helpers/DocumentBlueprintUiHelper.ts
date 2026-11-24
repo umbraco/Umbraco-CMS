@@ -7,12 +7,14 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
   private readonly documentBlueprintNameTxt: Locator;
   private readonly deleteMenu: Locator;
   private readonly documentBlueprintSidebarHeader: Locator;
+  private readonly actionMenuForDocumentBlueprintBtn: Locator;
   private readonly itemPickerModal: Locator;
 
   constructor(page: Page) {
     super(page);
     this.documentBlueprintTree = page.locator('umb-tree[alias="Umb.Tree.DocumentBlueprint"]');
     this.documentBlueprintSidebarHeader = page.locator('[data-mark="section-sidebar-app:Umb.SidebarMenu.DocumentBlueprint"]');
+    this.actionMenuForDocumentBlueprintBtn = this.documentBlueprintSidebarHeader.getByTestId('open-dropdown');
     this.itemPickerModal = page.locator('umb-item-picker-modal');
     this.documentBlueprintNameTxt = page.locator('#name-input #input');
     this.deleteMenu = page.locator('umb-section-sidebar #menu-item').getByLabel('Delete');
@@ -24,7 +26,7 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
 
   async clickActionsMenuAtRoot() {
     await this.hover(this.documentBlueprintSidebarHeader);
-    await this.click(this.documentBlueprintSidebarHeader.getByTestId('open-dropdown'));
+    await this.click(this.actionMenuForDocumentBlueprintBtn);
   }
 
   async isDocumentBlueprintSidebarHeaderVisible(isVisible: boolean = true) {

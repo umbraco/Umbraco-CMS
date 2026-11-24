@@ -30,6 +30,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(blockName);
   await umbracoApi.dataType.ensureNameNotExists(blockListName);
   await umbracoApi.dataType.ensureNameNotExists(propertyEditorName);
+  await umbracoApi.language.ensureIsoCodeNotExists('da');
 });
 
 test('cannot publish a block list with a mandatory radiobox without a value', async ({umbracoApi, umbracoUi}) => {

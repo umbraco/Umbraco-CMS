@@ -110,7 +110,7 @@ export class BasePage {
     if (options?.clearFirst !== false) {
       await locator.clear({timeout: ConstantHelper.timeout.action});
     }
-    await locator.pressSequentially(text, {delay: options?.delay ?? 50, timeout: ConstantHelper.timeout.action});
+    await locator.pressSequentially(text, {delay: options?.delay ?? 50});
     if (options?.verify) {
       await expect(locator).toHaveValue(text);
     }
