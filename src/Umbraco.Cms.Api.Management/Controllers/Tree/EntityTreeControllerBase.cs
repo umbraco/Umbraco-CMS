@@ -165,42 +165,33 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         Dictionary<int, IEntitySlim> visibleById = visible.ToDictionary(entity => entity.Id);
         Dictionary<int, Guid> keysById = fetched.ToDictionary(entity => entity.Id, entity => entity.Key);
         Dictionary<Guid, IEntitySlim> descendantsByKey = descendants.ToDictionary(entity => entity.Key);
-        var viewModelsByKey = new Dictionary<Guid, TItem>();
 
-        TItem? GetViewModel(IEntitySlim entity)
-        {
-            if (viewModelsByKey.TryGetValue(entity.Key, out TItem? viewModel) is false)
-            {
-                Guid? parentKey = keysById.TryGetValue(entity.ParentId, out Guid key) ? key : null;
-                viewModel = MapTreeItemViewModels(parentKey, [entity]).FirstOrDefault();
-                if (viewModel is not null)
-                {
-                    viewModelsByKey[entity.Key] = viewModel;
-                }
-            }
+        IEntitySlim[] visibleDescendants = descendantKeys
+            .Distinct()
+            .Select(descendantsByKey.GetValueOrDefault)
+            .WhereNotNull()
+            .Where(descendant => visibleById.ContainsKey(descendant.Id))
+            .ToArray();
 
-            return viewModel;
-        }
+        var viewModelsByKey = visibleDescendants
+            .SelectMany(descendant => descendant.AncestorIds())
+            .Distinct()
+            .Select(visibleById.GetValueOrDefault)
+            .WhereNotNull()
+            .GroupBy(ancestor => ancestor.ParentId)
+            .SelectMany(siblings => MapTreeItemViewModels(
+                keysById.TryGetValue(siblings.Key, out Guid parentKey) ? parentKey : null,
+                [.. siblings]))
+            .ToDictionary(viewModel => viewModel.Id);
 
-        var result = new List<(Guid DescendantKey, TItem[] Ancestors)>();
-        foreach (Guid descendantKey in descendantKeys.Distinct())
-        {
-            if (descendantsByKey.TryGetValue(descendantKey, out IEntitySlim? descendant) is false
-                || visibleById.ContainsKey(descendant.Id) is false)
-            {
-                continue;
-            }
-
-            TItem[] chain = descendant.AncestorIds()
-                .Select(id => visibleById.GetValueOrDefault(id))
+        (Guid DescendantKey, TItem[] Ancestors)[] result = visibleDescendants
+            .Select(descendant => (descendant.Key, descendant.AncestorIds()
+                .Select(id => keysById.TryGetValue(id, out Guid key) ? viewModelsByKey.GetValueOrDefault(key) : null)
                 .WhereNotNull()
-                .Select(GetViewModel)
-                .WhereNotNull()
-                .ToArray();
-            result.Add((descendantKey, chain));
-        }
+                .ToArray()))
+            .ToArray();
 
-        await PopulateFlags(viewModelsByKey.Values.ToArray());
+        await PopulateFlags([.. viewModelsByKey.Values]);
 
         return result;
     }
