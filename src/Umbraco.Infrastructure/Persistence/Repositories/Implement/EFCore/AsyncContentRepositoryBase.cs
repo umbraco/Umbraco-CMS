@@ -2428,8 +2428,9 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository, TConten
     /// <summary>
     ///     Resolves a sibling-unique name for <paramref name="nodeName" /> among the other nodes sharing
     ///     <paramref name="parentId" />. The default implementation only resolves literal duplicate names
-    ///     (via <see cref="SimilarNodeName.GetUniqueName(IEnumerable{SimilarNodeName},int,string)" />) — override
-    ///     to add further uniqueness checks (e.g. URL segment collisions), as <c>DocumentRepository</c> does.
+    ///     (via <see cref="SimilarNodeName.GetUniqueName(IEnumerable{SimilarNodeName},int,string)" />), so it
+    ///     fetches only the siblings whose name shares the base text and can collide; override to add further
+    ///     uniqueness checks (e.g. URL segment collisions), as <c>DocumentRepository</c> does.
     /// </summary>
     protected virtual async Task<string?> EnsureUniqueNodeNameAsync(UmbracoDbContext db, int parentId, string? nodeName, int id)
     {
@@ -2438,24 +2439,27 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository, TConten
             return nodeName;
         }
 
-        (string? uniqueName, List<SimilarNodeName> _) = await GetUniqueNodeNameAndSiblingsAsync(db, parentId, nodeName, id);
-        return uniqueName;
+        // On a flat tree such as a media library, fetching every sibling fetches most of the library on every write.
+        string prefix = SimilarNodeName.GetBaseText(nodeName);
+        List<SimilarNodeName> siblings = await db.Nodes
+            .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentId && node.Text!.StartsWith(prefix))
+            .Select(node => new SimilarNodeName { Id = node.NodeId, Name = node.Text })
+            .ToListAsync();
+
+        return SimilarNodeName.GetUniqueName(siblings, id, nodeName);
     }
 
     /// <summary>
     ///     Fetches every sibling under <paramref name="parentId" /> (of this repository's <c>NodeObjectTypeKey</c>)
     ///     and resolves a sibling-unique name for <paramref name="nodeName" />, returning both so overrides of
     ///     <see cref="EnsureUniqueNodeNameAsync" /> can run further checks against the same sibling list without
-    ///     re-querying. Deliberately unfiltered (no name-prefix narrowing) — unlike NPoco's generic
-    ///     Media/DataType-oriented sibling fetch, a URL-segment collision check (see <c>DocumentRepository</c>)
-    ///     needs the full sibling list, since two names with different literal prefixes can still collide on
-    ///     URL segment.
+    ///     re-querying. Unlike the default, the fetch is not narrowed to the name's base text: a check such as
+    ///     URL-segment collision (see <c>DocumentRepository</c>) needs every sibling, since two names with
+    ///     different literal prefixes can still collide.
     /// </summary>
     protected async Task<(string? UniqueName, List<SimilarNodeName> Siblings)> GetUniqueNodeNameAndSiblingsAsync(
         UmbracoDbContext db, int parentId, string? nodeName, int id)
     {
-        // TODO: fetch only siblings whose name starts with SimilarNodeName.GetBaseText(nodeName), as the NPoco
-        // EnsureUniqueNodeName does; loading every sibling makes each write O(siblings) on flat trees. [NL]
         List<SimilarNodeName> siblings = await db.Nodes
             .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentId)
             .Select(node => new SimilarNodeName { Id = node.NodeId, Name = node.Text })

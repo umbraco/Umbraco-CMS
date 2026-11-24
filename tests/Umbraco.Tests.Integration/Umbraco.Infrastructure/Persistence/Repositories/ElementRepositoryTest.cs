@@ -941,6 +941,31 @@ internal sealed class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task SaveAsync_FetchesOnlyTheSiblingsWhoseNameCanCollide()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        foreach (string name in new[] { "Alpha", "Beta", "Report" })
+        {
+            await repository.SaveAsync(ElementBuilder.CreateSimpleElement(_elementType, name), CancellationToken.None);
+        }
+
+        Element duplicate = ElementBuilder.CreateSimpleElement(_elementType, "Report");
+        CommandCounter.Reset();
+        CommandCounter.Enabled = true;
+        await repository.SaveAsync(duplicate, CancellationToken.None);
+        CommandCounter.Enabled = false;
+        scope.Complete();
+
+        IReadOnlyList<string> siblingFetches = [.. CommandCounter.Commands.Where(command => command.Contains("umbracoNode") && command.Contains("LIKE", StringComparison.OrdinalIgnoreCase))];
+        Assert.Multiple(() =>
+        {
+            Assert.That(duplicate.Name, Is.EqualTo("Report (1)"));
+            Assert.That(siblingFetches, Is.Not.Empty, "the sibling names are fetched narrowed to the names sharing the base text");
+        });
+    }
+
+    [Test]
     public async Task GetRecycleBinAsync_ReturnsTrashedElementsAtAnyDepthAndPagesThem()
     {
         IElementContainerService containerService = GetRequiredService<IElementContainerService>();
