@@ -212,6 +212,10 @@
         box.appendChild(el("div", "eyebrow", "Also closes"));
         var ul = el("ul", "closes"); c.alsoCloses.forEach(function (x) { ul.appendChild(el("li", null, x)); }); box.appendChild(ul);
       }
+      if (c.knownGaps && c.knownGaps.length) {
+        box.appendChild(el("div", "eyebrow", "Known gaps to settle in this campaign"));
+        var gaps = el("ul", "closes"); c.knownGaps.forEach(function (x) { gaps.appendChild(el("li", null, x)); }); box.appendChild(gaps);
+      }
       host.appendChild(box);
     });
 

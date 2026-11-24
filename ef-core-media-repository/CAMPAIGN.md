@@ -416,6 +416,7 @@ Steps 2 and 10 to 11 of §6 are the points in each PR where this must happen. A 
 - `MediaNavigationService` / `ContentNavigationRepository` (entity tier campaign), `DatabaseCacheRepository` (HybridCache), `EntityRepository`.
 - Culture-aware "published" ordering in the publishable `OrderByPublished` override (the TODO at today's `ApplyOrdering`; upstream #24530 has no EF Core counterpart).
 - `MediaBuilder`'s int-based static helpers once no test needs an `int parentId` any more.
+- Members campaign: `ApplyOrdering` on the wide base is a static switch over a fixed field list and rejects anything else; the NPoco `MemberRepository` pages with member-specific ordering fields (email, username). Add an overridable ordering step before porting member paging. Recorded on the grand plan under A2 "known gaps" on 24-11-2026.
 - Members campaign: decide the wide repository tier for a kind without a recycle bin. Today `IAsyncContentRepository` carries `RecycleBinKey`, `GetRecycleBinAsync`, `GetPagedRecycleBinAsync` and `RecycleBinSmellsAsync` for every kind (the NPoco `MemberRepository` throws from `RecycleBinId`). Options: a tree-only interface with the recycle bin members on an intermediate tier that media and the publishable kinds inherit, or a throwing default as NPoco has. The version members stay wide: every kind reads one version row, and the history reads and deletes are no-ops for members and media.
 
 ## 10. Working across machines (personal handover area)
