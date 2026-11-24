@@ -81,7 +81,7 @@ export class MemberGroupUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForMemberGroupToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.memberGroup, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.memberGroup, ConstantHelper.workspaceActions.memberGroupSave);
   }
 
   async clickConfirmToDeleteButtonAndWaitForMemberGroupToBeDeleted() {
