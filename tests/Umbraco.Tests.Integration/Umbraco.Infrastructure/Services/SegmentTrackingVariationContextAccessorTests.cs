@@ -118,12 +118,46 @@ public class SegmentTrackingVariationContextAccessorTests : UmbracoIntegrationTe
         CollectionAssert.AreEquivalent(new[] { "segment-3", "segment-4" }, _segmentTrackingVariationContextAccessor.TrackedSegments);
     }
 
+    [Test]
+    public async Task Can_Track_Segments_For_Segment_Only_Property_On_Culture_Variant_Content_Type()
+    {
+        var contentType = await SetupContentType(ContentVariation.CultureAndSegment, ContentVariation.Segment);
+        var createResult = await ContentEditingService.CreateAndPublishAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Properties = [
+                    new() { Alias = "title", Segment = null, Value = "Default segment" },
+                    new() { Alias = "title", Segment = "segment-1", Value = "Segment 1" },
+                    new() { Alias = "title", Segment = "segment-2", Value = "Segment 2" },
+                ],
+                Variants = [
+                    new() { Name = "Page, EN", Culture = "en-US" },
+                ],
+            },
+            new HashSet<string> { "en-US" },
+            Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(createResult.Success);
+
+        var content = await DocumentCacheService.GetByKeyAsync(createResult.Result.Content!.Key);
+        Assert.IsNotNull(content);
+
+        var titleValue = content.Value("title", "en-US");
+        Assert.AreEqual("Default segment", titleValue);
+
+        CollectionAssert.AreEquivalent(new[] { "segment-1", "segment-2" }, _segmentTrackingVariationContextAccessor.TrackedSegments);
+    }
+
     private async Task<IContentType> SetupContentType(ContentVariation variation)
+        => await SetupContentType(variation, variation);
+
+    private async Task<IContentType> SetupContentType(ContentVariation contentTypeVariation, ContentVariation propertyVariation)
     {
         var contentType = ContentTypeBuilder.CreateSimpleContentType();
-        contentType.Variations = variation;
+        contentType.Variations = contentTypeVariation;
         var titlePropertyType = contentType.PropertyTypes.First(pt => pt.Alias == "title");
-        titlePropertyType.Variations = variation;
+        titlePropertyType.Variations = propertyVariation;
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 

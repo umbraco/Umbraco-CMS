@@ -54,7 +54,7 @@ public static class VariationContextAccessorExtensions
     /// <param name="propertyAlias">The property alias.</param>
     /// <param name="culture">The culture, which may be set based on the variation context.</param>
     /// <param name="segment">The segment, which may be set based on the variation context.</param>
-    /// <param name="propertySegmentsForCulture">A factory method to resolve the available property value segments for a given culture at source level, or null if none is available.</param>
+    /// <param name="propertySegmentsForCulture">A factory method to resolve the available property value segments for a given culture at source level, or null if none is available. Overloads without this parameter, such as those used when resolving a value through the published value fallback, provide no segment information.</param>
     public static void ContextualizeVariation(
         this IVariationContextAccessor variationContextAccessor,
         ContentVariation variations,
@@ -93,14 +93,9 @@ public static class VariationContextAccessorExtensions
                 }
                 else
                 {
-                    var effectiveCulture = culture;
-
                     segment = propertyAlias == null ?
                         publishedVariationContext?.GetSegment(contentId.Value) :
-                        publishedVariationContext?.GetSegment(
-                            contentId.Value,
-                            propertyAlias,
-                            () => propertySegmentsForCulture?.Invoke(effectiveCulture));
+                        GetPropertySegment(publishedVariationContext, contentId.Value, propertyAlias, culture, propertySegmentsForCulture);
                 }
             }
             else
@@ -109,4 +104,12 @@ public static class VariationContextAccessorExtensions
             }
         }
     }
+
+    private static string? GetPropertySegment(
+        VariationContext? variationContext,
+        int contentId,
+        string propertyAlias,
+        string? culture,
+        Func<string?, IEnumerable<string>?>? propertySegmentsForCulture)
+        => variationContext?.GetSegment(contentId, propertyAlias, () => propertySegmentsForCulture?.Invoke(culture));
 }
