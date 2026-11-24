@@ -4584,7 +4584,11 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             .Build();
         trashedParent.Trashed = true;
         await repository.SaveAsync(trashedParent, CancellationToken.None);
-        var child = new ContentBuilder().WithContentType(_contentType).WithName("Child In Bin").WithParentId(trashedParent.Id).Build();
+        var child = new ContentBuilder()
+            .WithContentType(_contentType)
+            .WithName("Child In Bin")
+            .WithParentId(trashedParent.Id)
+            .Build();
         child.Trashed = true;
         await repository.SaveAsync(child, CancellationToken.None);
 
