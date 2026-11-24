@@ -962,6 +962,7 @@ export default {
 		next: 'Next',
 		no: 'No',
 		nodeName: 'Node Name',
+		none: 'None',
 		notFound: 'Not found',
 		noResults: 'No results',
 		noResultsFor: (query: string) => `No result for "${query}".`,

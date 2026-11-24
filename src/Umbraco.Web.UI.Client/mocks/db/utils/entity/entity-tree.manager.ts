@@ -52,19 +52,22 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		return items.reverse().map((item) => this.#treeItemMapper(item));
 	}
 
-	readBatch(ids: Array<string>) {
-		const items = ids
-			.map((id) => this.#db.read(id))
-			.filter((item): item is T => item !== undefined)
-			.map((item) => this.#treeItemMapper(item));
-		return { items, total: items.length };
-	}
-
 	getAncestorsOfBatch({ ids }: { ids: Array<string> }) {
 		const items = ids
 			.filter((id) => this.#db.read(id) !== undefined)
 			.map((id) => ({ id, ancestors: this.getAncestorsOf({ descendantId: id }).slice(0, -1) }));
 		return { items, total: items.length };
+	}
+
+	/** Returns the requested items that exist, in the order requested and without duplicates. Unknown ids are omitted. */
+	getItems({ ids }: { ids: Array<string> }) {
+		const items = [...new Set(ids)].map((id) => this.#db.read(id)).filter((item): item is T => item !== undefined);
+		const treeItems = items.map((item) => this.#treeItemMapper(item));
+		const treeItemsHasChildren = treeItems.map((item) => {
+			const children = this._getVisibleItems().filter((child) => child.parent?.id === item.id);
+			return { ...item, hasChildren: children.length > 0 };
+		});
+		return { items: treeItemsHasChildren, total: treeItemsHasChildren.length };
 	}
 
 	#pagedTreeResult({ items, skip, take }: { items: Array<T>; skip: number; take: number }) {

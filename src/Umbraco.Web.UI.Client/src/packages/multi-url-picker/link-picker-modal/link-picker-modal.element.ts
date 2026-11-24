@@ -186,6 +186,10 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		this.#partialUpdateLink({ name });
 	}
 
+	#shouldAutofillName() {
+		return !this.#userEditedTitle && !this._config.disableNameAutofill;
+	}
+
 	#onLinkTargetInput(event: UUIBooleanInputEvent) {
 		this.#partialUpdateLink({ target: event.target.checked ? '_blank' : undefined });
 	}
@@ -194,7 +198,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		const url = event.target.value as string;
 
 		let name: string | undefined;
-		if (url && !this.#userEditedTitle) {
+		if (url && this.#shouldAutofillName()) {
 			if (URL.canParse(url)) {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
@@ -253,7 +257,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 		const link = {
 			icon,
-			name: this.#userEditedTitle ? this.value.link.name : name || this.value.link.name,
+			name: this.#shouldAutofillName() ? name || this.value.link.name : this.value.link.name,
 			type: unique ? type : undefined,
 			unique,
 			url: url ?? this.value.link.url,
