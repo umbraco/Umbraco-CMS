@@ -7,11 +7,14 @@ const getTrimmedSelection = (selection: Selection) => {
 	const { $from, $to, from, to } = selection;
 	const start = $from.nodeAfter;
 	const end = $to.nodeBefore;
-	const leading = start?.isText ? /^\s*/.exec(start.text!)![0].length : 0;
-	const trailing = end?.isText ? /\s*$/.exec(end.text!)![0].length : 0;
+	const leading = start?.isText ? start.text!.length - start.text!.trimStart().length : 0;
+	const trailing = end?.isText ? end.text!.length - end.text!.trimEnd().length : 0;
 
 	return from + leading < to - trailing ? TextSelection.create($from.doc, from + leading, to - trailing) : null;
 };
+
+// The command `state` caches its selection until `tr` is read, so reading it makes `state` see the current selection.
+const refreshSelection = ({ state }: CommandProps) => state.tr;
 
 const runOnTrimmedSelection = (props: CommandProps, run: () => boolean) => {
 	const { tr } = props;
@@ -21,8 +24,7 @@ const runOnTrimmedSelection = (props: CommandProps, run: () => boolean) => {
 	if (!trimmed) return run();
 
 	tr.setSelection(trimmed);
-	// The command `state` caches its selection until `tr` is read, so read it to have `run` see the trimmed one.
-	void props.state.tr;
+	refreshSelection(props);
 	const result = run();
 	tr.setSelection(TextSelection.create(tr.doc, original.anchor, original.head));
 	return result;
