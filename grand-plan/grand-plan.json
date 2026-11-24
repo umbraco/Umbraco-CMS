@@ -444,13 +444,13 @@
         "name": "DataTypeUsageRepository",
         "lines": 53,
         "campaign": "D",
-        "note": "Node, PropertyData, PropertyType. In review as draft #24780 (24-11-2026)."
+        "note": "Node, PropertyData, PropertyType. In review as draft #24780 (24-11-2026); review bot approved after one doc nit."
       },
       {
         "name": "PropertyTypeUsageRepository",
         "lines": 64,
         "campaign": "D",
-        "note": "Same tables as DataTypeUsageRepository; do both in one PR. In review as draft #24780 (24-11-2026)."
+        "note": "Same tables as DataTypeUsageRepository; do both in one PR. In review as draft #24780 (24-11-2026); review bot approved after one doc nit."
       },
       {
         "name": "NodeCountRepository",
@@ -577,6 +577,10 @@
     }
   ],
   "log": [
+    {
+      "date": "24-11-2026",
+      "text": "Usage repositories PR #24780: review bot approved; the one doc nit applied (693466e032c). Awaiting human review."
+    },
     {
       "date": "24-11-2026",
       "text": "Easy win opened: DataTypeUsageRepository and PropertyTypeUsageRepository on EF Core, draft #24780 (13 new tests, contracts gain a trailing CancellationToken). Remove both from the lists when it merges."
