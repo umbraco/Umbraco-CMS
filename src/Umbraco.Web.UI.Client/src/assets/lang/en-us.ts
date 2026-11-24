@@ -30,10 +30,10 @@ export default {
 		noColors: 'You have not configured any approved colors',
 	},
 	colorPickerConfigurations: {
-		colorsDescription: 'Add, remove or sort colors (and labels).',
+		colorsDescription:
+			'Add, remove or sort colors. Give each color a label so assistive technology can identify it, even when labels are not shown.',
 		colorsTitle: 'Colors',
-		showLabelDescription:
-			'Displays colored field and a label for each color in the color picker, rather than just a colored field.',
+		showLabelDescription: 'Shows the label of each color in the color picker, rather than just the color.',
 	},
 	colors: {
 		grey: 'Gray',

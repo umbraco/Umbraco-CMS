@@ -1341,10 +1341,10 @@ export default {
 	},
 	colorPickerConfigurations: {
 		colorsTitle: 'Farver',
-		colorsDescription: 'Tilføj, fjern eller sorter farver (og etiketter).',
-		showLabelTitle: 'Inkluder label?',
-		showLabelDescription:
-			'Viser et farvet felt og en etiket for hver farve i farvevælgeren i stedet for blot et farvet felt.',
+		colorsDescription:
+			'Tilføj, fjern eller sorter farver. Giv hver farve en etiket, så hjælpeteknologi kan identificere den, også når etiketterne ikke vises.',
+		showLabelTitle: 'Vis etiketter?',
+		showLabelDescription: 'Viser etiketten for hver farve i farvevælgeren i stedet for blot farven.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'Du kan kun vælge følgende type(r) dokumenter: %0%',

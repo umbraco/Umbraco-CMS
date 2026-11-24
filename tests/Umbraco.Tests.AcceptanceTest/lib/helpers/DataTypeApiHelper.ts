@@ -1819,6 +1819,12 @@ export class DataTypeApiHelper {
     return valueData?.value === value;
   }
 
+  async doesApprovedColorHaveColorWithLabel(dataTypeName: string, color: string, label: string) {
+    const dataTypeData = await this.getByName(dataTypeName);
+    const valueData = dataTypeData.values.find(item => item.alias === 'items');
+    return valueData?.value.some(item => item.value === color && item.label === label) ?? false;
+  }
+
   async doesApprovedColorHaveColor(dataTypeName: string, color: string) {
     const dataTypeData = await this.getByName(dataTypeName);
     const valueData = dataTypeData.values.find(item => item.alias === 'items');

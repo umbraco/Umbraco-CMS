@@ -4,7 +4,6 @@ import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
 import { isAboveZeroAndBelowMinimum } from '@umbraco-cms/backoffice/validation';
@@ -86,22 +85,17 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
+	/**
+	 * Shows a label field next to each colour.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
 	@property({ type: Boolean })
 	showLabels = false;
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (instance) => {
-			const workspace = instance;
-			this.observe(
-				await workspace?.propertyValueByAlias<boolean>('useLabel'),
-				(value) => {
-					this.showLabels = !!value;
-				},
-				'observeUseLabel',
-			);
-		});
 
 		this.addValidator(
 			'rangeUnderflow',

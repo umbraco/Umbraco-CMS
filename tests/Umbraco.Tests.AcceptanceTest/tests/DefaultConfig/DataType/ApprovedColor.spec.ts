@@ -44,6 +44,21 @@ test('can add color', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesApprovedColorHaveColor(customDataTypeName, colorValue)).toBeTruthy();
 });
 
+test('can add a label to a color when labels are not shown to editors', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.dataType.createDefaultApprovedColorDataType(customDataTypeName);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.addColor(colorValue);
+  await umbracoUi.dataType.enterColorLabel(colorLabel);
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesApprovedColorHaveColorWithLabel(customDataTypeName, colorValue, colorLabel)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'useLabel', true)).toBeFalsy();
+});
+
 test('can remove color', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createApprovedColorDataTypeWithOneItem(customDataTypeName, colorLabel, colorValue);

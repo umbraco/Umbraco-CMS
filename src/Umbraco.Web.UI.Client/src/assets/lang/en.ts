@@ -1385,10 +1385,10 @@ export default {
 	},
 	colorPickerConfigurations: {
 		colorsTitle: 'Colours',
-		colorsDescription: 'Add, remove or sort colours (and labels).',
-		showLabelTitle: 'Include labels?',
-		showLabelDescription:
-			'Displays coloured field and a label for each colour in the colour picker, rather than just a coloured field.',
+		colorsDescription:
+			'Add, remove or sort colours. Give each colour a label so assistive technology can identify it, even when labels are not shown.',
+		showLabelTitle: 'Show labels?',
+		showLabelDescription: 'Shows the label of each colour in the colour picker, rather than just the colour.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'You can only select items of type(s): %0%',

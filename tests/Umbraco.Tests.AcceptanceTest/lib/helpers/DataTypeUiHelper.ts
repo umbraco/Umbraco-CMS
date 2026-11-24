@@ -485,6 +485,10 @@ export class DataTypeUiHelper extends UiBaseLocators {
     await this.enterText(this.colorValueTxt, value);
   }
 
+  async enterColorLabel(label: string) {
+    await this.enterText(this.page.getByTestId('property:items').getByPlaceholder('Label...').getByRole('textbox').last(), label);
+  }
+
   // Label
   async changeValueType(valueType: string) {
     await this.selectByText(this.page.getByLabel('Select a value type'), valueType);
