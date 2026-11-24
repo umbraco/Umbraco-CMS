@@ -12,7 +12,8 @@ export { Paragraph } from '@tiptap/extension-paragraph';
 export { Text } from '@tiptap/extension-text';
 
 // PROSEMIRROR TYPES
-export { NodeSelection, TextSelection } from '@tiptap/pm/state';
+export { NodeSelection, Plugin, TextSelection } from '@tiptap/pm/state';
+export type { Selection } from '@tiptap/pm/state';
 export type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 
 // OPTIONAL EXTENSIONS

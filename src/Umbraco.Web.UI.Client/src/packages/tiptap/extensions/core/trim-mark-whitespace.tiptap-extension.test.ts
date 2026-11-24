@@ -89,4 +89,55 @@ describe('UmbTrimMarkWhitespace', () => {
 		editor.commands.toggleBold();
 		expect(editor.state.doc.nodeAt(1)?.marks.map((mark) => mark.type.name)).to.deep.equal(['bold']);
 	});
+
+	describe('toggling an existing mark', () => {
+		const boldWord = '<p>This is a <strong>bold</strong> word</p>';
+
+		it('removes the mark when the selection includes unmarked trailing whitespace', () => {
+			select(boldWord, 11, 16);
+			editor.commands.toggleBold();
+			expect(editor.getHTML()).to.equal('<p>This is a bold word</p>');
+		});
+
+		it('keeps the original selection after removing the mark', () => {
+			select(boldWord, 11, 16);
+			editor.commands.toggleBold();
+			expect(editor.state.selection.from).to.equal(11);
+			expect(editor.state.selection.to).to.equal(16);
+		});
+	});
+
+	describe('double-click', () => {
+		const boldWord = '<p>This is a <strong>bold</strong> word</p>';
+		const doubleClick = async () => {
+			editor.view.dom.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+			await new Promise((resolve) => setTimeout(resolve));
+		};
+
+		it('excludes trailing whitespace from the selection', async () => {
+			select(boldWord, 11, 16);
+			await doubleClick();
+			expect(editor.state.selection.from).to.equal(11);
+			expect(editor.state.selection.to).to.equal(15);
+		});
+
+		it('makes the mark active for the selected word', async () => {
+			select(boldWord, 11, 16);
+			expect(editor.isActive('bold')).to.be.false;
+			await doubleClick();
+			expect(editor.isActive('bold')).to.be.true;
+		});
+
+		it('leaves a selection without edge whitespace unchanged', async () => {
+			select(boldWord, 11, 15);
+			await doubleClick();
+			expect(editor.state.selection.from).to.equal(11);
+			expect(editor.state.selection.to).to.equal(15);
+		});
+
+		it('does not trim a selection that was not made by a double-click', () => {
+			select(boldWord, 11, 16);
+			expect(editor.state.selection.to).to.equal(16);
+		});
+	});
 });
