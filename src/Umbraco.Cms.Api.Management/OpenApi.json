@@ -13419,7 +13419,7 @@
           "Document"
         ],
         "summary": "Gets the ancestors of multiple document tree items.",
-        "description": "Gets the ancestors of each document tree item identified by the provided Ids, ordered from the root down and excluding the item itself. Items and ancestors the current user cannot access are omitted.",
+        "description": "Gets the ancestors of each document tree item identified by the provided Ids, ordered from the root down and excluding the item itself. Items outside the start nodes of the current user are omitted, and ancestors above a start node are flagged as no access.",
         "operationId": "GetTreeDocumentAncestorsBatch",
         "parameters": [
           {

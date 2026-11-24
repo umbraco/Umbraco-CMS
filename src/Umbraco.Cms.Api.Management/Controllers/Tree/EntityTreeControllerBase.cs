@@ -142,9 +142,13 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     /// <param name="descendantKeys">The keys of the tree items to get the ancestors of.</param>
     /// <returns>
     /// The ancestors of each tree item, ordered from the root down and excluding the item itself, in the order
-    /// requested. Tree items that do not exist or that the current user cannot access are omitted, as are ancestors
-    /// the current user cannot access.
+    /// requested. Tree items that do not exist or that <see cref="FilterEntitiesByUserAccess"/> excludes are omitted,
+    /// as are excluded ancestors.
     /// </returns>
+    /// <remarks>
+    /// Unlike <see cref="GetBatch"/>, the results are not filtered by <c>FilterTreeEntities</c>, so the ancestors
+    /// of an item are returned even when the user could not browse to them in the tree.
+    /// </remarks>
     protected async Task<IEnumerable<(Guid DescendantKey, TItem[] Ancestors)>> GetAncestorsOfItems(Guid[] descendantKeys)
     {
         if (descendantKeys.Length == 0)
