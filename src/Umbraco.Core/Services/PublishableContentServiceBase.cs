@@ -86,6 +86,19 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     protected abstract void DeleteLocked(ICoreScope scope, TContent content, EventMessages evtMsgs);
 
+    /// <summary>
+    ///     Deletes an item, and any items deleted along with it, while holding a write lock.
+    /// </summary>
+    /// <param name="scope">The current scope.</param>
+    /// <param name="content">The item to delete.</param>
+    /// <param name="evtMsgs">The event messages to include in notifications.</param>
+    /// <param name="notificationState">
+    ///     The state of the deleting notification that started the operation, to pass to each deleted notification.
+    /// </param>
+    // TODO (V20): Make abstract and remove the overload without notification state.
+    protected virtual void DeleteLocked(ICoreScope scope, TContent content, EventMessages evtMsgs, IDictionary<string, object?>? notificationState)
+        => DeleteLocked(scope, content, evtMsgs);
+
     protected abstract SavingNotification<TContent> SavingNotification(TContent content, EventMessages eventMessages);
 
     protected abstract SavedNotification<TContent> SavedNotification(TContent content, EventMessages eventMessages);
@@ -1787,7 +1800,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         {
             scope.WriteLock(WriteLockIds);
 
-            if (scope.Notifications.PublishCancelable(DeletingNotification(content, eventMessages)))
+            DeletingNotification<TContent> deletingNotification = DeletingNotification(content, eventMessages);
+            if (scope.Notifications.PublishCancelable(deletingNotification))
             {
                 scope.Complete();
                 return OperationResult.Cancel(eventMessages);
@@ -1804,7 +1818,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     BuildCultureMap(content, content.ContentType.VariesByCulture() ? content.PublishedCultures : ["*"])));
             }
 
-            DeleteLocked(scope, content, eventMessages);
+            DeleteLocked(scope, content, eventMessages, deletingNotification.State);
 
             scope.Notifications.Publish(TreeChangeNotification(content, TreeChangeTypes.Remove, eventMessages));
             Audit(AuditType.Delete, userId, content.Id);

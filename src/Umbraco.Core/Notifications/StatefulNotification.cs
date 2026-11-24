@@ -18,8 +18,15 @@ public abstract class StatefulNotification : IStatefulNotification
     ///     Gets or sets a dictionary for storing custom state data.
     /// </summary>
     /// <remarks>
-    ///     This can be used by event subscribers to store state in the notification so they easily deal with custom state data
-    ///     between a starting ("ing") and an ending ("ed") notification.
+    ///     <para>
+    ///         This can be used by event subscribers to store state in the notification so they easily deal with custom state data
+    ///         between a starting ("ing") and an ending ("ed") notification.
+    ///     </para>
+    ///     <para>
+    ///         A single starting notification can be followed by several ending notifications that all share its dictionary
+    ///         instance, for example one for each entity affected by the operation. Where stored data relates to individual
+    ///         entities, key it by entity, and don't assume every entity in an ending notification has an entry.
+    ///     </para>
     /// </remarks>
     public IDictionary<string, object?> State
     {

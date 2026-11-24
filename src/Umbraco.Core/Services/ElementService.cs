@@ -87,7 +87,8 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
             return;
         }
 
-        if (scope.Notifications.PublishCancelable(new ElementDeletingNotification(elements, eventMessages)))
+        var deletingNotification = new ElementDeletingNotification(elements, eventMessages);
+        if (scope.Notifications.PublishCancelable(deletingNotification))
         {
             scope.Complete();
             return;
@@ -108,7 +109,7 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
 
             // delete content
             // triggers the deleted event
-            DeleteLocked(scope, element, eventMessages);
+            DeleteLocked(scope, element, eventMessages, deletingNotification.State);
             changes.Add(new TreeChange<IElement>(element, TreeChangeTypes.Remove));
         }
 
@@ -134,9 +135,12 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     protected override ILogger<ElementService> Logger => _logger;
 
     protected override void DeleteLocked(ICoreScope scope, IElement content, EventMessages evtMsgs)
+        => DeleteLocked(scope, content, evtMsgs, null);
+
+    protected override void DeleteLocked(ICoreScope scope, IElement content, EventMessages evtMsgs, IDictionary<string, object?>? notificationState)
     {
         _elementRepository.Delete(content);
-        scope.Notifications.Publish(new ElementDeletedNotification(content, evtMsgs));
+        scope.Notifications.Publish(new ElementDeletedNotification(content, evtMsgs).WithState(notificationState));
     }
 
     protected override SavingNotification<IElement> SavingNotification(IElement content, EventMessages eventMessages)

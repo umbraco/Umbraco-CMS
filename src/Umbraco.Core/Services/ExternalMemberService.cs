@@ -264,7 +264,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
         await _repository.DeleteAsync(key);
 
         scope.Notifications.Publish(
-            new ExternalMemberDeletedNotification(member, evtMsgs));
+            new ExternalMemberDeletedNotification(member, evtMsgs).WithStateFrom(deletingNotification));
 
         scope.Complete();
         return Attempt.SucceedWithStatus<ExternalMemberIdentity?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.Success, member);

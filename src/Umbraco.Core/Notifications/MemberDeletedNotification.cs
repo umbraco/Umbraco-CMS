@@ -12,6 +12,8 @@ namespace Umbraco.Cms.Core.Notifications;
 /// <remarks>
 ///     This notification is published by the <see cref="Services.IMemberService"/> when Delete or DeleteMembersOfType methods complete.
 ///     It is not cancelable since the delete operation has already completed.
+///     When deleting members of a type, each member gets its own notification sharing the state of the single
+///     <see cref="MemberDeletingNotification"/>.
 /// </remarks>
 public sealed class MemberDeletedNotification : DeletedNotification<IMember>
 {

@@ -10,8 +10,10 @@ namespace Umbraco.Cms.Core.Notifications;
 ///     Notification that is published after media has been deleted.
 /// </summary>
 /// <remarks>
-///     This notification is published by the <see cref="Services.IMediaService"/> when Delete or EmptyRecycleBin methods complete.
+///     This notification is published by the <see cref="Services.IMediaService"/> when Delete, DeleteMediaOfType or EmptyRecycleBin methods complete.
 ///     It is not cancelable since the delete operation has already completed.
+///     Deleting a media item also deletes its descendants; each gets its own notification sharing the state of the
+///     <see cref="MediaDeletingNotification"/> for the item chosen for deletion.
 /// </remarks>
 public sealed class MediaDeletedNotification : DeletedNotification<IMedia>
 {
