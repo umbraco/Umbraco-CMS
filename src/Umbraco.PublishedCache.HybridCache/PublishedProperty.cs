@@ -35,7 +35,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     private readonly Lock _locko = new();
     private ConcurrentDictionary<CompositeStringStringKey, SourceInterValue>? _sourceValues;
 
-    private Dictionary<string, string[]>? _sourceSegmentsByCulture;
+    private Dictionary<string, IReadOnlyList<string>>? _sourceSegmentsByCulture;
 
     // initializes a published content property with a value
     public PublishedProperty(
@@ -427,10 +427,11 @@ internal sealed class PublishedProperty : PublishedPropertyBase
                 }
             }
 
-            var sourceSegmentsByCulture = new Dictionary<string, string[]>(segmentsByCulture.Count, StringComparer.OrdinalIgnoreCase);
+            // Read-only, as the segments are shared across requests and handed out to variation contexts.
+            var sourceSegmentsByCulture = new Dictionary<string, IReadOnlyList<string>>(segmentsByCulture.Count, StringComparer.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, List<string>> segmentsForCulture in segmentsByCulture)
             {
-                sourceSegmentsByCulture[segmentsForCulture.Key] = segmentsForCulture.Value.ToArray();
+                sourceSegmentsByCulture[segmentsForCulture.Key] = Array.AsReadOnly(segmentsForCulture.Value.ToArray());
             }
 
             _sourceSegmentsByCulture = sourceSegmentsByCulture;

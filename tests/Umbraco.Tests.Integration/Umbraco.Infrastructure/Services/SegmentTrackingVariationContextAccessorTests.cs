@@ -302,6 +302,18 @@ public class SegmentTrackingVariationContextAccessorTests : UmbracoIntegrationTe
         CollectionAssert.AreEquivalent(new[] { "segment-1", "segment-2" }, TrackingContext.TrackedSegments);
     }
 
+    [Test]
+    public async Task Available_Segments_Cannot_Be_Modified_By_Variation_Context()
+    {
+        var content = await CreateSegmentVariantContent();
+
+        content.Value("title");
+
+        var availableSegments = TrackingContext.LastAvailableSegments;
+        Assert.IsInstanceOf<IList<string>>(availableSegments);
+        Assert.Throws<NotSupportedException>(() => ((IList<string>)availableSegments!)[0] = "modified");
+    }
+
     private async Task<IContentType> SetupContentType(ContentVariation variation)
         => await SetupContentType(variation, variation);
 
@@ -359,7 +371,8 @@ public class SegmentTrackingVariationContextAccessorTests : UmbracoIntegrationTe
     {
         public override string GetSegment(int contentId, string propertyAlias, Func<IEnumerable<string>?> availableSegments)
         {
-            var segments = availableSegments()?.ToArray();
+            LastAvailableSegments = availableSegments();
+            var segments = LastAvailableSegments?.ToArray();
             TrackedSegments = segments ?? [];
             Calls.Add(new TrackedCall(propertyAlias, segments));
 
@@ -373,6 +386,8 @@ public class SegmentTrackingVariationContextAccessorTests : UmbracoIntegrationTe
         }
 
         public string[] TrackedSegments { get; private set; } = [];
+
+        public IEnumerable<string>? LastAvailableSegments { get; private set; }
 
         public List<TrackedCall> Calls { get; } = [];
 
