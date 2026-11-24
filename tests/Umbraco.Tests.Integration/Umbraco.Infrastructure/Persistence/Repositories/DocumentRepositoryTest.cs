@@ -4577,7 +4577,11 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
 
-        var trashedParent = new ContentBuilder().WithContentType(_contentType).WithName("Trashed Parent").WithParentId(Constants.System.RecycleBinContent).Build();
+        var trashedParent = new ContentBuilder()
+            .WithContentType(_contentType)
+            .WithName("Trashed Parent")
+            .WithParentId(Constants.System.RecycleBinContent)
+            .Build();
         trashedParent.Trashed = true;
         await repository.SaveAsync(trashedParent, CancellationToken.None);
         var child = new ContentBuilder().WithContentType(_contentType).WithName("Child In Bin").WithParentId(trashedParent.Id).Build();
