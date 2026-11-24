@@ -1,6 +1,15 @@
-import { Bold, Document, Editor, Italic, Paragraph, Text } from '../../externals.js';
+import { Bold, Document, Editor, Italic, Node, Paragraph, Text } from '../../externals.js';
 import { UmbTrimMarkWhitespace } from './trim-mark-whitespace.tiptap-extension.js';
 import { expect } from '@open-wc/testing';
+
+const InlineAtom = Node.create({
+	name: 'inlineAtom',
+	group: 'inline',
+	inline: true,
+	atom: true,
+	parseHTML: () => [{ tag: 'span[data-atom]' }],
+	renderHTML: () => ['span', { 'data-atom': '' }],
+});
 
 describe('UmbTrimMarkWhitespace', () => {
 	let editorHost: HTMLDivElement;
@@ -11,7 +20,7 @@ describe('UmbTrimMarkWhitespace', () => {
 		document.body.appendChild(editorHost);
 		editor = new Editor({
 			element: editorHost,
-			extensions: [Document, Paragraph, Text, Bold, Italic, UmbTrimMarkWhitespace],
+			extensions: [Document, Paragraph, Text, Bold, Italic, InlineAtom, UmbTrimMarkWhitespace],
 		});
 	});
 
@@ -59,5 +68,25 @@ describe('UmbTrimMarkWhitespace', () => {
 		select('<p>This is a <strong>bold </strong>word</p>', 11, 16);
 		editor.commands.toggleBold();
 		expect(editor.getHTML()).to.equal('<p>This is a bold word</p>');
+	});
+
+	it('keeps the original selection after applying a mark', () => {
+		select('<p>This is a bold word</p>', 11, 16);
+		editor.commands.toggleBold();
+		expect(editor.state.selection.from).to.equal(11);
+		expect(editor.state.selection.to).to.equal(16);
+	});
+
+	it('marks the whole range when the selection ends at the start of the next block', () => {
+		editor.commands.setContent('<p>abc  </p><p>def</p>', { parseOptions: { preserveWhitespace: 'full' } });
+		editor.commands.setTextSelection({ from: 1, to: 8 });
+		editor.commands.toggleBold();
+		expect(editor.getHTML()).to.equal('<p><strong>abc  </strong></p><p>def</p>');
+	});
+
+	it('keeps an inline leaf at the selection edge inside the mark', () => {
+		select('<p><span data-atom></span> text</p>', 1, 4);
+		editor.commands.toggleBold();
+		expect(editor.state.doc.nodeAt(1)?.marks.map((mark) => mark.type.name)).to.deep.equal(['bold']);
 	});
 });
