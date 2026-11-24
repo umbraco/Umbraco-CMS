@@ -19,4 +19,4 @@ internal sealed record PublishableContentRow<TEntityDto, TVersionDto>(
     Guid? ParentUniqueId)
     : ContentRow<TVersionDto>(Node, Content, ContentVersion, EntityVersion, ParentUniqueId)
     where TEntityDto : class, IPublishableContentDto
-    where TVersionDto : class, IContentVersionDto;
+    where TVersionDto : class, IPublishableVersionDto;

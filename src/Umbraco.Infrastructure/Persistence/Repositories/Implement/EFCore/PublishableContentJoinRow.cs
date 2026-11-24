@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 /// <typeparam name="TVersionDto">The EF Core DTO type for the entity-specific version rows.</typeparam>
 internal sealed class PublishableContentJoinRow<TEntityDto, TVersionDto> : ContentJoinRow<TVersionDto>
     where TEntityDto : class, IPublishableContentDto
-    where TVersionDto : class, IContentVersionDto
+    where TVersionDto : class, IPublishableVersionDto
 {
     public TEntityDto Entity { get; set; } = null!;
 

@@ -45,7 +45,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     where TEntity : class, IPublishableContentBase
     where TRepository : class, IRepository
     where TEntityDto : class, IPublishableContentDto
-    where TContentVersionDto : class, IContentVersionDto
+    where TContentVersionDto : class, IPublishableVersionDto
     where TContentCultureVariationDto : class, ICultureVariationDto, new()
 {
     /// <summary>
@@ -123,7 +123,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
 
     /// <summary>
     ///     Builds the entity-specific version row (<typeparamref name="TContentVersionDto" />) for the entity's current
-    ///     version, from <see cref="IContentBase.VersionId" /> and with <see cref="IContentVersionDto.Published" /> set
+    ///     version, from <see cref="IContentBase.VersionId" /> and with <see cref="IPublishableVersionDto.Published" /> set
     ///     to <paramref name="publishing" />. Called once the version id is assigned.
     /// </summary>
     /// <param name="entity">The domain entity whose current version is being persisted.</param>

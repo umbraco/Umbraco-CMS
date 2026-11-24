@@ -5,7 +5,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Configurations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 
 [EntityTypeConfiguration(typeof(ElementVersionDtoConfiguration))]
-public class ElementVersionDto : IContentVersionDto
+public class ElementVersionDto : IPublishableVersionDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ElementVersion;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;

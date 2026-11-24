@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 ///     (e.g. <c>umbracoDocumentVersion</c>, <c>umbracoElementVersion</c>): the shared version id plus the
 ///     published flag.
 /// </summary>
-internal interface IContentVersionDto : IEntityVersionDto
+internal interface IPublishableVersionDto : IEntityVersionDto
 {
     /// <summary>Gets a value indicating whether this version is the published one.</summary>
     bool Published { get; }
