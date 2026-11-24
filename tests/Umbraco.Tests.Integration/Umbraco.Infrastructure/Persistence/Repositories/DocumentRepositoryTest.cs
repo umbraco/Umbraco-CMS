@@ -4572,6 +4572,57 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task GetAncestorsAsync_DoesNotCountTheRecycleBinAsAnAncestor()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        var trashedParent = new ContentBuilder()
+            .WithContentType(_contentType)
+            .WithName("Trashed Parent")
+            .WithParentId(Constants.System.RecycleBinContent)
+            .Build();
+        trashedParent.Trashed = true;
+        await repository.SaveAsync(trashedParent, CancellationToken.None);
+        var child = new ContentBuilder()
+            .WithContentType(_contentType)
+            .WithName("Child In Bin")
+            .WithParentId(trashedParent.Id)
+            .Build();
+        child.Trashed = true;
+        await repository.SaveAsync(child, CancellationToken.None);
+
+        PagedModel<IContent> result = await repository.GetAncestorsAsync(child.Key, skip: 0, take: 100, CancellationToken.None);
+        scope.Complete();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Total, Is.EqualTo(1), "the recycle bin node sits on the path but is not a document");
+            Assert.That(result.Items.Select(content => content.Key), Is.EqualTo(new[] { trashedParent.Key }));
+        });
+    }
+
+    [Test]
+    public async Task GetAncestorsAsync_KeyOfAnotherKind_ReturnsEmptyWithZeroTotal()
+    {
+        IElementContainerService containerService = GetRequiredService<IElementContainerService>();
+        EntityContainer parentFolder = (await containerService.CreateAsync(null, "Parent Folder", null, Constants.Security.SuperUserKey)).Result!;
+        EntityContainer childFolder = (await containerService.CreateAsync(null, "Child Folder", parentFolder.Key, Constants.Security.SuperUserKey)).Result!;
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetAncestorsAsync(childFolder.Key, skip: 0, take: 100, CancellationToken.None);
+        scope.Complete();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Total, Is.EqualTo(0));
+            Assert.That(result.Items, Is.Empty);
+        });
+    }
+
+    [Test]
     public async Task GetAncestorsAsync_IncludesTrashedAncestors()
     {
         // Unlike GetByLevelAsync, an ancestor chain must not silently drop trashed ancestors — a

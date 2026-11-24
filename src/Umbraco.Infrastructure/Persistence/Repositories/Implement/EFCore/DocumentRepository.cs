@@ -158,132 +158,16 @@ internal class DocumentRepository
         => GetDescendantsCoreAsync(ancestorKey, skip, take, ordering, loadTemplates: false, includeTrashed, cancellationToken);
 
     /// <inheritdoc />
-    public Task<PagedModel<IContent>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
-    {
-        ArgumentNullException.ThrowIfNull(ordering);
-
-        return AmbientScope.ExecuteWithContextAsync(async db =>
-        {
-            int total = await db.Nodes
-                .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Level == level && !node.Trashed)
-                .CountAsync(cancellationToken);
-
-            if (total == 0)
-            {
-                return new PagedModel<IContent> { Total = 0, Items = [] };
-            }
-
-            // Mirrors GetPagedRecycleBinAsync — only the leading node predicate (Level == level plus the
-            // same !Trashed exclusion the old sync ContentService.GetByLevel documented — "contrary to most
-            // methods, this method filters out trashed content items") differs from that method.
-            IQueryable<ContentJoinRow<DocumentDto, DocumentVersionDto>> baseQuery = BuildBaseQuery(
-                db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Level == level && !node.Trashed));
-
-            bool isCustomFieldOrdering = ordering is { IsCustomField: true };
-            bool isCultureNameOrdering =
-                !isCustomFieldOrdering
-                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) is true
-                && ordering is { IsInvariant: false };
-
-            IReadOnlyList<ContentRow<DocumentDto, DocumentVersionDto>> rows = isCustomFieldOrdering
-                ? await FetchCustomFieldOrdered()
-                : isCultureNameOrdering
-                    ? await FetchCultureNameOrdered()
-                    : await FetchDefaultOrdered();
-
-            if (rows.Count == 0)
-            {
-                return new PagedModel<IContent> { Total = total, Items = [] };
-            }
-
-            List<IContent> items = await AssembleEntitiesAsync(db, rows, propertyAliases: null, loadTemplates: true, cancellationToken);
-
-            async Task<IReadOnlyList<ContentRow<DocumentDto, DocumentVersionDto>>> FetchCustomFieldOrdered()
-            {
-                List<int> candidateNodeIds = await db.Nodes
-                    .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Level == level && !node.Trashed)
-                    .Select(node => node.NodeId)
-                    .ToListAsync(cancellationToken);
-
-                return await FetchCustomFieldOrderedPageAsync(
-                    db,
-                    candidateNodeIds,
-                    ordering!,
-                    skip,
-                    take,
-                    pageNodeIds => baseQuery
-                        .Where(joined => pageNodeIds.Contains(joined.Node.NodeId))
-                        .Select(ToContentRow)
-                        .ToListAsync(cancellationToken),
-                    cancellationToken);
-            }
-
-            Task<IReadOnlyList<ContentRow<DocumentDto, DocumentVersionDto>>> FetchCultureNameOrdered() =>
-                FetchCultureNameOrderedAsync(db, baseQuery, ordering!, skip, take, cancellationToken);
-
-            async Task<IReadOnlyList<ContentRow<DocumentDto, DocumentVersionDto>>> FetchDefaultOrdered()
-            {
-                IOrderedQueryable<ContentJoinRow<DocumentDto, DocumentVersionDto>> orderedQuery = ApplyOrdering(baseQuery, db.Users, ordering);
-
-                return await orderedQuery
-                    .Skip(skip)
-                    .Take(take)
-                    .Select(ToContentRow)
-                    .ToListAsync(cancellationToken);
-            }
-
-            return new PagedModel<IContent> { Total = total, Items = items };
-        });
-    }
+    public Task<PagedModel<IContent>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken) =>
+        GetByLevelCoreAsync(level, skip, take, ordering, cancellationToken);
 
     /// <inheritdoc />
     public Task<PagedModel<IContent>> GetAncestorsAsync(Guid key, int skip, int take, CancellationToken cancellationToken) =>
-        AmbientScope.ExecuteWithContextAsync(async db =>
-        {
-            var self = await db.Nodes
-                .Where(node => node.UniqueId == key)
-                .Select(node => new { node.NodeId, node.Path })
-                .FirstOrDefaultAsync(cancellationToken);
+        GetAncestorsCoreAsync(key, skip, take, cancellationToken);
 
-            if (self is null)
-            {
-                return new PagedModel<IContent> { Total = 0, Items = [] };
-            }
-
-            // Path is stored root-first (e.g. "-1,1063,1066,1092"), so splitting it already yields the
-            // ancestors in root-first order — excluding the root node itself and the node whose ancestors
-            // are being requested, mirroring ContentExtensions.GetAncestorIds().
-            List<int> ancestorNodeIds = [.. self.Path.Split(',')
-                .Select(segment => int.Parse(segment, CultureInfo.InvariantCulture))
-                .Where(nodeId => nodeId != Constants.System.Root && nodeId != self.NodeId)];
-
-            int total = ancestorNodeIds.Count;
-            if (total == 0)
-            {
-                return new PagedModel<IContent> { Total = 0, Items = [] };
-            }
-
-            List<int> pageNodeIds = [.. ancestorNodeIds.Skip(skip).Take(take)];
-            if (pageNodeIds.Count == 0)
-            {
-                return new PagedModel<IContent> { Total = total, Items = [] };
-            }
-
-            List<ContentRow<DocumentDto, DocumentVersionDto>> rows = await BuildBaseQuery(
-                    db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && pageNodeIds.Contains(node.NodeId)))
-                .Select(ToContentRow)
-                .ToListAsync(cancellationToken);
-
-            // The Contains-filtered fetch above does not preserve pageNodeIds' root-first order, so
-            // re-sort in memory to match it before assembling entities.
-            Dictionary<int, int> position = pageNodeIds
-                .Select((nodeId, index) => (nodeId, index))
-                .ToDictionary(x => x.nodeId, x => x.index);
-            List<ContentRow<DocumentDto, DocumentVersionDto>> orderedRows = [.. rows.OrderBy(row => position[row.Node.NodeId])];
-
-            List<IContent> items = await AssembleEntitiesAsync(db, orderedRows, propertyAliases: null, loadTemplates: true, cancellationToken);
-            return new PagedModel<IContent> { Total = total, Items = items };
-        });
+    /// <inheritdoc />
+    public Task<bool> RecycleBinSmellsAsync(CancellationToken cancellationToken) =>
+        RecycleBinSmellsCoreAsync(cancellationToken);
 
     /// <inheritdoc />
     protected override Task OnUowRefreshedEntityAsync(IContent entity, CancellationToken cancellationToken)
@@ -300,7 +184,7 @@ internal class DocumentRepository
     }
 
     /// <inheritdoc />
-    protected override IContent BuildEntity(ContentRow<DocumentDto, DocumentVersionDto> row, IContentType contentType) =>
+    protected override IContent BuildEntity(PublishableContentRow<DocumentDto, DocumentVersionDto> row, IContentType contentType) =>
         ContentBaseFactory.BuildEntity(row.Entity, row.Node, row.ContentVersion, row.PublishedContentVersion, contentType);
 
     /// <inheritdoc />
@@ -359,30 +243,7 @@ internal class DocumentRepository
     }
 
     /// <inheritdoc />
-    // A direct child of the recycle bin node is what makes the bin non-empty; anything trashed deeper down
-    // has such an ancestor. The cached answer is read and then inserted in two steps rather than through
-    // IAppPolicyCache.Get, whose factory is synchronous and would force this query to block on its result.
-    public async Task<bool> RecycleBinSmellsAsync(CancellationToken cancellationToken)
-    {
-        // Answered on every backoffice tree render, so it is cached. ContentCacheRefresher clears this key
-        // on refresh, so the answer cannot outlive a change to what is in the bin.
-        var cached = AppCaches.RuntimeCache.GetCacheItem<bool?>(RecycleBinCacheKey);
-        if (cached.HasValue)
-        {
-            return cached.Value;
-        }
-
-        var smells = await AmbientScope.ExecuteWithContextAsync(db =>
-            db.Nodes.AnyAsync(
-                node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == Constants.System.RecycleBinContent,
-                cancellationToken));
-
-        AppCaches.RuntimeCache.Insert(RecycleBinCacheKey, () => (bool?)smells);
-        return smells;
-    }
-
-    /// <inheritdoc />
-    protected override IQueryable<ContentJoinRow<DocumentDto, DocumentVersionDto>> BuildBaseQuery(
+    protected override IQueryable<PublishableContentJoinRow<DocumentDto, DocumentVersionDto>> BuildBaseQuery(
         UmbracoDbContext db,
         IQueryable<NodeDto> nodes,
         IQueryable<ContentVersionDto> contentVersions)
@@ -405,7 +266,7 @@ internal class DocumentRepository
             .SelectMany(joined => joined.publishedVersionGroup.DefaultIfEmpty(), (joined, publishedVersion) => new { joined.node, joined.contentVersion, joined.document, joined.content, joined.documentVersion, joined.contentType, publishedVersion })
             .GroupJoin(db.Nodes, joined => joined.node.ParentId, parentNode => parentNode.NodeId, (joined, parentNodeGroup) => new { joined.node, joined.contentVersion, joined.document, joined.content, joined.documentVersion, joined.contentType, joined.publishedVersion, parentNodeGroup })
             .SelectMany(joined => joined.parentNodeGroup.DefaultIfEmpty(), (joined, parentNode) => new { joined.node, joined.contentVersion, joined.document, joined.content, joined.documentVersion, joined.contentType, joined.publishedVersion, parentNode })
-            .Select(joined => new ContentJoinRow<DocumentDto, DocumentVersionDto>
+            .Select(joined => new PublishableContentJoinRow<DocumentDto, DocumentVersionDto>
             {
                 Node = joined.node,
                 Entity = joined.document,
@@ -423,7 +284,7 @@ internal class DocumentRepository
     protected override async Task OnEntitiesAssembledAsync(
         UmbracoDbContext db,
         IReadOnlyList<IContent> entities,
-        IReadOnlyList<ContentRow<DocumentDto, DocumentVersionDto>> rows,
+        IReadOnlyList<PublishableContentRow<DocumentDto, DocumentVersionDto>> rows,
         bool loadTemplates,
         CancellationToken cancellationToken)
     {
@@ -438,7 +299,7 @@ internal class DocumentRepository
         for (var i = 0; i < entities.Count; i++)
         {
             IContent entity = entities[i];
-            ContentRow<DocumentDto, DocumentVersionDto> row = rows[i];
+            PublishableContentRow<DocumentDto, DocumentVersionDto> row = rows[i];
 
             int? draftTemplateId = row.EntityVersion.TemplateId;
             if (draftTemplateId.HasValue && validTemplateIds.Contains(draftTemplateId.Value))
@@ -454,7 +315,7 @@ internal class DocumentRepository
         }
     }
 
-    private async Task<HashSet<int>> ResolveValidTemplateIdsAsync(IReadOnlyList<ContentRow<DocumentDto, DocumentVersionDto>> rows, CancellationToken cancellationToken)
+    private async Task<HashSet<int>> ResolveValidTemplateIdsAsync(IReadOnlyList<PublishableContentRow<DocumentDto, DocumentVersionDto>> rows, CancellationToken cancellationToken)
     {
         var templateIds = rows
             .SelectMany(row => new[] { row.EntityVersion.TemplateId, row.PublishedEntityVersion?.TemplateId })

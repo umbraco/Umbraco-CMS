@@ -14,13 +14,14 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 
 /// <summary>
 ///     Provides a base class for async repositories managing <see cref="IContentBase" /> entities,
-///     covering versioning, counting, recycle bin, and data integrity operations.
+///     covering reading and entity assembly, versioning, counting, recycle bin, and data integrity operations.
 /// </summary>
 /// <remarks>
 ///     Mirrors the role of the NPoco <c>ContentRepositoryBase</c>, sitting between
@@ -30,17 +31,26 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 /// </remarks>
 /// <typeparam name="TEntity">The content entity type.</typeparam>
 /// <typeparam name="TRepository">The concrete repository type (self-referential, used for cache policy resolution).</typeparam>
-internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
+/// <typeparam name="TContentType">The content type the entities are built against.</typeparam>
+/// <typeparam name="TVersionDto">The EF Core DTO type for the entity-specific version rows.</typeparam>
+/// <typeparam name="TJoinRow">The join shape the read queries are built on.</typeparam>
+/// <typeparam name="TRow">The row shape entity assembly consumes.</typeparam>
+internal abstract class AsyncContentRepositoryBase<TEntity, TRepository, TContentType, TVersionDto, TJoinRow, TRow>
     : AsyncEntityRepositoryBase<Guid, TEntity>, IAsyncContentRepository<TEntity>
     where TEntity : class, IContentBase
     where TRepository : class, IRepository
+    where TContentType : class, IContentTypeComposition
+    where TVersionDto : class, IEntityVersionDto
+    where TJoinRow : ContentJoinRow<TVersionDto>
+    where TRow : ContentRow<TVersionDto>
 {
     private readonly IIdKeyMap _idKeyMap;
     private readonly ITagRepository _tagRepository;
     private readonly IJsonSerializer _jsonSerializer;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="AsyncContentRepositoryBase{TEntity,TRepository}" /> class.
+    ///     Initializes a new instance of the
+    ///     <see cref="AsyncContentRepositoryBase{TEntity,TRepository,TContentType,TVersionDto,TJoinRow,TRow}" /> class.
     /// </summary>
     /// <param name="scopeAccessor">The EF Core scope accessor.</param>
     /// <param name="appCaches">The application caches.</param>
@@ -56,6 +66,7 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     /// <param name="eventAggregator">The event aggregator for unit-of-work notifications.</param>
     /// <param name="repositoryCacheVersionService">The repository cache version service.</param>
     /// <param name="cacheSyncService">The cache synchronization service.</param>
+    /// <param name="contentTypeRepository">The content type repository used to resolve content types by ID.</param>
     /// <param name="idKeyMap">The id/key map, used to resolve data types for tag and sortable-value handling.</param>
     /// <param name="tagRepository">The tag repository, used to persist tag values for tag-enabled properties on save.</param>
     /// <param name="jsonSerializer">The JSON serializer, used to parse legacy JSON-stored tag values.</param>
@@ -72,6 +83,7 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
         ICacheSyncService cacheSyncService,
+        IAsyncContentTypeRepositoryBase<TContentType> contentTypeRepository,
         IIdKeyMap idKeyMap,
         ITagRepository tagRepository,
         IJsonSerializer jsonSerializer)
@@ -89,6 +101,7 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
         DataValueReferenceFactories = dataValueReferenceFactories;
         DataTypeService = dataTypeService;
         EventAggregator = eventAggregator;
+        ContentTypeRepository = contentTypeRepository;
         _idKeyMap = idKeyMap;
         _tagRepository = tagRepository;
         _jsonSerializer = jsonSerializer;
@@ -103,6 +116,77 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     ///     Gets the self-referential <typeparamref name="TRepository" /> reference.
     /// </summary>
     protected abstract TRepository This { get; }
+
+    /// <summary>
+    ///     Builds a domain entity from the rows a read query returned for one version of it and its content type.
+    /// </summary>
+    /// <param name="row">The materialized row: the node, content and version rows the entity kind reads.</param>
+    /// <param name="contentType">
+    ///     The content type for the entity. The read fails before this is called when a row's content type cannot
+    ///     be resolved.
+    /// </param>
+    /// <returns>The constructed domain entity.</returns>
+    protected abstract TEntity BuildEntity(TRow row, TContentType contentType);
+
+    /// <summary>
+    ///     Builds the join every read query of this repository starts from, over nodes and content versions the
+    ///     caller has already filtered: the content and entity-specific version rows joined on the node and
+    ///     version ids, and the LEFT JOINed content type and parent node, plus whatever the entity kind adds.
+    /// </summary>
+    /// <remarks>
+    ///     Implementations keep the joins concrete to their own tables; everything downstream of the row is
+    ///     shared. Project with object-initializer syntax only, as
+    ///     <see cref="ContentJoinRow{TVersionDto}" /> explains.
+    /// </remarks>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="nodes">The nodes to read, already filtered by the caller.</param>
+    /// <param name="contentVersions">The content versions to join each node with, already filtered by the caller.</param>
+    /// <returns>One row per node and version pair.</returns>
+    protected abstract IQueryable<TJoinRow> BuildBaseQuery(
+        UmbracoDbContext db,
+        IQueryable<NodeDto> nodes,
+        IQueryable<ContentVersionDto> contentVersions);
+
+    /// <summary>
+    ///     Builds the join every read query of this repository starts from, joining each node with its current version.
+    /// </summary>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="nodes">The nodes to read, already filtered by the caller.</param>
+    /// <returns>One row per node.</returns>
+    protected IQueryable<TJoinRow> BuildBaseQuery(UmbracoDbContext db, IQueryable<NodeDto> nodes) =>
+        BuildBaseQuery(db, nodes, db.ContentVersions.Where(contentVersion => contentVersion.Current));
+
+    /// <summary>
+    ///     Gets the single shared projection from the join shape into the row entity assembly consumes; every read
+    ///     query ends with <c>.Select(ToContentRow)</c> instead of restating this construction.
+    /// </summary>
+    protected abstract Expression<Func<TJoinRow, TRow>> ToContentRow { get; }
+
+    /// <summary>
+    ///     Gets the id of the published version a row carries, or 0 when the row has none or the entity kind has no
+    ///     notion of a published version.
+    /// </summary>
+    /// <param name="row">The materialized row.</param>
+    /// <returns>The published version id, or 0.</returns>
+    protected virtual int GetPublishedVersionId(TRow row) => 0;
+
+    /// <summary>
+    ///     Loads whatever variation data the entity kind keeps for a batch of rows, before any entity is built, and
+    ///     returns the step that applies it to each built entity. The default applies nothing.
+    /// </summary>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="rows">The rows about to be assembled.</param>
+    /// <param name="versionIds">Every version id the rows carry, current and published, deduplicated.</param>
+    /// <param name="contentTypeMap">The content types of the rows, keyed by id.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The step applied to each entity once it is built, given the entity and its row.</returns>
+    protected virtual Task<Action<TEntity, TRow>> PrepareVariationsAsync(
+        UmbracoDbContext db,
+        IReadOnlyList<TRow> rows,
+        IReadOnlyList<int> versionIds,
+        IReadOnlyDictionary<int, TContentType> contentTypeMap,
+        CancellationToken cancellationToken) =>
+        Task.FromResult<Action<TEntity, TRow>>((entity, row) => { });
 
     /// <summary>Gets the language repository.</summary>
     protected ILanguageRepository LanguageRepository { get; }
@@ -124,6 +208,9 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
 
     /// <summary>Gets the event aggregator for publishing unit-of-work notifications.</summary>
     protected IEventAggregator EventAggregator { get; }
+
+    /// <summary>Gets the content type repository used to resolve content types by their integer ID.</summary>
+    protected IAsyncContentTypeRepositoryBase<TContentType> ContentTypeRepository { get; }
 
     /// <inheritdoc />
     // The base AsyncDefaultRepositoryCachePolicy defaults to the int-style "uRepo_" cache key prefix even
@@ -194,16 +281,6 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     }
 
     /// <inheritdoc />
-    public abstract Task<IEnumerable<TEntity>> GetAllVersionsAsync(Guid nodeKey, CancellationToken cancellationToken);
-
-    /// <inheritdoc />
-    public virtual async Task<IEnumerable<TEntity>> GetAllVersionsSlimAsync(Guid nodeKey, int skip, int take, CancellationToken cancellationToken)
-    {
-        IEnumerable<TEntity> allVersions = await GetAllVersionsAsync(nodeKey, cancellationToken);
-        return allVersions.Skip(skip).Take(take);
-    }
-
-    /// <inheritdoc />
     public virtual async Task<IEnumerable<int>> GetVersionIdsAsync(Guid nodeKey, int skip, int take, CancellationToken cancellationToken) =>
         await AmbientScope.ExecuteWithContextAsync<IEnumerable<int>>(async db =>
         {
@@ -221,9 +298,6 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
                 .Select(joined => joined.version.Id)
                 .ToListAsync(cancellationToken);
         });
-
-    /// <inheritdoc />
-    public abstract Task<TEntity?> GetVersionAsync(int versionId, CancellationToken cancellationToken);
 
     /// <inheritdoc />
     public virtual Task DeleteVersionAsync(int versionId, CancellationToken cancellationToken) =>
@@ -358,6 +432,1107 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
             : Constants.System.Root;
 
     /// <summary>
+    ///     Gets the selector for the published flag <see cref="ApplyOrdering" /> orders by when a caller asks for
+    ///     "published", or <see langword="null" /> for an entity kind without one.
+    /// </summary>
+    protected virtual Expression<Func<TJoinRow, bool>>? PublishedOrderingSelector => null;
+
+    /// <summary>
+    ///     Applies paging/ordering to a query, breaking ties on node id for stable paging.
+    /// </summary>
+    /// <remarks>
+    ///     Internal (not private) so the ordering unit tests can exercise the tiebreak logic
+    ///     directly, decoupling it from a real database's incidental row order.
+    /// </remarks>
+    /// <param name="source">The rows to order.</param>
+    /// <param name="users">The users, for ordering by owner or updater name.</param>
+    /// <param name="ordering">The ordering to apply; <see langword="null" /> for sort order.</param>
+    /// <param name="publishedSelector">
+    ///     Selects the published flag to order by, or <see langword="null" /> for an entity kind without one.
+    /// </param>
+    internal static IOrderedQueryable<TJoinRow> ApplyOrdering(
+        IQueryable<TJoinRow> source,
+        IQueryable<UserDto> users,
+        Ordering? ordering,
+        Expression<Func<TJoinRow, bool>>? publishedSelector)
+    {
+        bool descending = ordering is { Direction: Direction.Descending };
+        // No ordering at all means sort order - the default every caller relies on - which is distinct from
+        // asking for a field this repository cannot order by.
+        string orderBy = ordering?.OrderBy is { Length: > 0 } field ? field.ToLowerInvariant() : "sortorder";
+        IOrderedQueryable<TJoinRow> ordered = orderBy switch
+        {
+            // Invariant name ordering (node.Text). Culture-specific name ordering is handled
+            // by the callers via a ContentVersionCultureVariation JOIN before reaching this method.
+            "name" => descending
+                ? source.OrderByDescending(joined => joined.Node.Text)
+                : source.OrderBy(joined => joined.Node.Text),
+            "createdate" => descending
+                ? source.OrderByDescending(joined => joined.Node.CreateDate)
+                : source.OrderBy(joined => joined.Node.CreateDate),
+            "versiondate" or "updatedate" => descending
+                ? source.OrderByDescending(joined => joined.ContentVersion.VersionDate)
+                : source.OrderBy(joined => joined.ContentVersion.VersionDate),
+            "id" => descending
+                ? source.OrderByDescending(joined => joined.Node.NodeId)
+                : source.OrderBy(joined => joined.Node.NodeId),
+            // Ordered by the user's name rather than their id, which is the order a caller listing
+            // "owner" or "updater" is asking for. Owner is who created the node; updater is who created
+            // its latest draft version. The name is a correlated subquery written out in each key selector:
+            // the query provider only translates what it can see in the expression tree, and the lookup is
+            // then only paid for when a caller orders by a user name.
+            "owner" => descending
+                ? source.OrderByDescending(joined => users.Where(user => user.Id == joined.Node.UserId).Select(user => user.UserName).FirstOrDefault())
+                : source.OrderBy(joined => users.Where(user => user.Id == joined.Node.UserId).Select(user => user.UserName).FirstOrDefault()),
+            "updater" => descending
+                ? source.OrderByDescending(joined => users.Where(user => user.Id == joined.ContentVersion.UserId).Select(user => user.UserName).FirstOrDefault())
+                : source.OrderBy(joined => users.Where(user => user.Id == joined.ContentVersion.UserId).Select(user => user.UserName).FirstOrDefault()),
+            // Only entity kinds with a published flag supply a selector; for the others the field is as
+            // unsupported as any unknown one.
+            "published" when publishedSelector is not null => descending
+                ? source.OrderByDescending(publishedSelector)
+                : source.OrderBy(publishedSelector),
+            // Null-propagating operators aren't valid inside an Expression<Func<...>> tree - use a
+            // conditional instead of ContentType?.Alias.
+            "contenttypealias" => descending
+                ? source.OrderByDescending(joined => joined.ContentType == null ? null : joined.ContentType.Alias)
+                : source.OrderBy(joined => joined.ContentType == null ? null : joined.ContentType.Alias),
+            "path" => descending
+                ? source.OrderByDescending(joined => joined.Node.Path)
+                : source.OrderBy(joined => joined.Node.Path),
+            "sortorder" => descending
+                ? source.OrderByDescending(joined => joined.Node.SortOrder)
+                : source.OrderBy(joined => joined.Node.SortOrder),
+            // Custom-field ordering (ordering.IsCustomField) is intercepted by callers before reaching
+            // this method — see ResolveCustomFieldOrderedNodeIdsAsync. Anything else is rejected rather
+            // than quietly ordered by something the caller did not ask for.
+            _ => throw new NotSupportedException($"Ordering by {ordering?.OrderBy} not supported."),
+        };
+
+        // Break ties on node id so paged results stay stable/non-duplicated across separate fetches —
+        // mirrors NPoco's ContentRepositoryBase.PreparePageSql, which unconditionally appends "ORDER BY
+        // umbracoNode.id" after any user ordering (see http://issues.umbraco.org/issue/U4-8831). Skipped
+        // when already ordering by id, since that's already unique.
+        return orderBy == "id" ? ordered : ordered.ThenBy(joined => joined.Node.NodeId);
+    }
+
+    // Re-sequences a set of already-fetched rows to match a previously computed node ID order. A node ID
+    // present in orderedNodeIds is silently skipped if it has no corresponding row — the ordering-key
+    // resolution and the row fetch are two separate round trips (unlike the other ordering paths, which
+    // select/page within a single query), so a node concurrently deleted/moved between them would
+    // otherwise fail the whole page with a KeyNotFoundException instead of just omitting that one node.
+    private static List<TRow> ReorderRowsByNodeIds(List<TRow> rows, List<int> orderedNodeIds)
+    {
+        Dictionary<int, TRow> rowsByNodeId = rows.ToDictionary(row => row.Node.NodeId);
+        return [.. orderedNodeIds
+            .Where(rowsByNodeId.ContainsKey)
+            .Select(nodeId => rowsByNodeId[nodeId])];
+    }
+
+    /// <summary>
+    ///     Fetches one page of rows ordered by a custom property field: resolves the full ordered candidate id
+    ///     list, pages it, then fetches and re-sequences the page's rows.
+    /// </summary>
+    /// <remarks>
+    ///     Every branching read query shares this path for custom-field ordering; callers differ only in how
+    ///     <paramref name="candidateNodeIds" /> is filtered and how <paramref name="fetchRowsForPageNodeIds" />
+    ///     queries the base join.
+    /// </remarks>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="candidateNodeIds">The node ids to page over, already filtered by the caller.</param>
+    /// <param name="ordering">The custom-field ordering to apply.</param>
+    /// <param name="skip">The number of ordered nodes to skip.</param>
+    /// <param name="take">The number of ordered nodes to take.</param>
+    /// <param name="fetchRowsForPageNodeIds">Fetches the rows for a batch of the page's node ids, in any order.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The page's rows in the requested order.</returns>
+    protected static async Task<IReadOnlyList<TRow>> FetchCustomFieldOrderedPageAsync(
+        UmbracoDbContext db,
+        List<int> candidateNodeIds,
+        Ordering ordering,
+        int skip,
+        int take,
+        Func<List<int>, Task<List<TRow>>> fetchRowsForPageNodeIds,
+        CancellationToken cancellationToken)
+    {
+        List<int> orderedNodeIds = await ResolveCustomFieldOrderedNodeIdsAsync(
+            db, candidateNodeIds, ordering.OrderBy!, ordering.Culture ?? string.Empty, ordering.Direction, cancellationToken);
+
+        List<int> pageNodeIds = [.. orderedNodeIds.Skip(skip).Take(take)];
+        if (pageNodeIds.Count == 0)
+        {
+            return [];
+        }
+
+        // A page is only as small as the caller asked for, and callers pass int.MaxValue to mean "all of
+        // them", so the node ids going into the fetch predicate are batched like any other runtime-sized
+        // set. The ordering is restored once, over the whole page.
+        var unorderedRows = new List<TRow>();
+        foreach (IEnumerable<int> batch in pageNodeIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            unorderedRows.AddRange(await fetchRowsForPageNodeIds([.. batch]));
+        }
+
+        return ReorderRowsByNodeIds(unorderedRows, pageNodeIds);
+    }
+
+    /// <summary>
+    ///     Fetches one page of rows ordered by name in a specific culture, falling back to the invariant name for
+    ///     nodes without a variant name in that culture.
+    /// </summary>
+    /// <remarks>
+    ///     Every branching read query shares this path for culture-specific name ordering. The culture variations
+    ///     are LEFT JOINed filtered to the resolved language, so variantName = COALESCE(cultureVariation.Name, node.Text).
+    ///     The whole
+    ///     <typeparamref name="TJoinRow" /> is carried forward as one nested member
+    ///     through the GroupJoin/SelectMany so it can be unwrapped again for ordering and fed straight into the
+    ///     shared <see cref="ToContentRow" /> projection.
+    /// </remarks>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="baseQuery">The base join to order and page, already filtered by the caller.</param>
+    /// <param name="ordering">The name ordering to apply; its culture selects the variant names.</param>
+    /// <param name="skip">The number of ordered rows to skip.</param>
+    /// <param name="take">The number of ordered rows to take.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The page's rows in the requested order.</returns>
+    protected async Task<IReadOnlyList<TRow>> FetchCultureNameOrderedAsync(
+        UmbracoDbContext db,
+        IQueryable<TJoinRow> baseQuery,
+        Ordering ordering,
+        int skip,
+        int take,
+        CancellationToken cancellationToken)
+    {
+        // Pre-fetch the language ID — the Language table is tiny (bounded by configured languages).
+        // An unknown culture yields languageId = 0, which matches no culture-variation rows, so variantName falls
+        // back to node.Text for every row (graceful degradation).
+        int languageId = await db.Language
+            .Where(language => language.IsoCode == ordering.Culture)
+            .Select(language => language.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var withVariantName = baseQuery
+            .GroupJoin(
+                db.ContentVersionCultureVariations.Where(cultureVariation => cultureVariation.LanguageId == languageId),
+                joined => joined.ContentVersion.Id,
+                cultureVariation => cultureVariation.VersionId,
+                (joined, cultureVariationGroup) => new { joined, cultureVariationGroup })
+            .SelectMany(
+                joined => joined.cultureVariationGroup.DefaultIfEmpty(),
+                (joined, cultureVariation) => new
+                {
+                    joined.joined,
+                    variantName = cultureVariation != null ? cultureVariation.Name ?? joined.joined.Node.Text : joined.joined.Node.Text,
+                });
+
+        bool descending = ordering is { Direction: Direction.Descending };
+
+        var ordered = ApplyVariantNameOrdering(
+            withVariantName,
+            joined => joined.variantName,
+            joined => joined.joined.Node.NodeId,
+            descending);
+
+        return await ordered
+            .Skip(skip)
+            .Take(take)
+            .Select(joined => joined.joined)
+            .Select(ToContentRow)
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public virtual Task<IEnumerable<TEntity>> GetAllVersionsAsync(Guid nodeKey, CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            // All versions for the node, no Current filter.
+            List<TRow> rows = await BuildBaseQuery(
+                    db,
+                    db.Nodes.Where(node => node.UniqueId == nodeKey && node.NodeObjectType == NodeObjectTypeKey),
+                    db.ContentVersions)
+                .OrderByDescending(joined => joined.ContentVersion.Current)
+                .ThenByDescending(joined => joined.ContentVersion.VersionDate)
+                // Versions saved within the same clock tick share a VersionDate, so without an id tiebreak
+                // their relative order is whatever the provider happens to return.
+                .ThenByDescending(joined => joined.ContentVersion.Id)
+                .Select(ToContentRow)
+                .ToListAsync(cancellationToken);
+
+            if (rows.Count == 0)
+            {
+                return Enumerable.Empty<TEntity>();
+            }
+
+            return await AssembleEntitiesAsync(db, rows, propertyAliases: null, loadTemplates: true, cancellationToken);
+        });
+
+    /// <inheritdoc />
+    /// <remarks>
+    ///     Pages in SQL and hydrates without property data or templates - variants are still loaded, because
+    ///     this feeds rollback, which needs them.
+    /// </remarks>
+    public virtual Task<IEnumerable<TEntity>> GetAllVersionsSlimAsync(Guid nodeKey, int skip, int take, CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            List<TRow> rows = await BuildBaseQuery(
+                    db,
+                    db.Nodes.Where(node => node.UniqueId == nodeKey && node.NodeObjectType == NodeObjectTypeKey),
+                    db.ContentVersions)
+                .OrderByDescending(joined => joined.ContentVersion.Current)
+                .ThenByDescending(joined => joined.ContentVersion.VersionDate)
+                // Versions saved within the same clock tick share a VersionDate, so without an id tiebreak
+                // paging over them can repeat or skip a version.
+                .ThenByDescending(joined => joined.ContentVersion.Id)
+                .Skip(skip)
+                .Take(take)
+                .Select(ToContentRow)
+                .ToListAsync(cancellationToken);
+
+            if (rows.Count == 0)
+            {
+                return Enumerable.Empty<TEntity>();
+            }
+
+            return await AssembleEntitiesAsync(db, rows, propertyAliases: [], loadTemplates: false, cancellationToken);
+        });
+
+    /// <inheritdoc />
+    public virtual Task<TEntity?> GetVersionAsync(int versionId, CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            // Filter by the version's own id; no Current filter — historical versions are valid targets.
+            // The Nodes join guards against returning versions that belong to a different object type.
+            TRow? row = await BuildBaseQuery(
+                    db,
+                    db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey),
+                    db.ContentVersions.Where(contentVersion => contentVersion.Id == versionId))
+                .Select(ToContentRow)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (row is null)
+            {
+                return null;
+            }
+
+            List<TEntity> entities = await AssembleEntitiesAsync(db, [row], propertyAliases: null, loadTemplates: true, cancellationToken);
+            return entities.FirstOrDefault();
+        });
+
+    /// <inheritdoc />
+    public virtual Task<PagedModel<TEntity>> GetChildrenAsync(
+        Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken)
+        => GetChildrenCoreAsync(parentKey, skip, take, propertyAliases, ordering, loadTemplates: true, cancellationToken);
+
+    /// <summary>
+    ///     Gets a page of the children of a node, or of the root when <paramref name="parentKey" /> is
+    ///     <see langword="null" />, ordered as requested.
+    /// </summary>
+    /// <param name="parentKey">The parent key, or <see langword="null" /> for the root of the tree.</param>
+    /// <param name="skip">The number of ordered children to skip.</param>
+    /// <param name="take">The number of ordered children to take.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load, <see langword="null" /> for every property, or empty for none.
+    /// </param>
+    /// <param name="ordering">The ordering to apply; must not be <see langword="null" />.</param>
+    /// <param name="loadTemplates">Forwarded to the post-assembly hook, for entity kinds that have templates.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The page of children and the total number of children.</returns>
+    protected Task<PagedModel<TEntity>> GetChildrenCoreAsync(
+        Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, bool loadTemplates, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(ordering);
+
+        return AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            // A null parentKey means the root of the content tree - root has no Guid identity at all
+            // (Constants.System.RootKey is deliberately null), so it can't be resolved via ResolveNodeIdAsync.
+            int parentNodeId = parentKey.HasValue
+                ? await ResolveNodeIdAsync(db, parentKey.Value, cancellationToken)
+                : Constants.System.Root;
+
+            int total = await db.Nodes
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentNodeId)
+                .CountAsync(cancellationToken);
+
+            if (total == 0)
+            {
+                return new PagedModel<TEntity> { Total = 0, Items = [] };
+            }
+
+            IQueryable<TJoinRow> baseQuery = BuildBaseQuery(
+                db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentNodeId));
+
+            bool isCustomFieldOrdering = ordering is { IsCustomField: true };
+            bool isCultureNameOrdering =
+                !isCustomFieldOrdering
+                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) is true
+                && ordering is { IsInvariant: false };
+
+            IReadOnlyList<TRow> rows = isCustomFieldOrdering
+                ? await FetchCustomFieldOrdered()
+                : isCultureNameOrdering
+                    ? await FetchCultureNameOrdered()
+                    : await FetchDefaultOrdered();
+
+            if (rows.Count == 0)
+            {
+                return new PagedModel<TEntity> { Total = total, Items = [] };
+            }
+
+            List<TEntity> items = await AssembleEntitiesAsync(db, rows, propertyAliases, loadTemplates, cancellationToken);
+
+            async Task<IReadOnlyList<TRow>> FetchCustomFieldOrdered()
+            {
+                List<int> candidateNodeIds = await db.Nodes
+                    .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentNodeId)
+                    .Select(node => node.NodeId)
+                    .ToListAsync(cancellationToken);
+
+                return await FetchCustomFieldOrderedPageAsync(
+                    db,
+                    candidateNodeIds,
+                    ordering!,
+                    skip,
+                    take,
+                    pageNodeIds => baseQuery
+                        .Where(joined => pageNodeIds.Contains(joined.Node.NodeId))
+                        .Select(ToContentRow)
+                        .ToListAsync(cancellationToken),
+                    cancellationToken);
+            }
+
+            Task<IReadOnlyList<TRow>> FetchCultureNameOrdered() =>
+                FetchCultureNameOrderedAsync(db, baseQuery, ordering!, skip, take, cancellationToken);
+
+            async Task<IReadOnlyList<TRow>> FetchDefaultOrdered()
+            {
+                // Invariant name ordering falls through here: ApplyOrdering's default "name"
+                // arm uses node.Text.
+                IOrderedQueryable<TJoinRow> orderedQuery = ApplyOrdering(baseQuery, db.Users, ordering, PublishedOrderingSelector);
+
+                return await orderedQuery
+                    .Skip(skip)
+                    .Take(take)
+                    .Select(ToContentRow)
+                    .ToListAsync(cancellationToken);
+            }
+
+            return new PagedModel<TEntity> { Total = total, Items = items };
+        });
+    }
+
+    /// <inheritdoc />
+    public virtual Task<PagedModel<TEntity>> GetDescendantsAsync(
+        Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true)
+        => GetDescendantsCoreAsync(ancestorKey, skip, take, ordering, loadTemplates: true, includeTrashed, cancellationToken);
+
+    /// <summary>
+    ///     Gets a page of the descendants of a node, ordered as requested.
+    /// </summary>
+    /// <param name="ancestorKey">The ancestor key.</param>
+    /// <param name="skip">The number of ordered descendants to skip.</param>
+    /// <param name="take">The number of ordered descendants to take.</param>
+    /// <param name="ordering">The ordering to apply; must not be <see langword="null" />.</param>
+    /// <param name="loadTemplates">Forwarded to the post-assembly hook, for entity kinds that have templates.</param>
+    /// <param name="includeTrashed">Whether descendants in the recycle bin are included.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The page of descendants and the total number of descendants.</returns>
+    protected Task<PagedModel<TEntity>> GetDescendantsCoreAsync(
+        Guid ancestorKey, int skip, int take, Ordering? ordering, bool loadTemplates, bool includeTrashed, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(ordering);
+
+        return AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            // Matching on the ancestor's own path plus a separator keeps the predicate anchored. A leading
+            // wildcard matches the same rows but can never use an index and is not sargable, so the anchored
+            // form is the one worth keeping if umbracoNode.path is ever indexed. Root's seeded path is "-1",
+            // so this produces "-1," for it - every content path begins with that.
+            var ancestor = await db.Nodes
+                .Where(node => node.UniqueId == ancestorKey)
+                .Select(node => new { node.NodeId, node.Path })
+                .SingleOrDefaultAsync(cancellationToken);
+
+            if (ancestor is null)
+            {
+                return new PagedModel<TEntity> { Total = 0, Items = [] };
+            }
+
+            var pathMatch = $"{ancestor.Path},";
+
+            int total = await db.Nodes
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey
+                    && EF.Functions.Like(node.Path, $"{pathMatch}%")
+                    && (includeTrashed || node.Trashed == false))
+                .CountAsync(cancellationToken);
+
+            if (total == 0)
+            {
+                return new PagedModel<TEntity> { Total = 0, Items = [] };
+            }
+
+            IQueryable<TJoinRow> baseQuery = BuildBaseQuery(
+                db,
+                db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey
+                    && EF.Functions.Like(node.Path, $"{pathMatch}%")
+                    && (includeTrashed || node.Trashed == false)));
+
+            bool isCustomFieldOrdering = ordering is { IsCustomField: true };
+            bool isCultureNameOrdering =
+                !isCustomFieldOrdering
+                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) is true
+                && ordering is { IsInvariant: false };
+
+            IReadOnlyList<TRow> rows = isCustomFieldOrdering
+                ? await FetchCustomFieldOrdered()
+                : isCultureNameOrdering
+                    ? await FetchCultureNameOrdered()
+                    : await FetchDefaultOrdered();
+
+            if (rows.Count == 0)
+            {
+                return new PagedModel<TEntity> { Total = total, Items = [] };
+            }
+
+            List<TEntity> items = await AssembleEntitiesAsync(db, rows, propertyAliases: null, loadTemplates: loadTemplates, cancellationToken);
+
+            async Task<IReadOnlyList<TRow>> FetchCustomFieldOrdered()
+            {
+                List<int> candidateNodeIds = await db.Nodes
+                    .Where(node => node.NodeObjectType == NodeObjectTypeKey
+                        && EF.Functions.Like(node.Path, $"{pathMatch}%")
+                        && (includeTrashed || node.Trashed == false))
+                    .Select(node => node.NodeId)
+                    .ToListAsync(cancellationToken);
+
+                return await FetchCustomFieldOrderedPageAsync(
+                    db,
+                    candidateNodeIds,
+                    ordering!,
+                    skip,
+                    take,
+                    pageNodeIds => baseQuery
+                        .Where(joined => pageNodeIds.Contains(joined.Node.NodeId))
+                        .Select(ToContentRow)
+                        .ToListAsync(cancellationToken),
+                    cancellationToken);
+            }
+
+            Task<IReadOnlyList<TRow>> FetchCultureNameOrdered() =>
+                FetchCultureNameOrderedAsync(db, baseQuery, ordering!, skip, take, cancellationToken);
+
+            async Task<IReadOnlyList<TRow>> FetchDefaultOrdered()
+            {
+                // Invariant name ordering falls through here: ApplyOrdering's default "name"
+                // arm uses node.Text.
+                IOrderedQueryable<TJoinRow> orderedQuery = ApplyOrdering(baseQuery, db.Users, ordering, PublishedOrderingSelector);
+
+                return await orderedQuery
+                    .Skip(skip)
+                    .Take(take)
+                    .Select(ToContentRow)
+                    .ToListAsync(cancellationToken);
+            }
+
+            return new PagedModel<TEntity> { Total = total, Items = items };
+        });
+    }
+
+    /// <inheritdoc />
+    public virtual Task<IEnumerable<TEntity>> GetRootContentAsync(CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync<IEnumerable<TEntity>>(async db =>
+        {
+            List<TRow> rows = await BuildBaseQuery(
+                    db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == Constants.System.Root))
+                .Select(ToContentRow)
+                .ToListAsync(cancellationToken);
+
+            if (rows.Count == 0)
+            {
+                return [];
+            }
+
+            return await AssembleEntitiesAsync(db, rows, propertyAliases: null, loadTemplates: true, cancellationToken);
+        });
+
+    /// <inheritdoc />
+    public virtual Task<IEnumerable<TEntity>> GetRecycleBinAsync(CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync<IEnumerable<TEntity>>(async db =>
+        {
+            // Every trashed node of this object type, regardless of tree depth — not just the direct
+            // children of the recycle bin folder itself.
+            List<TRow> rows = await BuildBaseQuery(
+                    db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Trashed))
+                .Select(ToContentRow)
+                .ToListAsync(cancellationToken);
+
+            if (rows.Count == 0)
+            {
+                return [];
+            }
+
+            return await AssembleEntitiesAsync(db, rows, propertyAliases: null, loadTemplates: true, cancellationToken);
+        });
+
+    /// <inheritdoc />
+    public virtual Task<PagedModel<TEntity>> GetPagedRecycleBinAsync(int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(ordering);
+
+        return AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            int total = await db.Nodes
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Trashed)
+                .CountAsync(cancellationToken);
+
+            if (total == 0)
+            {
+                return new PagedModel<TEntity> { Total = 0, Items = [] };
+            }
+
+            IQueryable<TJoinRow> baseQuery = BuildBaseQuery(
+                db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Trashed));
+
+            bool isCustomFieldOrdering = ordering is { IsCustomField: true };
+            bool isCultureNameOrdering =
+                !isCustomFieldOrdering
+                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) is true
+                && ordering is { IsInvariant: false };
+
+            IReadOnlyList<TRow> rows = isCustomFieldOrdering
+                ? await FetchCustomFieldOrdered()
+                : isCultureNameOrdering
+                    ? await FetchCultureNameOrdered()
+                    : await FetchDefaultOrdered();
+
+            if (rows.Count == 0)
+            {
+                return new PagedModel<TEntity> { Total = total, Items = [] };
+            }
+
+            List<TEntity> items = await AssembleEntitiesAsync(db, rows, propertyAliases: null, loadTemplates: true, cancellationToken);
+
+            async Task<IReadOnlyList<TRow>> FetchCustomFieldOrdered()
+            {
+                List<int> candidateNodeIds = await db.Nodes
+                    .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Trashed)
+                    .Select(node => node.NodeId)
+                    .ToListAsync(cancellationToken);
+
+                return await FetchCustomFieldOrderedPageAsync(
+                    db,
+                    candidateNodeIds,
+                    ordering!,
+                    skip,
+                    take,
+                    pageNodeIds => baseQuery
+                        .Where(joined => pageNodeIds.Contains(joined.Node.NodeId))
+                        .Select(ToContentRow)
+                        .ToListAsync(cancellationToken),
+                    cancellationToken);
+            }
+
+            Task<IReadOnlyList<TRow>> FetchCultureNameOrdered() =>
+                FetchCultureNameOrderedAsync(db, baseQuery, ordering!, skip, take, cancellationToken);
+
+            async Task<IReadOnlyList<TRow>> FetchDefaultOrdered()
+            {
+                IOrderedQueryable<TJoinRow> orderedQuery = ApplyOrdering(baseQuery, db.Users, ordering, PublishedOrderingSelector);
+
+                return await orderedQuery
+                    .Skip(skip)
+                    .Take(take)
+                    .Select(ToContentRow)
+                    .ToListAsync(cancellationToken);
+            }
+
+            return new PagedModel<TEntity> { Total = total, Items = items };
+        });
+    }
+
+    /// <inheritdoc />
+    public virtual Task<PagedModel<TEntity>> GetPagedOfContentTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(ordering);
+
+        return AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            // Content types are themselves nodes (their own umbracoNode row), so their Guid key lives on
+            // NodeDto, not on ContentTypeDto — resolve keys to the underlying node IDs that ContentDto.ContentTypeId
+            // actually stores, in one batched query rather than per-key IIdKeyMap round-trips.
+            List<Guid> contentTypeKeysList = [.. contentTypeKeys];
+            List<int> contentTypeIdsList = await db.ContentTypes
+                .Join(
+                    db.Nodes.Where(node => contentTypeKeysList.Contains(node.UniqueId)),
+                    contentType => contentType.NodeId,
+                    node => node.NodeId,
+                    (contentType, node) => contentType.NodeId)
+                .ToListAsync(cancellationToken);
+
+            int total = await db.Nodes
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey)
+                .Join(
+                    db.Content,
+                    node => node.NodeId,
+                    content => content.NodeId,
+                    (node, content) => content)
+                .Where(content => contentTypeIdsList.Contains(content.ContentTypeId))
+                .CountAsync(cancellationToken);
+
+            if (total == 0)
+            {
+                return new PagedModel<TEntity> { Total = 0, Items = [] };
+            }
+
+            // The content-type filter is applied as an ordinary Where() on the shared join tail's
+            // output, rather than injected mid-chain — Content.ContentTypeId is exposed on every join
+            // row, and every join after Content in the shared tail is cardinality-preserving
+            // for a given (Node, Content) pair (current-version join is 1:1 under the "one current
+            // version per node" invariant every method in this file already relies on; both LEFT JOINs
+            // are 0-or-1), so the predicate commutes freely regardless of where it's written.
+            IQueryable<TJoinRow> baseQuery = BuildBaseQuery(db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey))
+                .Where(joined => contentTypeIdsList.Contains(joined.Content.ContentTypeId));
+
+            bool isCustomFieldOrdering = ordering is { IsCustomField: true };
+            bool isCultureNameOrdering =
+                !isCustomFieldOrdering
+                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) is true
+                && ordering is { IsInvariant: false };
+
+            IReadOnlyList<TRow> rows = isCustomFieldOrdering
+                ? await FetchCustomFieldOrdered()
+                : isCultureNameOrdering
+                    ? await FetchCultureNameOrdered()
+                    : await FetchDefaultOrdered();
+
+            if (rows.Count == 0)
+            {
+                return new PagedModel<TEntity> { Total = total, Items = [] };
+            }
+
+            List<TEntity> items = await AssembleEntitiesAsync(db, rows, propertyAliases: null, loadTemplates: true, cancellationToken);
+
+            async Task<IReadOnlyList<TRow>> FetchCustomFieldOrdered()
+            {
+                List<int> candidateNodeIds = await db.Nodes
+                    .Where(node => node.NodeObjectType == NodeObjectTypeKey)
+                    .Join(
+                        db.Content,
+                        node => node.NodeId,
+                        content => content.NodeId,
+                        (node, content) => new { node, content })
+                    .Where(joined => contentTypeIdsList.Contains(joined.content.ContentTypeId))
+                    .Select(joined => joined.node.NodeId)
+                    .ToListAsync(cancellationToken);
+
+                return await FetchCustomFieldOrderedPageAsync(
+                    db,
+                    candidateNodeIds,
+                    ordering!,
+                    skip,
+                    take,
+                    pageNodeIds => baseQuery
+                        .Where(joined => pageNodeIds.Contains(joined.Node.NodeId))
+                        .Select(ToContentRow)
+                        .ToListAsync(cancellationToken),
+                    cancellationToken);
+            }
+
+            Task<IReadOnlyList<TRow>> FetchCultureNameOrdered() =>
+                FetchCultureNameOrderedAsync(db, baseQuery, ordering!, skip, take, cancellationToken);
+
+            async Task<IReadOnlyList<TRow>> FetchDefaultOrdered()
+            {
+                IOrderedQueryable<TJoinRow> orderedQuery = ApplyOrdering(baseQuery, db.Users, ordering, PublishedOrderingSelector);
+
+                return await orderedQuery
+                    .Skip(skip)
+                    .Take(take)
+                    .Select(ToContentRow)
+                    .ToListAsync(cancellationToken);
+            }
+
+            return new PagedModel<TEntity> { Total = total, Items = items };
+        });
+    }
+
+    /// <summary>
+    ///     Gets a page of the items of this kind at a tree level, excluding trashed ones, ordered as requested.
+    ///     Exposed by the kinds whose contract has a level concept.
+    /// </summary>
+    /// <param name="level">The tree level.</param>
+    /// <param name="skip">The number of ordered items to skip.</param>
+    /// <param name="take">The number of ordered items to take.</param>
+    /// <param name="ordering">The ordering to apply; must not be <see langword="null" />.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The page of items and the total number of items at the level.</returns>
+    protected Task<PagedModel<TEntity>> GetByLevelCoreAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(ordering);
+
+        return AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            int total = await db.Nodes
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Level == level && !node.Trashed)
+                .CountAsync(cancellationToken);
+
+            if (total == 0)
+            {
+                return new PagedModel<TEntity> { Total = 0, Items = [] };
+            }
+
+            // Trashed items are excluded here, unlike the other paged reads.
+            IQueryable<TJoinRow> baseQuery = BuildBaseQuery(
+                db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Level == level && !node.Trashed));
+
+            bool isCustomFieldOrdering = ordering is { IsCustomField: true };
+            bool isCultureNameOrdering =
+                !isCustomFieldOrdering
+                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) is true
+                && ordering is { IsInvariant: false };
+
+            IReadOnlyList<TRow> rows = isCustomFieldOrdering
+                ? await FetchCustomFieldOrdered()
+                : isCultureNameOrdering
+                    ? await FetchCultureNameOrdered()
+                    : await FetchDefaultOrdered();
+
+            if (rows.Count == 0)
+            {
+                return new PagedModel<TEntity> { Total = total, Items = [] };
+            }
+
+            List<TEntity> items = await AssembleEntitiesAsync(db, rows, propertyAliases: null, loadTemplates: true, cancellationToken);
+
+            async Task<IReadOnlyList<TRow>> FetchCustomFieldOrdered()
+            {
+                List<int> candidateNodeIds = await db.Nodes
+                    .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Level == level && !node.Trashed)
+                    .Select(node => node.NodeId)
+                    .ToListAsync(cancellationToken);
+
+                return await FetchCustomFieldOrderedPageAsync(
+                    db,
+                    candidateNodeIds,
+                    ordering!,
+                    skip,
+                    take,
+                    pageNodeIds => baseQuery
+                        .Where(joined => pageNodeIds.Contains(joined.Node.NodeId))
+                        .Select(ToContentRow)
+                        .ToListAsync(cancellationToken),
+                    cancellationToken);
+            }
+
+            Task<IReadOnlyList<TRow>> FetchCultureNameOrdered() =>
+                FetchCultureNameOrderedAsync(db, baseQuery, ordering!, skip, take, cancellationToken);
+
+            async Task<IReadOnlyList<TRow>> FetchDefaultOrdered()
+            {
+                IOrderedQueryable<TJoinRow> orderedQuery = ApplyOrdering(baseQuery, db.Users, ordering, PublishedOrderingSelector);
+
+                return await orderedQuery
+                    .Skip(skip)
+                    .Take(take)
+                    .Select(ToContentRow)
+                    .ToListAsync(cancellationToken);
+            }
+
+            return new PagedModel<TEntity> { Total = total, Items = items };
+        });
+    }
+
+    /// <summary>
+    ///     Gets a page of the ancestors of an item of this kind, root-first. Only ancestors of the same kind are
+    ///     returned and counted: a recycle bin or a container on the path is not one. Exposed by the kinds whose
+    ///     contract has an ancestor concept.
+    /// </summary>
+    /// <param name="key">The key of the item.</param>
+    /// <param name="skip">The number of ancestors to skip.</param>
+    /// <param name="take">The number of ancestors to take.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The page of ancestors and their total number; empty when the key is not an item of this kind.</returns>
+    protected Task<PagedModel<TEntity>> GetAncestorsCoreAsync(Guid key, int skip, int take, CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            var self = await db.Nodes
+                .Where(node => node.UniqueId == key && node.NodeObjectType == NodeObjectTypeKey)
+                .Select(node => new { node.NodeId, node.Path })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (self is null)
+            {
+                return new PagedModel<TEntity> { Total = 0, Items = [] };
+            }
+
+            // Path is stored root-first (e.g. "-1,1063,1066,1092"), so splitting it already yields the
+            // ancestors in root-first order — excluding the root node itself and the node whose ancestors
+            // are being requested, mirroring ContentExtensions.GetAncestorIds().
+            List<int> pathNodeIds = [.. self.Path.Split(',')
+                .Select(segment => int.Parse(segment, CultureInfo.InvariantCulture))
+                .Where(nodeId => nodeId != Constants.System.Root && nodeId != self.NodeId)];
+
+            if (pathNodeIds.Count == 0)
+            {
+                return new PagedModel<TEntity> { Total = 0, Items = [] };
+            }
+
+            List<int> ancestorsOfThisKind = await db.Nodes
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey && pathNodeIds.Contains(node.NodeId))
+                .Select(node => node.NodeId)
+                .ToListAsync(cancellationToken);
+            List<int> ancestorNodeIds = [.. pathNodeIds.Where(ancestorsOfThisKind.Contains)];
+
+            int total = ancestorNodeIds.Count;
+            if (total == 0)
+            {
+                return new PagedModel<TEntity> { Total = 0, Items = [] };
+            }
+
+            List<int> pageNodeIds = [.. ancestorNodeIds.Skip(skip).Take(take)];
+            if (pageNodeIds.Count == 0)
+            {
+                return new PagedModel<TEntity> { Total = total, Items = [] };
+            }
+
+            List<TRow> rows = await BuildBaseQuery(
+                    db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && pageNodeIds.Contains(node.NodeId)))
+                .Select(ToContentRow)
+                .ToListAsync(cancellationToken);
+
+            // The Contains-filtered fetch above does not preserve pageNodeIds' root-first order, so
+            // re-sort in memory to match it before assembling entities.
+            Dictionary<int, int> position = pageNodeIds
+                .Select((nodeId, index) => (nodeId, index))
+                .ToDictionary(x => x.nodeId, x => x.index);
+            List<TRow> orderedRows = [.. rows.OrderBy(row => position[row.Node.NodeId])];
+
+            List<TEntity> items = await AssembleEntitiesAsync(db, orderedRows, propertyAliases: null, loadTemplates: true, cancellationToken);
+            return new PagedModel<TEntity> { Total = total, Items = items };
+        });
+
+    /// <summary>
+    ///     Gets whether the recycle bin of this kind holds an item of this kind directly under it. Exposed by the
+    ///     kinds whose bin holds nothing but items of that kind.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns><see langword="true" /> when the bin is not empty.</returns>
+    // A direct child of the recycle bin node is what makes the bin non-empty; anything trashed deeper down
+    // has such an ancestor. The cached answer is read and then inserted in two steps rather than through
+    // IAppPolicyCache.Get, whose factory is synchronous and would force this query to block on its result.
+    protected async Task<bool> RecycleBinSmellsCoreAsync(CancellationToken cancellationToken)
+    {
+        // Answered on every backoffice tree render, so it is cached. The kind's cache refresher clears this
+        // key on refresh, so the answer cannot outlive a change to what is in the bin.
+        var cached = AppCaches.RuntimeCache.GetCacheItem<bool?>(RecycleBinCacheKey);
+        if (cached.HasValue)
+        {
+            return cached.Value;
+        }
+
+        var smells = await AmbientScope.ExecuteWithContextAsync(db =>
+            db.Nodes.AnyAsync(
+                node => node.NodeObjectType == NodeObjectTypeKey
+                    && db.Nodes.Where(bin => bin.UniqueId == RecycleBinKey).Select(bin => bin.NodeId).Contains(node.ParentId),
+                cancellationToken));
+
+        AppCaches.RuntimeCache.Insert(RecycleBinCacheKey, () => (bool?)smells);
+        return smells;
+    }
+
+    /// <inheritdoc />
+    protected override async Task<TEntity?> PerformGetAsync(Guid key)
+    {
+        List<TEntity> results = await PerformGetRangeAsync([key], propertyAliases: null, loadTemplates: true, CancellationToken.None);
+        return results.FirstOrDefault();
+    }
+
+    /// <inheritdoc />
+    protected override async Task<IEnumerable<TEntity>?> PerformGetAllAsync()
+            => await PerformGetRangeAsync(null, propertyAliases: null, loadTemplates: true, CancellationToken.None);
+
+    /// <inheritdoc />
+    protected override async Task<IEnumerable<TEntity>?> PerformGetManyAsync(Guid[] keys)
+        => await PerformGetRangeAsync(keys, propertyAliases: null, loadTemplates: true, CancellationToken.None);
+
+    /// <inheritdoc />
+    public virtual async Task<IEnumerable<TEntity>> GetManyAsync(Guid[] keys, string[]? propertyAliases, CancellationToken cancellationToken)
+        => keys.Length == 0 ? [] : await PerformGetRangeAsync(keys, propertyAliases, loadTemplates: true, cancellationToken);
+
+    /// <summary>
+    ///     Reads and assembles the entities with the given keys, or every entity of this repository's kind when
+    ///     <paramref name="keys" /> is <see langword="null" />.
+    /// </summary>
+    /// <param name="keys">The keys to read, or <see langword="null" /> for every entity.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load, <see langword="null" /> for every property, or empty for none.
+    /// </param>
+    /// <param name="loadTemplates">Forwarded to the post-assembly hook, for entity kinds that have templates.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The assembled entities.</returns>
+    protected Task<List<TEntity>> PerformGetRangeAsync(Guid[]? keys, string[]? propertyAliases, bool loadTemplates, CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            IQueryable<NodeDto> nodeQuery = db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey);
+            if (keys is not null)
+            {
+                List<Guid> keyList = new(keys);
+                nodeQuery = nodeQuery.Where(node => keyList.Contains(node.UniqueId));
+            }
+
+            List<TRow> rows = await BuildBaseQuery(db, nodeQuery)
+                .Select(ToContentRow)
+                .ToListAsync(cancellationToken);
+
+            if (rows.Count == 0)
+            {
+                return [];
+            }
+
+            return await AssembleEntitiesAsync(db, rows, propertyAliases, loadTemplates, cancellationToken);
+        });
+
+    /// <summary>
+    ///     Builds fully populated entities from the rows a read query materialized: content types, property data,
+    ///     the entity kind's variations, the post-assembly hook, then a clean dirty state and the parent key.
+    /// </summary>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="rows">The rows to assemble, one per entity.</param>
+    /// <param name="propertyAliases">
+    ///     The property aliases to load, <see langword="null" /> for every property, or empty for none.
+    /// </param>
+    /// <param name="loadTemplates">Whether templates should be loaded, for entity kinds that have them.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The assembled entities, in row order.</returns>
+    protected async Task<List<TEntity>> AssembleEntitiesAsync(UmbracoDbContext db, IReadOnlyList<TRow> rows, string[]? propertyAliases, bool loadTemplates, CancellationToken cancellationToken)
+    {
+        // All relevant version IDs (current + published, deduplicated).
+        // Current and published are always different IDs after the first publish.
+        var allVersionIds = rows
+            .Select(row => row.ContentVersion.Id)
+            .Concat(rows
+                .Select(GetPublishedVersionId)
+                .Where(publishedVersionId => publishedVersionId > 0))
+            .Distinct()
+            .ToList();
+
+        Dictionary<int, List<PropertyDataDto>> propertyDtosByVersionId =
+            await LoadPropertyDataAsync(db, allVersionIds, propertyAliases, cancellationToken);
+
+        // Pre-populate content type map. ContentTypeRepository caches, so no extra DB round-trips
+        // after the first call per type — and we need the types up front to gate variation queries.
+        var contentTypeMap = new Dictionary<int, TContentType>();
+        foreach (int contentTypeId in rows.Select(row => row.Content.ContentTypeId).Distinct())
+        {
+            TContentType? contentType = await ContentTypeRepository.GetAsync(contentTypeId, cancellationToken);
+            if (contentType is null)
+            {
+                throw new InvalidOperationException($"Content type {contentTypeId} was not found.");
+            }
+
+            contentTypeMap[contentTypeId] = contentType;
+        }
+
+        Action<TEntity, TRow> applyVariations = await PrepareVariationsAsync(db, rows, allVersionIds, contentTypeMap, cancellationToken);
+
+        var entities = new List<TEntity>(rows.Count);
+
+        foreach (TRow row in rows)
+        {
+            TContentType contentType = contentTypeMap[row.Content.ContentTypeId];
+
+            TEntity entity = BuildEntity(row, contentType);
+
+            int publishedVersionId = GetPublishedVersionId(row);
+
+            var versionPropertyDtos = new List<PropertyDataDto>();
+            if (propertyDtosByVersionId.TryGetValue(row.ContentVersion.Id, out List<PropertyDataDto>? currentProps))
+            {
+                versionPropertyDtos.AddRange(currentProps);
+
+                // A fetched version can itself be the node's published version (e.g. fetching a specific,
+                // still-published version by id). PropertyFactory.BuildEntities classifies a dto as published
+                // purely by VersionId == publishedVersionId, so without a distinct draft-side entry every
+                // value would be published-only, leaving the unqualified (draft) accessor empty. Mirrors the
+                // "dirty corner case" handled the same way in ContentRepositoryBase.GetPropertyCollections.
+                if (row.ContentVersion.Id == publishedVersionId)
+                {
+                    versionPropertyDtos.AddRange(currentProps.Select(dto => dto.Clone(-1)));
+                }
+            }
+
+            if (publishedVersionId > 0 &&
+                publishedVersionId != row.ContentVersion.Id &&
+                propertyDtosByVersionId.TryGetValue(publishedVersionId, out List<PropertyDataDto>? pubProps))
+            {
+                versionPropertyDtos.AddRange(pubProps);
+            }
+
+            if (propertyAliases is { Length: 0 })
+            {
+                // Empty alias list means "no custom properties" - mirrors the NPoco path's short-circuit in
+                // ContentRepositoryBase.GetPropertyCollections, which skips property-slot creation entirely
+                // rather than creating slots with unset values.
+                entity.Properties = new PropertyCollection(new List<IProperty>());
+            }
+            else
+            {
+                IPropertyType[] compositionProperties = contentType.CompositionPropertyTypes.ToArray();
+                entity.Properties = new PropertyCollection(
+                    await PropertyFactory.BuildEntities(
+                        compositionProperties,
+                        versionPropertyDtos,
+                        publishedVersionId,
+                        LanguageRepository));
+            }
+
+            applyVariations(entity, row);
+
+            entities.Add(entity);
+        }
+
+        await OnEntitiesAssembledAsync(db, entities, rows, loadTemplates, cancellationToken);
+
+        for (var i = 0; i < entities.Count; i++)
+        {
+            TEntity entity = entities[i];
+            TRow row = rows[i];
+
+            // Applying variations above, and anything the post-assembly hook set, dirties the entity via
+            // collection-changed notifications, so a freshly-assembled entity must be reset to a clean state
+            // before being handed to the caller.
+            entity.ResetDirtyProperties(false);
+
+            // Root's node row exists (umbracoNode id -1) but carries Constants.System.RootSystemKey, not
+            // the semantic "no parent" value ParentKey contracts to - row.ParentUniqueId comes straight
+            // from a join on umbracoNode and must not be trusted for Root without this override.
+            entity.ParentKey = row.Node.ParentId == Constants.System.Root
+                ? null
+                : row.ParentUniqueId;
+        }
+
+        return entities;
+    }
+
+    /// <summary>
+    ///     Called once per assembled batch, after every entity has been built with its properties and variations and
+    ///     before the entities are reset to a clean state. Override to populate entity-kind-specific members from the
+    ///     rows, for example an entity kind with templates resolves and assigns them here.
+    /// </summary>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="entities">The assembled entities, in row order.</param>
+    /// <param name="rows">The rows the entities were built from, in the same order.</param>
+    /// <param name="loadTemplates">Whether the caller asked for templates to be loaded.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    protected virtual Task OnEntitiesAssembledAsync(
+        UmbracoDbContext db,
+        IReadOnlyList<TEntity> entities,
+        IReadOnlyList<TRow> rows,
+        bool loadTemplates,
+        CancellationToken cancellationToken) =>
+        Task.CompletedTask;
+
+    /// <summary>
     ///     Loads the property data rows of the given versions, grouped by version id.
     /// </summary>
     /// <param name="db">The EF Core context for the ambient scope.</param>
@@ -417,10 +1592,10 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     // appended after any user ordering for that reason (see http://issues.umbraco.org/issue/U4-8831).
     // Internal so the tiebreak can be exercised directly against a sequence with tied names, which a
     // database-backed test cannot reliably produce.
-    internal static IOrderedQueryable<TRow> ApplyVariantNameOrdering<TRow>(
-        IQueryable<TRow> source,
-        Expression<Func<TRow, string?>> variantNameSelector,
-        Expression<Func<TRow, int>> nodeIdSelector,
+    internal static IOrderedQueryable<TSource> ApplyVariantNameOrdering<TSource>(
+        IQueryable<TSource> source,
+        Expression<Func<TSource, string?>> variantNameSelector,
+        Expression<Func<TSource, int>> nodeIdSelector,
         bool descending)
         => descending
             ? source.OrderByDescending(variantNameSelector).ThenBy(nodeIdSelector)
@@ -569,21 +1744,6 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
 
         return string.CompareOrdinal(left.VarcharValue ?? string.Empty, right.VarcharValue ?? string.Empty);
     }
-
-    /// <inheritdoc />
-    public abstract Task<PagedModel<TEntity>> GetChildrenAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
-
-    /// <inheritdoc />
-    public abstract Task<PagedModel<TEntity>> GetDescendantsAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true);
-
-    /// <inheritdoc />
-    public abstract Task<IEnumerable<TEntity>> GetRootContentAsync(CancellationToken cancellationToken);
-
-    /// <inheritdoc />
-    public abstract Task<IEnumerable<TEntity>> GetRecycleBinAsync(CancellationToken cancellationToken);
-
-    /// <inheritdoc />
-    public abstract Task<PagedModel<TEntity>> GetPagedRecycleBinAsync(int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <inheritdoc />
     public virtual async Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(
