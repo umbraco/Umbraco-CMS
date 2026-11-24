@@ -149,6 +149,159 @@ public class SegmentTrackingVariationContextAccessorTests : UmbracoIntegrationTe
         CollectionAssert.AreEquivalent(new[] { "segment-1", "segment-2" }, _segmentTrackingVariationContextAccessor.TrackedSegments);
     }
 
+    [Test]
+    public async Task Can_Render_Value_For_Segment_Selected_From_Available_Segments()
+    {
+        var content = await CreateSegmentVariantContent();
+        TrackingContext.PreferredSegments = ["segment-not-stored", "segment-2"];
+
+        var titleValue = content.Value("title");
+
+        Assert.AreEqual("Segment 2", titleValue);
+    }
+
+    [Test]
+    public async Task Can_Render_Value_For_Segment_Selected_From_Available_Segments_Per_Culture()
+    {
+        var language = new LanguageBuilder()
+            .WithCultureInfo("da-DK")
+            .Build();
+        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey);
+
+        var contentType = await SetupContentType(ContentVariation.CultureAndSegment);
+        var createResult = await ContentEditingService.CreateAndPublishAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Properties = [
+                    new() { Alias = "title", Culture = "en-US", Segment = null, Value = "Default segment, EN" },
+                    new() { Alias = "title", Culture = "en-US", Segment = "segment-1", Value = "Segment 1, EN" },
+                    new() { Alias = "title", Culture = "da-DK", Segment = null, Value = "Default segment, DA" },
+                    new() { Alias = "title", Culture = "da-DK", Segment = "segment-2", Value = "Segment 2, DA" },
+                ],
+                Variants = [
+                    new() { Name = "Page, EN", Culture = "en-US" },
+                    new() { Name = "Page, DA", Culture = "da-DK" },
+                ],
+            },
+            new HashSet<string> { "en-US", "da-DK" },
+            Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(createResult.Success);
+
+        var content = await DocumentCacheService.GetByKeyAsync(createResult.Result.Content!.Key);
+        Assert.IsNotNull(content);
+
+        // Each culture stores only one of the preferred segments, so the selection must use the segments of the rendered culture.
+        TrackingContext.PreferredSegments = ["segment-2", "segment-1"];
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Segment 1, EN", content.Value("title", "en-US"));
+            Assert.AreEqual("Segment 2, DA", content.Value("title", "da-DK"));
+        });
+    }
+
+    [Test]
+    public async Task Available_Segments_Are_Empty_When_Property_Has_No_Segment_Values()
+    {
+        var language = new LanguageBuilder()
+            .WithCultureInfo("da-DK")
+            .Build();
+        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType();
+        contentType.Variations = ContentVariation.CultureAndSegment;
+        foreach (var propertyType in contentType.PropertyTypes)
+        {
+            propertyType.Variations = ContentVariation.CultureAndSegment;
+        }
+
+        contentType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var createResult = await ContentEditingService.CreateAndPublishAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Properties = [
+                    new() { Alias = "title", Culture = "en-US", Segment = null, Value = "Default segment, EN" },
+                    new() { Alias = "title", Culture = "en-US", Segment = "segment-1", Value = "Segment 1, EN" },
+                    new() { Alias = "title", Culture = "da-DK", Segment = null, Value = "Default segment, DA" },
+                ],
+                Variants = [
+                    new() { Name = "Page, EN", Culture = "en-US" },
+                    new() { Name = "Page, DA", Culture = "da-DK" },
+                ],
+            },
+            new HashSet<string> { "en-US", "da-DK" },
+            Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(createResult.Success);
+
+        var content = await DocumentCacheService.GetByKeyAsync(createResult.Result.Content!.Key);
+        Assert.IsNotNull(content);
+
+        // A culture with only a default segment value.
+        Assert.AreEqual("Default segment, DA", content.Value("title", "da-DK"));
+        var titleCall = TrackingContext.Calls.First(call => call.PropertyAlias == "title");
+        Assert.That(titleCall.AvailableSegments ?? [], Is.Empty);
+
+        // A property with no stored values at all.
+        TrackingContext.Calls.Clear();
+        Assert.IsFalse(content.HasValue("bodyText", "en-US"));
+        var bodyTextCall = TrackingContext.Calls.First(call => call.PropertyAlias == "bodyText");
+        Assert.That(bodyTextCall.AvailableSegments ?? [], Is.Empty);
+    }
+
+    [Test]
+    public async Task Renders_Default_Segment_Value_When_Selected_Segment_Has_No_Value()
+    {
+        var content = await CreateSegmentVariantContent();
+        TrackingContext.ForcedSegment = "segment-not-stored";
+
+        var titleValue = content.Value("title");
+
+        Assert.AreEqual("Default segment", titleValue);
+        CollectionAssert.AreEquivalent(new[] { "segment-1", "segment-2" }, TrackingContext.Calls.First().AvailableSegments);
+    }
+
+    [Test]
+    public async Task Explicit_Segment_Does_Not_Resolve_Segment_From_Variation_Context()
+    {
+        var content = await CreateSegmentVariantContent();
+        TrackingContext.ForcedSegment = "segment-2";
+
+        var titleValue = content.Value("title", segment: "segment-1");
+
+        Assert.AreEqual("Segment 1", titleValue);
+        Assert.IsEmpty(TrackingContext.Calls);
+    }
+
+    [Test]
+    public async Task Can_Get_Source_Value_For_Segment_Selected_From_Available_Segments()
+    {
+        var content = await CreateSegmentVariantContent();
+        TrackingContext.PreferredSegments = ["segment-2"];
+
+        var sourceValue = content.GetProperty("title")!.GetSourceValue();
+
+        Assert.AreEqual("Segment 2", sourceValue);
+        CollectionAssert.AreEquivalent(new[] { "segment-1", "segment-2" }, TrackingContext.TrackedSegments);
+    }
+
+    [Test]
+    public async Task Can_Get_Delivery_Api_Value_For_Segment_Selected_From_Available_Segments()
+    {
+        var content = await CreateSegmentVariantContent();
+        TrackingContext.PreferredSegments = ["segment-2"];
+
+        var deliveryApiValue = content.GetProperty("title")!.GetDeliveryApiValue(false);
+
+        Assert.AreEqual("Segment 2", deliveryApiValue);
+        CollectionAssert.AreEquivalent(new[] { "segment-1", "segment-2" }, TrackingContext.TrackedSegments);
+    }
+
     private async Task<IContentType> SetupContentType(ContentVariation variation)
         => await SetupContentType(variation, variation);
 
@@ -164,6 +317,35 @@ public class SegmentTrackingVariationContextAccessorTests : UmbracoIntegrationTe
         return contentType;
     }
 
+    private async Task<IPublishedContent> CreateSegmentVariantContent()
+    {
+        var contentType = await SetupContentType(ContentVariation.Segment);
+        var createResult = await ContentEditingService.CreateAndPublishAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Properties = [
+                    new() { Alias = "title", Segment = null, Value = "Default segment" },
+                    new() { Alias = "title", Segment = "segment-1", Value = "Segment 1" },
+                    new() { Alias = "title", Segment = "segment-2", Value = "Segment 2" },
+                ],
+                Variants = [
+                    new() { Name = "Page" },
+                ],
+            },
+            new HashSet<string>(),
+            Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(createResult.Success);
+
+        var content = await DocumentCacheService.GetByKeyAsync(createResult.Result.Content!.Key);
+        Assert.IsNotNull(content);
+        return content;
+    }
+
+    private SegmentTrackingVariationContext TrackingContext
+        => (SegmentTrackingVariationContext)_segmentTrackingVariationContextAccessor.VariationContext;
+
     private class SegmentTrackingVariationContextAccessor : IVariationContextAccessor
     {
         public VariationContext VariationContext { get; set; } = new SegmentTrackingVariationContext();
@@ -171,14 +353,33 @@ public class SegmentTrackingVariationContextAccessorTests : UmbracoIntegrationTe
         public string[] TrackedSegments => ((SegmentTrackingVariationContext)VariationContext).TrackedSegments;
     }
 
+    private record TrackedCall(string PropertyAlias, string[]? AvailableSegments);
+
     private class SegmentTrackingVariationContext : VariationContext
     {
         public override string GetSegment(int contentId, string propertyAlias, Func<IEnumerable<string>?> availableSegments)
         {
-            TrackedSegments = availableSegments()?.ToArray() ?? [];
-            return base.GetSegment(contentId, propertyAlias, availableSegments);
+            var segments = availableSegments()?.ToArray();
+            TrackedSegments = segments ?? [];
+            Calls.Add(new TrackedCall(propertyAlias, segments));
+
+            if (ForcedSegment is not null)
+            {
+                return ForcedSegment;
+            }
+
+            return PreferredSegments.FirstOrDefault(preferred => segments?.Contains(preferred) is true)
+                ?? base.GetSegment(contentId, propertyAlias, availableSegments);
         }
 
         public string[] TrackedSegments { get; private set; } = [];
+
+        public List<TrackedCall> Calls { get; } = [];
+
+        // Segments the request qualifies for, in priority order; the first one stored for the property is used.
+        public string[] PreferredSegments { get; set; } = [];
+
+        // Returned regardless of the available segments, to resolve a segment the property has no value for.
+        public string? ForcedSegment { get; set; }
     }
 }
