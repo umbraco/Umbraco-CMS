@@ -1,4 +1,3 @@
-using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -255,12 +254,13 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             rootContainerNotificationStates[rootContainer.Id] = containerDeletingNotification.State;
         }
 
+        // Paths of items in the recycle bin start with the root and the recycle bin, followed by the root-most item in the bin.
         List<IElement> deletedElements = DeleteDescendantsLocked(
             Constants.System.RecycleBinElementKey,
             UmbracoObjectTypes.ElementRecycleBin,
             scope,
             eventMessages,
-            item => rootContainerNotificationStates.TryGetValue(GetRecycleBinRootId(item), out IDictionary<string, object?>? state)
+            item => rootContainerNotificationStates.TryGetValue(item.Path.GetIdsFromPath()[2], out IDictionary<string, object?>? state)
                 ? state
                 : deletingNotification.State,
             pageSize);
@@ -274,10 +274,6 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
 
         scope.Complete();
         return Attempt.Succeed(EntityContainerOperationStatus.Success);
-
-        // Paths of items in the recycle bin start with the root and the recycle bin, followed by the root-most item in the bin.
-        static int GetRecycleBinRootId(IEntitySlim item)
-            => int.Parse(item.Path.Split(Constants.CharArrays.Comma)[2], CultureInfo.InvariantCulture);
     }
 
     private async Task<Attempt<EntityContainerOperationStatus>> MoveLockedAsync<TNotification>(
