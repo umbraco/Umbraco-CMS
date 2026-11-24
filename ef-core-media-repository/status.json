@@ -75,22 +75,22 @@
       "id": 3,
       "slug": "hoist-write-path",
       "title": "Hoist the generic write, delete and naming path into AsyncContentRepositoryBase",
-      "status": "planned",
-      "branch": "",
-      "pr": "",
-      "prUrl": "",
+      "status": "in-review",
+      "branch": "v20/feature/ef-core-media-repository-3-hoist-write-path",
+      "pr": "#24776",
+      "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24776",
       "dependsOn": [2],
       "summary": "Persist skeletons with publishing extension points, node/content/version/property-data persistence, the generic delete (with the entity-specific hook) and invariant unique naming moved to the wide base; the publishable base keeps published state, entity rows, culture variations, flag flips, templates and variant names.",
       "tasks": [
-        { "text": "Extension-point design agreed before moving code: shared protected steps plus a per-persist options record", "done": false },
-        { "text": "PersistNewItemAsync / PersistUpdatedItemAsync skeletons on the wide base; publishable overrides compose them", "done": false },
-        { "text": "PersistNewNode/Content/Versions, PersistNew/UpdatedPropertyDataAsync, BuildWriteRow hoisted", "done": false },
-        { "text": "PersistDeletedItemAsync hoisted with the PersistEntitySpecificDeleteClausesAsync hook; schedules delete stays publishable", "done": false },
-        { "text": "Invariant naming hoisted (EnsureUniqueNaming, SanitizeNamesAsync core, EnsureUniqueNodeNameAsync, GetUniqueNodeNameAndSiblingsAsync)", "done": false },
-        { "text": "Write-path and delete tests of the document and element fixtures green at unchanged counts", "done": false }
+        { "text": "Extension-point design agreed before moving code: shared protected steps plus a per-persist options record", "done": true },
+        { "text": "PersistNewItemAsync / PersistUpdatedItemAsync skeletons on the wide base; publishable overrides compose them", "done": true },
+        { "text": "PersistNewNode/Content/Versions, PersistNew/UpdatedPropertyDataAsync, BuildWriteRow hoisted", "done": true },
+        { "text": "PersistDeletedItemAsync hoisted with the PersistEntitySpecificDeleteClausesAsync hook; schedules delete stays publishable", "done": true },
+        { "text": "Invariant naming hoisted (EnsureUniqueNaming, SanitizeNamesAsync core, EnsureUniqueNodeNameAsync, GetUniqueNodeNameAndSiblingsAsync)", "done": true },
+        { "text": "Write-path and delete tests of the document and element fixtures green at unchanged counts", "done": true }
       ],
       "acceptance": "As PR 2 plus every write-path test green; the publishable base ends near its publishing-only content; the wide base has no Set<TEntityDto> and no PublishedState reference.",
-      "notes": "",
+      "notes": "Started 24-11-2026, cut from PR 2's branch at 1d880d7b519 (stacked; PR targets PR 2's branch until #24762 merges). Implemented 24-11-2026 as one scripted transplant: PublishableContentRepositoryBase 1478 to 1107 lines; wide base has no Set<TEntityDto> and no PublishedState reference; snapshots untouched; normalised diff of every moved member shows only the step substitutions. Decisions in CAMPAIGN.md §8 dated 24-11-2026. Verification: unit project 8239 passed; document, blueprint, element, content service, content publishing, content editing and HybridCache integration fixtures 1353 passed on SQLite; repository fixtures 231 passed on SQL Server (one SQLite-only skip); full --no-incremental solution build clean; independent review found one must-fix (two usings left unused by the move, removed) and recorded the no-op save of an unchanged item as a media behaviour change (§4b change 7). The sort order of a new item became a hook on the user's decision: the wide default takes the next free sort order as NPoco media does, the publishable base keeps the document rule (§4b keep 11); the document fixture's sort-order collision test covers the override. Committed as c6c8dda58fb and opened as draft PR #24776 against PR 2's branch on 24-11-2026; rebase onto the integration branch once #24762 merges.",
       "mergeCommit": ""
     },
     {
@@ -196,6 +196,9 @@
     }
   ],
   "log": [
+    { "date": "24-11-2026", "text": "PR 3 opened as draft #24776 (c6c8dda58fb), stacked on PR 2." },
+    { "date": "24-11-2026", "text": "PR 3 implemented and independently reviewed: write, delete and naming path hoisted into AsyncContentRepositoryBase; publishable base 1478 to 1107 lines; regression fixtures green on SQLite, repository fixtures green on SQL Server; the no-op save recorded as a media change and the new-item sort order made a per-kind hook (wide default = NPoco media). Awaiting the commit and the draft PR." },
+    { "date": "24-11-2026", "text": "PR 3 started on v20/feature/ef-core-media-repository-3-hoist-write-path, stacked on PR 2." },
     { "date": "24-11-2026", "text": "Members campaign gaps from the PR 2 review recorded on the grand plan (A2 known gaps: recycle bin and tree on the wide contract, versions as a split candidate, member ordering fields, document-only cores) and in this plan's backlog." },
     { "date": "23-11-2026", "text": "PR 2 review round 1 applied: the three tree/bin members stay on IDocumentRepository (elements must not expose them); ancestor total fixed for the recycle bin case; decision row added, PR 4 contract note widened." },
     { "date": "23-11-2026", "text": "Decision: the wide repository tier keeps the version and recycle bin members for every kind, matching the NPoco shape; the members campaign decides a split for the recycle bin (backlog row added)." },
