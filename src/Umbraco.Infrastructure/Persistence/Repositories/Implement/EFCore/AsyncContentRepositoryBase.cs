@@ -2432,6 +2432,11 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository, TConten
     ///     fetches only the siblings whose name shares the base text and can collide; override to add further
     ///     uniqueness checks (e.g. URL segment collisions), as <c>DocumentRepository</c> does.
     /// </summary>
+    /// <remarks>
+    ///     The narrowed fetch folds case the way the database does, so a sibling differing only in non-ASCII case
+    ///     is fetched under a case-insensitive SQL Server collation and not on SQLite. The NPoco base has the same
+    ///     split.
+    /// </remarks>
     protected virtual async Task<string?> EnsureUniqueNodeNameAsync(UmbracoDbContext db, int parentId, string? nodeName, int id)
     {
         if (!EnsureUniqueNaming)
