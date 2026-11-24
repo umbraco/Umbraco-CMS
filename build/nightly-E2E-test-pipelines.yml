@@ -122,44 +122,44 @@ stages:
           matrix:
             #            Windows:
             #              vmImage: 'windows-latest'
-            # We split the tests into 4 parts plus the Search tests for each OS to reduce the time it takes to run them on the pipeline
-            LinuxPart1Of4:
+            # We split the tests into 5 parts for each OS to reduce the time it takes to run them on the pipeline
+            LinuxPart1Of5:
               vmImage: "ubuntu-latest"
               # Filter tests that are not part of any of the namespaces the other parts run
               testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure.Service) & (FullyQualifiedName!~Umbraco.Core.Services) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
-            LinuxPart2Of4:
+            LinuxPart2Of5:
               vmImage: "ubuntu-latest"
               # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
-            LinuxPart3Of4:
+            LinuxPart3Of5:
               vmImage: "ubuntu-latest"
               # Filter tests that are part of the Umbraco.Core.Services namespace
               testFilter: "(FullyQualifiedName~Umbraco.Core.Services)"
-            LinuxPart4Of4:
+            LinuxPart4Of5:
               vmImage: "ubuntu-latest"
               # Filter tests that are part of the ManagementApi namespace
               testFilter: "(FullyQualifiedName~ManagementApi)"
-            LinuxSearch:
+            LinuxPart5Of5:
               vmImage: "ubuntu-latest"
               # Filter tests that are part of the Umbraco.Search namespace
               testFilter: "(FullyQualifiedName~Umbraco.Search)"
-            macOSPart1Of4:
+            macOSPart1Of5:
               vmImage: "macOS-latest"
               # Filter tests that are not part of any of the namespaces the other parts run
               testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure.Service) & (FullyQualifiedName!~Umbraco.Core.Services) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
-            macOSPart2Of4:
+            macOSPart2Of5:
               vmImage: "macOS-latest"
               # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
-            macOSPart3Of4:
+            macOSPart3Of5:
               vmImage: "macOS-latest"
               # Filter tests that are part of the Umbraco.Core.Services namespace
               testFilter: "(FullyQualifiedName~Umbraco.Core.Services)"
-            macOSPart4Of4:
+            macOSPart4Of5:
               vmImage: "macOS-latest"
               # Filter tests that are part of the ManagementApi namespace.
               testFilter: "(FullyQualifiedName~ManagementApi)"
-            macOSSearch:
+            macOSPart5Of5:
               vmImage: "macOS-latest"
               # Filter tests that are part of the Umbraco.Search namespace
               testFilter: "(FullyQualifiedName~Umbraco.Search)"
@@ -202,68 +202,68 @@ stages:
           SA_PASSWORD: UmbracoAcceptance123!
         strategy:
           matrix:
-            # Windows is split into 5 parts (ManagementApi split in two to avoid memory pressure on LocalDb); Linux into 4. Each also runs the Search tests on their own.
-            WindowsPart1Of5:
+            # Windows is split into 6 parts (ManagementApi split in two to avoid memory pressure on LocalDb); Linux into 5.
+            WindowsPart1Of6:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
               # Filter tests that are not part of any of the namespaces the other parts run
               testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure.Service) & (FullyQualifiedName!~Umbraco.Core.Services) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
-            WindowsPart2Of5:
+            WindowsPart2Of6:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
               # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
-            WindowsPart3Of5:
+            WindowsPart3Of6:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
               # Filter tests that are part of the Umbraco.Core.Services namespace
               testFilter: "(FullyQualifiedName~Umbraco.Core.Services)"
-            WindowsPart4Of5:
+            WindowsPart4Of6:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
               # ManagementApi, heavier sub-namespaces. Trailing dots prevent "User." from matching "UserGroup." etc.
               testFilter: "FullyQualifiedName~ManagementApi & (FullyQualifiedName~ManagementApi.Element. | FullyQualifiedName~ManagementApi.User. | FullyQualifiedName~ManagementApi.Document. | FullyQualifiedName~ManagementApi.DataType. | FullyQualifiedName~ManagementApi.DocumentType. | FullyQualifiedName~ManagementApi.MediaType. | FullyQualifiedName~ManagementApi.Template.)"
-            WindowsPart5Of5:
+            WindowsPart5Of6:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
               # ManagementApi, remainder (complement of Part4). vstest filters do not support group
               testFilter: "FullyQualifiedName~ManagementApi & FullyQualifiedName!~ManagementApi.Element. & FullyQualifiedName!~ManagementApi.User. & FullyQualifiedName!~ManagementApi.Document. & FullyQualifiedName!~ManagementApi.DataType. & FullyQualifiedName!~ManagementApi.DocumentType. & FullyQualifiedName!~ManagementApi.MediaType. & FullyQualifiedName!~ManagementApi.Template."
-            WindowsSearch:
+            WindowsPart6Of6:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
               # Filter tests that are part of the Umbraco.Search namespace
               testFilter: "(FullyQualifiedName~Umbraco.Search)"
-            LinuxPart1Of4:
+            LinuxPart1Of5:
               vmImage: "ubuntu-latest"
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
               # Filter tests that are not part of any of the namespaces the other parts run
               testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure.Service) & (FullyQualifiedName!~Umbraco.Core.Services) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
-            LinuxPart2Of4:
+            LinuxPart2Of5:
               vmImage: "ubuntu-latest"
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
               # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
-            LinuxPart3Of4:
+            LinuxPart3Of5:
               vmImage: "ubuntu-latest"
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
               # Filter tests that are part of the Umbraco.Core.Services namespace
               testFilter: "(FullyQualifiedName~Umbraco.Core.Services)"
-            LinuxPart4Of4:
+            LinuxPart4Of5:
               vmImage: "ubuntu-latest"
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
               # Filter tests that are part of the ManagementApi namespace.
               testFilter: "(FullyQualifiedName~ManagementApi)"
-            LinuxSearch:
+            LinuxPart5Of5:
               vmImage: "ubuntu-latest"
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
