@@ -64,19 +64,6 @@ public class BatchAncestorsDocumentTreeController : DocumentTreeControllerBase
         Guid? dataTypeId = null)
     {
         IgnoreUserStartNodesForDataType(dataTypeId);
-
-        DocumentTreeAncestorsResponseModel[] items = (await GetAncestorsOfItems([.. ids]))
-            .Select(chain => new DocumentTreeAncestorsResponseModel
-            {
-                Id = chain.DescendantKey,
-                Ancestors = chain.Ancestors,
-            })
-            .ToArray();
-
-        return Ok(new BatchResponseModel<DocumentTreeAncestorsResponseModel>
-        {
-            Total = items.Length,
-            Items = items,
-        });
+        return await GetBatchAncestors<DocumentTreeAncestorsResponseModel>([.. ids]);
     }
 }

@@ -113,7 +113,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         (entities, _) = await FilterTreeEntities(entities, entities.Length);
 
         IDictionary<int, Guid> parentKeysById = GetBatchParentKeys(entities);
-        Dictionary<Guid, TItem> treeItemViewModelsByKey = entities
+        var treeItemViewModelsByKey = entities
             .GroupBy(entity => entity.ParentId)
             .SelectMany(siblings => MapTreeItemViewModels(
                 parentKeysById.TryGetValue(siblings.Key, out Guid parentKey) ? parentKey : null,
@@ -139,6 +139,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     /// <summary>
     /// Gets the ancestors of each of the tree items identified by the provided keys.
     /// </summary>
+    /// <typeparam name="TAncestors">The tree-specific response model for the ancestors of an item.</typeparam>
     /// <param name="descendantKeys">The keys of the tree items to get the ancestors of.</param>
     /// <returns>
     /// The ancestors of each tree item, ordered from the root down and excluding the item itself, in the order
@@ -149,11 +150,12 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     /// Unlike <see cref="GetBatch"/>, the results are not filtered by <c>FilterTreeEntities</c>, so the ancestors
     /// of an item are returned even when the user could not browse to them in the tree.
     /// </remarks>
-    protected async Task<IEnumerable<(Guid DescendantKey, TItem[] Ancestors)>> GetAncestorsOfItems(Guid[] descendantKeys)
+    protected async Task<ActionResult<BatchResponseModel<TAncestors>>> GetBatchAncestors<TAncestors>(Guid[] descendantKeys)
+        where TAncestors : TreeItemAncestorsResponseModel<TItem>, new()
     {
         if (descendantKeys.Length == 0)
         {
-            return [];
+            return Ok(new BatchResponseModel<TAncestors>());
         }
 
         IEntitySlim[] descendants = GetEntitiesByKeys(descendantKeys);
@@ -184,11 +186,15 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
                 [.. siblings]))
             .ToDictionary(viewModel => viewModel.Id);
 
-        (Guid DescendantKey, TItem[] Ancestors)[] result = visibleDescendants
-            .Select(descendant => (descendant.Key, descendant.AncestorIds()
-                .Select(id => keysById.TryGetValue(id, out Guid key) ? viewModelsByKey.GetValueOrDefault(key) : null)
-                .WhereNotNull()
-                .ToArray()))
+        TAncestors[] items = visibleDescendants
+            .Select(descendant => new TAncestors
+            {
+                Id = descendant.Key,
+                Ancestors = descendant.AncestorIds()
+                    .Select(id => keysById.TryGetValue(id, out Guid key) ? viewModelsByKey.GetValueOrDefault(key) : null)
+                    .WhereNotNull()
+                    .ToArray(),
+            })
             .ToArray();
 
         foreach (IEntitySlim descendant in visibleDescendants)
@@ -204,7 +210,11 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         await PopulateFlags([.. viewModelsByKey.Values]);
 
-        return result;
+        return Ok(new BatchResponseModel<TAncestors>
+        {
+            Total = items.Length,
+            Items = items,
+        });
     }
 
     /// <summary>
