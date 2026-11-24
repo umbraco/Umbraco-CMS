@@ -28,6 +28,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(blockName);
   await umbracoApi.dataType.ensureNameNotExists(blockGridName);
+  await umbracoApi.language.ensureIsoCodeNotExists('da');
 });
 
 test('cannot publish a block grid with a mandatory radiobox without a value', async ({umbracoApi, umbracoUi}) => {
@@ -45,6 +46,7 @@ test('cannot publish a block grid with a mandatory radiobox without a value', as
   // Act
   await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.waitForBlockPropertyEditorToBeVisible();
   // Do not select any radiobox values and the validation error appears
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
@@ -74,6 +76,7 @@ test('cannot publish a block grid with a mandatory checkbox list without a value
   // Act
   await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.waitForBlockPropertyEditorToBeVisible();
   // Do not select any checkbox list values and the validation error appears
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
@@ -103,6 +106,7 @@ test('cannot publish a block grid with a mandatory dropdown without a value', as
   // Act
   await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.waitForBlockPropertyEditorToBeVisible();
   // Do not select any dropdown values and the validation error appears
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
@@ -145,7 +149,7 @@ test('cannot update a variant block grid with invalid text', {tag: '@release'}, 
   await umbracoUi.content.enterPropertyValue(textStringElementDataTypeName, wrongPropertyValue);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickContainerSaveButtonAndWaitForContentToBeUpdated();
   // Verify that the Block Grid entry has an invalid badge
   await umbracoUi.content.doesPropertyHaveInvalidBadge(blockGridName);
   await umbracoUi.content.clickBlockElementWithName(blockName);

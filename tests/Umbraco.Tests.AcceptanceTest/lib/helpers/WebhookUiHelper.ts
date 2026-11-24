@@ -90,6 +90,6 @@ export class WebhookUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForWebhookToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.webhook, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.webhook, ConstantHelper.workspaceActions.webhookSave);
   }
 }

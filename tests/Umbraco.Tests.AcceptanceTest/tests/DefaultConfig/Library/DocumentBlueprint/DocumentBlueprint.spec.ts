@@ -36,7 +36,7 @@ test('can create a document blueprint from the library menu', {tag: '@smoke'}, a
 
   // Assert
   expect(await umbracoApi.documentBlueprint.doesNameExist(documentBlueprintName)).toBeTruthy();
-  await umbracoUi.documentBlueprint.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, true);
+  await umbracoUi.documentBlueprint.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, true, false);
 });
 
 test('cannot choose an element type when creating a document blueprint', async ({umbracoApi, umbracoUi}) => {
@@ -136,7 +136,7 @@ test('can create a variant document blueprint', {tag: '@release'}, async ({umbra
 
   // Assert
   expect(await umbracoApi.documentBlueprint.doesNameExist(documentBlueprintName)).toBeTruthy();
-  await umbracoUi.documentBlueprint.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, true);
+  await umbracoUi.documentBlueprint.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, true, false);
   await umbracoUi.documentBlueprint.page.on('console', message => {
     expect(message.type()).not.toBe('error');
   });
