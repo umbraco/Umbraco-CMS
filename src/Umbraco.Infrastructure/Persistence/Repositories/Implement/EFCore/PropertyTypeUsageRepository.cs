@@ -6,7 +6,6 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 
-/// <inheritdoc />
 /// <summary>
 ///     Answers whether any value has been saved against a property type, and whether a content type exists.
 /// </summary>
