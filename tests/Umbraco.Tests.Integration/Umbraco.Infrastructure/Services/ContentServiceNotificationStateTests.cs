@@ -37,8 +37,6 @@ internal sealed class ContentServiceNotificationStateTests : UmbracoIntegrationT
         builder
             .AddNotificationHandler<ContentDeletingNotification, NotificationStateRecorder.WritingHandler<ContentDeletingNotification>>()
             .AddNotificationHandler<ContentDeletedNotification, NotificationStateRecorder.ReadingHandler<ContentDeletedNotification>>()
-            .AddNotificationHandler<ContentPublishingNotification, NotificationStateRecorder.WritingHandler<ContentPublishingNotification>>()
-            .AddNotificationHandler<ContentPublishedNotification, NotificationStateRecorder.ReadingHandler<ContentPublishedNotification>>()
             .AddNotificationHandler<ContentDeletingVersionsNotification, NotificationStateRecorder.WritingHandler<ContentDeletingVersionsNotification>>()
             .AddNotificationHandler<ContentDeletedVersionsNotification, NotificationStateRecorder.ReadingHandler<ContentDeletedVersionsNotification>>();
     }
@@ -84,28 +82,6 @@ internal sealed class ContentServiceNotificationStateTests : UmbracoIntegrationT
         ContentService.DeleteOfType(contentType.Id);
 
         AssertDeletedNotificationsShareDeletingState([first.Key, second.Key]);
-    }
-
-    [Test]
-    public async Task PublishBranch_Shares_Root_Publishing_State_With_Published_Notification()
-    {
-        IContentType contentType = await CreateContentType();
-        IContent root = CreateContent(contentType, "Root");
-        IContent child = CreateContent(contentType, "Child", root);
-
-        ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["*"]);
-
-        ContentPublishingNotification rootPublishing = Recorder.Starting
-            .OfType<ContentPublishingNotification>()
-            .Single(x => x.PublishedEntities.Any(e => e.Key == root.Key));
-        ContentPublishedNotification published = Recorder.Ending.OfType<ContentPublishedNotification>().Single();
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(published.PublishedEntities.Select(x => x.Key), Is.EquivalentTo(new[] { root.Key, child.Key }));
-            Assert.That(published.State, Is.SameAs(rootPublishing.State));
-            Assert.That(published.State.ContainsKey(NotificationStateRecorder.StateKey), Is.True);
-        });
     }
 
     [Test]

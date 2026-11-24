@@ -2623,7 +2623,6 @@ public class ContentService : RepositoryService, IContentService
         }
 
         var savingNotification = new ContentSavingNotification(document, evtMsgs);
-        initialNotificationState = savingNotification.State;
         if (scope.Notifications.PublishCancelable(savingNotification))
         {
             return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, document);
