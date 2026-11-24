@@ -118,6 +118,18 @@ public class BatchAncestorsDocumentTreeStartNodeAccessTests : StartNodeAccessTes
     }
 
     [Test]
+    public async Task Returns_Ancestors_Referencing_Their_Parents_For_Items_Sharing_Ancestors()
+    {
+        BatchResponseModel<DocumentTreeAncestorsResponseModel> result =
+            await GetAncestorsAsync([_insideGrandchild.Key, _browsable.Key]);
+
+        DocumentTreeAncestorsResponseModel[] chains = result.Items.ToArray();
+        Assert.AreEqual(2, chains.Length);
+        AssertAncestorsReferenceTheirParents(chains[0], _insideGrandchild.Key, [_siteRoot, _startNode, _insideChild]);
+        AssertAncestorsReferenceTheirParents(chains[1], _browsable.Key, [_siteRoot, _startNode, _unbrowsable]);
+    }
+
+    [Test]
     public async Task Marks_Ancestors_Above_The_User_Start_Node_As_No_Access()
     {
         BatchResponseModel<DocumentTreeAncestorsResponseModel> result = await GetAncestorsAsync([_insideGrandchild.Key]);
@@ -182,6 +194,21 @@ public class BatchAncestorsDocumentTreeStartNodeAccessTests : StartNodeAccessTes
             await GetAncestorsAsync([_outsideChild.Key], dataType.Key);
 
         Assert.IsEmpty(result.Items);
+    }
+
+    private static void AssertAncestorsReferenceTheirParents(
+        DocumentTreeAncestorsResponseModel chain,
+        Guid expectedId,
+        IContent[] expectedAncestors)
+    {
+        Assert.AreEqual(expectedId, chain.Id);
+        DocumentTreeItemResponseModel[] ancestors = chain.Ancestors.ToArray();
+        CollectionAssert.AreEqual(expectedAncestors.Select(ancestor => ancestor.Key), ancestors.Select(ancestor => ancestor.Id));
+        Assert.IsNull(ancestors[0].Parent);
+        for (var i = 1; i < ancestors.Length; i++)
+        {
+            Assert.AreEqual(expectedAncestors[i - 1].Key, ancestors[i].Parent?.Id);
+        }
     }
 
     private async Task<BatchResponseModel<DocumentTreeAncestorsResponseModel>> GetAncestorsAsync(
