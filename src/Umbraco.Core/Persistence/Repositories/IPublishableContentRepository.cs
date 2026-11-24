@@ -126,5 +126,58 @@ public interface IPublishableContentRepository<TContent> : IContentRepository<in
     ///     The provided collection of content keys filtered for those that are scheduled for publishing.
     /// </returns>
     IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] contentIds) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
+
+    /// <summary>
+    ///     Creates a new named-draft-branch version for an existing content item, cloning the given entity's
+    ///     current in-memory property values (and, for culture-varying content, its per-version culture names)
+    ///     into a fresh version row tagged with <paramref name="branchId" />. The entity's own (unbranched)
+    ///     current version is left completely untouched — this only ever adds a new row.
+    /// </summary>
+    /// <param name="entity">The content item's current default draft, as loaded via the ordinary read path.</param>
+    /// <param name="branchId">The id of the draft branch the new version belongs to.</param>
+    /// <returns>The id of the newly created branch version.</returns>
+    int CreateBranchVersion(TContent entity, int branchId);
+
+    /// <summary>
+    ///     Gets a content item as it currently stands within a specific named draft branch, rather than its
+    ///     node's default (unbranched) draft.
+    /// </summary>
+    /// <param name="nodeId">The node id.</param>
+    /// <param name="branchId">The id of the draft branch.</param>
+    /// <returns>The branch's current content, or <c>null</c> if the node or the branch's version doesn't exist.</returns>
+    TContent? GetByBranch(int nodeId, int branchId);
+
+    /// <summary>
+    ///     Marks a branch's version row as no longer current, once its content has been promoted elsewhere
+    ///     (e.g. copied forward onto the node's default draft and published). The row is left in place as
+    ///     ordinary, non-current history.
+    /// </summary>
+    /// <param name="versionId">The id of the branch version to mark superseded.</param>
+    void MarkBranchVersionSuperseded(int versionId);
+
+    /// <summary>
+    ///     Gets all versions of a content item, optionally restricted to a single named draft branch's own history.
+    /// </summary>
+    /// <param name="nodeId">The node id.</param>
+    /// <param name="branchId">
+    ///     When <c>null</c>, only the node's own (unbranched) history is returned, excluding any named draft
+    ///     branch's version rows. When specified, only that branch's version row(s) are returned.
+    /// </param>
+    /// <returns>The matching versions, newest first.</returns>
+    IEnumerable<TContent> GetAllVersions(int nodeId, int? branchId);
+
+    /// <summary>
+    ///     Gets a page of versions of a content item, optionally restricted to a single named draft branch's own
+    ///     history, loading the bare minimum of data needed to support rollback with variants.
+    /// </summary>
+    /// <param name="nodeId">The node id.</param>
+    /// <param name="skip">The number of versions to skip.</param>
+    /// <param name="take">The number of versions to take.</param>
+    /// <param name="branchId">
+    ///     When <c>null</c>, only the node's own (unbranched) history is returned, excluding any named draft
+    ///     branch's version rows. When specified, only that branch's version row(s) are returned.
+    /// </param>
+    /// <returns>The matching versions, newest first.</returns>
+    IEnumerable<TContent> GetAllVersionsSlim(int nodeId, int skip, int take, int? branchId);
 }
 

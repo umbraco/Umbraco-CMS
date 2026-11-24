@@ -806,6 +806,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         if (current)
         {
             sql.Where<ContentVersionDto>(x => x.Current); // always get the current version
+            sql.Where<ContentVersionDto>(x => x.BranchId == null); // ...specifically the node's default (unbranched) draft; named branches are resolved separately
         }
 
         return sql;
@@ -865,6 +866,20 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         return MapDtosToContent(Database.Fetch<TEntityDto>(sql), true);
     }
 
+    public IEnumerable<TEntity> GetAllVersions(int nodeId, int? branchId)
+    {
+        Sql<ISqlContext> sql = GetBaseQuery(QueryType.Many, false)
+            .Where<NodeDto>(x => x.NodeId == nodeId);
+        sql = branchId is null
+            ? sql.Where<ContentVersionDto>(x => x.BranchId == null)
+            : sql.Where<ContentVersionDto>(x => x.BranchId == branchId);
+        sql = sql
+            .OrderByDescending<ContentVersionDto>(x => x.Current)
+            .AndByDescending<ContentVersionDto>(x => x.VersionDate);
+
+        return MapDtosToContent(Database.Fetch<TEntityDto>(sql), true);
+    }
+
     // TODO: This method needs to return a readonly version of IContent! The content returned
     // from this method does not contain all of the data required to re-persist it and if that
     // is attempted some odd things will occur.
@@ -884,6 +899,28 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     {
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Many, false)
             .Where<NodeDto>(x => x.NodeId == nodeId)
+            .OrderByDescending<ContentVersionDto>(x => x.Current)
+            .AndByDescending<ContentVersionDto>(x => x.VersionDate);
+
+        var pageIndex = skip / take;
+
+        return MapDtosToContent(
+            Database.Page<TEntityDto>(pageIndex + 1, take, sql).Items,
+            true,
+            // load bare minimum, need variants though since this is used to rollback with variants
+            propertyAliases: [],
+            loadTemplates: false,
+            loadVariants: true);
+    }
+
+    public IEnumerable<TEntity> GetAllVersionsSlim(int nodeId, int skip, int take, int? branchId)
+    {
+        Sql<ISqlContext> sql = GetBaseQuery(QueryType.Many, false)
+            .Where<NodeDto>(x => x.NodeId == nodeId);
+        sql = branchId is null
+            ? sql.Where<ContentVersionDto>(x => x.BranchId == null)
+            : sql.Where<ContentVersionDto>(x => x.BranchId == branchId);
+        sql = sql
             .OrderByDescending<ContentVersionDto>(x => x.Current)
             .AndByDescending<ContentVersionDto>(x => x.VersionDate);
 
@@ -1258,6 +1295,12 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             // Ensure existing version retains current preventCleanup flag (both saving and publishing).
             contentVersionDto.PreventCleanup = version.PreventCleanup;
 
+            // BuildEntityDto rebuilt this row from the entity's own fields, which carry no notion of "which
+            // branch" - entity.VersionId identifies the exact row, but IContentBase has no BranchId property.
+            // Without this, an ordinary save of branch-scoped content would silently null the row's BranchId
+            // out from under it, since Database.Update below writes every mapped column as-is.
+            contentVersionDto.BranchId = version.BranchId;
+
             Database.Update(contentVersionDto);
             Database.Update(entityVersionDto);
 
@@ -1435,6 +1478,76 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         //    throw new Exception("oops");
         //}
     }
+
+    /// <inheritdoc />
+    public int CreateBranchVersion(TEntity entity, int branchId)
+    {
+        TEntityDto dto = BuildEntityDto(entity);
+
+        // new content-version header row for the branch: same node, tagged with the branch id, current
+        // within that branch's scope. Deliberately doesn't touch VersionDate/UserId — same as the
+        // "new draft continuation" row PersistUpdatedItem creates on publish — those carry over from
+        // the cloned dto as-is.
+        ContentVersionDto contentVersionDto = dto.ContentVersionDto.ContentVersionDto;
+        contentVersionDto.Id = 0; // new row
+        contentVersionDto.NodeId = entity.Id;
+        contentVersionDto.Current = true;
+        contentVersionDto.BranchId = branchId;
+        contentVersionDto.Text = entity.Name;
+        contentVersionDto.PreventCleanup = false;
+        Database.Insert(contentVersionDto);
+        var branchVersionId = contentVersionDto.Id;
+
+        TContentVersionDto entityVersionDto = dto.ContentVersionDto;
+        entityVersionDto.Id = branchVersionId;
+        entityVersionDto.Published = false;
+        Database.Insert(entityVersionDto);
+
+        // clone property values (and, for variant content, per-version culture names) from the entity's
+        // current in-memory state into the new branch version. Temporarily point the entity at the new
+        // version id so the shared DTO-building helpers below target the right row; restore it afterwards
+        // since this entity instance still represents the node's default draft, not the new branch.
+        var defaultDraftVersionId = entity.VersionId;
+        entity.VersionId = branchVersionId;
+        try
+        {
+            InsertPropertyValues(entity, 0, out _, out _);
+
+            if (entity.ContentType.VariesByCulture())
+            {
+                // only the version-scoped culture variation rows are cloned here (names/dates for this
+                // specific version). The node-scoped culture-availability bookkeeping (TContentCultureVariationDto)
+                // is keyed by (NodeId, LanguageId) rather than by version, so it already describes the node
+                // regardless of which draft is being viewed - inserting again here would collide with the
+                // default draft's existing rows for the same node/culture pairs.
+                Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing: false));
+            }
+        }
+        finally
+        {
+            entity.VersionId = defaultDraftVersionId;
+        }
+
+        return branchVersionId;
+    }
+
+    /// <inheritdoc />
+    public TEntity? GetByBranch(int nodeId, int branchId)
+    {
+        Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single, current: false)
+            .Where<NodeDto>(x => x.NodeId == nodeId)
+            .Where<ContentVersionDto>(x => x.BranchId == branchId)
+            .Where<ContentVersionDto>(x => x.Current);
+
+        TEntityDto? dto = Database.FirstOrDefault<TEntityDto>(sql);
+        return dto is null ? null : MapDtoToContent(dto);
+    }
+
+    /// <inheritdoc />
+    public void MarkBranchVersionSuperseded(int versionId)
+        => Database.Execute(Sql()
+            .Update<ContentVersionDto>(u => u.Set(x => x.Current, false))
+            .Where<ContentVersionDto>(x => x.Id == versionId));
 
     /// <inheritdoc />
     public void PersistContentSchedule(IPublishableContentBase content, ContentScheduleCollection contentSchedule)

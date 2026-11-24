@@ -22,6 +22,7 @@ public class ContentVersionDto
     private const string TextColumnName = "text";
     private const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
     private const string PreventCleanupColumnName = "preventCleanup";
+    private const string BranchIdColumnName = "branchId";
 
     private int? _userId;
 
@@ -97,4 +98,19 @@ public class ContentVersionDto
     [Column(PreventCleanupColumnName)]
     [Constraint(Default = "0")]
     public bool PreventCleanup { get; set; }
+
+    /// <summary>
+    /// Gets or sets the id of the named draft branch this version belongs to, or <c>null</c> if this version
+    /// belongs to the node's default (unbranched) draft/publish lineage.
+    /// </summary>
+    /// <remarks>
+    /// A node may have at most one row with <c>Current = true</c> per distinct <see cref="BranchId"/> value
+    /// (including the virtual "no branch" value, <c>null</c>) — the same trust-the-code convention described
+    /// above for <c>Current</c>, just scoped by branch as well as by node.
+    /// </remarks>
+    [Column(BranchIdColumnName)]
+    [ForeignKey(typeof(ContentDraftBranchDto))]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_" + BranchIdColumnName, ForColumns = $"{NodeIdColumnName},{BranchIdColumnName},{CurrentColumnName}")]
+    public int? BranchId { get; set; }
 }

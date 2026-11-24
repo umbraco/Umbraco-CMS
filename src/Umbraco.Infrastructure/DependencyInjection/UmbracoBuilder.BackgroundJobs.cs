@@ -29,6 +29,7 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IDistributedBackgroundJob, WebhookFiring>();
         builder.Services.AddSingleton<IDistributedBackgroundJob, ContentVersionCleanupJob>();
+        builder.Services.AddSingleton<IDistributedBackgroundJob, ContentDraftBranchScheduledPublishingJob>();
         builder.Services.AddSingleton<IDistributedBackgroundJob, HealthCheckNotifierJob>();
         builder.Services.AddSingleton<IDistributedBackgroundJob, LogScrubberJob>();
         builder.Services.AddSingleton<IDistributedBackgroundJob, ScheduledPublishingJob>();

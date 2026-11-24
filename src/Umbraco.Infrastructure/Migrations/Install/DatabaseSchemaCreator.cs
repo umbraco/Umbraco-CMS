@@ -32,6 +32,7 @@ public class DatabaseSchemaCreator
         typeof(ContentTypeDto),
         typeof(TemplateDto),
         typeof(ContentDto),
+        typeof(ContentDraftBranchDto),
         typeof(ContentVersionDto),
         typeof(MediaVersionDto),
         typeof(DocumentDto),

@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -178,6 +179,59 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
                 // Should be ordered oldest first (by versionDate ASC, and since all have same date, by id ASC).
                 var ids = results.Select(x => x.VersionId).ToList();
                 Assert.That(ids, Is.Ordered.Ascending);
+            });
+        }
+    }
+
+    [Test]
+    public async Task GetContentVersionsEligibleForCleanup_IncludesSupersededDraftBranchVersions()
+    {
+        // Proves this query treats a former draft branch version as ordinary history once its branch is
+        // promoted (superseded via ContentDraftBranchService.PromoteAsync / MarkBranchVersionSuperseded, and
+        // its BranchId cleared as part of the branch's own immediate deletion) - it isn't specially excluded.
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey);
+
+        var contentType =
+            ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
+
+        var content = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(content);
+        ContentService.Publish(content, []);
+        // At this point content has 2 versions: a published version and a current (default) draft.
+
+        IContentDraftBranchService branchService = GetRequiredService<IContentDraftBranchService>();
+        Cms.Core.Attempt<IContentDraftBranch?, ContentDraftBranchOperationStatus> created =
+            await branchService.CreateAsync(content.Key, "Feature Branch", Cms.Core.Constants.Security.SuperUserKey);
+        IContentDraftBranch branch = created.Result!;
+        var branchVersionId = branchService.GetContent(content.Key, branch.Key)!.VersionId;
+        // Forking the branch adds a 3rd version, tagged with the branch's id.
+
+        // Promoting the branch copies its values onto the default draft, supersedes the branch's own version
+        // row (Current=false), and deletes the branch itself immediately - which also clears BranchId on
+        // that version row, since the FK it pointed to is gone.
+        await branchService.PromoteAsync(content.Key, branch.Key, new HashSet<string>(), Cms.Core.Constants.Security.SuperUserKey);
+
+        using (ScopeProvider.CreateScope())
+        {
+            var db = ScopeAccessor.AmbientScope!.Database;
+            var syntax = ScopeAccessor.AmbientScope.SqlContext.SqlSyntax;
+
+            // Backdate only the branch's own version row; everything else stays "now" so it doesn't
+            // interfere with the date-cutoff assertion below.
+            db.Execute(
+                $"UPDATE {syntax.GetQuotedTableName("umbracoContentVersion")} SET {syntax.GetQuotedColumnName("versionDate")} = @0 WHERE {syntax.GetQuotedColumnName("id")} = @1",
+                DateTime.UtcNow.AddDays(-10),
+                branchVersionId);
+
+            var sut = new DocumentVersionRepository(ScopeAccessor);
+            var results = sut.GetContentVersionsEligibleForCleanup(DateTime.UtcNow.AddDays(-5), null);
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(1, results.Count);
+                Assert.AreEqual(branchVersionId, results.First().VersionId);
             });
         }
     }

@@ -61,6 +61,19 @@ public interface IElementEditingService
     Task<Attempt<ElementUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ElementUpdateModel updateModel, Guid userKey);
 
     /// <summary>
+    ///     Maps an update model onto an already-loaded element's properties and variants, without persisting it.
+    ///     Unlike <see cref="UpdateAsync"/>, this does not load the element by key itself - the caller supplies
+    ///     it - so it can be used against an element loaded via a different path than the default draft (e.g. a
+    ///     named draft branch's own version).
+    /// </summary>
+    /// <param name="element">The element to apply the update model onto.</param>
+    /// <param name="updateModel">The model containing the updated element data.</param>
+    /// <returns>An attempt containing the update result (with validation result) or an error status.</returns>
+    // TODO (V20): Remove default implementation.
+    Task<Attempt<ElementUpdateResult, ContentEditingOperationStatus>> MapUpdateAsync(IElement element, ElementUpdateModel updateModel)
+        => throw new NotImplementedException();
+
+    /// <summary>
     ///     Updates and publishes an existing element.
     /// </summary>
     /// <param name="key">The unique identifier of the element to update.</param>

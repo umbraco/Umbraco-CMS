@@ -123,5 +123,10 @@ public static partial class Constants
         ///     All relations and relation types.
         /// </summary>
         public const int Relations = -351;
+
+        /// <summary>
+        ///     All named draft branches.
+        /// </summary>
+        public const int ContentDraftBranches = -352;
     }
 }

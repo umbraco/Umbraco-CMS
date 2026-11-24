@@ -131,6 +131,11 @@ public static partial class Constants
             public const string ContentVersionCleanupPolicy = TableNamePrefix + "ContentVersionCleanupPolicy";
 
             /// <summary>
+            ///     The content draft branch table name.
+            /// </summary>
+            public const string ContentDraftBranch = TableNamePrefix + "ContentDraftBranch";
+
+            /// <summary>
             ///     The document table name.
             /// </summary>
             public const string Document = TableNamePrefix + "Document";
