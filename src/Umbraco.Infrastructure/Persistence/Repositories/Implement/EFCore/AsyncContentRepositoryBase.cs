@@ -6,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -1885,6 +1886,572 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository, TConten
     /// <param name="entity">The entity that was refreshed.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     protected abstract Task OnUowRefreshedEntityAsync(TEntity entity, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Builds the entity-specific version row (<typeparamref name="TVersionDto" />) for the entity's current
+    ///     version, from <see cref="IContentBase.VersionId" />. Called once the version id is assigned.
+    /// </summary>
+    /// <param name="entity">The domain entity whose current version is being persisted.</param>
+    /// <param name="publishing">
+    ///     Whether that version is being published as part of the same save; a kind without a published flag on its
+    ///     version row ignores it.
+    /// </param>
+    /// <returns>The version row ready to be saved.</returns>
+    protected abstract TVersionDto BuildEntityVersionRow(TEntity entity, bool publishing);
+
+    /// <summary>
+    ///     Writes every column of the entity-specific version row with the given id, from a row built by
+    ///     <see cref="BuildEntityVersionRow" />. Issued as an update statement rather than a tracked save because the
+    ///     same context may still track the instance the row was inserted from.
+    /// </summary>
+    /// <param name="db">The database context of the ambient scope.</param>
+    /// <param name="entityVersion">The row carrying the id and the values to write.</param>
+    protected abstract Task UpdateEntityVersionRowAsync(UmbracoDbContext db, TVersionDto entityVersion);
+
+    /// <summary>
+    ///     Builds the node, content and content version rows of the entity, the rows every content kind shares.
+    /// </summary>
+    /// <param name="entity">The entity being persisted.</param>
+    /// <param name="publishing">Whether the current version is being published as part of the same save.</param>
+    /// <returns>The three rows, not yet written.</returns>
+    protected ContentWriteRow BuildWriteRow(TEntity entity, bool publishing) =>
+        new(
+            ContentBaseFactory.BuildEFCoreNodeDto(entity, NodeObjectTypeKey),
+            ContentBaseFactory.BuildEFCoreContentDto(entity),
+            ContentBaseFactory.BuildEFCoreContentVersionDto(entity, publishing));
+
+    /// <summary>
+    ///     Deletes every row across every table that references a content node, in FK-safe (child-to-parent)
+    ///     order, before deleting the <c>umbracoNode</c> row itself. Entity-specific tables (e.g. Document's
+    ///     redirect URLs, domains) are deleted first via <see cref="PersistEntitySpecificDeleteClausesAsync" />,
+    ///     then the tables shared across all content kinds.
+    /// </summary>
+    protected override async Task PersistDeletedItemAsync(TEntity entity)
+    {
+        // Raise event first else potential FK issues.
+        EventAggregator.Publish(new ScopedEntityRemoveNotification(entity, new EventMessages()));
+
+        var nodeId = entity.Id;
+
+        await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            await PersistEntitySpecificDeleteClausesAsync(db, nodeId);
+
+            await db.User2NodeNotifies.Where(notification => notification.NodeId == nodeId).ExecuteDeleteAsync();
+
+            IQueryable<Guid> uniqueIdQuery = db.Nodes.Where(node => node.NodeId == nodeId).Select(node => node.UniqueId);
+            await db.UserGroup2GranularPermissions
+                .Where(granularPermission => granularPermission.UniqueId.HasValue && uniqueIdQuery.Contains(granularPermission.UniqueId.Value))
+                .ExecuteDeleteAsync();
+
+            await db.UserStartNodes.Where(startNode => startNode.StartNode == nodeId).ExecuteDeleteAsync();
+            await db.Relations.Where(relation => relation.ParentId == nodeId).ExecuteDeleteAsync();
+            await db.Relations.Where(relation => relation.ChildId == nodeId).ExecuteDeleteAsync();
+            await db.TagRelationships.Where(tagRelationship => tagRelationship.NodeId == nodeId).ExecuteDeleteAsync();
+
+            IQueryable<int> versionIdQuery = db.ContentVersions.Where(contentVersion => contentVersion.NodeId == nodeId).Select(contentVersion => contentVersion.Id);
+            await db.PropertyData.Where(propertyData => versionIdQuery.Contains(propertyData.VersionId)).ExecuteDeleteAsync();
+            await db.ContentVersionCultureVariations.Where(cultureVariation => versionIdQuery.Contains(cultureVariation.VersionId)).ExecuteDeleteAsync();
+            await db.ContentVersions.Where(contentVersion => contentVersion.NodeId == nodeId).ExecuteDeleteAsync();
+            await db.Content.Where(content => content.NodeId == nodeId).ExecuteDeleteAsync();
+            await db.Nodes.Where(node => node.NodeId == nodeId).ExecuteDeleteAsync();
+
+            return true;
+        });
+
+        // We need to flush the isolated cache by key explicitly here. The ContentCacheRefresher does the same
+        // thing, but by the time it's invoked, custom notification handlers might have already consumed the
+        // cached version. The insert and update paths flush for the same reason.
+        IsolatedCache.Clear(EntityTypeCacheKeyPrefix + entity.Key);
+
+        entity.DeleteDate = DateTime.UtcNow;
+    }
+
+    /// <summary>
+    ///     Deletes the rows in tables specific to this content kind (e.g. Document's redirect URLs, domains,
+    ///     access rules) that reference the node being deleted. Called by <see cref="PersistDeletedItemAsync" />
+    ///     before the tables shared across all content kinds.
+    /// </summary>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="nodeId">The node identifier of the content being deleted.</param>
+    protected abstract Task PersistEntitySpecificDeleteClausesAsync(UmbracoDbContext db, int nodeId);
+
+    /// <inheritdoc />
+    protected override async Task PersistNewItemAsync(TEntity item) =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            item.AddingEntity();
+
+            await SanitizeNamesAsync(db, item);
+            item.SanitizeEntityPropertiesForXmlStorage();
+
+            (NodeDto nodeDto, ContentDto contentDto, ContentVersionDto contentVersionDto) = BuildWriteRow(item, publishing: false);
+
+            await PersistNewNodeAsync(db, item, nodeDto);
+            await PersistNewContentAsync(db, item, contentDto);
+            await PersistNewVersionAsync(db, item, contentVersionDto, publishing: false);
+            await PersistNewPropertyDataAsync(db, item, publishedVersionId: 0);
+
+            await SetEntityTagsAsync(item);
+            await OnUowRefreshedEntityAsync(item, CancellationToken.None);
+
+            item.ResetDirtyProperties();
+
+            return true;
+        });
+
+    /// <inheritdoc />
+    protected override Task PersistUpdatedItemAsync(TEntity item) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            if (!item.IsDirty() && !item.IsAnyUserPropertyDirty())
+            {
+                // no change to save, do nothing, don't even update dates
+                return true;
+            }
+
+            ContentVersionDto version = await GetCurrentVersionRowAsync(db, item);
+
+            item.UpdatingEntity();
+
+            // A descendant moved as part of a bulk move has only Path, Level and UpdateDate dirty, so the
+            // version, property data and tag steps are skipped; a bulk move cannot be rolled back anyway.
+            var isMoving = item.IsMoving();
+
+            if (!isMoving)
+            {
+                await SanitizeNamesAsync(db, item);
+                item.SanitizeEntityPropertiesForXmlStorage();
+                await ApplyParentChangeAsync(db, item);
+            }
+
+            (NodeDto nodeDto, ContentDto contentDto, ContentVersionDto contentVersionDto) = BuildWriteRow(item, publishing: false);
+
+            await UpdateNodeRowAsync(db, item, nodeDto);
+
+            if (isMoving)
+            {
+                await OnUowRefreshedEntityAsync(item, CancellationToken.None);
+                item.ResetDirtyProperties();
+                IsolatedCache.Clear(EntityTypeCacheKeyPrefix + item.Key);
+                return true;
+            }
+
+            await UpdateContentRowAsync(db, item, contentDto);
+            await UpdateVersionRowsAsync(db, item, contentVersionDto, version.PreventCleanup, BuildEntityVersionRow(item, publishing: false));
+            await PersistUpdatedPropertyDataAsync(db, item, item.VersionId, publishedVersionId: 0);
+
+            await SetEntityTagsAsync(item);
+            await OnUowRefreshedEntityAsync(item, CancellationToken.None);
+
+            item.ResetDirtyProperties();
+
+            // Flushed by key explicitly: the cache refresher does the same, but by the time it runs, custom
+            // notification handlers might already have consumed the cached version.
+            IsolatedCache.Clear(EntityTypeCacheKeyPrefix + item.Key);
+
+            return true;
+        });
+
+    /// <summary>
+    ///     Inserts the node row (or converts the placeholder that reserved its id), resolving the path, level and sort
+    ///     order from the parent, and assigns the entity its id, path, level, sort order and parent key.
+    /// </summary>
+    protected async Task PersistNewNodeAsync(UmbracoDbContext db, TEntity item, NodeDto nodeDto)
+    {
+        NodeDto parent = await GetParentNodeDtoAsync(db, item.ParentId);
+        var level = parent.Level + 1;
+        int sortOrder = await ResolveNewItemSortOrderAsync(db, item);
+
+        nodeDto.Path = parent.Path;
+        nodeDto.Level = Convert.ToInt16(level);
+        nodeDto.SortOrder = sortOrder;
+
+        // Supports blueprint/import flows that pre-reserve a Key<->NodeId mapping via a placeholder
+        // IdReservation node before the real entity is created.
+        var reservedId = await GetReservedIdAsync(db, nodeDto.UniqueId);
+        if (reservedId > 0)
+        {
+            nodeDto.NodeId = reservedId;
+            nodeDto.Path = string.Concat(parent.Path, ",", reservedId);
+            ValidatePath(nodeDto);
+
+            await db.Nodes.Where(node => node.NodeId == reservedId).ExecuteUpdateAsync(setters => setters
+                .SetProperty(node => node.UniqueId, nodeDto.UniqueId)
+                .SetProperty(node => node.ParentId, nodeDto.ParentId)
+                .SetProperty(node => node.Level, nodeDto.Level)
+                .SetProperty(node => node.Path, nodeDto.Path)
+                .SetProperty(node => node.SortOrder, nodeDto.SortOrder)
+                .SetProperty(node => node.Trashed, nodeDto.Trashed)
+                .SetProperty(node => node.UserId, nodeDto.UserId)
+                .SetProperty(node => node.Text, nodeDto.Text)
+                .SetProperty(node => node.NodeObjectType, nodeDto.NodeObjectType)
+                .SetProperty(node => node.CreateDate, nodeDto.CreateDate));
+        }
+        else
+        {
+            db.Nodes.Add(nodeDto);
+            await db.SaveChangesAsync();
+
+            // The node stays tracked from the Add above, so mutating it directly and saving again is
+            // enough to patch the Path — no ExecuteUpdateAsync needed despite the context's global
+            // NoTracking query setting (that setting only affects query results, not tracked Adds).
+            nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
+            ValidatePath(nodeDto);
+            await db.SaveChangesAsync();
+        }
+
+        item.Id = nodeDto.NodeId;
+        item.Path = nodeDto.Path;
+        item.SortOrder = sortOrder;
+        item.Level = level;
+        item.ParentKey = ResolveParentKey(item.ParentId, parent);
+    }
+
+    /// <summary>
+    ///     Resolves the sort order a new item is inserted with. The default takes the next free sort order under
+    ///     the parent; a kind that lets callers place an item overrides it.
+    /// </summary>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="item">The entity being inserted.</param>
+    /// <returns>The sort order to insert with.</returns>
+    protected virtual Task<int> ResolveNewItemSortOrderAsync(UmbracoDbContext db, TEntity item) =>
+        GetNewChildSortOrderAsync(db, item.ParentId, 0);
+
+    /// <summary>Inserts the content row of a new entity.</summary>
+    protected static async Task PersistNewContentAsync(UmbracoDbContext db, TEntity item, ContentDto contentDto)
+    {
+        contentDto.NodeId = item.Id;
+        db.Content.Add(contentDto);
+        await db.SaveChangesAsync();
+    }
+
+    /// <summary>
+    ///     Inserts the content version row of a new entity as its current version and the kind-specific version row
+    ///     for it, and assigns the entity its version id.
+    /// </summary>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="item">The entity, with its id assigned.</param>
+    /// <param name="contentVersionDto">The content version row built for the entity.</param>
+    /// <param name="publishing">Whether the version is being published as part of the same save.</param>
+    protected async Task PersistNewVersionAsync(UmbracoDbContext db, TEntity item, ContentVersionDto contentVersionDto, bool publishing)
+    {
+        contentVersionDto.NodeId = item.Id;
+        db.ContentVersions.Add(contentVersionDto);
+        await db.SaveChangesAsync();
+        item.VersionId = contentVersionDto.Id;
+
+        db.Set<TVersionDto>().Add(BuildEntityVersionRow(item, publishing));
+        await db.SaveChangesAsync();
+    }
+
+    /// <summary>
+    ///     Reads the row of the version the entity is saving, which must be its current version.
+    /// </summary>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="item">The entity being updated.</param>
+    /// <returns>The current version row.</returns>
+    /// <exception cref="InvalidOperationException">The entity's version is not its current version.</exception>
+    protected static async Task<ContentVersionDto> GetCurrentVersionRowAsync(UmbracoDbContext db, TEntity item)
+    {
+        // whatever we do, we must check that we are saving the current version
+        ContentVersionDto? version = await db.ContentVersions.FirstOrDefaultAsync(contentVersion => contentVersion.Id == item.VersionId);
+        if (version is null || !version.Current)
+        {
+            throw new InvalidOperationException("Cannot save a non-current version.");
+        }
+
+        return version;
+    }
+
+    /// <summary>
+    ///     Re-homes the entity under its new parent when its parent changed: path, level, sort order and parent key.
+    /// </summary>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="item">The entity being updated.</param>
+    protected async Task ApplyParentChangeAsync(UmbracoDbContext db, TEntity item)
+    {
+        if (!item.IsPropertyDirty(nameof(item.ParentId)))
+        {
+            return;
+        }
+
+        NodeDto parent = await GetParentNodeDtoAsync(db, item.ParentId);
+        item.Path = string.Concat(parent.Path, ",", item.Id);
+        item.Level = parent.Level + 1;
+        item.SortOrder = await GetNewChildSortOrderAsync(db, item.ParentId, 0);
+        item.ParentKey = ResolveParentKey(item.ParentId, parent);
+    }
+
+    /// <summary>Writes the mutable columns of the entity's node row.</summary>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="item">The entity being updated.</param>
+    /// <param name="nodeDto">The node row built for the entity.</param>
+    protected static async Task UpdateNodeRowAsync(UmbracoDbContext db, TEntity item, NodeDto nodeDto)
+    {
+        ValidatePath(nodeDto);
+        await db.Nodes.Where(node => node.NodeId == item.Id).ExecuteUpdateAsync(setters => setters
+            .SetProperty(node => node.Text, nodeDto.Text)
+            .SetProperty(node => node.ParentId, nodeDto.ParentId)
+            .SetProperty(node => node.Level, nodeDto.Level)
+            .SetProperty(node => node.Path, nodeDto.Path)
+            .SetProperty(node => node.SortOrder, nodeDto.SortOrder)
+            .SetProperty(node => node.Trashed, nodeDto.Trashed)
+            .SetProperty(node => node.UserId, nodeDto.UserId));
+    }
+
+    /// <summary>Writes the mutable columns of the entity's content row.</summary>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="item">The entity being updated.</param>
+    /// <param name="contentDto">The content row built for the entity.</param>
+    protected static Task UpdateContentRowAsync(UmbracoDbContext db, TEntity item, ContentDto contentDto) =>
+        db.Content.Where(content => content.NodeId == item.Id).ExecuteUpdateAsync(setters => setters
+            .SetProperty(content => content.ContentTypeId, contentDto.ContentTypeId));
+
+    /// <summary>
+    ///     Writes the content version row of the entity's current version and the kind-specific version row for it.
+    /// </summary>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="item">The entity being updated.</param>
+    /// <param name="contentVersionDto">The content version row built for the entity.</param>
+    /// <param name="preventCleanup">The stored prevent-cleanup flag, which a save keeps.</param>
+    /// <param name="entityVersionDto">The kind-specific version row built for the entity.</param>
+    protected async Task UpdateVersionRowsAsync(UmbracoDbContext db, TEntity item, ContentVersionDto contentVersionDto, bool preventCleanup, TVersionDto entityVersionDto)
+    {
+        contentVersionDto.PreventCleanup = preventCleanup;
+
+        await db.ContentVersions.Where(contentVersion => contentVersion.Id == item.VersionId).ExecuteUpdateAsync(setters => setters
+            .SetProperty(contentVersion => contentVersion.VersionDate, contentVersionDto.VersionDate)
+            .SetProperty(contentVersion => contentVersion.UserId, contentVersionDto.UserId)
+            .SetProperty(contentVersion => contentVersion.Current, contentVersionDto.Current)
+            .SetProperty(contentVersion => contentVersion.Text, contentVersionDto.Text)
+            .SetProperty(contentVersion => contentVersion.PreventCleanup, contentVersionDto.PreventCleanup));
+
+        await UpdateEntityVersionRowAsync(db, entityVersionDto);
+    }
+
+    /// <summary>
+    ///     Inserts the property data rows of a new entity's current version and, when the kind has one, of its
+    ///     published version.
+    /// </summary>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="item">The entity, with its version id assigned.</param>
+    /// <param name="publishedVersionId">The id of the published version, or 0 when there is none.</param>
+    /// <returns>Whether the entity is edited and, for variant content, the cultures that are.</returns>
+    protected async Task<(bool Edited, HashSet<string>? EditedCultures)> PersistNewPropertyDataAsync(UmbracoDbContext db, TEntity item, int publishedVersionId)
+    {
+        (List<PropertyDataDto> propertyDataDtos, var edited, HashSet<string>? editedCultures) = await PropertyFactory.BuildEFCoreDtosAsync(
+            item.ContentType.Variations,
+            item.VersionId,
+            publishedVersionId,
+            item.Properties,
+            LanguageRepository,
+            PropertyEditors);
+
+        SetEntitySortableValues(item, propertyDataDtos);
+
+        if (propertyDataDtos.Count > 0)
+        {
+            db.PropertyData.AddRange(propertyDataDtos);
+            await db.SaveChangesAsync();
+        }
+
+        return (edited, editedCultures);
+    }
+
+    /// <summary>
+    ///     Diff-reconciles the property data rows of a version against the freshly built values of the entity's
+    ///     current properties: matches existing rows by property type, version, language and segment, updates the
+    ///     matches in place, inserts rows for unmatched values and deletes rows that no longer have a value.
+    /// </summary>
+    /// <remarks>
+    ///     The fetch takes no row lock: every caller holds the tree write lock, and the scope shares one connection
+    ///     and transaction, so that lock already serializes this read-then-write sequence.
+    /// </remarks>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="item">The entity being updated.</param>
+    /// <param name="versionId">The version whose rows are reconciled.</param>
+    /// <param name="publishedVersionId">The id of the published version, or 0 when there is none.</param>
+    /// <returns>Whether the entity is edited and, for variant content, the cultures that are.</returns>
+    protected async Task<(bool Edited, HashSet<string>? EditedCultures)> PersistUpdatedPropertyDataAsync(
+        UmbracoDbContext db, TEntity item, int versionId, int publishedVersionId)
+    {
+        // Tracked (overriding the context's global NoTracking default) so the toUpdate loop below can mutate
+        // these instances directly and have EF Core batch them into a single SaveChangesAsync round-trip,
+        // instead of issuing one ExecuteUpdateAsync per row.
+        List<PropertyDataDto> existingPropertyData = await db.PropertyData
+            .AsTracking()
+            .Where(propertyData => propertyData.VersionId == versionId)
+            .ToListAsync();
+
+        var propertyTypeToPropertyData = new Dictionary<(int PropertyTypeId, int VersionId, int? LanguageId, string? Segment), PropertyDataDto>();
+        var trackedById = new Dictionary<int, PropertyDataDto>();
+        var existingPropertyDataIds = new List<int>();
+        foreach (PropertyDataDto propertyData in existingPropertyData)
+        {
+            existingPropertyDataIds.Add(propertyData.Id);
+            propertyTypeToPropertyData[(propertyData.PropertyTypeId, propertyData.VersionId, propertyData.LanguageId, propertyData.Segment)] = propertyData;
+            trackedById[propertyData.Id] = propertyData;
+        }
+
+        (List<PropertyDataDto> propertyDataDtos, var edited, HashSet<string>? editedCultures) = await PropertyFactory.BuildEFCoreDtosAsync(
+            item.ContentType.Variations,
+            item.VersionId,
+            publishedVersionId,
+            item.Properties,
+            LanguageRepository,
+            PropertyEditors);
+
+        SetEntitySortableValues(item, propertyDataDtos);
+
+        var toUpdate = new List<PropertyDataDto>();
+        var toInsert = new List<PropertyDataDto>();
+        foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
+        {
+            // Check if this already exists and update, else insert a new one.
+            if (propertyTypeToPropertyData.TryGetValue(
+                    (propertyDataDto.PropertyTypeId, propertyDataDto.VersionId, propertyDataDto.LanguageId, propertyDataDto.Segment),
+                    out PropertyDataDto? existing))
+            {
+                propertyDataDto.Id = existing.Id;
+                toUpdate.Add(propertyDataDto);
+            }
+            else
+            {
+                toInsert.Add(propertyDataDto);
+            }
+
+            // Track which ones have been processed. For entries in toInsert, propertyDataDto.Id is still
+            // 0 here — Remove(0) is a harmless no-op unless an existing row happens to have Id 0, which
+            // can't happen for a real PK.
+            existingPropertyDataIds.Remove(propertyDataDto.Id);
+        }
+
+        // Mutate the tracked instances directly rather than issuing one ExecuteUpdateAsync per row — EF Core
+        // batches these together with the toInsert Adds below into a single SaveChangesAsync round-trip.
+        foreach (PropertyDataDto propertyDataDto in toUpdate)
+        {
+            PropertyDataDto tracked = trackedById[propertyDataDto.Id];
+            tracked.LanguageId = propertyDataDto.LanguageId;
+            tracked.Segment = propertyDataDto.Segment;
+            tracked.IntegerValue = propertyDataDto.IntegerValue;
+            tracked.DecimalValue = propertyDataDto.DecimalValue;
+            tracked.DateValue = propertyDataDto.DateValue;
+            tracked.VarcharValue = propertyDataDto.VarcharValue;
+            tracked.TextValue = propertyDataDto.TextValue;
+            tracked.SortableValue = propertyDataDto.SortableValue;
+        }
+
+        if (toInsert.Count > 0)
+        {
+            db.PropertyData.AddRange(toInsert);
+        }
+
+        if (toUpdate.Count > 0 || toInsert.Count > 0)
+        {
+            await db.SaveChangesAsync();
+        }
+
+        // For any remaining that haven't been processed, they need to be deleted. Batched per this repo's
+        // 2100-parameter convention (Infrastructure/CLAUDE.md §6) since an entity with many
+        // culture/segment-variant properties can plausibly exceed it.
+        if (existingPropertyDataIds.Count > 0)
+        {
+            foreach (IEnumerable<int> batch in existingPropertyDataIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                List<int> batchIds = [.. batch];
+                await db.PropertyData.Where(propertyData => batchIds.Contains(propertyData.Id)).ExecuteDeleteAsync();
+            }
+        }
+
+        return (edited, editedCultures);
+    }
+
+    /// <summary>
+    ///     Gets a value indicating whether saving must keep names unique among siblings.
+    /// </summary>
+    protected virtual bool EnsureUniqueNaming => true;
+
+    /// <summary>
+    ///     Ensures the entity has a valid, sibling-unique invariant name.
+    /// </summary>
+    protected async Task SanitizeNamesAsync(UmbracoDbContext db, TEntity content)
+    {
+        await EnsureInvariantNameExistsAsync(content);
+        await EnsureInvariantNameIsUniqueAsync(db, content);
+    }
+
+    private async Task EnsureInvariantNameExistsAsync(TEntity content)
+    {
+        if (content.ContentType.VariesByCulture())
+        {
+            // content varies by culture
+            // then it must have at least a variant name, else it makes no sense
+            if (content.CultureInfos?.Count == 0)
+            {
+                throw new InvalidOperationException("Cannot save content with an empty name.");
+            }
+
+            // and then, we need to set the invariant name implicitly,
+            // using the default culture if it has a name, otherwise anything we can
+            var defaultCulture = await LanguageRepository.GetDefaultIsoCodeAsync();
+            content.Name = defaultCulture is not null &&
+                           (content.CultureInfos?.TryGetValue(defaultCulture, out ContentCultureInfos? cultureName) ??
+                            false)
+                ? cultureName!.Name
+                : content.CultureInfos![0].Name;
+        }
+        else
+        {
+            // content is invariant, and invariant content must have an explicit invariant name
+            if (string.IsNullOrWhiteSpace(content.Name))
+            {
+                throw new InvalidOperationException("Cannot save content with an empty name.");
+            }
+        }
+    }
+
+    private async Task EnsureInvariantNameIsUniqueAsync(UmbracoDbContext db, TEntity content) =>
+        content.Name = await EnsureUniqueNodeNameAsync(db, content.ParentId, content.Name, content.Id);
+
+    /// <summary>
+    ///     Resolves a sibling-unique name for <paramref name="nodeName" /> among the other nodes sharing
+    ///     <paramref name="parentId" />. The default implementation only resolves literal duplicate names
+    ///     (via <see cref="SimilarNodeName.GetUniqueName(IEnumerable{SimilarNodeName},int,string)" />) — override
+    ///     to add further uniqueness checks (e.g. URL segment collisions), as <c>DocumentRepository</c> does.
+    /// </summary>
+    protected virtual async Task<string?> EnsureUniqueNodeNameAsync(UmbracoDbContext db, int parentId, string? nodeName, int id)
+    {
+        if (!EnsureUniqueNaming)
+        {
+            return nodeName;
+        }
+
+        (string? uniqueName, List<SimilarNodeName> _) = await GetUniqueNodeNameAndSiblingsAsync(db, parentId, nodeName, id);
+        return uniqueName;
+    }
+
+    /// <summary>
+    ///     Fetches every sibling under <paramref name="parentId" /> (of this repository's <c>NodeObjectTypeKey</c>)
+    ///     and resolves a sibling-unique name for <paramref name="nodeName" />, returning both so overrides of
+    ///     <see cref="EnsureUniqueNodeNameAsync" /> can run further checks against the same sibling list without
+    ///     re-querying. Deliberately unfiltered (no name-prefix narrowing) — unlike NPoco's generic
+    ///     Media/DataType-oriented sibling fetch, a URL-segment collision check (see <c>DocumentRepository</c>)
+    ///     needs the full sibling list, since two names with different literal prefixes can still collide on
+    ///     URL segment.
+    /// </summary>
+    protected async Task<(string? UniqueName, List<SimilarNodeName> Siblings)> GetUniqueNodeNameAndSiblingsAsync(
+        UmbracoDbContext db, int parentId, string? nodeName, int id)
+    {
+        // TODO: fetch only siblings whose name starts with SimilarNodeName.GetBaseText(nodeName), as the NPoco
+        // EnsureUniqueNodeName does; loading every sibling makes each write O(siblings) on flat trees. [NL]
+        List<SimilarNodeName> siblings = await db.Nodes
+            .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentId)
+            .Select(node => new SimilarNodeName { Id = node.NodeId, Name = node.Text })
+            .ToListAsync();
+
+        return (SimilarNodeName.GetUniqueName(siblings, id, nodeName), siblings);
+    }
 
     /// <summary>
     ///     Replaces the tags stored for every tag-enabled property of the entity with the tags its current values
