@@ -1039,6 +1039,8 @@ private static void AddCustomizers(IUmbracoBuilder builder) =>
 
 **SQLite collation**: SQLite string collation is handled automatically — no action required when adding new DTOs. `SqliteCollationModelCustomizer` (in `Umbraco.Cms.Persistence.EFCore.Sqlite`) applies `COLLATE NOCASE` to all string properties globally. This matches NPoco's `SqliteSyntaxProvider`, which creates ALL string columns as `TEXT COLLATE NOCASE` (case-insensitive), aligning with SQL Server's default `CI_AS` collation. EF Core's SQLite provider would otherwise default to plain `TEXT` (case-sensitive). See `Umbraco.Cms.Persistence.EFCore.Sqlite/CLAUDE.md` for details.
 
+**SQL Server unique index filters**: also handled automatically. EF Core's SQL Server provider adds an `IS NOT NULL` filter by convention to unique indexes over nullable columns, which NPoco's `SqlServerSyntaxProvider` never creates. `SqlServerUniqueIndexFilterModelCustomizer` (in `Umbraco.Cms.Persistence.EFCore.SqlServer`) clears every filter that convention produced on Umbraco's own entity types, so a shared Configuration declares the unique index as-is and needs no `.HasFilter(null)`. A filter a Configuration sets explicitly with `.HasFilter(...)` is kept.
+
 ### Step 5: Generate EF Core Migrations
 
 Migrations must be generated in **BOTH** provider projects. These migrations are **NO-OPs** (empty `Up`/`Down` methods) because NPoco creates the actual tables. They exist only to update the EF Core model snapshot.

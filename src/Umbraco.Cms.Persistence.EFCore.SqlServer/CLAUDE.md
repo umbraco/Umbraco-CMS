@@ -38,6 +38,7 @@ Umbraco.Cms.Persistence.EFCore.SqlServer/
 ├── SqlServerEFCoreDistributedLockingMechanism.cs # Distributed locking
 ├── SqlServerMigrationProvider.cs                # IMigrationProvider impl
 ├── SqlServerMigrationProviderSetup.cs           # IMigrationProviderSetup impl
+├── SqlServerUniqueIndexFilterModelCustomizer.cs # Clears the provider's IS NOT NULL filter on unique indexes
 └── UmbracoBuilderExtensions.cs                  # IUmbracoBuilder extensions
 ```
 
@@ -144,6 +145,8 @@ SQL Server-specific EF Core model customizations (e.g., indexes with included co
 - `SqlServerDocumentVersionDtoModelCustomizer` — adds `.IncludeProperties()` to `DocumentVersionDto` indexes
 
 **When to add a new customizer**: Only when the NPoco DTO has SQL Server-specific index features (included columns via `[IncludeColumns]`). If the DTO has no included columns, no customizer is needed.
+
+**Unique index filters**: handled automatically — no per-DTO action needed. EF Core's SQL Server provider adds an `IS NOT NULL` filter by convention to every unique index over nullable columns, but NPoco's `SqlServerSyntaxProvider` creates unique indexes unfiltered. `SqlServerUniqueIndexFilterModelCustomizer` (project root, registered last in `AddCustomizers()`) clears every filter the provider convention produced on Umbraco's own entity types; a filter a Configuration sets explicitly with `.HasFilter(...)` is kept, and OpenIddict's indexes keep the filter their own migration created. `UmbracoDbContextProviderCustomizerTests` fails if a filtered Umbraco index shows up again.
 
 **Full migration guide**: See `/src/Umbraco.Infrastructure/CLAUDE.md` → "Section 12: EF Core DTO Migration Guide".
 
