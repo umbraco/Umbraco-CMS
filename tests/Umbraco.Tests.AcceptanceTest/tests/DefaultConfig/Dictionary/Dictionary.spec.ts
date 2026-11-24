@@ -154,7 +154,7 @@ test('can import a dictionary item', async ({umbracoApi, umbracoUi}) => {
   // Assert
   // Verify the imported dictionary item displays in the list
   await umbracoUi.reloadPage();
-  expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importDictionaryName)).toBeTruthy();
+  await umbracoUi.dictionary.doesDictionaryCollectionContainText(importDictionaryName);
   // Verify the imported dictionary item displays in the tree
   await umbracoUi.dictionary.reloadTree(dictionaryName);
   await umbracoUi.dictionary.isDictionaryTreeItemVisible(importDictionaryName);
@@ -178,8 +178,8 @@ test('can import a dictionary item with descendants', {tag: '@smoke'}, async ({u
   // Assert
   // Verify the imported dictionary items display in the list
   await umbracoUi.reloadPage();
-  expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importParentDictionaryName)).toBeTruthy();
-  expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importChildDictionaryName)).toBeTruthy();
+  await umbracoUi.dictionary.doesDictionaryCollectionContainText(importParentDictionaryName);
+  await umbracoUi.dictionary.doesDictionaryCollectionContainText(importChildDictionaryName);
   // Verify the imported dictionary items display in the tree
   await umbracoUi.dictionary.reloadTree(dictionaryName);
   await umbracoUi.dictionary.isDictionaryTreeItemVisible(importParentDictionaryName);

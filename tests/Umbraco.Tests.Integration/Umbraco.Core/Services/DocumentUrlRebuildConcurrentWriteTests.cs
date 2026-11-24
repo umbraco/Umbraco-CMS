@@ -1,6 +1,7 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -285,6 +286,13 @@ internal sealed class DocumentUrlRebuildConcurrentWriteTests : UmbracoIntegratio
 
         public void Configure(ConnectionStrings umbracoConnectionString)
         {
+            // The harness configures the database before the fixture's own setup can ignore the test.
+            if (Constants.ProviderNames.SQLLite.InvariantEquals(umbracoConnectionString.ProviderName) is false)
+            {
+                _inner.Configure(umbracoConnectionString);
+                return;
+            }
+
             _filePath = Path.Combine(Path.GetTempPath(), $"umbraco-{Guid.NewGuid():N}.sqlite.db");
             var fileConnectionString = new SqliteConnectionStringBuilder
             {

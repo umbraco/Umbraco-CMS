@@ -33,7 +33,7 @@ async function openVariantContentWithTipTapAndAddABlock(umbracoApi, umbracoUi) {
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickInsertBlockButton();
-  await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.clickBlockElementWithNameInRichTextEditor(blockName);
   await umbracoUi.content.enterTextstring(textStringText);
   await umbracoUi.content.clickCreateModalButton();
 }

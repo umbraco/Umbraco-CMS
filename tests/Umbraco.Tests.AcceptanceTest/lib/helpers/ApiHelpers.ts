@@ -265,8 +265,15 @@ export class ApiHelpers {
   /**
    * Signs the given user in. The server sets the httpOnly authentication cookie on the browser
    * context, which is the sole credential for every subsequent request.
+   *
+   * Every authenticated response re-issues the cookie of the session that made the request, so a
+   * response still in flight for the previous session would replace the cookie this sign-in sets.
+   * The page therefore leaves the back office first, which cancels its pending requests.
    */
   async signIn(userEmail: string, userPassword: string) {
+    if (this.page.url().startsWith(this.baseUrl)) {
+      await this.page.goto('about:blank');
+    }
     await this.login.login(userEmail, userPassword);
   }
 

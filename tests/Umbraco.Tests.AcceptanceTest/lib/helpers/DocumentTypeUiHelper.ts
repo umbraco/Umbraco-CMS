@@ -169,7 +169,7 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForDocumentTypeToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentType, this.clickSaveButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.documentType, ConstantHelper.workspaceActions.documentTypeSave);
   }
 
   async clickConfirmToDeleteButtonAndWaitForDocumentTypeToBeDeleted() {

@@ -182,7 +182,7 @@ export class MemberUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForMemberToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.member, this.clickSaveButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.member, ConstantHelper.workspaceActions.memberSave);
   }
 
   async clickConfirmToDeleteButtonAndWaitForMemberToBeDeleted() {

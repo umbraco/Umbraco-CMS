@@ -39,6 +39,8 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
         timeout: ConstantHelper.timeout.short,
       });
     }).toPass({timeout: ConstantHelper.timeout.long});
+    // A query typed before the search providers have loaded is not searched for.
+    await this.isVisible(this.activeProvider);
   }
 
   async clickOutsideToCloseModal() {
