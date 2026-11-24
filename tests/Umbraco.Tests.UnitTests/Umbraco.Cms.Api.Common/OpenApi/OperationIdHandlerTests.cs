@@ -84,6 +84,17 @@ internal sealed class OperationIdHandlerTests
     public void Can_Generate_Operation_Id(OperationIdCase testCase, string expected)
         => Assert.AreEqual(expected, CreateSut().Handle(CreateApiDescription(testCase)));
 
+    [Test]
+    [SetCulture("tr-TR")] // tr-TR upper-cases "i" to a dotted "İ"
+    public void Can_Generate_Operation_Id_With_The_Invariant_Culture()
+        => Assert.AreEqual(
+            "GetItemDocumentByIdInfo",
+            CreateSut().Handle(CreateApiDescription(new OperationIdCase
+            {
+                HttpMethod = "GET",
+                RelativePath = "umbraco/management/api/v1/item/document/{id}/info",
+            })));
+
     private static IEnumerable<TestCaseData> CanHandleCases()
     {
         yield return new TestCaseData(typeof(ValidateUpdateDocumentController), true)

@@ -396,7 +396,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
                 continue;
             }
 
-            if (node is not null)
+            // An entry of another entity type means the key identifies no document; it is accounted for, as a null is.
+            if (node is not null && node.IsOtherEntityType(ContentCacheDataSerializerEntityType.Document) is false)
             {
                 idKeyPairs.Add((node.Id, node.Key));
                 ResolveNode(key, node, preview, generation, resolved);
@@ -415,7 +416,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
     // The single batched database read for whatever L0 and L1/L2 missed. A database-read node
     // additionally gets the published-ancestor guard applied (mirroring GetNodeAsync's read-through
-    // result) and, once resolved, is promoted into L1 — an L1/L2 hit is already there. A key the
+    // result) and, once resolved, is promoted into L1 — an L1/L2 hit is already there. Drafts are
+    // promoted too, as GetNodeAsync does, since the draft entry is refreshed on every save. A key the
     // database has nothing for gets a cached null, as GetNodeAsync writes, so it is not re-read on
     // every request.
     private async Task ReadFromDatabaseAsync(List<Guid> keys, bool preview, long generation, Dictionary<Guid, IPublishedContent> resolved, ContentSourcesReader readContentSources)
@@ -437,7 +439,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             }
 
             if (ResolveNode(node.Key, node, preview, generation, resolved)
-                && preview is false && IsCacheGenerationCurrent(generation))
+                && IsCacheGenerationCurrent(generation))
             {
                 await _hybridCache.SetAsync(GetCacheKey(node.Key, preview), node, GetEntryOptions(node.Key, preview), GenerateTags(node));
             }
@@ -446,19 +448,27 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         await CacheNullsForKeysNotReturnedAsync(keys, coldNodes, preview, generation);
     }
 
-    // Keys the database returned nothing for (e.g. unpublished documents) resolve to nothing until a
-    // refresh says otherwise. Without this a traversal that passes unpublished children re-reads them
-    // on every request. A node that came back but failed the ancestor guard is not cached as null,
-    // matching GetNodeAsync, since that check can be transiently wrong during a cache rebuild.
+    // Keys the database returned nothing for (unpublished documents, or for drafts, documents that no
+    // longer exist) resolve to nothing until a refresh says otherwise. Without this a traversal that
+    // passes them re-reads them on every request. A node that came back but failed the ancestor guard
+    // is not cached as null, matching GetNodeAsync, since that check can be transiently wrong during a
+    // cache rebuild.
     private async Task CacheNullsForKeysNotReturnedAsync(List<Guid> keys, IReadOnlyCollection<ContentCacheNode> returnedNodes, bool preview, long generation)
     {
-        if (preview || IsCacheGenerationCurrent(generation) is false)
+        if (IsCacheGenerationCurrent(generation) is false)
         {
             return;
         }
 
         var returnedKeys = returnedNodes.Select(node => node.Key).ToHashSet();
-        foreach (Guid key in keys.Where(key => returnedKeys.Contains(key) is false))
+        Guid[] keysNotReturned = keys.Where(key => returnedKeys.Contains(key) is false).ToArray();
+        if (keysNotReturned.Length == 0)
+        {
+            return;
+        }
+
+        ISet<Guid> keysSharedWithOtherEntityTypes = GetKeysSharingCacheKeysWithOtherEntityTypes(keysNotReturned, preview);
+        foreach (Guid key in keysNotReturned.Where(key => keysSharedWithOtherEntityTypes.Contains(key) is false))
         {
             await _hybridCache.SetAsync(GetCacheKey(key, preview), (ContentCacheNode?)null, GetEntryOptions(key, preview), GenerateTags(null));
         }
@@ -509,6 +519,12 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
         (bool exists, ContentCacheNode? contentCacheNode) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
 
+        // The entry is another entity type's, so the key identifies no document.
+        if (contentCacheNode?.IsOtherEntityType(ContentCacheDataSerializerEntityType.Document) is true)
+        {
+            return null;
+        }
+
         // A value found in the backing store is already current, so it can always populate the caches
         // below; only a value built from the read-through DB fetch needs the generation guard.
         bool snapshotIsCurrent = true;
@@ -520,16 +536,13 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             // memory permanently stale until a full clear).
             long generation = Interlocked.Read(ref _cacheGeneration);
 
-            bool ancestorCheckFailed;
-            (contentCacheNode, ancestorCheckFailed) = await GetContentCacheNodeFromRepo();
+            bool cacheable;
+            (contentCacheNode, cacheable) = await GetContentCacheNodeFromRepo();
 
             snapshotIsCurrent = IsCacheGenerationCurrent(generation);
 
-            // Only cache the result if the ancestor check didn't fail.
-            // When content exists in DB but the ancestor check fails, this could be a transient
-            // race condition during cache rebuild. Caching null would poison the distributed cache.
             // Skip the write when the generation moved — a refresh has superseded this snapshot.
-            if (ancestorCheckFailed is false && snapshotIsCurrent)
+            if (cacheable && snapshotIsCurrent)
             {
                 await _hybridCache.SetAsync(
                     cacheKey,
@@ -570,9 +583,14 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
         return result;
 
-        async Task<(ContentCacheNode? Node, bool AncestorCheckFailed)> GetContentCacheNodeFromRepo()
+        async Task<(ContentCacheNode? Node, bool Cacheable)> GetContentCacheNodeFromRepo()
         {
             ContentCacheNode? contentCacheNode = await readContentSource(key, preview);
+
+            if (contentCacheNode is null)
+            {
+                return (null, GetKeysSharingCacheKeysWithOtherEntityTypes([key], preview).Count == 0);
+            }
 
             // If we can resolve the content cache node, we still need to check if the ancestor path is published.
             // This does cost some performance, but it's necessary to ensure that the content is actually published.
@@ -580,17 +598,24 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             // Similarly, when a branch is published, next time the content is requested, the parent will be published.
             // Null values are cached here are tagged and cleared by ClearMemoryCacheAsync, so the next request after a
             // cache clear will re-query the database.
-            if (preview is false && contentCacheNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(contentCacheNode.Key) is false)
+            if (preview is false && _publishStatusQueryService.HasPublishedAncestorPath(contentCacheNode.Key) is false)
             {
                 // Content exists in the DB but the ancestor path is not published. Return null but
                 // signal to the caller that this should NOT be cached — the ancestor check may be
-                // transiently wrong during a cache rebuild.
-                return (null, true);
+                // transiently wrong during a cache rebuild, and caching null would poison the distributed cache.
+                return (null, false);
             }
 
-            return (contentCacheNode, false);
+            return (contentCacheNode, true);
         }
     }
+
+    // A null cached under a key that another cache also reads would hide that cache's item. Media reads the same
+    // published key as documents; no other cache reads the draft key.
+    private ISet<Guid> GetKeysSharingCacheKeysWithOtherEntityTypes(IReadOnlyCollection<Guid> keys, bool preview)
+        => preview
+            ? new HashSet<Guid>()
+            : _databaseCacheRepository.GetKeysOfEntityTypes(keys, ContentCacheDataSerializerEntityType.Media);
 
     private bool GetPreview() => _previewService.IsInPreview();
 
@@ -774,23 +799,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
                 _logger.LogDebug("Document nodes to cache {NodeCount}", cacheNodes.Count);
             }
 
-            // The seeded nodes carry both identifiers, so the id/key map is warmed without any lookups of its own.
-            var idKeyPairs = new List<(int Id, Guid Key)>(cacheNodes.Count);
-
-            foreach (ContentCacheNode cacheNode in cacheNodes)
-            {
-                var cacheKey = GetCacheKey(cacheNode.Key, false);
-                await _hybridCache.SetAsync(
-                    cacheKey,
-                    cacheNode,
-                    GetSeedEntryOptions(),
-                    GenerateTags(cacheNode),
-                    cancellationToken: cancellationToken);
-
-                idKeyPairs.Add((cacheNode.Id, cacheNode.Key));
-            }
-
-            _idKeyMap.PopulateCache(idKeyPairs, UmbracoObjectTypes.Document);
+            await SeedBatchAsync(cacheNodes, cancellationToken);
         }
 
 #if DEBUG
@@ -799,6 +808,35 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 #else
         _logger.LogInformation("Document cache seeding completed with {SeedCount} seed keys.", SeedKeys.Count);
 #endif
+    }
+
+    private async Task SeedBatchAsync(List<ContentCacheNode> cacheNodes, CancellationToken cancellationToken)
+    {
+        // The seeded nodes carry both identifiers, so the id/key map is warmed without any lookups of its own.
+        var idKeyPairs = new List<(int Id, Guid Key)>(cacheNodes.Count);
+
+        foreach (ContentCacheNode cacheNode in cacheNodes)
+        {
+            // Warm the id/key map even for nodes skipped below, as ReadFromDatabaseAsync does.
+            idKeyPairs.Add((cacheNode.Id, cacheNode.Key));
+
+            // Seed keys aren't guaranteed to have a published ancestor path when seeding runs, so a node
+            // is only cached if it would also be visible when read through from the database.
+            if (_publishStatusQueryService.HasPublishedAncestorPath(cacheNode.Key) is false)
+            {
+                continue;
+            }
+
+            var cacheKey = GetCacheKey(cacheNode.Key, false);
+            await _hybridCache.SetAsync(
+                cacheKey,
+                cacheNode,
+                GetSeedEntryOptions(),
+                GenerateTags(cacheNode),
+                cancellationToken: cancellationToken);
+        }
+
+        _idKeyMap.PopulateCache(idKeyPairs, UmbracoObjectTypes.Document);
     }
 
     /// <summary>
