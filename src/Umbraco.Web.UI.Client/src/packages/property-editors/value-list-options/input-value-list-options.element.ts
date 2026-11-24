@@ -140,7 +140,7 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 	async #focusNewEntry() {
 		await this.updateComplete;
 		const options = this.shadowRoot?.querySelectorAll<UmbInputValueListOptionElement>('.option');
-		await options?.[options.length - 1]?.focus();
+		options?.[options.length - 1]?.focus();
 	}
 
 	override getFormElement() {
