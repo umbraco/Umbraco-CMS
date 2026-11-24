@@ -108,7 +108,7 @@
         { "text": "StartsWith filter on the base text; the TODO comment and the grand-plan backlog row removed", "done": true }
       ],
       "acceptance": "Document and element fixtures at unchanged counts; the new test green and red first.",
-      "notes": "Numbered 3b in CAMPAIGN.md. Started 24-11-2026, stacked on PR 3 at 68ac4cb2f45. Design: the wide default EnsureUniqueNodeNameAsync fetches only siblings whose name starts with SimilarNodeName.GetBaseText(name), as NPoco's virtual EnsureUniqueNodeName does; GetUniqueNodeNameAndSiblingsAsync keeps the full fetch for DocumentRepository's URL-segment check, as NPoco's out-siblings variant does. Implemented 24-11-2026: element test proven red (no LIKE in any save command) then green; naming fixtures 73 green on SQLite, element and document insert fixtures 49 green on SQL Server; full solution build clean; independent review found only nits (comment grammar, presence instead of a count assertion), applied. Grand plan loose end #23447 closed. Committed as d4dfd1720d8 and opened as draft PR #24779 against PR 3's branch on 24-11-2026; rebase onto the integration branch once #24776 merges.",
+      "notes": "Numbered 3b in CAMPAIGN.md. Started 24-11-2026, stacked on PR 3 at 68ac4cb2f45. Design: the wide default EnsureUniqueNodeNameAsync fetches only siblings whose name starts with SimilarNodeName.GetBaseText(name), as NPoco's virtual EnsureUniqueNodeName does; GetUniqueNodeNameAndSiblingsAsync keeps the full fetch for DocumentRepository's URL-segment check, as NPoco's out-siblings variant does. Implemented 24-11-2026: element test proven red (no LIKE in any save command) then green; naming fixtures 73 green on SQLite, element and document insert fixtures 49 green on SQL Server; full solution build clean; independent review found only nits (comment grammar, presence instead of a count assertion), applied. Grand plan loose end #23447 closed. Committed as d4dfd1720d8 and opened as draft PR #24779 against PR 3's branch on 24-11-2026; rebase onto the integration branch once #24776 merges. Review round 1 (the review bot, approved) applied in d67bb47c473: a remarks note that the narrowed fetch folds case the way the database does (NPoco parity; non-ASCII case variants are fetched on SQL Server CI collations, not on SQLite); the test assertion tied to the text column; three wildcard cases ([draft], 50% off, a_b) pin EF Core's parameter escaping, green on SQLite and SQL Server.",
       "mergeCommit": ""
     },
     {
@@ -197,6 +197,7 @@
     }
   ],
   "log": [
+    { "date": "24-11-2026", "text": "PR 3b review round 1 applied (d67bb47c473): case-folding remark, assertion tied to the text column, wildcard-escaping cases green on both providers." },
     { "date": "24-11-2026", "text": "Easy win from the map opened as draft #24780 (usage repositories to EF Core), outside the campaign numbering." },
     { "date": "24-11-2026", "text": "PR 3b opened as draft #24779 (d4dfd1720d8), stacked on PR 3." },
     { "date": "24-11-2026", "text": "PR 3b started on v20/feature/ef-core-media-repository-3b-narrow-sibling-fetch, stacked on PR 3. An easy win from the migration map (DataTypeUsageRepository + PropertyTypeUsageRepository to EF Core) delegated to an agent in a separate worktree." },
