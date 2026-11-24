@@ -125,6 +125,36 @@ internal sealed class ElementServiceNotificationStateTests : UmbracoIntegrationT
     }
 
     [Test]
+    public async Task EmptyRecycleBin_Publishes_Deleting_Notification_For_Every_Root_Folder_Across_Pages()
+    {
+        IContentType elementType = await CreateElementType();
+        IElement looseElement = await CreateElement(elementType.Key);
+        Assert.That((await ElementEditingService.MoveToRecycleBinAsync(looseElement.Key, Constants.Security.SuperUserKey)).Success, Is.True);
+        (Guid firstFolder, Guid firstFolderElement) = await CreateTrashedFolder(elementType.Key);
+        (Guid secondFolder, Guid secondFolderElement) = await CreateTrashedFolder(elementType.Key);
+
+        Attempt<EntityContainerOperationStatus> result = await ((ElementContainerService)ElementContainerService)
+            .EmptyRecycleBinAsync(Constants.Security.SuperUserKey, 1);
+        Assert.That(result.Success, Is.True);
+
+        ElementDeletingNotification elementDeleting = Recorder.Starting.OfType<ElementDeletingNotification>().Single();
+        EntityContainerDeletingNotification[] folderDeletings = Recorder.Starting.OfType<EntityContainerDeletingNotification>().ToArray();
+        Assert.That(folderDeletings.SelectMany(x => x.DeletedEntities).Select(x => x.Key), Is.EquivalentTo(new[] { firstFolder, secondFolder }));
+
+        IDictionary<string, object?> FolderState(Guid folderKey)
+            => folderDeletings.Single(x => x.DeletedEntities.Any(e => e.Key == folderKey)).State;
+
+        AssertDeletedStates(new Dictionary<Guid, IDictionary<string, object?>>
+        {
+            [looseElement.Key] = elementDeleting.State,
+            [firstFolder] = FolderState(firstFolder),
+            [firstFolderElement] = FolderState(firstFolder),
+            [secondFolder] = FolderState(secondFolder),
+            [secondFolderElement] = FolderState(secondFolder),
+        });
+    }
+
+    [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureCancelContainerDeleting))]
     public async Task EmptyRecycleBin_Is_Cancelled_By_Root_Folder_Deleting_Notification()
     {
@@ -193,6 +223,16 @@ internal sealed class ElementServiceNotificationStateTests : UmbracoIntegrationT
         Assert.That((await ElementContainerService.MoveToRecycleBinAsync(folderKey, Constants.Security.SuperUserKey)).Success, Is.True);
 
         return new TrashedStructure(looseElement.Key, folderKey, folderElement.Key, subfolderKey, subfolderElement.Key);
+    }
+
+    private async Task<(Guid Folder, Guid Element)> CreateTrashedFolder(Guid elementTypeKey)
+    {
+        var folderKey = Guid.NewGuid();
+        Assert.That((await ElementContainerService.CreateAsync(folderKey, folderKey.ToString("N"), null, Constants.Security.SuperUserKey)).Success, Is.True);
+        IElement element = await CreateElement(elementTypeKey, folderKey);
+        Assert.That((await ElementContainerService.MoveToRecycleBinAsync(folderKey, Constants.Security.SuperUserKey)).Success, Is.True);
+
+        return (folderKey, element.Key);
     }
 
     private async Task<IContentType> CreateElementType()
