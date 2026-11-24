@@ -11,6 +11,8 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class VariationContextAccessorExtensions
 {
+    private static readonly Func<IEnumerable<string>?> _noAvailableSegments = () => null;
+
     /// <summary>
     ///     Contextualizes the variation based on the content variation settings and property alias.
     /// </summary>
@@ -111,5 +113,12 @@ public static class VariationContextAccessorExtensions
         string propertyAlias,
         string? culture,
         Func<string?, IEnumerable<string>?>? propertySegmentsForCulture)
-        => variationContext?.GetSegment(contentId, propertyAlias, () => propertySegmentsForCulture?.Invoke(culture));
+        => variationContext?.GetSegment(
+            contentId,
+            propertyAlias,
+            propertySegmentsForCulture is null ? _noAvailableSegments : BindCulture(propertySegmentsForCulture, culture));
+
+    // Kept separate from GetPropertySegment so the closure is only allocated when there is a factory to bind.
+    private static Func<IEnumerable<string>?> BindCulture(Func<string?, IEnumerable<string>?> propertySegmentsForCulture, string? culture)
+        => () => propertySegmentsForCulture(culture);
 }
