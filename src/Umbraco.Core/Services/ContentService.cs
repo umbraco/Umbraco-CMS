@@ -2623,6 +2623,7 @@ public class ContentService : RepositoryService, IContentService
         }
 
         var savingNotification = new ContentSavingNotification(document, evtMsgs);
+        initialNotificationState = savingNotification.State;
         if (scope.Notifications.PublishCancelable(savingNotification))
         {
             return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, document);
@@ -2682,7 +2683,8 @@ public class ContentService : RepositoryService, IContentService
         {
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            if (scope.Notifications.PublishCancelable(new ContentDeletingNotification(content, eventMessages)))
+            var deletingNotification = new ContentDeletingNotification(content, eventMessages);
+            if (scope.Notifications.PublishCancelable(deletingNotification))
             {
                 scope.Complete();
                 return OperationResult.Cancel(eventMessages);
@@ -2699,7 +2701,7 @@ public class ContentService : RepositoryService, IContentService
                     BuildCultureMap(content, content.ContentType.VariesByCulture() ? content.PublishedCultures : ["*"])));
             }
 
-            DeleteLocked(scope, content, eventMessages);
+            DeleteLocked(scope, content, eventMessages, deletingNotification.State);
 
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(content, TreeChangeTypes.Remove, eventMessages));
@@ -2711,12 +2713,12 @@ public class ContentService : RepositoryService, IContentService
         return OperationResult.Succeed(eventMessages);
     }
 
-    private void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs)
+    private void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs, IDictionary<string, object?> notificationState)
     {
         void DoDelete(IContent c)
         {
             _documentRepository.Delete(c);
-            scope.Notifications.Publish(new ContentDeletedNotification(c, evtMsgs));
+            scope.Notifications.Publish(new ContentDeletedNotification(c, evtMsgs).WithState(notificationState));
 
             // media files deleted by QueuingEventDispatcher
         }
@@ -3159,7 +3161,7 @@ public class ContentService : RepositoryService, IContentService
                         continue;
                     }
 
-                    DeleteLocked(scope, content, eventMessages);
+                    DeleteLocked(scope, content, eventMessages, deletingContentNotification.State);
                     deleted.Add(content);
                 }
             }
@@ -4119,7 +4121,8 @@ public class ContentService : RepositoryService, IContentService
                 return;
             }
 
-            if (scope.Notifications.PublishCancelable(new ContentDeletingNotification(contents, eventMessages)))
+            var deletingNotification = new ContentDeletingNotification(contents, eventMessages);
+            if (scope.Notifications.PublishCancelable(deletingNotification))
             {
                 scope.Complete();
                 return;
@@ -4153,7 +4156,7 @@ public class ContentService : RepositoryService, IContentService
 
                 // delete content
                 // triggers the deleted event (and handles the files)
-                DeleteLocked(scope, content, eventMessages);
+                DeleteLocked(scope, content, eventMessages, deletingNotification.State);
                 changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.Remove));
             }
 

@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Notifications;
 /// </summary>
 /// <remarks>
 ///     This notification is cancelable, allowing handlers to prevent the delete operation.
-///     The notification is published by the <see cref="Services.IMediaService"/> when DeleteMediaOfType, Delete, or EmptyRecycleBin methods are called.
+///     The notification is published by the <see cref="Services.IMediaService"/> when DeleteMediaOfType or Delete methods are called.
 /// </remarks>
 public sealed class MediaDeletingNotification : DeletingNotification<IMedia>
 {

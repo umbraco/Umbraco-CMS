@@ -1006,13 +1006,14 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.WriteLock(Constants.Locks.MediaTree);
 
-                if (scope.Notifications.PublishCancelable(new MediaDeletingNotification(media, messages)))
+                var deletingNotification = new MediaDeletingNotification(media, messages);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(messages);
                 }
 
-                DeleteLocked(scope, media, messages);
+                DeleteLocked(scope, media, messages, deletingNotification.State);
 
                 scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.Remove, messages));
                 Audit(AuditType.Delete, userId, media.Id);
@@ -1029,12 +1030,13 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="scope">The current database scope.</param>
         /// <param name="media">The media item to delete.</param>
         /// <param name="evtMsgs">The event messages to include in notifications.</param>
-        private void DeleteLocked(ICoreScope scope, IMedia media, EventMessages evtMsgs)
+        /// <param name="notificationState">The state of the deleting notification, passed to each deleted notification.</param>
+        private void DeleteLocked(ICoreScope scope, IMedia media, EventMessages evtMsgs, IDictionary<string, object?>? notificationState)
         {
             void DoDelete(IMedia c)
             {
                 _mediaRepository.Delete(c);
-                scope.Notifications.Publish(new MediaDeletedNotification(c, evtMsgs));
+                scope.Notifications.Publish(new MediaDeletedNotification(c, evtMsgs).WithState(notificationState));
 
                 // media files deleted by QueuingEventDispatcher
             }
@@ -1446,7 +1448,7 @@ namespace Umbraco.Cms.Core.Services
 
                 foreach (IMedia media in medias)
                 {
-                    DeleteLocked(scope, media, messages);
+                    DeleteLocked(scope, media, messages, null);
                     deleted.Add(media);
                 }
                 scope.Notifications.Publish(new MediaEmptiedRecycleBinNotification(deleted, new EventMessages()).WithStateFrom(emptyingRecycleBinNotification));
@@ -1729,7 +1731,8 @@ namespace Umbraco.Cms.Core.Services
                 IQuery<IMedia>? query = Query<IMedia>().WhereIn(x => x.ContentTypeId, mediaTypeIdsA);
                 IMedia[] medias = _mediaRepository.Get(query)?.ToArray() ?? Array.Empty<IMedia>();
 
-                if (scope.Notifications.PublishCancelable(new MediaDeletingNotification(medias, messages)))
+                var deletingNotification = new MediaDeletingNotification(medias, messages);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
                     return;
@@ -1755,7 +1758,7 @@ namespace Umbraco.Cms.Core.Services
 
                     // delete media
                     // triggers the deleted event (and handles the files)
-                    DeleteLocked(scope, media, messages);
+                    DeleteLocked(scope, media, messages, deletingNotification.State);
                     changes.Add(new TreeChange<IMedia>(media, TreeChangeTypes.Remove));
                 }
 

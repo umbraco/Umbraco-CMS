@@ -10,8 +10,10 @@ namespace Umbraco.Cms.Core.Notifications;
 ///     Notification that is published after content has been deleted.
 /// </summary>
 /// <remarks>
-///     This notification is published by the <see cref="Services.IContentService"/> when Delete or EmptyRecycleBin methods complete.
+///     This notification is published by the <see cref="Services.IContentService"/> when Delete, DeleteOfType or EmptyRecycleBin methods complete.
 ///     It is not cancelable since the delete operation has already completed.
+///     Deleting a content item also deletes its descendants; each gets its own notification sharing the state of the
+///     <see cref="ContentDeletingNotification"/> for the item chosen for deletion.
 /// </remarks>
 public sealed class ContentDeletedNotification : DeletedNotification<IContent>
 {
