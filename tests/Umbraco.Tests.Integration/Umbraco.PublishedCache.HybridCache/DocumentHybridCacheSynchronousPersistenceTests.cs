@@ -179,6 +179,18 @@ internal sealed class DocumentHybridCacheSynchronousPersistenceTests : UmbracoIn
         public (ContentCacheNode? Draft, ContentCacheNode? Published) GetContentSourceForPublishStates(Guid key)
             => _inner.GetContentSourceForPublishStates(key);
 
+        public ContentCacheNode? GetContentSource(Guid key, bool preview = false)
+            => _inner.GetContentSource(key, preview);
+
+        public IEnumerable<ContentCacheNode> GetContentSources(IEnumerable<Guid> keys, bool preview = false)
+            => _inner.GetContentSources(keys, preview);
+
+        public ContentCacheNode? GetMediaSource(Guid key)
+            => _inner.GetMediaSource(key);
+
+        public IEnumerable<ContentCacheNode> GetMediaSources(IEnumerable<Guid> keys)
+            => _inner.GetMediaSources(keys);
+
         public Task DeleteContentItemAsync(int id)
         {
             AsynchronousWrites++;
@@ -226,6 +238,9 @@ internal sealed class DocumentHybridCacheSynchronousPersistenceTests : UmbracoIn
 
         public IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType)
             => _inner.GetContentByContentTypeKey(keys, entityType);
+
+        public ISet<Guid> GetKeysOfEntityTypes(IReadOnlyCollection<Guid> keys, ContentCacheDataSerializerEntityType entityTypes)
+            => _inner.GetKeysOfEntityTypes(keys, entityTypes);
 
         public IEnumerable<Guid> GetDocumentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false)
             => _inner.GetDocumentKeysByContentTypeKeys(keys, published);

@@ -1,12 +1,8 @@
-import type { UmbMockDataSet } from './data/mock-data-set.types.js';
+import type { UmbMockDataSet, UmbMockSetManifest } from './data/mock-data-set.types.js';
+import { manifests } from './data/sets/manifests.js';
 import { umbMockDbRegistry } from './db/mock-db-registry.js';
 
-interface UmbMockSetEntry {
-	label: string;
-	loader: () => Promise<UmbMockDataSet>;
-	/** Whether the set appears in the header app dropdown. Defaults to false. */
-	visible?: boolean;
-}
+export const MOCK_USER_STORAGE_KEY = 'umb:mockUser';
 
 /**
  * Central manager for mock data sets.
@@ -16,39 +12,9 @@ class UmbMockManager {
 	#currentSetName: string = 'default';
 	#currentDataSet: UmbMockDataSet | null = null;
 
-	// Lazy loaders for mock sets
-	#mockSetLoaders: Record<string, UmbMockSetEntry> = {
-		default: {
-			label: 'Default',
-			loader: () => import('./data/sets/default/index.js') as Promise<UmbMockDataSet>,
-			visible: true,
-		},
-		kitchenSink: {
-			label: 'Kitchen Sink',
-			loader: () => import('./data/sets/kitchen-sink/index.js') as Promise<UmbMockDataSet>,
-			visible: true,
-		},
-		userPermissions: {
-			label: 'User Permissions',
-			loader: () => import('./data/sets/user-permissions/index.js') as Promise<UmbMockDataSet>,
-			visible: false,
-		},
-		documents: {
-			label: 'Documents',
-			loader: () => import('./data/sets/documents/index.js') as Promise<UmbMockDataSet>,
-			visible: true,
-		},
-		blocks: {
-			label: 'Blocks',
-			loader: () => import('./data/sets/blocks/index.js') as Promise<UmbMockDataSet>,
-			visible: true,
-		},
-		multiBrandClothingShop: {
-			label: 'Multi Brand Clothing Shop',
-			loader: () => import('./data/sets/multi-brand-clothing-shop/index.js') as Promise<UmbMockDataSet>,
-			visible: true,
-		},
-	};
+	#mockSetLoaders: Record<string, UmbMockSetManifest> = Object.fromEntries(
+		manifests.map((manifest) => [manifest.alias, manifest]),
+	);
 
 	/**
 	 * Get current mock set name.
@@ -65,13 +31,53 @@ class UmbMockManager {
 	}
 
 	/**
-	 * Get all visible mock sets as alias/label pairs.
+	 * Get the names of the examples that the current mock set loads.
+	 */
+	get currentSetExamples(): Array<string> {
+		return this.#mockSetLoaders[this.#currentSetName]?.examples ?? [];
+	}
+
+	/**
+	 * Get all visible mock sets, without their loaders.
 	 * Only sets with `visible: true` are included.
 	 */
-	get availableSets(): Array<{ alias: string; label: string }> {
-		return Object.entries(this.#mockSetLoaders)
-			.filter(([, { visible }]) => visible === true)
-			.map(([alias, { label }]) => ({ alias, label }));
+	get availableSets(): Array<Omit<UmbMockSetManifest, 'loader' | 'visible'>> {
+		return Object.values(this.#mockSetLoaders)
+			.filter(({ visible }) => visible === true)
+			.map(({ alias, label, icon }) => ({ alias, label, icon }));
+	}
+
+	/**
+	 * Whether the current mock set lets you switch the current user.
+	 */
+	get canSwitchUser(): boolean {
+		return this.#mockSetLoaders[this.#currentSetName]?.userSwitcher === true;
+	}
+
+	/**
+	 * Get the users of the current mock set as id/name pairs. Empty unless the set lets you switch the current user.
+	 */
+	get availableUsers(): Array<{ id: string; name: string }> {
+		if (!this.canSwitchUser) return [];
+		return (this.#currentDataSet?.user ?? []).map(({ id, name }) => ({ id, name }));
+	}
+
+	/**
+	 * Get the id of the user that was picked with the user switcher.
+	 * Undefined when nothing valid was picked, in which case the first user of the set is the current user.
+	 */
+	get currentUserId(): string | undefined {
+		if (!this.canSwitchUser) return undefined;
+		const pickedUserId = localStorage.getItem(MOCK_USER_STORAGE_KEY);
+		return this.availableUsers.find((user) => user.id === pickedUserId)?.id;
+	}
+
+	/**
+	 * Get the name of the current user when the set lets you switch the current user.
+	 */
+	get currentUserName(): string | undefined {
+		const users = this.availableUsers;
+		return (users.find((user) => user.id === this.currentUserId) ?? users[0])?.name;
 	}
 
 	/**

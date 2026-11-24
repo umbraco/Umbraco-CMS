@@ -54,6 +54,41 @@ public interface IMediaCacheService
     }
 
     /// <summary>
+    /// Gets a published media item by its unique key, for synchronous callers.
+    /// </summary>
+    /// <param name="key">The unique key of the media.</param>
+    /// <returns>The published media content, or <c>null</c> if not found.</returns>
+    /// <remarks>
+    /// Implementations should avoid blocking on <see cref="GetByKeyAsync"/>, and read synchronously from the
+    /// backing stores that support it: a caller blocked on asynchronous work needs a second thread to complete it.
+    /// A store with no synchronous read, for example a distributed cache, may still have to be waited on.
+    /// The default implementation blocks on <see cref="GetByKeyAsync"/>.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation and reference to it in the remarks.
+    IPublishedContent? GetByKey(Guid key)
+        => GetByKeyAsync(key).GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Gets a published media item by its integer identifier, for synchronous callers.
+    /// </summary>
+    /// <param name="id">The integer identifier of the media.</param>
+    /// <returns>The published media content, or <c>null</c> if not found.</returns>
+    /// <remarks>See <see cref="GetByKey"/>. The default implementation blocks on <see cref="GetByIdAsync"/>.</remarks>
+    // TODO (V20): Remove the default implementation and reference to it in the remarks.
+    IPublishedContent? GetById(int id)
+        => GetByIdAsync(id).GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Gets multiple published media items by their unique keys, for synchronous callers.
+    /// </summary>
+    /// <param name="keys">The unique keys of the media to retrieve.</param>
+    /// <returns>The published media items that exist, in the same order as <paramref name="keys"/> (missing items omitted).</returns>
+    /// <remarks>See <see cref="GetByKey"/>. The default implementation blocks on <see cref="GetByKeysAsync"/>.</remarks>
+    // TODO (V20): Remove the default implementation and reference to it in the remarks.
+    IReadOnlyList<IPublishedContent> GetByKeys(IReadOnlyCollection<Guid> keys)
+        => GetByKeysAsync(keys).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Attempts to retrieve a media item from the in-memory converted-content cache without
     /// touching the distributed cache or the database.
     /// </summary>

@@ -105,7 +105,9 @@ import type {
 // Model Type Definitions
 // ============================================================================
 
-export type UmbMockDataTypeModel = DataTypeResponseModel & DataTypeTreeItemResponseModel & DataTypeItemResponseModel;
+export type UmbMockDataTypeModel = DataTypeResponseModel &
+	Omit<DataTypeTreeItemResponseModel, 'parentIsFolder'> &
+	DataTypeItemResponseModel;
 
 export type UmbMockDictionaryModel = DictionaryItemResponseModel &
 	NamedEntityTreeItemResponseModel &
@@ -123,10 +125,10 @@ export type UmbMockDocumentModel = DocumentResponseModel &
 
 export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
 	DocumentBlueprintItemResponseModel &
-	DocumentBlueprintTreeItemResponseModel;
+	Omit<DocumentBlueprintTreeItemResponseModel, 'parentIsFolder'>;
 
 export type UmbMockDocumentTypeModel = DocumentTypeResponseModel &
-	DocumentTypeTreeItemResponseModel &
+	Omit<DocumentTypeTreeItemResponseModel, 'parentIsFolder'> &
 	DocumentTypeItemResponseModel;
 
 export type UmbMockLanguageModel = LanguageResponseModel & LanguageItemResponseModel;
@@ -139,7 +141,7 @@ export type UmbMockMediaModel = MediaResponseModel &
 	};
 
 export type UmbMockMediaTypeModel = MediaTypeResponseModel &
-	MediaTypeTreeItemResponseModel &
+	Omit<MediaTypeTreeItemResponseModel, 'parentIsFolder'> &
 	MediaTypeItemResponseModel;
 
 export type UmbMockMemberModel = MemberResponseModel & MemberItemResponseModel;
@@ -147,7 +149,7 @@ export type UmbMockMemberModel = MemberResponseModel & MemberItemResponseModel;
 export type UmbMockMemberGroupModel = MemberGroupItemResponseModel;
 
 export type UmbMockMemberTypeModel = MemberTypeResponseModel &
-	MemberTypeTreeItemResponseModel &
+	Omit<MemberTypeTreeItemResponseModel, 'parentIsFolder'> &
 	MemberTypeItemResponseModel & {
 		hasListView: boolean;
 	};
@@ -272,6 +274,24 @@ export interface UmbMockDataSet {
 	// Template-specific helpers
 	templateQueryResult?: TemplateQueryResultResponseModel;
 	templateQuerySettings?: TemplateQuerySettingsResponseModel;
+}
+
+/**
+ * Describes a mock data set and how to load it.
+ * Each set folder exports one of these from its `manifest.ts`.
+ */
+export interface UmbMockSetManifest {
+	alias: string;
+	label: string;
+	/** Icon name, as registered in the icon registry (e.g. `icon-home`). */
+	icon?: string;
+	/** Whether the set appears in the header app dropdown. Defaults to false. */
+	visible?: boolean;
+	/** Whether the current user can be switched between the users of the set from the header. Defaults to false. */
+	userSwitcher?: boolean;
+	/** Names of folders under `examples/` that are loaded whenever this set is active. */
+	examples?: Array<string>;
+	loader: () => Promise<UmbMockDataSet>;
 }
 
 // ============================================================================

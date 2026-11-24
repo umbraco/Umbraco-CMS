@@ -13,6 +13,22 @@ describe('UmbPropertyEditorUIBlockGridElement', () => {
 		expect(element).to.be.instanceOf(UmbPropertyEditorUIBlockGridElement);
 	});
 
+	describe('readonly', () => {
+		it('reflects readonly changes after the first render to the attribute', async () => {
+			expect(element.hasAttribute('readonly')).to.be.false;
+
+			element.readonly = true;
+			await element.updateComplete;
+
+			expect(element.hasAttribute('readonly')).to.be.true;
+
+			element.readonly = false;
+			await element.updateComplete;
+
+			expect(element.hasAttribute('readonly')).to.be.false;
+		});
+	});
+
 	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
 		it('passes the a11y audit', async () => {
 			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);

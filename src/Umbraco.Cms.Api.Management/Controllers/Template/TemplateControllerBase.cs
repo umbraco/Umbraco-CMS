@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Api.Management.Permissions;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -16,6 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Template;
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Template)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Template))]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessTemplates)]
+[RequiresPermissionsFor(Constants.Permissions.Entities.Template.Resource)]
 public class TemplateControllerBase : ManagementApiControllerBase
 {
     protected IActionResult TemplateOperationStatusResult(TemplateOperationStatus status) =>
@@ -46,6 +48,7 @@ public class TemplateControllerBase : ManagementApiControllerBase
                 .WithTitle("Master template cannot be deleted")
                 .WithDetail("The master templates cannot be deleted. Please ensure the template is not a master template before you delete.")
                 .Build()),
+#pragma warning disable CS0618 // Type or member is obsolete
             TemplateOperationStatus.NotAllowedInProductionMode => BadRequest(problemDetailsBuilder
                 .WithTitle("Not allowed in production mode")
                 .WithDetail("Template modifications are not allowed when running in production mode.")
@@ -54,6 +57,7 @@ public class TemplateControllerBase : ManagementApiControllerBase
                 .WithTitle("Content change not allowed in production mode")
                 .WithDetail("Template content changes are not allowed when running in production mode. Metadata updates are permitted.")
                 .Build()),
+#pragma warning restore CS0618 // Type or member is obsolete
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown template operation status.")
                 .Build()),

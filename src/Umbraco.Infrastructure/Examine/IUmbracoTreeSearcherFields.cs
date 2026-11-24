@@ -14,6 +14,9 @@ public interface IUmbracoTreeSearcherFields
     ///     Gets the additional index fields that are searched in the back office for member entities.
     /// </summary>
     /// <returns>An enumerable collection of index field names used for searching member entities in the back office.</returns>
+    /// <remarks>
+    ///     These fields can hold identifying data, so they are only searched for users with access to the Members section.
+    /// </remarks>
     IEnumerable<string> GetBackOfficeMembersFields();
 
     /// <summary>
@@ -37,6 +40,9 @@ public interface IUmbracoTreeSearcherFields
     /// Returns the set of field names to be loaded for back office member search or display.
     /// </summary>
     /// <returns>A set of field names relevant to back office members.</returns>
+    /// <remarks>
+    ///     These fields are only loaded for users with access to the Members section.
+    /// </remarks>
     ISet<string> GetBackOfficeMembersFieldsToLoad();
 
     /// <summary>

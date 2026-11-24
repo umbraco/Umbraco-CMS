@@ -193,8 +193,8 @@ public class MemberSignInManagerTests
 
         // Assert
         _mockEventAggregator.Verify(
-            x => x.Publish(It.Is<MemberLoginSuccessNotification>(n =>
-                n.IpAddress == TestIpAddress && n.MemberKey == memberKey)),
+            x => x.PublishAsync(It.Is<MemberLoginSuccessNotification>(n =>
+                n.IpAddress == TestIpAddress && n.MemberKey == memberKey), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -211,10 +211,10 @@ public class MemberSignInManagerTests
 
         // Assert
         _mockEventAggregator.Verify(
-            x => x.Publish(It.Is<MemberLoginFailedNotification>(n =>
+            x => x.PublishAsync(It.Is<MemberLoginFailedNotification>(n =>
                 n.IpAddress == TestIpAddress
                 && n.MemberKey == memberKey
-                && n.Reason == MemberLoginFailedReason.InvalidCredentials)),
+                && n.Reason == MemberLoginFailedReason.InvalidCredentials), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -232,10 +232,10 @@ public class MemberSignInManagerTests
 
         // Assert
         _mockEventAggregator.Verify(
-            x => x.Publish(It.Is<MemberLoginFailedNotification>(n =>
+            x => x.PublishAsync(It.Is<MemberLoginFailedNotification>(n =>
                 n.IpAddress == TestIpAddress
                 && n.MemberKey == null
-                && n.Reason == MemberLoginFailedReason.MemberNotFound)),
+                && n.Reason == MemberLoginFailedReason.MemberNotFound), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -255,10 +255,10 @@ public class MemberSignInManagerTests
 
         // Assert
         _mockEventAggregator.Verify(
-            x => x.Publish(It.Is<MemberLoginFailedNotification>(n =>
+            x => x.PublishAsync(It.Is<MemberLoginFailedNotification>(n =>
                 n.IpAddress == TestIpAddress
                 && n.MemberKey == memberKey
-                && n.Reason == MemberLoginFailedReason.LockedOut)),
+                && n.Reason == MemberLoginFailedReason.LockedOut), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -279,10 +279,10 @@ public class MemberSignInManagerTests
 
         // Assert
         _mockEventAggregator.Verify(
-            x => x.Publish(It.Is<MemberLoginFailedNotification>(n =>
+            x => x.PublishAsync(It.Is<MemberLoginFailedNotification>(n =>
                 n.IpAddress == TestIpAddress
                 && n.MemberKey == memberKey
-                && n.Reason == MemberLoginFailedReason.NotAllowed)),
+                && n.Reason == MemberLoginFailedReason.NotAllowed), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -333,8 +333,8 @@ public class MemberSignInManagerTests
 
         // Assert
         _mockEventAggregator.Verify(
-            x => x.Publish(It.Is<MemberLogoutSuccessNotification>(n =>
-                n.IpAddress == TestIpAddress && n.MemberKey == memberKey)),
+            x => x.PublishAsync(It.Is<MemberLogoutSuccessNotification>(n =>
+                n.IpAddress == TestIpAddress && n.MemberKey == memberKey), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -351,7 +351,7 @@ public class MemberSignInManagerTests
 
         // Assert
         _mockEventAggregator.Verify(
-            x => x.Publish(It.IsAny<MemberLogoutSuccessNotification>()),
+            x => x.PublishAsync(It.IsAny<MemberLogoutSuccessNotification>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 }

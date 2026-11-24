@@ -86,4 +86,19 @@ internal sealed class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestW
         var publishedTextPage = await PublishedContentCache.GetByIdAsync(Textpage.Key);
         CacheTestsHelper.AssertPage(Textpage, publishedTextPage);
     }
+
+    [Test]
+    public async Task CantGetPublishedContentAfterReseedingWithKeysFromBeforeParentWasUnpublished()
+    {
+        await ContentPublishingService.PublishBranchAsync(Textpage.Key, Array.Empty<string>(), PublishBranchFilter.All, Constants.Security.SuperUserKey, false);
+        var cacheService = DocumentCacheService as DocumentCacheService;
+        cacheService!.ResetSeedKeys();
+        await DocumentCacheService.ClearMemoryCacheAsync(CancellationToken.None);
+        Assert.IsTrue(await DocumentCacheService.HasContentByIdAsync(_subSubPage.Id));
+
+        await ContentPublishingService.UnpublishAsync(Subpage.Key, null, Constants.Security.SuperUserKey);
+        await DocumentCacheService.ClearMemoryCacheAsync(CancellationToken.None);
+
+        Assert.IsNull(await PublishedContentCache.GetByIdAsync(_subSubPage.Key));
+    }
 }

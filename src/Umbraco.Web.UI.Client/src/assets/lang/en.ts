@@ -491,11 +491,16 @@ export default {
 		noDocumentTypesCreateNew: 'Create a new Document Type',
 		noDocumentTypesAllowedAtRoot:
 			'There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Structure</strong>.',
+		noDocumentTypesAllowedAtRootWithNoSettingsAccess:
+			'There are no Document Types allowed for creating content at the root.',
 		noMediaTypes:
 			'There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Structure</strong>.',
 		noMediaTypesWithNoSettingsAccess:
 			"The selected media in the tree doesn't allow for any other media to be created below it.",
 		noMediaTypesEditPermissions: 'Edit permissions for this Media Type',
+		noMediaTypesAllowedAtRoot:
+			'There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow at root</strong> option under <strong>Structure</strong>.',
+		noMediaTypesAllowedAtRootWithNoSettingsAccess: 'There are no Media Types allowed for creating media at the root.',
 		documentTypeWithoutTemplate: 'Document Type without a template',
 		documentTypeWithTemplate: 'Document Type with Template',
 		documentTypeWithTemplateDescription:
@@ -957,6 +962,7 @@ export default {
 		next: 'Next',
 		no: 'No',
 		nodeName: 'Node Name',
+		none: 'None',
 		notFound: 'Not found',
 		noResults: 'No results',
 		noResultsFor: (query: string) => `No result for "${query}".`,
@@ -1442,7 +1448,7 @@ export default {
 		pickedTrashedItems: 'You have picked media items currently deleted or in the recycle bin',
 		trashed: 'Trashed',
 		openMedia: 'Open in Media Library',
-		changeMedia: 'Change Media Item',
+		changeMedia: 'Replace Media Item',
 		editMediaEntryLabel: 'Edit %0% on %1%',
 		confirmCancelMediaEntryCreationHeadline: 'Discard creation?',
 		confirmCancelMediaEntryCreationMessage: 'Are you sure you want to cancel the creation.',
@@ -2805,6 +2811,7 @@ export default {
 		addSettingsElementType: 'Add settings',
 		confirmDeleteBlockTitle: 'Delete %0%?',
 		confirmDeleteBlockMessage: 'Are you sure you want to delete this %0%?',
+		setUnexpose: 'Make draft',
 		confirmDeleteBlockTypeTitle: 'Delete block configuration?',
 		confirmDeleteBlockTypeMessage: 'Are you sure you want to delete the block configuration <strong>%0%</strong>?',
 		confirmDeleteBlockTypeNotice:

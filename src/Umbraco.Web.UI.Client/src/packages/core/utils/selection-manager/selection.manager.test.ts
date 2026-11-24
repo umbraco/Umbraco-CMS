@@ -315,4 +315,37 @@ describe('UmbSelectionManager', () => {
 			expect(manager.getSelection()).to.deep.equal([null]);
 		});
 	});
+
+	describe('Changing the selection', () => {
+		it('applies select, deselect and clearSelection through setSelection', () => {
+			const applied: Array<Array<string | null>> = [];
+			class UmbRecordingSelectionManager extends UmbSelectionManager {
+				override setSelection(value: Array<string | null>) {
+					applied.push(value);
+					super.setSelection(value);
+				}
+			}
+			const recording = new UmbRecordingSelectionManager(new UmbTestControllerHostElement());
+			recording.setSelectable(true);
+			recording.setMultiple(true);
+
+			recording.select('1');
+			recording.select('2');
+			recording.deselect('1');
+			recording.clearSelection();
+
+			expect(applied).to.deep.equal([['1'], ['1', '2'], ['2'], []]);
+		});
+
+		it('keeps an already selected item that is no longer allowed when the selection changes', () => {
+			manager.setSelection(['1']);
+			manager.setAllowLimitation((item) => item !== '1');
+
+			manager.select('2');
+			expect(manager.getSelection()).to.deep.equal(['1', '2']);
+
+			manager.deselect('2');
+			expect(manager.getSelection()).to.deep.equal(['1']);
+		});
+	});
 });

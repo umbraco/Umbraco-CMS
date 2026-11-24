@@ -257,4 +257,42 @@ describe('UmbTableElement', () => {
 			expect(checkbox.indeterminate).to.be.false;
 		});
 	});
+
+	describe('header labels', () => {
+		it('keep sortable column labels inside their header cells when the table is narrower than the labels', async () => {
+			element.style.display = 'block';
+			element.style.width = '320px';
+			element.columns = ['Last Modified Date', 'Document Author Name', 'Publication Status'].map((name, index) => ({
+				name,
+				alias: `column${index}`,
+				allowSorting: true,
+			}));
+			element.items = items(['1']);
+			await element.updateComplete;
+
+			const headCells = element.shadowRoot!.querySelectorAll('uui-table-head-cell:has(button)');
+			expect(headCells).to.have.lengthOf(3);
+			headCells.forEach((cell) => {
+				const cellRect = cell.getBoundingClientRect();
+				const labelRect = cell.querySelector('button > span')!.getBoundingClientRect();
+				expect(labelRect.right, cell.textContent!.trim()).to.be.at.most(Math.ceil(cellRect.right));
+			});
+		});
+
+		it('keep the sort indicator at its full size when a sortable column label wraps', async () => {
+			element.style.display = 'block';
+			element.style.width = '320px';
+			element.columns = [
+				{ name: 'Id', alias: 'short', allowSorting: true },
+				{ name: 'Document Author Name', alias: 'long', allowSorting: true },
+			];
+			element.items = items(['1']);
+			await element.updateComplete;
+
+			const [unwrapped, wrapped] = Array.from(element.shadowRoot!.querySelectorAll('uui-symbol-sort')).map(
+				(symbol) => symbol.getBoundingClientRect().width,
+			);
+			expect(wrapped).to.equal(unwrapped);
+		});
+	});
 });

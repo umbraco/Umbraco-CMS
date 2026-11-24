@@ -60,7 +60,7 @@ internal static class UmbracoDatabaseExtensions
         Sql<ISqlContext>? sql = database.SqlContext.Sql()
             .Select<KeyValueDto>()
             .From<KeyValueDto>()
-            .Where(whereParam, keyPrefix + sqlSyntax.GetWildcardPlaceholder());
+            .Where($"{whereParam} {sqlSyntax.GetLikeEscapeClause()}", sqlSyntax.EscapeLikeValue(keyPrefix) + sqlSyntax.GetWildcardPlaceholder());
 
         return database.Fetch<KeyValueDto>(sql)
             .ToDictionary(x => x.Key, x => x.Value);

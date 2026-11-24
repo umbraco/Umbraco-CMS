@@ -12,6 +12,8 @@ import {
 } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbMediaItemModel, UmbMediaUrlModel } from '@umbraco-cms/backoffice/media';
 import { UMB_MEDIA_ITEM_STORE_CONTEXT, UMB_MEDIA_URL_STORE_CONTEXT } from '@umbraco-cms/backoffice/media';
+import type { UmbLocalizationSet } from '@umbraco-cms/backoffice/localization-api';
+import { UMB_DEFAULT_LOCALIZATION_CULTURE, umbLocalizationManager } from '@umbraco-cms/backoffice/localization-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
@@ -77,6 +79,62 @@ describe('UmbInputMultiUrlElement', () => {
 
 	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbInputMultiUrlElement);
+	});
+
+	// The server reports a violated item count with these messages, so the input has to use the same ones
+	// for the editor to see the same wording whichever side validated the value.
+	describe('item count validation messages', () => {
+		const externalLink = (name: string): UmbLinkPickerLink => ({ type: 'external', name, url: `https://${name}` });
+
+		const itemCountMessages: UmbLocalizationSet = {
+			$code: UMB_DEFAULT_LOCALIZATION_CULTURE,
+			$dir: 'ltr',
+			validation_entriesShort: 'Minimum %0% entries, requires %1% more.',
+			validation_entriesExceed: 'Maximum %0% entries, you have entered %1% too many.',
+		};
+
+		let previousFallback: ReturnType<typeof umbLocalizationManager.localizations.get>;
+
+		beforeEach(() => {
+			previousFallback = umbLocalizationManager.localizations.get(UMB_DEFAULT_LOCALIZATION_CULTURE);
+			umbLocalizationManager.registerLocalization(itemCountMessages);
+		});
+
+		afterEach(() => {
+			if (previousFallback) {
+				umbLocalizationManager.localizations.set(UMB_DEFAULT_LOCALIZATION_CULTURE, previousFallback);
+			} else {
+				umbLocalizationManager.localizations.delete(UMB_DEFAULT_LOCALIZATION_CULTURE);
+			}
+		});
+
+		it('states the minimum and how many more items are needed', async () => {
+			element.min = 3;
+			element.urls = [externalLink('a')];
+			await element.updateComplete;
+
+			expect(element.checkValidity()).to.equal(false);
+			expect(element.validationMessage).to.equal('Minimum 3 entries, requires 2 more.');
+		});
+
+		it('states the maximum and how many items are over it', async () => {
+			element.max = 1;
+			element.urls = [externalLink('a'), externalLink('b'), externalLink('c')];
+			await element.updateComplete;
+
+			expect(element.checkValidity()).to.equal(false);
+			expect(element.validationMessage).to.equal('Maximum 1 entries, you have entered 2 too many.');
+		});
+
+		it('uses a message it is given in place of the default', async () => {
+			element.min = 2;
+			element.minMessage = 'Pick at least two';
+			element.urls = [externalLink('a')];
+			await element.updateComplete;
+
+			expect(element.checkValidity()).to.equal(false);
+			expect(element.validationMessage).to.equal('Pick at least two');
+		});
 	});
 
 	// The link picker modal is opened through a modal route, so it is never a descendant of this
