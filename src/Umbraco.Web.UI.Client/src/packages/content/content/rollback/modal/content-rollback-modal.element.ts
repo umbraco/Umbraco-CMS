@@ -149,7 +149,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 				this.data!.rollbackRepositoryAlias,
 			);
 
-			this.#requestVersions();
+			void this.#requestVersions();
 		});
 	}
 
@@ -202,7 +202,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 		const id = tempItems.find((item) => item.isCurrentlyPublishedVersion && !item.isCurrentDraftVersion)?.id;
 
 		if (id) {
-			this.#selectVersion(id);
+			void this.#selectVersion(id);
 		}
 	}
 
@@ -290,7 +290,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 	}
 
 	#onVersionClicked(id: string) {
-		this.#selectVersion(id);
+		void this.#selectVersion(id);
 	}
 
 	async #onPreventCleanup(event: Event, id: string, preventCleanup: boolean) {
@@ -330,7 +330,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 
 		// If we have toggled on and have a selected version, immediately show the diff.
 		if (this._showDiff && this._selectedVersion) {
-			this.#setDiffs();
+			void this.#setDiffs();
 		}
 	}
 
