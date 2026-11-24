@@ -12,6 +12,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
+const VARIANT_DOCUMENT_TYPE_ID = 'variant-documents-variant-document-type-id';
 const EN_US = new UmbVariantId('en-US');
 const EN_US_NAME_PATH = `$.variants[${UmbDataPathVariantQuery(EN_US)}].name`;
 
@@ -101,5 +102,67 @@ describe('UmbContentDetailWorkspaceContextBase (missing variant name)', () => {
 		);
 
 		expect(valid).to.be.true;
+	});
+});
+
+describe('UmbContentDetailWorkspaceContextBase (selected variant not yet created)', () => {
+	let hostElement: UmbTestDocumentWorkspaceHostElement;
+	let context: UmbDocumentWorkspaceContext;
+	let validation: UmbValidationController;
+
+	before(() => {
+		umbExtensionsRegistry.registerMany(TEST_MANIFESTS);
+	});
+
+	after(() => {
+		umbExtensionsRegistry.unregisterMany(TEST_MANIFESTS.map((m) => m.alias));
+	});
+
+	beforeEach(async () => {
+		await useMockSet('documents');
+		hostElement = new UmbTestDocumentWorkspaceHostElement();
+		document.body.appendChild(hostElement);
+		await hostElement.init();
+		context = new UmbDocumentWorkspaceContext(hostElement);
+		await context.create({ entityType: 'document', unique: null }, VARIANT_DOCUMENT_TYPE_ID);
+
+		const consumedValidation = await new UmbTestValidationContextConsumerController(hostElement)
+			.consumeContext(UMB_VALIDATION_CONTEXT, () => {})
+			.asPromise();
+		if (!consumedValidation) throw new Error('Could not resolve the Validation Context of the workspace.');
+		validation = consumedValidation;
+	});
+
+	afterEach(() => {
+		document.body.innerHTML = '';
+	});
+
+	async function runMandatoryValidation(): Promise<boolean> {
+		const saveData = await context.constructSaveData([EN_US]);
+		return context.runMandatoryValidationForSaveData(saveData, [EN_US]).then(
+			() => true,
+			() => false,
+		);
+	}
+
+	function nameMessages() {
+		return validation.messages.getMessages().filter((x) => x.path === EN_US_NAME_PATH);
+	}
+
+	it('reports a missing name for a selected variant that has not been created', async () => {
+		expect(context.getData()?.variants.some((x) => EN_US.compare(x))).to.be.false;
+
+		expect(await runMandatoryValidation()).to.be.false;
+
+		expect(nameMessages()).to.have.lengthOf(1);
+	});
+
+	it('removes the missing name message once the variant is created by giving it a name', async () => {
+		await runMandatoryValidation();
+		expect(nameMessages()).to.have.lengthOf(1);
+
+		context.setName('Named', EN_US);
+
+		expect(nameMessages()).to.have.lengthOf(0);
 	});
 });
