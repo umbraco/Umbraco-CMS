@@ -33,7 +33,7 @@
       "id": 9,
       "slug": "remove-unique-index-filters",
       "title": "PR 1b: Remove the auto-generated unique index filters from the SQL Server model",
-      "status": "in-review",
+      "status": "merged",
       "branch": "v20/feature/ef-core-media-repository-1b-remove-unique-index-filters",
       "pr": "#24758",
       "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24758",
@@ -47,13 +47,13 @@
       ],
       "acceptance": "Solution builds; both snapshots clean; the SQL Server snapshot diff touches only filter lines and the last migration id.",
       "notes": "Numbered PR 1b in CAMPAIGN.md. Started 23-11-2026, cut from 17cdf561180 (the PR 1 merge, head of the integration branch). Committed as f064b258d99 and opened as draft PR #24758 on 23-11-2026. Review round 1 (the review bot) applied in cc65832b950: the seven per-DTO customizers became one model-wide SqlServerUniqueIndexFilterModelCustomizer that clears every filter the SQL Server provider convention added on Umbraco entity types (explicit filters and OpenIddict types untouched); PR description rewritten to match. Inventory: ten filtered unique indexes in the SQL Server snapshot, of which three are OpenIddict tables created filtered by their own EF Core migration and stay; seven Umbraco DTOs are in scope (AccessRule, DocumentUrlAlias, Language, MediaVersion, PropertyData, RedirectUrl, Tag).",
-      "mergeCommit": ""
+      "mergeCommit": "042dd9ebb81"
     },
     {
       "id": 2,
       "slug": "hoist-read-path",
       "title": "Hoist the generic read path into AsyncContentRepositoryBase",
-      "status": "in-review",
+      "status": "merged",
       "branch": "v20/feature/ef-core-media-repository-2-hoist-read-path",
       "pr": "#24762",
       "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24762",
@@ -68,8 +68,8 @@
         { "text": "Document, blueprint and element fixtures and the unit project at unchanged counts; snapshots untouched", "done": true }
       ],
       "acceptance": "All document, blueprint and element fixtures and the unit project green at unchanged counts; snapshots untouched; PublishableContentRepositoryBase about 900-1100 lines smaller; no publishing reference left on the wide base except the OrderByPublished hook.",
-      "notes": "Started 23-11-2026, cut from 17cdf561180. Spike (two-tier rows, generic base query and projection, GetAsync and entity assembly) green on SQLite and SQL Server: 158 repository read tests on each. Phase 2 hoisted ordering, the fetch helpers, versions, children, descendants, root, recycle bin, paged-of-types, by-level, ancestors and RecycleBinSmellsAsync; PublishableContentRepositoryBase went from 2381 to 1478 lines; a normalised diff of every moved member shows only type-parameter and hook substitutions; both snapshots untouched. Decisions in CAMPAIGN.md §8 dated 23-11-2026. Verification: unit project 8236 passed; document, blueprint, element, content service and HybridCache integration fixtures 1029 passed on SQLite; repository fixtures 230 passed on SQL Server (one SQLite-only skip); full --no-incremental solution build clean; independent review found no must-fix, its two should-fix and three nits applied. Committed as 4f5fc0f61d3 and opened as draft PR #24762 on 23-11-2026. Review round 1 (the review bot, plus the user): GetByLevelAsync, GetAncestorsAsync and RecycleBinSmellsAsync went back to IDocumentRepository only, as protected cores on the wide base that DocumentRepository forwards to (elements must not expose them); GetAncestorsCoreAsync counts only ancestors of its own kind (two document tests, both proven red first); the published ordering branch gained unit coverage. Sonar duplication gate fails on moved code as it did on the element hoist #24175. Review round 2 (a maintainer, approved): IContentVersionDto renamed to IPublishableVersionDto in 0c5aa93e53e; two test builders reformatted via the GitHub UI. Ready to merge on the user's say.",
-      "mergeCommit": ""
+      "notes": "Started 23-11-2026, cut from 17cdf561180. Spike (two-tier rows, generic base query and projection, GetAsync and entity assembly) green on SQLite and SQL Server: 158 repository read tests on each. Phase 2 hoisted ordering, the fetch helpers, versions, children, descendants, root, recycle bin, paged-of-types, by-level, ancestors and RecycleBinSmellsAsync; PublishableContentRepositoryBase went from 2381 to 1478 lines; a normalised diff of every moved member shows only type-parameter and hook substitutions; both snapshots untouched. Decisions in CAMPAIGN.md §8 dated 23-11-2026. Verification: unit project 8236 passed; document, blueprint, element, content service and HybridCache integration fixtures 1029 passed on SQLite; repository fixtures 230 passed on SQL Server (one SQLite-only skip); full --no-incremental solution build clean; independent review found no must-fix, its two should-fix and three nits applied. Committed as 4f5fc0f61d3 and opened as draft PR #24762 on 23-11-2026. Review round 1 (the review bot, plus the user): GetByLevelAsync, GetAncestorsAsync and RecycleBinSmellsAsync went back to IDocumentRepository only, as protected cores on the wide base that DocumentRepository forwards to (elements must not expose them); GetAncestorsCoreAsync counts only ancestors of its own kind (two document tests, both proven red first); the published ordering branch gained unit coverage. Sonar duplication gate fails on moved code as it did on the element hoist #24175. Review round 2 (a maintainer, approved): IContentVersionDto renamed to IPublishableVersionDto in 0c5aa93e53e; two test builders reformatted via the GitHub UI. Squash-merged on 24-11-2026 as 1aae294e917 (patch id identical to the branch diff).",
+      "mergeCommit": "1aae294e917"
     },
     {
       "id": 3,
@@ -90,7 +90,7 @@
         { "text": "Write-path and delete tests of the document and element fixtures green at unchanged counts", "done": true }
       ],
       "acceptance": "As PR 2 plus every write-path test green; the publishable base ends near its publishing-only content; the wide base has no Set<TEntityDto> and no PublishedState reference.",
-      "notes": "Started 24-11-2026, cut from PR 2's branch at 1d880d7b519 (stacked; PR targets PR 2's branch until #24762 merges). Implemented 24-11-2026 as one scripted transplant: PublishableContentRepositoryBase 1478 to 1107 lines; wide base has no Set<TEntityDto> and no PublishedState reference; snapshots untouched; normalised diff of every moved member shows only the step substitutions. Decisions in CAMPAIGN.md §8 dated 24-11-2026. Verification: unit project 8239 passed; document, blueprint, element, content service, content publishing, content editing and HybridCache integration fixtures 1353 passed on SQLite; repository fixtures 231 passed on SQL Server (one SQLite-only skip); full --no-incremental solution build clean; independent review found one must-fix (two usings left unused by the move, removed) and recorded the no-op save of an unchanged item as a media behaviour change (§4b change 7). The sort order of a new item became a hook on the user's decision: the wide default takes the next free sort order as NPoco media does, the publishable base keeps the document rule (§4b keep 11); the document fixture's sort-order collision test covers the override. Committed as c6c8dda58fb and opened as draft PR #24776 against PR 2's branch on 24-11-2026; rebase onto the integration branch once #24762 merges. Rebased onto PR 2's review round 2 head as 833801a54ef on 24-11-2026 (one doc-block conflict, PR 3's side taken); repository fixtures 231 green after the rebase.",
+      "notes": "Started 24-11-2026, cut from PR 2's branch at 1d880d7b519 (stacked; PR targets PR 2's branch until #24762 merges). Implemented 24-11-2026 as one scripted transplant: PublishableContentRepositoryBase 1478 to 1107 lines; wide base has no Set<TEntityDto> and no PublishedState reference; snapshots untouched; normalised diff of every moved member shows only the step substitutions. Decisions in CAMPAIGN.md §8 dated 24-11-2026. Verification: unit project 8239 passed; document, blueprint, element, content service, content publishing, content editing and HybridCache integration fixtures 1353 passed on SQLite; repository fixtures 231 passed on SQL Server (one SQLite-only skip); full --no-incremental solution build clean; independent review found one must-fix (two usings left unused by the move, removed) and recorded the no-op save of an unchanged item as a media behaviour change (§4b change 7). The sort order of a new item became a hook on the user's decision: the wide default takes the next free sort order as NPoco media does, the publishable base keeps the document rule (§4b keep 11); the document fixture's sort-order collision test covers the override. Committed as c6c8dda58fb and opened as draft PR #24776 against PR 2's branch on 24-11-2026; rebase onto the integration branch once #24762 merges. Rebased onto PR 2's review round 2 head as 833801a54ef on 24-11-2026 (one doc-block conflict, PR 3's side taken); repository fixtures 231 green after the rebase. After the PR 2 squash: rebased onto the integration branch as 3ed1a87f678 (git rebase --onto 1aae294e917 0c5aa93e53e), fixtures 231 green, force-pushed with a lease, PR retargeted to v18/feature/ef-core-repositories.",
       "mergeCommit": ""
     },
     {
@@ -196,6 +196,7 @@
     }
   ],
   "log": [
+    { "date": "24-11-2026", "text": "PR 1b merged as 042dd9ebb81 and PR 2 merged as 1aae294e917 (squash). PR 3 rebased onto the integration branch (3ed1a87f678) and retargeted; now the only open PR." },
     { "date": "24-11-2026", "text": "PR 2 approved by a maintainer; IContentVersionDto renamed to IPublishableVersionDto (0c5aa93e53e). PR 3 rebased onto it (833801a54ef) and force-pushed with a lease." },
     { "date": "24-11-2026", "text": "PR 3 opened as draft #24776 (c6c8dda58fb), stacked on PR 2." },
     { "date": "24-11-2026", "text": "PR 3 implemented and independently reviewed: write, delete and naming path hoisted into AsyncContentRepositoryBase; publishable base 1478 to 1107 lines; regression fixtures green on SQLite, repository fixtures green on SQL Server; the no-op save recorded as a media change and the new-item sort order made a per-kind hook (wide default = NPoco media). Awaiting the commit and the draft PR." },
