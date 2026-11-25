@@ -67,6 +67,8 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
     /// </summary>
     internal sealed class ContentPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
+        private readonly IJsonSerializer _jsonSerializer;
+
         /// <summary>
         ///     Initializes a new instance of the <see cref="ContentPickerPropertyValueEditor" /> class.
         /// </summary>
@@ -87,25 +89,15 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
             ILocalizedTextService localizedTextService)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
+            _jsonSerializer = jsonSerializer;
             Validators.Add(new TypedValidatorRunner<string, ContentPickerConfiguration>(
                 new AllowedTypeValidator(localizedTextService, contentService, coreScopeProvider)));
         }
 
         /// <inheritdoc />
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
-        {
-            var asString = value is string str ? str : value?.ToString();
-
-            if (string.IsNullOrEmpty(asString))
-            {
-                yield break;
-            }
-
-            if (UdiParser.TryParse(asString, out Udi? udi))
-            {
-                yield return new UmbracoEntityReference(udi);
-            }
-        }
+            => EntityPickerValueParser.ParseKeys(value, Constants.UdiEntityType.Document, _jsonSerializer)
+                .Select(key => new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Document, key)));
 
         /// <inheritdoc />
         /// <remarks>
@@ -120,8 +112,7 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
         /// <inheritdoc />
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
-            // since our storage type is a string, we can expect the base to return a string
-            var stringValue = base.ToEditor(property, culture, segment) as string;
+            var stringValue = property.GetValue(culture, segment)?.ToString();
 
             if (stringValue.IsNullOrWhiteSpace())
             {
@@ -137,13 +128,10 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
                 return conversionAttempt.Success ? conversionAttempt.Result : null;
             }
 
-            // if its not an old value, it should be a udi
-            if (UdiParser.TryParse(stringValue, out GuidUdi? guidUdi) is false)
-            {
-                return null;
-            }
-
-            return guidUdi.Guid;
+            // A value holding several documents presents the first, as this editor holds one.
+            return EntityPickerValueParser.ParseKeys(stringValue, Constants.UdiEntityType.Document, _jsonSerializer)
+                .Cast<Guid?>()
+                .FirstOrDefault();
         }
     }
 

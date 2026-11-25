@@ -1,5 +1,6 @@
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -95,6 +96,22 @@ public class MultipleDocumentPickerValueConverterTests : PropertyValueConverterT
 
         Assert.NotNull(result);
         Assert.IsEmpty(result);
+    }
+
+    [Test]
+    public void MultipleDocumentPickerValueConverter_ReadsAValueStoredAsCommaSeparatedUdis()
+    {
+        var valueConverter = CreateValueConverter();
+        var missingKey = Guid.NewGuid();
+
+        var result = valueConverter.ConvertIntermediateToObject(
+            Mock.Of<IPublishedElement>(),
+            PropertyType(),
+            PropertyCacheLevel.Element,
+            $"{new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key)},{new GuidUdi(Constants.UdiEntityType.Document, missingKey)}",
+            false) as IEnumerable<IPublishedContent>;
+
+        Assert.That(result?.Select(x => x.Key), Is.EqualTo(new[] { PublishedContent.Key }));
     }
 
     [TestCase(null)]

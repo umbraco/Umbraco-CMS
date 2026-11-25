@@ -79,14 +79,8 @@ public class MultipleDocumentPickerValueConverter : PropertyValueConverterBase, 
 
     private IPublishedContent[] GetDocuments(object? inter, bool preview)
     {
-        var value = inter as string;
-        if (value.IsNullOrWhiteSpace())
-        {
-            return [];
-        }
-
-        Guid[]? keys = _jsonSerializer.Deserialize<Guid[]>(value);
-        if (keys is null || keys.Length == 0)
+        IReadOnlyList<Guid> keys = EntityPickerValueParser.ParseKeys(inter, Constants.UdiEntityType.Document, _jsonSerializer);
+        if (keys.Count == 0)
         {
             return [];
         }

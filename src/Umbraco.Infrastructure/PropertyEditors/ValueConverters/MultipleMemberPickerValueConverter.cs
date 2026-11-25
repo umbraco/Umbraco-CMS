@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
@@ -77,22 +76,10 @@ public class MultipleMemberPickerValueConverter : PropertyValueConverterBase, ID
         => "(unsupported)";
 
     private IPublishedContent[] GetMembers(object? inter)
-    {
-        var value = inter as string;
-        if (value.IsNullOrWhiteSpace())
-        {
-            return [];
-        }
-
-        Guid[]? keys = _jsonSerializer.Deserialize<Guid[]>(value);
-
-        return keys is null
-            ? []
-            : keys
-                .Select(key => _memberService.GetById(key))
-                .WhereNotNull()
-                .Select(member => _publishedMemberCache.Get(member) as IPublishedContent)
-                .WhereNotNull()
-                .ToArray();
-    }
+        => EntityPickerValueParser.ParseKeys(inter, Constants.UdiEntityType.Member, _jsonSerializer)
+            .Select(key => _memberService.GetById(key))
+            .WhereNotNull()
+            .Select(member => _publishedMemberCache.Get(member) as IPublishedContent)
+            .WhereNotNull()
+            .ToArray();
 }

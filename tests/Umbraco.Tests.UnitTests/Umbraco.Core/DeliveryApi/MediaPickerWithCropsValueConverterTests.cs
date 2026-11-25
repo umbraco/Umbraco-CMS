@@ -423,6 +423,29 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         Assert.That(result?.Select(x => x.Content.Name), Is.EqualTo(new[] { "First media", "Third media" }));
     }
 
+    [Test]
+    public void MediaPickerWithCropsValueConverter_InMultiMode_ReadsOnlyMediaFromAValueStoredAsCommaSeparatedUdis()
+    {
+        var publishedPropertyType = SetupMediaPropertyType(true);
+        var firstMediaKey = SetupMedia("First media", ".jpg", 200, 400, "First alt text", 800);
+        var secondMediaKey = SetupMedia("Second media", ".png", 300, 600, "Second alt text", 900);
+
+        var valueConverter = MediaPickerWithCropsValueConverter(true);
+        var inter = string.Join(
+            ',',
+            new GuidUdi(Constants.UdiEntityType.Media, firstMediaKey),
+            new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()),
+            new GuidUdi(Constants.UdiEntityType.Media, secondMediaKey));
+
+        var result = valueConverter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<MediaWithCrops>;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result?.Select(x => x.Content.Name), Is.EqualTo(new[] { "First media", "Second media" }));
+            PublishedMediaCacheMock.Verify(c => c.GetByIds(It.Is<IReadOnlyCollection<Guid>>(k => k.SequenceEqual(new[] { firstMediaKey, secondMediaKey }))), Times.Once);
+        });
+    }
+
     private string SerializeMediaWithCropsDtos(params Guid[] mediaKeys)
     {
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());

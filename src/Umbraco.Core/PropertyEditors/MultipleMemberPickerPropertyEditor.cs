@@ -130,6 +130,15 @@ public class MultipleMemberPickerPropertyEditor : DataEditor, IValueSchemaProvid
             }
         }
 
+        /// <inheritdoc/>
+        public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
+        {
+            var value = property.GetValue(culture, segment);
+            return value is null
+                ? base.ToEditor(property, culture, segment)
+                : Deserialize(_jsonSerializer, value).Select(key => key.ToString()).ToArray();
+        }
+
         /// <summary>
         ///     Deserializes the provided value into the keys of the picked members.
         /// </summary>
@@ -137,13 +146,7 @@ public class MultipleMemberPickerPropertyEditor : DataEditor, IValueSchemaProvid
         /// <param name="value">The stored value.</param>
         /// <returns>The keys of the picked members.</returns>
         internal static IEnumerable<Guid> Deserialize(IJsonSerializer jsonSerializer, object? value)
-        {
-            var asString = value as string ?? value?.ToString();
-
-            return string.IsNullOrWhiteSpace(asString)
-                ? []
-                : jsonSerializer.Deserialize<IEnumerable<Guid>>(asString) ?? [];
-        }
+            => EntityPickerValueParser.ParseKeys(value, Constants.UdiEntityType.Member, jsonSerializer);
     }
 
     /// <summary>
