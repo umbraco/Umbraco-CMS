@@ -16,6 +16,7 @@ import {
 	svg,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 interface UmbDonutChartSliceData {
 	amount: number;
@@ -475,6 +476,7 @@ export class UmbDonutChartElement extends UmbLitElement {
 	}
 
 	static override styles = [
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

@@ -235,7 +235,8 @@ export default [
 	},
 	{
 		// The donut chart folder is self-contained, so it can move to another package without edits: its runtime code
-		// imports only Lit, the Umbraco Lit element and (type-only) the localization API, besides its own files.
+		// imports only Lit, the Umbraco Lit element, the shared text styles and (type-only) the localization API, besides
+		// its own files.
 		files: ['src/packages/log-viewer/components/donut-chart/**/*.ts'],
 		ignores: ['**/*.test.ts', '**/*.stories.ts'],
 		rules: {
@@ -244,15 +245,9 @@ export default [
 				{
 					patterns: [
 						{
-							group: [
-								'../*',
-								'@umbraco-cms/backoffice/*',
-								'!@umbraco-cms/backoffice/external/lit',
-								'!@umbraco-cms/backoffice/lit-element',
-								'!@umbraco-cms/backoffice/localization-api',
-							],
+							regex: '^(\\.\\./|@umbraco-cms/backoffice/(?!(external/lit|lit-element|style|localization-api)$))',
 							message:
-								'The donut chart imports only @umbraco-cms/backoffice/external/lit, @umbraco-cms/backoffice/lit-element, type-only @umbraco-cms/backoffice/localization-api and files in its own folder.',
+								'The donut chart imports only @umbraco-cms/backoffice/external/lit, @umbraco-cms/backoffice/lit-element, @umbraco-cms/backoffice/style, type-only @umbraco-cms/backoffice/localization-api and files in its own folder.',
 						},
 						{
 							group: ['@umbraco-cms/backoffice/localization-api'],

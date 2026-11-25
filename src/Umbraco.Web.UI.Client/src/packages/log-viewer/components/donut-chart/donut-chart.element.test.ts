@@ -275,7 +275,8 @@ describe('UmbDonutChartElement', () => {
 		it('picks up slices passed through a nested slot', async () => {
 			const host = document.createElement('div');
 			host.attachShadow({ mode: 'open' }).innerHTML = '<umb-donut-chart><slot></slot></umb-donut-chart>';
-			host.innerHTML = '<umb-donut-slice name="A" amount="1"></umb-donut-slice><umb-donut-slice name="B" amount="3"></umb-donut-slice>';
+			host.innerHTML =
+				'<umb-donut-slice name="A" amount="1"></umb-donut-slice><umb-donut-slice name="B" amount="3"></umb-donut-slice>';
 			const container = await fixture<HTMLElement>(html`<div></div>`);
 			container.append(host);
 			const element = host.shadowRoot!.querySelector<UmbDonutChartElement>('umb-donut-chart')!;
