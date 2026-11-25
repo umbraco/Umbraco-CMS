@@ -6,6 +6,7 @@ import { UMB_EDIT_DATA_TYPE_FOLDER_WORKSPACE_PATH_PATTERN } from '../tree/folder
 import type { UmbDataTypeDetailRepository } from '../repository/index.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import { UMB_DATA_TYPE_WORKSPACE_ALIAS } from './constants.js';
+import { UmbDataTypeConfigConverterController } from './data-type-config-converter.controller.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbInvariantDatasetWorkspaceContext,
@@ -85,6 +86,16 @@ export class UmbDataTypeWorkspaceContext
 	#propertyEditorUiName = new UmbStringState<string | null>(null);
 	readonly propertyEditorUiName = this.#propertyEditorUiName.asObservable();
 
+	// The property editor schema and settings as saved, so the settings can be converted when the data type moves to
+	// another property editor schema, or restored when it moves back.
+	#savedEditorAlias?: string;
+	#savedValues: Array<UmbDataTypePropertyValueModel> = [];
+
+	// The property editor schema the current settings were made for.
+	#valuesEditorAlias?: string;
+
+	#configConverter = new UmbDataTypeConfigConverterController(this);
+
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			workspaceAlias: UMB_DATA_TYPE_WORKSPACE_ALIAS,
@@ -150,7 +161,30 @@ export class UmbDataTypeWorkspaceContext
 		this.#propertyEditorDataSourceSettingsProperties = [];
 		this.#propertyEditorDataSourceSettingsDefaultData = [];
 		this.#settingsDefaultData = undefined;
+		this.#rememberSavedSettings(undefined);
 		this.#mergeConfigProperties();
+	}
+
+	protected override async _processIncomingData(data: EntityType): Promise<EntityType> {
+		const processedData = await super._processIncomingData(data);
+		this.#rememberSavedSettings(processedData);
+		return processedData;
+	}
+
+	protected override async _create(currentData: EntityType, parent: UmbEntityModel) {
+		await super._create(currentData, parent);
+		this.#rememberSavedSettings(this._data.getPersisted());
+	}
+
+	protected override async _update(currentData: EntityType) {
+		await super._update(currentData);
+		this.#rememberSavedSettings(this._data.getPersisted());
+	}
+
+	#rememberSavedSettings(data: EntityType | undefined) {
+		this.#savedEditorAlias = data?.editorAlias;
+		this.#savedValues = data?.values ?? [];
+		this.#valuesEditorAlias = data?.editorAlias;
 	}
 
 	// Hold the last set property editor ui alias, so we know when it changes, so we can reset values. [NL]
@@ -316,6 +350,47 @@ export class UmbDataTypeWorkspaceContext
 		const data = this._data.getCurrent();
 		if (!data) return;
 
+		// Settings changed before the first move away from the saved property editor schema are the ones to convert.
+		if (this.#valuesEditorAlias === this.#savedEditorAlias) {
+			this.#savedValues = data.values ?? [];
+		}
+
+		const fromSchemaAlias = this.#savedEditorAlias;
+		const toSchemaAlias = data.editorAlias;
+		if (
+			fromSchemaAlias &&
+			toSchemaAlias &&
+			fromSchemaAlias !== toSchemaAlias &&
+			this.#configConverter.hasConverter(fromSchemaAlias, toSchemaAlias)
+		) {
+			void this.#transferConvertedConfig(fromSchemaAlias, toSchemaAlias, this.#savedValues);
+			return;
+		}
+
+		// Moving back to the saved property editor schema restores the saved settings.
+		this.#applyConfigDefaultData(
+			toSchemaAlias,
+			toSchemaAlias === this.#savedEditorAlias ? this.#savedValues : (data.values ?? []),
+		);
+	}
+
+	async #transferConvertedConfig(
+		fromSchemaAlias: string,
+		toSchemaAlias: string,
+		savedValues: Array<UmbDataTypePropertyValueModel>,
+	) {
+		const convertedValues = await this.#configConverter.convert(fromSchemaAlias, toSchemaAlias, savedValues);
+
+		// A later change of property editor supersedes this conversion.
+		if (this.getPropertyEditorSchemaAlias() !== toSchemaAlias) return;
+
+		this.#applyConfigDefaultData(toSchemaAlias, [
+			...convertedValues.map(({ alias, value }) => ({ alias, value })),
+			...savedValues,
+		]);
+	}
+
+	#applyConfigDefaultData(editorAlias: string | undefined, existingValues: Array<UmbDataTypePropertyValueModel>) {
 		// We are going to transfer the default data from the schema and the UI (the UI can override the schema data).
 		// Let us figure out which editors are alike from the inherited data, so we can keep that data around and only transfer the data that is not
 		// inherited from the previous data type.
@@ -330,7 +405,7 @@ export class UmbDataTypeWorkspaceContext
 		// We want to keep the existing data, if it is not in the default data, and if it is in the default data, then we want to keep the default data.
 		for (const property of this.#properties.getValue()) {
 			// We are matching on the alias, as we assume that the alias is unique for the data type.
-			const existingData = data.values?.find((x) => x.alias === property.alias);
+			const existingData = existingValues.find((x) => x.alias === property.alias);
 			if (existingData) {
 				values.push(existingData);
 				continue;
@@ -345,6 +420,7 @@ export class UmbDataTypeWorkspaceContext
 
 		this._data.updatePersisted({ values });
 		this._data.updateCurrent({ values });
+		this.#valuesEditorAlias = editorAlias;
 	}
 
 	public getPropertyDefaultValue(alias: string) {
