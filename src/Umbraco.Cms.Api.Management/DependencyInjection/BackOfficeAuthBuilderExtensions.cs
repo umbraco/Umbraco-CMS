@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using OpenIddict.Server;
 using Umbraco.Cms.Api.Common.DependencyInjection;
+using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Management.Configuration;
 using Umbraco.Cms.Api.Management.Handlers;
 using Umbraco.Cms.Api.Management.Middleware;
@@ -83,6 +84,8 @@ public static class BackOfficeAuthBuilderExtensions
         builder.AddUmbracoOpenIddict();
 
         builder.Services.AddTransient<IBackOfficeApplicationManager, BackOfficeApplicationManager>();
+        builder.Services.Configure<UmbracoOpenApiUiOptions>(options =>
+            options.OAuthSecuritySchemes.Add(ManagementApiConfiguration.ApiSecurityName));
         builder.Services.AddScoped<IBackOfficeUserClientCredentialsManager, BackOfficeUserClientCredentialsManager>();
         builder.Services.AddSingleton<BackOfficeAuthorizationInitializationMiddleware>();
         builder.Services.Configure<UmbracoPipelineOptions>(options => options.AddFilter(new BackofficePipelineFilter("Backoffice")));

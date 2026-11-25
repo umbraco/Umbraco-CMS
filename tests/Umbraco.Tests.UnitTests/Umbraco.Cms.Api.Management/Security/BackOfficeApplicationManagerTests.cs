@@ -2,15 +2,15 @@
 // See LICENSE for more details.
 
 using System.Collections.Immutable;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System.Globalization;
 using System.Text.Json;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using OpenIddict.Abstractions;
+using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -70,7 +70,8 @@ public class BackOfficeApplicationManagerTests
             _mockWebHostEnvironment.Object,
             _securitySettings,
             _mockRuntimeState.Object,
-            _mockLogger.Object);
+            _mockLogger.Object,
+            []);
 
         var newHosts = new[] { new Uri("https://server1.local/") };
 
@@ -274,7 +275,8 @@ public class BackOfficeApplicationManagerTests
             _mockWebHostEnvironment.Object,
             _securitySettings,
             _mockRuntimeState.Object,
-            _mockLogger.Object);
+            _mockLogger.Object,
+            []);
 
         var newHosts = new[] { new Uri("https://server1.local/") }; // Same host
 
@@ -352,7 +354,8 @@ public class BackOfficeApplicationManagerTests
             _mockWebHostEnvironment.Object,
             securitySettingsWithHost,
             _mockRuntimeState.Object,
-            _mockLogger.Object);
+            _mockLogger.Object,
+            []);
 
         // server2 is the host detected by the middleware on this instance
         var newHosts = new[] { new Uri("https://server2.local/") };
@@ -412,7 +415,8 @@ public class BackOfficeApplicationManagerTests
             _mockWebHostEnvironment.Object,
             securitySettingsWithHost,
             _mockRuntimeState.Object,
-            _mockLogger.Object);
+            _mockLogger.Object,
+            []);
 
         // Pass the same host as middleware-detected
         var newHosts = new[] { new Uri("https://server1.local/") };
@@ -671,11 +675,80 @@ public class BackOfficeApplicationManagerTests
             .ReturnsAsync(ImmutableDictionary<string, JsonElement>.Empty);
     }
 
+    [Test]
+    public async Task EnsureBackOfficeApplicationAsync_OpenApiUiProvider_RegistersEachRedirectPathOnEachHost()
+    {
+        _mockWebHostEnvironment.Setup(x => x.EnvironmentName).Returns("Development");
+
+        List<OpenIddictApplicationDescriptor> openApiUiDescriptors = CaptureCreatedDescriptors(Constants.OAuthClientIds.OpenApiUi);
+
+        var provider = new Mock<IOpenApiUiProvider>();
+        provider.Setup(x => x.GetOAuthRedirectPaths()).Returns(["/custom/ui/", "/custom/ui/callback"]);
+
+        var sut = CreateManager(provider.Object);
+
+        await sut.EnsureBackOfficeApplicationAsync([new Uri("https://server1.local/"), new Uri("https://server2.local/")]);
+
+        Assert.That(openApiUiDescriptors, Has.Count.EqualTo(1));
+        Assert.That(
+            openApiUiDescriptors[0].RedirectUris.Select(x => x.ToString()),
+            Is.EquivalentTo(new[]
+            {
+                "https://server1.local/custom/ui/",
+                "https://server1.local/custom/ui/callback",
+                "https://server2.local/custom/ui/",
+                "https://server2.local/custom/ui/callback",
+            }));
+    }
+
+    [Test]
+    public async Task EnsureBackOfficeApplicationAsync_NoOpenApiUiProvider_RemovesOpenApiUiApplication()
+    {
+        _mockWebHostEnvironment.Setup(x => x.EnvironmentName).Returns("Development");
+
+        var storedOpenApiUiApplication = new object();
+        _mockApplicationManager
+            .Setup(x => x.FindByClientIdAsync(Constants.OAuthClientIds.OpenApiUi, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(storedOpenApiUiApplication);
+
+        List<OpenIddictApplicationDescriptor> openApiUiDescriptors = CaptureCreatedDescriptors(Constants.OAuthClientIds.OpenApiUi);
+
+        var sut = CreateManager();
+
+        await sut.EnsureBackOfficeApplicationAsync([new Uri("https://server1.local/")]);
+
+        Assert.That(openApiUiDescriptors, Is.Empty);
+        _mockApplicationManager.Verify(
+            x => x.DeleteAsync(storedOpenApiUiApplication, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    private List<OpenIddictApplicationDescriptor> CaptureCreatedDescriptors(string clientId)
+    {
+        var captured = new List<OpenIddictApplicationDescriptor>();
+        _mockApplicationManager
+            .Setup(x => x.CreateAsync(It.Is<OpenIddictApplicationDescriptor>(d => d.ClientId == clientId), It.IsAny<CancellationToken>()))
+            .Callback<OpenIddictApplicationDescriptor, CancellationToken>((descriptor, _) => captured.Add(descriptor))
+            .ReturnsAsync(new object());
+
+        return captured;
+    }
+
+    private BackOfficeApplicationManager CreateManager(params IOpenApiUiProvider[] openApiUiProviders) =>
+        new(
+            _mockApplicationManager.Object,
+            _mockWebHostEnvironment.Object,
+            _securitySettings,
+            _mockRuntimeState.Object,
+            _mockLogger.Object,
+            openApiUiProviders);
+
     private BackOfficeApplicationManager CreateDefaultMockedBackofficeApplicationManager() =>
         new(
             _mockApplicationManager.Object,
             _mockWebHostEnvironment.Object,
             _securitySettings,
             _mockRuntimeState.Object,
-            _mockLogger.Object);
+            _mockLogger.Object,
+            []);
 }

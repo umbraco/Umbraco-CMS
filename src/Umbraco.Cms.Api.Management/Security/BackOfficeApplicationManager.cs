@@ -2,12 +2,15 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
+using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
 
@@ -24,6 +27,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
     private readonly Uri? _backOfficeHost;
     private readonly string _callbackPathName;
     private readonly string _effectiveLogoutPathName;
+    private readonly IOpenApiUiProvider? _openApiUiProvider;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BackOfficeApplicationManager"/> class.
@@ -33,12 +37,39 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
     /// <param name="securitySettings">The security settings options for configuring backoffice security.</param>
     /// <param name="runtimeState">The current runtime state of the Umbraco application.</param>
     /// <param name="logger">The logger used for logging events related to the backoffice application manager.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
     public BackOfficeApplicationManager(
         IOpenIddictApplicationManager applicationManager,
         IWebHostEnvironment webHostEnvironment,
         IOptions<SecuritySettings> securitySettings,
         IRuntimeState runtimeState,
         ILogger<BackOfficeApplicationManager> logger)
+        : this(
+            applicationManager,
+            webHostEnvironment,
+            securitySettings,
+            runtimeState,
+            logger,
+            StaticServiceProvider.Instance.GetServices<IOpenApiUiProvider>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeApplicationManager"/> class.
+    /// </summary>
+    /// <param name="applicationManager">The OpenIddict application manager used for managing backoffice authentication applications.</param>
+    /// <param name="webHostEnvironment">Provides information about the web hosting environment.</param>
+    /// <param name="securitySettings">The security settings options for configuring backoffice security.</param>
+    /// <param name="runtimeState">The current runtime state of the Umbraco application.</param>
+    /// <param name="logger">The logger used for logging events related to the backoffice application manager.</param>
+    /// <param name="openApiUiProviders">The OpenAPI UI provider, if one is registered, whose OAuth redirect paths are registered for the OpenAPI UI client.</param>
+    public BackOfficeApplicationManager(
+        IOpenIddictApplicationManager applicationManager,
+        IWebHostEnvironment webHostEnvironment,
+        IOptions<SecuritySettings> securitySettings,
+        IRuntimeState runtimeState,
+        ILogger<BackOfficeApplicationManager> logger,
+        IEnumerable<IOpenApiUiProvider> openApiUiProviders)
         : base(applicationManager, logger)
     {
         _webHostEnvironment = webHostEnvironment;
@@ -47,14 +78,16 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         _backOfficeHost = securitySettings.Value.BackOfficeHost;
         _callbackPathName = securitySettings.Value.CallbackPathName;
         _effectiveLogoutPathName = securitySettings.Value.GetEffectiveLogoutPathName();
+        _openApiUiProvider = openApiUiProviders.LastOrDefault();
     }
 
     /// <summary>
     /// Ensures that the back office application is properly configured with the specified back office hosts.
     /// This includes merging the provided hosts with those already configured, validating that all hosts are absolute URIs,
     /// and creating or updating the OpenId applications required for back office authentication.
-    /// In production environments, developer-specific OpenId applications (such as Swagger and Postman) are removed;
-    /// in non-production environments, these are created or updated as needed.
+    /// In production environments, developer-specific OpenId applications (the OpenAPI UI and Postman) are removed;
+    /// in non-production environments, these are created or updated as needed. The OpenAPI UI application is only
+    /// kept when an <see cref="IOpenApiUiProvider"/> supplies redirect paths for it.
     /// </summary>
     /// <param name="backOfficeHosts">A collection of absolute <see cref="Uri"/> instances representing the back office hosts to configure.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
@@ -96,6 +129,8 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
             },
             cancellationToken);
 
+        string[] openApiUiRedirectPaths = _openApiUiProvider?.GetOAuthRedirectPaths().ToArray() ?? [];
+
         if (_webHostEnvironment.IsProduction())
         {
             await Delete(Constants.OAuthClientIds.OpenApiUi, cancellationToken);
@@ -103,12 +138,21 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         }
         else
         {
-            await CreateOrUpdate(
-                DeveloperOpenIddictApplicationDescriptor(
-                    "Umbraco OpenAPI access",
-                    Constants.OAuthClientIds.OpenApiUi,
-                    backOfficeHostsAsArray.Select(backOfficeUrl => CallbackUrlFor(backOfficeUrl, "/umbraco/openapi/oauth2-redirect.html")).ToArray()),
-                cancellationToken);
+            if (openApiUiRedirectPaths.Length > 0)
+            {
+                await CreateOrUpdate(
+                    DeveloperOpenIddictApplicationDescriptor(
+                        "Umbraco OpenAPI access",
+                        Constants.OAuthClientIds.OpenApiUi,
+                        backOfficeHostsAsArray
+                            .SelectMany(backOfficeUrl => openApiUiRedirectPaths.Select(path => CallbackUrlFor(backOfficeUrl, path)))
+                            .ToArray()),
+                    cancellationToken);
+            }
+            else
+            {
+                await Delete(Constants.OAuthClientIds.OpenApiUi, cancellationToken);
+            }
 
             await CreateOrUpdate(
                 DeveloperOpenIddictApplicationDescriptor(
