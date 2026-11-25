@@ -26,7 +26,7 @@ internal static class MigrationBehaviorExtensions
             return true;
         }
 
-        if (string.IsNullOrWhiteSpace(state) || plan.IsKnownState(state))
+        if (string.IsNullOrWhiteSpace(state) || plan.IgnoreCurrentState || plan.IsKnownState(state))
         {
             logger.LogWarning(
                 "Migration plan {PlanName} is at state {DatabaseState}, behind its final state {FinalState}. "

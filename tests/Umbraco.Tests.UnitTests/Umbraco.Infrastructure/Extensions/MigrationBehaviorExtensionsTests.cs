@@ -70,6 +70,17 @@ public class MigrationBehaviorExtensionsTests
         VerifyLoggedOnce(logger, LogLevel.Error);
     }
 
+    [Test]
+    public void None_Skips_Unknown_State_With_Warning_When_Plan_Ignores_Current_State()
+    {
+        var logger = new Mock<ILogger>();
+
+        var result = MigrationBehavior.None.ShouldMigrate(new IgnoreCurrentStatePlan(), UnknownState, logger.Object);
+
+        Assert.That(result, Is.False);
+        VerifyLoggedOnce(logger, LogLevel.Warning);
+    }
+
     private static string KnownStateBehindFinal(MigrationPlan plan)
         => plan.Transitions[plan.InitialState]!.TargetState;
 
@@ -82,4 +93,13 @@ public class MigrationBehaviorExtensionsTests
                 It.IsAny<Exception?>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
+
+    private sealed class IgnoreCurrentStatePlan : MigrationPlan
+    {
+        public IgnoreCurrentStatePlan()
+            : base("IgnoreCurrentStatePlan")
+            => From(string.Empty).To("{00000000-0000-0000-0000-000000000002}");
+
+        public override bool IgnoreCurrentState => true;
+    }
 }

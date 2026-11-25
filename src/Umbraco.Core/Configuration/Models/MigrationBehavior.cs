@@ -16,6 +16,7 @@ public enum MigrationBehavior
     /// <para>
     /// A plan behind its final state is logged as a warning.
     /// A plan at a state the running version does not know - typically written by a newer version sharing the database, for example during a rolling upgrade - is logged as an error.
+    /// A plan that always runs from its initial state, whatever state is stored, is never at an unknown state, so it is logged as a warning.
     /// </para>
     /// <para>
     /// Only use this when the running version is compatible with the database schema as it is.
@@ -27,6 +28,7 @@ public enum MigrationBehavior
     /// <summary>
     /// A plan behind its final state is upgraded, either unattended or from the backoffice depending on <see cref="UnattendedSettings.UpgradeUnattended" /> and <see cref="UnattendedSettings.PackageMigrationsUnattended" />.
     /// A plan at a state the running version does not know cannot be migrated, so the boot fails.
+    /// A plan that always runs from its initial state, whatever state is stored, is upgraded from that initial state instead.
     /// </summary>
     Upgrade = 1,
 }
