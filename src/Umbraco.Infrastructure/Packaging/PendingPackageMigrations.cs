@@ -38,6 +38,7 @@ public class PendingPackageMigrations
     /// Returns the package migration plans that are pending.
     /// </summary>
     /// <param name="keyValues">The key/value pairs from the key/value storage of migration names and their states.</param>
+    /// <returns>The package migration plans whose state in the key/value storage is missing or differs from their final state.</returns>
     internal IReadOnlyList<PackageMigrationPlan> GetPendingPackageMigrationPlans(IReadOnlyDictionary<string, string?>? keyValues)
     {
         var packageMigrationPlans = _packageMigrationPlans.ToList();

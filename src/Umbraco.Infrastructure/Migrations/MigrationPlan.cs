@@ -475,9 +475,9 @@ public class MigrationPlan
         public Type MigrationType { get; }
 
         /// <inheritdoc />
-        public override string ToString()
-            => MigrationType == typeof(NoopMigration)
-            ? $"{(SourceState == string.Empty ? "<empty>" : SourceState)} --> {TargetState}"
-            : $"{SourceState} -- ({MigrationType.FullName}) --> {TargetState}";
+        public override string ToString() =>
+            MigrationType == typeof(NoopMigration)
+                ? $"{(SourceState == string.Empty ? "<empty>" : SourceState)} --> {TargetState}"
+                : $"{SourceState} -- ({MigrationType.FullName}) --> {TargetState}";
     }
 }

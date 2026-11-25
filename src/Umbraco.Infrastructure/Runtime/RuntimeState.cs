@@ -380,7 +380,7 @@ public class RuntimeState : IRuntimeState
 
                 // This could need both an upgrade AND package migrations to execute, so always add any pending package migrations
                 MigrationBehavior migrationBehavior = _runtimeSettings.Value.MigrationBehavior;
-                IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState
+                List<string> packagesRequiringMigration = _packageMigrationState
                     .GetPendingPackageMigrationPlans(keyValues)
                     .Where(plan => migrationBehavior.ShouldMigrate(plan, GetState(keyValues, plan), _logger))
                     .Select(plan => plan.Name)
