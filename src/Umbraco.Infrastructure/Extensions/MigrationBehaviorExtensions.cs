@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Migrations;
 
@@ -9,6 +10,8 @@ namespace Umbraco.Cms.Infrastructure.Extensions;
 /// </summary>
 internal static class MigrationBehaviorExtensions
 {
+    private const string SettingName = Constants.Configuration.ConfigRuntime + ":" + nameof(RuntimeSettings.MigrationBehavior);
+
     /// <summary>
     /// Determines whether a plan that is not at its final state should be migrated at boot.
     /// </summary>
@@ -30,12 +33,15 @@ internal static class MigrationBehaviorExtensions
         {
             logger.LogWarning(
                 "Migration plan {PlanName} is at state {DatabaseState}, behind its final state {FinalState}. "
-                + "It is not migrated because {SettingName} is set to {Behavior}.",
+                + "It is not migrated because {SettingName} is set to {Behavior}, so this version runs against a database it has not migrated, "
+                + "and anything that depends on the pending migrations can fail until the plan is migrated. "
+                + "Expected only while another instance migrates the database; otherwise change the setting to {UpgradeBehavior} and restart.",
                 plan.Name,
                 string.IsNullOrWhiteSpace(state) ? "<none>" : state,
                 plan.FinalState,
-                nameof(RuntimeSettings.MigrationBehavior),
-                behavior);
+                SettingName,
+                behavior,
+                MigrationBehavior.Upgrade);
         }
         else
         {
@@ -44,7 +50,7 @@ internal static class MigrationBehaviorExtensions
                 + "It is not migrated because {SettingName} is set to {Behavior}; this is expected while a newer version shares the database.",
                 plan.Name,
                 state,
-                nameof(RuntimeSettings.MigrationBehavior),
+                SettingName,
                 behavior);
         }
 
