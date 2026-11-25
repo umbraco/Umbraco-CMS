@@ -26,6 +26,7 @@ public class BackOfficeGraphicsController : Controller
     public const string LoginBackGroundRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginBackground);
     public const string LoginLogoRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginLogo);
     public const string LoginLogoAlternativeRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginLogoAlternative);
+    public const string FaviconRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(Favicon);
 
     private readonly IOptions<ContentSettings> _contentSettings;
     private readonly IContentTypeProvider _contentTypeProvider;
@@ -95,12 +96,23 @@ public class BackOfficeGraphicsController : Controller
     [MapToApiVersion("1.0")]
     public IActionResult LoginLogoAlternative() => HandleFileRequest(_contentSettings.Value.LoginLogoImageAlternative);
 
+    /// <summary>
+    /// Gets the favicon for the back office and its login screen.
+    /// </summary>
+    /// <returns>An <see cref="IActionResult"/> containing the favicon, or a 404 response if the configured file does not exist.</returns>
+    [HttpGet("favicon", Name = FaviconRouteName)]
+    [EndpointSummary("Gets the back office favicon.")]
+    [EndpointDescription("Gets the custom back office favicon if configured.")]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
+    public IActionResult Favicon() => HandleFileRequest(_contentSettings.Value.BackOfficeFavicon);
+
     private IActionResult HandleFileRequest(string virtualPath)
     {
         var filePath = $"{Constants.SystemDirectories.Umbraco}/{virtualPath}".TrimStart(Constants.CharArrays.Tilde);
         IFileInfo fileInfo = _webHostEnvironment.WebRootFileProvider.GetFileInfo(filePath);
 
-        if (fileInfo.PhysicalPath is null)
+        if (!fileInfo.Exists || fileInfo.PhysicalPath is null)
         {
             return NotFound();
         }

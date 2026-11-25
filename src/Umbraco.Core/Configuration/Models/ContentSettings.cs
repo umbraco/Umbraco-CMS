@@ -69,6 +69,11 @@ public class ContentSettings
     internal const string StaticBackOfficeLogoAlternative = "assets/logo_blue.svg";
 
     /// <summary>
+    ///     The default path for the back-office favicon.
+    /// </summary>
+    internal const string StaticBackOfficeFavicon = "backoffice/assets/favicon.svg";
+
+    /// <summary>
     ///     The default value for hiding the back-office logo.
     /// </summary>
     internal const bool StaticHideBackOfficeLogo = false;
@@ -208,6 +213,16 @@ public class ContentSettings
     /// <remarks>This is the alternative version to the regular logo found at <see cref="BackOfficeLogo"/>.</remarks>
     [DefaultValue(StaticBackOfficeLogoAlternative)]
     public string BackOfficeLogoAlternative { get; set; } = StaticBackOfficeLogoAlternative;
+
+    /// <summary>
+    ///     Gets or sets a value for the path to the favicon shown for the backoffice and its login screen.
+    /// </summary>
+    /// <remarks>
+    ///     Like the other backoffice graphics, the path is relative to the <c>wwwroot/umbraco</c> folder.
+    ///     For example, <c>../favicon.ico</c> uses the favicon in the root of <c>wwwroot</c>.
+    /// </remarks>
+    [DefaultValue(StaticBackOfficeFavicon)]
+    public string BackOfficeFavicon { get; set; } = StaticBackOfficeFavicon;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.

@@ -29,6 +29,7 @@
     var loginLogoImage = Url.RouteUrl(BackOfficeGraphicsController.LoginLogoRouteName, new {Version= "1"});
     var loginLogoImageAlternative = Url.RouteUrl(BackOfficeGraphicsController.LoginLogoAlternativeRouteName, new {Version= "1"});
     var loginBackgroundImage = Url.RouteUrl(BackOfficeGraphicsController.LoginBackGroundRouteName, new {Version= "1"});
+    var favicon = Url.RouteUrl(BackOfficeGraphicsController.FaviconRouteName, new {Version= "1"});
     var usernameIsEmail = SecuritySettings.Value.UsernameIsEmail;
     var allowUserInvite = EmailSender.IsEmailConfigured();
     var allowPasswordReset = ForgotPasswordSender.IsPasswordResetConfigured();
@@ -40,7 +41,7 @@
 <head>
     <meta charset="UTF-8"/>
     <base href="@backOfficePath.EnsureEndsWith('/')" />
-    <link rel="icon" type="image/svg+xml" href="~/umbraco/backoffice/assets/favicon.svg" asp-append-version="true"/>
+    <link rel="icon" href="@favicon"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="mobile-web-app-capable" content="yes"/>
     <meta name="robots" content="noindex, nofollow"/>

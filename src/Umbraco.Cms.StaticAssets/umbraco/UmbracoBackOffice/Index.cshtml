@@ -14,20 +14,20 @@
 @inject IOptions<GlobalSettings> GlobalSettings
 @inject IOptions<SecuritySettings> SecuritySettings
 @inject Umbraco.Cms.Core.Security.ICspNonceService CspNonceService
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @addTagHelper Umbraco.Cms.Web.Common.TagHelpers.CspNonceTagHelper, Umbraco.Cms.Web.Common
 @{
     bool.TryParse(Context.Request.Query["umbDebug"], out var isDebug);
     var backOfficePath = BackOfficePathGenerator.BackOfficePath;
     var backOfficeAssetsPath = BackOfficePathGenerator.BackOfficeAssetsPath;
     var loginLogoImageAlternative = Url.RouteUrl(BackOfficeGraphicsController.LoginLogoAlternativeRouteName, new {Version= "1"});
+    var favicon = Url.RouteUrl(BackOfficeGraphicsController.FaviconRouteName, new {Version= "1"});
 }<!doctype html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <base href="@backOfficePath.EnsureEndsWith('/')" />
-    <link rel="icon" type="image/svg+xml" href="~/umbraco/backoffice/assets/favicon.svg" asp-append-version="true" />
+    <link rel="icon" href="@favicon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="mobile-web-app-capable" content="yes"/>
     <meta name="robots" content="noindex, nofollow"/>
