@@ -1,14 +1,14 @@
-import { Extension, Plugin, TextSelection, commands, isMarkActive } from '../../externals.js';
-import type { CommandProps, Selection } from '../../externals.js';
+import { Extension, Plugin, TextSelection, commands, getMarkType, isMarkActive } from '../../externals.js';
+import type { CommandProps, ProseMirrorNode, Selection } from '../../externals.js';
 
-const getTrimmedSelection = (selection: Selection) => {
+const getTrimmedSelection = (selection: Selection, keepWhitespace: (node: ProseMirrorNode) => boolean) => {
 	if (!(selection instanceof TextSelection) || selection.empty) return null;
 
 	const { $from, $to, from, to } = selection;
 	const start = $from.nodeAfter;
 	const end = $to.nodeBefore;
-	const leading = start?.isText ? start.text!.length - start.text!.trimStart().length : 0;
-	const trailing = end?.isText ? end.text!.length - end.text!.trimEnd().length : 0;
+	const leading = start?.isText && !keepWhitespace(start) ? start.text!.length - start.text!.trimStart().length : 0;
+	const trailing = end?.isText && !keepWhitespace(end) ? end.text!.length - end.text!.trimEnd().length : 0;
 
 	return from + leading < to - trailing ? TextSelection.create($from.doc, from + leading, to - trailing) : null;
 };
@@ -16,10 +16,15 @@ const getTrimmedSelection = (selection: Selection) => {
 // The command `state` caches its selection until `tr` is read, so reading it makes `state` see the current selection.
 const refreshSelection = ({ state }: CommandProps) => state.tr;
 
-const runOnTrimmedSelection = (props: CommandProps, run: () => boolean) => {
+const runOnTrimmedSelection = (
+	props: CommandProps,
+	typeOrName: Parameters<typeof getMarkType>[0],
+	run: () => boolean,
+) => {
 	const { tr } = props;
 	const original = tr.selection;
-	const trimmed = getTrimmedSelection(original);
+	const type = getMarkType(typeOrName, props.state.schema);
+	const trimmed = getTrimmedSelection(original, (node) => !!type.isInSet(node.marks));
 
 	if (!trimmed) return run();
 
@@ -27,6 +32,7 @@ const runOnTrimmedSelection = (props: CommandProps, run: () => boolean) => {
 	refreshSelection(props);
 	const result = run();
 	tr.setSelection(TextSelection.create(tr.doc, original.anchor, original.head));
+	refreshSelection(props);
 	return result;
 };
 
@@ -43,11 +49,13 @@ export const UmbTrimMarkWhitespace = Extension.create({
 	addCommands() {
 		return {
 			setMark: (typeOrName, attributes) => (props) =>
-				runOnTrimmedSelection(props, () => commands.setMark(typeOrName, attributes)(props)),
+				runOnTrimmedSelection(props, typeOrName, () => commands.setMark(typeOrName, attributes)(props)),
 
 			toggleMark: (typeOrName, attributes, options) => (props) => {
 				const toggle = () => commands.toggleMark(typeOrName, attributes, options)(props);
-				return isMarkActive(props.state, typeOrName, attributes) ? toggle() : runOnTrimmedSelection(props, toggle);
+				return isMarkActive(props.state, typeOrName, attributes)
+					? toggle()
+					: runOnTrimmedSelection(props, typeOrName, toggle);
 			},
 		};
 	},
@@ -61,7 +69,8 @@ export const UmbTrimMarkWhitespace = Extension.create({
 					handleDOMEvents: {
 						dblclick: (view) => {
 							setTimeout(() => {
-								const trimmed = getTrimmedSelection(view.state.selection);
+								if (view.isDestroyed) return;
+								const trimmed = getTrimmedSelection(view.state.selection, (node) => node.marks.length > 0);
 								if (trimmed) view.dispatch(view.state.tr.setSelection(trimmed));
 							});
 							return false;

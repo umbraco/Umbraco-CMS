@@ -1,4 +1,4 @@
-import { Bold, Document, Editor, Italic, Node, Paragraph, Text } from '../../externals.js';
+import { Bold, Document, Editor, Italic, Link, Node, Paragraph, Text } from '../../externals.js';
 import { UmbTrimMarkWhitespace } from './trim-mark-whitespace.tiptap-extension.js';
 import { expect } from '@open-wc/testing';
 
@@ -20,7 +20,7 @@ describe('UmbTrimMarkWhitespace', () => {
 		document.body.appendChild(editorHost);
 		editor = new Editor({
 			element: editorHost,
-			extensions: [Document, Paragraph, Text, Bold, Italic, InlineAtom, UmbTrimMarkWhitespace],
+			extensions: [Document, Paragraph, Text, Bold, Italic, Link, InlineAtom, UmbTrimMarkWhitespace],
 		});
 	});
 
@@ -135,9 +135,22 @@ describe('UmbTrimMarkWhitespace', () => {
 			expect(editor.state.selection.to).to.equal(15);
 		});
 
-		it('does not trim a selection that was not made by a double-click', () => {
-			select(boldWord, 11, 16);
+		it('keeps whitespace that already carries a mark, so the whole run can be unset', async () => {
+			select('<p>This is a <strong>bold </strong>word</p>', 11, 16);
+			await doubleClick();
 			expect(editor.state.selection.to).to.equal(16);
+			editor.commands.toggleBold();
+			expect(editor.getHTML()).to.equal('<p>This is a bold word</p>');
+		});
+	});
+
+	describe('updating an existing mark', () => {
+		it('keeps trailing whitespace that already has the mark in the updated range', () => {
+			editor.commands.setContent('<p>See <a href="/old">this link </a>here.</p>');
+			editor.commands.setTextSelection(7);
+			editor.chain().extendMarkRange('link').setLink({ href: '/new' }).run();
+			expect(editor.getHTML()).to.contain('href="/new">this link </a>here.');
+			expect(editor.getHTML()).to.not.contain('/old');
 		});
 	});
 });
