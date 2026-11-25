@@ -113,13 +113,34 @@ public class MultipleDocumentPickerValueConverterTests : PropertyValueConverterT
         Assert.AreEqual("TheContentType", content.ContentType);
     }
 
-    private MultipleDocumentPickerValueConverter CreateValueConverter()
+    [Test]
+    public void MultipleDocumentPickerValueConverter_YieldsNothingForUnroutableContent()
+    {
+        var routeBuilder = new Mock<IApiContentRouteBuilder>();
+        routeBuilder
+            .Setup(builder => builder.Build(PublishedContent, It.IsAny<string?>()))
+            .Returns((IApiContentRoute?)null);
+        var valueConverter = CreateValueConverter(routeBuilder.Object);
+
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(
+            Mock.Of<IPublishedElement>(),
+            PropertyType(),
+            PropertyCacheLevel.Element,
+            Serialize(PublishedContent.Key),
+            false,
+            false) as IEnumerable<IApiContent>;
+
+        Assert.NotNull(result);
+        Assert.IsEmpty(result);
+    }
+
+    private MultipleDocumentPickerValueConverter CreateValueConverter(IApiContentRouteBuilder? routeBuilder = null)
         => new(
             Serializer(),
             PublishedContentCacheMock.Object,
             new ApiContentBuilder(
                 new ApiContentNameProvider(),
-                CreateContentRouteBuilder(ApiContentPathProvider, CreateGlobalSettings()),
+                routeBuilder ?? CreateContentRouteBuilder(ApiContentPathProvider, CreateGlobalSettings()),
                 CreateOutputExpansionStrategyAccessor(),
                 CreateVariationContextAccessor()));
 
