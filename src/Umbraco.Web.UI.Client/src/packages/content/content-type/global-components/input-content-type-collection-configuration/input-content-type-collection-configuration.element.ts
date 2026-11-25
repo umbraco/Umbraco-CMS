@@ -124,8 +124,8 @@ export class UmbInputContentTypeCollectionConfigurationElement extends UmbFormCo
 		if (this.readonly) return nothing;
 		return html`
 			<uui-action-bar slot="actions">
-				<uui-button label=${this.localize.term('general_choose')} href=${this._dataTypePickerModalPath}></uui-button>
-				<uui-button @click=${this.#clearDataType} label=${this.localize.term('general_remove')}></uui-button>
+				<uui-button .label=${this.localize.term('actions_replace')} .href=${this._dataTypePickerModalPath}></uui-button>
+				<uui-button @click=${this.#clearDataType} .label=${this.localize.term('general_remove')}></uui-button>
 			</uui-action-bar>
 		`;
 	}
