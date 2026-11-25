@@ -17,14 +17,14 @@ export class UmbLogViewerLevelTagElement extends LitElement {
 		Verbose: { look: 'secondary' },
 		Debug: {
 			look: 'primary',
-			style: 'background-color: var(--umb-log-viewer-debug-color)',
+			style: 'background-color: var(--umb-log-viewer-debug-color); color: var(--uui-color-surface)',
 		},
 		Information: { look: 'primary', color: 'positive' },
 		Warning: { look: 'primary', color: 'warning' },
 		Error: { look: 'primary', color: 'danger' },
 		Fatal: {
 			look: 'primary',
-			style: 'background-color: var(--umb-log-viewer-fatal-color)',
+			style: 'background-color: var(--umb-log-viewer-fatal-color); color: var(--uui-color-surface)',
 		},
 	};
 

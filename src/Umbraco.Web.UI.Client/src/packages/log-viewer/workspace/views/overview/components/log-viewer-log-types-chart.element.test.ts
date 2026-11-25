@@ -1,6 +1,8 @@
 import type { UmbLogViewerLogTypesChartElement } from './log-viewer-log-types-chart.element.js';
 import { aTimeout, expect, fixture, html } from '@open-wc/testing';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { contrastRatio, useUuiTheme } from '@umbraco-cms/internal/test-utils';
+import type { UmbDonutSliceElement } from '../../../../components/donut-chart/index.js';
 
 import '../../../../../../libs/context-api/provide/context-provider.element.js';
 import '../../../../components/donut-chart/index.js';
@@ -29,6 +31,10 @@ async function settle(element: UmbLogViewerLogTypesChartElement) {
 		await element.updateComplete;
 		await element.shadowRoot!.querySelector('umb-donut-chart')?.updateComplete;
 	}
+}
+
+function shadowColor(boxShadow: string): string {
+	return boxShadow.match(/^(rgba?\([^)]*\)|color\([^)]*\))/)![1];
 }
 
 describe('UmbLogViewerLogTypesChartElement', () => {
@@ -71,5 +77,41 @@ describe('UmbLogViewerLogTypesChartElement', () => {
 			{ level: 'Error', share: '10%' },
 		]);
 		expect(chartShares(element)).to.deep.equal(legend(element).filter(({ share }) => share));
+	});
+
+	it('gives each level a link to the same logs as its slice, at least 24 by 24 pixels', async () => {
+		const links = [...element.shadowRoot!.querySelectorAll<HTMLAnchorElement>('#legend a')];
+		const slices = [...element.shadowRoot!.querySelectorAll<UmbDonutSliceElement>('umb-donut-slice')];
+
+		expect(links.map((link) => link.getAttribute('href'))).to.deep.equal(slices.map((slice) => slice.href));
+		expect(links.map((link) => link.getAttribute('aria-label'))).to.deep.equal(slices.map((slice) => slice.label));
+		for (const link of links) {
+			const box = link.getBoundingClientRect();
+			expect(box.width).to.be.at.least(24);
+			expect(box.height).to.be.at.least(24);
+		}
+	});
+
+	it('makes each level filter at least 24 pixels tall', async () => {
+		for (const button of element.shadowRoot!.querySelectorAll('#legend button')) {
+			expect(button.getBoundingClientRect().height).to.be.at.least(24);
+		}
+	});
+
+	it('outlines a focused legend control in two colours at least 9:1 apart in every theme', async () => {
+		for (const control of element.shadowRoot!.querySelectorAll<HTMLElement>('#legend button, #legend a')) {
+			control.focus();
+			for (const theme of ['light', 'dark', 'high-contrast'] as const) {
+				const removeTheme = theme === 'light' ? () => undefined : await useUuiTheme(theme);
+				const style = getComputedStyle(control);
+				expect(contrastRatio(style.outlineColor, shadowColor(style.boxShadow)), theme).to.be.at.least(9);
+				expect(parseFloat(style.outlineWidth), theme).to.be.at.least(2);
+				removeTheme();
+			}
+		}
+	});
+
+	it('passes the a11y audit', async () => {
+		await expect(element).shadowDom.to.be.accessible();
 	});
 });

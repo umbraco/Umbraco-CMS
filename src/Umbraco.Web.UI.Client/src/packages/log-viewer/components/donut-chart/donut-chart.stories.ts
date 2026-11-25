@@ -153,3 +153,14 @@ export const LargerSize: Story = {
 			])}
 		</umb-donut-chart>`,
 };
+
+export const ThickRing: Story = {
+	render: () =>
+		html`<umb-donut-chart border-size="38" description="A ring too thick for details in its hole">
+			${renderSlices([
+				{ name: 'Apples', amount: 60 },
+				{ name: 'Pears', amount: 30 },
+				{ name: 'Plums', amount: 10 },
+			])}
+		</umb-donut-chart>`,
+};

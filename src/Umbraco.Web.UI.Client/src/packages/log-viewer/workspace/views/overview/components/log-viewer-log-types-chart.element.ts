@@ -95,7 +95,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 					</umb-localize>
 				</p>
 				<div id="log-types-container">
-					<umb-donut-chart .description=${this.localize.term('logViewer_logTypes')}>
+					<umb-donut-chart border-size="8" .description=${this.localize.term('logViewer_logTypes')}>
 						${repeat(
 							this._logLevelCount,
 							([level]) => level,
@@ -116,14 +116,16 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 								([level]) => level,
 								([level, count]) => {
 									const shown = !this._logLevelCountFilter.includes(level);
+									const viewLogsLabel = this.localize.term('logViewer_viewLogsLabel', level);
 									return html`<li>
 										<button
 											class=${classMap({ active: !shown })}
 											aria-pressed=${shown}
 											@click=${() => this.#setCountFilter(level)}>
-											<uui-icon
-												name="icon-record"
-												style="color: var(--umb-log-viewer-${level.toLowerCase()}-color);"></uui-icon>
+											<span
+												class="swatch"
+												aria-hidden="true"
+												style="background: var(--umb-log-viewer-${level.toLowerCase()}-color);"></span>
 											<span>${level}</span>
 											<span class="count">
 												${this.localize.number(count, {
@@ -136,6 +138,13 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 												${shown ? umbFormatDonutShare(count / shownTotal, this.localize) : nothing}
 											</span>
 										</button>
+										<a
+											class="view-logs"
+											href=${this.#buildSearchUrl(level)}
+											aria-label=${viewLogsLabel}
+											title=${viewLogsLabel}>
+											<uui-icon name="icon-search"></uui-icon>
+										</a>
 									</li>`;
 								},
 							)}
@@ -176,6 +185,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 				#log-types-container {
 					display: flex;
 					align-items: flex-start;
+					column-gap: var(--uui-size-space-2);
 				}
 
 				umb-donut-chart {
@@ -192,14 +202,42 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 			button {
 				all: unset;
 				display: grid;
-				grid-column: 1 / -1;
+				grid-column: 1 / 5;
 				grid-template-columns: subgrid;
 				align-items: center;
+				min-height: 24px;
 				cursor: pointer;
 			}
 
-			button:focus {
-				outline: 1px solid var(--uui-color-focus);
+			.view-logs {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 24px;
+				min-height: 24px;
+				color: var(--uui-color-interactive);
+			}
+
+			.view-logs:hover {
+				color: var(--uui-color-interactive-emphasis);
+			}
+
+			button:focus-visible,
+			.view-logs:focus-visible {
+				outline: 2px solid var(--uui-color-text);
+				outline-offset: 2px;
+				box-shadow: 0 0 0 2px var(--uui-color-surface);
+			}
+
+			button > * + * {
+				padding-inline-start: var(--uui-size-space-1);
+			}
+
+			.swatch {
+				width: var(--uui-size-3);
+				height: var(--uui-size-3);
+				border-radius: 50%;
+				forced-color-adjust: none;
 			}
 
 			button.active {
@@ -213,8 +251,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 				border: 0;
 				font: inherit;
 				display: grid;
-				grid-template-columns: repeat(4, auto);
-				column-gap: var(--uui-size-space-2);
+				grid-template-columns: repeat(5, auto);
 			}
 
 			li {

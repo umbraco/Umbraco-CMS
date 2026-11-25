@@ -2,7 +2,12 @@ import { UmbDonutChartElement } from './donut-chart.element.js';
 import type { UmbDonutSliceElement } from './donut-slice.element.js';
 import { aTimeout, expect, fixture, html } from '@open-wc/testing';
 import { sendKeys } from '@web/test-runner-commands';
-import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+import {
+	type UmbTestRunnerWindow,
+	contrastRatio,
+	defaultA11yConfig,
+	useUuiTheme,
+} from '@umbraco-cms/internal/test-utils';
 
 import './donut-slice.element.js';
 
@@ -49,13 +54,50 @@ function hover(element: UmbDonutChartElement, index: number, clientX?: number, c
 	path.dispatchEvent(new PointerEvent('pointermove', init));
 }
 
-function detailsBox(element: UmbDonutChartElement): HTMLElement {
-	return element.shadowRoot!.querySelector<HTMLElement>('#details-box')!;
+function details(element: UmbDonutChartElement): HTMLElement | null {
+	return element.shadowRoot!.querySelector<HTMLElement>('#details, #details-box.show');
 }
 
 function detailsText(element: UmbDonutChartElement): string | undefined {
-	const box = detailsBox(element);
-	return box.classList.contains('show') ? box.textContent!.replace(/\s+/g, ' ').trim() : undefined;
+	return details(element)?.textContent!.replace(/\s+/g, ' ').trim();
+}
+
+function leave(element: UmbDonutChartElement, pointerType = 'mouse') {
+	const area = element.shadowRoot!.querySelector('#chart') ?? svgOf(element);
+	area.dispatchEvent(new PointerEvent('pointerleave', { pointerType }));
+}
+
+function expectLinesInHole(element: UmbDonutChartElement, innerRadius: number) {
+	const chart = svgOf(element).getBoundingClientRect();
+	const holeRadius = (innerRadius / 100) * chart.width;
+	const centre = { x: chart.left + chart.width / 2, y: chart.top + chart.height / 2 };
+	for (const line of details(element)!.children) {
+		const box = line.getBoundingClientRect();
+		for (const [x, y] of [
+			[box.left, box.top],
+			[box.right, box.top],
+			[box.left, box.bottom],
+			[box.right, box.bottom],
+		]) {
+			expect(Math.hypot(x - centre.x, y - centre.y), line.textContent!.trim()).to.be.at.most(holeRadius);
+		}
+	}
+}
+
+function surface(): string {
+	return getComputedStyle(document.documentElement).getPropertyValue('--uui-color-surface');
+}
+
+async function forEachTheme(action: (theme: string) => Promise<void>) {
+	await action('light');
+	for (const theme of ['dark', 'high-contrast'] as const) {
+		const removeTheme = await useUuiTheme(theme);
+		try {
+			await action(theme);
+		} finally {
+			removeTheme();
+		}
+	}
 }
 
 function tap(element: UmbDonutChartElement, index: number) {
@@ -71,7 +113,7 @@ function tap(element: UmbDonutChartElement, index: number) {
 	for (const type of ['pointerover', 'pointerdown', 'pointerup', 'pointerout']) {
 		path.dispatchEvent(new PointerEvent(type, init));
 	}
-	svgOf(element).dispatchEvent(new PointerEvent('pointerleave', { ...init, bubbles: false, composed: false }));
+	leave(element, 'touch');
 }
 
 async function captureWarnings(action: (warnings: Array<string>) => Promise<void>) {
@@ -133,6 +175,16 @@ describe('UmbDonutChartElement', () => {
 			expect(svg.querySelectorAll('[role="listitem"], a')).to.have.lengthOf(0);
 			expect(svg.getAttribute('aria-hidden')).to.equal('true');
 			expect(paintedBounds(element).height).to.be.closeTo(90, 0.5);
+		});
+
+		it('draws the empty ring with at least 3:1 contrast against the surface in every theme', async () => {
+			const element = await fixture<UmbDonutChartElement>(html`<umb-donut-chart></umb-donut-chart>`);
+			await settle(element);
+			const track = svgOf(element).querySelector('path.track')!;
+
+			await forEachTheme(async (theme) => {
+				expect(contrastRatio(getComputedStyle(track).fill, surface()), theme).to.be.at.least(3);
+			});
 		});
 
 		it('announces the description when nothing is drawable', async () => {
@@ -492,12 +544,12 @@ describe('UmbDonutChartElement', () => {
 		});
 	});
 
-	describe('details box', () => {
+	describe('details', () => {
 		let element: UmbDonutChartElement;
 
 		beforeEach(async () => {
 			element = await fixture<UmbDonutChartElement>(html`
-				<umb-donut-chart>
+				<umb-donut-chart border-size="8">
 					<umb-donut-slice name="Information" amount="50000" kind="messages" href="#info"></umb-donut-slice>
 					<umb-donut-slice name="Fatal" amount="1" kind="messages" href="#fatal"></umb-donut-slice>
 				</umb-donut-chart>
@@ -509,40 +561,77 @@ describe('UmbDonutChartElement', () => {
 			hover(element, 1);
 			await element.updateComplete;
 
-			const box = detailsBox(element);
-			expect(box.classList.contains('show')).to.be.true;
-			expect(box.textContent!.replace(/\s+/g, ' ').trim()).to.equal('Fatal 1 messages (<0.1%)');
+			expect(detailsText(element)).to.equal('Fatal 1 messages (<0.1%)');
 		});
 
 		it('shows the details of a link slice that receives keyboard focus', async () => {
 			svgOf(element).querySelectorAll('a')[0].focus();
 			await element.updateComplete;
 
-			const box = detailsBox(element);
-			expect(box.classList.contains('show')).to.be.true;
-			expect(box.textContent!.replace(/\s+/g, ' ').trim()).to.equal('Information 50,000 messages (>99.9%)');
+			expect(detailsText(element)).to.equal('Information 50,000 messages (>99.9%)');
 		});
 
-		it('stays inside the chart when the pointer is near any corner', async () => {
-			const bounds = element.getBoundingClientRect();
-			const corners = [
-				[bounds.left + 2, bounds.top + 2],
-				[bounds.right - 2, bounds.top + 2],
-				[bounds.left + 2, bounds.bottom - 2],
-				[bounds.right - 2, bounds.bottom - 2],
-			];
+		it('shows the details inside the hole of the ring, clear of every slice', async () => {
+			hover(element, 1);
+			await element.updateComplete;
 
-			for (const [x, y] of corners) {
-				hover(element, 0, x, y);
+			expectLinesInHole(element, 37);
+		});
+
+		it('fits the name, amount and share of a typical slice in the hole of a chart of the default size', async () => {
+			const chart = await fixture<UmbDonutChartElement>(html`
+				<umb-donut-chart>
+					<umb-donut-slice name="Information" amount="50000" kind="messages"></umb-donut-slice>
+					<umb-donut-slice name="Warning" amount="1200" kind="messages"></umb-donut-slice>
+				</umb-donut-chart>
+			`);
+			await settle(chart);
+
+			hover(chart, 1);
+			await chart.updateComplete;
+
+			expect(detailsText(chart)).to.equal('Warning 1,200 messages (2.3%)');
+			expect(details(chart)!.classList.contains('below')).to.be.false;
+			expectLinesInHole(chart, 25);
+		});
+
+		it('keeps the details while the pointer moves from the slice into the hole and over them', async () => {
+			hover(element, 1);
+			await element.updateComplete;
+
+			svgOf(element).dispatchEvent(new PointerEvent('pointerover', { bubbles: true, composed: true }));
+			details(element)?.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, composed: true }));
+			await element.updateComplete;
+
+			expect(detailsText(element)).to.equal('Fatal 1 messages (<0.1%)');
+		});
+
+		it('shows the details directly below the ring when they do not fit in the hole', async () => {
+			for (const borderSize of [45, 40]) {
+				element.borderSize = borderSize;
+				await settle(element);
+				hover(element, 0);
 				await element.updateComplete;
 
-				const box = detailsBox(element).getBoundingClientRect();
-				expect(detailsText(element), `${x},${y}`).to.exist;
-				expect(box.left, `${x},${y}`).to.be.at.least(bounds.left - 0.5);
-				expect(box.top, `${x},${y}`).to.be.at.least(bounds.top - 0.5);
-				expect(box.right, `${x},${y}`).to.be.at.most(bounds.right + 0.5);
-				expect(box.bottom, `${x},${y}`).to.be.at.most(bounds.bottom + 0.5);
+				const box = details(element)!.getBoundingClientRect();
+				const host = element.getBoundingClientRect();
+				expect(box.top, `border-size ${borderSize}`).to.be.at.least(svgOf(element).getBoundingClientRect().bottom);
+				expect(box.left, `border-size ${borderSize}`).to.be.at.least(host.left - 0.5);
+				expect(box.right, `border-size ${borderSize}`).to.be.at.most(host.right + 0.5);
 			}
+		});
+
+		it('keeps its size when the details show below the ring', async () => {
+			element.borderSize = 45;
+			await settle(element);
+			const before = element.getBoundingClientRect();
+
+			hover(element, 0);
+			await element.updateComplete;
+			const after = element.getBoundingClientRect();
+
+			expect(detailsText(element)).to.exist;
+			expect([after.width, after.height]).to.deep.equal([before.width, before.height]);
 		});
 
 		it('wraps long names inside the chart', async () => {
@@ -551,8 +640,8 @@ describe('UmbDonutChartElement', () => {
 			hover(element, 0);
 			await element.updateComplete;
 
-			expect(detailsBox(element).getBoundingClientRect().width).to.be.at.most(element.getBoundingClientRect().width);
-			expect(detailsBox(element).scrollWidth).to.be.at.most(detailsBox(element).clientWidth);
+			expect(details(element)!.getBoundingClientRect().width).to.be.at.most(element.getBoundingClientRect().width);
+			expect(details(element)!.scrollWidth).to.be.at.most(details(element)!.clientWidth);
 		});
 
 		it('closes on Escape without moving keyboard focus', async () => {
@@ -568,6 +657,32 @@ describe('UmbDonutChartElement', () => {
 			expect(element.shadowRoot!.activeElement).to.equal(link);
 		});
 
+		it('closes on Escape inside a modal dialog without closing the dialog', async () => {
+			const dialog = await fixture<HTMLDialogElement>(html`
+				<dialog>
+					<umb-donut-chart>
+						<umb-donut-slice name="A" amount="3" href="#a"></umb-donut-slice>
+						<umb-donut-slice name="B" amount="1" href="#b"></umb-donut-slice>
+					</umb-donut-chart>
+				</dialog>
+			`);
+			const chart = dialog.querySelector('umb-donut-chart')!;
+			await settle(chart);
+			dialog.showModal();
+			svgOf(chart).querySelector('a')!.focus();
+			await chart.updateComplete;
+			expect(detailsText(chart)).to.exist;
+
+			await sendKeys({ press: 'Escape' });
+			await chart.updateComplete;
+
+			expect(detailsText(chart)).to.be.undefined;
+			expect(dialog.open).to.be.true;
+
+			await sendKeys({ press: 'Escape' });
+			expect(dialog.open).to.be.false;
+		});
+
 		it('closes the details of a hovered slice on Escape', async () => {
 			hover(element, 1);
 			await element.updateComplete;
@@ -579,14 +694,43 @@ describe('UmbDonutChartElement', () => {
 			expect(detailsText(element)).to.be.undefined;
 		});
 
-		it('draws a two-tone focus ring around a slice with keyboard focus', async () => {
+		it('does not bring the details back when the pointer leaves after Escape', async () => {
+			svgOf(element).querySelectorAll('a')[0].focus();
+			hover(element, 1);
+			await element.updateComplete;
+
+			await sendKeys({ press: 'Escape' });
+			leave(element);
+			await element.updateComplete;
+
+			expect(detailsText(element)).to.be.undefined;
+		});
+
+		it('draws a focus ring in two colours at least 9:1 apart in every theme', async () => {
 			svgOf(element).querySelectorAll('a')[1].focus();
 			await element.updateComplete;
 
-			const ring = [...svgOf(element).querySelectorAll('.focus-ring path')].map((path) => getComputedStyle(path));
-			expect(ring).to.have.lengthOf(2);
-			expect(ring[0].stroke).not.to.equal(ring[1].stroke);
-			expect(parseFloat(ring[0].strokeWidth)).to.be.greaterThan(parseFloat(ring[1].strokeWidth));
+			await forEachTheme(async (theme) => {
+				const [outer, inner] = [...svgOf(element).querySelectorAll('.focus-ring path')].map((path) =>
+					getComputedStyle(path),
+				);
+				expect(contrastRatio(outer.stroke, inner.stroke), theme).to.be.at.least(9);
+				expect(
+					Math.max(contrastRatio(outer.stroke, surface()), contrastRatio(inner.stroke, surface())),
+					theme,
+				).to.be.at.least(3);
+				expect(parseFloat(inner.strokeWidth), theme).to.be.at.least(2);
+				expect((parseFloat(outer.strokeWidth) - parseFloat(inner.strokeWidth)) / 2, theme).to.be.at.least(2);
+			});
+		});
+
+		it('shows the details text with at least 4.5:1 contrast in every theme', async () => {
+			hover(element, 1);
+			await element.updateComplete;
+
+			await forEachTheme(async (theme) => {
+				expect(contrastRatio(getComputedStyle(details(element)!).color, surface()), theme).to.be.at.least(4.5);
+			});
 		});
 
 		it('keeps keyboard focus and its details on the same slice when an earlier slice is removed', async () => {
@@ -619,16 +763,16 @@ describe('UmbDonutChartElement', () => {
 			await settle(element);
 
 			expect(detailsText(element)).to.be.undefined;
-			expect(svgOf(element).classList.contains('has-active')).to.be.false;
+			expect(svgOf(element).querySelector('.active')).to.be.null;
 		});
 
 		it('hides when the pointer leaves the chart', async () => {
 			hover(element, 0);
 			await element.updateComplete;
-			svgOf(element).dispatchEvent(new PointerEvent('pointerleave'));
+			leave(element);
 			await element.updateComplete;
 
-			expect(detailsBox(element).classList.contains('show')).to.be.false;
+			expect(detailsText(element)).to.be.undefined;
 		});
 	});
 });
