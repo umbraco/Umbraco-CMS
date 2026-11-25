@@ -589,6 +589,25 @@ describe('UmbDonutChartElement', () => {
 			expect(parseFloat(ring[0].strokeWidth)).to.be.greaterThan(parseFloat(ring[1].strokeWidth));
 		});
 
+		it('keeps keyboard focus and its details on the same slice when an earlier slice is removed', async () => {
+			const chart = await fixture<UmbDonutChartElement>(html`
+				<umb-donut-chart>
+					<umb-donut-slice name="A" amount="3" href="#a" label="Open A"></umb-donut-slice>
+					<umb-donut-slice name="B" amount="2" href="#b" label="Open B"></umb-donut-slice>
+					<umb-donut-slice name="C" amount="1" href="#c" label="Open C"></umb-donut-slice>
+				</umb-donut-chart>
+			`);
+			await settle(chart);
+			svgOf(chart).querySelectorAll('a')[1].focus();
+			await chart.updateComplete;
+
+			chart.querySelector('umb-donut-slice')!.remove();
+			await settle(chart);
+
+			expect(chart.shadowRoot!.activeElement?.getAttribute('aria-label')).to.equal('Open B');
+			expect(detailsText(chart)).to.equal('B 2 (66.7%)');
+		});
+
 		it('forgets the hovered slice when it is disconnected', async () => {
 			hover(element, 1);
 			await element.updateComplete;

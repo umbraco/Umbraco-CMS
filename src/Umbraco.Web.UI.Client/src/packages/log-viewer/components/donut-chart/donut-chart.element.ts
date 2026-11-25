@@ -11,14 +11,17 @@ import {
 	property,
 	query,
 	queryAssignedElements,
+	repeat,
 	state,
 	styleMap,
 	svg,
+	type PropertyValues,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 interface UmbDonutChartSliceData {
+	element: UmbDonutSliceElement;
 	amount: number;
 	color: string;
 	name: string;
@@ -143,7 +146,7 @@ export class UmbDonutChartElement extends UmbLitElement {
 	@queryAssignedElements({ selector: 'umb-donut-slice', flatten: true })
 	private _sliceElements!: UmbDonutSliceElement[];
 
-	@query('#container')
+	@query('#container', true)
 	private _container!: HTMLDivElement;
 
 	@query('#details-box')
@@ -223,6 +226,8 @@ export class UmbDonutChartElement extends UmbLitElement {
 
 	override connectedCallback(): void {
 		super.connectedCallback();
+		this._activeIndex = undefined;
+		this._focusIndex = undefined;
 		document.addEventListener('keydown', this.#onDocumentKeyDown);
 		document.addEventListener('pointerdown', this.#onDocumentPointerDown);
 	}
@@ -231,11 +236,9 @@ export class UmbDonutChartElement extends UmbLitElement {
 		super.disconnectedCallback();
 		document.removeEventListener('keydown', this.#onDocumentKeyDown);
 		document.removeEventListener('pointerdown', this.#onDocumentPointerDown);
-		this._activeIndex = undefined;
-		this._focusIndex = undefined;
 	}
 
-	protected override willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+	protected override willUpdate(changedProperties: PropertyValues<this>): void {
 		super.willUpdate(changedProperties);
 
 		if (this.#updateLayoutInputs(changedProperties)) {
@@ -247,8 +250,8 @@ export class UmbDonutChartElement extends UmbLitElement {
 		}
 	}
 
-	#updateLayoutInputs(changedProperties: Map<PropertyKey, unknown>): boolean {
-		const geometryChanged = ['radius', 'borderSize', 'svgSize'].some((name) => changedProperties.has(name));
+	#updateLayoutInputs(changedProperties: PropertyValues<this>): boolean {
+		const geometryChanged = (['radius', 'borderSize', 'svgSize'] as const).some((name) => changedProperties.has(name));
 		if (geometryChanged) {
 			this.#geometry = this.#resolveGeometry();
 		}
@@ -265,28 +268,40 @@ export class UmbDonutChartElement extends UmbLitElement {
 	#readChangedSlices(): boolean {
 		if (!this.#slicesChanged) return false;
 		this.#slicesChanged = false;
-		this.#slices = this._sliceElements.map(({ amount, color, name, kind, href, label }) => ({
-			amount,
-			color,
-			name,
-			kind,
-			href,
-			label,
+		this.#slices = this._sliceElements.map((element) => ({
+			element,
+			amount: element.amount,
+			color: element.color,
+			name: element.name,
+			kind: element.kind,
+			href: element.href,
+			label: element.label,
 		}));
 		return true;
 	}
 
 	#updateSegments(): void {
+		const activeSlice = this.#sliceAt(this._activeIndex);
+		const focusSlice = this.#sliceAt(this._focusIndex);
+		const detailsSlice = this.#sliceAt(this.#detailsIndex);
+
 		this.#segments = this.#layoutSegments();
-		this._activeIndex = this.#existingSegmentIndex(this._activeIndex);
-		this._focusIndex = this.#existingSegmentIndex(this._focusIndex);
+
+		this._activeIndex = this.#indexOfSlice(activeSlice);
+		this._focusIndex = this.#indexOfSlice(focusSlice);
+		this.#detailsIndex = this.#indexOfSlice(detailsSlice);
 	}
 
-	#existingSegmentIndex(index: number | undefined): number | undefined {
-		return index !== undefined && index < this.#segments.length ? index : undefined;
+	#sliceAt(index: number | undefined): UmbDonutSliceElement | undefined {
+		return index === undefined ? undefined : this.#segments[index]?.element;
 	}
 
-	protected override updated(changedProperties: Map<PropertyKey, unknown>): void {
+	#indexOfSlice(slice: UmbDonutSliceElement | undefined): number | undefined {
+		const index = slice ? this.#segments.findIndex((segment) => segment.element === slice) : -1;
+		return index === -1 ? undefined : index;
+	}
+
+	protected override updated(changedProperties: PropertyValues<this>): void {
 		super.updated(changedProperties);
 		if (this._activeIndex !== undefined) {
 			this.#positionDetailsBox();
@@ -460,7 +475,11 @@ export class UmbDonutChartElement extends UmbLitElement {
 			@pointermove=${this.#onPointerMove}
 			@pointerleave=${this.#onPointerLeave}
 			@pointerup=${this.#onPointerUp}>
-			${this.#segments.map((segment, index) => this.#renderSegment(segment, index))}${this.#renderFocusRing()}
+			${repeat(
+				this.#segments,
+				(segment) => segment.element,
+				(segment, index) => this.#renderSegment(segment, index),
+			)}${this.#renderFocusRing()}
 		</svg>`;
 	}
 
