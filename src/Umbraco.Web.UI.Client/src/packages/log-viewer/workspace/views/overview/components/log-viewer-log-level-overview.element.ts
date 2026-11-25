@@ -1,5 +1,5 @@
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
-import { html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, property, state, styleMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { LoggerResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { consumeContext } from '@umbraco-cms/backoffice/context-api';
@@ -35,9 +35,11 @@ export class UmbLogViewerLogLevelOverviewElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`${this._loggers.length > 0
-			? this._loggers.find((logger) => logger.name === this.loggerName)?.level
-			: nothing}`;
+		const level = this._loggers.find((logger) => logger.name === this.loggerName)?.level;
+		if (!level) return nothing;
+		return html`<span style=${styleMap({ color: `var(--umb-log-viewer-${level.toLowerCase()}-color)` })}
+			>${level}</span
+		>`;
 	}
 }
 

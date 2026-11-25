@@ -1,7 +1,7 @@
 import { UmbDonutChartElement } from './donut-chart.element.js';
 import type { UmbDonutSliceElement } from './donut-slice.element.js';
 import { aTimeout, expect, fixture, html } from '@open-wc/testing';
-import { sendKeys } from '@web/test-runner-commands';
+import { resetMouse, sendKeys, sendMouse } from '@web/test-runner-commands';
 import {
 	type UmbTestRunnerWindow,
 	contrastRatio,
@@ -418,13 +418,14 @@ describe('UmbDonutChartElement', () => {
 			expect(sliceNames(element)).to.deep.equal(['Information: 50.000 (97,6\u00a0%)', 'Warning: 1.233 (2,4\u00a0%)']);
 		});
 
-		it('has one tab stop per link slice and none for the chart itself', async () => {
+		it('has one tab stop per drawn slice and none for the chart itself', async () => {
 			const container = await fixture<HTMLElement>(html`
 				<div>
 					<button id="first">First</button>
 					<umb-donut-chart>
 						<umb-donut-slice name="A" amount="3" href="#a" label="Open A"></umb-donut-slice>
 						<umb-donut-slice name="B" amount="2"></umb-donut-slice>
+						<umb-donut-slice name="Empty" amount="0"></umb-donut-slice>
 						<umb-donut-slice name="C" amount="1" href="#c" label="Open C"></umb-donut-slice>
 					</umb-donut-chart>
 					<button id="last">Last</button>
@@ -437,10 +438,10 @@ describe('UmbDonutChartElement', () => {
 				container.querySelector<HTMLElement>('#last')!,
 			);
 
-			expect(stops).to.deep.equal(['a Open A', 'a Open C']);
+			expect(stops).to.deep.equal(['a Open A', 'path B: 2 (33.3%)', 'a Open C']);
 		});
 
-		it('has no tab stop when no slice is a link', async () => {
+		it('makes slices without a link focusable, with the focus ring and details of a link slice', async () => {
 			const container = await fixture<HTMLElement>(html`
 				<div>
 					<button id="first">First</button>
@@ -453,12 +454,18 @@ describe('UmbDonutChartElement', () => {
 			`);
 			await settle(container.querySelector<UmbDonutChartElement>('umb-donut-chart')!);
 
+			const chart = container.querySelector<UmbDonutChartElement>('umb-donut-chart')!;
 			const stops = await tabStopsBetween(
 				container.querySelector<HTMLElement>('#first')!,
 				container.querySelector<HTMLElement>('#last')!,
 			);
+			expect(stops).to.deep.equal(['path A: 3 (60%)', 'path B: 2 (40%)']);
 
-			expect(stops).to.deep.equal([]);
+			container.querySelector<HTMLElement>('#first')!.focus();
+			await sendKeys({ press: 'Tab' });
+			await chart.updateComplete;
+			expect(detailsText(chart)).to.equal('A 3 (60%)');
+			expect(svgOf(chart).querySelectorAll('.focus-ring path')).to.have.lengthOf(2);
 		});
 
 		it('names a link slice by its label and keeps the slice details as its description', async () => {
@@ -618,6 +625,30 @@ describe('UmbDonutChartElement', () => {
 				expect(box.top, `border-size ${borderSize}`).to.be.at.least(svgOf(element).getBoundingClientRect().bottom);
 				expect(box.left, `border-size ${borderSize}`).to.be.at.least(host.left - 0.5);
 				expect(box.right, `border-size ${borderSize}`).to.be.at.most(host.right + 0.5);
+			}
+		});
+
+		it('keeps the details below the ring while the pointer moves down onto them', async () => {
+			element.borderSize = 45;
+			await settle(element);
+			const chart = svgOf(element).getBoundingClientRect();
+			const x = Math.round(chart.left + chart.width / 2);
+			let y = Math.round(chart.top + chart.height * 0.95 - 4);
+			try {
+				await sendMouse({ type: 'move', position: [x, y] });
+				await element.updateComplete;
+				expect(detailsText(element)).to.exist;
+
+				const panel = details(element)!.querySelector('#details-panel') ?? details(element)!;
+				const target = panel.getBoundingClientRect().top + 4;
+				while (y < target) {
+					y += 1;
+					await sendMouse({ type: 'move', position: [x, y] });
+					await element.updateComplete;
+					expect(detailsText(element), `pointer at y=${y}`).to.exist;
+				}
+			} finally {
+				await resetMouse();
 			}
 		});
 

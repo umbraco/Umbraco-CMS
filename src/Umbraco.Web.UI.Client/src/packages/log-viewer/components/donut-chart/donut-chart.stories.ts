@@ -15,12 +15,12 @@ interface ExampleDonutSlice {
 
 const COLORS = [
 	'var(--uui-palette-violet-blue)',
-	'var(--uui-palette-jungle-green)',
-	'var(--uui-palette-sunglow)',
+	'var(--uui-palette-forest-green)',
+	'var(--uui-palette-sunglow-dark)',
 	'var(--uui-palette-maroon-flush)',
 	'var(--uui-palette-malibu)',
 	'var(--uui-palette-cocoa-brown)',
-	'var(--uui-palette-spanish-pink)',
+	'var(--uui-palette-chamoisee)',
 	'var(--uui-palette-gunmetal)',
 ];
 

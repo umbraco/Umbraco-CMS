@@ -157,10 +157,6 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 
 	static override styles = [
 		css`
-			uui-box {
-				container-type: inline-size;
-			}
-
 			#description {
 				text-align: center;
 				font-size: var(--uui-type-small-size);
@@ -169,34 +165,21 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 			}
 
 			#log-types-container {
-				display: grid;
-				gap: var(--uui-size-space-4);
-				grid-template-columns: 1fr;
-				place-items: center;
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: center;
+				align-items: flex-start;
+				gap: var(--uui-size-space-4) var(--uui-size-space-2);
+			}
+
+			umb-donut-chart {
+				flex: 1 1 120px;
+				min-width: 120px;
+				max-width: 200px;
 			}
 
 			#legend {
-				width: 100%;
-				display: flex;
-				justify-content: center;
-			}
-
-			@container (min-width: 312px) {
-				#log-types-container {
-					display: flex;
-					align-items: flex-start;
-					column-gap: var(--uui-size-space-2);
-				}
-
-				umb-donut-chart {
-					flex: 0 1 auto;
-					min-width: 0;
-				}
-
-				#legend {
-					flex: none;
-					width: auto;
-				}
+				flex: none;
 			}
 
 			button {

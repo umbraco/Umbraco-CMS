@@ -84,6 +84,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 			:host {
 				display: block;
 				margin: var(--uui-size-layout-1);
+				container-type: inline-size;
 			}
 
 			#logviewer-layout {
@@ -125,7 +126,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 			}
 
 			#log-level {
-				color: var(--uui-color-positive);
 				text-align: center;
 				margin: 0;
 			}
@@ -157,8 +157,18 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 			#error-count {
 				font-size: 3rem;
 				text-align: center;
-				color: var(--uui-color-danger);
+				color: var(--umb-log-viewer-error-color);
 				margin: 0;
+			}
+
+			@container (max-width: 800px) {
+				#logviewer-layout {
+					grid-template-columns: minmax(0, 1fr);
+					grid-template-areas:
+						'info'
+						'saved-searches'
+						'common-messages';
+				}
 			}
 		`,
 	];

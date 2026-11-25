@@ -58,12 +58,12 @@ const fitsChord = (line: DOMRect, radius: number, centreY: number): boolean => {
  * A donut chart that shows each slotted `umb-donut-slice` as a share of the total of all slices.
  *
  * Each `umb-donut-slice` takes an `amount`, a `color` (any CSS colour, including `var(...)`), a `name`, a `kind` (the
- * unit shown after the amount) and optionally an `href` with a `label` for the link's accessible name. Hovering,
- * focusing or tapping a slice shows its name, amount, kind and share in the hole of the ring, or just below the ring,
- * over whatever follows the chart, when a line does not fit in the hole; Escape hides them. Showing them never changes
- * the size of the element. Set the element's width to size the chart (it defaults to 200px);
- * the height follows. Consumers with many small categories should group the long tail themselves, for example into an
- * "Other" slice.
+ * unit shown after the amount) and optionally an `href` with a `label` for the link's accessible name. Every drawn
+ * slice is a tab stop: a link when it has an `href`, otherwise a focusable image. Hovering, focusing or tapping a slice
+ * shows its name, amount, kind and share in the hole of the ring, or just below the ring, over whatever follows the
+ * chart, when a line does not fit in the hole; Escape hides them. Showing them never changes the size of the element.
+ * Set the element's width to size the chart (it defaults to 200px); the height follows. Consumers with many small
+ * categories should group the long tail themselves, for example into an "Other" slice.
  *
  * Slice colours are the consumer's to choose: give each slice at least 3:1 contrast against `--uui-color-surface` in
  * every theme. A link slice can be smaller than the 24 by 24 CSS pixels that WCAG 2.5.8 asks of a pointer target, so
@@ -346,7 +346,8 @@ export class UmbDonutChartElement extends UmbLitElement {
 		const bounds = this._container.getBoundingClientRect();
 		const radius = (innerRadius / size) * bounds.width - HOLE_MARGIN;
 		const centreY = bounds.top + bounds.height / 2;
-		return [...details.children].every((line) => fitsChord(line.getBoundingClientRect(), radius, centreY));
+		const lines = details.firstElementChild?.children ?? [];
+		return [...lines].every((line) => fitsChord(line.getBoundingClientRect(), radius, centreY));
 	}
 
 	#resolveGeometry(): UmbDonutChartGeometry {
@@ -455,7 +456,8 @@ export class UmbDonutChartElement extends UmbLitElement {
 			d=${segment.path}
 			style=${styleMap({ fill: segment.color })}
 			role=${segment.href ? nothing : 'img'}
-			aria-label=${segment.href ? nothing : name}></path>`;
+			aria-label=${segment.href ? nothing : name}
+			tabindex=${segment.href ? nothing : '0'}></path>`;
 
 		return svg`<g
 			role="listitem"
@@ -505,11 +507,13 @@ export class UmbDonutChartElement extends UmbLitElement {
 		const segment = this._activeIndex === undefined ? undefined : this.#segments[this._activeIndex];
 		if (this.hideDetailBox || !segment) return nothing;
 		return html`<div id="details" aria-hidden="true">
-			<div id="details-title">
-				<span class="swatch" style=${styleMap({ background: segment.color })}></span>${segment.name}
+			<div id="details-panel">
+				<div id="details-title">
+					<span class="swatch" style=${styleMap({ background: segment.color })}></span>${segment.name}
+				</div>
+				<div>${this.#getAmount(segment)}</div>
+				<div>${this.#getShare(segment)}</div>
 			</div>
-			<div>${this.#getAmount(segment)}</div>
-			<div>${this.#getShare(segment)}</div>
 		</div>`;
 	}
 
@@ -568,7 +572,8 @@ export class UmbDonutChartElement extends UmbLitElement {
 				transform: scale(1.04);
 			}
 
-			a {
+			a,
+			.slice {
 				outline: none;
 			}
 
@@ -595,14 +600,18 @@ export class UmbDonutChartElement extends UmbLitElement {
 				left: 50%;
 				translate: -50% -50%;
 				box-sizing: border-box;
-				display: flex;
-				flex-direction: column;
-				align-items: center;
 				color: var(--uui-color-text);
 				font-size: var(--uui-type-small-size);
 				line-height: 1.5;
 				text-align: center;
 				white-space: nowrap;
+			}
+
+			#details-panel {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				box-sizing: border-box;
 			}
 
 			#details.below {
@@ -611,14 +620,17 @@ export class UmbDonutChartElement extends UmbLitElement {
 				left: 0;
 				z-index: 1;
 				translate: none;
-				margin-top: var(--uui-size-space-2);
+				padding-top: var(--uui-size-space-2);
+				white-space: normal;
+				overflow-wrap: anywhere;
+			}
+
+			#details.below #details-panel {
 				padding: var(--uui-size-space-2) var(--uui-size-space-3);
 				background: var(--uui-color-surface);
 				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
 				box-shadow: var(--uui-shadow-depth-3);
-				white-space: normal;
-				overflow-wrap: anywhere;
 			}
 
 			#details-title {

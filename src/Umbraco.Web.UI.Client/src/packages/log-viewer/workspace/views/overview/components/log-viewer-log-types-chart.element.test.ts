@@ -114,4 +114,23 @@ describe('UmbLogViewerLogTypesChartElement', () => {
 	it('passes the a11y audit', async () => {
 		await expect(element).shadowDom.to.be.accessible();
 	});
+
+	it('keeps the chart at least 120 pixels wide, moving the legend below it when both do not fit side by side', async () => {
+		const root = element.shadowRoot!;
+		for (let width = 240; width <= 480; width += 4) {
+			element.style.display = 'block';
+			element.style.width = `${width}px`;
+			await settle(element);
+
+			const chart = root.querySelector('umb-donut-chart')!.getBoundingClientRect();
+			const legend = root.querySelector('#legend')!.getBoundingClientRect();
+			const container = root.querySelector('#log-types-container')!.getBoundingClientRect();
+			expect(chart.width, `${width}px`).to.be.at.least(120);
+			if (legend.top >= chart.bottom) {
+				expect(chart.width, `${width}px, legend below`).to.be.closeTo(Math.min(200, container.width), 0.5);
+			} else {
+				expect(legend.left, `${width}px, legend beside`).to.be.at.least(chart.right);
+			}
+		}
+	});
 });

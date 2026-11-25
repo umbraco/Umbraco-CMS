@@ -3,10 +3,12 @@ import { expect, fixture, html } from '@open-wc/testing';
 import { LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { contrastRatio, toSrgb, useUuiTheme } from '@umbraco-cms/internal/test-utils';
 
+import type { UmbLogViewerLevelTagElement } from './views/search/components/log-viewer-level-tag.element.js';
+
 import './views/search/components/log-viewer-level-tag.element.js';
 
 const LEVELS = ['verbose', 'debug', 'information', 'warning', 'error', 'fatal'];
-const TAGGED_LEVELS = ['Debug', 'Fatal'] as const;
+const TAGGED_LEVELS = ['Verbose', 'Debug', 'Information', 'Warning', 'Error', 'Fatal'] as const;
 
 @customElement('umb-test-log-viewer-level-colors')
 class UmbTestLogViewerLevelColorsElement extends LitElement {
@@ -70,15 +72,18 @@ describe('UmbLogViewerWorkspaceElement level colours', () => {
 		});
 	});
 
-	it('keeps the text of level tags drawn in a level colour at least 4.5:1 in every theme', async () => {
+	it('keeps the text of every level tag at least 4.5:1 against its background in every theme', async () => {
+		const failures: Array<string> = [];
 		await forEachTheme(async (theme) => {
-			for (const levelTag of element.shadowRoot!.querySelectorAll<LitElement>('umb-log-viewer-level-tag')) {
-				const tag = levelTag.shadowRoot!.querySelector('uui-tag')!;
-				const style = getComputedStyle(tag);
+			for (const levelTag of element.shadowRoot!.querySelectorAll<UmbLogViewerLevelTagElement>(
+				'umb-log-viewer-level-tag',
+			)) {
+				const style = getComputedStyle(levelTag.shadowRoot!.querySelector('uui-tag')!);
 				const ratio = contrastRatio(style.color, style.backgroundColor);
-				expect(ratio, `${tag.textContent?.trim()} tag in ${theme}`).to.be.at.least(4.5);
+				if (ratio < 4.5) failures.push(`${levelTag.level} in ${theme}: ${ratio.toFixed(2)}`);
 			}
 		});
+		expect(failures, failures.join('; ')).to.deep.equal([]);
 	});
 
 	it('draws Warning in an amber hue, apart from the hue of Error, in every theme', async () => {
