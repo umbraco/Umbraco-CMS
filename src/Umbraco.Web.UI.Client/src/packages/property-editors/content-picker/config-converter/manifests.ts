@@ -5,7 +5,7 @@ const fromPropertyEditorSchemaAlias = 'Umbraco.MultiNodeTreePicker';
 export const manifests: Array<ManifestPropertyEditorConfigConverter> = [
 	{
 		type: 'propertyEditorConfigConverter',
-		alias: 'Umb.PropertyEditorConfigConverter.ContentPicker.DocumentPicker',
+		alias: 'Umb.PropertyEditorConfigConverter.ContentPicker.DocumentPicker.Single',
 		name: 'Multi Node Tree Picker to Single Document Picker Config Converter',
 		api: () => import('./content-picker-to-document-picker-config-converter.js'),
 		fromPropertyEditorSchemaAlias,
@@ -29,7 +29,7 @@ export const manifests: Array<ManifestPropertyEditorConfigConverter> = [
 	},
 	{
 		type: 'propertyEditorConfigConverter',
-		alias: 'Umb.PropertyEditorConfigConverter.ContentPicker.MediaPicker',
+		alias: 'Umb.PropertyEditorConfigConverter.ContentPicker.MediaPicker.Multiple',
 		name: 'Multi Node Tree Picker to Media Picker Config Converter',
 		api: () => import('./content-picker-to-media-picker-config-converter.js'),
 		fromPropertyEditorSchemaAlias,
@@ -37,7 +37,7 @@ export const manifests: Array<ManifestPropertyEditorConfigConverter> = [
 	},
 	{
 		type: 'propertyEditorConfigConverter',
-		alias: 'Umb.PropertyEditorConfigConverter.ContentPicker.MemberPicker',
+		alias: 'Umb.PropertyEditorConfigConverter.ContentPicker.MemberPicker.Single',
 		name: 'Multi Node Tree Picker to Single Member Picker Config Converter',
 		api: () => import('./content-picker-to-member-picker-config-converter.js'),
 		fromPropertyEditorSchemaAlias,

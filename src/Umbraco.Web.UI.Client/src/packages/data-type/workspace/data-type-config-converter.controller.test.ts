@@ -28,6 +28,12 @@ class UmbTestHeavierConverter extends UmbControllerBase implements UmbPropertyEd
 	}
 }
 
+class UmbTestFailingConverter extends UmbControllerBase implements UmbPropertyEditorConfigConverter {
+	convert(): UmbPropertyEditorConfig {
+		throw new Error('Test converter failure');
+	}
+}
+
 const fromSchemaAlias = 'Test.From';
 const toSchemaAlias = 'Test.To';
 
@@ -84,6 +90,30 @@ describe('UmbDataTypeConfigConverterController', () => {
 				{ alias: 'shared', value: 'from the heavier converter' },
 				{ alias: 'newName', value: 42 },
 			]);
+		});
+
+		it('skips a converter that fails, so the others still apply', async () => {
+			const failing: ManifestPropertyEditorConfigConverter = {
+				type: 'propertyEditorConfigConverter',
+				alias: 'Test.ConfigConverter.Failing',
+				name: 'Test Failing Config Converter',
+				api: UmbTestFailingConverter,
+				weight: 1000,
+				fromPropertyEditorSchemaAlias: fromSchemaAlias,
+				forPropertyEditorSchemaAlias: toSchemaAlias,
+			};
+			umbExtensionsRegistry.register(failing);
+
+			try {
+				const result = await controller.convert(fromSchemaAlias, toSchemaAlias, [{ alias: 'oldName', value: 42 }]);
+
+				expect(result).to.deep.equal([
+					{ alias: 'shared', value: 'from the heavier converter' },
+					{ alias: 'newName', value: 42 },
+				]);
+			} finally {
+				umbExtensionsRegistry.unregister(failing.alias);
+			}
 		});
 
 		it('converts nothing when no converter is registered for the property editor schemas', async () => {

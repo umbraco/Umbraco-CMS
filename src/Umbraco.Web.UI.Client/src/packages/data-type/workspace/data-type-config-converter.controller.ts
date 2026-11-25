@@ -4,6 +4,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import type {
 	ManifestPropertyEditorConfigConverter,
 	UmbPropertyEditorConfig,
+	UmbPropertyEditorConfigConverter,
 } from '@umbraco-cms/backoffice/property-editor';
 
 /**
@@ -27,6 +28,7 @@ export class UmbDataTypeConfigConverterController extends UmbControllerBase {
 	 * @param {string} toSchemaAlias - The alias of the property editor schema to convert the settings for.
 	 * @param {UmbPropertyEditorConfig} config - The settings to convert.
 	 * @returns {Promise<UmbPropertyEditorConfig>} The converted settings; a setting from a converter of higher weight wins.
+	 * A converter that fails is skipped, so the others still apply.
 	 */
 	async convert(
 		fromSchemaAlias: string,
@@ -36,16 +38,19 @@ export class UmbDataTypeConfigConverterController extends UmbControllerBase {
 		const converted: UmbPropertyEditorConfig = [];
 
 		for (const manifest of this.#getManifests(fromSchemaAlias, toSchemaAlias)) {
-			const api = await createExtensionApi(this, manifest);
-			if (!api) continue;
-
-			for (const setting of await api.convert(config)) {
-				if (converted.some((x) => x.alias === setting.alias) === false) {
-					converted.push(setting);
+			let api: UmbPropertyEditorConfigConverter | undefined;
+			try {
+				api = await createExtensionApi(this, manifest);
+				for (const setting of (await api?.convert(config)) ?? []) {
+					if (converted.some((x) => x.alias === setting.alias) === false) {
+						converted.push(setting);
+					}
 				}
+			} catch (error) {
+				console.error(`The property editor config converter "${manifest.alias}" failed, so it was skipped.`, error);
+			} finally {
+				api?.destroy();
 			}
-
-			api.destroy();
 		}
 
 		return converted;
