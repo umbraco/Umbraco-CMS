@@ -245,7 +245,11 @@ export default [
 				{
 					patterns: [
 						{
-							regex: '^(\\.\\./|@umbraco-cms/backoffice/(?!(external/lit|lit-element|style|localization-api)$))',
+							regex: '\\.\\./',
+							message: 'The donut chart imports nothing from outside its own folder.',
+						},
+						{
+							regex: '^(?!\\./|@umbraco-cms/backoffice/(external/lit|lit-element|style|localization-api)$)',
 							message:
 								'The donut chart imports only @umbraco-cms/backoffice/external/lit, @umbraco-cms/backoffice/lit-element, @umbraco-cms/backoffice/style, type-only @umbraco-cms/backoffice/localization-api and files in its own folder.',
 						},
