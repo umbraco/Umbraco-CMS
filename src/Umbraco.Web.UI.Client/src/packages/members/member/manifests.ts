@@ -10,6 +10,7 @@ import { manifests as propertyEditorManifests } from './property-editor/manifest
 import { manifests as referenceManifests } from './reference/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as searchManifests } from './search/manifests.js';
+import { manifests as userPermissionManifests } from './user-permissions/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import * as entryPointModule from './entry-point.js';
 
@@ -28,6 +29,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...referenceManifests,
 	...repositoryManifests,
 	...searchManifests,
+	...userPermissionManifests,
 	...workspaceManifests,
 	{
 		name: 'Member Backoffice Entry Point',
