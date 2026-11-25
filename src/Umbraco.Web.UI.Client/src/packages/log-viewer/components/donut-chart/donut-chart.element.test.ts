@@ -1,6 +1,7 @@
 import { UmbDonutChartElement } from './donut-chart.element.js';
 import type { UmbDonutSliceElement } from './donut-slice.element.js';
 import { aTimeout, expect, fixture, html } from '@open-wc/testing';
+import { sendKeys } from '@web/test-runner-commands';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 import './donut-slice.element.js';
@@ -52,6 +53,51 @@ function detailsBox(element: UmbDonutChartElement): HTMLElement {
 	return element.shadowRoot!.querySelector<HTMLElement>('#details-box')!;
 }
 
+function detailsText(element: UmbDonutChartElement): string | undefined {
+	const box = detailsBox(element);
+	return box.classList.contains('show') ? box.textContent!.replace(/\s+/g, ' ').trim() : undefined;
+}
+
+function tap(element: UmbDonutChartElement, index: number) {
+	const path = listItems(element)[index].querySelector('path')!;
+	const bounds = path.getBoundingClientRect();
+	const init = {
+		bubbles: true,
+		composed: true,
+		pointerType: 'touch',
+		clientX: bounds.left + bounds.width / 2,
+		clientY: bounds.top + bounds.height / 2,
+	};
+	for (const type of ['pointerover', 'pointerdown', 'pointerup', 'pointerout']) {
+		path.dispatchEvent(new PointerEvent(type, init));
+	}
+	svgOf(element).dispatchEvent(new PointerEvent('pointerleave', { ...init, bubbles: false, composed: false }));
+}
+
+async function captureWarnings(action: (warnings: Array<string>) => Promise<void>) {
+	const warnings: Array<string> = [];
+	const originalWarn = console.warn;
+	console.warn = (message: string) => warnings.push(message);
+	try {
+		await action(warnings);
+	} finally {
+		console.warn = originalWarn;
+	}
+}
+
+async function tabStopsBetween(first: HTMLElement, last: HTMLElement): Promise<Array<string>> {
+	first.focus();
+	const stops: Array<string> = [];
+	for (let i = 0; i < 10; i++) {
+		await sendKeys({ press: 'Tab' });
+		const active = document.activeElement;
+		if (active === last) return stops;
+		const inner = active?.shadowRoot?.activeElement;
+		stops.push(inner ? `${inner.tagName.toLowerCase()} ${inner.getAttribute('aria-label')}` : `${active?.tagName}`);
+	}
+	return stops;
+}
+
 describe('UmbDonutChartElement', () => {
 	it('is the element defined for its tag', () => {
 		expect(customElements.get('umb-donut-chart')).to.equal(UmbDonutChartElement);
@@ -87,6 +133,20 @@ describe('UmbDonutChartElement', () => {
 			expect(svg.querySelectorAll('[role="listitem"], a')).to.have.lengthOf(0);
 			expect(svg.getAttribute('aria-hidden')).to.equal('true');
 			expect(paintedBounds(element).height).to.be.closeTo(90, 0.5);
+		});
+
+		it('announces the description when nothing is drawable', async () => {
+			const element = await fixture<UmbDonutChartElement>(html`
+				<umb-donut-chart description="Messages by level">
+					<umb-donut-slice name="A" amount="0"></umb-donut-slice>
+				</umb-donut-chart>
+			`);
+			await settle(element);
+
+			const svg = svgOf(element);
+			expect(svg.getAttribute('aria-hidden')).to.be.null;
+			expect(svg.getAttribute('role')).to.equal('img');
+			expect(svg.getAttribute('aria-label')).to.equal('Messages by level');
 		});
 
 		it('shows the track ring when there are no slices', async () => {
@@ -172,6 +232,58 @@ describe('UmbDonutChartElement', () => {
 			);
 		});
 
+		it('warns and uses the default minimum slice size when min-slice-percent is invalid', async () => {
+			await captureWarnings(async (warnings) => {
+				const element = await fixture<HTMLElement>(html`
+					<div>
+						<umb-donut-chart id="default">
+							<umb-donut-slice amount="1000"></umb-donut-slice>
+							<umb-donut-slice amount="1"></umb-donut-slice>
+						</umb-donut-chart>
+						<umb-donut-chart id="invalid">
+							<umb-donut-slice amount="1000"></umb-donut-slice>
+							<umb-donut-slice amount="1"></umb-donut-slice>
+						</umb-donut-chart>
+					</div>
+				`);
+				const reference = element.querySelector<UmbDonutChartElement>('#default')!;
+				const invalid = element.querySelector<UmbDonutChartElement>('#invalid')!;
+				await settle(reference);
+				const tinySlice = (chart: UmbDonutChartElement) => listItems(chart)[1].querySelector('path')!.getAttribute('d');
+
+				for (const value of [NaN, -1, Infinity, -Infinity]) {
+					invalid.minSlicePercent = 10;
+					await settle(invalid);
+					warnings.length = 0;
+
+					invalid.minSlicePercent = value;
+					await settle(invalid);
+
+					expect(warnings, `${value}`).to.have.lengthOf(1);
+					expect(warnings[0], `${value}`).to.contain('min-slice-percent');
+					expect(tinySlice(invalid), `${value}`).to.equal(tinySlice(reference));
+				}
+
+				warnings.length = 0;
+				invalid.minSlicePercent = 0;
+				await settle(invalid);
+				expect(warnings).to.have.lengthOf(0);
+				expect(tinySlice(invalid)).not.to.equal(tinySlice(reference));
+			});
+		});
+
+		it('picks up slices passed through a nested slot', async () => {
+			const host = document.createElement('div');
+			host.attachShadow({ mode: 'open' }).innerHTML = '<umb-donut-chart><slot></slot></umb-donut-chart>';
+			host.innerHTML = '<umb-donut-slice name="A" amount="1"></umb-donut-slice><umb-donut-slice name="B" amount="3"></umb-donut-slice>';
+			const container = await fixture<HTMLElement>(html`<div></div>`);
+			container.append(host);
+			const element = host.shadowRoot!.querySelector<UmbDonutChartElement>('umb-donut-chart')!;
+			await settle(element);
+
+			expect(sliceNames(element)).to.deep.equal(['A: 1 (25%)', 'B: 3 (75%)']);
+		});
+
 		it('follows slices that are added, changed and removed', async () => {
 			const element = await fixture<UmbDonutChartElement>(html`
 				<umb-donut-chart>
@@ -241,6 +353,61 @@ describe('UmbDonutChartElement', () => {
 			]);
 		});
 
+		it('formats amounts and shares in the language of the element', async () => {
+			const element = await fixture<UmbDonutChartElement>(html`
+				<umb-donut-chart lang="da">
+					<umb-donut-slice name="Information" amount="50000"></umb-donut-slice>
+					<umb-donut-slice name="Warning" amount="1233"></umb-donut-slice>
+				</umb-donut-chart>
+			`);
+			await settle(element);
+
+			expect(sliceNames(element)).to.deep.equal(['Information: 50.000 (97,6\u00a0%)', 'Warning: 1.233 (2,4\u00a0%)']);
+		});
+
+		it('has one tab stop per link slice and none for the chart itself', async () => {
+			const container = await fixture<HTMLElement>(html`
+				<div>
+					<button id="first">First</button>
+					<umb-donut-chart>
+						<umb-donut-slice name="A" amount="3" href="#a" label="Open A"></umb-donut-slice>
+						<umb-donut-slice name="B" amount="2"></umb-donut-slice>
+						<umb-donut-slice name="C" amount="1" href="#c" label="Open C"></umb-donut-slice>
+					</umb-donut-chart>
+					<button id="last">Last</button>
+				</div>
+			`);
+			await settle(container.querySelector<UmbDonutChartElement>('umb-donut-chart')!);
+
+			const stops = await tabStopsBetween(
+				container.querySelector<HTMLElement>('#first')!,
+				container.querySelector<HTMLElement>('#last')!,
+			);
+
+			expect(stops).to.deep.equal(['a Open A', 'a Open C']);
+		});
+
+		it('has no tab stop when no slice is a link', async () => {
+			const container = await fixture<HTMLElement>(html`
+				<div>
+					<button id="first">First</button>
+					<umb-donut-chart>
+						<umb-donut-slice name="A" amount="3"></umb-donut-slice>
+						<umb-donut-slice name="B" amount="2"></umb-donut-slice>
+					</umb-donut-chart>
+					<button id="last">Last</button>
+				</div>
+			`);
+			await settle(container.querySelector<UmbDonutChartElement>('umb-donut-chart')!);
+
+			const stops = await tabStopsBetween(
+				container.querySelector<HTMLElement>('#first')!,
+				container.querySelector<HTMLElement>('#last')!,
+			);
+
+			expect(stops).to.deep.equal([]);
+		});
+
 		it('names a link slice by its label and keeps the slice details as its description', async () => {
 			const element = await fixture<UmbDonutChartElement>(html`
 				<umb-donut-chart>
@@ -269,6 +436,59 @@ describe('UmbDonutChartElement', () => {
 				await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
 			});
 		}
+	});
+
+	describe('touch', () => {
+		let element: UmbDonutChartElement;
+
+		beforeEach(async () => {
+			element = await fixture<UmbDonutChartElement>(html`
+				<umb-donut-chart>
+					<umb-donut-slice name="Apples" amount="6" kind="items"></umb-donut-slice>
+					<umb-donut-slice name="Pears" amount="3" kind="items"></umb-donut-slice>
+					<umb-donut-slice name="Plums" amount="1" kind="items" href="#plums"></umb-donut-slice>
+				</umb-donut-chart>
+			`);
+			await settle(element);
+		});
+
+		it('toggles the details of a tapped slice that is not a link', async () => {
+			tap(element, 1);
+			await element.updateComplete;
+			expect(detailsText(element)).to.equal('Pears 3 items (30%)');
+
+			tap(element, 1);
+			await element.updateComplete;
+			expect(detailsText(element)).to.be.undefined;
+		});
+
+		it('moves the details to another tapped slice', async () => {
+			tap(element, 1);
+			await element.updateComplete;
+			tap(element, 0);
+			await element.updateComplete;
+
+			expect(detailsText(element)).to.equal('Apples 6 items (60%)');
+		});
+
+		it('closes the details on a tap outside the chart', async () => {
+			tap(element, 0);
+			await element.updateComplete;
+
+			document.body.dispatchEvent(
+				new PointerEvent('pointerdown', { bubbles: true, composed: true, pointerType: 'touch' }),
+			);
+			await element.updateComplete;
+
+			expect(detailsText(element)).to.be.undefined;
+		});
+
+		it('leaves a tapped link slice to its link', async () => {
+			tap(element, 2);
+			await element.updateComplete;
+
+			expect(detailsText(element)).to.be.undefined;
+		});
 	});
 
 	describe('details box', () => {
@@ -302,16 +522,84 @@ describe('UmbDonutChartElement', () => {
 			expect(box.textContent!.replace(/\s+/g, ' ').trim()).to.equal('Information 50,000 messages (>99.9%)');
 		});
 
-		it('stays inside the chart when the pointer is near an edge', async () => {
+		it('stays inside the chart when the pointer is near any corner', async () => {
 			const bounds = element.getBoundingClientRect();
-			hover(element, 0, bounds.right - 2, bounds.bottom - 2);
+			const corners = [
+				[bounds.left + 2, bounds.top + 2],
+				[bounds.right - 2, bounds.top + 2],
+				[bounds.left + 2, bounds.bottom - 2],
+				[bounds.right - 2, bounds.bottom - 2],
+			];
+
+			for (const [x, y] of corners) {
+				hover(element, 0, x, y);
+				await element.updateComplete;
+
+				const box = detailsBox(element).getBoundingClientRect();
+				expect(detailsText(element), `${x},${y}`).to.exist;
+				expect(box.left, `${x},${y}`).to.be.at.least(bounds.left - 0.5);
+				expect(box.top, `${x},${y}`).to.be.at.least(bounds.top - 0.5);
+				expect(box.right, `${x},${y}`).to.be.at.most(bounds.right + 0.5);
+				expect(box.bottom, `${x},${y}`).to.be.at.most(bounds.bottom + 0.5);
+			}
+		});
+
+		it('wraps long names inside the chart', async () => {
+			element.querySelector<UmbDonutSliceElement>('umb-donut-slice')!.name = 'A'.repeat(200);
+			await settle(element);
+			hover(element, 0);
 			await element.updateComplete;
 
-			const box = detailsBox(element).getBoundingClientRect();
-			expect(box.left).to.be.at.least(bounds.left - 0.5);
-			expect(box.top).to.be.at.least(bounds.top - 0.5);
-			expect(box.right).to.be.at.most(bounds.right + 0.5);
-			expect(box.bottom).to.be.at.most(bounds.bottom + 0.5);
+			expect(detailsBox(element).getBoundingClientRect().width).to.be.at.most(element.getBoundingClientRect().width);
+			expect(detailsBox(element).scrollWidth).to.be.at.most(detailsBox(element).clientWidth);
+		});
+
+		it('closes on Escape without moving keyboard focus', async () => {
+			const link = svgOf(element).querySelectorAll('a')[0];
+			link.focus();
+			await element.updateComplete;
+			expect(detailsText(element)).to.exist;
+
+			await sendKeys({ press: 'Escape' });
+			await element.updateComplete;
+
+			expect(detailsText(element)).to.be.undefined;
+			expect(element.shadowRoot!.activeElement).to.equal(link);
+		});
+
+		it('closes the details of a hovered slice on Escape', async () => {
+			hover(element, 1);
+			await element.updateComplete;
+			expect(detailsText(element)).to.exist;
+
+			document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+			await element.updateComplete;
+
+			expect(detailsText(element)).to.be.undefined;
+		});
+
+		it('draws a two-tone focus ring around a slice with keyboard focus', async () => {
+			svgOf(element).querySelectorAll('a')[1].focus();
+			await element.updateComplete;
+
+			const ring = [...svgOf(element).querySelectorAll('.focus-ring path')].map((path) => getComputedStyle(path));
+			expect(ring).to.have.lengthOf(2);
+			expect(ring[0].stroke).not.to.equal(ring[1].stroke);
+			expect(parseFloat(ring[0].strokeWidth)).to.be.greaterThan(parseFloat(ring[1].strokeWidth));
+		});
+
+		it('forgets the hovered slice when it is disconnected', async () => {
+			hover(element, 1);
+			await element.updateComplete;
+			expect(detailsText(element)).to.exist;
+
+			const parent = element.parentElement!;
+			element.remove();
+			parent.append(element);
+			await settle(element);
+
+			expect(detailsText(element)).to.be.undefined;
+			expect(svgOf(element).classList.contains('has-active')).to.be.false;
 		});
 
 		it('hides when the pointer leaves the chart', async () => {

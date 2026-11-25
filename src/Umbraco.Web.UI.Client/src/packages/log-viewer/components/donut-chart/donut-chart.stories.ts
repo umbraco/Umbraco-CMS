@@ -114,7 +114,7 @@ export const Empty: Story = {
 	render: () => html`<umb-donut-chart description="Nothing to show"></umb-donut-chart>`,
 };
 
-export const AllZero: Story = {
+export const ZeroAmounts: Story = {
 	render: () =>
 		html`<umb-donut-chart description="Nothing counted yet">
 			${renderSlices([
@@ -135,7 +135,7 @@ export const WithLinks: Story = {
 		</umb-donut-chart>`,
 };
 
-export const CustomSize: Story = {
+export const LargerSize: Story = {
 	render: () =>
 		html`<umb-donut-chart
 			style="width: 320px"

@@ -2,7 +2,6 @@ import type { UmbDonutSliceElement } from './donut-slice.element.js';
 import { umbFormatDonutShare } from './format-donut-share.function.js';
 import { umbLayoutDonutSlices } from './layout-donut-slices.function.js';
 import type { UmbDonutSliceLayout } from './layout-donut-slices.function.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	classMap,
 	css,
@@ -53,9 +52,24 @@ const placeWithin = (anchor: number, length: number, available: number): number 
 
 /**
  * A donut chart that shows each slotted `umb-donut-slice` as a share of the total of all slices.
- * Set the element's width to size the chart; it defaults to 200px.
+ *
+ * Each `umb-donut-slice` takes an `amount`, a `color` (any CSS colour, including `var(...)`), a `name`, a `kind` (the
+ * unit shown after the amount) and optionally an `href` with a `label` for the link's accessible name. Hovering,
+ * focusing or tapping a slice shows its name, amount, kind and share. Set the element's width to size the chart (it
+ * defaults to 200px); the height follows. Consumers with many small categories should group the long tail themselves,
+ * for example into an "Other" slice.
  * @element umb-donut-chart
  * @slot - The `umb-donut-slice` elements to show.
+ * @cssprop --uui-color-border - The ring shown when no slice has an amount, and the details box border.
+ * @cssprop --uui-color-surface - The details box background, and the inner edge of the focus ring.
+ * @cssprop --uui-color-text - The details box text.
+ * @cssprop --uui-color-text-alt - The description text.
+ * @cssprop --uui-color-focus - The focus ring.
+ * @cssprop --uui-shadow-depth-3 - The details box shadow.
+ * @cssprop --uui-border-radius - The details box corners.
+ * @cssprop --uui-size-space-2 - Spacing in the details box and above the description.
+ * @cssprop --uui-size-space-3 - Spacing in the details box.
+ * @cssprop --uui-type-small-size - The details box and description text size.
  */
 @customElement('umb-donut-chart')
 export class UmbDonutChartElement extends UmbLitElement {
@@ -125,7 +139,7 @@ export class UmbDonutChartElement extends UmbLitElement {
 	@property({ type: Number, attribute: 'min-slice-percent' })
 	minSlicePercent?: number;
 
-	@queryAssignedElements({ selector: 'umb-donut-slice' })
+	@queryAssignedElements({ selector: 'umb-donut-slice', flatten: true })
 	private _sliceElements!: UmbDonutSliceElement[];
 
 	@query('#container')
@@ -137,6 +151,9 @@ export class UmbDonutChartElement extends UmbLitElement {
 	@state()
 	private _activeIndex?: number;
 
+	@state()
+	private _focusIndex?: number;
+
 	#slices: Array<UmbDonutChartSliceData> = [];
 	#slicesChanged = false;
 	#geometry: UmbDonutChartGeometry = {
@@ -145,6 +162,7 @@ export class UmbDonutChartElement extends UmbLitElement {
 		innerRadius: DEFAULT_RADIUS - DEFAULT_BORDER_SIZE,
 	};
 	#segments: Array<UmbDonutChartSegment> = [];
+	#minSlicePercent?: number;
 	#detailsIndex?: number;
 	#detailsBoxAnchor = { x: 0, y: 0 };
 
@@ -155,32 +173,66 @@ export class UmbDonutChartElement extends UmbLitElement {
 	};
 
 	#onPointerOver = (event: PointerEvent) => {
+		if (event.pointerType === 'touch') return;
 		this._activeIndex = this.#getSegmentIndex(event.target);
 		this.#setDetailsBoxAnchorFromPointer(event);
 	};
 
 	#onPointerMove = (event: PointerEvent) => {
-		if (this._activeIndex === undefined) return;
+		if (event.pointerType === 'touch' || this._activeIndex === undefined) return;
 		this.#setDetailsBoxAnchorFromPointer(event);
 		this.#positionDetailsBox();
 	};
 
-	#onPointerLeave = () => {
-		const focused = this.shadowRoot?.activeElement;
-		this._activeIndex = focused?.matches(':focus-visible') ? this.#getSegmentIndex(focused) : undefined;
+	#onPointerLeave = (event: PointerEvent) => {
+		if (event.pointerType === 'touch') return;
+		this._activeIndex = this._focusIndex;
 		if (this._activeIndex !== undefined) this.#setDetailsBoxAnchorFromSegment(this._activeIndex);
+	};
+
+	#onPointerUp = (event: PointerEvent) => {
+		if (event.pointerType !== 'touch') return;
+		const index = this.#getSegmentIndex(event.target);
+		if (index !== undefined && this.#segments[index]?.href) return;
+		this._activeIndex = index === this._activeIndex ? undefined : index;
+		if (this._activeIndex !== undefined) this.#setDetailsBoxAnchorFromPointer(event);
 	};
 
 	#onFocusIn = (event: FocusEvent) => {
 		const target = event.target as Element;
-		if (!target.matches(':focus-visible')) return;
-		this._activeIndex = this.#getSegmentIndex(target);
-		if (this._activeIndex !== undefined) this.#setDetailsBoxAnchorFromSegment(this._activeIndex);
+		const index = this.#getSegmentIndex(target);
+		if (index === undefined || !target.matches(':focus-visible')) return;
+		this._focusIndex = index;
+		this._activeIndex = index;
+		this.#setDetailsBoxAnchorFromSegment(index);
 	};
 
 	#onFocusOut = () => {
+		this._focusIndex = undefined;
 		this._activeIndex = undefined;
 	};
+
+	#onDocumentKeyDown = (event: KeyboardEvent) => {
+		if (event.key === 'Escape') this._activeIndex = undefined;
+	};
+
+	#onDocumentPointerDown = (event: PointerEvent) => {
+		if (this._activeIndex !== undefined && !event.composedPath().includes(this)) this._activeIndex = undefined;
+	};
+
+	override connectedCallback(): void {
+		super.connectedCallback();
+		document.addEventListener('keydown', this.#onDocumentKeyDown);
+		document.addEventListener('pointerdown', this.#onDocumentPointerDown);
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		document.removeEventListener('keydown', this.#onDocumentKeyDown);
+		document.removeEventListener('pointerdown', this.#onDocumentPointerDown);
+		this._activeIndex = undefined;
+		this._focusIndex = undefined;
+	}
 
 	protected override willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
 		super.willUpdate(changedProperties);
@@ -189,6 +241,10 @@ export class UmbDonutChartElement extends UmbLitElement {
 			changedProperties.has('radius') || changedProperties.has('borderSize') || changedProperties.has('svgSize');
 		if (geometryChanged) {
 			this.#geometry = this.#resolveGeometry();
+		}
+
+		if (changedProperties.has('minSlicePercent')) {
+			this.#minSlicePercent = this.#resolveMinSlicePercent();
 		}
 
 		const slicesChanged = this.#slicesChanged;
@@ -208,6 +264,9 @@ export class UmbDonutChartElement extends UmbLitElement {
 			this.#segments = this.#layoutSegments();
 			if (this._activeIndex !== undefined && this._activeIndex >= this.#segments.length) {
 				this._activeIndex = undefined;
+			}
+			if (this._focusIndex !== undefined && this._focusIndex >= this.#segments.length) {
+				this._focusIndex = undefined;
 			}
 		}
 
@@ -247,8 +306,18 @@ export class UmbDonutChartElement extends UmbLitElement {
 		return fallback;
 	}
 
+	#resolveMinSlicePercent(): number | undefined {
+		const value = this.minSlicePercent;
+		if (value === undefined || value === null) return undefined;
+		if (Number.isFinite(value) && value >= 0) return value;
+		console.warn(
+			`umb-donut-chart: min-slice-percent must be zero or a positive number, got ${value}. Using ${UmbDonutChartElement.MIN_SLICE_PERCENT}.`,
+		);
+		return undefined;
+	}
+
 	#layoutSegments(): Array<UmbDonutChartSegment> {
-		const minSlicePercent = this.minSlicePercent ?? UmbDonutChartElement.MIN_SLICE_PERCENT;
+		const minSlicePercent = this.#minSlicePercent ?? UmbDonutChartElement.MIN_SLICE_PERCENT;
 		const layout = umbLayoutDonutSlices(
 			this.#slices.map((slice) => slice.amount),
 			{ minSweep: UmbDonutChartElement.percentToDegrees(minSlicePercent), gap: SLICE_GAP_DEGREES },
@@ -350,10 +419,23 @@ export class UmbDonutChartElement extends UmbLitElement {
 		</g>`;
 	}
 
+	#renderFocusRing() {
+		const segment = this._focusIndex === undefined ? undefined : this.#segments[this._focusIndex];
+		if (!segment) return nothing;
+		return svg`<g class="focus-ring" aria-hidden="true">
+			<path class="focus-ring-outer" d=${segment.path}></path>
+			<path class="focus-ring-inner" d=${segment.path}></path>
+		</g>`;
+	}
+
 	#renderChart() {
 		const { size } = this.#geometry;
 		if (this.#segments.length === 0) {
-			return html`<svg viewBox="0 0 ${size} ${size}" aria-hidden="true">
+			return html`<svg
+				viewBox="0 0 ${size} ${size}"
+				role=${this.description ? 'img' : nothing}
+				aria-label=${this.description || nothing}
+				aria-hidden=${this.description ? nothing : 'true'}>
 				<path class="track" fill-rule="evenodd" d=${this.#getRingPath()}></path>
 			</svg>`;
 		}
@@ -366,9 +448,8 @@ export class UmbDonutChartElement extends UmbLitElement {
 			@pointerover=${this.#onPointerOver}
 			@pointermove=${this.#onPointerMove}
 			@pointerleave=${this.#onPointerLeave}
-			@focusin=${this.#onFocusIn}
-			@focusout=${this.#onFocusOut}>
-			${this.#segments.map((segment, index) => this.#renderSegment(segment, index))}
+			@pointerup=${this.#onPointerUp}>
+			${this.#segments.map((segment, index) => this.#renderSegment(segment, index))}${this.#renderFocusRing()}
 		</svg>`;
 	}
 
@@ -386,13 +467,14 @@ export class UmbDonutChartElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<div id="container">${this.#renderChart()}${this.#renderDetailsBox()}</div>
+		return html`<div id="container" @focusin=${this.#onFocusIn} @focusout=${this.#onFocusOut}>
+				${this.#renderChart()}${this.#renderDetailsBox()}
+			</div>
 			${this.showDescription && this.description ? html`<p class="description">${this.description}</p>` : nothing}
 			<slot @slotchange=${this.#onSlicesChange} @slice-update=${this.#onSlicesChange}></slot>`;
 	}
 
 	static override styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				display: block;
@@ -428,10 +510,21 @@ export class UmbDonutChartElement extends UmbLitElement {
 				outline: none;
 			}
 
-			a:focus-visible .slice {
+			.focus-ring path {
+				fill: none;
+				pointer-events: none;
+				stroke-linejoin: round;
+				vector-effect: non-scaling-stroke;
+			}
+
+			.focus-ring-outer {
+				stroke: var(--uui-color-surface);
+				stroke-width: 6px;
+			}
+
+			.focus-ring-inner {
 				stroke: var(--uui-color-focus);
 				stroke-width: 2px;
-				vector-effect: non-scaling-stroke;
 			}
 
 			#details-box {
@@ -450,6 +543,7 @@ export class UmbDonutChartElement extends UmbLitElement {
 				box-shadow: var(--uui-shadow-depth-3);
 				font-size: var(--uui-type-small-size);
 				line-height: 1.5;
+				overflow-wrap: anywhere;
 				opacity: 0;
 				pointer-events: none;
 				transition: opacity 120ms linear;
