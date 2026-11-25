@@ -1,6 +1,11 @@
 import UmbThemeContext from './theme.context.js';
-import { UMB_THEME_LIGHT_ALIAS, UMB_THEME_DARK_ALIAS, UMB_THEME_HIGH_CONTRAST_ALIAS } from './constants.js';
-export { UMB_THEME_LIGHT_ALIAS, UMB_THEME_DARK_ALIAS, UMB_THEME_HIGH_CONTRAST_ALIAS };
+import {
+	UMB_THEME_AUTO_ALIAS,
+	UMB_THEME_LIGHT_ALIAS,
+	UMB_THEME_DARK_ALIAS,
+	UMB_THEME_HIGH_CONTRAST_ALIAS,
+} from './constants.js';
+export { UMB_THEME_AUTO_ALIAS, UMB_THEME_LIGHT_ALIAS, UMB_THEME_DARK_ALIAS, UMB_THEME_HIGH_CONTRAST_ALIAS };
 
 export const themes: Array<UmbExtensionManifest> = [
 	{
@@ -8,6 +13,14 @@ export const themes: Array<UmbExtensionManifest> = [
 		alias: 'Umb.GlobalContext.Theme',
 		name: 'Theme Context',
 		api: UmbThemeContext,
+	},
+	{
+		type: 'theme',
+		alias: UMB_THEME_AUTO_ALIAS,
+		name: 'Auto (Experimental)',
+		css: '/umbraco/backoffice/css/dark.css',
+		meta: { mediaQuery: '(prefers-color-scheme: dark)' },
+		weight: 400,
 	},
 	{
 		type: 'theme',
@@ -28,6 +41,7 @@ export const themes: Array<UmbExtensionManifest> = [
 		alias: UMB_THEME_DARK_ALIAS,
 		name: 'Dark (Experimental)',
 		css: '/umbraco/backoffice/css/dark.css',
+		meta: { colorScheme: 'dark' },
 		weight: 200,
 	},
 	{
