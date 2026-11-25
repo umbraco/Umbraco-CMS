@@ -17,7 +17,6 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
 public class MultipleDocumentPickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
-    private readonly IJsonSerializer _jsonSerializer;
     private readonly IPublishedContentCache _publishedContentCache;
     private readonly IApiContentBuilder _apiContentBuilder;
 
@@ -32,7 +31,6 @@ public class MultipleDocumentPickerValueConverter : PropertyValueConverterBase, 
         IPublishedContentCache publishedContentCache,
         IApiContentBuilder apiContentBuilder)
     {
-        _jsonSerializer = jsonSerializer;
         _publishedContentCache = publishedContentCache;
         _apiContentBuilder = apiContentBuilder;
     }
@@ -79,7 +77,7 @@ public class MultipleDocumentPickerValueConverter : PropertyValueConverterBase, 
 
     private IPublishedContent[] GetDocuments(object? inter, bool preview)
     {
-        IReadOnlyList<Guid> keys = EntityPickerValueParser.ParseKeys(inter, Constants.UdiEntityType.Document, _jsonSerializer);
+        IReadOnlyList<Guid> keys = EntityPickerValueParser.ParseKeys(inter, Constants.UdiEntityType.Document);
         if (keys.Count == 0)
         {
             return [];

@@ -39,6 +39,22 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
     }
 
     [Test]
+    public void ContentPickerValueConverter_ReadsTheFirstDocumentOfAJsonArrayOfKeys()
+    {
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.Alias).Returns("test");
+        var first = Guid.NewGuid();
+
+        var result = CreateValueConverter().ConvertSourceToIntermediate(
+            Mock.Of<IPublishedElement>(),
+            publishedPropertyType.Object,
+            $"[\"{first}\",\"{Guid.NewGuid()}\"]",
+            false);
+
+        Assert.AreEqual(new GuidUdi(Constants.UdiEntityType.Document, first), result);
+    }
+
+    [Test]
     public void ContentPickerValueConverter_ReadsTheUdiItStores()
     {
         var publishedPropertyType = new Mock<IPublishedPropertyType>();

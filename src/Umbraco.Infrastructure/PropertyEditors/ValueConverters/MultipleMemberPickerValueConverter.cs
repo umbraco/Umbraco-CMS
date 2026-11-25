@@ -16,7 +16,6 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
 public class MultipleMemberPickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
-    private readonly IJsonSerializer _jsonSerializer;
     private readonly IMemberService _memberService;
     private readonly IPublishedMemberCache _publishedMemberCache;
 
@@ -31,7 +30,6 @@ public class MultipleMemberPickerValueConverter : PropertyValueConverterBase, ID
         IMemberService memberService,
         IPublishedMemberCache publishedMemberCache)
     {
-        _jsonSerializer = jsonSerializer;
         _memberService = memberService;
         _publishedMemberCache = publishedMemberCache;
     }
@@ -76,7 +74,7 @@ public class MultipleMemberPickerValueConverter : PropertyValueConverterBase, ID
         => "(unsupported)";
 
     private IPublishedContent[] GetMembers(object? inter)
-        => EntityPickerValueParser.ParseKeys(inter, Constants.UdiEntityType.Member, _jsonSerializer)
+        => EntityPickerValueParser.ParseKeys(inter, Constants.UdiEntityType.Member)
             .Select(key => _memberService.GetById(key))
             .WhereNotNull()
             .Select(member => _publishedMemberCache.Get(member) as IPublishedContent)

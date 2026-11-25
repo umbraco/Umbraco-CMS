@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
-using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Search;
 
@@ -40,7 +39,7 @@ internal sealed class ContentPickerPropertyValueHandlerTests
             .Setup(p => p.GetValue(It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<bool>()))
             .Returns(storedValue);
 
-        return new ContentPickerPropertyValueHandler(new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()))
+        return new ContentPickerPropertyValueHandler()
             .GetIndexFields(property.Object, null, null, true, Mock.Of<IContentBase>())
             .ToArray();
     }

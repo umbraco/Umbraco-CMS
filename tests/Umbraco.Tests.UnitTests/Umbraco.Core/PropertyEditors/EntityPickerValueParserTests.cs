@@ -1,9 +1,8 @@
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
@@ -12,8 +11,6 @@ internal sealed class EntityPickerValueParserTests
 {
     private static readonly Guid _first = new("0f4f9a0e-6b1e-4d0f-9b1c-2a3f6e5d4c3b");
     private static readonly Guid _second = new("8c2d7e61-3a4b-4c5d-8e9f-0a1b2c3d4e5f");
-
-    private readonly IJsonSerializer _jsonSerializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
     [TestCase(null)]
     [TestCase("")]
@@ -29,6 +26,31 @@ internal sealed class EntityPickerValueParserTests
     [Test]
     public void Reads_A_Json_Array_Of_Keys_Held_As_A_Json_Node()
         => Assert.That(Parse(new JsonArray(_first.ToString(), _second.ToString())), Is.EqualTo(new[] { _first, _second }));
+
+    [Test]
+    public void Reads_A_Json_Array_Of_Keys_Held_As_A_Json_Element()
+        => Assert.That(
+            Parse(JsonDocument.Parse($"[\"{_first}\",\"{_second}\"]").RootElement),
+            Is.EqualTo(new[] { _first, _second }));
+
+    [TestCase("N")]
+    [TestCase("B")]
+    [TestCase("P")]
+    public void Reads_A_Json_Array_Of_Keys_In_Any_Guid_Format(string format)
+        => Assert.That(
+            Parse($"[\"{_first.ToString(format)}\",\"{_second.ToString(format).ToUpperInvariant()}\"]"),
+            Is.EqualTo(new[] { _first, _second }));
+
+    [Test]
+    public void Reads_The_Keys_Of_A_Json_Array_Holding_Other_Entries()
+        => Assert.That(
+            Parse($"[\"{_first}\",\"not-a-key\",42,null,{{}},\"{_second}\"]"),
+            Is.EqualTo(new[] { _first, _second }));
+
+    [TestCase("{\"key\":\"0f4f9a0e-6b1e-4d0f-9b1c-2a3f6e5d4c3b\"}")]
+    [TestCase("[\"0f4f9a0e-6b1e-4d0f-9b1c-2a3f6e5d4c3b\"")]
+    public void Reads_No_Keys_From_Json_That_Is_Not_An_Array(string value)
+        => Assert.That(Parse(value), Is.Empty);
 
     [Test]
     public void Reads_A_Single_Key()
@@ -64,12 +86,8 @@ internal sealed class EntityPickerValueParserTests
             Parse($"{DocumentUdi(_first)},{DocumentUdi(_second)},{DocumentUdi(_first)}"),
             Is.EqualTo(new[] { _first, _second, _first }));
 
-    [Test]
-    public void Reads_No_Keys_From_Malformed_Json()
-        => Assert.That(Parse("[\"not-a-guid\""), Is.Empty);
-
-    private IReadOnlyList<Guid> Parse(object? value)
-        => EntityPickerValueParser.ParseKeys(value, Constants.UdiEntityType.Document, _jsonSerializer);
+    private static IReadOnlyList<Guid> Parse(object? value)
+        => EntityPickerValueParser.ParseKeys(value, Constants.UdiEntityType.Document);
 
     private static string DocumentUdi(Guid key) => new GuidUdi(Constants.UdiEntityType.Document, key).ToString();
 

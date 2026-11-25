@@ -63,9 +63,8 @@ public class MemberPickerValueConverter : PropertyValueConverterBase, IDeliveryA
             return attemptConvertUdi.Result;
         }
 
-        // A value holding several members converts to the first, as this editor holds one.
-        if (source is string listSource
-            && EntityPickerValueParser.ParseKeyList(listSource, Constants.UdiEntityType.Member) is [var firstKey, ..])
+        // Read any format a picker stores. A value holding several members converts to the first, as this editor holds one.
+        if (EntityPickerValueParser.ParseKeys(source, Constants.UdiEntityType.Member) is [var firstKey, ..])
         {
             return new GuidUdi(Constants.UdiEntityType.Member, firstKey);
         }

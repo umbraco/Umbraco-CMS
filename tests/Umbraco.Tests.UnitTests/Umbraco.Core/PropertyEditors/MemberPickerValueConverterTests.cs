@@ -28,4 +28,22 @@ internal sealed class MemberPickerValueConverterTests
 
         Assert.AreEqual(new GuidUdi(Constants.UdiEntityType.Member, first), result);
     }
+
+    [Test]
+    public void Convert_Stored_Json_Array_Of_Keys_To_First_Member()
+    {
+        var first = Guid.NewGuid();
+        var converter = new MemberPickerValueConverter(
+            Mock.Of<IMemberService>(),
+            Mock.Of<IPublishedMemberCache>(),
+            Mock.Of<IExternalMemberService>());
+
+        var result = converter.ConvertSourceToIntermediate(
+            Mock.Of<IPublishedElement>(),
+            Mock.Of<IPublishedPropertyType>(),
+            $"[\"{first}\",\"{Guid.NewGuid()}\"]",
+            false);
+
+        Assert.AreEqual(new GuidUdi(Constants.UdiEntityType.Member, first), result);
+    }
 }

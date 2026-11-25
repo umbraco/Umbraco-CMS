@@ -79,9 +79,8 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
             return attemptConvertUdi.Result;
         }
 
-        // A value holding several documents converts to the first, as this editor holds one.
-        if (source is string listSource
-            && EntityPickerValueParser.ParseKeyList(listSource, Constants.UdiEntityType.Document) is [var firstKey, ..])
+        // Read any format a picker stores. A value holding several documents converts to the first, as this editor holds one.
+        if (EntityPickerValueParser.ParseKeys(source, Constants.UdiEntityType.Document) is [var firstKey, ..])
         {
             return new GuidUdi(Constants.UdiEntityType.Document, firstKey);
         }

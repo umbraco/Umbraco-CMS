@@ -76,8 +76,6 @@ public class MemberPickerPropertyEditor : DataEditor, IValueSchemaProvider
     internal sealed class MemberPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly IMemberService _memberService;
-        private readonly IJsonSerializer _jsonSerializer;
-
         /// <summary>
         ///     Initializes a new instance of the <see cref="MemberPickerPropertyValueEditor" /> class.
         /// </summary>
@@ -99,7 +97,6 @@ public class MemberPickerPropertyEditor : DataEditor, IValueSchemaProvider
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _memberService = memberService;
-            _jsonSerializer = jsonSerializer;
             Validators.Add(new TypedValidatorRunner<string, MemberPickerConfigurationBase>(
                 new SingleMemberTypeFilterValidator(localizedTextService, memberService, coreScopeProvider)));
         }
@@ -119,7 +116,7 @@ public class MemberPickerPropertyEditor : DataEditor, IValueSchemaProvider
             }
 
             // A value holding several members presents the first, as this editor holds one.
-            return EntityPickerValueParser.ParseKeys(stringValue, Constants.UdiEntityType.Member, _jsonSerializer)
+            return EntityPickerValueParser.ParseKeys(stringValue, Constants.UdiEntityType.Member)
                 .Cast<Guid?>()
                 .FirstOrDefault();
         }
@@ -135,7 +132,7 @@ public class MemberPickerPropertyEditor : DataEditor, IValueSchemaProvider
 
         /// <inheritdoc />
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
-            => EntityPickerValueParser.ParseKeys(value, Constants.UdiEntityType.Member, _jsonSerializer)
+            => EntityPickerValueParser.ParseKeys(value, Constants.UdiEntityType.Member)
                 .Select(key => new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Member, key)));
     }
 }

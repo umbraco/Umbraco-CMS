@@ -339,7 +339,7 @@ public abstract class MediaPickerPropertyEditorBase : DataEditor, IValueSchemaPr
 
             if (!rawJson.DetectIsJson())
             {
-                foreach (Guid mediaKey in EntityPickerValueParser.ParseKeys(rawJson, Constants.UdiEntityType.Media, jsonSerializer))
+                foreach (Guid mediaKey in EntityPickerValueParser.ParseKeys(rawJson, Constants.UdiEntityType.Media))
                 {
                     yield return new MediaWithCropsDto
                     {

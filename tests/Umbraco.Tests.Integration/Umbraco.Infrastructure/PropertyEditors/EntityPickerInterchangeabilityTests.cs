@@ -21,7 +21,7 @@ using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 /// <summary>
-/// Tests that a data type can move onto the document pickers from an editor storing a comma-separated list of UDIs,
+/// Tests that a data type can move onto the document pickers from another entity picker,
 /// without its stored values being converted first: they keep rendering, and are stored in the picker's own format
 /// the next time they are saved.
 /// </summary>
@@ -57,22 +57,24 @@ internal sealed class EntityPickerInterchangeabilityTests : UmbracoIntegrationTe
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
     }
 
-    [TestCase(Constants.PropertyEditors.Aliases.ContentPicker)]
-    [TestCase(Constants.PropertyEditors.Aliases.MultipleDocumentPicker)]
-    public async Task Stored_Value_Renders_After_The_Data_Type_Editor_Changes(string propertyEditorAlias)
+    [TestCase(Constants.PropertyEditors.Aliases.MultiNodeTreePicker, Constants.PropertyEditors.Aliases.ContentPicker)]
+    [TestCase(Constants.PropertyEditors.Aliases.MultiNodeTreePicker, Constants.PropertyEditors.Aliases.MultipleDocumentPicker)]
+    [TestCase(Constants.PropertyEditors.Aliases.MultipleDocumentPicker, Constants.PropertyEditors.Aliases.ContentPicker)]
+    public async Task Stored_Value_Renders_After_The_Data_Type_Editor_Changes(string storedByEditorAlias, string propertyEditorAlias)
     {
-        (Guid first, Guid second, IContent page) = await CreatePageStoringCommaSeparatedUdis();
+        (Guid first, Guid second, IContent page) = await CreatePageStoredBy(storedByEditorAlias);
 
         await SwitchPropertyEditorAsync(page.ContentType.Id, propertyEditorAlias);
 
         Assert.That(PublishedKeys(page.Key), Is.EqualTo(ExpectedKeys(propertyEditorAlias, first, second)));
     }
 
-    [TestCase(Constants.PropertyEditors.Aliases.ContentPicker)]
-    [TestCase(Constants.PropertyEditors.Aliases.MultipleDocumentPicker)]
-    public async Task Saving_Stores_The_Value_In_The_Format_Of_The_Data_Type_Editor(string propertyEditorAlias)
+    [TestCase(Constants.PropertyEditors.Aliases.MultiNodeTreePicker, Constants.PropertyEditors.Aliases.ContentPicker)]
+    [TestCase(Constants.PropertyEditors.Aliases.MultiNodeTreePicker, Constants.PropertyEditors.Aliases.MultipleDocumentPicker)]
+    [TestCase(Constants.PropertyEditors.Aliases.MultipleDocumentPicker, Constants.PropertyEditors.Aliases.ContentPicker)]
+    public async Task Saving_Stores_The_Value_In_The_Format_Of_The_Data_Type_Editor(string storedByEditorAlias, string propertyEditorAlias)
     {
-        (Guid first, Guid second, IContent page) = await CreatePageStoringCommaSeparatedUdis();
+        (Guid first, Guid second, IContent page) = await CreatePageStoredBy(storedByEditorAlias);
         await SwitchPropertyEditorAsync(page.ContentType.Id, propertyEditorAlias);
 
         await SaveAndPublishTheEditorValue(page.Key, propertyEditorAlias);
@@ -105,8 +107,8 @@ internal sealed class EntityPickerInterchangeabilityTests : UmbracoIntegrationTe
             _ => [],
         };
 
-    // The multi node tree picker stores a comma-separated list of UDIs.
-    private async Task<(Guid First, Guid Second, IContent Page)> CreatePageStoringCommaSeparatedUdis()
+    // The multi node tree picker stores a comma-separated list of UDIs, the multiple document picker a JSON array of keys.
+    private async Task<(Guid First, Guid Second, IContent Page)> CreatePageStoredBy(string editorAlias)
     {
         IContentType targetType = new ContentTypeBuilder().WithAlias("target").WithName("Target").Build();
         await ContentTypeService.CreateAsync(targetType, Constants.Security.SuperUserKey);
@@ -114,7 +116,7 @@ internal sealed class EntityPickerInterchangeabilityTests : UmbracoIntegrationTe
         IContent secondTarget = CreateAndPublish(targetType, "Second target");
 
         var dataType = new DataType(
-            PropertyEditorCollection[Constants.PropertyEditors.Aliases.MultiNodeTreePicker],
+            PropertyEditorCollection[editorAlias],
             ConfigurationEditorJsonSerializer)
         {
             Name = "Picker",
@@ -134,10 +136,12 @@ internal sealed class EntityPickerInterchangeabilityTests : UmbracoIntegrationTe
             .Build();
         await ContentTypeService.CreateAsync(pageType, Constants.Security.SuperUserKey);
 
-        var storedValue = string.Join(
-            ',',
-            new GuidUdi(Constants.UdiEntityType.Document, firstTarget.Key),
-            new GuidUdi(Constants.UdiEntityType.Document, secondTarget.Key));
+        var storedValue = editorAlias == Constants.PropertyEditors.Aliases.MultiNodeTreePicker
+            ? string.Join(
+                ',',
+                new GuidUdi(Constants.UdiEntityType.Document, firstTarget.Key),
+                new GuidUdi(Constants.UdiEntityType.Document, secondTarget.Key))
+            : JsonSerializer.Serialize(new[] { firstTarget.Key, secondTarget.Key });
         IContent page = CreateAndPublish(pageType, "Picker Page", new { picker = storedValue });
 
         return (firstTarget.Key, secondTarget.Key, page);

@@ -93,8 +93,6 @@ public class MultipleMemberPickerPropertyEditor : DataEditor, IValueSchemaProvid
     /// </summary>
     internal sealed class MultipleMemberPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
-        private readonly IJsonSerializer _jsonSerializer;
-
         /// <summary>
         ///     Initializes a new instance of the <see cref="MultipleMemberPickerPropertyValueEditor" /> class.
         /// </summary>
@@ -115,7 +113,6 @@ public class MultipleMemberPickerPropertyEditor : DataEditor, IValueSchemaProvid
             ICoreScopeProvider coreScopeProvider)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
-            _jsonSerializer = jsonSerializer;
             Validators.Add(new TypedValidatorRunner<List<string>, MemberPickerConfigurationBase>(
                 new MinMaxValidator(localizedTextService),
                 new MultipleMemberTypeFilterValidator(localizedTextService, memberService, coreScopeProvider)));
@@ -124,7 +121,7 @@ public class MultipleMemberPickerPropertyEditor : DataEditor, IValueSchemaProvid
         /// <inheritdoc/>
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
         {
-            foreach (Guid key in Deserialize(_jsonSerializer, value))
+            foreach (Guid key in Deserialize(value))
             {
                 yield return new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Member, key));
             }
@@ -136,17 +133,16 @@ public class MultipleMemberPickerPropertyEditor : DataEditor, IValueSchemaProvid
             var value = property.GetValue(culture, segment);
             return value is null
                 ? base.ToEditor(property, culture, segment)
-                : Deserialize(_jsonSerializer, value).Select(key => key.ToString()).ToArray();
+                : Deserialize(value).Select(key => key.ToString()).ToArray();
         }
 
         /// <summary>
         ///     Deserializes the provided value into the keys of the picked members.
         /// </summary>
-        /// <param name="jsonSerializer">The JSON serializer.</param>
         /// <param name="value">The stored value.</param>
         /// <returns>The keys of the picked members.</returns>
-        internal static IEnumerable<Guid> Deserialize(IJsonSerializer jsonSerializer, object? value)
-            => EntityPickerValueParser.ParseKeys(value, Constants.UdiEntityType.Member, jsonSerializer);
+        internal static IEnumerable<Guid> Deserialize(object? value)
+            => EntityPickerValueParser.ParseKeys(value, Constants.UdiEntityType.Member);
     }
 
     /// <summary>

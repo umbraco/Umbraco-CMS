@@ -67,8 +67,6 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
     /// </summary>
     internal sealed class ContentPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
-        private readonly IJsonSerializer _jsonSerializer;
-
         /// <summary>
         ///     Initializes a new instance of the <see cref="ContentPickerPropertyValueEditor" /> class.
         /// </summary>
@@ -89,14 +87,13 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
             ILocalizedTextService localizedTextService)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
-            _jsonSerializer = jsonSerializer;
             Validators.Add(new TypedValidatorRunner<string, ContentPickerConfiguration>(
                 new AllowedTypeValidator(localizedTextService, contentService, coreScopeProvider)));
         }
 
         /// <inheritdoc />
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
-            => EntityPickerValueParser.ParseKeys(value, Constants.UdiEntityType.Document, _jsonSerializer)
+            => EntityPickerValueParser.ParseKeys(value, Constants.UdiEntityType.Document)
                 .Select(key => new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Document, key)));
 
         /// <inheritdoc />
@@ -129,7 +126,7 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
             }
 
             // A value holding several documents presents the first, as this editor holds one.
-            return EntityPickerValueParser.ParseKeys(stringValue, Constants.UdiEntityType.Document, _jsonSerializer)
+            return EntityPickerValueParser.ParseKeys(stringValue, Constants.UdiEntityType.Document)
                 .Cast<Guid?>()
                 .FirstOrDefault();
         }
