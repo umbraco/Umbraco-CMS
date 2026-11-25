@@ -3,7 +3,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.Migrations;
 
 /// <summary>
-/// Represents a migration plan.
+///     Represents a migration plan.
 /// </summary>
 public class MigrationPlan
 {
@@ -12,7 +12,7 @@ public class MigrationPlan
     private string? _prevState;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MigrationPlan" /> class.
+    ///     Initializes a new instance of the <see cref="MigrationPlan" /> class.
     /// </summary>
     /// <param name="name">The name of the plan.</param>
     public MigrationPlan(string name)
@@ -23,49 +23,34 @@ public class MigrationPlan
     }
 
     /// <summary>
-    /// If set to true the plan executor will ignore any current state persisted and
-    /// run the plan from its initial state to its end state.
+    ///     If set to true the plan executor will ignore any current state persisted and
+    ///     run the plan from its initial state to its end state.
     /// </summary>
-    /// <value>
-    ///   <c>true</c> if the current state should be ignored; otherwise, <c>false</c>.
-    /// </value>
     public virtual bool IgnoreCurrentState { get; } = false;
 
     /// <summary>
-    /// Gets the transitions.
+    ///     Gets the transitions.
     /// </summary>
-    /// <value>
-    /// The transitions.
-    /// </value>
     public IReadOnlyDictionary<string, Transition?> Transitions => _transitions;
 
     /// <summary>
-    /// Gets the name of the plan.
+    ///     Gets the name of the plan.
     /// </summary>
-    /// <value>
-    /// The name.
-    /// </value>
     public string Name { get; }
 
     /// <summary>
-    /// Gets the initial state.
+    ///     Gets the initial state.
     /// </summary>
-    /// <value>
-    /// The initial state.
-    /// </value>
     /// <remarks>
-    /// The initial state is the state when the plan has never
-    /// run. By default, it is the empty string, but plans may override
-    /// it if they have other ways of determining where to start from.
+    ///     The initial state is the state when the plan has never
+    ///     run. By default, it is the empty string, but plans may override
+    ///     it if they have other ways of determining where to start from.
     /// </remarks>
     public virtual string InitialState => string.Empty;
 
     /// <summary>
-    /// Gets the final state.
+    ///     Gets the final state.
     /// </summary>
-    /// <value>
-    /// The final state.
-    /// </value>
     public string FinalState
     {
         get
@@ -82,7 +67,7 @@ public class MigrationPlan
     }
 
     /// <summary>
-    /// Adds a transition to the specified target state using an empty (no-operation) migration.
+    ///     Adds a transition to the specified target state using an empty (no-operation) migration.
     /// </summary>
     /// <param name="targetState">The target state to transition to.</param>
     /// <returns>
@@ -184,7 +169,7 @@ public class MigrationPlan
         => To(targetState, typeof(TMigration));
 
     /// <summary>
-    /// Adds a transition to a target state through a migration.
+    ///     Adds a transition to a target state through a migration.
     /// </summary>
     /// <param name="targetState">The target state to transition to.</param>
     /// <param name="migration">The type of migration to apply during the transition. This should be a <see cref="Type" /> derived from <c>MigrationBase</c>, or <c>null</c> for no migration.</param>
@@ -206,7 +191,7 @@ public class MigrationPlan
         => Add(_prevState, targetState.ToString(), migration);
 
     /// <summary>
-    /// Specifies the starting state for the migration plan, which determines where migrations begin execution.
+    ///     Specifies the starting state for the migration plan, which determines where migrations begin execution.
     /// </summary>
     /// <param name="sourceState">The starting state to set for the migration plan.</param>
     /// <returns>
@@ -220,12 +205,14 @@ public class MigrationPlan
     }
 
     /// <summary>
-    /// Adds a transition to a new target state through a migration, replacing a previous migration with a recovery migration for the old state.
+    ///     Adds a transition to a new target state through a migration, replacing a previous migration with a recovery migration for the old state.
     /// </summary>
     /// <typeparam name="TMigrationNew">The migration to apply for the new target state.</typeparam>
     /// <typeparam name="TMigrationRecover">The migration to use to recover from the previous target state.</typeparam>
-    /// <param name="recoverState">The previous target state that should be recovered from using
-    /// <typeparamref name="TMigrationRecover" /> before transitioning to the new target state.</param>
+    /// <param name="recoverState">
+    ///     The previous target state that should be recovered from using
+    ///     <typeparamref name="TMigrationRecover" /> before transitioning to the new target state.
+    /// </param>
     /// <param name="targetState">The new target state to transition to.</param>
     /// <returns>
     /// The current <see cref="MigrationPlan" /> instance, allowing for method chaining.
@@ -241,7 +228,7 @@ public class MigrationPlan
     }
 
     /// <summary>
-    /// Adds a transition to a new target state using the specified migration, replacing a previous migration for the given state.
+    ///     Adds a transition to a new target state using the specified migration, replacing a previous migration for the given state.
     /// </summary>
     /// <typeparam name="TMigrationNew">The migration to apply to reach the new target state.</typeparam>
     /// <param name="recoverState">The previous target state that can be recovered from directly.</param>
@@ -259,7 +246,7 @@ public class MigrationPlan
     }
 
     /// <summary>
-    /// Adds transitions to a <paramref name="targetState" /> by cloning the transition chain from <paramref name="startState" /> up to (but not including) <paramref name="endState" />.
+    ///     Adds transitions to a <paramref name="targetState"/> by cloning the transition chain from <paramref name="startState"/> up to (but not including) <paramref name="endState"/>.
     /// </summary>
     /// <param name="startState">The initial state from which the transition chain will be cloned.</param>
     /// <param name="endState">The state at which to stop cloning transitions (exclusive).</param>
@@ -310,7 +297,7 @@ public class MigrationPlan
     }
 
     /// <summary>
-    /// Creates a random, unique state as a string in GUID format.
+    ///     Creates a random, unique state as a string in GUID format.
     /// </summary>
     /// <returns>
     /// A string containing a randomly generated, unique GUID in braces and uppercase.
@@ -319,7 +306,7 @@ public class MigrationPlan
         => Guid.NewGuid().ToString("B").ToUpper();
 
     /// <summary>
-    /// Initiates the process of merging multiple migration branches into a single branch within the migration plan.
+    ///     Initiates the process of merging multiple migration branches into a single branch within the migration plan.
     /// </summary>
     /// <returns>
     /// A <see cref="MergeBuilder" /> instance used to configure and define the merge operation.
@@ -327,7 +314,7 @@ public class MigrationPlan
     public MergeBuilder Merge() => new(this);
 
     /// <summary>
-    /// Validates the plan.
+    ///     Validates the plan.
     /// </summary>
     public void Validate()
     {
@@ -395,14 +382,14 @@ public class MigrationPlan
     public bool IsKnownState(string state) => _transitions.ContainsKey(state);
 
     /// <summary>
-    /// Throws an exception when the specified initial state is unknown to the migration plan.
+    ///     Throws an exception when the specified initial state is unknown to the migration plan.
     /// </summary>
     /// <param name="state">The initial state value that is not recognized by the migration plan.</param>
     public virtual void ThrowOnUnknownInitialState(string state) =>
         throw new InvalidOperationException($"The migration plan \"{Name}\" does not support migrating from state \"{state}\".");
 
     /// <summary>
-    /// Follows a path (for tests and debugging).
+    ///     Follows a path (for tests and debugging).
     /// </summary>
     /// <param name="fromState">From state.</param>
     /// <param name="toState">To state.</param>
@@ -455,12 +442,12 @@ public class MigrationPlan
     }
 
     /// <summary>
-    /// Represents a plan transition.
+    ///     Represents a plan transition.
     /// </summary>
     public class Transition
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Transition" /> class.
+        ///     Initializes a new instance of the <see cref="Transition" /> class.
         /// </summary>
         /// <param name="sourceState">The source state of the transition.</param>
         /// <param name="targetState">The target state of the transition.</param>
@@ -473,27 +460,18 @@ public class MigrationPlan
         }
 
         /// <summary>
-        /// Gets the source state.
+        ///     Gets the source state.
         /// </summary>
-        /// <value>
-        /// The state of the source.
-        /// </value>
         public string SourceState { get; }
 
         /// <summary>
-        /// Gets the target state.
+        ///     Gets the target state.
         /// </summary>
-        /// <value>
-        /// The state of the target.
-        /// </value>
         public string TargetState { get; }
 
         /// <summary>
-        /// Gets the migration type.
+        ///     Gets the migration type.
         /// </summary>
-        /// <value>
-        /// The type of the migration.
-        /// </value>
         public Type MigrationType { get; }
 
         /// <inheritdoc />
