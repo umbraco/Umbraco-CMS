@@ -599,9 +599,36 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
 
     [TestCase("""[{"value":"a"}]""")]
     [TestCase("""[{"value":"a","label":""}]""")]
+    [TestCase("""[{"value":"","label":""}]""")]
     public async Task Cannot_Save_Value_List_With_Option_Without_Label(string itemsJson)
     {
         var dataType = CreateValueListDataType(itemsJson);
+
+        var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DataTypeOperationStatus.InvalidConfiguration, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Save_Value_List_With_Blank_Value_Option()
+    {
+        var dataType = CreateValueListDataType("""[{"value":"","label":"None"},{"value":"a","label":"A"}]""");
+
+        var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        IDataType? actual = await DataTypeService.GetAsync(dataType.Key);
+        var configuration = actual!.ConfigurationObject as ValueListConfiguration;
+        Assert.IsNotNull(configuration);
+        Assert.AreEqual(2, configuration!.Items.Count);
+        Assert.AreEqual(string.Empty, configuration.Items[0].Value);
+    }
+
+    [Test]
+    public async Task Cannot_Save_Value_List_With_Duplicate_Blank_Values()
+    {
+        var dataType = CreateValueListDataType("""[{"value":"","label":"None"},{"value":"","label":"Nothing"}]""");
 
         var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
 

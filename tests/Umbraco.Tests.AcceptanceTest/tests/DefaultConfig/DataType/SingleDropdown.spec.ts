@@ -104,20 +104,19 @@ test('cannot save an option without a label', async ({umbracoApi, umbracoUi}) =>
   expect(await umbracoApi.dataType.doesDataTypeHaveOption(customDataTypeName, 'Test option')).toBeFalsy();
 });
 
-test('cannot save an option without a value', async ({umbracoApi, umbracoUi}) => {
+test('can save an option with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createSingleDropdownDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
   await umbracoUi.dataType.clickAddOptionButton();
-  await umbracoUi.dataType.enterOptionLabel('Test option');
+  await umbracoUi.dataType.enterOptionLabel('None');
   await umbracoUi.dataType.enterOptionValue('');
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.doesOptionFieldShowError(0, 'value');
-  expect(await umbracoApi.dataType.doesDataTypeHaveOption(customDataTypeName, 'Test option')).toBeFalsy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveOption(customDataTypeName, '', 'None')).toBeTruthy();
 });
 
 test('cannot save two options with the same value', async ({umbracoApi, umbracoUi}) => {
@@ -128,6 +127,23 @@ test('cannot save two options with the same value', async ({umbracoApi, umbracoU
   // Act
   await umbracoUi.dataType.clickAddOptionButton();
   await umbracoUi.dataType.enterOptionLabel('Test option');
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isValidationMessageVisible(ConstantHelper.validationMessages.valueNotUnique);
+  const dataType = await umbracoApi.dataType.getByName(customDataTypeName);
+  expect(dataType.values.find(item => item.alias === 'items').value).toHaveLength(1);
+});
+
+test('cannot save two options with an empty value', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.dataType.createSingleDropdownDataType(customDataTypeName, [{value: '', label: 'None'}]);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.clickAddOptionButton();
+  await umbracoUi.dataType.enterOptionLabel('Empty');
+  await umbracoUi.dataType.enterOptionValue('');
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert

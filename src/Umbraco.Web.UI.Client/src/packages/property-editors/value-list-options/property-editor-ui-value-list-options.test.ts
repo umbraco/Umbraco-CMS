@@ -37,9 +37,15 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 		await getRows().at(-1)!.updateComplete;
 	}
 
-	async function leave(row: UmbInputValueListOptionElement) {
-		getField(row, 'value').dispatchEvent(new FocusEvent('focusout', { bubbles: true, composed: true }));
+	async function leave(row: UmbInputValueListOptionElement, field: 'value' | 'label' = 'value') {
+		getField(row, field).dispatchEvent(new FocusEvent('focusout', { bubbles: true, composed: true }));
 		await row.updateComplete;
+	}
+
+	async function getFieldMessage(row: UmbInputValueListOptionElement, field: 'value' | 'label') {
+		const wrapper = getField(row, field).closest('umb-form-validation-message')!;
+		await wrapper.updateComplete;
+		return wrapper.shadowRoot!.textContent!.trim();
 	}
 
 	async function type(row: UmbInputValueListOptionElement, field: 'value' | 'label', text: string) {
@@ -103,39 +109,46 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 		]);
 	});
 
-	it('shows the message of each empty field below that field', async () => {
+	it('shows the message of a missing label below the label, and none below an empty value', async () => {
 		await setValue([{ value: '', label: '' }]);
 		const row = getRows()[0];
 
-		for (const field of ['label', 'value'] as const) {
-			getField(row, field).dispatchEvent(new FocusEvent('focusout', { bubbles: true, composed: true }));
-		}
-		await row.updateComplete;
+		await leave(row, 'label');
+		await leave(row, 'value');
 
-		const wrappers = Array.from(row.shadowRoot!.querySelectorAll('umb-form-validation-message'));
-		expect(wrappers.map((wrapper) => wrapper.querySelector('uui-input')!.className)).to.deep.equal(['label', 'value']);
-		for (const wrapper of wrappers) {
-			await wrapper.updateComplete;
-			expect(wrapper.shadowRoot!.textContent!.trim()).to.not.equal('');
+		expect(await getFieldMessage(row, 'label')).to.not.equal('');
+		expect(await getFieldMessage(row, 'value')).to.equal('');
+	});
+
+	it('is valid when every option has a label, even with an empty value, as when saving', async () => {
+		for (const items of [
+			[{ value: 'a', label: 'A' }],
+			[{ value: '', label: 'None' }],
+			[
+				{ value: 'a', label: 'A' },
+				{ value: ' ', label: 'None' },
+			],
+		]) {
+			await setValue(items);
+			expect(getInput().checkValidity(), JSON.stringify(items)).to.be.true;
 		}
 	});
 
-	it('is valid when every option has a label and a value, and invalid, marking the empty fields, when one has not, as when saving', async () => {
-		await setValue([{ value: 'a', label: 'A' }]);
-		expect(getInput().checkValidity()).to.be.true;
-
+	it('is invalid, marking the label, when an option has no label, even with an empty value, as when saving', async () => {
 		await setValue([
 			{ value: 'a', label: 'A' },
+			{ value: 'b', label: '' },
 			{ value: '', label: '' },
 		]);
-		const [filledRow, emptyRow] = getRows();
+		const [filledRow, ...unlabelledRows] = getRows();
 
 		expect(getInput().checkValidity()).to.be.false;
 
-		expect(getField(emptyRow, 'label').validity.valid).to.be.false;
-		expect(getField(emptyRow, 'value').validity.valid).to.be.false;
-		expect(getField(emptyRow, 'label').pristine).to.be.false;
-		expect(getField(emptyRow, 'value').pristine).to.be.false;
+		for (const row of unlabelledRows) {
+			expect(getField(row, 'label').validity.valid).to.be.false;
+			expect(getField(row, 'label').pristine).to.be.false;
+			expect(getField(row, 'value').validity.valid).to.be.true;
+		}
 		expect(getField(filledRow, 'label').validity.valid).to.be.true;
 	});
 
@@ -183,6 +196,20 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 		expect(element.value).to.deep.equal([{ value: 'banana', label: 'banana split' }]);
 	});
 
+	it('never fills in the value of an existing option without a value', async () => {
+		await setValue([
+			{ value: 'a', label: 'A' },
+			{ value: '', label: '' },
+		]);
+
+		await type(getRows()[1], 'label', 'None');
+
+		expect(element.value).to.deep.equal([
+			{ value: 'a', label: 'A' },
+			{ value: '', label: 'None' },
+		]);
+	});
+
 	it('does not fill in the label from the value', async () => {
 		await setValue([{ value: 'a', label: 'A' }]);
 		await add();
@@ -201,13 +228,13 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 		expect(hasUniquenessError()).to.be.true;
 	});
 
-	it('reports empty values as missing, not as duplicates of each other', async () => {
-		await setValue([{ value: '' }, { value: '' }]);
-		const fields = getRows().map((row) => getField(row, 'value'));
-		fields.forEach((field) => field.checkValidity());
+	it('reports blank values as duplicates of each other', async () => {
+		await setValue([
+			{ value: '', label: 'None' },
+			{ value: ' ', label: 'Nothing' },
+		]);
 
-		expect(fields.map((field) => field.validity.valueMissing)).to.deep.equal([true, true]);
-		expect(hasUniquenessError()).to.be.false;
+		expect(hasUniquenessError()).to.be.true;
 	});
 
 	it('shows the uniqueness message in the list once an option is left', async () => {
@@ -238,18 +265,19 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 		expect(changes).to.equal(2);
 	});
 
-	it('marks an added option as invalid once its empty value is left, and valid again when it is filled in', async () => {
-		await setValue([{ value: 'a' }]);
+	it('marks the label of an added option as invalid once it is left empty, and valid again when it is filled in', async () => {
+		await setValue([{ value: 'a', label: 'A' }]);
 		await add();
 		const row = getRows()[1];
-		const field = getField(row, 'value');
+		const field = getField(row, 'label');
 		expect(field.pristine).to.be.true;
 
-		await leave(row);
+		await leave(row, 'label');
 		expect(field.pristine).to.be.false;
 		expect(field.validity.valid).to.be.false;
+		expect(getField(row, 'value').validity.valid).to.be.true;
 
-		await type(row, 'value', 'b');
+		await type(row, 'label', 'B');
 		await field.updateComplete;
 		expect(field.validity.valid).to.be.true;
 	});

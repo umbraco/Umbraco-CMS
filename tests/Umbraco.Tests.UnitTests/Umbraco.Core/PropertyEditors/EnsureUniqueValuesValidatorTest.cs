@@ -88,4 +88,29 @@ public class EnsureUniqueValuesValidatorTest
         => Assert.AreEqual(
             2,
             Validate(DeserializeItems("""[{"value":"one","label":"One"},{"value":"two"},{"value":"three","label":""}]""")).Count());
+
+    [TestCase("""[{"value":"","label":"None"}]""")]
+    [TestCase("""[{"value":"  ","label":"None"}]""")]
+    [TestCase("""[{"value":null,"label":"None"}]""")]
+    public void Allows_Option_With_Blank_Value(string itemsJson)
+        => Assert.AreEqual(0, Validate(DeserializeItems(itemsJson)).Count());
+
+    [TestCase("""[{"value":""}]""")]
+    [TestCase("""[{"value":"","label":""}]""")]
+    [TestCase("""[{"value":"","label":null}]""")]
+    [TestCase("""[{"value":"  ","label":"  "}]""")]
+    public void Rejects_Option_With_Blank_Value_Without_Label(string itemsJson)
+        => Assert.AreEqual(1, Validate(DeserializeItems(itemsJson)).Count());
+
+    [Test]
+    public void Allows_Option_With_Blank_Value_Alongside_Other_Options()
+        => Assert.AreEqual(
+            0,
+            Validate(DeserializeItems("""[{"value":"","label":"None"},{"value":"one","label":"One"}]""")).Count());
+
+    [TestCase("""[{"value":"","label":"None"},{"value":"","label":"Nothing"}]""")]
+    [TestCase("""[{"value":"  ","label":"None"},{"value":"  ","label":"Nothing"}]""")]
+    [TestCase("""[{"value":"","label":"None"},{"value":"  ","label":"Nothing"}]""")]
+    public void Rejects_Duplicate_Blank_Value(string itemsJson)
+        => Assert.AreEqual(1, Validate(DeserializeItems(itemsJson)).Count());
 }

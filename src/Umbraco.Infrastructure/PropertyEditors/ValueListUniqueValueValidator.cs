@@ -64,7 +64,7 @@ public class ValueListUniqueValueValidator : IValueValidator
         }
 
         var duplicateValues = options
-            .Select(option => option.Value)
+            .Select(option => string.IsNullOrWhiteSpace(option.Value) ? string.Empty : option.Value)
             .GroupBy(v => v)
             .Where(group => group.Count() > 1)
             .Select(group => group.First())

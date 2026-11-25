@@ -19,6 +19,7 @@ interface UmbValueListOptionEntry {
 	id: string;
 	value: string;
 	label: string;
+	isNew?: boolean;
 }
 
 // Pressing a button must not blur the field being edited, or an error it then shows can move the button before the click lands.
@@ -99,15 +100,15 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 		const seen = new Set<string>();
 		const duplicates = new Set<string>();
 		for (const { value } of this._entries) {
-			if (value.trim() === '') continue;
-			if (seen.has(value)) duplicates.add(value);
-			seen.add(value);
+			const key = value.trim() === '' ? '' : value;
+			if (seen.has(key)) duplicates.add(key);
+			seen.add(key);
 		}
 		return duplicates;
 	}
 
 	#onAdd() {
-		this._entries = [...this._entries, { id: crypto.randomUUID(), value: '', label: '' }];
+		this._entries = [...this._entries, { id: crypto.randomUUID(), value: '', label: '', isNew: true }];
 		this.#sorter.setModel(this._entries);
 		this.dispatchEvent(new UmbChangeEvent());
 		void this.#focusNewEntry();
@@ -177,6 +178,7 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 					data-sort-entry-id=${entry.id}
 					.value=${entry.value}
 					.label=${entry.label}
+					.isNew=${entry.isNew ?? false}
 					?readonly=${this.readonly}
 					@focusout=${this.#onOptionFocusOut}
 					@change=${(event: Event) => this.#onChange(event, entry.id)}

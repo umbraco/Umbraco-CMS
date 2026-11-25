@@ -29,6 +29,16 @@ internal sealed class MigrateValueListItemsToOptionsTests : MigrateMinMaxToRange
     }
 
     [Test]
+    public async Task Converts_Blank_String_Item_To_Option_With_Blank_Value_And_Label()
+    {
+        var id = await CreateDataTypeWithRawConfig(Constants.PropertyEditors.Aliases.RadioButtonList, """{"items":["a",""]}""");
+
+        await RunMigration<MigrateValueListItemsToOptions>();
+
+        await AssertConfig(id, """{"items":[{"value":"a","label":"a"},{"value":"","label":""}]}""");
+    }
+
+    [Test]
     public async Task Preserves_Other_Keys()
     {
         var id = await CreateDataTypeWithRawConfig(

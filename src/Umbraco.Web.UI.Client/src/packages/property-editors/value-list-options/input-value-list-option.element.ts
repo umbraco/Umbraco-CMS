@@ -1,5 +1,4 @@
 import { css, customElement, html, nothing, property, query } from '@umbraco-cms/backoffice/external/lit';
-import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
@@ -30,19 +29,19 @@ export class UmbInputValueListOptionElement extends UUIFormControlWithBasicsMixi
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
+	/**
+	 * Whether the option has just been added. The value of a new option follows its label until the value is edited.
+	 * @type {boolean}
+	 * @default false
+	 */
+	@property({ type: Boolean, attribute: false })
+	isNew = false;
+
 	@query('uui-input')
 	protected _firstInput?: UUIInputElement;
 
-	// A new option starts without a value, and only a new option takes its value from its label.
-	#isNew = false;
-
 	// The label as it was before the last edit.
 	#previousLabel = '';
-
-	protected override willUpdate(changedProperties: PropertyValues) {
-		super.willUpdate(changedProperties);
-		if (!this.hasUpdated) this.#isNew = this.value === '';
-	}
 
 	#onValueInput(event: UUIInputEvent) {
 		event.stopPropagation();
@@ -63,7 +62,7 @@ export class UmbInputValueListOptionElement extends UUIFormControlWithBasicsMixi
 	#onLabelInput(event: UUIInputEvent) {
 		event.stopPropagation();
 		this.label = (event.currentTarget as UUIInputElement).value as string;
-		if (this.#isNew && (this.value === '' || this.value === this.#previousLabel)) this.value = this.label;
+		if (this.isNew && (this.value === '' || this.value === this.#previousLabel)) this.value = this.label;
 		this.#previousLabel = this.label;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
@@ -122,8 +121,6 @@ export class UmbInputValueListOptionElement extends UUIFormControlWithBasicsMixi
 					placeholder=${this.localize.term('general_value')}
 					.value=${this.value}
 					?readonly=${this.readonly}
-					required
-					required-message=${UMB_VALIDATION_EMPTY_LOCALIZATION_KEY}
 					@input=${this.#onValueInput}
 					@focusout=${this.#onFieldFocusOut}></uui-input>
 			</umb-form-validation-message>
