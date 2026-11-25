@@ -1,10 +1,12 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
@@ -159,6 +161,81 @@ internal sealed class MemberTypeEditingServiceTests : ContentTypeEditingServiceT
             Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.MemberCanViewProperty(propertyType.Alias) == memberCanView));
             Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.MemberCanEditProperty(propertyType.Alias) == memberCanEdit));
         });
+    }
+
+    [Test]
+    public async Task Removing_Composition_Deletes_The_Composition_Property_Data_Of_The_Composing_Members()
+    {
+        var compositionProperty = MemberTypePropertyTypeModel("Composition text", "compositionText");
+        var compositionCreateModel = MemberTypeCreateModel("Composition", "composition", propertyTypes: [compositionProperty]);
+        var composition = (await MemberTypeEditingService.CreateAsync(compositionCreateModel, Constants.Security.SuperUserKey)).Result!;
+        var compositionPropertyTypeIds = composition.PropertyTypes.Select(x => x.Id).ToArray();
+        Composition[] compositions = [new() { Key = composition.Key, CompositionType = CompositionType.Composition }];
+
+        var composingProperty = MemberTypePropertyTypeModel("Composing text", "composingText");
+        var composingCreateModel = MemberTypeCreateModel("Composing", "composing", propertyTypes: [composingProperty]);
+        composingCreateModel.Compositions = compositions;
+        var composingType = (await MemberTypeEditingService.CreateAsync(composingCreateModel, Constants.Security.SuperUserKey)).Result!;
+
+        var otherComposingProperty = MemberTypePropertyTypeModel("Other composing text", "otherComposingText");
+        var otherComposingCreateModel = MemberTypeCreateModel("Other composing", "otherComposing", propertyTypes: [otherComposingProperty]);
+        otherComposingCreateModel.Compositions = compositions;
+        var otherComposingType = (await MemberTypeEditingService.CreateAsync(otherComposingCreateModel, Constants.Security.SuperUserKey)).Result!;
+
+        var memberEditingService = GetRequiredService<IMemberEditingService>();
+        var superUser = (await UserService.GetAsync(Constants.Security.SuperUserKey))!;
+
+        async Task<IMember> CreateMember(IMemberType memberType, string ownAlias, string name)
+        {
+            var username = name.Replace(" ", string.Empty);
+            var createModel = new MemberCreateModel
+            {
+                ContentTypeKey = memberType.Key,
+                Username = username,
+                Email = $"{username}@example.com",
+                Password = "SuperSecret123",
+                IsApproved = true,
+                Variants = [new VariantModel { Name = name }],
+                Properties =
+                [
+                    new PropertyValueModel { Alias = "compositionText", Value = $"{name} compositionText" },
+                    new PropertyValueModel { Alias = ownAlias, Value = $"{name} {ownAlias}" },
+                ],
+            };
+            var result = await memberEditingService.CreateAsync(createModel, superUser);
+            Assert.That(result.Success, Is.True, result.Status.ToString());
+            return result.Result.Content!;
+        }
+
+        var composingMembers = new List<IMember>();
+        for (var i = 0; i < 3; i++)
+        {
+            composingMembers.Add(await CreateMember(composingType, "composingText", $"Composing {i}"));
+        }
+
+        var otherComposingMembers = new List<IMember>();
+        for (var i = 0; i < 2; i++)
+        {
+            otherComposingMembers.Add(await CreateMember(otherComposingType, "otherComposingText", $"Other composing {i}"));
+        }
+
+        List<PropertyDataDto> before = FetchAllPropertyData();
+
+        var updateModel = MemberTypeUpdateModel("Composing", "composing", propertyTypes: [composingProperty]);
+        var updateResult = await MemberTypeEditingService.UpdateAsync(composingType, updateModel, Constants.Security.SuperUserKey);
+        Assert.That(updateResult.Success, Is.True);
+
+        AssertOnlyPropertyDataDeleted(before, compositionPropertyTypeIds, composingMembers.Select(x => x.Id).ToArray());
+        var memberService = GetRequiredService<IMemberService>();
+        foreach (IMember member in composingMembers)
+        {
+            Assert.That(memberService.GetById(member.Id)!.Properties.Contains("compositionText"), Is.False);
+        }
+
+        foreach (IMember member in otherComposingMembers)
+        {
+            Assert.That(memberService.GetById(member.Id)!.GetValue<string>("compositionText"), Is.Not.Empty);
+        }
     }
 
     private MemberTypeCreateModel MemberTypeCreateModel(

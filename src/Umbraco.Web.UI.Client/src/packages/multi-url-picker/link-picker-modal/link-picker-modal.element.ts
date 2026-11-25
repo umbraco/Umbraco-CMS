@@ -187,6 +187,10 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		this.#partialUpdateLink({ name });
 	}
 
+	#shouldAutofillName() {
+		return !this.#userEditedTitle && !this._config.disableNameAutofill;
+	}
+
 	#onLinkTargetInput(event: UUIBooleanInputEvent) {
 		this.#partialUpdateLink({ target: event.target.checked ? '_blank' : undefined });
 	}
@@ -194,9 +198,10 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	#onLinkUrlInput(event: UUIInputEvent) {
 		const url = event.target.value as string;
 		this.#userEditedTitle ??= this.value.link.name !== this.#getTitleFromUrl(this.value.link.url);
+		const title = this.#shouldAutofillName() ? this.#getTitleFromUrl(url) : undefined;
 
 		this.#partialUpdateLink({
-			name: this.#userEditedTitle ? this.value.link.name : (this.#getTitleFromUrl(url) ?? ''),
+			name: this.#userEditedTitle ? this.value.link.name : (title ?? ''),
 			type: 'external',
 			url,
 		});
@@ -268,7 +273,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 		const link = {
 			icon,
-			name: this.#userEditedTitle ? this.value.link.name : name || this.value.link.name,
+			name: this.#shouldAutofillName() ? name || this.value.link.name : this.value.link.name,
 			type: unique ? type : undefined,
 			unique,
 			url: url ?? this.value.link.url,

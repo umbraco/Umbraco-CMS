@@ -129,7 +129,11 @@ export class UmbBlockActionDefaultElement<
 				label=${label}
 				title=${label}
 				@click=${this.#onClick}>
-				${when(this.manifest.meta.icon, (icon) => html`<uui-icon name=${icon}></uui-icon>`)}
+				${when(
+						this.manifest.meta.icon,
+						(icon) => html`<uui-icon name=${icon}></uui-icon>`,
+						() => label,
+					)}
 				${when(this._invalid, () => html`<uui-badge attention color="invalid" label="Invalid">!</uui-badge>`)}
 			</uui-button>
 		`;

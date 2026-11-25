@@ -2,6 +2,7 @@ import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.
 import type {
 	UmbMediaTreeChildrenOfRequestArgs,
 	UmbMediaTreeItemModel,
+	UmbMediaTreeItemsRequestArgs,
 	UmbMediaTreeRootItemsRequestArgs,
 } from '../types.js';
 import { UmbManagementApiMediaTreeDataRequestManager } from './media-tree.server.request-manager.js';
@@ -47,6 +48,14 @@ export class UmbMediaTreeServerDataSource
 
 	async getAncestorsOf(args: UmbTreeAncestorsOfRequestArgs) {
 		const { data, error } = await this.#treeRequestManager.getAncestorsOf(args);
+
+		const mappedData = data?.map((item) => this.#mapItem(item));
+
+		return { data: mappedData, error };
+	}
+
+	async getItems(args: UmbMediaTreeItemsRequestArgs) {
+		const { data, error } = await this.#treeRequestManager.getBatch(args);
 
 		const mappedData = data?.map((item) => this.#mapItem(item));
 

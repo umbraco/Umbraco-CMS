@@ -131,7 +131,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 		return html`
 			${this.#renderTrashState()} ${this.#renderCreateDate()} ${this.#renderUpdateDate()}
 			<div class="general-item">
-				<strong><umb-localize key="content_mediaType">Media Type</umb-localize></strong>
+				<strong><umb-localize key="content_mediatype">Media Type</umb-localize></strong>
 				<uui-ref-node-document-type
 					standalone
 					href=${ifDefined(

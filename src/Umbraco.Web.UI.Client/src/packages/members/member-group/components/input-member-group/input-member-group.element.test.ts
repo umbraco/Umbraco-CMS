@@ -2,14 +2,17 @@ import { resetMockHandlers, useMockHandlers } from '../../../../../../mocks/inde
 import { UMB_EDIT_MEMBER_GROUP_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { manifests as itemRepositoryManifests } from '../../repository/item/manifests.js';
 import { UmbMemberGroupItemStore } from '../../repository/item/member-group-item.store.js';
+import type { UmbMemberGroupItemModel } from '../../types.js';
+import type { UmbMemberGroupPickerModalData } from '../member-group-picker-modal/member-group-picker-modal.token.js';
 import { UmbInputMemberGroupElement } from './input-member-group.element.js';
 import { expect, fixture, html, nextFrame, waitUntil } from '@open-wc/testing';
+import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { MemberGroupItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import { provideTestModalManager } from '@umbraco-cms/internal/test-utils';
 
 const { http, HttpResponse } = window.MockServiceWorker;
 
@@ -31,6 +34,14 @@ const memberGroupItem = (unique: string): MemberGroupItemResponseModel => ({
 
 describe('UmbInputMemberGroupElement', () => {
 	let element: UmbInputMemberGroupElement;
+	let openedWith: Array<UmbMemberGroupPickerModalData>;
+	let submitValue: unknown;
+
+	const openPicker = async () => {
+		element.shadowRoot!.querySelector<HTMLElement>('#btn-add')!.click();
+		await waitUntil(() => openedWith.length === 1, 'the picker modal was opened');
+		return openedWith[0];
+	};
 
 	const refNodes = () => Array.from(element.shadowRoot?.querySelectorAll('uui-ref-node') ?? []);
 
@@ -71,6 +82,23 @@ describe('UmbInputMemberGroupElement', () => {
 		);
 		element = host.querySelector<UmbInputMemberGroupElement>('umb-input-member-group')!;
 		await element.updateComplete;
+
+		openedWith = [];
+		submitValue = undefined;
+		const modalManager = {
+			getHostElement: () => host,
+			open: (_host: unknown, _token: unknown, args: { data: UmbMemberGroupPickerModalData }) => {
+				openedWith.push(args.data);
+				return {
+					onSubmit: () => (submitValue ? Promise.resolve(submitValue) : Promise.reject(new Error('Cancelled'))),
+				};
+			},
+		};
+		new UmbContextProvider(
+			host,
+			UMB_MODAL_MANAGER_CONTEXT,
+			modalManager as unknown as typeof UMB_MODAL_MANAGER_CONTEXT.TYPE,
+		).hostConnected();
 	});
 
 	afterEach(() => {
@@ -117,20 +145,47 @@ describe('UmbInputMemberGroupElement', () => {
 			);
 
 		it('replaces the only item with the one picked, when a single item is allowed', async () => {
-			const opened = provideTestModalManager(element.parentElement!, { selection: ['group-b'] });
+			submitValue = { selection: ['group-b'] };
 			await renderWith(['group-a'], 1);
 			expect(replaceButton(), 'replace button').to.exist;
 
 			replaceButton()!.click();
 			await waitUntil(() => element.selection[0] === 'group-b', 'the item was not changed');
 
-			expect(opened).to.have.lengthOf(1);
+			expect(openedWith).to.have.lengthOf(1);
 			expect(element.selection).to.deep.equal(['group-b']);
 		});
 
 		it('does not offer replace when more than one item is allowed', async () => {
 			await renderWith(['group-a'], 2);
 			expect(replaceButton()).to.be.null;
+		});
+	});
+
+	describe('pickable filters', () => {
+		const memberGroup = (name: string) => ({ unique: name, name }) as UmbMemberGroupItemModel;
+
+		it('prevents member groups rejected by the browse pickable filter from being picked', async () => {
+			element.browsePickableFilter = (item) => item.name !== 'Rejected';
+
+			const { pickableFilter } = await openPicker();
+
+			expect(pickableFilter!(memberGroup('Accepted'))).to.be.true;
+			expect(pickableFilter!(memberGroup('Rejected'))).to.be.false;
+		});
+
+		it('passes the deprecated filter to the picker', async () => {
+			const filter = () => true;
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
+			element.filter = filter;
+
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
+			expect((await openPicker()).filter).to.equal(filter);
+		});
+
+		it('does not pass a filter to the picker when none is set', async () => {
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
+			expect((await openPicker()).filter).to.be.undefined;
 		});
 	});
 });
