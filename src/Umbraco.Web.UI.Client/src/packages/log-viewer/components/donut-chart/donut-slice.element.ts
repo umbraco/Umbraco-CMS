@@ -39,6 +39,14 @@ export class UmbDonutSliceElement extends LitElement {
 	@property()
 	href = '';
 
+	/**
+	 * Accessible name of the slice's link, describing where it leads. Defaults to the slice's name, amount, kind and share.
+	 * Only used when `href` is set.
+	 * @memberof UmbDonutSliceElement
+	 */
+	@property()
+	label = '';
+
 	override willUpdate() {
 		this.dispatchEvent(new CustomEvent('slice-update', { composed: true, bubbles: true }));
 	}
