@@ -30,6 +30,9 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 	@property({ attribute: false })
 	startNode?: UmbMediaPathModel = root;
 
+	@property({ type: Boolean, attribute: 'no-access' })
+	noAccess = false;
+
 	@property({ attribute: false })
 	public set currentMedia(value: UmbMediaPathModel) {
 		if (value !== this._currentMedia) {
@@ -282,7 +285,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 			</div>`;
 		}
 
-		if (this._allowedFolderTypes.length === 0) {
+		if (this.noAccess || this._allowedFolderTypes.length === 0) {
 			return nothing;
 		}
 

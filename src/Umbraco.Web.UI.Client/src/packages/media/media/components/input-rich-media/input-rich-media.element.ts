@@ -25,6 +25,7 @@ import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 
 import '@umbraco-cms/backoffice/imaging';
 import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbClipboardCopyRequestEvent, UmbClipboardPasteRequestEvent } from '@umbraco-cms/backoffice/clipboard';
 
@@ -137,6 +138,9 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
 
+	@state()
+	private _hasMediaRootAccess?: boolean;
+
 	/**
 	 * The clipboard affordances to offer. Supplied by the hosting property editor, because it is the one that owns
 	 * the value on both sides — see the `clipboard-copy-request` and `clipboard-paste-request` events.
@@ -212,6 +216,16 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+			this.observe(
+				context?.hasMediaRootAccess,
+				(hasMediaRootAccess) => {
+					this._hasMediaRootAccess = hasMediaRootAccess;
+				},
+				'umbMediaRootAccessObserver',
+			);
+		});
 
 		this.observe(
 			this.#itemManager.items,
@@ -415,6 +429,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		return html`<umb-dropzone-media
 			id="dropzone"
 			?multiple=${this.multiple}
+			.noAccess=${!this.startNode?.unique && this._hasMediaRootAccess === false}
 			.parentUnique=${this.startNode?.unique ?? null}
 			@change=${this.#onUploadCompleted}></umb-dropzone-media>`;
 	}
