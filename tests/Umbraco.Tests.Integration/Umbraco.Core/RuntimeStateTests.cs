@@ -72,45 +72,24 @@ internal sealed class RuntimeStateTests : UmbracoIntegrationTest
         Assert.AreEqual(RuntimeLevelReason.Run, RuntimeState.Reason);
     }
 
-    [TestCase(MigrationBehavior.None)]
-    [TestCase(MigrationBehavior.IgnoreUnknown)]
-    public void GivenPackageWithoutState_WhenMigrationBehaviorExcludesUpgrade_ThenLevelIsRunAndNothingIsPending(MigrationBehavior migrationBehavior)
+    [TestCase(MigrationBehavior.None, null, false)]
+    [TestCase(MigrationBehavior.None, UnknownState, true)]
+    [TestCase(MigrationBehavior.IgnoreUnknown, null, false)]
+    [TestCase(MigrationBehavior.IgnoreUnknown, UnknownState, false)]
+    [TestCase(MigrationBehavior.Upgrade, null, true)]
+    [TestCase(MigrationBehavior.Upgrade, UnknownState, true)]
+    [TestCase(MigrationBehavior.RollingUpgrade, null, true)]
+    [TestCase(MigrationBehavior.RollingUpgrade, UnknownState, false)]
+    public void GivenPackageNotAtFinalState_ThenMigrationBehaviorDecidesWhetherItIsPending(MigrationBehavior migrationBehavior, string? packageState, bool isPending)
     {
+        SetPackageState(packageState);
         SetMigrationBehavior(migrationBehavior);
 
         RuntimeState.DetermineRuntimeLevel();
 
-        Assert.AreEqual(RuntimeLevel.Run, RuntimeState.Level);
-        Assert.AreEqual(RuntimeLevelReason.Run, RuntimeState.Reason);
-        Assert.IsEmpty(GetPendingPackageMigrations());
-    }
-
-    [TestCase(MigrationBehavior.IgnoreUnknown)]
-    [TestCase(MigrationBehavior.RollingUpgrade)]
-    public void GivenPackageAtUnknownState_WhenMigrationBehaviorIgnoresUnknown_ThenLevelIsRunAndNothingIsPending(MigrationBehavior migrationBehavior)
-    {
-        SetPackageState(UnknownState);
-        SetMigrationBehavior(migrationBehavior);
-
-        RuntimeState.DetermineRuntimeLevel();
-
-        Assert.AreEqual(RuntimeLevel.Run, RuntimeState.Level);
-        Assert.AreEqual(RuntimeLevelReason.Run, RuntimeState.Reason);
-        Assert.IsEmpty(GetPendingPackageMigrations());
-    }
-
-    [TestCase(MigrationBehavior.None)]
-    [TestCase(MigrationBehavior.Upgrade)]
-    public void GivenPackageAtUnknownState_WhenMigrationBehaviorDoesNotIgnoreUnknown_ThenLevelIsUpgrading(MigrationBehavior migrationBehavior)
-    {
-        SetPackageState(UnknownState);
-        SetMigrationBehavior(migrationBehavior);
-
-        RuntimeState.DetermineRuntimeLevel();
-
-        Assert.AreEqual(RuntimeLevel.Upgrading, RuntimeState.Level);
-        Assert.AreEqual(RuntimeLevelReason.UpgradePackageMigrations, RuntimeState.Reason);
-        CollectionAssert.AreEqual(new[] { TestMigrationPlan.TestMigrationPlanName }, GetPendingPackageMigrations());
+        Assert.AreEqual(isPending ? RuntimeLevel.Upgrading : RuntimeLevel.Run, RuntimeState.Level);
+        Assert.AreEqual(isPending ? RuntimeLevelReason.UpgradePackageMigrations : RuntimeLevelReason.Run, RuntimeState.Reason);
+        CollectionAssert.AreEqual(isPending ? new[] { TestMigrationPlan.TestMigrationPlanName } : Array.Empty<string>(), GetPendingPackageMigrations());
     }
 
     [TestCase(MigrationBehavior.None, true, false)]
@@ -148,7 +127,7 @@ internal sealed class RuntimeStateTests : UmbracoIntegrationTest
         VerifyWarnings(logger, Times.Exactly(2));
     }
 
-    private IRuntimeState CreateRuntimeState(MigrationBehavior migrationBehavior, ILogger<global::Umbraco.Cms.Infrastructure.Runtime.RuntimeState> logger)
+    private global::Umbraco.Cms.Infrastructure.Runtime.RuntimeState CreateRuntimeState(MigrationBehavior migrationBehavior, ILogger<global::Umbraco.Cms.Infrastructure.Runtime.RuntimeState> logger)
         => new global::Umbraco.Cms.Infrastructure.Runtime.RuntimeState(
             Services.GetRequiredService<IOptions<GlobalSettings>>(),
             Services.GetRequiredService<IOptions<UnattendedSettings>>(),

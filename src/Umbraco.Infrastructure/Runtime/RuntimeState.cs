@@ -358,6 +358,11 @@ public class RuntimeState : IRuntimeState
         NeedsPackageMigration
     }
 
+    private static string? GetState(IReadOnlyDictionary<string, string?>? keyValues, MigrationPlan plan)
+        => keyValues?.TryGetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name, out var state) ?? false
+            ? state
+            : null;
+
     private UmbracoDatabaseState GetUmbracoDatabaseState(IUmbracoDatabaseFactory databaseFactory)
     {
         try
@@ -465,9 +470,4 @@ public class RuntimeState : IRuntimeState
 
         return _runtimeSettings.Value.MigrationBehavior.ShouldMigrate(plan, CurrentMigrationState, migrationLogger);
     }
-
-    private static string? GetState(IReadOnlyDictionary<string, string?>? keyValues, MigrationPlan plan)
-        => keyValues?.TryGetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name, out var state) ?? false
-            ? state
-            : null;
 }
