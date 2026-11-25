@@ -4,6 +4,7 @@ import { UMB_ELEMENT_WORKSPACE_CONTEXT } from './element-workspace.context-token
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-element-workspace-editor')
@@ -14,6 +15,7 @@ export class UmbElementWorkspaceEditorElement extends UmbLitElement {
 
 	#workspaceContext?: typeof UMB_ELEMENT_WORKSPACE_CONTEXT.TYPE;
 	#variants?: Array<UmbElementVariantOptionModel>;
+	#appCulture?: string;
 	#isForbidden = false;
 
 	@state()
@@ -24,6 +26,18 @@ export class UmbElementWorkspaceEditorElement extends UmbLitElement {
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (appLanguage) => {
+			this.observe(appLanguage?.appLanguageCulture, (appCulture) => {
+				const previousCulture = this.#appCulture;
+				this.#appCulture = appCulture;
+				if (previousCulture === undefined) {
+					// Only the initial app culture affects the routes, later changes do not.
+					this._generateRoutes();
+				}
+			});
+		});
+
 		this.consumeContext(UMB_ELEMENT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#observeVariants();
@@ -66,6 +80,11 @@ export class UmbElementWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	private _generateRoutes() {
+		if (!this.#appCulture) {
+			this._routes = undefined;
+			return;
+		}
+
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
 
@@ -99,11 +118,15 @@ export class UmbElementWorkspaceEditorElement extends UmbLitElement {
 		});
 
 		if (routes.length !== 0 && this.#variants?.length) {
-			// Using first single view as the default route for now (hence the math below):
+			const defaultVariant =
+				this.#variants.find((v) => v.culture === this.#appCulture) ??
+				this.#variants.find((v) => !v.culture) ??
+				this.#variants[0];
+
 			routes.push({
 				path: '',
 				pathMatch: 'full',
-				redirectTo: routes[this.#variants.length * this.#variants.length]?.path,
+				redirectTo: defaultVariant.unique,
 			});
 		}
 
