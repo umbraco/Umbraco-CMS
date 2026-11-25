@@ -35,6 +35,7 @@ public class RuntimeState : IRuntimeState
     private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata = null!;
     private readonly IRuntimeModeValidationService _runtimeModeValidationService = null!;
     private readonly IDatabaseAvailabilityCheck _databaseAvailabilityCheck = null!;
+    private int? _loggedMigrationStateFingerprint;
 
     /// <summary>
     /// Creates and returns the initial <see cref="RuntimeState"/> instance representing the booting state of the application.
@@ -380,14 +381,15 @@ public class RuntimeState : IRuntimeState
 
                 // This could need both an upgrade AND package migrations to execute, so always add any pending package migrations
                 MigrationBehavior migrationBehavior = _runtimeSettings.Value.MigrationBehavior;
+                ILogger? migrationLogger = HasMigrationStateChanged(migrationBehavior, keyValues) ? _logger : null;
                 List<string> packagesRequiringMigration = _packageMigrationState
                     .GetPendingPackageMigrationPlans(keyValues)
-                    .Where(plan => migrationBehavior.ShouldMigrate(plan, GetState(keyValues, plan), _logger))
+                    .Where(plan => migrationBehavior.ShouldMigrate(plan, GetState(keyValues, plan), migrationLogger))
                     .Select(plan => plan.Name)
                     .ToList();
                 _startupState[PendingPackageMigrationsStateKey] = packagesRequiringMigration;
 
-                if (DoesUmbracoRequireUpgrade(keyValues))
+                if (DoesUmbracoRequireUpgrade(keyValues, migrationLogger))
                 {
                     return UmbracoDatabaseState.NeedsUpgrade;
                 }
@@ -412,7 +414,33 @@ public class RuntimeState : IRuntimeState
         }
     }
 
-    private bool DoesUmbracoRequireUpgrade(IReadOnlyDictionary<string, string?>? keyValues)
+    // The runtime level is determined several times during boot. A skipped migration is only reported again when the
+    // inputs that decide it - the configured behavior and the stored migration states - have changed since it was last reported.
+    private bool HasMigrationStateChanged(MigrationBehavior migrationBehavior, IReadOnlyDictionary<string, string?>? keyValues)
+    {
+        var hashCode = default(HashCode);
+        hashCode.Add(migrationBehavior);
+
+        if (keyValues is not null)
+        {
+            foreach (KeyValuePair<string, string?> keyValue in keyValues.OrderBy(x => x.Key, StringComparer.Ordinal))
+            {
+                hashCode.Add(keyValue.Key);
+                hashCode.Add(keyValue.Value);
+            }
+        }
+
+        var fingerprint = hashCode.ToHashCode();
+        if (_loggedMigrationStateFingerprint == fingerprint)
+        {
+            return false;
+        }
+
+        _loggedMigrationStateFingerprint = fingerprint;
+        return true;
+    }
+
+    private bool DoesUmbracoRequireUpgrade(IReadOnlyDictionary<string, string?>? keyValues, ILogger? migrationLogger)
     {
         var plan = new UmbracoPlan(_umbracoVersion);
         var upgrader = new Upgrader(plan);
@@ -435,7 +463,7 @@ public class RuntimeState : IRuntimeState
             return false;
         }
 
-        return _runtimeSettings.Value.MigrationBehavior.ShouldMigrate(plan, CurrentMigrationState, _logger);
+        return _runtimeSettings.Value.MigrationBehavior.ShouldMigrate(plan, CurrentMigrationState, migrationLogger);
     }
 
     private static string? GetState(IReadOnlyDictionary<string, string?>? keyValues, MigrationPlan plan)

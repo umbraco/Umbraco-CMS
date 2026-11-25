@@ -20,7 +20,7 @@ public class RuntimeSettings
     public RuntimeMode Mode { get; set; } = RuntimeMode.BackofficeDevelopment;
 
     /// <summary>
-    /// Gets or sets which migrations the runtime performs at boot when the database is not at the final state of a migration plan.
+    /// Gets or sets how the runtime handles migrations at boot when the database is not at the final state of a migration plan.
     /// </summary>
     /// <remarks>
     /// Read when the runtime level is determined at boot, so a change takes effect on the next restart.

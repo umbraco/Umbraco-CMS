@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
@@ -12,6 +14,8 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Packaging;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -68,12 +72,11 @@ internal sealed class RuntimeStateTests : UmbracoIntegrationTest
         Assert.AreEqual(RuntimeLevelReason.Run, RuntimeState.Reason);
     }
 
-    [TestCase(null)]
-    [TestCase(UnknownState)]
-    public void GivenPackageMigrationsExist_WhenMigrationBehaviorIsNone_ThenLevelIsRunAndNothingIsPending(string? packageState)
+    [TestCase(MigrationBehavior.None)]
+    [TestCase(MigrationBehavior.IgnoreUnknown)]
+    public void GivenPackageWithoutState_WhenMigrationBehaviorExcludesUpgrade_ThenLevelIsRunAndNothingIsPending(MigrationBehavior migrationBehavior)
     {
-        SetPackageState(packageState);
-        SetMigrationBehavior(MigrationBehavior.None);
+        SetMigrationBehavior(migrationBehavior);
 
         RuntimeState.DetermineRuntimeLevel();
 
@@ -82,10 +85,26 @@ internal sealed class RuntimeStateTests : UmbracoIntegrationTest
         Assert.IsEmpty(GetPendingPackageMigrations());
     }
 
-    [Test]
-    public void GivenPackageAtUnknownState_WhenMigrationBehaviorIsUpgrade_ThenLevelIsUpgrading()
+    [TestCase(MigrationBehavior.IgnoreUnknown)]
+    [TestCase(MigrationBehavior.RollingUpgrade)]
+    public void GivenPackageAtUnknownState_WhenMigrationBehaviorIgnoresUnknown_ThenLevelIsRunAndNothingIsPending(MigrationBehavior migrationBehavior)
     {
         SetPackageState(UnknownState);
+        SetMigrationBehavior(migrationBehavior);
+
+        RuntimeState.DetermineRuntimeLevel();
+
+        Assert.AreEqual(RuntimeLevel.Run, RuntimeState.Level);
+        Assert.AreEqual(RuntimeLevelReason.Run, RuntimeState.Reason);
+        Assert.IsEmpty(GetPendingPackageMigrations());
+    }
+
+    [TestCase(MigrationBehavior.None)]
+    [TestCase(MigrationBehavior.Upgrade)]
+    public void GivenPackageAtUnknownState_WhenMigrationBehaviorDoesNotIgnoreUnknown_ThenLevelIsUpgrading(MigrationBehavior migrationBehavior)
+    {
+        SetPackageState(UnknownState);
+        SetMigrationBehavior(migrationBehavior);
 
         RuntimeState.DetermineRuntimeLevel();
 
@@ -94,31 +113,64 @@ internal sealed class RuntimeStateTests : UmbracoIntegrationTest
         CollectionAssert.AreEqual(new[] { TestMigrationPlan.TestMigrationPlanName }, GetPendingPackageMigrations());
     }
 
-    [TestCase(true)]
-    [TestCase(false)]
-    public void GivenCorePlanNotAtFinalState_WhenMigrationBehaviorIsNone_ThenLevelIsRun(bool coreStateIsKnown)
+    [TestCase(MigrationBehavior.None, true, false)]
+    [TestCase(MigrationBehavior.None, false, true)]
+    [TestCase(MigrationBehavior.IgnoreUnknown, true, false)]
+    [TestCase(MigrationBehavior.IgnoreUnknown, false, false)]
+    [TestCase(MigrationBehavior.Upgrade, true, true)]
+    [TestCase(MigrationBehavior.Upgrade, false, true)]
+    [TestCase(MigrationBehavior.RollingUpgrade, true, true)]
+    [TestCase(MigrationBehavior.RollingUpgrade, false, false)]
+    public void GivenCorePlanNotAtFinalState_ThenMigrationBehaviorDecidesWhetherUpgradeIsRequired(MigrationBehavior migrationBehavior, bool coreStateIsKnown, bool upgradeIsRequired)
     {
         SetPackageState(TestMigrationPlan.TestMigrationFinalState.ToString());
         SetCoreState(coreStateIsKnown);
-        SetMigrationBehavior(MigrationBehavior.None);
+        SetMigrationBehavior(migrationBehavior);
 
         RuntimeState.DetermineRuntimeLevel();
 
-        Assert.AreEqual(RuntimeLevel.Run, RuntimeState.Level);
-        Assert.AreEqual(RuntimeLevelReason.Run, RuntimeState.Reason);
+        Assert.AreEqual(upgradeIsRequired ? RuntimeLevelReason.UpgradeMigrations : RuntimeLevelReason.Run, RuntimeState.Reason);
     }
 
-    [TestCase(true)]
-    [TestCase(false)]
-    public void GivenCorePlanNotAtFinalState_WhenMigrationBehaviorIsUpgrade_ThenUpgradeIsRequired(bool coreStateIsKnown)
+    [Test]
+    public void GivenSkippedMigration_WhenRuntimeLevelIsDeterminedRepeatedly_ThenItIsLoggedOnlyWhenTheStateChanges()
     {
-        SetPackageState(TestMigrationPlan.TestMigrationFinalState.ToString());
-        SetCoreState(coreStateIsKnown);
+        SetPackageState(UnknownState);
+        var logger = new Mock<ILogger<global::Umbraco.Cms.Infrastructure.Runtime.RuntimeState>>();
+        IRuntimeState runtimeState = CreateRuntimeState(MigrationBehavior.RollingUpgrade, logger.Object);
 
-        RuntimeState.DetermineRuntimeLevel();
+        runtimeState.DetermineRuntimeLevel();
+        runtimeState.DetermineRuntimeLevel();
+        VerifyWarnings(logger, Times.Once());
 
-        Assert.AreEqual(RuntimeLevelReason.UpgradeMigrations, RuntimeState.Reason);
+        SetPackageState("{00000000-0000-0000-0000-000000000002}");
+        runtimeState.DetermineRuntimeLevel();
+        VerifyWarnings(logger, Times.Exactly(2));
     }
+
+    private IRuntimeState CreateRuntimeState(MigrationBehavior migrationBehavior, ILogger<global::Umbraco.Cms.Infrastructure.Runtime.RuntimeState> logger)
+        => new global::Umbraco.Cms.Infrastructure.Runtime.RuntimeState(
+            Services.GetRequiredService<IOptions<GlobalSettings>>(),
+            Services.GetRequiredService<IOptions<UnattendedSettings>>(),
+            Options.Create(new RuntimeSettings { MigrationBehavior = migrationBehavior }),
+            Services.GetRequiredService<IUmbracoVersion>(),
+            Services.GetRequiredService<IUmbracoDatabaseFactory>(),
+            logger,
+            Services.GetRequiredService<PendingPackageMigrations>(),
+            Services.GetRequiredService<IConflictingRouteService>(),
+            Services.GetServices<IDatabaseProviderMetadata>(),
+            Services.GetRequiredService<IRuntimeModeValidationService>(),
+            Services.GetRequiredService<IDatabaseAvailabilityCheck>());
+
+    private static void VerifyWarnings(Mock<ILogger<global::Umbraco.Cms.Infrastructure.Runtime.RuntimeState>> logger, Times times)
+        => logger.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            times);
 
     private void SetMigrationBehavior(MigrationBehavior migrationBehavior)
         => Services.GetRequiredService<IOptions<RuntimeSettings>>().Value.MigrationBehavior = migrationBehavior;

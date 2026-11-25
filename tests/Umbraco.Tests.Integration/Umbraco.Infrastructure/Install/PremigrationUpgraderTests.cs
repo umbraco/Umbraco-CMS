@@ -28,17 +28,39 @@ internal sealed class PremigrationUpgraderTests : UmbracoIntegrationTest
 
     private IRuntimeState RuntimeState => GetRequiredService<IRuntimeState>();
 
-    [TestCase(true)]
-    [TestCase(false)]
-    public async Task HandleAsync_WhenMigrationBehaviorIsNone_DoesNotRunPremigrations(bool stateIsKnown)
+    [TestCase(MigrationBehavior.None)]
+    [TestCase(MigrationBehavior.IgnoreUnknown)]
+    public async Task HandleAsync_WhenMigrationBehaviorExcludesUpgrade_DoesNotRunPremigrationsBehindFinalState(MigrationBehavior migrationBehavior)
     {
         var plan = new UmbracoPremigrationPlan();
-        var state = stateIsKnown ? plan.Transitions[plan.InitialState]!.TargetState : UnknownState;
+        var state = plan.Transitions[plan.InitialState]!.TargetState;
         Assert.That(state, Is.Not.EqualTo(plan.FinalState));
+
+        await AssertPremigrationsNotRunAsync(migrationBehavior, state);
+    }
+
+    [TestCase(MigrationBehavior.IgnoreUnknown)]
+    [TestCase(MigrationBehavior.RollingUpgrade)]
+    public async Task HandleAsync_WhenMigrationBehaviorIgnoresUnknown_DoesNotRunPremigrationsAtUnknownState(MigrationBehavior migrationBehavior)
+        => await AssertPremigrationsNotRunAsync(migrationBehavior, UnknownState);
+
+    [TestCase(MigrationBehavior.None)]
+    [TestCase(MigrationBehavior.Upgrade)]
+    public async Task HandleAsync_WhenMigrationBehaviorDoesNotIgnoreUnknown_FailsBootAtUnknownState(MigrationBehavior migrationBehavior)
+    {
+        KeyValueService.SetValue(Constants.Conventions.Migrations.UmbracoUpgradePlanPremigrationsKey, UnknownState);
+
+        await CreateUpgrader(migrationBehavior).HandleAsync(new RuntimePremigrationsUpgradeNotification(), CancellationToken.None);
+
+        Assert.That(RuntimeState.Level, Is.EqualTo(RuntimeLevel.BootFailed));
+    }
+
+    private async Task AssertPremigrationsNotRunAsync(MigrationBehavior migrationBehavior, string state)
+    {
         KeyValueService.SetValue(Constants.Conventions.Migrations.UmbracoUpgradePlanPremigrationsKey, state);
 
         var notification = new RuntimePremigrationsUpgradeNotification();
-        await CreateUpgrader(MigrationBehavior.None).HandleAsync(notification, CancellationToken.None);
+        await CreateUpgrader(migrationBehavior).HandleAsync(notification, CancellationToken.None);
 
         Assert.Multiple(() =>
         {

@@ -16,70 +16,90 @@ public class MigrationBehaviorExtensionsTests
 {
     private const string UnknownState = "{00000000-0000-0000-0000-000000000001}";
 
-    [TestCase(null)]
-    [TestCase(UnknownState)]
-    public void Upgrade_Migrates_Any_State_Behind_Final(string? state)
+    [TestCase(MigrationBehavior.Upgrade)]
+    [TestCase(MigrationBehavior.RollingUpgrade)]
+    public void Upgrade_Migrates_Known_State_Behind_Final(MigrationBehavior behavior)
     {
+        var plan = new UmbracoPremigrationPlan();
         var logger = new Mock<ILogger>();
 
-        var result = MigrationBehavior.Upgrade.ShouldMigrate(new UmbracoPremigrationPlan(), state, logger.Object);
-
-        Assert.That(result, Is.True);
+        Assert.That(behavior.ShouldMigrate(plan, KnownStateBehindFinal(plan), logger.Object), Is.True);
         logger.VerifyNoOtherCalls();
     }
 
-    [Test]
-    public void Upgrade_Migrates_Known_State_Behind_Final()
+    [TestCase(MigrationBehavior.Upgrade)]
+    [TestCase(MigrationBehavior.RollingUpgrade)]
+    public void Upgrade_Migrates_Missing_State(MigrationBehavior behavior)
+        => Assert.That(behavior.ShouldMigrate(new UmbracoPremigrationPlan(), null, Mock.Of<ILogger>()), Is.True);
+
+    [TestCase(MigrationBehavior.None)]
+    [TestCase(MigrationBehavior.IgnoreUnknown)]
+    public void Without_Upgrade_Skips_Known_State_With_Warning(MigrationBehavior behavior)
+    {
+        var plan = new UmbracoPremigrationPlan();
+        var logger = new Mock<ILogger>();
+
+        Assert.That(behavior.ShouldMigrate(plan, KnownStateBehindFinal(plan), logger.Object), Is.False);
+        VerifyLoggedOnce(logger, LogLevel.Warning);
+    }
+
+    [TestCase(MigrationBehavior.None)]
+    [TestCase(MigrationBehavior.IgnoreUnknown)]
+    public void Without_Upgrade_Skips_Missing_State_With_Warning(MigrationBehavior behavior)
+    {
+        var logger = new Mock<ILogger>();
+
+        Assert.That(behavior.ShouldMigrate(new UmbracoPremigrationPlan(), null, logger.Object), Is.False);
+        VerifyLoggedOnce(logger, LogLevel.Warning);
+    }
+
+    [TestCase(MigrationBehavior.None)]
+    [TestCase(MigrationBehavior.Upgrade)]
+    public void Without_IgnoreUnknown_Migrates_Unknown_State_So_The_Boot_Fails(MigrationBehavior behavior)
+    {
+        var logger = new Mock<ILogger>();
+
+        Assert.That(behavior.ShouldMigrate(new UmbracoPremigrationPlan(), UnknownState, logger.Object), Is.True);
+        logger.VerifyNoOtherCalls();
+    }
+
+    [TestCase(MigrationBehavior.IgnoreUnknown)]
+    [TestCase(MigrationBehavior.RollingUpgrade)]
+    public void IgnoreUnknown_Skips_Unknown_State_With_Warning(MigrationBehavior behavior)
+    {
+        var logger = new Mock<ILogger>();
+
+        Assert.That(behavior.ShouldMigrate(new UmbracoPremigrationPlan(), UnknownState, logger.Object), Is.False);
+        VerifyLoggedOnce(logger, LogLevel.Warning);
+    }
+
+    [TestCase(MigrationBehavior.None)]
+    [TestCase(MigrationBehavior.RollingUpgrade)]
+    public void Without_Logger_Decides_Without_Logging(MigrationBehavior behavior)
     {
         var plan = new UmbracoPremigrationPlan();
 
-        Assert.That(MigrationBehavior.Upgrade.ShouldMigrate(plan, KnownStateBehindFinal(plan), Mock.Of<ILogger>()), Is.True);
+        Assert.Multiple(() =>
+        {
+            Assert.That(behavior.ShouldMigrate(plan, KnownStateBehindFinal(plan), null), Is.EqualTo(behavior.HasFlag(MigrationBehavior.Upgrade)));
+            Assert.That(behavior.ShouldMigrate(plan, UnknownState, null), Is.EqualTo(behavior.HasFlag(MigrationBehavior.IgnoreUnknown) is false));
+        });
     }
 
-    [Test]
-    public void None_Skips_Known_State_With_Warning()
+    [TestCase(MigrationBehavior.None)]
+    [TestCase(MigrationBehavior.IgnoreUnknown)]
+    public void Without_Upgrade_Skips_Plan_Ignoring_Current_State_With_Warning(MigrationBehavior behavior)
     {
-        var plan = new UmbracoPremigrationPlan();
         var logger = new Mock<ILogger>();
 
-        var result = MigrationBehavior.None.ShouldMigrate(plan, KnownStateBehindFinal(plan), logger.Object);
-
-        Assert.That(result, Is.False);
+        Assert.That(behavior.ShouldMigrate(new IgnoreCurrentStatePlan(), UnknownState, logger.Object), Is.False);
         VerifyLoggedOnce(logger, LogLevel.Warning);
     }
 
-    [Test]
-    public void None_Skips_Missing_State_With_Warning()
-    {
-        var logger = new Mock<ILogger>();
-
-        var result = MigrationBehavior.None.ShouldMigrate(new UmbracoPremigrationPlan(), null, logger.Object);
-
-        Assert.That(result, Is.False);
-        VerifyLoggedOnce(logger, LogLevel.Warning);
-    }
-
-    [Test]
-    public void None_Skips_Unknown_State_With_Error()
-    {
-        var logger = new Mock<ILogger>();
-
-        var result = MigrationBehavior.None.ShouldMigrate(new UmbracoPremigrationPlan(), UnknownState, logger.Object);
-
-        Assert.That(result, Is.False);
-        VerifyLoggedOnce(logger, LogLevel.Error);
-    }
-
-    [Test]
-    public void None_Skips_Unknown_State_With_Warning_When_Plan_Ignores_Current_State()
-    {
-        var logger = new Mock<ILogger>();
-
-        var result = MigrationBehavior.None.ShouldMigrate(new IgnoreCurrentStatePlan(), UnknownState, logger.Object);
-
-        Assert.That(result, Is.False);
-        VerifyLoggedOnce(logger, LogLevel.Warning);
-    }
+    [TestCase(MigrationBehavior.Upgrade)]
+    [TestCase(MigrationBehavior.RollingUpgrade)]
+    public void Upgrade_Migrates_Plan_Ignoring_Current_State(MigrationBehavior behavior)
+        => Assert.That(behavior.ShouldMigrate(new IgnoreCurrentStatePlan(), UnknownState, Mock.Of<ILogger>()), Is.True);
 
     private static string KnownStateBehindFinal(MigrationPlan plan)
         => plan.Transitions[plan.InitialState]!.TargetState;
