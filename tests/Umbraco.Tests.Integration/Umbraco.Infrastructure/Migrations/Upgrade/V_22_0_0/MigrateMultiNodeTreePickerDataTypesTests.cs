@@ -159,10 +159,12 @@ internal sealed class MigrateMultiNodeTreePickerDataTypesTests : UmbracoIntegrat
         });
     }
 
-    [Test]
-    public async Task Leaves_A_Data_Type_With_An_Unknown_Start_Node_Type()
+    [TestCase("""{ "startNode": { "type": "somethingElse" }, "filter": "abc" }""", TestName = "Leaves a data type with an unknown start node type")]
+    [TestCase("not json", TestName = "Leaves a data type with configuration that isn't JSON")]
+    [TestCase("[]", TestName = "Leaves a data type with configuration that is a JSON array")]
+    [TestCase("\"text\"", TestName = "Leaves a data type with configuration that is a JSON string")]
+    public async Task Leaves_A_Data_Type_It_Cannot_Map(string configuration)
     {
-        const string configuration = """{ "startNode": { "type": "somethingElse" }, "filter": "abc" }""";
         var id = await CreateMultiNodeTreePickerDataType(configuration);
 
         await RunMigration();
@@ -171,7 +173,7 @@ internal sealed class MigrateMultiNodeTreePickerDataTypesTests : UmbracoIntegrat
         Assert.Multiple(() =>
         {
             Assert.AreEqual(MultiNodeTreePickerAlias, row.EditorAlias);
-            Assert.That(JsonNode.DeepEquals(JsonNode.Parse(row.Configuration!), JsonNode.Parse(configuration)), Is.True);
+            Assert.AreEqual(configuration, row.Configuration);
         });
     }
 

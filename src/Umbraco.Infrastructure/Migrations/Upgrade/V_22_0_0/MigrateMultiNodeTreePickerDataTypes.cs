@@ -170,6 +170,8 @@ internal sealed class MigrateMultiNodeTreePickerDataTypes : AsyncMigrationBase
         var migrated = new JsonObject();
         JsonNode? startNode = configuration[StartNodeKey];
 
+        // The single pickers have no item limits. Nothing is lost: a minimum only applies once items are picked, so
+        // with a maximum of one it was already met by the one item.
         if (target.Multiple)
         {
             CopyIfPresent(configuration, migrated, ValidationLimitKey, ValidationLimitKey);
