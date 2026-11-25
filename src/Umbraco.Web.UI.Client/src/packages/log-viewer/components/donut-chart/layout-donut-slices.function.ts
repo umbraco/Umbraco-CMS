@@ -18,13 +18,17 @@ export interface UmbDonutSliceLayout {
 
 const MAX_TOTAL_GAP_DEGREES = 60;
 
+const clampToRange = (value: number, min: number, max: number): number =>
+	Number.isFinite(value) ? Math.min(Math.max(value, min), max) : min;
+
 /**
  * Lays out the slices of a donut chart around a full circle.
  *
  * Amounts that are not positive finite numbers are left out. A single drawable slice is a full ring. Otherwise every
  * slice gets at least the minimum sweep, the sweep needed to lift small slices to it is taken from the larger slices in
- * proportion to how far they exceed it, and the sweeps plus the gaps between slices fill exactly 360 degrees. The
- * minimum shrinks so that inflated slices never take more than half of the ring.
+ * proportion to how far they exceed it, and the sweeps plus the gaps between slices fill exactly 360 degrees. With many
+ * slices the gaps shrink to take at most 60 degrees in total, and the minimum shrinks so that slices at the minimum
+ * never take more than half of the remaining ring.
  * @param {ReadonlyArray<number>} amounts - The amount of each slice, in display order.
  * @param {UmbDonutSliceLayoutOptions} options - The minimum sweep and the gap between slices.
  * @returns {Array<UmbDonutSliceLayout>} One entry per drawable slice, in input order.
@@ -60,8 +64,4 @@ export function umbLayoutDonutSlices(
 		startAngle += sweep + gap;
 		return layout;
 	});
-}
-
-function clampToRange(value: number, min: number, max: number) {
-	return Number.isFinite(value) ? Math.min(Math.max(value, min), max) : min;
 }

@@ -1,80 +1,109 @@
 import type { UmbDonutSliceElement } from './donut-slice.element.js';
+import { umbFormatDonutShare } from './format-donut-share.function.js';
+import { umbLayoutDonutSlices } from './layout-donut-slices.function.js';
+import type { UmbDonutSliceLayout } from './layout-donut-slices.function.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
+	classMap,
 	css,
-	html,
-	svg,
 	customElement,
+	html,
+	nothing,
 	property,
 	query,
 	queryAssignedElements,
 	state,
+	styleMap,
+	svg,
 } from '@umbraco-cms/backoffice/external/lit';
-import { clamp } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-interface Circle {
+interface UmbDonutChartSliceData {
+	amount: number;
 	color: string;
 	name: string;
-	percent: number;
-	visualPercent: number;
 	kind: string;
-	number: number;
 	href: string;
+	label: string;
 }
 
-interface CircleWithCommands extends Circle {
-	offset: number;
-	commands: string;
+interface UmbDonutChartSegment extends UmbDonutChartSliceData, UmbDonutSliceLayout {
+	path: string;
 }
-//TODO: maybe move to UI Library
+
+interface UmbDonutChartGeometry {
+	size: number;
+	radius: number;
+	innerRadius: number;
+}
+
+const DEFAULT_SVG_SIZE = 100;
+const DEFAULT_RADIUS = 45;
+const DEFAULT_BORDER_SIZE = 20;
+const SLICE_GAP_DEGREES = 1.5;
+const DETAILS_BOX_OFFSET = 12;
+
+const roundCoordinate = (value: number): number => Math.round(value * 1000) / 1000;
+
+const placeWithin = (anchor: number, length: number, available: number): number => {
+	const after = anchor + DETAILS_BOX_OFFSET;
+	const preferred = after + length <= available ? after : anchor - DETAILS_BOX_OFFSET - length;
+	return Math.min(Math.max(preferred, 0), Math.max(available - length, 0));
+};
+
 /**
- * This is a donut chart component that can be used to display data in a circular way.
- * @class UmbDonutChartElement
- * @augments {UmbLitElement}
+ * A donut chart that shows each slotted `umb-donut-slice` as a share of the total of all slices.
+ * Set the element's width to size the chart; it defaults to 200px.
+ * @element umb-donut-chart
+ * @slot - The `umb-donut-slice` elements to show.
  */
 @customElement('umb-donut-chart')
 export class UmbDonutChartElement extends UmbLitElement {
+	/**
+	 * Converts a percentage of the full circle to degrees.
+	 * @param {number} percent - The percentage of the full circle.
+	 * @returns {number} The angle in degrees.
+	 */
 	static percentToDegrees(percent: number): number {
 		return percent * 3.6;
 	}
 
 	/**
-	 * Minimum visual percentage for rendering a slice.
-	 * Slices below this percentage will be visually expanded to this size to remain visible.
+	 * The default for `minSlicePercent`: the smallest share of the ring, in percent, that a slice with an amount is
+	 * drawn with, so it stays visible and can be hovered.
 	 */
-	static MIN_SLICE_PERCENT = 5;
+	static MIN_SLICE_PERCENT = 1;
 
 	/**
-	 * Circle radius in pixels
+	 * Circle radius in SVG user units (see `svgSize`)
 	 * @memberof UmbDonutChartElement
 	 */
 	@property({ type: Number })
-	radius = 45;
+	radius = DEFAULT_RADIUS;
 
 	/**
-	 * The circle thickness in pixels
+	 * The circle thickness in SVG user units. Clamped to `radius`.
 	 * @memberof UmbDonutChartElement
 	 */
 	@property({ type: Number, attribute: 'border-size' })
-	borderSize = 20;
+	borderSize = DEFAULT_BORDER_SIZE;
 
 	/**
-	 * The size of SVG element in pixels
+	 * The width and height of the SVG viewBox in user units. The rendered size follows the element's width.
 	 * @memberof UmbDonutChartElement
 	 */
 	@property({ type: Number, attribute: 'svg-size' })
-	svgSize = 100;
+	svgSize = DEFAULT_SVG_SIZE;
 
 	/**
-	 * Description of the graph, added for accessibility purposes
+	 * Description of the graph, used as the accessible name of the list of slices
 	 * @memberof UmbDonutChartElement
 	 */
 	@property()
 	description = '';
 
 	/**
-	 * Hides the box that appears oh hover with the details of the slice
+	 * Hides the box that appears on hover or keyboard focus with the details of the slice
 	 * @memberof UmbDonutChartElement
 	 */
 	@property({ type: Boolean })
@@ -87,301 +116,362 @@ export class UmbDonutChartElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: 'show-description' })
 	showDescription = false;
 
+	/**
+	 * The smallest share of the ring, in percent, that a slice with an amount is drawn with. It shrinks when there are
+	 * too many slices for each to get it. Defaults to `UmbDonutChartElement.MIN_SLICE_PERCENT`. The details box and
+	 * accessible names always use the true share.
+	 * @memberof UmbDonutChartElement
+	 */
+	@property({ type: Number, attribute: 'min-slice-percent' })
+	minSlicePercent?: number;
+
 	@queryAssignedElements({ selector: 'umb-donut-slice' })
-	private _slices!: UmbDonutSliceElement[];
+	private _sliceElements!: UmbDonutSliceElement[];
 
 	@query('#container')
 	private _container!: HTMLDivElement;
 
 	@query('#details-box')
-	private _detailsBox!: HTMLDivElement;
+	private _detailsBox?: HTMLDivElement;
 
 	@state()
-	private _circles: CircleWithCommands[] = [];
+	private _activeIndex?: number;
 
-	@state()
-	private _viewBox = 100;
+	#slices: Array<UmbDonutChartSliceData> = [];
+	#slicesChanged = false;
+	#geometry: UmbDonutChartGeometry = {
+		size: DEFAULT_SVG_SIZE,
+		radius: DEFAULT_RADIUS,
+		innerRadius: DEFAULT_RADIUS - DEFAULT_BORDER_SIZE,
+	};
+	#segments: Array<UmbDonutChartSegment> = [];
+	#detailsIndex?: number;
+	#detailsBoxAnchor = { x: 0, y: 0 };
 
-	@state()
-	private _posY = 0;
-
-	@state()
-	private _posX = 0;
-
-	@state()
-	private _detailName = '';
-
-	@state()
-	private _detailAmount = '0';
-
-	@state()
-	private _detailColor = 'black';
-
-	@state()
-	private _totalAmount = 0;
-
-	@state()
-	private _detailKind = '';
-
-	#containerBounds: DOMRect | undefined;
-
-	override firstUpdated() {
-		this.#containerBounds = this._container.getBoundingClientRect();
-	}
-
-	protected override willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
-		if (_changedProperties.has('radius') || _changedProperties.has('borderSize') || _changedProperties.has('svgSize')) {
-			if (this.borderSize > this.radius) {
-				throw new Error('Border size cannot be bigger than radius');
-			}
-
-			this.#printCircles();
-		}
-	}
-
-	#calculatePercentage(partialValue: number) {
-		if (this._totalAmount === 0) return 0;
-		const percent = (100 * partialValue) / this._totalAmount;
-		return clamp(percent, 0, 99);
-	}
-
-	#printCircles(event: Event | null = null) {
-		this._totalAmount = this._slices.reduce((acc, slice) => acc + slice.amount, 0);
-		event?.stopPropagation();
-
-		// First pass: calculate actual percentages
-		const circles = this._slices.map((slice) => {
-			const percent = this.#calculatePercentage(slice.amount);
-			return {
-				percent,
-				visualPercent: percent,
-				number: slice.amount,
-				color: slice.color,
-				name: slice.name,
-				kind: slice.kind,
-				href: slice.href,
-			};
-		});
-
-		// Second pass: apply minimum visual percentage and normalize to 100%
-		const totalActualPercent = circles.reduce((acc, c) => acc + c.percent, 0);
-		if (totalActualPercent > 0) {
-			const smallSlices = circles.filter((c) => c.percent > 0 && c.percent < UmbDonutChartElement.MIN_SLICE_PERCENT);
-
-			// Expand small slices to minimum
-			smallSlices.forEach((c) => {
-				c.visualPercent = UmbDonutChartElement.MIN_SLICE_PERCENT;
-			});
-
-			// Calculate total and normalize to 100%
-			const totalVisualPercent = circles.reduce((acc, c) => acc + c.visualPercent, 0);
-			if (totalVisualPercent > 0 && totalVisualPercent !== 100) {
-				const scale = 100 / totalVisualPercent;
-				circles.forEach((c) => {
-					c.visualPercent = c.visualPercent * scale;
-				});
-			}
-		}
-
-		this._circles = this.#addCommands(circles);
-	}
-
-	#addCommands(Circles: Circle[]): CircleWithCommands[] {
-		let previousPercent = 0;
-		return Circles.map((slice) => {
-			const sliceWithCommands: CircleWithCommands = {
-				...slice,
-				commands: this.#getSliceCommands(slice, this.radius, this.svgSize, this.borderSize),
-				offset: previousPercent * 3.6 * -1,
-			};
-			previousPercent += slice.visualPercent;
-			return sliceWithCommands;
-		});
-	}
-
-	#getSliceCommands(Circle: Circle, radius: number, svgSize: number, borderSize: number): string {
-		const degrees = UmbDonutChartElement.percentToDegrees(Circle.visualPercent);
-		const longPathFlag = degrees > 180 ? 1 : 0;
-		const innerRadius = radius - borderSize;
-
-		const commands: string[] = [];
-		commands.push(`M ${svgSize / 2 + radius} ${svgSize / 2}`);
-		commands.push(`A ${radius} ${radius} 0 ${longPathFlag} 0 ${this.#getCoordFromDegrees(degrees, radius, svgSize)}`);
-		commands.push(`L ${this.#getCoordFromDegrees(degrees, innerRadius, svgSize)}`);
-		commands.push(`A ${innerRadius} ${innerRadius} 0 ${longPathFlag} 1 ${svgSize / 2 + innerRadius} ${svgSize / 2}`);
-		return commands.join(' ');
-	}
-
-	#getCoordFromDegrees(angle: number, radius: number, svgSize: number): string {
-		const x = Math.cos((angle * Math.PI) / 180);
-		const y = Math.sin((angle * Math.PI) / 180);
-		const coordX = x * radius + svgSize / 2;
-		const coordY = y * -radius + svgSize / 2;
-		return [coordX, coordY].join(' ');
-	}
-
-	#calculateDetailsBoxPosition = (event: MouseEvent) => {
-		// Recalculate bounds on each mouse move to handle window resize
-		this.#containerBounds = this._container.getBoundingClientRect();
-		const x = this.#containerBounds ? event.clientX - this.#containerBounds?.left : 0;
-		const y = this.#containerBounds ? event.clientY - this.#containerBounds?.top : 0;
-		this._posX = x + 10;
-		this._posY = y + 10;
+	#onSlicesChange = (event: Event) => {
+		event.stopPropagation();
+		this.#slicesChanged = true;
+		this.requestUpdate();
 	};
 
-	#setDetailsBoxData(event: MouseEvent) {
-		const target = event.target as SVGPathElement;
-		const index = target.dataset.index as unknown as number;
-		const circle = this._circles[index];
-		this._detailName = circle.name;
-		this._detailAmount = this.localize.number(circle.number);
-		this._detailColor = circle.color;
-		this._detailKind = circle.kind;
+	#onPointerOver = (event: PointerEvent) => {
+		this._activeIndex = this.#getSegmentIndex(event.target);
+		this.#setDetailsBoxAnchorFromPointer(event);
+	};
+
+	#onPointerMove = (event: PointerEvent) => {
+		if (this._activeIndex === undefined) return;
+		this.#setDetailsBoxAnchorFromPointer(event);
+		this.#positionDetailsBox();
+	};
+
+	#onPointerLeave = () => {
+		const focused = this.shadowRoot?.activeElement;
+		this._activeIndex = focused?.matches(':focus-visible') ? this.#getSegmentIndex(focused) : undefined;
+		if (this._activeIndex !== undefined) this.#setDetailsBoxAnchorFromSegment(this._activeIndex);
+	};
+
+	#onFocusIn = (event: FocusEvent) => {
+		const target = event.target as Element;
+		if (!target.matches(':focus-visible')) return;
+		this._activeIndex = this.#getSegmentIndex(target);
+		if (this._activeIndex !== undefined) this.#setDetailsBoxAnchorFromSegment(this._activeIndex);
+	};
+
+	#onFocusOut = () => {
+		this._activeIndex = undefined;
+	};
+
+	protected override willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+		super.willUpdate(changedProperties);
+
+		const geometryChanged =
+			changedProperties.has('radius') || changedProperties.has('borderSize') || changedProperties.has('svgSize');
+		if (geometryChanged) {
+			this.#geometry = this.#resolveGeometry();
+		}
+
+		const slicesChanged = this.#slicesChanged;
+		if (slicesChanged) {
+			this.#slicesChanged = false;
+			this.#slices = this._sliceElements.map(({ amount, color, name, kind, href, label }) => ({
+				amount,
+				color,
+				name,
+				kind,
+				href,
+				label,
+			}));
+		}
+
+		if (geometryChanged || slicesChanged || changedProperties.has('minSlicePercent')) {
+			this.#segments = this.#layoutSegments();
+			if (this._activeIndex !== undefined && this._activeIndex >= this.#segments.length) {
+				this._activeIndex = undefined;
+			}
+		}
+
+		if (this._activeIndex !== undefined) {
+			this.#detailsIndex = this._activeIndex;
+		}
 	}
 
-	#showDetailsBox(event: MouseEvent) {
-		if (this.hideDetailBox) return;
-		this.#setDetailsBoxData(event);
-		this._detailsBox.classList.add('show');
+	protected override updated(changedProperties: Map<PropertyKey, unknown>): void {
+		super.updated(changedProperties);
+		if (this._activeIndex !== undefined) {
+			this.#positionDetailsBox();
+		}
 	}
 
-	#hideDetailsBox() {
-		if (this.hideDetailBox) return;
-		this._detailsBox.classList.remove('show');
+	#resolveGeometry(): UmbDonutChartGeometry {
+		const size = this.#positiveOr(this.svgSize, DEFAULT_SVG_SIZE, 'svg-size');
+
+		let radius = this.#positiveOr(this.radius, DEFAULT_RADIUS, 'radius');
+		if (radius > size / 2) {
+			console.warn(`umb-donut-chart: radius (${radius}) does not fit svg-size (${size}). Using ${size / 2}.`);
+			radius = size / 2;
+		}
+
+		let borderSize = this.#positiveOr(this.borderSize, DEFAULT_BORDER_SIZE, 'border-size');
+		if (borderSize > radius) {
+			console.warn(`umb-donut-chart: border-size (${borderSize}) is larger than radius (${radius}). Using ${radius}.`);
+			borderSize = radius;
+		}
+
+		return { size, radius, innerRadius: radius - borderSize };
 	}
 
-	#renderCircles() {
-		return svg`
-				<filter id="erode" x="-20%" y="-20%" width="140%" height="140%" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse" color-interpolation-filters="linearRGB">
-					<feMorphology operator="erode" radius="0.5 0.5" x="0%" y="0%" width="100%" height="100%" in="SourceGraphic" result="morphology"/>
-				</filter>
-				<filter id="filter" x="-20%" y="-20%" width="140%" height="140%" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse" color-interpolation-filters="linearRGB">
-					<feColorMatrix
-						type="matrix"
-						values="1.8 0 0 0 0
-						0 1.8 0 0 0
-						0 0 1.8 0 0
-						0 0 0 500 -20" x="0%" y="0%" width="100%" height="100%" in="merge1" result="colormatrix2"/>
-					<feMorphology operator="erode" radius="0.5 0.5" x="0%" y="0%" width="100%" height="100%" in="colormatrix2" result="morphology2"/>
-					<feFlood flood-color="#ffffff" flood-opacity="0.3" x="0%" y="0%" width="100%" height="100%" result="flood3"/>
-					<feComposite in="flood3" in2="SourceAlpha" operator="in" x="0%" y="0%" width="100%" height="100%" result="composite3"/>
-					<feMorphology operator="erode" radius="1 1" x="0%" y="0%" width="100%" height="100%" in="composite3" result="morphology1"/>
-					<feMerge x="0%" y="0%" width="100%" height="100%" result="merge1">
-						<feMergeNode in="morphology2"/>
-						<feMergeNode in="morphology1"/>
-					</feMerge>
-					<feDropShadow stdDeviation="1 1" in="merge1" dx="0" dy="0" flood-color="#000" flood-opacity="0.8" x="0%" y="0%" width="100%" height="100%" result="dropShadow1"/>
-				</filter>
-				<desc>${this.description}</desc>
-					${this._circles.map((circle, i) => {
-						const content = svg`
-								<path
-								class="circle"
-								data-index="${i}"
-									fill="${circle.color}"
-									role="listitem"
-									d="${circle.commands}"
-									transform="rotate(${circle.offset} ${this._viewBox / 2} ${this._viewBox / 2})">
-								</path>
-								<path
-								data-index="${i}"
-								@mouseenter=${this.#showDetailsBox}
-								@mouseleave=${this.#hideDetailsBox}
-									class="highlight"
-									fill="${circle.color}"
-									role="listitem"
-									d="${circle.commands}"
-									transform="rotate(${circle.offset} ${this._viewBox / 2} ${this._viewBox / 2})">
-								</path>`;
+	#positiveOr(value: number, fallback: number, name: string): number {
+		if (Number.isFinite(value) && value > 0) return value;
+		console.warn(`umb-donut-chart: ${name} must be a positive number, got ${value}. Using ${fallback}.`);
+		return fallback;
+	}
 
-						return circle.href
-							? svg`<a href="${circle.href}" aria-label=${this.localize.term('logViewer_viewLogsLabel', circle.name)}>${content}</a>`
-							: content;
-					})}
+	#layoutSegments(): Array<UmbDonutChartSegment> {
+		const minSlicePercent = this.minSlicePercent ?? UmbDonutChartElement.MIN_SLICE_PERCENT;
+		const layout = umbLayoutDonutSlices(
+			this.#slices.map((slice) => slice.amount),
+			{ minSweep: UmbDonutChartElement.percentToDegrees(minSlicePercent), gap: SLICE_GAP_DEGREES },
+		);
+		return layout.map((slice) => ({ ...this.#slices[slice.index], ...slice, path: this.#getSlicePath(slice) }));
+	}
 
-        `;
+	#getSlicePath({ startAngle, sweep }: UmbDonutSliceLayout): string {
+		if (sweep >= 360) return this.#getRingPath();
+
+		const { radius, innerRadius } = this.#geometry;
+		const endAngle = startAngle + sweep;
+		const largeArc = sweep > 180 ? 1 : 0;
+		return [
+			`M ${this.#getPoint(startAngle, radius)}`,
+			`A ${radius} ${radius} 0 ${largeArc} 1 ${this.#getPoint(endAngle, radius)}`,
+			`L ${this.#getPoint(endAngle, innerRadius)}`,
+			`A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${this.#getPoint(startAngle, innerRadius)}`,
+			'Z',
+		].join(' ');
+	}
+
+	#getRingPath(): string {
+		const { radius, innerRadius } = this.#geometry;
+		const circle = (r: number, sweepFlag: number) =>
+			`M ${this.#getPoint(0, r)} A ${r} ${r} 0 1 ${sweepFlag} ${this.#getPoint(180, r)} A ${r} ${r} 0 1 ${sweepFlag} ${this.#getPoint(0, r)} Z`;
+		return `${circle(radius, 1)} ${circle(innerRadius, 0)}`;
+	}
+
+	#getPoint(angle: number, distance: number): string {
+		const { x, y } = this.#getCoordinates(angle, distance);
+		return `${roundCoordinate(x)} ${roundCoordinate(y)}`;
+	}
+
+	#getCoordinates(angle: number, distance: number) {
+		const center = this.#geometry.size / 2;
+		const radians = (angle * Math.PI) / 180;
+		return { x: center + distance * Math.sin(radians), y: center - distance * Math.cos(radians) };
+	}
+
+	#getSegmentIndex(target: EventTarget | null): number | undefined {
+		const index = target instanceof Element ? target.closest('[data-index]')?.getAttribute('data-index') : null;
+		return index ? Number(index) : undefined;
+	}
+
+	#setDetailsBoxAnchorFromPointer(event: PointerEvent) {
+		const bounds = this._container.getBoundingClientRect();
+		this.#detailsBoxAnchor = { x: event.clientX - bounds.left, y: event.clientY - bounds.top };
+	}
+
+	#setDetailsBoxAnchorFromSegment(index: number) {
+		const segment = this.#segments[index];
+		if (!segment) return;
+		const { size, radius, innerRadius } = this.#geometry;
+		const scale = this._container.clientWidth / size;
+		const { x, y } = this.#getCoordinates(segment.startAngle + segment.sweep / 2, (radius + innerRadius) / 2);
+		this.#detailsBoxAnchor = { x: x * scale, y: y * scale };
+	}
+
+	#positionDetailsBox() {
+		if (!this._detailsBox) return;
+		const { x, y } = this.#detailsBoxAnchor;
+		const left = placeWithin(x, this._detailsBox.offsetWidth, this._container.clientWidth);
+		const top = placeWithin(y, this._detailsBox.offsetHeight, this._container.clientHeight);
+		this._detailsBox.style.translate = `${left}px ${top}px`;
+	}
+
+	#getDetails(segment: UmbDonutChartSegment): string {
+		const amount = [this.localize.number(segment.amount), segment.kind].filter(Boolean).join(' ');
+		return `${amount} (${umbFormatDonutShare(segment.share, this.localize)})`;
+	}
+
+	#getAccessibleName(segment: UmbDonutChartSegment): string {
+		const details = this.#getDetails(segment);
+		return segment.name ? `${segment.name}: ${details}` : details;
+	}
+
+	#renderSegment(segment: UmbDonutChartSegment, index: number) {
+		const name = this.#getAccessibleName(segment);
+		const slice = svg`<path
+			class="slice"
+			fill-rule="evenodd"
+			d=${segment.path}
+			style=${styleMap({ fill: segment.color })}
+			role=${segment.href ? nothing : 'img'}
+			aria-label=${segment.href ? nothing : name}></path>`;
+
+		return svg`<g
+			role="listitem"
+			class=${classMap({ segment: true, active: index === this._activeIndex })}
+			data-index=${index}>
+			${
+				segment.href
+					? svg`<a href=${segment.href} aria-label=${segment.label || name}>
+						${segment.label ? svg`<desc>${name}</desc>` : nothing}${slice}
+					</a>`
+					: slice
+			}
+		</g>`;
+	}
+
+	#renderChart() {
+		const { size } = this.#geometry;
+		if (this.#segments.length === 0) {
+			return html`<svg viewBox="0 0 ${size} ${size}" aria-hidden="true">
+				<path class="track" fill-rule="evenodd" d=${this.#getRingPath()}></path>
+			</svg>`;
+		}
+
+		return html`<svg
+			viewBox="0 0 ${size} ${size}"
+			role="list"
+			aria-label=${this.description || nothing}
+			class=${classMap({ 'has-active': this._activeIndex !== undefined })}
+			@pointerover=${this.#onPointerOver}
+			@pointermove=${this.#onPointerMove}
+			@pointerleave=${this.#onPointerLeave}
+			@focusin=${this.#onFocusIn}
+			@focusout=${this.#onFocusOut}>
+			${this.#segments.map((segment, index) => this.#renderSegment(segment, index))}
+		</svg>`;
+	}
+
+	#renderDetailsBox() {
+		if (this.hideDetailBox) return nothing;
+		const segment = this.#detailsIndex === undefined ? undefined : this.#segments[this.#detailsIndex];
+		return html`<div id="details-box" class=${classMap({ show: this._activeIndex !== undefined })} aria-hidden="true">
+			${segment
+				? html`<div id="details-title">
+							<span class="swatch" style=${styleMap({ background: segment.color })}></span>${segment.name}
+						</div>
+						<div>${this.#getDetails(segment)}</div>`
+				: nothing}
+		</div>`;
 	}
 
 	override render() {
-		return html` <div id="container" @mousemove=${this.#calculateDetailsBoxPosition}>
-				<svg width="100%" height="100%" viewBox="0 0 ${this._viewBox} ${this._viewBox}" role="list">
-					${this.#renderCircles()}
-				</svg>
-				<div
-					id="details-box"
-					style="--pos-y: ${this._posY}px; --pos-x: ${this._posX}px; --umb-donut-detail-color: ${this._detailColor}">
-					<div id="details-title"><uui-icon name="icon-record"></uui-icon>${this._detailName}</div>
-					<span>${this._detailAmount} ${this._detailKind}</span>
-				</div>
-			</div>
-			${this.showDescription && this.description ? html`<p class="description">${this.description}</p>` : ''}
-			<slot @slotchange=${this.#printCircles} @slice-update=${this.#printCircles}></slot>`;
+		return html`<div id="container">${this.#renderChart()}${this.#renderDetailsBox()}</div>
+			${this.showDescription && this.description ? html`<p class="description">${this.description}</p>` : nothing}
+			<slot @slotchange=${this.#onSlicesChange} @slice-update=${this.#onSlicesChange}></slot>`;
 	}
 
 	static override styles = [
 		UmbTextStyles,
 		css`
-			path {
-				pointer-events: visibleFill;
-			}
-			.circle {
-				filter: url(#erode);
-			}
-
-			.highlight {
-				transition: opacity 200ms linear;
-				filter: url(#filter);
-				opacity: 0;
-			}
-
-			.highlight:hover {
-				opacity: 0.5;
+			:host {
+				display: block;
+				width: 200px;
+				max-width: 100%;
 			}
 
 			#container {
 				position: relative;
-				width: 100%;
-				max-width: 200px;
 				aspect-ratio: 1;
 			}
 
+			svg {
+				display: block;
+				width: 100%;
+				height: 100%;
+				overflow: visible;
+			}
+
+			.track {
+				fill: var(--uui-color-border);
+			}
+
+			.segment {
+				transition: opacity 120ms linear;
+			}
+
+			svg.has-active .segment:not(.active) {
+				opacity: 0.7;
+			}
+
+			a {
+				outline: none;
+			}
+
+			a:focus-visible .slice {
+				stroke: var(--uui-color-focus);
+				stroke-width: 2px;
+				vector-effect: non-scaling-stroke;
+			}
+
 			#details-box {
-				background: #ffffffe6;
-				border: 1px solid var(--uui-color-border-standalone);
-				border-radius: var(--uui-border-radius);
-				box-sizing: border-box;
+				position: absolute;
 				top: 0;
 				left: 0;
-				position: absolute;
-				opacity: 0;
-				padding: 0.5em;
-				line-height: 1.5;
+				z-index: 1;
+				box-sizing: border-box;
+				width: max-content;
+				max-width: 100%;
+				padding: var(--uui-size-space-2) var(--uui-size-space-3);
+				background: var(--uui-color-surface);
+				color: var(--uui-color-text);
+				border: 1px solid var(--uui-color-border);
+				border-radius: var(--uui-border-radius);
+				box-shadow: var(--uui-shadow-depth-3);
 				font-size: var(--uui-type-small-size);
-				box-shadow: var(--uui-shadow-depth-1);
-				transform: translate3d(var(--pos-x), var(--pos-y), 0);
-				transition: transform 0.2s cubic-bezier(0.02, 1.23, 0.79, 1.08);
-				transition: opacity 150ms linear;
+				line-height: 1.5;
+				opacity: 0;
 				pointer-events: none;
+				transition: opacity 120ms linear;
 			}
 
 			#details-box.show {
 				opacity: 1;
 			}
 
-			#details-box uui-icon {
-				/* optically correct alignment */
-				color: var(--umb-donut-detail-color);
-				margin-right: 0.2em;
-			}
-
 			#details-title {
-				font-weight: bold;
 				display: flex;
 				align-items: center;
+				gap: var(--uui-size-space-2);
+				font-weight: bold;
 			}
 
-			.slice-number {
-				user-select: none;
+			.swatch {
+				flex: none;
+				width: 0.75em;
+				height: 0.75em;
+				border-radius: 50%;
+				forced-color-adjust: none;
 			}
 
 			.description {
@@ -389,6 +479,13 @@ export class UmbDonutChartElement extends UmbLitElement {
 				font-size: var(--uui-type-small-size);
 				color: var(--uui-color-text-alt);
 				margin: var(--uui-size-space-2) 0 0 0;
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				.segment,
+				#details-box {
+					transition: none;
+				}
 			}
 		`,
 	];

@@ -1,6 +1,7 @@
 import type { UmbLogLevelCounts } from '../../../../../log-viewer/types.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { umbFormatDonutShare } from '../../../../components/donut-chart/format-donut-share.function.js';
+import { classMap, css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
@@ -85,6 +86,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	}
 
 	override render() {
+		const total = this._logLevelKeys.reduce((sum, [, count]) => sum + count, 0);
 		return html`
 			<uui-box id="types" headline=${this.localize.term('logViewer_logTypes')}>
 				<p id="description">
@@ -93,7 +95,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 					</umb-localize>
 				</p>
 				<div id="log-types-container">
-					<umb-donut-chart>
+					<umb-donut-chart .description=${this.localize.term('logViewer_logTypes')}>
 						${repeat(
 							this._logLevelCount,
 							([level]) => level,
@@ -103,6 +105,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 									.amount=${number}
 									.kind=${this.localize.term('logViewer_messagesCount')}
 									.href=${this.#buildSearchUrl(level)}
+									.label=${this.localize.term('logViewer_viewLogsLabel', level)}
 									.color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice>`,
 						)}
 					</umb-donut-chart>
@@ -114,10 +117,9 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 								([level, count]) =>
 									html`<li>
 										<button
-											@click=${(e: Event) => {
-												(e.target as HTMLElement)?.classList.toggle('active');
-												this.#setCountFilter(level);
-											}}>
+											class=${classMap({ active: this._logLevelCountFilter.includes(level) })}
+											aria-pressed=${!this._logLevelCountFilter.includes(level)}
+											@click=${() => this.#setCountFilter(level)}>
 											<uui-icon
 												name="icon-record"
 												style="color: var(--umb-log-viewer-${level.toLowerCase()}-color);"></uui-icon>
@@ -127,7 +129,8 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 													notation: 'compact',
 													minimumFractionDigits: count > 1000 ? 1 : 0,
 													maximumFractionDigits: 2,
-												})})
+												})}
+												· ${umbFormatDonutShare(count / total, this.localize)})
 											</span>
 										</button>
 									</li>`,
@@ -160,8 +163,8 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 			}
 
 			umb-donut-chart {
-				width: 100%;
-				max-width: 200px;
+				width: 200px;
+				max-width: 100%;
 			}
 
 			#legend {
@@ -170,14 +173,10 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 				justify-content: center;
 			}
 
-			@container (min-width: 312px) {
+			@container (min-width: 480px) {
 				#log-types-container {
 					grid-template-columns: auto 1fr;
 					place-items: start;
-				}
-
-				umb-donut-chart {
-					max-width: 200px;
 				}
 
 				#legend {
@@ -199,23 +198,6 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 
 			button.active {
 				text-decoration: line-through;
-			}
-
-			#chart {
-				width: 150px;
-				aspect-ratio: 1;
-				background:
-					radial-gradient(white 40%, transparent 41%),
-					conic-gradient(
-						var(--umb-log-viewer-debug-color) 0% 20%,
-						var(--umb-log-viewer-information-color) 20% 40%,
-						var(--umb-log-viewer-warning-color) 40% 60%,
-						var(--umb-log-viewer-error-color) 60% 80%,
-						var(--umb-log-viewer-fatal-color) 80% 100%
-					);
-				margin: 10px;
-				display: inline-block;
-				border-radius: 50%;
 			}
 
 			ul {
