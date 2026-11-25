@@ -238,42 +238,52 @@ export class UmbDonutChartElement extends UmbLitElement {
 	protected override willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
 		super.willUpdate(changedProperties);
 
-		const geometryChanged =
-			changedProperties.has('radius') || changedProperties.has('borderSize') || changedProperties.has('svgSize');
-		if (geometryChanged) {
-			this.#geometry = this.#resolveGeometry();
-		}
-
-		if (changedProperties.has('minSlicePercent')) {
-			this.#minSlicePercent = this.#resolveMinSlicePercent();
-		}
-
-		const slicesChanged = this.#slicesChanged;
-		if (slicesChanged) {
-			this.#slicesChanged = false;
-			this.#slices = this._sliceElements.map(({ amount, color, name, kind, href, label }) => ({
-				amount,
-				color,
-				name,
-				kind,
-				href,
-				label,
-			}));
-		}
-
-		if (geometryChanged || slicesChanged || changedProperties.has('minSlicePercent')) {
-			this.#segments = this.#layoutSegments();
-			if (this._activeIndex !== undefined && this._activeIndex >= this.#segments.length) {
-				this._activeIndex = undefined;
-			}
-			if (this._focusIndex !== undefined && this._focusIndex >= this.#segments.length) {
-				this._focusIndex = undefined;
-			}
+		if (this.#updateLayoutInputs(changedProperties)) {
+			this.#updateSegments();
 		}
 
 		if (this._activeIndex !== undefined) {
 			this.#detailsIndex = this._activeIndex;
 		}
+	}
+
+	#updateLayoutInputs(changedProperties: Map<PropertyKey, unknown>): boolean {
+		const geometryChanged = ['radius', 'borderSize', 'svgSize'].some((name) => changedProperties.has(name));
+		if (geometryChanged) {
+			this.#geometry = this.#resolveGeometry();
+		}
+
+		const minSlicePercentChanged = changedProperties.has('minSlicePercent');
+		if (minSlicePercentChanged) {
+			this.#minSlicePercent = this.#resolveMinSlicePercent();
+		}
+
+		const slicesChanged = this.#readChangedSlices();
+		return geometryChanged || minSlicePercentChanged || slicesChanged;
+	}
+
+	#readChangedSlices(): boolean {
+		if (!this.#slicesChanged) return false;
+		this.#slicesChanged = false;
+		this.#slices = this._sliceElements.map(({ amount, color, name, kind, href, label }) => ({
+			amount,
+			color,
+			name,
+			kind,
+			href,
+			label,
+		}));
+		return true;
+	}
+
+	#updateSegments(): void {
+		this.#segments = this.#layoutSegments();
+		this._activeIndex = this.#existingSegmentIndex(this._activeIndex);
+		this._focusIndex = this.#existingSegmentIndex(this._focusIndex);
+	}
+
+	#existingSegmentIndex(index: number | undefined): number | undefined {
+		return index !== undefined && index < this.#segments.length ? index : undefined;
 	}
 
 	protected override updated(changedProperties: Map<PropertyKey, unknown>): void {

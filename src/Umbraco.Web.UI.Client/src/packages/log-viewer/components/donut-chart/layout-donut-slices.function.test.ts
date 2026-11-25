@@ -31,6 +31,19 @@ function skewedAmounts(count: number, random: () => number): Array<number> {
 	return Array.from({ length: count }, () => Math.round(10 ** (random() * 6)));
 }
 
+function expectSweepsToFollowAmounts(amounts: Array<number>, layout: Array<UmbDonutSliceLayout>): void {
+	const byAmount = [...layout].sort((a, b) => amounts[a.index] - amounts[b.index]);
+	byAmount.slice(1).forEach((slice, i) => {
+		const previous = byAmount[i];
+		const message = `amounts ${amounts.join(', ')}`;
+		if (amounts[slice.index] === amounts[previous.index]) {
+			expect(slice.sweep, message).to.be.closeTo(previous.sweep, EPSILON);
+		} else {
+			expect(slice.sweep, message).to.be.at.least(previous.sweep - EPSILON);
+		}
+	});
+}
+
 describe('umbLayoutDonutSlices', () => {
 	describe('drawable slices', () => {
 		it('treats negative, NaN and non-finite amounts as zero and does not lay them out', () => {
@@ -118,15 +131,7 @@ describe('umbLayoutDonutSlices', () => {
 			const random = seededRandom(3);
 			for (let run = 0; run < 200; run++) {
 				const amounts = skewedAmounts(2 + Math.floor(random() * 29), random);
-				const layout = umbLayoutDonutSlices(amounts, OPTIONS);
-
-				for (const a of layout) {
-					for (const b of layout) {
-						if (amounts[a.index] > amounts[b.index]) {
-							expect(a.sweep, `amounts ${amounts.join(', ')}`).to.be.at.least(b.sweep - EPSILON);
-						}
-					}
-				}
+				expectSweepsToFollowAmounts(amounts, umbLayoutDonutSlices(amounts, OPTIONS));
 			}
 		});
 
