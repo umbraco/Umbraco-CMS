@@ -100,12 +100,15 @@ internal sealed class MigrateValueListItemsToOptions : AsyncMigrationBase
             migrated++;
         }
 
-        Logger.LogInformation(
-            "Value list options migration complete: migrated {Migrated} of {Total} data type(s) ({Unchanged} unchanged, {Unparseable} could not be parsed).",
-            migrated,
-            dataTypeDtos.Count,
-            unchanged,
-            unparseable);
+        if (Logger.IsEnabled(LogLevel.Information))
+        {
+            Logger.LogInformation(
+                "Value list options migration complete: migrated {Migrated} of {Total} data type(s) ({Unchanged} unchanged, {Unparseable} could not be parsed).",
+                migrated,
+                dataTypeDtos.Count,
+                unchanged,
+                unparseable);
+        }
 
         return Task.CompletedTask;
     }

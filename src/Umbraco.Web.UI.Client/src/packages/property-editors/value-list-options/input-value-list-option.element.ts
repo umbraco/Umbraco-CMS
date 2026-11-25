@@ -141,7 +141,7 @@ export class UmbInputValueListOptionElement extends UUIFormControlWithBasicsMixi
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: grid;

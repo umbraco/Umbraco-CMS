@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 [TestFixture]
 public class ValueListConfigurationTests
 {
-    private static readonly IConfigurationEditorJsonSerializer _serializer =
+    private static readonly SystemTextConfigurationEditorJsonSerializer _serializer =
         new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
     [Test]
@@ -77,7 +77,7 @@ public class ValueListConfigurationTests
             """{"items":[{"value":"a","label":"a"},{"value":"b","label":"B"},{"value":"c"}]}""",
             _serializer.Serialize(configurationEditor.FromDatabase("""{"items":["a",{"value":"b","label":"B"},{"value":"c"}]}""", _serializer)));
 
-    private static IDictionary<string, object> Deserialize(string json)
+    private static Dictionary<string, object> Deserialize(string json)
         => _serializer.Deserialize<Dictionary<string, object>>(json)!;
 
     private static ValueListConfiguration Read(string json)

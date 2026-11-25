@@ -30,10 +30,9 @@ const preventFocusLoss = (event: MouseEvent) => event.preventDefault();
 @customElement('umb-input-value-list-options')
 export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefined | string, typeof UmbLitElement>(
 	UmbLitElement,
-	undefined,
 ) {
-	#sorter = new UmbSorterController<UmbValueListOptionEntry>(this, {
-		getUniqueOfElement: (element) => element.getAttribute('data-sort-entry-id'),
+	readonly #sorter = new UmbSorterController<UmbValueListOptionEntry>(this, {
+		getUniqueOfElement: (element) => element.dataset.sortEntryId,
 		getUniqueOfModel: (entry) => entry.id,
 		identifier: 'Umb.SorterIdentifier.ValueListOptions',
 		itemSelector: '.option',
@@ -116,7 +115,9 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 
 	#onChange(event: Event, id: string) {
 		const { value, label } = event.currentTarget as UmbInputValueListOptionElement;
-		this._entries = this._entries.map((entry) => (entry.id === id ? { ...entry, value: String(value), label } : entry));
+		this._entries = this._entries.map((entry) =>
+			entry.id === id ? { ...entry, value: value as string, label } : entry,
+		);
 		this.#sorter.setModel(this._entries);
 		this.dispatchEvent(new UmbChangeEvent());
 	}
@@ -198,7 +199,7 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			#action {
 				display: block;
