@@ -36,7 +36,7 @@ public class PremigrationUpgrader : INotificationAsyncHandler<RuntimePremigratio
     /// <param name="runtimeState">Represents the current runtime state of the Umbraco application.</param>
     /// <param name="umbracoDatabaseFactory">Factory for creating Umbraco database connections.</param>
     /// <param name="keyValueService">Service for accessing and storing key-value pairs in the database.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
     public PremigrationUpgrader(
         IProfilingLogger profilingLogger,
         DatabaseBuilder databaseBuilder,

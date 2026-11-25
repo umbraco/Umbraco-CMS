@@ -99,7 +99,7 @@ public class RuntimeState : IRuntimeState
     /// <param name="databaseProviderMetadata">A collection of metadata for available database providers.</param>
     /// <param name="runtimeModeValidationService">Service for validating the current runtime mode.</param>
     /// <param name="databaseAvailabilityCheck">Service to check the availability of the database.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
     public RuntimeState(
        IOptions<GlobalSettings> globalSettings,
        IOptions<UnattendedSettings> unattendedSettings,
