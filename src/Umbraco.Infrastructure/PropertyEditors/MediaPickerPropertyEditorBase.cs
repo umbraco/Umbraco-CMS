@@ -339,19 +339,15 @@ public abstract class MediaPickerPropertyEditorBase : DataEditor, IValueSchemaPr
 
             if (!rawJson.DetectIsJson())
             {
-                // Old comma seperated UDI format
-                foreach (var udiStr in rawJson.Split(Constants.CharArrays.Comma))
+                foreach (Guid mediaKey in EntityPickerValueParser.ParseKeys(rawJson, Constants.UdiEntityType.Media))
                 {
-                    if (UdiParser.TryParse(udiStr, out Udi? udi) && udi is GuidUdi guidUdi)
+                    yield return new MediaWithCropsDto
                     {
-                        yield return new MediaWithCropsDto
-                        {
-                            Key = Guid.NewGuid(),
-                            MediaKey = guidUdi.Guid,
-                            Crops = Enumerable.Empty<ImageCropperValue.ImageCropperCrop>(),
-                            FocalPoint = new ImageCropperValue.ImageCropperFocalPoint { Left = 0.5m, Top = 0.5m },
-                        };
-                    }
+                        Key = Guid.NewGuid(),
+                        MediaKey = mediaKey,
+                        Crops = Enumerable.Empty<ImageCropperValue.ImageCropperCrop>(),
+                        FocalPoint = new ImageCropperValue.ImageCropperFocalPoint { Left = 0.5m, Top = 0.5m },
+                    };
                 }
             }
             else

@@ -76,7 +76,6 @@ public class MemberPickerPropertyEditor : DataEditor, IValueSchemaProvider
     internal sealed class MemberPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly IMemberService _memberService;
-
         /// <summary>
         ///     Initializes a new instance of the <see cref="MemberPickerPropertyValueEditor" /> class.
         /// </summary>
@@ -105,16 +104,10 @@ public class MemberPickerPropertyEditor : DataEditor, IValueSchemaProvider
         /// <inheritdoc />
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
-            // the stored value is either an UDI or an integer ID - need to transform this into the corresponding member key
-            var value = base.ToEditor(property, culture, segment);
-            if (value is not string stringValue || stringValue.IsNullOrWhiteSpace())
+            var stringValue = property.GetValue(culture, segment)?.ToString();
+            if (stringValue.IsNullOrWhiteSpace())
             {
-                return value;
-            }
-
-            if (UdiParser.TryParse<GuidUdi>(stringValue, out GuidUdi? guidUdi))
-            {
-                return guidUdi.Guid;
+                return base.ToEditor(property, culture, segment);
             }
 
             if (int.TryParse(stringValue, out int memberId))
@@ -122,7 +115,10 @@ public class MemberPickerPropertyEditor : DataEditor, IValueSchemaProvider
                 return _memberService.GetById(memberId)?.Key;
             }
 
-            return null;
+            // A value holding several members presents the first, as this editor holds one.
+            return EntityPickerValueParser.ParseKeys(stringValue, Constants.UdiEntityType.Member)
+                .Cast<Guid?>()
+                .FirstOrDefault();
         }
 
         /// <inheritdoc />
@@ -136,18 +132,7 @@ public class MemberPickerPropertyEditor : DataEditor, IValueSchemaProvider
 
         /// <inheritdoc />
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
-        {
-            var asString = value is string str ? str : value?.ToString();
-
-            if (string.IsNullOrEmpty(asString))
-            {
-                yield break;
-            }
-
-            if (UdiParser.TryParse(asString, out Udi? udi))
-            {
-                yield return new UmbracoEntityReference(udi);
-            }
-        }
+            => EntityPickerValueParser.ParseKeys(value, Constants.UdiEntityType.Member)
+                .Select(key => new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Member, key)));
     }
 }

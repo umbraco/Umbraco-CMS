@@ -36,6 +36,18 @@ public class MultipleDocumentPickerPropertyValueHandlerTests : ContentTestBase
         Assert.That(keywords, Is.EqualTo(new[] { "7c7ad126-bdbc-46c1-8cc1-c281bf575d97" }).AsCollection);
     }
 
+    [Test]
+    public void PickedDocumentsStoredAsCommaSeparatedUdis_CanBeIndexed()
+    {
+        Content content = CreateContent(
+            "umb://document/7c7ad126bdbc46c18cc1c281bf575d97,umb://document/b9cc8a2e9a024bbeb0ca38e197316517");
+
+        IEnumerable<string>? keywords = IndexedKeywords(content);
+        Assert.That(
+            keywords,
+            Is.EqualTo(new[] { "7c7ad126-bdbc-46c1-8cc1-c281bf575d97", "b9cc8a2e-9a02-4bbe-b0ca-38e197316517" }).AsCollection);
+    }
+
     [TestCase("[]")]
     [TestCase("")]
     public void AnEmptyValue_YieldsNoField(string value)

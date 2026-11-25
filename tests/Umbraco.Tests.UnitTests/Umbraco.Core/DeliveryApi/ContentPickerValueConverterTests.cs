@@ -23,6 +23,54 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
                 CreateVariationContextAccessor()));
 
     [Test]
+    public void ContentPickerValueConverter_ReadsTheFirstDocumentOfAValueHoldingSeveral()
+    {
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.Alias).Returns("test");
+        var first = Guid.NewGuid();
+
+        var result = CreateValueConverter().ConvertSourceToIntermediate(
+            Mock.Of<IPublishedElement>(),
+            publishedPropertyType.Object,
+            $"{new GuidUdi(Constants.UdiEntityType.Media, Guid.NewGuid())},{new GuidUdi(Constants.UdiEntityType.Document, first)},{new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid())}",
+            false);
+
+        Assert.AreEqual(new GuidUdi(Constants.UdiEntityType.Document, first), result);
+    }
+
+    [Test]
+    public void ContentPickerValueConverter_ReadsTheFirstDocumentOfAJsonArrayOfKeys()
+    {
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.Alias).Returns("test");
+        var first = Guid.NewGuid();
+
+        var result = CreateValueConverter().ConvertSourceToIntermediate(
+            Mock.Of<IPublishedElement>(),
+            publishedPropertyType.Object,
+            $"[\"{first}\",\"{Guid.NewGuid()}\"]",
+            false);
+
+        Assert.AreEqual(new GuidUdi(Constants.UdiEntityType.Document, first), result);
+    }
+
+    [Test]
+    public void ContentPickerValueConverter_ReadsTheUdiItStores()
+    {
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.Alias).Returns("test");
+        var udi = new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid());
+
+        var result = CreateValueConverter().ConvertSourceToIntermediate(
+            Mock.Of<IPublishedElement>(),
+            publishedPropertyType.Object,
+            udi.ToString(),
+            false);
+
+        Assert.AreEqual(udi, result);
+    }
+
+    [Test]
     public void ContentPickerValueConverter_BuildsDeliveryApiOutput()
     {
         var publishedPropertyType = new Mock<IPublishedPropertyType>();

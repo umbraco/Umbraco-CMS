@@ -92,8 +92,6 @@ public class MultipleDocumentPickerPropertyEditor : DataEditor, IValueSchemaProv
     /// </summary>
     internal sealed class MultipleDocumentPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
-        private readonly IJsonSerializer _jsonSerializer;
-
         /// <summary>
         ///     Initializes a new instance of the <see cref="MultipleDocumentPickerPropertyValueEditor" /> class.
         /// </summary>
@@ -114,7 +112,6 @@ public class MultipleDocumentPickerPropertyEditor : DataEditor, IValueSchemaProv
             ICoreScopeProvider coreScopeProvider)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
-            _jsonSerializer = jsonSerializer;
             Validators.Add(new TypedValidatorRunner<List<string>, MultipleDocumentPickerConfiguration>(
                 new MinMaxValidator(localizedTextService),
                 new AllowedTypeValidator(localizedTextService, contentService, coreScopeProvider)));
@@ -123,26 +120,28 @@ public class MultipleDocumentPickerPropertyEditor : DataEditor, IValueSchemaProv
         /// <inheritdoc/>
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
         {
-            foreach (Guid key in Deserialize(_jsonSerializer, value))
+            foreach (Guid key in Deserialize(value))
             {
                 yield return new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Document, key));
             }
         }
 
+        /// <inheritdoc/>
+        public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
+        {
+            var value = property.GetValue(culture, segment);
+            return value is null
+                ? base.ToEditor(property, culture, segment)
+                : Deserialize(value).Select(key => key.ToString()).ToArray();
+        }
+
         /// <summary>
         ///     Deserializes the provided value into the keys of the picked documents.
         /// </summary>
-        /// <param name="jsonSerializer">The JSON serializer.</param>
         /// <param name="value">The stored value.</param>
         /// <returns>The keys of the picked documents.</returns>
-        internal static IEnumerable<Guid> Deserialize(IJsonSerializer jsonSerializer, object? value)
-        {
-            var asString = value as string ?? value?.ToString();
-
-            return string.IsNullOrWhiteSpace(asString)
-                ? []
-                : jsonSerializer.Deserialize<IEnumerable<Guid>>(asString) ?? [];
-        }
+        internal static IEnumerable<Guid> Deserialize(object? value)
+            => EntityPickerValueParser.ParseKeys(value, Constants.UdiEntityType.Document);
     }
 
     /// <summary>

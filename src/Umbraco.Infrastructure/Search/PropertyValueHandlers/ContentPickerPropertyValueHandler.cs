@@ -1,8 +1,7 @@
-﻿using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Extensions;
+﻿using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Search.Indexing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 
@@ -18,22 +17,13 @@ internal sealed class ContentPickerPropertyValueHandler : IPropertyValueHandler,
     /// <inheritdoc />
     public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
     {
-        Guid? key = ParsePropertyValue(property, culture, segment, published);
-        return key.HasValue
-            ? [new IndexField(property.Alias, new IndexValue { Keywords = [key.Value.AsKeyword()] }, culture, segment)]
+        // A value holding several documents indexes the first, as this editor holds one.
+        IReadOnlyList<Guid> keys = EntityPickerValueParser.ParseKeys(
+            property.GetValue(culture, segment, published),
+            Umbraco.Cms.Core.Constants.UdiEntityType.Document);
+
+        return keys.Count > 0
+            ? [new IndexField(property.Alias, new IndexValue { Keywords = [keys[0].AsKeyword()] }, culture, segment)]
             : [];
-    }
-
-    private static Guid? ParsePropertyValue(IProperty property, string? culture, string? segment, bool published)
-    {
-        var value = property.GetValue(culture, segment, published) as string;
-        if (value.IsNullOrWhiteSpace()
-            || UdiParser.TryParse(value, out Udi? udi) is false
-            || udi is not GuidUdi guidUdi)
-        {
-            return null;
-        }
-
-        return guidUdi.Guid;
     }
 }

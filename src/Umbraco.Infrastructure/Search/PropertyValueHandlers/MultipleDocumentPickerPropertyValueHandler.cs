@@ -1,8 +1,7 @@
 ﻿using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Search.Indexing;
-using Umbraco.Cms.Core.Serialization;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 
@@ -11,15 +10,6 @@ namespace Umbraco.Cms.Infrastructure.Search.PropertyValueHandlers;
 /// </summary>
 internal sealed class MultipleDocumentPickerPropertyValueHandler : IPropertyValueHandler, ICorePropertyValueHandler
 {
-    private readonly IJsonSerializer _jsonSerializer;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MultipleDocumentPickerPropertyValueHandler"/> class.
-    /// </summary>
-    /// <param name="jsonSerializer">The JSON serializer used to deserialize the picked keys.</param>
-    public MultipleDocumentPickerPropertyValueHandler(IJsonSerializer jsonSerializer)
-        => _jsonSerializer = jsonSerializer;
-
     /// <inheritdoc />
     public bool CanHandle(IPropertyType propertyType)
         => propertyType.PropertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.MultipleDocumentPicker;
@@ -27,18 +17,12 @@ internal sealed class MultipleDocumentPickerPropertyValueHandler : IPropertyValu
     /// <inheritdoc />
     public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
     {
-        var value = property.GetValue(culture, segment, published) as string;
-        if (value.IsNullOrWhiteSpace())
-        {
-            return [];
-        }
+        IReadOnlyList<Guid> keys = EntityPickerValueParser.ParseKeys(
+            property.GetValue(culture, segment, published),
+            Umbraco.Cms.Core.Constants.UdiEntityType.Document);
 
-        Guid[]? keys = _jsonSerializer.Deserialize<Guid[]>(value);
-        if (keys is null || keys.Length == 0)
-        {
-            return [];
-        }
-
-        return [new IndexField(property.Alias, new IndexValue { Keywords = keys.Select(key => key.AsKeyword()).ToArray() }, culture, segment)];
+        return keys.Count > 0
+            ? [new IndexField(property.Alias, new IndexValue { Keywords = keys.Select(key => key.AsKeyword()).ToArray() }, culture, segment)]
+            : [];
     }
 }

@@ -1,6 +1,5 @@
 using System.Globalization;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
@@ -78,6 +77,12 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
         if (attemptConvertUdi.Success)
         {
             return attemptConvertUdi.Result;
+        }
+
+        // Read any format a picker stores. A value holding several documents converts to the first, as this editor holds one.
+        if (EntityPickerValueParser.ParseKeys(source, Constants.UdiEntityType.Document) is [var firstKey, ..])
+        {
+            return new GuidUdi(Constants.UdiEntityType.Document, firstKey);
         }
 
         return null;
