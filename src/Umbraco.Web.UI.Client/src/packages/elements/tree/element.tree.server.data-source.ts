@@ -3,6 +3,7 @@ import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_ROOT_ENTITY_TYPE, UMB_ELEMENT_FOLD
 import type {
 	UmbElementTreeChildrenOfRequestArgs,
 	UmbElementTreeItemModel,
+	UmbElementTreeItemsRequestArgs,
 	UmbElementTreeRootItemsRequestArgs,
 } from '../types.js';
 import { UmbManagementApiElementTreeDataRequestManager } from './element-tree.server.request-manager.js';
@@ -54,12 +55,24 @@ export class UmbElementTreeServerDataSource
 		return { data: mappedData, error };
 	}
 
+	async getItems(args: UmbElementTreeItemsRequestArgs) {
+		const { data, error } = await this.#treeRequestManager.getBatch(args);
+
+		const mappedData = data?.map((item) => this.#mapItem(item));
+
+		return { data: mappedData, error };
+	}
+
 	#mapItem(item: ElementTreeItemResponseModel): UmbElementTreeItemModel {
 		return {
 			unique: item.id,
 			parent: {
 				unique: item.parent ? item.parent.id : null,
-				entityType: item.parent ? UMB_ELEMENT_ENTITY_TYPE : UMB_ELEMENT_ROOT_ENTITY_TYPE,
+				entityType: item.parent
+					? item.parentIsFolder
+						? UMB_ELEMENT_FOLDER_ENTITY_TYPE
+						: UMB_ELEMENT_ENTITY_TYPE
+					: UMB_ELEMENT_ROOT_ENTITY_TYPE,
 			},
 			name: item.name,
 			entityType: item.isFolder ? UMB_ELEMENT_FOLDER_ENTITY_TYPE : UMB_ELEMENT_ENTITY_TYPE,

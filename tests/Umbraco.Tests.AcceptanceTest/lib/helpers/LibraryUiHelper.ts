@@ -8,6 +8,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   private readonly publishBtn: Locator;
   private readonly unpublishBtn: Locator;
   private readonly actionMenuForElementBtn: Locator;
+  private readonly elementSidebarHeader: Locator;
   private readonly textstringTxt: Locator;
   private readonly infoTab: Locator;
   private readonly linkElement: Locator;
@@ -203,7 +204,8 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.elementNameTxt = page.locator('#name-input input');
     this.publishBtn = page.getByLabel(/^Publish(…)?$/);
     this.unpublishBtn = page.getByLabel(/^Unpublish(…)?$/);
-    this.actionMenuForElementBtn = page.locator('#header').getByTestId('open-dropdown');
+    this.elementSidebarHeader = page.locator('[data-mark="section-sidebar-app:Umb.SidebarMenu.Element"]');
+    this.actionMenuForElementBtn = this.elementSidebarHeader.getByTestId('open-dropdown');
     this.textstringTxt = page.locator('umb-property-editor-ui-text-box #input');
     this.reloadChildrenThreeDotsBtn = page.getByRole('button', {name: 'Reload children…'});
     this.elementTree = page.locator('umb-tree[alias="Umb.Tree.Element"]');
@@ -216,7 +218,10 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.dropdown = page.locator('select#native');
     this.splitView = page.locator('#splitViews');
     this.setADateTxt = page.getByLabel('Set a date…');
-    this.chooseMediaPickerBtn = page.locator('umb-property-editor-ui-media-picker #btn-add');
+    // The single and multiple media pickers are separate elements, and a property can be either.
+    this.chooseMediaPickerBtn = page.locator(
+      'umb-property-editor-ui-media-picker #btn-add, umb-property-editor-ui-single-media-picker #btn-add',
+    );
     this.chooseMemberPickerBtn = page.locator('umb-property-editor-ui-member-picker #btn-add');
     this.numericTxt = page.locator('umb-property-editor-ui-number input');
     this.addMultiURLPickerBtn = page.locator('umb-property-editor-ui-multi-url-picker #btn-add');
@@ -288,7 +293,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.duplicateToBtn = page.getByRole('button', {name: 'Duplicate to'});
     this.moveToBtn = page.getByRole('button', {name: 'Move to'});
     this.duplicateBtn = page.getByLabel('Duplicate', {exact: true});
-    this.elementTreeRefreshBtn = page.locator('#header').getByLabel('#actions_refreshNode');
+    this.elementTreeRefreshBtn = page.locator('[data-mark="section-sidebar-app:Umb.SidebarMenu.Element"]').getByLabel('#actions_refreshNode');
     this.sortChildrenBtn = page.getByRole('button', {name: 'Sort children'});
     this.rollbackBtn = page.getByTestId('audit-log-action:Umb.AuditLogAction.Element.Rollback');
     this.rollbackContainerBtn = this.container.getByLabel('Rollback');
@@ -302,7 +307,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.selectErrorPageElement = page.locator('.select-item').filter({hasText: 'Error Page'}).locator('umb-input-element').locator('#button');
     this.rollbackItem = page.locator('.rollback-item');
     this.activeRollbackItem = page.locator('.rollback-item.active');
-    this.actionsMenu = page.locator('uui-scroll-container');
+    this.actionsMenu = page.locator('umb-entity-action-list');
     this.linkToElementBtn = this.linkPickerModal.getByTestId('action:element').locator('#button');
     this.linkToMediaBtn = this.linkPickerModal.getByTestId('action:media').locator('#button');
     this.linkToManualBtn = this.linkPickerModal.getByTestId('action:external').locator('#button');
@@ -410,6 +415,10 @@ export class LibraryUiHelper extends UiBaseLocators {
   async clickSaveAndPublishButton() {
     await this.click(this.saveAndPublishBtn);
     await this.page.waitForTimeout(ConstantHelper.wait.short);
+  }
+
+  async isElementSidebarHeaderVisible(isVisible: boolean = true) {
+    return this.isVisible(this.elementSidebarHeader, isVisible);
   }
 
   async isSuccessStateVisibleForSaveAndPublishButton (isVisible: boolean = true){
@@ -570,8 +579,16 @@ export class LibraryUiHelper extends UiBaseLocators {
     return elementId;
   }
 
+  private async waitForElementToBeUpdated(save: () => Promise<void>) {
+    return await this.waitForWorkspaceToBeSaved(save, ConstantHelper.apiEndpoints.element, ConstantHelper.workspaceActions.elementSave);
+  }
+
+  private async waitForElementToBePublished(publish: () => Promise<void>) {
+    return await this.waitForWorkspaceToBePublished(publish, "element", ConstantHelper.workspaceActions.elementSaveAndPublish);
+  }
+
   async clickSaveModalButtonAndWaitForElementToBeUpdated(){
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickSaveModalButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
+    return await this.waitForElementToBeUpdated(() => this.click(this.saveModalBtn));
   }
 
   async clickSaveAndPublishButtonAndWaitForElementToBeCreated(){
@@ -583,15 +600,15 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForElementToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickSaveButtonForElement(), ConstantHelper.statusCodes.ok);
+    return await this.waitForElementToBeUpdated(() => this.click(this.saveElementBtn));
   }
 
   async clickSaveAndPublishButtonAndWaitForElementToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickSaveAndPublishButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForElementToBePublished(() => this.click(this.saveAndPublishBtn));
   }
 
   async clickSaveAndPublishButtonAndWaitForElementToBePublished() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickSaveAndPublishButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForElementToBePublished(() => this.click(this.saveAndPublishBtn));
   }
 
   private async clickContainerSaveButton() {
@@ -599,11 +616,11 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async clickContainerSaveButtonAndWaitForElementToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickContainerSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForElementToBeUpdated(() => this.clickContainerSaveButton());
   }
 
   async clickContainerSaveAndPublishButtonAndWaitForElementToBePublished() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.element, this.clickContainerSaveAndPublishButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForElementToBePublished(() => this.click(this.containerSaveAndPublishBtn));
   }
 
   async clickElementTypeByName(elementTypeName: string) {
@@ -709,7 +726,8 @@ export class LibraryUiHelper extends UiBaseLocators {
   }
 
   async isElementInTreeVisible(name: string, isVisible: boolean = true) {
-    await this.isVisible(this.elementTreeItem.getByLabel(name, {exact: true}).first(), isVisible);
+    // A collapsed folder keeps its children in the DOM, so a same-named child can precede the item that is shown.
+    await this.isVisible(this.elementTreeItem.getByLabel(name, {exact: true}).filter({visible: true}).first(), isVisible);
   }
 
   async isChildElementInTreeVisible(parentName: string, childName: string, isVisible: boolean = true) {
@@ -1068,6 +1086,10 @@ export class LibraryUiHelper extends UiBaseLocators {
 
   async isElementReadOnly(isVisible: boolean = true) {
     await this.isVisible(this.elementReadOnly, isVisible);
+  }
+
+  async doesElementNameInputHaveValue(name: string) {
+    await expect(this.elementNameTxt).toHaveValue(name, {timeout: ConstantHelper.timeout.long});
   }
 
   async isElementNameInputEditable(isEditable: boolean = true) {

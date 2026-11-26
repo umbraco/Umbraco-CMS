@@ -770,29 +770,6 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    [Obsolete("As this is testing an obsolete method, it will be removed when that the method is deleted. Scheduled for removal in Umbraco 19.")]
-    public void Can_Get_Content_Schedules_By_Ids()
-    {
-        // Arrange
-        var root = ContentService.GetById(Textpage.Id);
-        ContentService.Publish(root!, root!.AvailableCultures.ToArray());
-        var content = ContentService.GetById(Subpage.Id);
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddDays(1), null);
-        ContentService.PersistContentSchedule(content!, contentSchedule);
-        ContentService.Publish(content, content.AvailableCultures.ToArray());
-
-        // Act
-#pragma warning disable CS0618 // Type or member is obsolete
-        var keys = ContentService.GetContentSchedulesByIds([Textpage.Key, Subpage.Key, Subpage2.Key]).ToList();
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        // Assert
-        Assert.AreEqual(1, keys.Count);
-        Assert.AreEqual(keys[0].Key, Subpage.Id);
-        Assert.AreEqual(keys[0].Value.First().Id, contentSchedule.FullSchedule.First().Id);
-    }
-
-    [Test]
     public void Can_Get_Content_Schedules_By_Keys()
     {
         // Arrange
@@ -1374,7 +1351,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsFalse(content.HasIdentity);
 
         // content cannot publish values because they are invalid
-        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, LocalizedTextService, ValueEditorCache, Mock.Of<ICultureDictionary>(), Mock.Of<ILanguageService>(), Mock.Of<IOptions<ContentSettings>>());
+        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, LocalizedTextService, ValueEditorCache, Mock.Of<ICultureDictionary>(), Mock.Of<ILanguageService>(), Mock.Of<IOptions<ContentSettings>>(), GetRequiredService<IIdKeyMap>());
         var isValid = propertyValidationService.IsPropertyDataValid(
             content,
             out var invalidProperties,
@@ -1472,7 +1449,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         while (page * pageSize < total)
         {
             var descendants =
-                ContentService.GetPagedDescendants(parent.Id, page++, pageSize, out total);
+                ContentService.GetPagedDescendants(parent.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
             foreach (var x in descendants)
             {
                 Console.WriteLine("          "[..x.Level] + x.Id);
@@ -2404,7 +2381,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var descendants = new List<IContent>();
         while (page * pageSize < total)
         {
-            descendants.AddRange(ContentService.GetPagedDescendants(content.Id, page++, pageSize, out total));
+            descendants.AddRange(ContentService.GetPagedDescendants(content.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null));
         }
 
         Assert.AreNotEqual(-20, content.ParentId);
@@ -2419,7 +2396,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         page = 0;
         while (page * pageSize < total)
         {
-            descendants.AddRange(ContentService.GetPagedDescendants(content.Id, page++, pageSize, out total));
+            descendants.AddRange(ContentService.GetPagedDescendants(content.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null));
         }
 
         Assert.AreEqual(-20, content.ParentId);
@@ -2523,7 +2500,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var total = long.MaxValue;
         while (page * pageSize < total)
         {
-            descendants.AddRange(ContentService.GetPagedDescendants(parentPage.Id, page++, pageSize, out total));
+            descendants.AddRange(ContentService.GetPagedDescendants(parentPage.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null));
         }
 
         Assert.AreEqual(3, descendants.Count);
@@ -2548,7 +2525,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         page = 0;
         while (page * pageSize < total)
         {
-            descendants.AddRange(ContentService.GetPagedDescendants(parentPage2.Id, page++, pageSize, out total));
+            descendants.AddRange(ContentService.GetPagedDescendants(parentPage2.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null));
         }
 
         Assert.AreEqual(3, descendants.Count);
@@ -4737,7 +4714,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         int[] ChildIdsInSortOrder() => ContentService
-            .GetPagedChildren(root.Id, 0, 100, out _)
+            .GetPagedChildren(root.Id, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
             .OrderBy(child => child.SortOrder)
             .Select(child => child.Id)
             .ToArray();

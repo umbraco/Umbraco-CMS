@@ -674,38 +674,6 @@ export default {
 		changeKeyError: "Khóa '%0%' đã tồn tại.",
 		overviewTitle: 'Tổng quan từ điển',
 	},
-	examineManagement: {
-		configuredSearchers: 'Các tìm kiếm đã cấu hình',
-		configuredSearchersDescription:
-			'Hiển thị các thuộc tính và công cụ cho bất kỳ tìm kiếm nào đã cấu hình (ví dụ: như một tìm kiếm đa chỉ mục)',
-		fieldValues: 'Giá trị trường',
-		healthStatus: 'Trạng thái sức khỏe',
-		healthStatusDescription: 'Trạng thái sức khỏe của chỉ mục và nếu nó có thể được đọc',
-		indexers: 'Bộ lập chỉ mục',
-		indexInfo: 'Thông tin chỉ mục',
-		contentInIndex: 'Nội dung trong chỉ mục',
-		indexInfoDescription: 'Liệt kê các thuộc tính của chỉ mục',
-		manageIndexes: 'Quản lý các chỉ mục Examine',
-		manageIndexesDescription:
-			'Cho phép bạn xem chi tiết của từng chỉ mục và cung cấp một số công cụ để quản lý các chỉ mục',
-		rebuildIndex: 'Xây dựng lại chỉ mục',
-		rebuildIndexWarning:
-			'Điều này sẽ khiến chỉ mục được xây dựng lại.<br />Tùy thuộc vào lượng nội dung trên trang web của bạn, quá trình này có thể mất một thời gian.<br />Không khuyến nghị xây dựng lại chỉ mục trong thời gian lưu lượng truy cập cao hoặc khi các biên tập viên đang chỉnh sửa nội dung.',
-		searchers: 'Bộ tìm kiếm',
-		searchDescription: 'Tìm kiếm trong chỉ mục và xem kết quả',
-		tools: 'Công cụ',
-		toolsDescription: 'Công cụ quản lý chỉ mục',
-		fields: 'trường',
-		indexCannotRead: 'Không thể đọc chỉ mục và cần được xây dựng lại',
-		processIsTakingLonger:
-			'Quá trình mất nhiều thời gian hơn dự kiến, hãy kiểm tra nhật ký Umbraco để xem có lỗi nào trong quá trình này không',
-		indexCannotRebuild: 'Chỉ mục này không thể được xây dựng lại vì không có IIndexPopulator được gán',
-		iIndexPopulator: 'IIndexPopulator',
-		noResults: 'Không tìm thấy kết quả nào',
-		searchResultsFound: 'Hiển thị %0% - %1% của %2% kết quả - Trang %3% trên %4%',
-		corruptStatus: 'Phát hiện chỉ mục có khả năng bị hỏng',
-		corruptErrorDescription: 'Lỗi nhận được khi đánh giá chỉ mục:',
-	},
 	placeholders: {
 		username: 'Nhập tên người dùng...',
 		password: 'Nhập mật khẩu...',
@@ -1301,6 +1269,9 @@ export default {
 		invalidPublishBranchPermissions: 'Người dùng không có đủ quyền để xuất bản tất cả tài liệu con',
 		contentPublishedFailedReqCultureValidationError:
 			"Xác thực không thành công đối với ngôn ngữ bắt buộc '%0%'. Ngôn ngữ này đã được lưu nhưng chưa được xuất bản.",
+		publishedNotificationTitle: 'Đã xuất bản',
+		publishedNotificationDescription: '%0% hiện đã có sẵn công khai',
+		publishedVariantNotificationDescription: '%1% hiện đã có sẵn công khai bằng %0%',
 	},
 	colorpicker: {
 		noColors: 'Bạn chưa cấu hình bất kỳ màu nào được phê duyệt',
@@ -1501,6 +1472,7 @@ export default {
 		editContentPublishedFailedByValidation: 'Tài liệu không thể được xuất bản, nhưng chúng tôi đã lưu nó cho bạn',
 		editContentPublishedFailedByParent: 'Tài liệu không thể được xuất bản, vì một trang cha không được xuất bản',
 		editContentPublishedHeader: 'Tài liệu đã được xuất bản',
+		editElementPublishedHeader: 'Phần tử đã được xuất bản',
 		editContentPublishedText: 'và hiện đang hiển thị trên trang web',
 		editContentUnpublishedHeader: 'Tài liệu đã bị hủy xuất bản',
 		editContentUnpublishedText: 'và không còn hiển thị trên trang web',
@@ -2386,7 +2358,6 @@ export default {
 		contentRedirectManager: 'Quản lý URL chuyển hướng',
 		mediaFolderBrowser: 'Nội dung',
 		settingsWelcome: 'Chào mừng',
-		settingsExamine: 'Quản lý Examine',
 		settingsPublishedStatus: 'Trạng thái đã xuất bản',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Health Check',
@@ -2850,5 +2821,10 @@ export default {
 		browseTab: 'Duyệt',
 		searchTab: 'Tìm kiếm',
 		selectedCount: (count: number) => `Đã chọn ${count} mục`,
+	},
+	elements: {
+		confirmPublishDescription: 'Xuất bản sẽ làm cho mục này có sẵn công khai.',
+		confirmBulkPublishDescription: 'Xuất bản sẽ làm cho các mục đã chọn có sẵn công khai.',
+		confirmBulkUnpublishDescription: 'Các mục đã chọn sẽ không còn khả dụng công khai.',
 	},
 } as UmbLocalizationDictionary;

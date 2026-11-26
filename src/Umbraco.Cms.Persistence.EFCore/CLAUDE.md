@@ -3,7 +3,7 @@
 Entity Framework Core persistence layer for Umbraco CMS. This project provides EF Core integration including scoping, distributed locking, and migration infrastructure.
 
 **Project Type**: Class Library (NuGet package)
-**Target Framework**: net10.0
+**Target Framework**: net11.0
 **Dependencies**: Umbraco.Core, Umbraco.Infrastructure
 
 ---
@@ -240,6 +240,7 @@ Top-level dependency on `Microsoft.Extensions.Caching.Memory` overrides vulnerab
 | `IEFCoreScopeAccessor<TDbContext>` | Access ambient scope |
 | `IMigrationProvider` | Provider-specific migration execution |
 | `IMigrationProviderSetup` | DbContext options setup per provider |
+| `IDatabaseConfigurator` | Provider setup for any DbContext through `UseUmbracoDatabaseProvider`, without migrations |
 
 ### Provider Constants
 

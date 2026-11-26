@@ -41,8 +41,10 @@ internal static class UserGroupFactory
             userGroup.StartContentId = dto.StartContentId;
             userGroup.StartMediaId = dto.StartMediaId;
             userGroup.StartElementId = dto.StartElementId;
+            userGroup.StartDocumentBlueprintId = dto.StartDocumentBlueprintId;
             userGroup.Permissions = dto.UserGroup2PermissionDtos.Select(x => x.Permission).ToHashSet();
             userGroup.HasAccessToAllLanguages = dto.HasAccessToAllLanguages;
+            userGroup.HasAccessToInvariantForVariant = dto.HasAccessToInvariantForVariant;
             userGroup.Description = dto.Description;
             if (dto.UserGroup2AppDtos != null)
             {
@@ -114,7 +116,9 @@ internal static class UserGroupFactory
             StartMediaId = entity.StartMediaId,
             StartContentId = entity.StartContentId,
             StartElementId = entity.StartElementId,
+            StartDocumentBlueprintId = entity.StartDocumentBlueprintId,
             HasAccessToAllLanguages = entity.HasAccessToAllLanguages,
+            HasAccessToInvariantForVariant = entity.HasAccessToInvariantForVariant,
         };
 
         foreach (var app in entity.AllowedSections)

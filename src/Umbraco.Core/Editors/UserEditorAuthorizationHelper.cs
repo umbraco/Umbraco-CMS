@@ -53,7 +53,7 @@ public class UserEditorAuthorizationHelper
         IEnumerable<int>? startContentIds,
         IEnumerable<int>? startMediaIds,
         IEnumerable<string>? userGroupAliases)
-        => IsAuthorized(currentUser, savingUser, startContentIds, startMediaIds, null, userGroupAliases);
+        => IsAuthorized(currentUser, savingUser, startContentIds, startMediaIds, null, null, userGroupAliases);
 
     /// <summary>
     ///     Checks if the current user has access to save the user data
@@ -65,12 +65,34 @@ public class UserEditorAuthorizationHelper
     /// <param name="startElementIds">The start element ids of the user being saved (can be null or empty)</param>
     /// <param name="userGroupAliases">The user aliases of the user being saved (can be null or empty)</param>
     /// <returns></returns>
+    [Obsolete("Use the overload taking the document blueprint start node ids. Scheduled for removal in Umbraco 21.")]
     public Attempt<string?> IsAuthorized(
         IUser? currentUser,
         IUser? savingUser,
         IEnumerable<int>? startContentIds,
         IEnumerable<int>? startMediaIds,
         IEnumerable<int>? startElementIds,
+        IEnumerable<string>? userGroupAliases)
+        => IsAuthorized(currentUser, savingUser, startContentIds, startMediaIds, startElementIds, null, userGroupAliases);
+
+    /// <summary>
+    ///     Checks if the current user has access to save the user data
+    /// </summary>
+    /// <param name="currentUser">The current user trying to save user data</param>
+    /// <param name="savingUser">The user instance being saved (can be null if it's a new user)</param>
+    /// <param name="startContentIds">The start content ids of the user being saved (can be null or empty)</param>
+    /// <param name="startMediaIds">The start media ids of the user being saved (can be null or empty)</param>
+    /// <param name="startElementIds">The start element ids of the user being saved (can be null or empty)</param>
+    /// <param name="startDocumentBlueprintIds">The start document blueprint ids of the user being saved (can be null or empty)</param>
+    /// <param name="userGroupAliases">The user aliases of the user being saved (can be null or empty)</param>
+    /// <returns></returns>
+    public Attempt<string?> IsAuthorized(
+        IUser? currentUser,
+        IUser? savingUser,
+        IEnumerable<int>? startContentIds,
+        IEnumerable<int>? startMediaIds,
+        IEnumerable<int>? startElementIds,
+        IEnumerable<int>? startDocumentBlueprintIds,
         IEnumerable<string>? userGroupAliases)
     {
         var currentIsAdmin = currentUser?.IsAdmin() ?? false;
@@ -104,9 +126,14 @@ public class UserEditorAuthorizationHelper
             : startElementIds == null || savingUser.StartElementIds is null
                 ? null
                 : startElementIds.Except(savingUser.StartElementIds).ToArray();
+        IEnumerable<int>? changedStartDocumentBlueprintIds = savingUser == null
+            ? startDocumentBlueprintIds
+            : startDocumentBlueprintIds == null || savingUser.StartDocumentBlueprintIds is null
+                ? null
+                : startDocumentBlueprintIds.Except(savingUser.StartDocumentBlueprintIds).ToArray();
         Attempt<string?> pathResult = currentUser is null
             ? Attempt<string?>.Fail()
-            : AuthorizePath(currentUser, changedStartContentIds, changedStartMediaIds, changedStartElementIds);
+            : AuthorizePath(currentUser, changedStartContentIds, changedStartMediaIds, changedStartElementIds, changedStartDocumentBlueprintIds);
         if (pathResult == false)
         {
             return pathResult;
@@ -141,12 +168,13 @@ public class UserEditorAuthorizationHelper
     }
 
     /// <summary>
-    /// Authorizes that the current user has access to the specified start content, media and element paths.
+    /// Authorizes that the current user has access to the specified start content, media, element and document blueprint paths.
     /// </summary>
     /// <param name="currentUser">The current user attempting the operation.</param>
     /// <param name="startContentIds">The content start node IDs to authorize.</param>
     /// <param name="startMediaIds">The media start node IDs to authorize.</param>
     /// <param name="startElementIds">The element start node IDs to authorize.</param>
+    /// <param name="startDocumentBlueprintIds">The document blueprint start node IDs to authorize.</param>
     /// <returns>
     /// A successful attempt if the user has access to all paths; otherwise, a failed attempt with an error message.
     /// </returns>
@@ -154,7 +182,8 @@ public class UserEditorAuthorizationHelper
         IUser currentUser,
         IEnumerable<int>? startContentIds,
         IEnumerable<int>? startMediaIds,
-        IEnumerable<int>? startElementIds)
+        IEnumerable<int>? startElementIds,
+        IEnumerable<int>? startDocumentBlueprintIds)
     {
         if (startContentIds != null)
         {
@@ -235,6 +264,36 @@ public class UserEditorAuthorizationHelper
                     if (currentUser.HasElementPathAccess(container, _entityService, _appCaches) == false)
                     {
                         return Attempt.Fail("The current user does not have access to the element path " + container.Path);
+                    }
+                }
+            }
+        }
+
+        if (startDocumentBlueprintIds != null)
+        {
+            foreach (var documentBlueprintId in startDocumentBlueprintIds)
+            {
+                if (documentBlueprintId == Constants.System.Root)
+                {
+                    if (currentUser.HasDocumentBlueprintRootAccess(_entityService, _appCaches) == false)
+                    {
+                        return Attempt.Fail("The current user does not have access to the document blueprint root");
+                    }
+                }
+                else
+                {
+                    IEntitySlim? container = _entityService.Get(documentBlueprintId, UmbracoObjectTypes.DocumentBlueprintContainer);
+                    if (container == null)
+                    {
+                        continue;
+                    }
+
+                    var hasAccess = ContentPermissions.HasPathAccessWithoutRecycleBin(
+                        container.Path,
+                        currentUser.CalculateDocumentBlueprintStartNodeIds(_entityService, _appCaches));
+                    if (hasAccess == false)
+                    {
+                        return Attempt.Fail("The current user does not have access to the document blueprint path " + container.Path);
                     }
                 }
             }

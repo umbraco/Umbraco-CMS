@@ -48,12 +48,12 @@ public class OAuthOptionsHelper
     }
 
     /// <summary>
-    /// Sets the context to redirect to the <see cref="SecuritySettings.AuthorizeCallbackErrorPathName"/> path with all parameters, except state, that are passed to the initial server callback configured for the configured external login provider
+    /// Sets the context to redirect to the <see cref="SecuritySettings.GetEffectiveErrorPathName"/> path with all parameters, except state, that are passed to the initial server callback configured for the configured external login provider
     /// </summary>
     public T SetUmbracoRedirectWithFilteredParams<T>(T context, string providerFriendlyName, string eventName)
         where T : HandleRequestContext<RemoteAuthenticationOptions>
     {
-        var callbackPath =_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName;
+        var callbackPath =_securitySettings.Value.BackOfficeHost + _securitySettings.Value.GetEffectiveErrorPathName();
 
         callbackPath = callbackPath.AppendQueryStringToUrl("flow=external-login")
         .AppendQueryStringToUrl($"provider={providerFriendlyName}")

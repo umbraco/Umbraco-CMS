@@ -512,13 +512,14 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 x => x.StartContentId,
                 x => x.StartMediaId,
                 x => x.StartElementId,
+                x => x.StartDocumentBlueprintId,
                 x => x.UpdateDate,
                 x => x.Alias,
                 x => x.Name,
                 x => x.Description,
                 x => x.HasAccessToAllLanguages,
-                x => x.Key,
-                x => x.DefaultPermissions)
+                x => x.HasAccessToInvariantForVariant,
+                x => x.Key)
             .AndBy<UserGroup2AppDto>(x => x.AppAlias, x => x.UserGroupId);
 
     protected override string GetBaseWhereClause() => $"{QuoteTableName(UserGroupDto.TableName)}.id = @id";

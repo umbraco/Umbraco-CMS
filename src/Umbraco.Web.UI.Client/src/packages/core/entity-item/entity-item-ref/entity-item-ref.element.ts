@@ -228,7 +228,7 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 		super.destroy();
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: block;

@@ -1,4 +1,4 @@
-# @umbraco/acceptance-test-helpers
+# @umbraco-cms/acceptance-test-helpers
 
 Test helpers and builders for writing [Playwright](https://playwright.dev/) end-to-end tests for Umbraco CMS solutions.
 
@@ -7,7 +7,7 @@ This package provides API helpers, UI helpers, and JSON model builders to simpli
 ## Installation
 
 ```bash
-npm install -D @umbraco/acceptance-test-helpers
+npm install -D @umbraco-cms/acceptance-test-helpers
 ```
 
 ## Configuration
@@ -19,7 +19,7 @@ The test helpers need to know how to connect and authenticate with your Umbraco 
 | `URL` | No | `https://localhost:44339` | Base URL of the Umbraco instance |
 | `UMBRACO_USER_LOGIN` | Yes | — | Backoffice superadmin email |
 | `UMBRACO_USER_PASSWORD` | Yes | — | Backoffice superadmin password |
-| `STORAGE_STATE_PATH` | Recommended | — | Path to Playwright auth storage state JSON (should match `storageState` in your `playwright.config`). The API helpers read tokens from this file for REST calls. Without it, tokens are extracted from the live page context, which is slower and less reliable. |
+| `STORAGE_STATE_PATH` | Recommended | — | Path to Playwright auth storage state JSON (should match `storageState` in your `playwright.config`). Back-office auth is cookie-only, so this is where the authentication cookie is persisted and reused between tests. Without it, every test signs in again, which is slower and less reliable. |
 | `CONSOLE_ERRORS_PATH` | No | — | Path to a JSON file where browser console errors are collected during test runs. |
 
 You can set them via a `.env` file in your project root (loaded with [dotenv](https://www.npmjs.com/package/dotenv) or similar):
@@ -46,7 +46,7 @@ env:
 The package exports a custom Playwright `test` fixture that provides two main helper categories:
 
 ```typescript
-import { ConstantHelper, test } from '@umbraco/acceptance-test-helpers';
+import { ConstantHelper, test } from '@umbraco-cms/acceptance-test-helpers';
 import { expect } from '@playwright/test';
 
 test('can create content', async ({ umbracoApi, umbracoUi }) => {
@@ -110,7 +110,7 @@ await umbracoUi.content.isSuccessStateVisibleForSaveButton();
 await umbracoUi.content.doesSuccessNotificationHaveText('Content saved');
 ```
 
-**Available UI helpers**: `content`, `contentRender`, `currentUserProfile`, `dataType`, `dictionary`, `documentBlueprint`, `documentType`, `examineManagement`, `externalLogin`, `form`, `healthCheck`, `install`, `language`, `login`, `logViewer`, `media`, `mediaType`, `member`, `memberGroup`, `memberType`, `modelsBuilder`, `package`, `partialView`, `profiling`, `publishedStatus`, `redirectManagement`, `relationType`, `script`, `stylesheet`, `telemetryData`, `template`, `user`, `userGroup`, `webhook`, `welcomeDashboard`
+**Available UI helpers**: `content`, `contentRender`, `currentUserProfile`, `dataType`, `dictionary`, `documentBlueprint`, `documentType`, `externalLogin`, `form`, `healthCheck`, `install`, `language`, `login`, `logViewer`, `media`, `mediaType`, `member`, `memberGroup`, `memberType`, `modelsBuilder`, `package`, `partialView`, `profiling`, `publishedStatus`, `redirectManagement`, `relationType`, `script`, `stylesheet`, `telemetryData`, `template`, `user`, `userGroup`, `webhook`, `welcomeDashboard`
 
 ### `page` — Raw Playwright Page
 
@@ -119,7 +119,7 @@ Direct access to Playwright's Page object for custom interactions.
 ## Helper Constants
 
 ```typescript
-import { ConstantHelper, NotificationConstantHelper, AliasHelper } from '@umbraco/acceptance-test-helpers';
+import { ConstantHelper, NotificationConstantHelper, AliasHelper } from '@umbraco-cms/acceptance-test-helpers';
 
 // Section names
 ConstantHelper.sections.content
@@ -150,7 +150,7 @@ Build complex Umbraco JSON models for test setup using the builder pattern with 
 ### Quick Start
 
 ```typescript
-import { DocumentTypeBuilder, AliasHelper } from '@umbraco/acceptance-test-helpers';
+import { DocumentTypeBuilder, AliasHelper } from '@umbraco-cms/acceptance-test-helpers';
 
 // Minimal — uses defaults
 const simpleDocType = new DocumentTypeBuilder().build();

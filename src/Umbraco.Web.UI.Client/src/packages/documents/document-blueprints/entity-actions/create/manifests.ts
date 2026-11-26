@@ -13,11 +13,4 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	},
 	...defaultManifests,
 	...folderManifests,
-	// Deprecated: kept for backwards compatibility. Scheduled for removal in Umbraco 19.
-	{
-		type: 'modal',
-		alias: 'Umb.Modal.DocumentBlueprintOptionsCreate',
-		name: 'Document Blueprint Options Create Modal',
-		element: () => import('./modal/document-blueprint-options-create-modal.element.js'),
-	},
 ];

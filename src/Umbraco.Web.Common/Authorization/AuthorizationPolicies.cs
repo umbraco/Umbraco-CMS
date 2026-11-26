@@ -10,6 +10,16 @@ public static class AuthorizationPolicies
     public const string BackOfficeAccess = nameof(BackOfficeAccess);
     public const string DenyLocalLoginIfConfigured = nameof(DenyLocalLoginIfConfigured);
     public const string RequireAdminAccess = nameof(RequireAdminAccess);
+
+    /// <summary>
+    ///     Policy required to query search indexes and read the raw field values they hold.
+    /// </summary>
+    /// <remarks>
+    ///     Defaults to administrators only, as an index can hold any data an implementor chooses to put in it. It can be
+    ///     replaced by re-registering the policy, for example in a
+    ///     <c>PostConfigure&lt;AuthorizationOptions&gt;</c> callback.
+    /// </remarks>
+    public const string SearcherQueryAccess = nameof(SearcherQueryAccess);
     public const string UserBelongsToUserGroupInRequest = nameof(UserBelongsToUserGroupInRequest);
     public const string UserPermissionByResource = nameof(UserPermissionByResource);
 
@@ -21,6 +31,11 @@ public static class AuthorizationPolicies
     public const string ElementPermissionByResource = nameof(ElementPermissionByResource);
 
     public const string ElementFolderPermissionByResource = nameof(ElementFolderPermissionByResource);
+
+    /// <summary>
+    ///     Requires that the user has access to the document blueprints in the request.
+    /// </summary>
+    public const string DocumentBlueprintPermissionByResource = nameof(DocumentBlueprintPermissionByResource);
 
     // Single section access
     public const string SectionAccessContent = nameof(SectionAccessContent);
@@ -38,8 +53,14 @@ public static class AuthorizationPolicies
     public const string SectionAccessForContentTree = nameof(SectionAccessForContentTree);
     public const string SectionAccessForElementTree = nameof(SectionAccessForElementTree);
 
+    /// <summary>
+    ///     Requires access to a section that shows the document blueprint tree.
+    /// </summary>
+    public const string SectionAccessForDocumentBlueprintTree = nameof(SectionAccessForDocumentBlueprintTree);
+
     // Single tree access
     public const string TreeAccessDocuments = nameof(TreeAccessDocuments);
+    public const string TreeAccessDocumentBlueprints = nameof(TreeAccessDocumentBlueprints);
     public const string TreeAccessElements = nameof(TreeAccessElements);
     public const string TreeAccessPartialViews = nameof(TreeAccessPartialViews);
     public const string TreeAccessDataTypes = nameof(TreeAccessDataTypes);
@@ -57,12 +78,14 @@ public static class AuthorizationPolicies
 
     // Custom access based on multiple trees
     public const string TreeAccessDocumentsOrDocumentTypes = nameof(TreeAccessDocumentsOrDocumentTypes);
+    public const string TreeAccessDocumentsOrDocumentBlueprints = nameof(TreeAccessDocumentsOrDocumentBlueprints);
     public const string TreeAccessDocumentsOrElementsOrDocumentTypes = nameof(TreeAccessDocumentsOrElementsOrDocumentTypes);
     public const string TreeAccessMediaOrMediaTypes = nameof(TreeAccessMediaOrMediaTypes);
     public const string TreeAccessDictionaryOrTemplates = nameof(TreeAccessDictionaryOrTemplates);
     public const string TreeAccessDocumentOrMediaOrContentTypes = nameof(TreeAccessDocumentOrMediaOrContentTypes);
     public const string TreeAccessDocumentsOrMediaOrMembersOrContentTypes = nameof(TreeAccessDocumentsOrMediaOrMembersOrContentTypes);
     public const string TreeAccessDocumentsOrElementsOrMediaOrMembersOrContentTypes = nameof(TreeAccessDocumentsOrElementsOrMediaOrMembersOrContentTypes);
+    public const string TreeAccessDocumentsOrElementsOrMediaOrMembers = nameof(TreeAccessDocumentsOrElementsOrMediaOrMembers);
     public const string TreeAccessStylesheetsOrDocumentOrMediaOrMember = nameof(TreeAccessStylesheetsOrDocumentOrMediaOrMember);
     public const string TreeAccessMembersOrMemberTypes = nameof(TreeAccessMembersOrMemberTypes);
 

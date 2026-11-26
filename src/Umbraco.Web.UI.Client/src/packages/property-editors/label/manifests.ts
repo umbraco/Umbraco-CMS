@@ -1,4 +1,5 @@
 import { manifest as labelSchemaManifest } from './Umbraco.Label.js';
+import { manifests as typedLabelManifests } from './typed-labels.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -7,7 +8,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Label Property Editor UI',
 		element: () => import('./property-editor-ui-label.element.js'),
 		meta: {
-			supportsVariantChange: true,
 			label: 'Label',
 			icon: 'icon-readonly',
 			group: '#propertyEditorUIGroups_common',
@@ -27,4 +27,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	labelSchemaManifest,
+	...typedLabelManifests,
 ];

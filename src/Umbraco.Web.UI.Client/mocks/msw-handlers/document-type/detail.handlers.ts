@@ -2,6 +2,7 @@ const { http, HttpResponse } = window.MockServiceWorker;
 import { umbDocumentBlueprintMockDb } from '../../db/document-blueprint.db.js';
 import { umbDocumentTypeMockDb } from '../../db/document-type.db.js';
 import { UMB_SLUG } from './slug.js';
+import { createProblemDetails } from '../../utils.js';
 import type {
 	CreateMediaTypeRequestModel,
 	PagedDocumentTypeBlueprintItemResponseModel,
@@ -35,7 +36,7 @@ export const detailHandlers = [
 
 		const relevantBlueprints = umbDocumentBlueprintMockDb
 			.getAll()
-			.filter((blueprint) => blueprint.documentType.id === id);
+			.filter((blueprint) => blueprint.documentType?.id === id);
 		const response: PagedDocumentTypeBlueprintItemResponseModel = {
 			total: relevantBlueprints.length,
 			items: relevantBlueprints,
@@ -55,6 +56,16 @@ export const detailHandlers = [
 		if (id === 'forbidden') {
 			// Simulate a forbidden response
 			return new HttpResponse(null, { status: 403 });
+		}
+		if (!umbDocumentTypeMockDb.read(id)) {
+			return HttpResponse.json(
+				createProblemDetails({
+					title: 'Not Found',
+					detail: 'The specified document type was not found',
+					status: 404,
+				}),
+				{ status: 404 },
+			);
 		}
 		const response = umbDocumentTypeMockDb.detail.read(id);
 		return HttpResponse.json(response);

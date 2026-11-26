@@ -7,6 +7,7 @@ import type {
 	HttpResponse as HttpResponseType,
 	delay as delayType,
 	isCommonAssetRequest as isCommonAssetRequestType,
+	ws as wsType,
 	HttpHandler,
 } from 'msw';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -97,6 +98,7 @@ declare global {
 			HttpResponse: typeof HttpResponseType;
 			delay: typeof delayType;
 			isCommonAssetRequest: typeof isCommonAssetRequestType;
+			ws: typeof wsType;
 		};
 	}
 }

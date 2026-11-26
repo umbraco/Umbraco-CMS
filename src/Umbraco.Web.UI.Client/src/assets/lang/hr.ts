@@ -579,34 +579,6 @@ export default {
 		changeKeyError: "Stavka '%0%' već postoji.",
 		overviewTitle: 'Pregled riječnika',
 	},
-	examineManagement: {
-		configuredSearchers: 'Konfigurirani pretraživači',
-		configuredSearchersDescription:
-			'Prikazuje svojstva i alate za bilo koji konfigurirani pretraživač (npr. kao multi-indeksni pretraživač)',
-		fieldValues: 'Vrijednosti polja',
-		healthStatus: 'Status zdravlja',
-		healthStatusDescription: 'Status zdravlja indeksa i da li se može pročitati',
-		indexers: 'Indeksi',
-		indexInfo: 'Indeks info',
-		contentInIndex: 'Sadržaj u indeksu',
-		indexInfoDescription: 'Navodi svojstva indeksa',
-		manageIndexes: 'Upravljanje Examine-ovim indeksima',
-		manageIndexesDescription:
-			'Omogućava vam pregled detalja svakog indeksa i pruža neke alate za upravljanje indeksima',
-		rebuildIndex: 'Obnovi indeks',
-		rebuildIndexWarning:
-			'\n      Ovo će uzrokovati obnavljanje indexa.<br />\n      Ovisno o količini sadržaja vaše web stranice, ovo bi moglo potrajati.<br />\n      Nije preporučljivo obnavljati index-e tijekom velike posjećenosti vaše web stranice ili u vrijeme kada urednik uređuje sadržaj stranice.\n     ',
-		searchers: 'Pretraživači',
-		searchDescription: 'Pretražite indeks i pogledajte rezultate',
-		tools: 'Alati',
-		toolsDescription: 'Alati za upravljanje indeksima',
-		fields: 'polja',
-		indexCannotRead: 'Indeks se ne može pročitati i morat će se ponovo obnoviti',
-		processIsTakingLonger:
-			'Proces traje duže od očekivanog, provjerite Umbraco log zapis da vidite\n       da li je bilo grešaka tijekom ove operacije\n    ',
-		indexCannotRebuild: 'Ovaj indeks se ne može ponovo obnoviti jer mu nije dodijeljen',
-		iIndexPopulator: 'IIndexPopulator',
-	},
 	placeholders: {
 		username: 'Upišite svoje korisničko ime',
 		password: 'Upišite svoju lozinku',
@@ -1135,6 +1107,8 @@ export default {
 		publishAll: 'Objavi %0% i sve njegove podstranice',
 		publishHelp:
 			'Pritisni <em>Objavi</em> za objavu <strong>%0%</strong> i na taj način svoj sadržaj učiniti javno dostupnim.<br/><br />\n      Ovu stranicu i sve njene podstranice možete objaviti odabirom <em>Uključi neobjavljene podstranice</em>.\n      ',
+		publishedNotificationTitle: 'Objavljeno',
+		publishedNotificationDescription: '%0% je sada javno dostupno',
 	},
 	colorpicker: {
 		noColors: 'Niste konfigurirali nijednu odobrenu boju',
@@ -1311,6 +1285,7 @@ export default {
 		dictionaryItemSaved: 'Stavka riječnika je spremljena',
 		editContentPublishedFailedByParent: 'Objavljivanje nije uspjelo jer nadređena stranica nije objavljena',
 		editContentPublishedHeader: 'Sadržaj objavljen',
+		editElementPublishedHeader: 'Element objavljen',
 		editContentPublishedText: 'i vidljivo na web stranici',
 		editBlueprintSavedHeader: 'Predložak sadržaja je spremljen',
 		editBlueprintSavedText: 'Promjene su uspješno spremljene',
@@ -2041,7 +2016,6 @@ export default {
 		contentRedirectManager: 'Preusmjeravanje URL-ova',
 		mediaFolderBrowser: 'Sadržaj',
 		settingsWelcome: 'Dobrodošli',
-		settingsExamine: 'Examine menadžment',
 		settingsPublishedStatus: 'Status stranice',
 		settingsModelsBuilder: 'Generator modela',
 		settingsHealthCheck: 'Provjera zdravlja',
@@ -2366,5 +2340,10 @@ export default {
 		basicLevelDescription: 'Poslat ćemo anonimni ID web-mjesta, verziju Umbraco-a i instalirane pakete.',
 		detailedLevelDescription:
 			'\n          Poslat ćemo:\n          <ul>\n            <li>Anonimni ID web-mjesta, verziju Umbraco-a i instalirane pakete.</li>\n            <li>Broj: korijenskih čvorova, čvorova sadržaja, makroa, medija, vrsta dokumenata, predložaka, jezika, domena, korisničkih grupa, korisnika, članova, vanjskih pružatelja prijave u Backoffice-u i uređivača svojstava u upotrebi.</li>\n            <li>Informacije o sustavu: web poslužitelj, operativni sustav poslužitelja, okvir poslužitelja, jezik operativnog sustava poslužitelja i pružatelj baze podataka.</li>\n            <li>Postavke konfiguracije: način Modelsbuilder-a, postoji li prilagođena putanja Umbraco-a, ASP okolina, je li omogućen dostavni API, dopušta li javni pristup i je li u načinu rada za otklanjanje pogrešaka.</li>\n          </ul>\n          <em>Moguće je da ćemo u budućnosti promijeniti podatke koje šaljemo na Detaljnoj razini. Ako se to dogodi, bit će navedeno iznad.\n          <br>Odabirom "Detaljno" pristajete na prikupljanje trenutnih i budućih anonimiziranih informacija.</em>\n       ',
+	},
+	elements: {
+		confirmPublishDescription: 'Objavljivanjem će ovo postati javno dostupno.',
+		confirmBulkPublishDescription: 'Objavljivanjem će odabrane stavke postati javno dostupne.',
+		confirmBulkUnpublishDescription: 'Odabrane stavke više neće biti javno dostupne.',
 	},
 } as UmbLocalizationDictionary;

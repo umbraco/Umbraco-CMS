@@ -16,7 +16,7 @@ import type {
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { umbVariantIdsToCultures, type UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
@@ -97,7 +97,7 @@ export class UmbDocumentPublishingServerDataSource {
 	 * @returns {Array<string>} The distinct culture codes to publish
 	 */
 	#mapCulturesToPublish(variantIds: Array<UmbVariantId>): Array<string> {
-		return [...new Set(variantIds.filter((x) => !x.isCultureInvariant()).map((x) => x.toCultureString()))];
+		return umbVariantIdsToCultures(variantIds).filter((x): x is string => x !== null);
 	}
 
 	/**
@@ -241,7 +241,6 @@ export class UmbDocumentPublishingServerDataSource {
 			variants: data.variants.map((variant) => {
 				return {
 					culture: variant.culture || null,
-					segment: variant.segment || null,
 					state: variant.state,
 					name: variant.name,
 					publishDate: variant.publishDate || null,

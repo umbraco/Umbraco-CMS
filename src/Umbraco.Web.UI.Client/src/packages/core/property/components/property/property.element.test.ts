@@ -11,7 +11,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 const ELEMENT_NAME = 'umb-test-property-editor-ui';
 const ALIAS_DEFAULT = 'Umb.Test.PropertyEditorUi.Default';
-const ALIAS_SUPPORTS_VARIANT_CHANGE = 'Umb.Test.PropertyEditorUi.SupportsVariantChange';
 
 // Form-control surface (via the real mixin), so `umb-property` builds a `UmbBindServerValidationToFormControl` for
 // this element, as it does for a real Property Editor UI. Without it, `#setupControlValidation()` bails early. [NL]
@@ -28,7 +27,6 @@ class UmbTestPropertyEditorUiElement
 	readonly?: boolean;
 	mandatory?: boolean;
 	mandatoryMessage?: string;
-	destroyed = false;
 
 	/** Simulates a user edit: the editor's own value moves and it announces it, as a real editor does. */
 	userEdits(newValue: unknown): void {
@@ -40,11 +38,6 @@ class UmbTestPropertyEditorUiElement
 		super();
 		UmbTestPropertyEditorUiElement.instanceCount++;
 	}
-
-	override destroy() {
-		this.destroyed = true;
-		super.destroy();
-	}
 }
 
 @customElement('umb-test-property-host')
@@ -53,7 +46,7 @@ class UmbTestPropertyHostElement extends UmbControllerHostElementMixin(HTMLEleme
 	datasetContext = new UmbPropertyDatasetContextBase(this);
 }
 
-function manifest(alias: string, supportVariantChange?: boolean): ManifestPropertyEditorUi {
+function manifest(alias: string): ManifestPropertyEditorUi {
 	return {
 		type: 'propertyEditorUi',
 		alias,
@@ -63,7 +56,6 @@ function manifest(alias: string, supportVariantChange?: boolean): ManifestProper
 			label: alias,
 			icon: 'icon-circle',
 			group: 'Common',
-			supportsVariantChange: supportVariantChange,
 		},
 	} as ManifestPropertyEditorUi;
 }
@@ -78,14 +70,12 @@ describe('UmbPropertyElement', () => {
 	beforeEach(async () => {
 		UmbTestPropertyEditorUiElement.instanceCount = 0;
 		umbExtensionsRegistry.register(manifest(ALIAS_DEFAULT));
-		umbExtensionsRegistry.register(manifest(ALIAS_SUPPORTS_VARIANT_CHANGE, true));
 		host = await fixture(html`<umb-test-property-host><umb-property></umb-property></umb-test-property-host>`);
 		element = host.querySelector('umb-property') as UmbPropertyElement;
 	});
 
 	afterEach(() => {
 		umbExtensionsRegistry.unregister(ALIAS_DEFAULT);
-		umbExtensionsRegistry.unregister(ALIAS_SUPPORTS_VARIANT_CHANGE);
 	});
 
 	async function getEditorElement(): Promise<UmbTestPropertyEditorUiElement> {
@@ -97,24 +87,8 @@ describe('UmbPropertyElement', () => {
 	}
 
 	describe('variant switching (dataPath change)', () => {
-		it('re-creates the Property Editor UI element when the manifest does not declare supportVariantChange', async () => {
+		it('keeps the same Property Editor UI element when the data path changes', async () => {
 			element.propertyEditorUiAlias = ALIAS_DEFAULT;
-			element.dataPath = DATA_PATH_EN_US;
-			const firstInstance = await getEditorElement();
-
-			element.dataPath = DATA_PATH_DA_DK;
-			await waitUntil(
-				() => UmbTestPropertyEditorUiElement.instanceCount === 2,
-				'Property Editor UI element was not re-created for the new variant',
-			);
-
-			const secondInstance = await getEditorElement();
-			expect(secondInstance).to.not.equal(firstInstance);
-			expect(firstInstance.destroyed).to.be.true;
-		});
-
-		it('keeps the same Property Editor UI element when the manifest declares supportsVariantChange: true', async () => {
-			element.propertyEditorUiAlias = ALIAS_SUPPORTS_VARIANT_CHANGE;
 			element.dataPath = DATA_PATH_EN_US;
 			const firstInstance = await getEditorElement();
 
@@ -186,8 +160,8 @@ describe('UmbPropertyElement', () => {
 		});
 
 		describe('moving to another variant’s data path', () => {
-			it('keeps the previous variant’s message when the editor supports variant change', async () => {
-				element.propertyEditorUiAlias = ALIAS_SUPPORTS_VARIANT_CHANGE;
+			it('keeps the previous variant’s message', async () => {
+				element.propertyEditorUiAlias = ALIAS_DEFAULT;
 				element.dataPath = DATA_PATH_DA_DK;
 				await getEditorElement();
 				host.datasetContext.setPropertyValue('test', 'Dansk værdi');
@@ -204,29 +178,8 @@ describe('UmbPropertyElement', () => {
 				expect(host.validation.messages.getMessages()).to.have.lengthOf(1);
 			});
 
-			it('keeps the previous variant’s message when the editor is re-created', async () => {
-				element.propertyEditorUiAlias = ALIAS_DEFAULT;
-				element.dataPath = DATA_PATH_DA_DK;
-				await getEditorElement();
-				host.datasetContext.setPropertyValue('test', 'Dansk værdi');
-				await aTimeout(20);
-
-				host.validation.messages.addMessage('server', DATA_PATH_DA_DK, 'Server says no');
-				await aTimeout(20);
-
-				element.dataPath = DATA_PATH_EN_US;
-				await waitUntil(
-					() => UmbTestPropertyEditorUiElement.instanceCount === 2,
-					'Property Editor UI element was not re-created for the new variant',
-				);
-				host.datasetContext.setPropertyValue('test', 'English value');
-				await aTimeout(20);
-
-				expect(host.validation.messages.getMessages()).to.have.lengthOf(1);
-			});
-
 			it('flags the element for a message belonging to the new data path', async () => {
-				element.propertyEditorUiAlias = ALIAS_SUPPORTS_VARIANT_CHANGE;
+				element.propertyEditorUiAlias = ALIAS_DEFAULT;
 				element.dataPath = DATA_PATH_DA_DK;
 				await getEditorElement();
 
@@ -249,7 +202,7 @@ describe('UmbPropertyElement', () => {
 				host.validation.messages.addMessage('server', DATA_PATH_EN_US, 'Server says no');
 				await aTimeout(20);
 
-				element.propertyEditorUiAlias = ALIAS_SUPPORTS_VARIANT_CHANGE;
+				element.propertyEditorUiAlias = ALIAS_DEFAULT;
 				await aTimeout(20);
 
 				expect(host.validation.messages.getMessages()).to.have.lengthOf(1);

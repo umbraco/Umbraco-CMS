@@ -1,5 +1,7 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbInputDocumentElement } from '../../components/input-document/input-document.element.js';
+import { UmbDocumentDynamicRootResolver } from '../../dynamic-root/document-dynamic-root-resolver.controller.js';
+import type { UmbDynamicRoot } from '@umbraco-cms/backoffice/dynamic-root';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -30,6 +32,7 @@ export class UmbPropertyEditorUIDocumentPickerElement
 		}
 
 		this._startNodeId = config.getValueByAlias('startNodeId');
+		this.#dynamicRoot = config.getValueByAlias<UmbDynamicRoot>('dynamicRoot');
 
 		const allowedContentTypes = config.getValueByAlias<string>('allowedContentTypes');
 		this._allowedContentTypes = allowedContentTypes ? allowedContentTypes.split(',').filter(Boolean) : undefined;
@@ -60,6 +63,13 @@ export class UmbPropertyEditorUIDocumentPickerElement
 	private _startNodeId?: string;
 
 	@state()
+	private _startNodeIds?: Array<string>;
+
+	#dynamicRoot?: UmbDynamicRoot;
+
+	#dynamicRootResolver = new UmbDocumentDynamicRootResolver(this);
+
+	@state()
 	private _allowedContentTypes?: string[];
 
 	@state()
@@ -81,8 +91,15 @@ export class UmbPropertyEditorUIDocumentPickerElement
 		);
 	}
 
-	override firstUpdated() {
+	override async firstUpdated() {
 		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-document')!);
+
+		// A fixed start node wins; the dynamic root is only resolved when there is none.
+		if (!this._startNodeId) {
+			const resolved = await this.#dynamicRootResolver.resolveStartNodeUniques(this.#dynamicRoot);
+			this._startNodeId = resolved?.[0];
+			this._startNodeIds = resolved;
+		}
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputDocumentElement }) {
@@ -102,15 +119,22 @@ export class UmbPropertyEditorUIDocumentPickerElement
 	}
 
 	override render() {
-		const startNode: UmbTreeStartNode | undefined = this._startNodeId
-			? { unique: this._startNodeId, entityType: UMB_DOCUMENT_ENTITY_TYPE }
-			: undefined;
+		// A dynamic root query can resolve to more than one node, and all of them are made available to the picker.
+		const startNodes: Array<UmbTreeStartNode> | undefined =
+			this._startNodeIds && this._startNodeIds.length > 1
+				? this._startNodeIds.map((unique) => ({ unique, entityType: UMB_DOCUMENT_ENTITY_TYPE }))
+				: undefined;
+		const startNode: UmbTreeStartNode | undefined =
+			!startNodes && this._startNodeId
+				? { unique: this._startNodeId, entityType: UMB_DOCUMENT_ENTITY_TYPE }
+				: undefined;
 
 		return html`
 			<umb-input-document
 				.min=${this._min}
 				.max=${this._max}
 				.startNode=${startNode}
+				.startNodes=${startNodes}
 				.allowedContentTypeIds=${this._allowedContentTypes}
 				.value=${this.value}
 				@change=${this.#onChange}

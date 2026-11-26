@@ -4,6 +4,9 @@ import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-a
 export type BlockWorkspaceHasSettingsConditionConfig =
 	UmbConditionConfigBase<'Umb.Condition.BlockWorkspaceHasSettings'>;
 
+// eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-empty-object-type
+export interface BlockWorkspaceHasContentConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockWorkspaceHasContent'> {}
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export interface BlockEntryShowContentEditConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryShowContentEdit'> {
 	match?: boolean;
@@ -20,10 +23,27 @@ export interface BlockWorkspaceIsReadOnlyConditionConfig extends UmbConditionCon
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export type BlockEntryHasSettingsConditionConfig = UmbConditionConfigBase<'Umb.Condition.BlockEntryHasSettings'>;
+export interface BlockEntryHasSettingsConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryHasSettings'> {
+	match?: boolean;
+}
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export interface BlockEntryHasExternalContentConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryHasExternalContent'> {
+	match?: boolean;
+}
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export interface BlockEntryIsReadOnlyConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryIsReadOnly'> {
+	match?: boolean;
+}
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export interface BlockEntryIsAllowedInLibraryConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryIsAllowedInLibrary'> {
+	match?: boolean;
+}
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export interface BlockEntryIsUnsupportedConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryIsUnsupported'> {
 	match?: boolean;
 }
 
@@ -33,15 +53,29 @@ export interface UmbBlockEntryIsExposedConditionConfig extends UmbConditionConfi
 	match?: boolean;
 }
 
+export interface UmbBlockEntryVariesByVariantConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryVariesByVariant'> {
+	match?: boolean;
+}
+
+export interface UmbBlockWorkspaceVariesByVariantConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockWorkspaceVariesByVariant'> {
+	match?: boolean;
+}
+
 declare global {
 	interface UmbExtensionConditionConfigMap {
 		umbBlock:
 			| BlockEntryShowContentEditConditionConfig
 			| BlockWorkspaceHasSettingsConditionConfig
+			| BlockWorkspaceHasContentConditionConfig
 			| BlockEntryIsExposedConditionConfig
+			| BlockEntryHasExternalContentConditionConfig
 			| BlockWorkspaceIsReadOnlyConditionConfig
 			| BlockEntryIsReadOnlyConditionConfig
 			| BlockEntryHasSettingsConditionConfig
-			| UmbBlockEntryIsExposedConditionConfig;
+			| BlockEntryIsAllowedInLibraryConditionConfig
+			| BlockEntryIsUnsupportedConditionConfig
+			| UmbBlockEntryIsExposedConditionConfig
+			| UmbBlockEntryVariesByVariantConditionConfig
+			| UmbBlockWorkspaceVariesByVariantConditionConfig;
 	}
 }

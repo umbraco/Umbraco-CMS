@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 /// Represents a multi-node tree picker property editor.
 /// </summary>
+[Obsolete("The multi node tree picker is replaced by the dedicated document, media, element and member pickers. Scheduled for removal in Umbraco 22.")]
 [DataEditor(
     Constants.PropertyEditors.Aliases.MultiNodeTreePicker,
     ValueType = ValueTypes.Text,
@@ -81,14 +82,14 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
         // Add minItems/maxItems from configuration if available
         if (configuration is MultiNodePickerConfiguration pickerConfig)
         {
-            if (pickerConfig.MinNumber > 0)
+            if (pickerConfig.ValidationLimit.Min is int min && min > 0)
             {
-                schema["minItems"] = pickerConfig.MinNumber;
+                schema["minItems"] = min;
             }
 
-            if (pickerConfig.MaxNumber > 0)
+            if (pickerConfig.ValidationLimit.Max is int max && max > 0)
             {
-                schema["maxItems"] = pickerConfig.MaxNumber;
+                schema["maxItems"] = max;
             }
         }
 
@@ -284,13 +285,16 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
                     return validationResults;
                 }
 
-                if (ItemCountValidationHelper.IsAboveZeroAndBelowMinimum(entityReferences?.Length ?? 0, configuration.MinNumber))
+                var minNumber = configuration.ValidationLimit.Min ?? 0;
+                var maxNumber = configuration.ValidationLimit.Max ?? 0;
+
+                if (ItemCountValidationHelper.IsAboveZeroAndBelowMinimum(entityReferences?.Length ?? 0, minNumber))
                 {
                     validationResults.Add(new ValidationResult(
                         _localizedTextService.Localize(
                             "validation",
                             "entriesShort",
-                            [configuration.MinNumber.ToString(), (configuration.MinNumber - (entityReferences?.Length ?? 0)).ToString()
+                            [minNumber.ToString(), (minNumber - (entityReferences?.Length ?? 0)).ToString()
                             ]),
                         ["value"]));
                 }
@@ -300,13 +304,13 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
                     return validationResults;
                 }
 
-                if (configuration.MaxNumber > 0 && entityReferences.Length > configuration.MaxNumber)
+                if (maxNumber > 0 && entityReferences.Length > maxNumber)
                 {
                     validationResults.Add(new ValidationResult(
                         _localizedTextService.Localize(
                             "validation",
                             "entriesExceed",
-                            [configuration.MaxNumber.ToString(), (entityReferences.Length - configuration.MaxNumber).ToString()
+                            [maxNumber.ToString(), (entityReferences.Length - maxNumber).ToString()
                             ]),
                         ["value"]));
                 }

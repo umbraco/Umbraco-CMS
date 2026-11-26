@@ -21,6 +21,7 @@ import type {
 	UmbBlockLabelUfmValueType,
 } from '@umbraco-cms/backoffice/block';
 
+import '../../../block/components/block-state-tag/block-state-tag.element.js';
 import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
@@ -35,7 +36,7 @@ const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest:
 export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitElement) {
 	#manager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
 	#blockContext?: typeof UMB_BLOCK_LIST_ENTRY_CONTEXT.TYPE;
-	#contentKey?: string;
+	#key?: string;
 
 	@property({ type: String, reflect: false })
 	icon?: string;
@@ -74,11 +75,11 @@ export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEl
 			this.#blockContext = blockContext;
 			this.observe(
 				this.#blockContext?.unique,
-				(contentKey) => {
-					this.#contentKey = contentKey;
+				(key) => {
+					this.#key = key;
 					this.#load();
 				},
-				'observeContentKey',
+				'observeKey',
 			);
 		});
 
@@ -150,8 +151,8 @@ export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEl
 	}
 
 	#load() {
-		if (!this._workspaceContext || !this.#contentKey) return;
-		this._workspaceContext.load(this.#contentKey);
+		if (!this._workspaceContext || !this.#key) return;
+		this._workspaceContext.load(this.#key);
 	}
 
 	readonly #onClick = () => {
@@ -171,7 +172,7 @@ export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEl
 
 	readonly #onBlockInserted = (event: Event) => {
 		const blockEvent = event as UmbBlockInsertedEvent<UmbBlockListLayoutModel, UmbBlockListWorkspaceOriginData>;
-		if (blockEvent.detail.layout.contentKey === this.#contentKey) {
+		if (blockEvent.detail.layout.key === this.#key) {
 			this._isOpen = true;
 		}
 	};
@@ -203,14 +204,7 @@ export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEl
 				</span>
 				<div id="info">${this.renderNameSlot(blockValue)}</div>
 			</span>
-			${when(
-				this.unpublished,
-				() => html`
-					<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}>
-						<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
-					</uui-tag>
-				`,
-			)}
+			<umb-block-state-tag slot="name"></umb-block-state-tag>
 		`;
 	}
 
@@ -336,13 +330,6 @@ export class UmbInlineListBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEl
 				justify-content: center;
 				height: 100%;
 				padding-left: var(--uui-size-2, 6px);
-			}
-
-			uui-tag {
-				margin-left: 0.5em;
-				margin-bottom: -0.3em;
-				margin-top: -0.3em;
-				vertical-align: text-top;
 			}
 
 			:host(:not([disabled])) #open-part:hover #icon {

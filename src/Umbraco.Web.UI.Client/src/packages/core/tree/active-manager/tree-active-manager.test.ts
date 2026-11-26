@@ -138,30 +138,4 @@ describe('UmbTreeItemActiveManager', () => {
 			expect(manager.getActiveTrail()).to.deep.equal([item]);
 		});
 	});
-
-	describe('deprecated members', () => {
-		it('setActive delegates to setActiveTrail', () => {
-			manager.setActive([item]);
-			expect(manager.getActiveTrail()).to.deep.equal([item]);
-		});
-
-		it('getActive delegates to getActiveTrail', () => {
-			manager.setActiveTrail([item]);
-			expect(manager.getActive()).to.deep.equal([item]);
-		});
-
-		it('removeActiveIfMatch delegates to removeActiveTrailIfMatch', () => {
-			manager.setActiveTrail([item]);
-			manager.removeActiveIfMatch([item]);
-			expect(manager.getActiveTrail()).to.deep.equal([]);
-		});
-
-		it('active emits the same values as activeTrail', (done) => {
-			manager.setActiveTrail([item]);
-			manager.active.subscribe((value) => {
-				expect(value).to.deep.equal([item]);
-				done();
-			});
-		});
-	});
 });

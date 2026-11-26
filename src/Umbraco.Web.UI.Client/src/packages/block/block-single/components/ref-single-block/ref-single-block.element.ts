@@ -1,8 +1,10 @@
-import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbBlockRefNameSlotMixin } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockDataType, UmbBlockLabelUfmValueType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
+
+import '../../../block/components/block-state-tag/block-state-tag.element.js';
 
 /**
  * @element umb-ref-single-block
@@ -35,14 +37,7 @@ export class UmbRefSingleBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEle
 				.href=${this.config?.showContentEdit ? this.config?.editContentPath : undefined}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 				${this.renderNameSlot(blockValue, 'name')}
-				${when(
-					this.unpublished,
-					() => html`
-						<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}>
-							<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
-						</uui-tag>
-					`,
-				)}
+				<umb-block-state-tag slot="name"></umb-block-state-tag>
 			</uui-ref-node>
 		`;
 	}
@@ -51,12 +46,6 @@ export class UmbRefSingleBlockElement extends UmbBlockRefNameSlotMixin(UmbLitEle
 		css`
 			uui-ref-node {
 				min-height: var(--uui-size-16);
-			}
-			uui-tag {
-				margin-left: 0.5em;
-				margin-bottom: -0.3em;
-				margin-top: -0.3em;
-				vertical-align: text-top;
 			}
 			:host([unpublished]) umb-icon,
 			:host([unpublished]) umb-ufm-render,

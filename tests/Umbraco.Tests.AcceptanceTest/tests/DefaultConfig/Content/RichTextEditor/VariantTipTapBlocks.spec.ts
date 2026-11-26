@@ -52,7 +52,7 @@ test('invariant document type with invariant tiptap RTE with invariant block wit
 
   // Act
   await umbracoUi.content.clickInsertBlockButton();
-  await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.clickBlockElementWithNameInRichTextEditor(blockName);
   await umbracoUi.content.enterTextstring(textStringText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
@@ -90,7 +90,6 @@ test('can not create unsupported invariant document type with invariant tiptap R
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, tipTapName, tipTapId, documentTypeGroupName);
   contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
@@ -115,7 +114,7 @@ test('variant document type with variant tiptap RTE with variant block with an v
 
   // Act
   await umbracoUi.content.clickInsertBlockButton();
-  await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.clickBlockElementWithNameInRichTextEditor(blockName);
   await umbracoUi.content.enterTextstring(textStringText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
@@ -140,7 +139,7 @@ test('variant document type with invariant tiptap RTE with variant block with an
 
   // Act
   await umbracoUi.content.clickInsertBlockButton();
-  await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.clickBlockElementWithNameInRichTextEditor(blockName);
   await umbracoUi.content.enterTextstring(textStringText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
@@ -165,7 +164,7 @@ test('variant document type with invariant tiptap RTE with variant block with an
 
   // Act
   await umbracoUi.content.clickInsertBlockButton();
-  await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.clickBlockElementWithNameInRichTextEditor(blockName);
   await umbracoUi.content.enterTextstring(textStringText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();

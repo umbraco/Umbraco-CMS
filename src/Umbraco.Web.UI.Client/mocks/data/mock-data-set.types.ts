@@ -3,6 +3,7 @@ import type {
 	DataTypeItemResponseModel,
 	DataTypeResponseModel,
 	DataTypeTreeItemResponseModel,
+	DatatypeConfigurationResponseModel,
 	// Dictionary
 	DictionaryItemItemResponseModel,
 	DictionaryItemResponseModel,
@@ -61,6 +62,8 @@ import type {
 	// Script
 	ScriptItemResponseModel,
 	ScriptResponseModel,
+	// Segment
+	SegmentResponseModel,
 	// Static File
 	StaticFileItemResponseModel,
 	// Stylesheet
@@ -90,10 +93,6 @@ import type {
 	// Health Check
 	HealthCheckGroupPresentationModel,
 	HealthCheckGroupWithResultResponseModel,
-	// Examine
-	IndexResponseModel,
-	PagedIndexResponseModel,
-	SearchResultResponseModel,
 	// Tracked Reference
 	IReferenceResponseModelDefaultReferenceResponseModel,
 	IReferenceResponseModelDocumentReferenceResponseModel,
@@ -111,7 +110,9 @@ import type {
 // Model Type Definitions
 // ============================================================================
 
-export type UmbMockDataTypeModel = DataTypeResponseModel & DataTypeTreeItemResponseModel & DataTypeItemResponseModel;
+export type UmbMockDataTypeModel = DataTypeResponseModel &
+	Omit<DataTypeTreeItemResponseModel, 'parentIsFolder'> &
+	DataTypeItemResponseModel;
 
 export type UmbMockDictionaryModel = DictionaryItemResponseModel &
 	NamedEntityTreeItemResponseModel &
@@ -127,12 +128,14 @@ export type UmbMockDocumentModel = DocumentResponseModel &
 		domains?: DomainsResponseModel;
 	};
 
-export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
-	DocumentBlueprintItemResponseModel &
-	DocumentBlueprintTreeItemResponseModel;
+export type UmbMockDocumentBlueprintModel = Omit<DocumentBlueprintResponseModel, 'documentType'> &
+	Omit<DocumentBlueprintItemResponseModel, 'documentType'> &
+	Omit<DocumentBlueprintTreeItemResponseModel, 'documentType' | 'parentIsFolder'> & {
+		documentType: DocumentTypeReferenceResponseModel | null;
+	};
 
 export type UmbMockDocumentTypeModel = DocumentTypeResponseModel &
-	DocumentTypeTreeItemResponseModel &
+	Omit<DocumentTypeTreeItemResponseModel, 'parentIsFolder'> &
 	DocumentTypeItemResponseModel;
 
 export type UmbMockElementModel = Omit<ElementResponseModel, 'documentType'> &
@@ -154,7 +157,7 @@ export type UmbMockMediaModel = MediaResponseModel &
 	};
 
 export type UmbMockMediaTypeModel = MediaTypeResponseModel &
-	MediaTypeTreeItemResponseModel &
+	Omit<MediaTypeTreeItemResponseModel, 'parentIsFolder'> &
 	MediaTypeItemResponseModel;
 
 export type UmbMockMemberModel = MemberResponseModel & MemberItemResponseModel;
@@ -162,7 +165,7 @@ export type UmbMockMemberModel = MemberResponseModel & MemberItemResponseModel;
 export type UmbMockMemberGroupModel = MemberGroupItemResponseModel;
 
 export type UmbMockMemberTypeModel = MemberTypeResponseModel &
-	MemberTypeTreeItemResponseModel &
+	Omit<MemberTypeTreeItemResponseModel, 'parentIsFolder'> &
 	MemberTypeItemResponseModel & {
 		hasListView: boolean;
 	};
@@ -178,6 +181,8 @@ export type UmbMockRelationTypeModel = RelationTypeResponseModel & RelationTypeI
 export type UmbMockRelationTypeItemModel = RelationTypeItemResponseModel;
 
 export type UmbMockScriptModel = ScriptResponseModel & FileSystemTreeItemPresentationModel & ScriptItemResponseModel;
+
+export type UmbMockSegmentModel = SegmentResponseModel;
 
 export type UmbMockStaticFileModel = StaticFileItemResponseModel & FileSystemTreeItemPresentationModel;
 
@@ -229,6 +234,7 @@ export interface UmbMockLogLevelsModel {
 export interface UmbMockDataSet {
 	// Core entity data arrays (all optional, defaults to empty array)
 	dataType?: Array<UmbMockDataTypeModel>;
+	dataTypeConfiguration?: DatatypeConfigurationResponseModel;
 	dictionary?: Array<UmbMockDictionaryModel>;
 	document?: Array<UmbMockDocumentModel>;
 	documentBlueprint?: Array<UmbMockDocumentBlueprintModel>;
@@ -246,6 +252,7 @@ export interface UmbMockDataSet {
 	relation?: Array<UmbMockRelationModel>;
 	relationType?: Array<UmbMockRelationTypeModel>;
 	script?: Array<UmbMockScriptModel>;
+	segment?: Array<UmbMockSegmentModel>;
 	staticFile?: Array<UmbMockStaticFileModel>;
 	stylesheet?: Array<UmbMockStylesheetModel>;
 	template?: Array<UmbMockTemplateModel>;
@@ -269,13 +276,10 @@ export interface UmbMockDataSet {
 	healthGroups?: Array<HealthCheckGroupWithResultResponseModel & { name: string }>;
 	healthGroupsWithoutResult?: Array<HealthCheckGroupPresentationModel>;
 
-	// Examine/search data
-	examineIndexers?: Array<IndexResponseModel>;
-	examinePagedIndexers?: PagedIndexResponseModel;
-	examineSearchResults?: Array<SearchResultResponseModel>;
-
 	// Tracked references
 	trackedReferenceItems?: Array<UmbMockTrackedReferenceItemModel>;
+	/** The items referencing each target, keyed by the target's id. When set, the reference endpoints use it instead of `trackedReferenceItems`. */
+	referencedBy?: Record<string, Array<UmbMockTrackedReferenceItemModel>>;
 
 	// News
 	news?: Array<NewsDashboardItemResponseModel>;
@@ -286,6 +290,24 @@ export interface UmbMockDataSet {
 	// Template-specific helpers
 	templateQueryResult?: TemplateQueryResultResponseModel;
 	templateQuerySettings?: TemplateQuerySettingsResponseModel;
+}
+
+/**
+ * Describes a mock data set and how to load it.
+ * Each set folder exports one of these from its `manifest.ts`.
+ */
+export interface UmbMockSetManifest {
+	alias: string;
+	label: string;
+	/** Icon name, as registered in the icon registry (e.g. `icon-home`). */
+	icon?: string;
+	/** Whether the set appears in the header app dropdown. Defaults to false. */
+	visible?: boolean;
+	/** Whether the current user can be switched between the users of the set from the header. Defaults to false. */
+	userSwitcher?: boolean;
+	/** Names of folders under `examples/` that are loaded whenever this set is active. */
+	examples?: Array<string>;
+	loader: () => Promise<UmbMockDataSet>;
 }
 
 // ============================================================================

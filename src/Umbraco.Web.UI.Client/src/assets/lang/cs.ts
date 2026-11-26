@@ -507,33 +507,6 @@ export default {
 		changeKeyError: "Klíč '%0%' již existuje.",
 		overviewTitle: 'Přehled slovníku',
 	},
-	examineManagement: {
-		configuredSearchers: 'Konfigurovaní vyhledávače',
-		configuredSearchersDescription:
-			'Zobrazuje vlastnosti a nástroje pro libovolný konfigurovaný vyhledávač (např. pro víceindexový vyhledávač)',
-		fieldValues: 'Hodnoty pole',
-		healthStatus: 'Stav',
-		healthStatusDescription: 'Stav indexu a jeho čitelnost',
-		indexers: 'Indexery',
-		indexInfo: 'Informace o indexu',
-		indexInfoDescription: 'Uvádí vlastnosti indexu',
-		manageIndexes: 'Spravovat indexy Examine',
-		manageIndexesDescription:
-			'Umožňuje zobrazit podrobnosti každého indexu a poskytuje některé nástroje pro správu indexů',
-		rebuildIndex: 'Znovu vytvořit index',
-		rebuildIndexWarning:
-			'\n      To způsobí opětovné sestavení indexu.<br />V závislosti na tom, kolik obsahu je na vašem webu, může to chvíli trvat.<br />Nedoporučuje se znovu vytvářet index v době vysokého provozu na webu nebo při úpravách obsahu editory.\n     ',
-		searchers: 'Vyhledávače',
-		searchDescription: 'Prohledat index a zobrazit výsledky',
-		tools: 'Nástroje',
-		toolsDescription: 'Nástroje pro správu indexu',
-		fields: 'pole',
-		indexCannotRead: 'Index nelze číst a bude nutné jej znovu sestavit',
-		processIsTakingLonger:
-			'Proces trvá déle, než se očekávalo, zkontrolujte Umbraco log a zkontrolujte, zda během této operace nedošlo k chybám',
-		indexCannotRebuild: 'Tento index nelze znovu sestavit, protože nemá přiřazen',
-		iIndexPopulator: 'IIndexPopulator',
-	},
 	placeholders: {
 		username: 'Zadejte Vaše uživatelské jméno',
 		password: 'Zadejte Vaše heslo',
@@ -1045,6 +1018,9 @@ export default {
 		publishHelp:
 			'Klikněte <em>ok</em> pro publikování <strong>%0%</strong> a tedy zveřejnění jejího obsahu.<br/><br />\n      Můžete publikovat tuto stránku a všechny její podstránky zatrhnutím <em>publikovat všchny podstránky</em> níže.\n      ',
 		includeUnpublished: 'Zahrnout nepublikované podřízené stránky',
+		publishedNotificationTitle: 'Publikováno',
+		publishedNotificationDescription: '%0% je nyní veřejně dostupné',
+		publishedVariantNotificationDescription: '%1% je nyní veřejně dostupné v %0%',
 	},
 	colorpicker: {
 		noColors: 'Nenakonfigurovali jste žádné schválené barvy',
@@ -1167,6 +1143,7 @@ export default {
 		dataTypeSaved: 'Datový typ byl uložen',
 		dictionaryItemSaved: 'Položka slovníku byla uložena',
 		editContentPublishedHeader: 'Obsah byl publikován',
+		editElementPublishedHeader: 'Prvek byl publikován',
 		editContentPublishedText: 'a je viditelný na webu',
 		editMultiContentPublishedText: '%0% dokumentů zveřejněných a viditelných na webu',
 		editVariantPublishedText: '%0% zveřejněných a viditelných na webu',
@@ -1812,7 +1789,6 @@ export default {
 		contentRedirectManager: 'Správa přesměrování',
 		mediaFolderBrowser: 'Obsah',
 		settingsWelcome: 'Vítejte',
-		settingsExamine: 'Správa Examine',
 		settingsPublishedStatus: 'Stav publikování',
 		settingsModelsBuilder: 'Tvůrce modelů',
 		settingsHealthCheck: 'Health Check',
@@ -1927,5 +1903,10 @@ export default {
 		formsHeadline: 'Umbraco formuláře',
 		formsDescription:
 			'Vytvářejte formuláře pomocí intuitivního rozhraní drag and drop. Od jednoduchých kontaktních formulářů, které odesílají e-maily, až po pokročilé dotazníky, které se integrují do systémů CRM. Vaši klienti to budou milovat!',
+	},
+	elements: {
+		confirmPublishDescription: 'Publikování toto zpřístupní veřejnosti.',
+		confirmBulkPublishDescription: 'Publikování zpřístupní vybrané položky veřejnosti.',
+		confirmBulkUnpublishDescription: 'Vybrané položky již nebudou veřejně dostupné.',
 	},
 } as UmbLocalizationDictionary;

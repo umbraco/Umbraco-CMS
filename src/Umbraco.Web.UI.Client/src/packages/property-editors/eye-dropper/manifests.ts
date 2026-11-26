@@ -8,7 +8,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Eye Dropper Color Picker Property Editor UI',
 		element: () => import('./property-editor-ui-eye-dropper.element.js'),
 		meta: {
-			supportsVariantChange: true,
 			label: 'Eye Dropper Color Picker',
 			icon: 'icon-colorpicker',
 			group: '#propertyEditorUIGroups_pickers',

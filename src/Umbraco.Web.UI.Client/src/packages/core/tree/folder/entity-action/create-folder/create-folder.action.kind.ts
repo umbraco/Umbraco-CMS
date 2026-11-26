@@ -1,6 +1,9 @@
 import { UmbCreateFolderEntityAction } from './create-folder.action.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST,
+	UMB_ENTITY_ACTION_GROUP_CREATE,
+} from '@umbraco-cms/backoffice/entity-action';
 
 export const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -10,6 +13,7 @@ export const manifest: UmbExtensionManifestKind = {
 	manifest: {
 		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
+		group: UMB_ENTITY_ACTION_GROUP_CREATE,
 		kind: 'folderCreate',
 		api: UmbCreateFolderEntityAction,
 		weight: 900,

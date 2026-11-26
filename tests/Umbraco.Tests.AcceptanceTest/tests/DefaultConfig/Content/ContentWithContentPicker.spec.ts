@@ -1,9 +1,9 @@
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
-const dataTypeName = 'Content Picker';
+const dataTypeName = 'Single Document Picker';
 const contentPickerDocumentTypeName = 'DocumentTypeForContentPicker';
 const contentPickerName = 'TestContentPicker';
 let contentPickerDocumentTypeId = '';
@@ -157,7 +157,7 @@ test('can remove content picker in the content', async ({umbracoApi, umbracoUi})
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
-  await umbracoApi.document.createDocumentWithContentPicker(contentName, documentTypeId, contentPickerId);
+  await umbracoApi.document.createDocumentWithContentPicker(contentName, documentTypeId, contentPickerId, AliasHelper.toAlias(dataTypeName));
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -177,7 +177,7 @@ test('can remove a not-found content picker', {tag: '@release'}, async ({umbraco
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
-  await umbracoApi.document.createDocumentWithContentPicker(contentName, documentTypeId, contentPickerId);
+  await umbracoApi.document.createDocumentWithContentPicker(contentName, documentTypeId, contentPickerId, AliasHelper.toAlias(dataTypeName));
   await umbracoApi.document.delete(contentPickerId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -197,7 +197,7 @@ test('can navigate away from content with a content picker value without seeing 
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
-  await umbracoApi.document.createDocumentWithContentPicker(contentName, documentTypeId, contentPickerId);
+  await umbracoApi.document.createDocumentWithContentPicker(contentName, documentTypeId, contentPickerId, AliasHelper.toAlias(dataTypeName));
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
@@ -215,7 +215,7 @@ test('can see discard changes when navigating away from content with a changed c
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
-  await umbracoApi.document.createDocumentWithContentPicker(contentName, documentTypeId, contentPickerId);
+  await umbracoApi.document.createDocumentWithContentPicker(contentName, documentTypeId, contentPickerId, AliasHelper.toAlias(dataTypeName));
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);

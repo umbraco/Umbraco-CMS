@@ -7,6 +7,7 @@ function makeLayout(
 	options: { settingsKey?: string; areas?: Array<{ key: string; items: Array<UmbBlockGridLayoutModel> }> } = {},
 ): UmbBlockGridLayoutModel {
 	return {
+		key: `${contentKey}-layout`,
 		contentKey,
 		settingsKey: options.settingsKey,
 		columnSpan: 12,
@@ -62,7 +63,7 @@ describe('forEachBlockLayoutEntryOf', () => {
 		expect(seen).to.deep.equal([{ contentKey: 'child', settingsKey: 'child-settings' }]);
 	});
 
-	it('passes the correct parentUnique and areaKey for a nested entry', async () => {
+	it("passes the parent's layout key as parentUnique and the area key for a nested entry", async () => {
 		const grandchild = makeLayout('grandchild');
 		const child = makeLayout('child', {
 			areas: [{ key: 'inner-area', items: [grandchild] }],
@@ -76,8 +77,8 @@ describe('forEachBlockLayoutEntryOf', () => {
 			calls.push({ contentKey: entry.contentKey, parentUnique, areaKey });
 		});
 
-		expect(calls).to.deep.include({ contentKey: 'child', parentUnique: 'root', areaKey: 'outer-area' });
-		expect(calls).to.deep.include({ contentKey: 'grandchild', parentUnique: 'child', areaKey: 'inner-area' });
+		expect(calls).to.deep.include({ contentKey: 'child', parentUnique: 'root-layout', areaKey: 'outer-area' });
+		expect(calls).to.deep.include({ contentKey: 'grandchild', parentUnique: 'child-layout', areaKey: 'inner-area' });
 	});
 
 	it('does nothing when the entry has no areas', async () => {

@@ -80,6 +80,26 @@ describe('UmbMemberPickerValueSummaryResolver', () => {
 		expect(uniques).to.include(MEMBER_TWO_ID);
 	});
 
+	it('resolves an array value to its items in order', async () => {
+		const result = await resolver.resolveValues([[MEMBER_TWO_ID, MEMBER_ONE_ID]]);
+
+		expect(result.data).to.have.length(1);
+		expect(result.data[0].map((item) => item.unique)).to.deep.equal([MEMBER_TWO_ID, MEMBER_ONE_ID]);
+	});
+
+	it('returns an empty array for an empty array value', async () => {
+		const result = await resolver.resolveValues([[]]);
+		expect(result.data).to.deep.equal([[]]);
+	});
+
+	it('resolves string and array values in the same batch', async () => {
+		const result = await resolver.resolveValues([MEMBER_ONE_ID, [MEMBER_TWO_ID]]);
+
+		expect(result.data).to.have.length(2);
+		expect(result.data[0][0].unique).to.equal(MEMBER_ONE_ID);
+		expect(result.data[1][0].unique).to.equal(MEMBER_TWO_ID);
+	});
+
 	it('returns an empty array for an unknown member ID', async () => {
 		const result = await resolver.resolveValues(['00000000-0000-0000-0000-000000000000']);
 

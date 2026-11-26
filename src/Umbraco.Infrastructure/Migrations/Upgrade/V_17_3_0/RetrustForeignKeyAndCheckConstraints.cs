@@ -1,7 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_3_0;
@@ -15,18 +13,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_3_0;
 public class RetrustForeignKeyAndCheckConstraints : AsyncMigrationBase
 {
     private readonly IUmbracoDatabaseFactory _databaseFactory;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RetrustForeignKeyAndCheckConstraints"/> class.
-    /// </summary>
-    /// <param name="context">The migration context.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public RetrustForeignKeyAndCheckConstraints(IMigrationContext context)
-        : this(
-            context,
-            StaticServiceProvider.Instance.GetRequiredService<IUmbracoDatabaseFactory>())
-    {
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RetrustForeignKeyAndCheckConstraints"/> class.

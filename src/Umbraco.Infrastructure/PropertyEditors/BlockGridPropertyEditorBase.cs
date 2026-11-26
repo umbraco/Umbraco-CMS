@@ -26,19 +26,11 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public abstract class BlockGridPropertyEditorBase : DataEditor, IValueSchemaProvider
 {
-    private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
-
-    protected BlockGridPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
+    protected BlockGridPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
     {
-        _blockValuePropertyIndexValueFactory = blockValuePropertyIndexValueFactory;
         SupportsReadOnly = true;
     }
-
-    /// <summary>
-    /// Gets the <see cref="IPropertyIndexValueFactory"/> instance used to generate index values for block grid properties.
-    /// </summary>
-    public override IPropertyIndexValueFactory PropertyIndexValueFactory => _blockValuePropertyIndexValueFactory;
 
     /// <inheritdoc />
     public virtual Type? GetValueType(object? configuration) => typeof(string); // JSON string representation
@@ -230,8 +222,8 @@ public abstract class BlockGridPropertyEditorBase : DataEditor, IValueSchemaProv
                         continue;
                     }
 
-                    if (ItemCountValidationHelper.IsAboveZeroAndBelowMinimum(area.Items.Length, areaConfig.MinAllowed)
-                        || (areaConfig.MaxAllowed.HasValue && area.Items.Length > areaConfig.MaxAllowed))
+                    if (ItemCountValidationHelper.IsAboveZeroAndBelowMinimum(area.Items.Length, areaConfig.ValidationLimit?.Min)
+                        || (areaConfig.ValidationLimit?.Max is int maxAllowed && area.Items.Length > maxAllowed))
                     {
                         validationResults.Add(new ValidationResult(TextService.Localize("validation", "entriesAreasMismatch")));
                     }

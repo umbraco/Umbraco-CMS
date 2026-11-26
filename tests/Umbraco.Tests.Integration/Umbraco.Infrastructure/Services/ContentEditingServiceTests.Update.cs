@@ -100,9 +100,7 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new VariantModel { Name = "The Updated Name" },
-                new VariantModel { Segment = "seg-1", Name = "The Updated Name" },
-                new VariantModel { Segment = "seg-2", Name = "The Updated Name" }
+                new VariantModel { Name = "The Updated Name" }
             ]
         };
 
@@ -149,11 +147,7 @@ public partial class ContentEditingServiceTests
             Variants =
             [
                 new VariantModel { Name = "The Updated English Default Name", Culture = "en-US" },
-                new VariantModel { Name = "The Updated English Seg-1 Name", Culture = "en-US", Segment = "seg-1" },
-                new VariantModel { Name = "The Updated English Seg-2 Name", Culture = "en-US", Segment = "seg-2" },
                 new VariantModel { Name = "The Updated Danish Default Name", Culture = "da-DK" },
-                new VariantModel { Name = "The Updated Danish Seg-1 Name", Culture = "da-DK", Segment = "seg-1" },
-                new VariantModel { Name = "The Updated Danish Seg-2 Name", Culture = "da-DK", Segment = "seg-2" },
             ]
         };
 
@@ -207,11 +201,7 @@ public partial class ContentEditingServiceTests
             Variants =
             [
                 new VariantModel { Name = "The Updated English Default Name", Culture = "en-US" },
-                new VariantModel { Name = "The Updated English Seg-1 Name", Culture = "en-US", Segment = "seg-1" },
-                new VariantModel { Name = "The Updated English Seg-2 Name", Culture = "en-US", Segment = "seg-2" },
                 new VariantModel { Name = "The Updated Danish Default Name", Culture = "da-DK" },
-                new VariantModel { Name = "The Updated Danish Seg-1 Name", Culture = "da-DK", Segment = "seg-1" },
-                new VariantModel { Name = "The Updated Danish Seg-2 Name", Culture = "da-DK", Segment = "seg-2" },
             ]
         };
 
@@ -254,7 +244,7 @@ public partial class ContentEditingServiceTests
         // Arrange: prepare culture and segment variant content, and an editor with access to
         // English only, so every segment of the Danish culture is off limits to them.
         var content = await CreateCultureAndSegmentVariantContent(ContentVariation.Segment);
-        var editor = await CreateEnglishLanguageOnlyEditor();
+        var editor = await CreateEnglishLanguageOnlyEditor(withHasAccessToInvariantForVariant: true);
 
         var updateModel = new ContentUpdateModel
         {
@@ -301,7 +291,7 @@ public partial class ContentEditingServiceTests
                 Assert.AreEqual("The initial seg-1 title in Danish", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"));
                 Assert.AreEqual("The initial seg-2 title in Danish", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"));
 
-                // The editor has access to the default language, so the culture invariant property is updated.
+                // The editor has access to invariant-for-variant, so the culture invariant property is updated.
                 Assert.AreEqual("The updated other default title", updatedContent.GetValue<string>("otherTitle", culture: null, segment: null));
                 Assert.AreEqual("The updated other seg-1 title", updatedContent.GetValue<string>("otherTitle", culture: null, segment: "seg-1"));
                 Assert.AreEqual("The updated other seg-2 title", updatedContent.GetValue<string>("otherTitle", culture: null, segment: "seg-2"));
@@ -364,16 +354,16 @@ public partial class ContentEditingServiceTests
     /// content for every segment, not only its segment-less value.
     /// </summary>
     /// <remarks>
-    /// The editor is restricted to a non-default language, which is what withholds access to culture
-    /// invariant properties when the AllowEditInvariantFromNonDefault content setting is false.
+    /// The editor does not have access to the invariant-for-variant, which is what withholds access to culture
+    /// invariant properties.
     /// </remarks>
     [Test]
     public async Task Can_Retain_Existing_Segment_Values_For_Invariant_Property_Without_Access()
     {
         // Arrange: prepare culture and segment variant content with a culture invariant, segment variant
-        // "otherTitle" property, and an editor with access to Danish only - not the default language.
+        // "otherTitle" property, and an editor with access to Danish only.
         var content = await CreateCultureAndSegmentVariantContent(ContentVariation.Segment);
-        var editor = await CreateSingleLanguageEditor("da-DK");
+        var editor = await CreateSingleLanguageEditor("da-DK", withHasAccessToInvariantForVariant: false);
 
         var updateModel = new ContentUpdateModel
         {
@@ -411,7 +401,7 @@ public partial class ContentEditingServiceTests
                 Assert.AreEqual("The updated seg-1 Danish title", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"));
                 Assert.AreEqual("The updated seg-2 Danish title", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"));
 
-                // The editor has no access to the default language, so every segment of the culture
+                // The editor has no access to invariant-for-variant, so every segment of the culture
                 // invariant property keeps its initial value.
                 Assert.AreEqual("The initial other default title", updatedContent.GetValue<string>("otherTitle", culture: null, segment: null));
                 Assert.AreEqual("The initial other seg-1 title", updatedContent.GetValue<string>("otherTitle", culture: null, segment: "seg-1"));
@@ -879,6 +869,80 @@ public partial class ContentEditingServiceTests
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+
+        var updated = await ContentEditingService.GetAsync(content.Key);
+        Assert.IsNotNull(updated);
+        Assert.AreEqual(originalName, updated.Name);
+    }
+
+    [TestCase("")]
+    [TestCase(" ")]
+    public async Task Cannot_Update_Invariant_With_Blank_Name(string name)
+    {
+        var content = await CreateInvariantContent();
+        var originalName = content.Name;
+
+        var updateModel = new ContentUpdateModel
+        {
+            Variants = [new VariantModel { Name = name }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The updated title" }],
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+
+        var updated = await ContentEditingService.GetAsync(content.Key);
+        Assert.IsNotNull(updated);
+        Assert.AreEqual(originalName, updated.Name);
+    }
+
+    [TestCase("")]
+    [TestCase(" ")]
+    public async Task Cannot_Update_Culture_Variant_With_Only_Blank_Names(string name)
+    {
+        var content = await CreateCultureVariantContent();
+        var originalEnglishName = content.GetCultureName("en-US");
+        var originalDanishName = content.GetCultureName("da-DK");
+
+        var updateModel = new ContentUpdateModel
+        {
+            Properties = [new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" }],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = name },
+                new VariantModel { Culture = "da-DK", Name = name }
+            ]
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+
+        var updated = await ContentEditingService.GetAsync(content.Key);
+        Assert.IsNotNull(updated);
+        Assert.AreEqual(originalEnglishName, updated.GetCultureName("en-US"));
+        Assert.AreEqual(originalDanishName, updated.GetCultureName("da-DK"));
+    }
+
+    [Test]
+    public async Task Cannot_Update_Segment_Variant_Without_Variants()
+    {
+        var content = await CreateSegmentVariantContent();
+        var originalName = content.Name;
+
+        var updateModel = new ContentUpdateModel
+        {
+            Variants = [],
+            Properties = [new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" }],
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status);
 
         var updated = await ContentEditingService.GetAsync(content.Key);
         Assert.IsNotNull(updated);

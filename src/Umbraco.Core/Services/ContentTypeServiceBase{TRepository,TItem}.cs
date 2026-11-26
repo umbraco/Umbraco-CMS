@@ -1,8 +1,6 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
@@ -68,45 +66,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         _eventAggregator = eventAggregator;
         _userIdKeyResolver = userIdKeyResolver;
         _contentTypeFilters = contentTypeFilters;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ContentTypeServiceBase{TRepository, TItem}"/> class.
-    /// </summary>
-    /// <param name="provider">The core scope provider.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="eventMessagesFactory">The event messages factory.</param>
-    /// <param name="repository">The content type repository.</param>
-    /// <param name="auditRepository">The audit repository.</param>
-    /// <param name="containerRepository">The entity container repository.</param>
-    /// <param name="entityRepository">The entity repository.</param>
-    /// <param name="eventAggregator">The event aggregator.</param>
-    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
-    /// <param name="contentTypeFilters">The content type filter collection.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    protected ContentTypeServiceBase(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        TRepository repository,
-        IAuditRepository auditRepository,
-        IEntityContainerRepository containerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver,
-        ContentTypeFilterCollection contentTypeFilters)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            repository,
-            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-            containerRepository,
-            entityRepository,
-            eventAggregator,
-            userIdKeyResolver,
-            contentTypeFilters)
-    {
     }
 
     /// <summary>
@@ -979,7 +938,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             return ContentTypeOperationStatus.CancelledByNotification;
         }
 
-        PerformDelete(scope, item, deletingNotification, eventMessages, performingUserId);
+        await PerformDeleteAsync(scope, item, deletingNotification, eventMessages, performingUserId);
 
         scope.Complete();
         return ContentTypeOperationStatus.Success;
@@ -1010,6 +969,26 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     }
 
     private void PerformDelete(ICoreScope scope, TItem item, DeletingNotification<TItem> deletingNotification, EventMessages eventMessages, int userId)
+    {
+        (TItem[] descendantsAndSelf, ContentTypeChange<TItem>[] changes) = DeleteLocked(scope, item, eventMessages);
+
+        // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
+        _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
+
+        PublishDeleted(scope, item, descendantsAndSelf, changes, deletingNotification, eventMessages, userId);
+    }
+
+    private async Task PerformDeleteAsync(ICoreScope scope, TItem item, DeletingNotification<TItem> deletingNotification, EventMessages eventMessages, int userId)
+    {
+        (TItem[] descendantsAndSelf, ContentTypeChange<TItem>[] changes) = DeleteLocked(scope, item, eventMessages);
+
+        // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
+        await _eventAggregator.PublishAsync(GetContentTypeRefreshedNotification(changes, eventMessages));
+
+        PublishDeleted(scope, item, descendantsAndSelf, changes, deletingNotification, eventMessages, userId);
+    }
+
+    private (TItem[] DescendantsAndSelf, ContentTypeChange<TItem>[] Changes) DeleteLocked(ICoreScope scope, TItem item, EventMessages eventMessages)
     {
         scope.WriteLock(WriteLockIds);
 
@@ -1046,8 +1025,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)))
             .ToArray();
 
-        // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
-        _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
+        return (descendantsAndSelf, changes);
+    }
+
+    private void PublishDeleted(ICoreScope scope, TItem item, TItem[] descendantsAndSelf, ContentTypeChange<TItem>[] changes, DeletingNotification<TItem> deletingNotification, EventMessages eventMessages, int userId)
+    {
         scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 
         DeletedNotification<TItem> deletedNotification = GetDeletedNotification(descendantsAndSelf.DistinctBy(x => x.Id), eventMessages);
@@ -1189,7 +1171,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 copy.ParentId = containerId.Value;
 
                 SavingNotification<TItem> savingNotification = GetSavingNotification(copy, eventMessages);
-                if (scope.Notifications.PublishCancelable(savingNotification))
+                if (await scope.Notifications.PublishCancelableAsync(savingNotification))
                 {
                     scope.Complete();
                     return MapStatusTypeToAttempt(copy, MoveOperationStatusType.FailedCancelledByEvent);
@@ -1199,7 +1181,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
                 ContentTypeChange<TItem>[] changes = ComposeContentTypeChanges(copy).ToArray();
 
-                _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
+                await _eventAggregator.PublishAsync(GetContentTypeRefreshedNotification(changes, eventMessages));
                 scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 
                 SavedNotification<TItem> savedNotification = GetSavedNotification(copy, eventMessages);
@@ -1280,7 +1262,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         {
             var moveEventInfo = new MoveEventInfo<TItem>(toMove, toMove.Path, containerKey);
             MovingNotification<TItem> movingNotification = GetMovingNotification(moveEventInfo, eventMessages);
-            if (scope.Notifications.PublishCancelable(movingNotification))
+            if (await scope.Notifications.PublishCancelableAsync(movingNotification))
             {
                 scope.Complete();
                 return MapStatusTypeToAttempt(toMove, MoveOperationStatusType.FailedCancelledByEvent);

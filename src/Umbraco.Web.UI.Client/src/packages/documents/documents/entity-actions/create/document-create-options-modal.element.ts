@@ -23,6 +23,7 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 @customElement('umb-document-create-options-modal')
 export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
@@ -52,6 +53,9 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 	@state()
 	private _hasSettingsAccess = false;
 
+	@state()
+	private _isProductionMode?: boolean;
+
 	constructor() {
 		super();
 
@@ -65,6 +69,22 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 				},
 			},
 		]);
+
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this.observe(
+				context?.isProductionMode,
+				(isProductionMode) => {
+					this._isProductionMode = isProductionMode;
+				},
+				'_observeIsProductionMode',
+			);
+		});
+	}
+
+	// Document Type structure can't be edited without Settings access, and shouldn't be in Production mode.
+	// Until the runtime mode is known, treat it as Production (safe default).
+	get #canEditDocumentTypeStructure() {
+		return this._hasSettingsAccess && this._isProductionMode === false;
 	}
 
 	override async firstUpdated() {
@@ -187,35 +207,42 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 	}
 
 	#renderNoDocumentTypes() {
-		if (this.data?.documentType?.unique) {
+		const isChild = !!this.data?.documentType?.unique;
+
+		if (!this.#canEditDocumentTypeStructure) {
+			return isChild
+				? html`<umb-localize key="create_noDocumentTypesWithNoSettingsAccess">
+						The selected page in the content tree doesn't allow for any pages to be created below it.
+					</umb-localize>`
+				: html`<umb-localize key="create_noDocumentTypesAllowedAtRootWithNoSettingsAccess">
+						There are no Document Types allowed for creating content at the root.
+					</umb-localize>`;
+		}
+
+		if (isChild) {
 			return html`
 				<umb-localize key="create_noDocumentTypes">
 					There are no allowed Document Types available for creating content here. You must enable these in
 					<strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the
 					<strong>Allowed child node types</strong> under <strong>Structure</strong>.
 				</umb-localize>
-				${when(
-					this._hasSettingsAccess,
-					() => html`
-						<br />
-						<uui-button
-							id="edit-permissions"
-							look="secondary"
-							href=${`/section/settings/workspace/document-type/edit/${this.data?.documentType?.unique}/view/structure`}
-							label=${this.localize.term('create_noDocumentTypesEditPermissions')}
-							@click=${() => this._rejectModal()}></uui-button>
-					`,
-				)}
-			`;
-		} else {
-			return html`
-				<umb-localize key="create_noDocumentTypesAllowedAtRoot">
-					There are no allowed Document Types available for creating content here. You must enable these in
-					<strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the
-					<strong>Allow as root</strong> option under <strong>Structure</strong>.
-				</umb-localize>
+				<br />
+				<uui-button
+					id="edit-permissions"
+					look="secondary"
+					href=${`/section/settings/workspace/document-type/edit/${this.data?.documentType?.unique}/view/structure`}
+					label=${this.localize.term('create_noDocumentTypesEditPermissions')}
+					@click=${() => this._rejectModal()}></uui-button>
 			`;
 		}
+
+		return html`
+			<umb-localize key="create_noDocumentTypesAllowedAtRoot">
+				There are no allowed Document Types available for creating content here. You must enable these in
+				<strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the
+				<strong>Allow as root</strong> option under <strong>Structure</strong>.
+			</umb-localize>
+		`;
 	}
 
 	#renderDocumentTypes() {

@@ -147,7 +147,8 @@ export class MemberUiHelper extends UiBaseLocators {
   }
 
   async clickRemoveMemberGroupByName(memberGroupName: string) {
-    await this.click(this.page.locator(`[name="${memberGroupName}"]`).getByLabel('Remove'));
+    const memberGroupLocator = this.entityItem.filter({has: this.page.locator(`[name="${memberGroupName}"]`)});
+    await this.click(memberGroupLocator.getByLabel('Remove'));
   }
 
   async enterNewPassword(password: string) {
@@ -181,7 +182,7 @@ export class MemberUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForMemberToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.member, this.clickSaveButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.member, ConstantHelper.workspaceActions.memberSave);
   }
 
   async clickConfirmToDeleteButtonAndWaitForMemberToBeDeleted() {

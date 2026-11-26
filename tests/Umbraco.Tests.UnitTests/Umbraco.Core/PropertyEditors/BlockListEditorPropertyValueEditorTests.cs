@@ -326,7 +326,7 @@ public class BlockListEditorPropertyValueEditorTests
         {
             ConfigurationObject = new BlockListConfiguration
             {
-                ValidationLimit = new BlockListConfiguration.NumberRange
+                ValidationLimit = new NumberRange
                 {
                     Min = 2,
                     Max = 4

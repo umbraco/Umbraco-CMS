@@ -208,27 +208,19 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L126
         // replaced in order to use a custom auth type
         AuthenticateResult auth = await Context.AuthenticateAsync(AuthenticationType);
-        IList<Claim> claims = Array.Empty<Claim>();
-
-        Claim? authenticationMethod = auth.Principal?.FindFirst(ClaimTypes.AuthenticationMethod);
-        Claim? amr = auth.Principal?.FindFirst("amr");
-
-        if (authenticationMethod != null || amr != null)
-        {
-            claims = new List<Claim>();
-            if (authenticationMethod != null)
-            {
-                claims.Add(authenticationMethod);
-            }
-
-            if (amr != null)
-            {
-                claims.Add(amr);
-            }
-        }
-
-        await SignInWithClaimsAsync(user, auth.Properties, claims);
+        await SignInWithClaimsAsync(user, auth.Properties, GetAuthenticationMethodClaims(auth.Principal));
     }
+
+    /// <summary>
+    ///     Gets the claims of a principal that record how it was authenticated, to carry over when its sign-in is re-issued.
+    /// </summary>
+    /// <param name="principal">The currently signed-in principal.</param>
+    /// <returns>The authentication method claims of the principal, if any.</returns>
+    protected static IReadOnlyList<Claim> GetAuthenticationMethodClaims(ClaimsPrincipal? principal)
+        => new[] { ClaimTypes.AuthenticationMethod, Core.Constants.Security.AuthenticationMethodsReferencesClaimType }
+            .Select(type => principal?.FindFirst(type))
+            .OfType<Claim>()
+            .ToList();
 
     /// <inheritdoc />
     public override async Task SignInWithClaimsAsync(TUser user, AuthenticationProperties? authenticationProperties, IEnumerable<Claim> additionalClaims)
@@ -430,7 +422,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
 
         if (loginProvider == null)
         {
-            await SignInWithClaimsAsync(user, isPersistent, new[] { new Claim("amr", "pwd") });
+            await SignInWithClaimsAsync(user, isPersistent, new[] { new Claim(Core.Constants.Security.AuthenticationMethodsReferencesClaimType, "pwd") });
         }
         else
         {
@@ -501,7 +493,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         // When token is verified correctly, clear the access failed count used for lockout
         await ResetLockout(user);
 
-        var claims = new List<Claim> { new("amr", "mfa") };
+        var claims = new List<Claim> { new(Core.Constants.Security.AuthenticationMethodsReferencesClaimType, "mfa") };
 
         // Cleanup external cookie
         if (twoFactorInfo.LoginProvider != null)

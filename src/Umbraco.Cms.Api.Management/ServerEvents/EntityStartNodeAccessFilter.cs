@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Api.Management.ServerEvents;
 /// <summary>
 /// Base class for entity access filters that gate server event delivery by the recipient's
 /// start-node access to the entity's tree path. Only entity types that have a start node
-/// use this base (in practice documents and media), and every such type has a recycle bin.
+/// use this base, and every such type has a recycle bin.
 /// Sources without a start node implement <see cref="IServerEventAccessFilter"/>
 /// directly instead.
 /// </summary>

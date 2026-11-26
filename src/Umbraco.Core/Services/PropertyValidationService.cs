@@ -1,9 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Validation;
@@ -57,30 +55,6 @@ public class PropertyValidationService : IPropertyValidationService
         _idKeyMap = idKeyMap;
     }
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="PropertyValidationService" /> class.
-    /// </summary>
-    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public PropertyValidationService(
-        PropertyEditorCollection propertyEditors,
-        IDataTypeService dataTypeService,
-        ILocalizedTextService textService,
-        IValueEditorCache valueEditorCache,
-        ICultureDictionary cultureDictionary,
-        ILanguageService languageService,
-        IOptions<ContentSettings> contentSettings)
-        : this(
-            propertyEditors,
-            dataTypeService,
-            textService,
-            valueEditorCache,
-            cultureDictionary,
-            languageService,
-            contentSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
-    {
-    }
-
     /// <inheritdoc />
     public IEnumerable<ValidationResult> ValidatePropertyValue(
         IPropertyType propertyType,
@@ -105,13 +79,10 @@ public class PropertyValidationService : IPropertyValidationService
         }
 
         // only validate culture invariant properties if
-        // - AllowEditInvariantFromNonDefault is true, or
-        // - the default language is being validated, or
+        // - the validation context indicates invariant properties should be validated, or
         // - the underlying data editor supports partial property value merging (e.g. block level variance)
-        var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
         if (propertyType.VariesByCulture() is false
-            && _contentSettings.AllowEditInvariantFromNonDefault is false
-            && validationContext.CulturesBeingValidated.InvariantContains(defaultCulture) is false
+            && validationContext.ValidateInvariantProperties is false
             && dataEditor.CanMergePartialPropertyValues(propertyType) is false)
         {
             return [];
@@ -170,6 +141,11 @@ public class PropertyValidationService : IPropertyValidationService
                 return false;
             }
 
+            if (HasInvalidSegmentValue(content, x, impact))
+            {
+                return true;
+            }
+
             // impacts invariant = validate invariant property, invariant culture
             if (impact.ImpactsOnlyInvariantCulture)
             {
@@ -201,8 +177,7 @@ public class PropertyValidationService : IPropertyValidationService
                 {
                     Culture = null,
                     Segment = null,
-                    CulturesBeingValidated = [impact.Culture!],
-                    SegmentsBeingValidated = []
+                    CulturesBeingValidated = [impact.Culture!]
                 });
 #pragma warning restore CS0618 // Type or member is obsolete
             }
@@ -220,6 +195,61 @@ public class PropertyValidationService : IPropertyValidationService
         return invalidProperties.Length == 0;
     }
 
+    /// <summary>
+    ///     Determines whether the property holds an invalid value in a non-default segment of the cultures the impact publishes.
+    /// </summary>
+    private bool HasInvalidSegmentValue(IPublishableContentBase content, IProperty property, CultureImpact impact)
+    {
+        if (property.PropertyType.VariesBySegment() is false)
+        {
+            return false;
+        }
+
+        var variesByCulture = property.PropertyType.VariesByCulture();
+        IEnumerable<string> culturesBeingValidated = [];
+
+        if (impact.ImpactsAllCultures is false)
+        {
+            if (variesByCulture)
+            {
+                if (impact.ImpactsOnlyInvariantCulture)
+                {
+                    return false;
+                }
+            }
+            else if (impact.ImpactsExplicitCulture)
+            {
+                if (GetDataEditor(property.PropertyType)?.CanMergePartialPropertyValues(property.PropertyType) is true)
+                {
+                    culturesBeingValidated = [impact.Culture!];
+                }
+                else if (impact.ImpactsAlsoInvariantProperties is false && content.Published)
+                {
+                    return false;
+                }
+            }
+        }
+
+        var culture = variesByCulture ? impact.Culture : null;
+
+        // a culture invariant value applies to every culture, so when all cultures are impacted it is validated for all of them
+        var validateInvariantValueForAllCultures = variesByCulture is false && impact.ImpactsAllCultures;
+
+        return property.Values.Any(value =>
+            value.Segment.IsNullOrWhiteSpace() is false
+            && property.PropertyType.SupportsVariation(value.Culture, value.Segment, true)
+            && (impact.ImpactsAllCultures || value.Culture.InvariantEquals(culture))
+            && IsValidPropertyValue(
+                property,
+                value.EditedValue,
+                new PropertyValidationContext
+                {
+                    Culture = validateInvariantValueForAllCultures ? "*" : value.Culture,
+                    Segment = value.Segment,
+                    CulturesBeingValidated = culturesBeingValidated,
+                }) is false);
+    }
+
     /// <inheritdoc />
     // TODO (V20): Make this internal rather than removing it entirely in V20, so the
     // referencing unit tests can continue to exercise this code.
@@ -235,7 +265,7 @@ public class PropertyValidationService : IPropertyValidationService
             Culture = validationContext.Culture?.NullOrWhiteSpaceAsNull(),
             Segment = validationContext.Segment?.NullOrWhiteSpaceAsNull(),
             CulturesBeingValidated = validationContext.CulturesBeingValidated,
-            SegmentsBeingValidated = validationContext.SegmentsBeingValidated
+            ValidateInvariantProperties = validationContext.ValidateInvariantProperties,
         };
 
         var culture = validationContext.Culture;
@@ -277,7 +307,6 @@ public class PropertyValidationService : IPropertyValidationService
                         Culture = culture,
                         Segment = null,
                         CulturesBeingValidated = validationContext.CulturesBeingValidated,
-                        SegmentsBeingValidated = validationContext.SegmentsBeingValidated,
                     }))
             {
                 return false;

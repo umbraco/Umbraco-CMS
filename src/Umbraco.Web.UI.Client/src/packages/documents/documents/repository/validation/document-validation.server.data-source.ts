@@ -6,7 +6,7 @@ import {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { umbVariantIdsToCultures, type UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
@@ -74,7 +74,7 @@ export class UmbDocumentValidationServerDataSource {
 	): Promise<UmbDataSourceResponse<string>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
-		const cultures = variantIds.map((id) => id.culture).filter((culture) => culture !== null) as Array<string>;
+		const cultures = umbVariantIdsToCultures(variantIds).filter((x): x is string => x !== null);
 
 		// TODO: make data mapper to prevent errors
 		const body: ValidateUpdateDocumentRequestModel = {

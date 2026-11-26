@@ -17,7 +17,7 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
 {
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
-    private readonly IPreviewService _previewService;
+    private readonly IPreviewSessionService _previewSessionService;
     private readonly IPublishedContentCache _publishedContentCache;
     private readonly IDocumentCacheService _documentCacheService;
 
@@ -26,19 +26,19 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
     /// </summary>
     /// <param name="variationContextAccessor">The variation context accessor for retrieving culture information.</param>
     /// <param name="publishStatusQueryService">The service for querying document publish status.</param>
-    /// <param name="previewService">The service for determining if the current request is in preview mode.</param>
+    /// <param name="previewSessionService">The service for determining if the current request is in preview mode.</param>
     /// <param name="publishedContentCache">The published content cache for retrieving content items.</param>
     /// <param name="documentCacheService">The document cache service used to materialise candidate keys in batches.</param>
     public PublishedContentStatusFilteringService(
         IVariationContextAccessor variationContextAccessor,
         IDocumentPublishStatusQueryService publishStatusQueryService,
-        IPreviewService previewService,
+        IPreviewSessionService previewSessionService,
         IPublishedContentCache publishedContentCache,
         IDocumentCacheService documentCacheService)
     {
         _variationContextAccessor = variationContextAccessor;
         _publishStatusQueryService = publishStatusQueryService;
-        _previewService = previewService;
+        _previewSessionService = previewSessionService;
         _publishedContentCache = publishedContentCache;
         _documentCacheService = documentCacheService;
     }
@@ -54,7 +54,7 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
             return [];
         }
 
-        var preview = _previewService.IsInPreview();
+        var preview = _previewSessionService.IsActive();
 
         // Kept lazy so the publish-status filter is only evaluated for keys actually drawn — preserving
         // the short-circuit for .FirstOrDefault() / .Take(n).
@@ -80,7 +80,7 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
     /// <inheritdoc />
     public IEnumerable<IPublishedContent> Unfiltered(IEnumerable<Guid> candidateKeys)
     {
-        var preview = _previewService.IsInPreview();
+        var preview = _previewSessionService.IsActive();
         return candidateKeys.Select(key => _publishedContentCache.GetById(preview, key)).WhereNotNull();
     }
 
@@ -95,11 +95,9 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
         }
     }
 
-    // Sync-over-async is intentional: FilterAvailable backs the sync IPublishedContent.Children()/
-    // Descendants() surface, and GetByKeysAsync has no sync counterpart.
     private void ResolvePersistedItems(IReadOnlyCollection<Guid> missedKeys, bool preview, IDictionary<Guid, IPublishedContent> results)
     {
-        foreach (IPublishedContent content in _documentCacheService.GetByKeysAsync(missedKeys, preview).GetAwaiter().GetResult())
+        foreach (IPublishedContent content in _documentCacheService.GetByKeys(missedKeys, preview))
         {
             results[content.Key] = content;
         }

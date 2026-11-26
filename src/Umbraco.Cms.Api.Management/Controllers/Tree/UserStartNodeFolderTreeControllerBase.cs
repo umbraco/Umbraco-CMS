@@ -31,12 +31,16 @@ public abstract class UserStartNodeFolderTreeControllerBase<TItem> : FolderTreeC
     /// </summary>
     /// <param name="entityService">The entity service.</param>
     /// <param name="flagProviders">The flag provider collection.</param>
+    /// <param name="entitySearchService">The entity search service.</param>
+    /// <param name="idKeyMap">The id/key map.</param>
     /// <param name="treeFilterService">The user start node tree filter service.</param>
     protected UserStartNodeFolderTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
         IUserStartNodeTreeFilterService treeFilterService)
-        : base(entityService, flagProviders)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap)
     {
         _treeFilterService = treeFilterService;
     }
@@ -58,6 +62,15 @@ public abstract class UserStartNodeFolderTreeControllerBase<TItem> : FolderTreeC
         => ShouldBypassStartNodeFiltering()
             ? base.GetPagedChildEntities(parentKey, skip, take, out totalItems)
             : MapAccessEntities(_treeFilterService.GetFilteredChildEntities(parentKey, skip, take, ItemOrdering, out totalItems));
+
+    /// <inheritdoc />
+    protected override IEntitySlim[] GetBatchEntities(Guid[] keys)
+    {
+        IEntitySlim[] entities = base.GetBatchEntities(keys);
+        return ShouldBypassStartNodeFiltering()
+            ? entities
+            : MapAccessEntities(_treeFilterService.GetFilteredEntities(entities));
+    }
 
     /// <inheritdoc />
     protected override IEntitySlim[] GetSiblingEntities(Guid target, int before, int after, out long totalBefore, out long totalAfter)

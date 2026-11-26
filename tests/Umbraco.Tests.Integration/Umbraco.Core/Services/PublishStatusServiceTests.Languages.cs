@@ -24,17 +24,17 @@ internal sealed partial class PublishStatusServiceTests
         Content unpublished = ContentBuilder.CreateSimpleContent(ContentType, "Unpublished", Textpage.Id);
         ContentService.Save(unpublished);
 
-        Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Textpage.Key, UnusedCulture));
+        Assert.IsFalse(PublishStatusQueryService.IsPublished(Textpage.Key, UnusedCulture));
 
         await LanguageService.CreateAsync(new Language(UnusedCulture, "Danish"), Constants.Security.SuperUserKey);
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(Textpage.Key, UnusedCulture));
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(Subpage.Key, UnusedCulture));
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(Textpage.Key, UnusedCulture));
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(Subpage.Key, UnusedCulture));
             Assert.IsTrue(PublishStatusQueryService.HasPublishedAncestorPath(Subpage.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(unpublished.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Trashed.Key, UnusedCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(unpublished.Key, UnusedCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Trashed.Key, UnusedCulture));
         });
 
         IPublishedContent[] available = GetRequiredService<IPublishedContentStatusFilteringService>()
@@ -91,8 +91,8 @@ internal sealed partial class PublishStatusServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(Textpage.Key, changedIsoCode));
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(Subpage.Key, changedIsoCode));
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(Textpage.Key, changedIsoCode));
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(Subpage.Key, changedIsoCode));
             Assert.IsTrue(PublishStatusQueryService.HasPublishedAncestorPath(Subpage.Key, changedIsoCode));
         });
     }
@@ -117,7 +117,7 @@ internal sealed partial class PublishStatusServiceTests
         ContentService.Save(document);
         ContentService.Publish(document, [DefaultCulture]);
 
-        Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(document.Key, string.Empty));
+        Assert.IsTrue(PublishStatusQueryService.IsPublished(document.Key, string.Empty));
 
         ILanguage language = (await LanguageService.GetAsync(UnusedCulture))!;
         language.IsDefault = true;
@@ -125,8 +125,8 @@ internal sealed partial class PublishStatusServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(document.Key, string.Empty));
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(document.Key, DefaultCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(document.Key, string.Empty));
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(document.Key, DefaultCulture));
         });
     }
 
@@ -164,20 +164,20 @@ internal sealed partial class PublishStatusServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(publishedInBothCultures.Key, UnusedCulture));
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(publishedInBothCultures.Key, DefaultCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(publishedInDeletedCultureOnly.Key));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Textpage.Key, UnusedCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(publishedInBothCultures.Key, UnusedCulture));
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(publishedInBothCultures.Key, DefaultCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublishedInAnyCulture(publishedInDeletedCultureOnly.Key));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Textpage.Key, UnusedCulture));
         });
 
         await LanguageService.CreateAsync(new Language(UnusedCulture, "Danish"), Constants.Security.SuperUserKey);
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(publishedInBothCultures.Key, UnusedCulture));
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(publishedInBothCultures.Key, DefaultCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(publishedInDeletedCultureOnly.Key, UnusedCulture));
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(Textpage.Key, UnusedCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(publishedInBothCultures.Key, UnusedCulture));
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(publishedInBothCultures.Key, DefaultCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(publishedInDeletedCultureOnly.Key, UnusedCulture));
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(Textpage.Key, UnusedCulture));
         });
     }
 
@@ -212,8 +212,8 @@ internal sealed partial class PublishStatusServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(document.Key, changedIsoCode));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(document.Key, UnusedCulture));
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(document.Key, changedIsoCode));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(document.Key, UnusedCulture));
         });
     }
 

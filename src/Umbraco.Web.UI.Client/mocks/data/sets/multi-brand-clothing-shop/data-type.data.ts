@@ -25,12 +25,11 @@ const dataType = (
 	values,
 });
 
-const nodePicker = (id: string, name: string, documentTypeId: string, maxNumber: number) =>
+const nodePicker = (id: string, name: string, documentTypeId: string, maxNumber?: number) =>
 	dataType(id, name, 'Umbraco.MultiNodeTreePicker', 'Umb.PropertyEditorUi.ContentPicker', [
 		{ alias: 'startNode', value: { type: 'content', id: null, dynamicRoot: null } },
 		{ alias: 'filter', value: documentTypeId },
-		{ alias: 'minNumber', value: 0 },
-		{ alias: 'maxNumber', value: maxNumber },
+		{ alias: 'validationLimit', value: { max: maxNumber } },
 		{ alias: 'showOpenButton', value: true },
 		{ alias: 'ignoreUserStartNodes', value: false },
 	]);
@@ -97,7 +96,7 @@ const block = (options: UmbMbcsBlockOptions) => ({
 	areas: (options.areas ?? []).map((area) => ({
 		...area,
 		rowSpan: 1,
-		minAllowed: 0,
+		validationLimit: { min: 0 },
 		specifiedAllowance: [],
 	})),
 	editorSize: 'medium',
@@ -112,7 +111,6 @@ const richTextEditor = (id: string, name: string, blockElementTypeIds: Array<str
 			value: [
 				[
 					[
-						'Umb.Tiptap.Toolbar.StyleSelect',
 						'Umb.Tiptap.Toolbar.Bold',
 						'Umb.Tiptap.Toolbar.Italic',
 						'Umb.Tiptap.Toolbar.BulletList',
@@ -246,9 +244,9 @@ export const data: Array<UmbMockDataTypeModel> = [
 		'Multi URL Picker (max 1)',
 		'Umbraco.MultiUrlPicker',
 		'Umb.PropertyEditorUi.MultiUrlPicker',
-		[{ alias: 'maxNumber', value: 1 }],
+		[{ alias: 'validationLimit', value: { max: 1 } }],
 	),
-	nodePicker(DATA_TYPE_IDS.productPicker, 'Product Picker', DOCUMENT_TYPE_IDS.product, 0),
+	nodePicker(DATA_TYPE_IDS.productPicker, 'Product Picker', DOCUMENT_TYPE_IDS.product),
 	nodePicker(DATA_TYPE_IDS.productPickerSingle, 'Product Picker (max 1)', DOCUMENT_TYPE_IDS.product, 1),
 	nodePicker(DATA_TYPE_IDS.articlePickerSingle, 'Article Picker (max 1)', DOCUMENT_TYPE_IDS.article, 1),
 	collection(DATA_TYPE_IDS.productsCollection, 'Products Collection', {
@@ -427,6 +425,35 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{ alias: 'useSingleBlockMode', value: false },
 			{ alias: 'useLiveEditing', value: true },
 			{ alias: 'useInlineEditingAsDefault', value: true },
+		],
+	),
+	dataType(
+		DATA_TYPE_IDS.mediaCollection,
+		'Collection View - Media',
+		'Umbraco.ListView',
+		'Umb.PropertyEditorUi.Collection',
+		[
+			{ alias: 'pageSize', value: 50 },
+			{ alias: 'orderBy', value: 'updateDate' },
+			{ alias: 'orderDirection', value: 'desc' },
+			{
+				alias: 'includeProperties',
+				value: [
+					{ alias: 'sortOrder', header: 'Sort order', isSystem: true, nameTemplate: null },
+					{ alias: 'updateDate', header: 'Last edited', isSystem: true, nameTemplate: null },
+					{ alias: 'creator', header: 'Created by', isSystem: true, nameTemplate: null },
+				],
+			},
+			{
+				alias: 'layouts',
+				value: [
+					{ icon: 'icon-grid', name: 'Media Grid Collection View', collectionView: 'Umb.CollectionView.Media.Grid' },
+					{ icon: 'icon-list', name: 'Media Table Collection View', collectionView: 'Umb.CollectionView.Media.Table' },
+				],
+			},
+			{ alias: 'icon', value: 'icon-layers' },
+			{ alias: 'tabName', value: 'Items' },
+			{ alias: 'showContentFirst', value: false },
 		],
 	),
 	dataType(DATA_TYPE_IDS.imageCropper, 'Image Cropper', 'Umbraco.ImageCropper', 'Umb.PropertyEditorUi.ImageCropper', [

@@ -98,9 +98,7 @@ public partial class ElementEditingServiceTests
             ],
             Variants =
             [
-                new VariantModel { Name = "The Updated Name" },
-                new VariantModel { Segment = "seg-1", Name = "The Updated Name" },
-                new VariantModel { Segment = "seg-2", Name = "The Updated Name" }
+                new VariantModel { Name = "The Updated Name" }
             ],
         };
 
@@ -183,11 +181,7 @@ public partial class ElementEditingServiceTests
             Variants =
             [
                 new VariantModel { Name = "The Updated English Name", Culture = "en-US" },
-                new VariantModel { Name = "The Updated English Name", Culture = "en-US", Segment = "seg-1" },
-                new VariantModel { Name = "The Updated English Name", Culture = "en-US", Segment = "seg-2" },
-                new VariantModel { Name = "The Updated Danish Name", Culture = "da-DK" },
-                new VariantModel { Name = "The Updated Danish Name", Culture = "da-DK", Segment = "seg-1" },
-                new VariantModel { Name = "The Updated Danish Name", Culture = "da-DK", Segment = "seg-2" }
+                new VariantModel { Name = "The Updated Danish Name", Culture = "da-DK" }
             ],
         };
 
@@ -216,5 +210,79 @@ public partial class ElementEditingServiceTests
                 Assert.AreEqual("The updated seg-2 title in Danish", updatedElement.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"));
             });
         }
+    }
+
+    [TestCase("")]
+    [TestCase(" ")]
+    public async Task Cannot_Update_Invariant_With_Blank_Name(string name)
+    {
+        var element = await CreateInvariantElement();
+        var originalName = element.Name;
+
+        var updateModel = new ElementUpdateModel
+        {
+            Variants = [new VariantModel { Name = name }],
+            Properties = [new PropertyValueModel { Alias = "title", Value = "The updated title" }],
+        };
+
+        var result = await ElementEditingService.UpdateAsync(element.Key, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+
+        var updated = await ElementEditingService.GetAsync(element.Key);
+        Assert.IsNotNull(updated);
+        Assert.AreEqual(originalName, updated.Name);
+    }
+
+    [TestCase("")]
+    [TestCase(" ")]
+    public async Task Cannot_Update_Culture_Variant_With_Only_Blank_Names(string name)
+    {
+        var element = await CreateCultureVariantElement();
+        var originalEnglishName = element.GetCultureName("en-US");
+        var originalDanishName = element.GetCultureName("da-DK");
+
+        var updateModel = new ElementUpdateModel
+        {
+            Properties = [new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" }],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = name },
+                new VariantModel { Culture = "da-DK", Name = name }
+            ],
+        };
+
+        var result = await ElementEditingService.UpdateAsync(element.Key, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidName, result.Status);
+
+        var updated = await ElementEditingService.GetAsync(element.Key);
+        Assert.IsNotNull(updated);
+        Assert.AreEqual(originalEnglishName, updated.GetCultureName("en-US"));
+        Assert.AreEqual(originalDanishName, updated.GetCultureName("da-DK"));
+    }
+
+    [Test]
+    public async Task Cannot_Update_Segment_Variant_Without_Variants()
+    {
+        var element = await CreateSegmentVariantElement();
+        var originalName = element.Name;
+
+        var updateModel = new ElementUpdateModel
+        {
+            Variants = [],
+            Properties = [new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" }],
+        };
+
+        var result = await ElementEditingService.UpdateAsync(element.Key, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status);
+
+        var updated = await ElementEditingService.GetAsync(element.Key);
+        Assert.IsNotNull(updated);
+        Assert.AreEqual(originalName, updated.Name);
     }
 }

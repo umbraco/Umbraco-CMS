@@ -19,6 +19,27 @@ public interface IExternalMemberRepository
     Task<ExternalMemberIdentity?> GetByKeyAsync(Guid key);
 
     /// <summary>
+    ///     Gets the external members with the given unique keys.
+    /// </summary>
+    /// <param name="keys">The unique identifiers of the external members.</param>
+    /// <returns>The external members found; keys that do not match an external member are omitted.</returns>
+    // TODO (V20): Remove the default implementation.
+    async Task<IEnumerable<ExternalMemberIdentity>> GetByKeysAsync(IEnumerable<Guid> keys)
+    {
+        var members = new List<ExternalMemberIdentity>();
+        foreach (Guid key in keys.Distinct())
+        {
+            ExternalMemberIdentity? member = await GetByKeyAsync(key);
+            if (member is not null)
+            {
+                members.Add(member);
+            }
+        }
+
+        return members;
+    }
+
+    /// <summary>
     ///     Gets an external member by email address.
     /// </summary>
     /// <param name="email">The email address to search for.</param>

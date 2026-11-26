@@ -57,6 +57,19 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     }
 
     /// <inheritdoc />
+    public async Task<IEnumerable<ExternalMemberIdentity>> GetByKeysAsync(IEnumerable<Guid> keys)
+    {
+        Guid[] keysAsArray = keys as Guid[] ?? keys.ToArray();
+        if (keysAsArray.Length is 0)
+        {
+            return [];
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return await _repository.GetByKeysAsync(keysAsArray);
+    }
+
+    /// <inheritdoc />
     public async Task<ExternalMemberIdentity?> GetByEmailAsync(string email)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -107,7 +120,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
 
         // Publish cancelable saving notification.
         var savingNotification = new ExternalMemberSavingNotification(member, evtMsgs);
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             scope.Complete();
             return Attempt.FailWithStatus(ExternalMemberOperationStatus.CancelledByNotification, member);
@@ -175,7 +188,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
 
         // Publish cancelable saving notification.
         var savingNotification = new ExternalMemberSavingNotification(member, evtMsgs);
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             scope.Complete();
             return Attempt.FailWithStatus(ExternalMemberOperationStatus.CancelledByNotification, member);
@@ -214,14 +227,14 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
         }
 
         // Login is not a member update: UpdateDate is intentionally left untouched, and the
-        // IndexableFieldsChanged state flag tells the Examine indexing handler to skip the
-        // re-index since no indexed field has changed. Mirror the content-member pattern
-        // (MemberService.UpdateLoginPropertiesAsync) so downstream handlers see the same shape.
+        // IndexableFieldsChanged state flag signals that no indexed field changed, mirroring
+        // the content-member pattern (MemberService.UpdateLoginPropertiesAsync). External
+        // members are not currently indexed by search, so this flag has no consumer yet.
         var savingNotification = new ExternalMemberSavingNotification(member, evtMsgs);
         savingNotification.State.Add(Constants.Conventions.Member.LoginPropertiesOnlyStateKey, true);
         savingNotification.State.Add(Constants.Conventions.Member.IndexableFieldsChangedStateKey, false);
 
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             scope.Complete();
             return Attempt.FailWithStatus(ExternalMemberOperationStatus.CancelledByNotification, member);
@@ -252,7 +265,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
 
         // Publish cancelable deleting notification.
         var deletingNotification = new ExternalMemberDeletingNotification(member, evtMsgs);
-        if (scope.Notifications.PublishCancelable(deletingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
         {
             scope.Complete();
             return Attempt.FailWithStatus<ExternalMemberIdentity?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.CancelledByNotification, member);

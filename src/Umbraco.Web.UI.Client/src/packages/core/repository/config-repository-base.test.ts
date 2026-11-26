@@ -71,23 +71,4 @@ describe('UmbConfigRepositoryBase', () => {
 
 		expect(await value).to.deep.equal({ foo: 'bar' });
 	});
-
-	it('deprecated initialized warns and still resolves', async () => {
-		document.body.appendChild(hostElement);
-
-		const originalWarn = console.warn;
-		let warned = '';
-		console.warn = (...args: Array<unknown>) => {
-			warned += args.map(String).join(' ');
-		};
-		try {
-			await repository.initialized;
-		} finally {
-			console.warn = originalWarn;
-		}
-
-		expect(warned).to.contain('deprecated');
-		expect(warned).to.contain('initialized');
-		expect(await firstValueFrom(repository.part('foo'))).to.equal('bar');
-	});
 });

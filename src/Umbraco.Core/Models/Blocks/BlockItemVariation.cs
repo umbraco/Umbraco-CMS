@@ -1,7 +1,7 @@
 namespace Umbraco.Cms.Core.Models.Blocks;
 
 /// <summary>
-///     Represents a block item variation for culture and segment.
+///     Represents a block item variation for culture.
 /// </summary>
 public class BlockItemVariation
 {
@@ -17,12 +17,10 @@ public class BlockItemVariation
     /// </summary>
     /// <param name="contentKey">The content key.</param>
     /// <param name="culture">The culture.</param>
-    /// <param name="segment">The segment.</param>
-    public BlockItemVariation(Guid contentKey, string? culture, string? segment)
+    public BlockItemVariation(Guid contentKey, string? culture)
     {
         ContentKey = contentKey;
         Culture = culture;
-        Segment = segment;
     }
 
     /// <summary>
@@ -40,12 +38,4 @@ public class BlockItemVariation
     ///     The culture.
     /// </value>
     public string? Culture { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the segment.
-    /// </summary>
-    /// <value>
-    ///     The segment.
-    /// </value>
-    public string? Segment { get; set; }
 }

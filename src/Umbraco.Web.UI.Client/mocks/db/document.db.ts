@@ -48,8 +48,6 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 
 	getConfiguration(): DocumentConfigurationResponseModel {
 		return {
-			allowEditInvariantFromNonDefault: true,
-			allowNonExistingSegmentsCreation: true,
 			disableDeleteWhenReferenced: true,
 			disableUnpublishWhenReferenced: true,
 		};
@@ -129,7 +127,6 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 		variants: request.variants.map((variantRequest) => {
 			return {
 				culture: variantRequest.culture,
-				segment: variantRequest.segment,
 				name: variantRequest.name,
 				createDate: now,
 				updateDate: now,

@@ -6,7 +6,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Content Picker Source Property Editor UI',
 	element: () => import('./property-editor-ui-content-picker-source.element.js'),
 	meta: {
-		supportsVariantChange: true,
 		label: 'Content Picker Source',
 		icon: 'icon-page-add',
 		group: '#propertyEditorUIGroups_pickers',

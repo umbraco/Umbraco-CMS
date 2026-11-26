@@ -75,10 +75,10 @@ public class DocumentReferencesStartNodeAccessTests : StartNodeAccessTestBase<Re
     }
 
     private string ReferencedByUrl(Guid id) =>
-        GetManagementApiUrl<ReferencedByDocumentController>(x => x.ReferencedBy2(CancellationToken.None, id, 0, 20));
+        GetManagementApiUrl<ReferencedByDocumentController>(x => x.ReferencedBy(CancellationToken.None, id, 0, 20));
 
     private string ReferencedDescendantsUrl(Guid id) =>
-        GetManagementApiUrl<ReferencedDescendantsDocumentController>(x => x.ReferencedDescendants2(CancellationToken.None, id, 0, 20));
+        GetManagementApiUrl<ReferencedDescendantsDocumentController>(x => x.ReferencedDescendants(CancellationToken.None, id, 0, 20));
 
     private string AreReferencedUrl(params Guid[] ids) =>
         WithIds(GetManagementApiUrl<AreReferencedDocumentController>(x => x.GetPagedReferencedItems(CancellationToken.None, new HashSet<Guid>(), 0, 20)), ids);

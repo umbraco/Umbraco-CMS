@@ -23,6 +23,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
     private readonly IDocumentCacheService _documentCacheService;
     private readonly IMediaCacheService _mediaCacheService;
+    private readonly IElementCacheService _elementCacheService;
     private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
     private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
@@ -41,6 +42,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
     /// <param name="mediaCacheService">The media cache service.</param>
     /// <param name="contentTypeCommonRepository">The content type common repository.</param>
     /// <param name="dataTypeConfigurationCache">The data type configuration cache.</param>
+    /// <param name="elementCacheService">The element cache service.</param>
     public DataTypeCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -53,7 +55,8 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         IDocumentCacheService documentCacheService,
         IMediaCacheService mediaCacheService,
         IContentTypeCommonRepository contentTypeCommonRepository,
-        IDataTypeConfigurationCache dataTypeConfigurationCache)
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
+        IElementCacheService elementCacheService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
@@ -64,6 +67,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         _mediaCacheService = mediaCacheService;
         _contentTypeCommonRepository = contentTypeCommonRepository;
         _dataTypeConfigurationCache = dataTypeConfigurationCache;
+        _elementCacheService = elementCacheService;
     }
 
     /// <summary>
@@ -80,7 +84,8 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
     /// <param name="documentCacheService">The document cache service.</param>
     /// <param name="mediaCacheService">The media cache service.</param>
     /// <param name="contentTypeCommonRepository">The content type common repository.</param>
-    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    /// <param name="dataTypeConfigurationCache">The data type configuration cache.</param>
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
     public DataTypeCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -92,7 +97,8 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         IPublishedContentTypeCache publishedContentTypeCache,
         IDocumentCacheService documentCacheService,
         IMediaCacheService mediaCacheService,
-        IContentTypeCommonRepository contentTypeCommonRepository)
+        IContentTypeCommonRepository contentTypeCommonRepository,
+        IDataTypeConfigurationCache dataTypeConfigurationCache)
         : this(
             appCaches,
             serializer,
@@ -105,7 +111,8 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
             documentCacheService,
             mediaCacheService,
             contentTypeCommonRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IDataTypeConfigurationCache>())
+            dataTypeConfigurationCache,
+            StaticServiceProvider.Instance.GetRequiredService<IElementCacheService>())
     {
     }
 
@@ -222,6 +229,11 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
                 .Select(x => x.Id)
                 .ToArray();
 
+            var elementTypeIds = removedContentTypes
+                .Where(x => x.ItemType == PublishedItemType.Element)
+                .Select(x => x.Id)
+                .ToArray();
+
             if (documentTypeIds.Length > 0)
             {
                 _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds).GetAwaiter().GetResult();
@@ -232,22 +244,20 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
                 _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds).GetAwaiter().GetResult();
             }
 
+            if (elementTypeIds.Length > 0)
+            {
+                _elementCacheService.RebuildMemoryCacheByContentTypeAsync(elementTypeIds).GetAwaiter().GetResult();
+            }
+
             // In auto models builder mode (InMemoryAuto), the factory reset above invalidates ALL compiled
-            // model types, so we must clear all converted content entries — not just the rebuilt types —
-            // to prevent stale instances of other types (e.g. Model.Parent<T>()) from being returned.
-            // RebuildMemoryCacheByContentTypeAsync already clears selectively for the affected types,
-            // but the full clear is needed for all other types whose models were also invalidated.
+            // model types, whichever types (if any) use the changed data types. Converted items of every kind
+            // can hold instances of them (e.g. Model.Parent<T>(), or a document's block items built from an
+            // element type), so every converted content cache is cleared, not just those of the rebuilt types.
             if (_publishedModelFactory is IAutoPublishedModelFactory)
             {
-                if (documentTypeIds.Length > 0)
-                {
-                    _documentCacheService.ClearConvertedContentCache();
-                }
-
-                if (mediaTypeIds.Length > 0)
-                {
-                    _mediaCacheService.ClearConvertedContentCache();
-                }
+                _documentCacheService.ClearConvertedContentCache();
+                _mediaCacheService.ClearConvertedContentCache();
+                _elementCacheService.ClearConvertedContentCache();
             }
         });
         base.Refresh(payloads);

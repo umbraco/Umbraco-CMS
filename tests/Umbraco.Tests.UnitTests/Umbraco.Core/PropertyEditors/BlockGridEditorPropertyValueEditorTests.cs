@@ -234,7 +234,7 @@ public class BlockGridEditorPropertyValueEditorTests
         {
             ConfigurationObject = new BlockGridConfiguration
             {
-                ValidationLimit = new BlockGridConfiguration.NumberRange
+                ValidationLimit = new NumberRange
                 {
                     Min = rootMin,
                     Max = rootMax,
@@ -249,7 +249,7 @@ public class BlockGridEditorPropertyValueEditorTests
                             new BlockGridConfiguration.BlockGridAreaConfiguration
                             {
                                 Key = _areaKey,
-                                MinAllowed = areaMinAllowed,
+                                ValidationLimit = new NumberRange { Min = areaMinAllowed },
                             },
                         ],
                     },

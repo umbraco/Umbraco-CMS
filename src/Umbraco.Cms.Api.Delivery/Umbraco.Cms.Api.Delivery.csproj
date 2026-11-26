@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Search.Core\Umbraco.Cms.Search.Core.csproj" />
     <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
   </ItemGroup>
 

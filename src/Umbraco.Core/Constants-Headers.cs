@@ -21,5 +21,10 @@ public static partial class Constants
         ///     Response notifications header name.
         /// </summary>
         public const string Notifications = "Umb-Notifications";
+
+        /// <summary>
+        ///     Denied permission header name. Names the permission verb that environment permissions denied.
+        /// </summary>
+        public const string DeniedPermission = "Umb-Denied-Permission";
     }
 }

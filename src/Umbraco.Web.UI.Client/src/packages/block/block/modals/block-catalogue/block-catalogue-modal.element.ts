@@ -13,13 +13,14 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '@umbraco-cms/backoffice/document-type';
 import { UMB_MODAL_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { UmbBlockTypeGroup, UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
 import type { UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
-import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbDeselectedEvent, UmbSelectedEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbEntityOpenedEvent } from '@umbraco-cms/backoffice/entity';
 
@@ -35,6 +36,8 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
 	);
 
+	#pickerContext = new UmbPickerContext(this);
+
 	#search = '';
 
 	#serverUrl = '';
@@ -42,7 +45,12 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	private _groupedBlocks: Array<{ name?: string; blocks: Array<UmbBlockTypeItemWithGroupKey> }> = [];
 
 	@state()
-	private _openClipboard?: boolean;
+	private _activeView: 'create' | 'clipboard' | 'library' = 'create';
+
+	@state()
+	private _searchQuery = '';
+
+	#hasLibraryElements = false;
 
 	@state()
 	private _workspacePath?: string;
@@ -93,13 +101,38 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 			},
 			null,
 		);
+
+		this.#pickerContext.search.updateConfig({ providerAlias: 'Umb.SearchProvider.Element' });
+		this.#pickerContext.selection.setMultiple(false);
+		this.observe(
+			this.#pickerContext.search.query,
+			(query) => {
+				this._searchQuery = query?.query ?? '';
+			},
+			null,
+		);
+		this.observe(
+			this.#pickerContext.selection.selection,
+			(selection) => {
+				const elementKey = selection[0];
+				this.value = elementKey ? { library: { elementKey } } : undefined;
+			},
+			null,
+		);
 	}
 
 	override connectedCallback() {
 		super.connectedCallback();
 		if (!this.data) return;
 
-		this._openClipboard = this.data.openClipboard ?? false;
+		this.#hasLibraryElements = (this.data.libraryAllowedElementTypeKeys?.length ?? 0) > 0;
+		if (this.data.openLibrary && this.#hasLibraryElements) {
+			this._activeView = 'library';
+		} else if (this.data.openClipboard) {
+			this._activeView = 'clipboard';
+		} else {
+			this._activeView = 'create';
+		}
 
 		this.#itemManager.setUniques(this.data.blocks.map((block) => block.contentElementTypeKey));
 	}
@@ -191,15 +224,36 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		this.modalContext?.submit();
 	}
 
+	#canSubmit() {
+		switch (this._activeView) {
+			case 'clipboard':
+				return !!this.value && 'clipboard' in this.value && this.value.clipboard.selection.length > 0;
+			case 'library':
+				return !!this.value && 'library' in this.value;
+			default:
+				return false;
+		}
+	}
+
+	#openClipboard() {
+		if (this._activeView !== 'clipboard') {
+			this.#pickerContext.selection.clearSelection();
+			this.value = {
+				clipboard: {
+					selection: [],
+				},
+			};
+		}
+		this._activeView = 'clipboard';
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('blockEditor_addBlock')}>
 				${this.#renderViews()}${this.#renderMain()}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
-					${this.value?.clipboard?.selection &&
-					this.value?.clipboard?.selection?.length > 0 &&
-					this._openClipboard === true
+					${this.#canSubmit()
 						? html`<uui-button
 								label=${this.localize.term('general_submit')}
 								look="primary"
@@ -212,7 +266,15 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	#renderMain() {
-		return this._manager ? (this._openClipboard ? this.#renderClipboard() : this.#renderCreateEmpty()) : nothing;
+		if (!this._manager) return nothing;
+		switch (this._activeView) {
+			case 'clipboard':
+				return this.#renderClipboard();
+			case 'library':
+				return this.#renderLibrary();
+			default:
+				return this.#renderCreateEmpty();
+		}
 	}
 
 	#renderClipboard() {
@@ -222,6 +284,49 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 				@selection-change=${this.#onClipboardPickerSelectionChange}
 				@entity-opened=${this.#onClipboardPickerCardEntityOpened}></umb-clipboard-entry-picker>
 		`;
+	}
+
+	#renderLibrary() {
+		return html`
+			<umb-picker-search-field></umb-picker-search-field>
+			<umb-picker-search-result .pickableFilter=${this.#librarySelectableFilter}></umb-picker-search-result>
+			${when(
+				!this._searchQuery,
+				() => html`
+					<uui-box>
+						<umb-tree
+							alias="Umb.Tree.Element"
+							.props=${this.#libraryTreeProps}
+							@selected=${this.#onLibraryElementSelected}
+							@deselected=${this.#onLibraryElementDeselected}></umb-tree>
+					</uui-box>
+				`,
+			)}
+		`;
+	}
+
+	#librarySelectableFilter = (item: any) => {
+		if (item.isFolder) return false;
+		const allowedKeys = this.data?.libraryAllowedElementTypeKeys;
+		if (!allowedKeys?.length) return true;
+		return allowedKeys.includes(item.documentType?.unique ?? '');
+	};
+
+	#libraryTreeProps = {
+		hideTreeItemActions: true,
+		hideTreeRoot: true,
+		selectableFilter: this.#librarySelectableFilter,
+		selectionManager: this.#pickerContext.selection,
+	};
+
+	#onLibraryElementSelected(event: UmbSelectedEvent) {
+		event.stopPropagation();
+		if (event.unique) this.#pickerContext.selection.select(event.unique);
+	}
+
+	#onLibraryElementDeselected(event: UmbDeselectedEvent) {
+		event.stopPropagation();
+		if (event.unique) this.#pickerContext.selection.deselect(event.unique);
 	}
 
 	#renderCreateEmpty() {
@@ -289,24 +394,27 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 			<uui-tab-group slot="navigation">
 				<uui-tab
 					label=${this.localize.term('blockEditor_tabCreateEmpty')}
-					?active=${!this._openClipboard}
-					@click=${() => (this._openClipboard = false)}>
+					?active=${this._activeView === 'create'}
+					@click=${() => (this._activeView = 'create')}>
 					<umb-localize key="blockEditor_tabCreateEmpty">Create Empty</umb-localize>
 					<uui-icon slot="icon" name="icon-add"></uui-icon>
 				</uui-tab>
+				${when(
+					this.#hasLibraryElements,
+					() => html`
+						<uui-tab
+							label=${this.localize.term('blockEditor_tabLibrary')}
+							?active=${this._activeView === 'library'}
+							@click=${() => (this._activeView = 'library')}>
+							<umb-localize key="blockEditor_tabLibrary">Library</umb-localize>
+							<uui-icon slot="icon" name="icon-link"></uui-icon>
+						</uui-tab>
+					`,
+				)}
 				<uui-tab
 					label=${this.localize.term('blockEditor_tabClipboard')}
-					?active=${this._openClipboard}
-					@click=${() => {
-						if (!this._openClipboard) {
-							this.value = {
-								clipboard: {
-									selection: [],
-								},
-							};
-						}
-						this._openClipboard = true;
-					}}>
+					?active=${this._activeView === 'clipboard'}
+					@click=${this.#openClipboard}>
 					<umb-localize key="blockEditor_tabClipboard">Clipboard</umb-localize>
 					<uui-icon slot="icon" name="icon-clipboard"></uui-icon>
 				</uui-tab>

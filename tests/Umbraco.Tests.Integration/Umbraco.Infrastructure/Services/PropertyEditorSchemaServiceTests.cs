@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -54,15 +55,14 @@ internal sealed class PropertyEditorSchemaServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         var dataType = new DataType(
-            new IntegerPropertyEditor(DataValueEditorFactory),
+            new IntegerPropertyEditor(DataValueEditorFactory, GetRequiredService<IIOHelper>()),
             ConfigurationEditorJsonSerializer)
         {
             Name = "Test Integer GetSchemaAsync",
             DatabaseType = ValueStorageType.Integer,
             ConfigurationData = new Dictionary<string, object>
             {
-                { "min", 0 },
-                { "max", 100 },
+                { "validationRange", new Dictionary<string, object> { { "min", 0 }, { "max", 100 } } },
             },
         };
         var createResult = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);

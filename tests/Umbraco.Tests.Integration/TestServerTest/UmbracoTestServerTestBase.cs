@@ -39,11 +39,11 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = true)]
     public abstract class UmbracoTestServerTestBase : UmbracoIntegrationTestBase
     {
-        private static readonly Dictionary<string, WebApplicationFactory<UmbracoTestServerTestBase>> _factoryCache = new();
+        private static readonly Dictionary<string, IWebApplicationFactoryAdapter> _factoryCache = new();
 
         protected HttpClient Client { get; private set; }
 
-        protected WebApplicationFactory<UmbracoTestServerTestBase> Factory { get; private set; }
+        protected IWebApplicationFactoryAdapter Factory { get; private set; }
 
         protected IServiceProvider Services => Factory?.Services;
 
@@ -108,7 +108,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             });
         }
 
-        private WebApplicationFactory<UmbracoTestServerTestBase> CreateNewFactory()
+        private IWebApplicationFactoryAdapter CreateNewFactory()
         {
             /*
              * It's worth noting that our usage of WebApplicationFactory is non-standard,
@@ -123,18 +123,25 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
              * However we need to separate the testing framework we provide for downstream projects from our own tests.
              * We cannot use the Umbraco.Web.UI startup yet as that is not available downstream.
              *
+             * The factory is created for the concrete fixture type rather than this base class, as WebApplicationFactory
+             * requires the entry point assembly's .deps.json file, which a downstream test project only has for its own assembly.
+             *
              * See https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests
              */
-            return new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder)
-                .WithWebHostBuilder(builder =>
+            Func<IHostBuilder> createHostBuilder = CreateHostBuilder;
+
+            Action<IWebHostBuilder> configureWebHost = builder =>
+            {
+                builder.UseContentRoot(Assembly.GetExecutingAssembly().GetRootDirectorySafe());
+                builder.ConfigureTestServices(services =>
                 {
-                    builder.UseContentRoot(Assembly.GetExecutingAssembly().GetRootDirectorySafe());
-                    builder.ConfigureTestServices(services =>
-                    {
-                        services.AddSingleton<IWebProfilerRepository, TestWebProfilerRepository>();
-                        CustomTestAuthSetup(services);
-                    });
+                    services.AddSingleton<IWebProfilerRepository, TestWebProfilerRepository>();
+                    CustomTestAuthSetup(services);
                 });
+            };
+
+            Type adapterType = typeof(WebApplicationFactoryAdapter<>).MakeGenericType(GetType());
+            return (IWebApplicationFactoryAdapter)Activator.CreateInstance(adapterType, createHostBuilder, configureWebHost)!;
         }
 
         [TearDown]
@@ -170,7 +177,11 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
             // Remove the CancellationToken from the method params, this is automatically added by the framework
             // So we do not want to add this to the query string
-            methodParams.Remove(methodParams.FirstOrDefault(x => x.Value is CancellationToken).Key);
+            var cancellationTokenParam = methodParams.FirstOrDefault(x => x.Value is CancellationToken).Key;
+            if (cancellationTokenParam is not null)
+            {
+                methodParams.Remove(cancellationTokenParam);
+            }
             methodParams["version"] = method?.GetCustomAttribute<MapToApiVersionAttribute>()?.Versions[0].MajorVersion.ToString();
 
             // Rename keys if [FromQuery(Name = "...")] specifies a different name

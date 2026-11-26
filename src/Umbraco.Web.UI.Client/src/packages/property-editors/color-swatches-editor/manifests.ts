@@ -6,7 +6,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	name: 'Color Swatches Editor Property Editor UI',
 	element: () => import('./property-editor-ui-color-swatches-editor.element.js'),
 	meta: {
-		supportsVariantChange: true,
 		label: 'Color Swatches Editor',
 		icon: 'icon-page-add',
 		group: '#propertyEditorUIGroups_pickers',

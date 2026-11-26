@@ -5,6 +5,12 @@ import {
   DatePickerDataTypeBuilder,
   BlockListDataTypeBuilder,
   DropdownDataTypeBuilder,
+  SingleDropdownDataTypeBuilder,
+  SingleMediaPickerDataTypeBuilder,
+  SingleUrlPickerDataTypeBuilder,
+  RangeSliderDataTypeBuilder,
+  MultipleDocumentPickerDataTypeBuilder,
+  MultipleMemberPickerDataTypeBuilder,
   ContentPickerDataTypeBuilder,
   BlockGridDataTypeBuilder,
   ImageCropperDataTypeBuilder,
@@ -32,10 +38,12 @@ import {
   DateTimeWithTimeZonePickerDataTypeBuilder,
   DateOnlyPickerDataTypeBuilder,
   TimeOnlyPickerDataTypeBuilder,
+  DateTimePickerDataTypeBuilder,
   EntityDataPickerDataTypeBuilder,
   ElementPickerDataTypeBuilder,
   UserPickerDataTypeBuilder,
-  MemberGroupPickerDataTypeBuilder
+  MemberGroupPickerDataTypeBuilder,
+  SingleBlockDataTypeBuilder
 } from "../builders";
 
 export class DataTypeApiHelper {
@@ -309,9 +317,9 @@ export class DataTypeApiHelper {
   async createDropdownDataType(name: string, isMultiple: boolean, options: string[]) {
     await this.ensureNameNotExists(name);
 
-    const dataType = new DropdownDataTypeBuilder()
+    const builder = isMultiple ? new DropdownDataTypeBuilder() : new SingleDropdownDataTypeBuilder();
+    const dataType = builder
       .withName(name)
-      .withMultiple(isMultiple)
       .withItems(options)
       .build();
     return await this.save(dataType);
@@ -355,6 +363,19 @@ export class DataTypeApiHelper {
       .build();
 
     return await this.save(blockList);
+  }
+
+  async createSingleBlockDataTypeWithABlock(name: string, contentElementTypeId: string) {
+    await this.ensureNameNotExists(name);
+
+    const singleBlock = new SingleBlockDataTypeBuilder()
+      .withName(name)
+      .addBlock()
+        .withContentElementTypeKey(contentElementTypeId)
+        .done()
+      .build();
+
+    return await this.save(singleBlock);
   }
 
   async createBlockListDataTypeWithContentAndSettingsElementType(name: string, contentElementTypeId: string, settingsElementTypeId: string) {
@@ -1069,12 +1090,12 @@ export class DataTypeApiHelper {
 
   async doesBlockEditorBlockContainAreaWithMinAllowed(blockGridName: string, elementTypeKey: string, areaAlias: string = 'area', minAllowed: number) {
     const block = await this.getBlockWithContentElementTypeId(blockGridName, elementTypeKey);
-    return block.areas.find(area => area.minAllowed === minAllowed && area.alias === areaAlias);
+    return block.areas.find(area => area.validationLimit?.min === minAllowed && area.alias === areaAlias);
   }
 
   async doesBlockEditorBlockContainAreaWithMaxAllowed(blockGridName: string, elementTypeKey: string, areaAlias: string = 'area', maxAllowed: number) {
     const block = await this.getBlockWithContentElementTypeId(blockGridName, elementTypeKey);
-    return block.areas.find(area => area.maxAllowed === maxAllowed && area.alias === areaAlias);
+    return block.areas.find(area => area.validationLimit?.max === maxAllowed && area.alias === areaAlias);
   }
 
   async doesBlockEditorBlockContainAreaWithSpecifiedAllowance(blockGridName: string, elementTypeKey: string, areaAlias: string = 'area') {
@@ -1195,7 +1216,6 @@ export class DataTypeApiHelper {
     const dataType = new MediaPickerDataTypeBuilder()
       .withName(name)
       .withFilter(mediaType.id)
-      .withMultiple(false)
       .withMinValue(minValue)
       .withMaxValue(maxValue)
       .withEnableLocalFocalPoint(enableLocalFocalPoint)
@@ -1929,11 +1949,78 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
+  async createSingleMediaPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new SingleMediaPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createSingleUrlPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new SingleUrlPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createSingleDropdownDataType(name: string, options: string[] = []) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new SingleDropdownDataTypeBuilder()
+      .withName(name)
+      .withItems(options)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createRangeSliderDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new RangeSliderDataTypeBuilder()
+      .withName(name)
+      .withMaxValue(100)
+      .withStep(1)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createMultipleDocumentPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultipleDocumentPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createMultipleMemberPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultipleMemberPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+    return await this.save(dataType);
+  }
+
   async createDefaultDropdownDataType(name: string) {
     await this.ensureNameNotExists(name);
 
     const dataType = new DropdownDataTypeBuilder()
       .withName(name)
+      .build();
+    return await this.save(dataType);
+  }
+
+  async createTypedLabelDataType(name: string, editorAlias: string, editorUiAlias: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new LabelDataTypeBuilder()
+      .withName(name)
+      .withEditor(editorAlias, editorUiAlias)
       .build();
     return await this.save(dataType);
   }
@@ -1961,6 +2048,17 @@ export class DataTypeApiHelper {
     const dataTypeData = await this.getByName(dataTypeName);
     const valueData = dataTypeData.values.find(item => item.alias === 'validationLimit');
     return valueData?.value.max === max && valueData?.value.min === min;
+  }
+
+  // Checks a single range configuration value (e.g. 'validationRange' or 'validationLimit') that stores its
+  // bounds as a {min, max} object. Both bounds are asserted, so a bound that is not passed in must be unset.
+  async doesDataTypeHaveRangeValue(dataTypeName: string, alias: string, min?: number, max?: number, dataTypeData?) {
+    const dataType = dataTypeData || await this.getByName(dataTypeName);
+    const valueData = dataType.values.find(item => item.alias === alias);
+    if (!valueData) {
+      return false;
+    }
+    return (valueData.value?.min ?? undefined) === min && (valueData.value?.max ?? undefined) === max;
   }
 
   async doesDataTypeHaveCrops(dataTypeName: string, cropLabel: string, cropAlias: string, cropWidth: number, cropHeight: number) {
@@ -2217,6 +2315,16 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
+  async createDefaultDateTimePickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new DateTimePickerDataTypeBuilder()
+      .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
   async createDefaultUserPickerDataType(name: string) {
     await this.ensureNameNotExists(name);
 
@@ -2317,13 +2425,35 @@ export class DataTypeApiHelper {
     return await this.save(builder);
   }
 
-  async createDefaultElementPickerWithValidationLimit(name: string, minValidation: number = 0, maxValidation: number = 0) {
+  async createDefaultElementPickerWithValidationLimit(name: string, minValidation?: number, maxValidation?: number) {
     await this.ensureNameNotExists(name);
 
     const builder = new ElementPickerDataTypeBuilder()
       .withName(name)
       .withMinValidation(minValidation)
       .withMaxValidation(maxValidation)
+      .build();
+
+    return await this.save(builder);
+  }
+
+  async createElementPickerDataTypeWithAllowedContentTypes(name: string, allowedContentTypeIds: string[]) {
+    await this.ensureNameNotExists(name);
+
+    const builder = new ElementPickerDataTypeBuilder()
+      .withName(name)
+      .withAllowedContentTypeIds(allowedContentTypeIds)
+      .build();
+
+    return await this.save(builder);
+  }
+
+  async createElementPickerDataTypeWithStartNode(name: string, startNodeFolderId: string) {
+    await this.ensureNameNotExists(name);
+
+    const builder = new ElementPickerDataTypeBuilder()
+      .withName(name)
+      .withStartNodeId(startNodeFolderId)
       .build();
 
     return await this.save(builder);

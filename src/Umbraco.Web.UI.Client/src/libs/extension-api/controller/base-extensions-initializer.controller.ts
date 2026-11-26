@@ -1,6 +1,7 @@
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import type { ManifestBase } from '../types/index.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
+import { compareExtensionsByWeight } from '../functions/compare-extensions-by-weight.function.js';
 import type { UmbBaseExtensionInitializer } from './base-extension-initializer.controller.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -28,6 +29,11 @@ export abstract class UmbBaseExtensionsInitializer<
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>,
 > extends UmbControllerBase {
 	#promiseResolvers: Array<() => void> = [];
+	#unsettledAliases = new Set<string>();
+	#manifestsReceivedResolver!: () => void;
+	#manifestsReceived = new Promise<void>((resolve) => {
+		this.#manifestsReceivedResolver = resolve;
+	});
 	#extensionRegistry: UmbExtensionRegistry<ManifestType>;
 	#type: ManifestTypeName | Array<ManifestTypeName>;
 	#filter: undefined | null | ((manifest: ManifestType) => boolean);
@@ -46,6 +52,30 @@ export abstract class UmbBaseExtensionsInitializer<
 				this.#promiseResolvers.push(resolve);
 			}
 		});
+	}
+
+	/**
+	 * Resolves once the manifests have been received and each of the matching extensions has had its first
+	 * permission answer: either permitted (and ready to use) or not permitted by its conditions.
+	 * Resolves right away when no extension matches. Later changes to the extensions do not affect it.
+	 * @returns {Promise<void>} A promise that resolves when the first answers are known.
+	 */
+	async asSettledPromise(): Promise<void> {
+		await this.#manifestsReceived;
+		await Promise.all(
+			this._extensions.map((extension) => {
+				this.#unsettledAliases.add(extension.alias);
+				return extension.asSettledPromise().then(() => this.#unsettledAliases.delete(extension.alias));
+			}),
+		);
+	}
+
+	/**
+	 * The aliases of the extensions that {@link asSettledPromise} is still waiting for.
+	 * @returns {Array<string>} The aliases of the extensions without a first answer.
+	 */
+	getUnsettledAliases(): Array<string> {
+		return [...this.#unsettledAliases];
 	}
 
 	constructor(
@@ -95,6 +125,7 @@ export abstract class UmbBaseExtensionsInitializer<
 			this._extensions.length = 0;
 			// _permittedExts should have been cleared via the destroy callbacks.
 			this.#permittedExts.length = 0;
+			this.#manifestsReceivedResolver();
 			return;
 		}
 
@@ -120,6 +151,8 @@ export abstract class UmbBaseExtensionsInitializer<
 				this._extensions.push(this._createController(manifest));
 			}
 		});
+
+		this.#manifestsReceivedResolver();
 	};
 
 	protected abstract _createController(manifest: ManifestType): ControllerType;
@@ -168,7 +201,7 @@ export abstract class UmbBaseExtensionsInitializer<
 		});
 
 		// Sorting:
-		approvedExtensions.sort((a, b) => b.weight - a.weight);
+		approvedExtensions.sort(compareExtensionsByWeight);
 
 		if (this.#single && approvedExtensions.length > 1) {
 			approvedExtensions = [approvedExtensions[0]];
@@ -226,6 +259,7 @@ export abstract class UmbBaseExtensionsInitializer<
 			this.#onChange?.([]);
 		}
 		this.#promiseResolvers.length = 0;
+		this.#manifestsReceivedResolver();
 		this.#filter = undefined;
 		this.#onChange = undefined;
 		(this.#extensionRegistry as unknown) = undefined;

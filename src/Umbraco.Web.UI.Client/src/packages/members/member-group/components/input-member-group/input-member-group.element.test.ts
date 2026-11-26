@@ -1,5 +1,4 @@
 import { resetMockHandlers, useMockHandlers } from '../../../../../../mocks/index.js';
-import { UMB_EDIT_MEMBER_GROUP_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { manifests as itemRepositoryManifests } from '../../repository/item/manifests.js';
 import { UmbMemberGroupItemStore } from '../../repository/item/member-group-item.store.js';
 import { UmbInputMemberGroupElement } from './input-member-group.element.js';
@@ -12,8 +11,7 @@ import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 const { http, HttpResponse } = window.MockServiceWorker;
 
-// Stands in for a non-routable host, such as a modal opened without a router, where no route context is
-// available. It provides the item store the input's repository waits for.
+// Provides the item store the input's repository waits for.
 @customElement('umb-test-input-member-group-host')
 class UmbTestInputMemberGroupHostElement extends UmbControllerHostElementMixin(HTMLElement) {
 	constructor() {
@@ -31,21 +29,21 @@ const memberGroupItem = (unique: string): MemberGroupItemResponseModel => ({
 describe('UmbInputMemberGroupElement', () => {
 	let element: UmbInputMemberGroupElement;
 
-	const refNodes = () => Array.from(element.shadowRoot?.querySelectorAll('uui-ref-node') ?? []);
+	const itemRefs = () => Array.from(element.shadowRoot?.querySelectorAll('umb-entity-item-ref') ?? []);
 
 	const renderWith = async (selection: Array<string>, max?: number) => {
 		if (max !== undefined) {
 			element.max = max;
 		}
 		element.selection = selection;
-		await waitUntil(() => refNodes().length === selection.length, 'every member group was rendered');
+		await waitUntil(() => itemRefs().length === selection.length, 'every member group was rendered');
 		// The sorter sets up its items on the next animation frame.
 		await nextFrame();
 	};
 
-	const isDraggableAfterMouseDown = (refNode: Element) => {
-		refNode.dispatchEvent(new MouseEvent('mousedown', { button: 0, bubbles: true, composed: true }));
-		return (refNode as HTMLElement).draggable;
+	const isDraggableAfterMouseDown = (itemRef: Element) => {
+		itemRef.dispatchEvent(new MouseEvent('mousedown', { button: 0, bubbles: true, composed: true }));
+		return (itemRef as HTMLElement).draggable;
 	};
 
 	before(() => {
@@ -80,32 +78,22 @@ describe('UmbInputMemberGroupElement', () => {
 		expect(element).to.be.instanceOf(UmbInputMemberGroupElement);
 	});
 
-	it('links to the member group workspace in a new tab when no route context is available', async () => {
-		await renderWith(['group-a']);
-
-		const [refNode] = refNodes();
-		expect(refNode.getAttribute('href')).to.equal(
-			UMB_EDIT_MEMBER_GROUP_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: 'group-a' }),
-		);
-		expect(refNode.getAttribute('target')).to.equal('_blank');
-	});
-
 	it('lets items be dragged when it can hold more than one item', async () => {
 		await renderWith(['group-a', 'group-b']);
 
-		expect(isDraggableAfterMouseDown(refNodes()[0])).to.be.true;
+		expect(isDraggableAfterMouseDown(itemRefs()[0])).to.be.true;
 	});
 
 	it('does not let items be dragged when it can hold at most one item', async () => {
 		await renderWith(['group-a'], 1);
 
-		expect(isDraggableAfterMouseDown(refNodes()[0])).to.be.false;
+		expect(isDraggableAfterMouseDown(itemRefs()[0])).to.be.false;
 	});
 
 	it('does not let items be dragged when it is readonly', async () => {
 		element.readonly = true;
 		await renderWith(['group-a', 'group-b']);
 
-		expect(isDraggableAfterMouseDown(refNodes()[0])).to.be.false;
+		expect(isDraggableAfterMouseDown(itemRefs()[0])).to.be.false;
 	});
 });

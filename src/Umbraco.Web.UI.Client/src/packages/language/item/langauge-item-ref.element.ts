@@ -5,9 +5,10 @@ import { customElement, html, ifDefined, nothing, property, state } from '@umbra
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL, umbGenerateWorkspaceLink } from '@umbraco-cms/backoffice/workspace';
+import { UmbEntityItemRefFrameMixin } from '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-language-item-ref')
-export class UmbLanguageItemRefElement extends UmbLitElement {
+export class UmbLanguageItemRefElement extends UmbEntityItemRefFrameMixin(UmbLitElement) {
 	@property({ type: Object })
 	item?: UmbLanguageItemModel;
 
@@ -31,6 +32,10 @@ export class UmbLanguageItemRefElement extends UmbLitElement {
 			.observeRouteBuilder((routeBuilder) => {
 				this._editPath = routeBuilder({});
 			});
+	}
+
+	protected override get isEntityFrameNavigable() {
+		return !this.readonly && !!this.item?.unique;
 	}
 
 	#getLink() {
@@ -57,6 +62,7 @@ export class UmbLanguageItemRefElement extends UmbLitElement {
 				<slot name="actions" slot="actions"></slot>
 				<umb-icon slot="icon" name="icon-globe"></umb-icon>
 			</uui-ref-node>
+			${this.renderEntityFrame()}
 		`;
 	}
 }

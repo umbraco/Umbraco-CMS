@@ -13,8 +13,8 @@ export default {
 
 const config = new UmbPropertyEditorConfigCollection([
 	{
-		alias: 'maxVal',
-		value: 100,
+		alias: 'validationRange',
+		value: { min: 0, max: 100 },
 	},
 	{
 		alias: 'step',

@@ -1,6 +1,9 @@
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS, UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS } from './constants.js';
 import { manifest as propertyEditorSchema } from './Umbraco.BlockList.js';
-import { UmbStandardBlockValueResolver } from '@umbraco-cms/backoffice/block';
+import {
+	UmbBlockPropertyValueEntityReferenceResolver,
+	UmbStandardBlockValueResolver,
+} from '@umbraco-cms/backoffice/block';
 import { UMB_PROPERTY_HAS_VALUE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/property';
 
 const propertyEditorUi: UmbExtensionManifest = {
@@ -9,7 +12,6 @@ const propertyEditorUi: UmbExtensionManifest = {
 	name: 'Block List Property Editor UI',
 	element: () => import('./property-editor-ui-block-list.element.js'),
 	meta: {
-		supportsVariantChange: true,
 		label: 'Block List',
 		propertyEditorSchemaAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
 		icon: 'icon-thumbnail-list',
@@ -62,6 +64,14 @@ const propertyValueResolver: UmbExtensionManifest = {
 	forEditorAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
 };
 
+const propertyValueEntityReference: UmbExtensionManifest = {
+	type: 'propertyValueEntityReference',
+	alias: 'Umb.PropertyValueEntityReference.BlockList',
+	name: 'Block List Entity Reference Resolver',
+	api: UmbBlockPropertyValueEntityReferenceResolver,
+	forEditorAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
+};
+
 const sortModePropertyContext: UmbExtensionManifest = {
 	type: 'propertyContext',
 	kind: 'sortMode',
@@ -87,6 +97,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	propertyEditorSchema,
 	propertyEditorUi,
 	propertyValueResolver,
+	propertyValueEntityReference,
 	sortModePropertyContext,
 	sortModePropertyAction,
 ];

@@ -9,6 +9,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly unpublishBtn: Locator;
   private readonly actionMenuForContentBtn: Locator;
   private readonly textstringTxt: Locator;
+  private readonly blockPropertyEditor: Locator;
   private readonly infoTab: Locator;
   private readonly linkContent: Locator;
   private readonly historyItems: Locator;
@@ -32,6 +33,8 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly textAreaTxt: Locator;
   private readonly plusIconBtn: Locator;
   private readonly enterTagTxt: Locator;
+  private readonly documentMenuItem: Locator;
+  private readonly documentRecycleBinMenuItem: Locator;
   private readonly menuItemTree: Locator;
   private readonly hostnameComboBox: Locator;
   private readonly confirmToUnpublishBtn: Locator;
@@ -233,6 +236,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.unpublishBtn = page.getByLabel(/^Unpublish(…)?$/);
     this.actionMenuForContentBtn = page.locator('#header').getByTestId('open-dropdown');
     this.textstringTxt = page.locator('umb-property-editor-ui-text-box #input');
+    this.blockPropertyEditor = this.sidebarModal.last().locator('umb-property #editor > *').first();
     this.reloadChildrenThreeDotsBtn = page.getByRole('button', {
       name: 'Reload children…',
     });
@@ -241,14 +245,17 @@ export class ContentUiHelper extends UiBaseLocators {
     this.textAreaTxt = page.locator('umb-property-editor-ui-textarea textarea');
     this.plusIconBtn = page.locator('#icon-add svg');
     this.enterTagTxt = page.getByPlaceholder('Enter tag');
-    this.menuItemTree = page.locator('umb-menu-item-tree-default');
+    this.documentMenuItem = page.locator('[data-mark="menu-item:Umb.MenuItem.Document"]');
+    this.documentRecycleBinMenuItem = page.locator('[data-mark="menu-item:Umb.MenuItem.Document.RecycleBin"]');
+    this.menuItemTree = this.documentMenuItem.or(this.documentRecycleBinMenuItem);
     this.confirmToUnpublishBtn = page.locator('umb-content-unpublish-modal').getByLabel('Unpublish');
     this.confirmToPublishBtn = page.locator('umb-content-publish-modal').getByLabel('Publish');
     this.dropdown = page.locator("select#native");
     this.splitView = page.locator("#splitViews");
     this.setADateTxt = page.getByLabel("Set a date…");
+    // The single and multiple media pickers are separate elements, and a property can be either.
     this.chooseMediaPickerBtn = page.locator(
-      "umb-property-editor-ui-media-picker #btn-add",
+      "umb-property-editor-ui-media-picker #btn-add, umb-property-editor-ui-single-media-picker #btn-add",
     );
     this.chooseMemberPickerBtn = page.locator(
       "umb-property-editor-ui-member-picker #btn-add",
@@ -378,7 +385,7 @@ export class ContentUiHelper extends UiBaseLocators {
       .locator("#button");
     this.rollbackItem = page.locator(".rollback-item");
     this.activeRollbackItem = page.locator(".rollback-item.active");
-    this.actionsMenu = page.locator("uui-scroll-container");
+    this.actionsMenu = page.locator("umb-entity-action-list");
     this.linkToDocumentBtn = this.linkPickerModal
       .getByTestId("action:document")
       .locator("#button");
@@ -546,9 +553,10 @@ export class ContentUiHelper extends UiBaseLocators {
     // The alias suffix (Classic/Table) is stable across entity types, but the entity segment isn't, so match on suffix only.
     this.treeViewClassicOptionBtnInPickerModal = this.sidebarModal.locator('[data-mark^="tree:switch-view:"][data-mark$=".Classic"]');
     this.treeViewTableOptionBtnInPickerModal = this.sidebarModal.locator('[data-mark^="tree:switch-view:"][data-mark$=".Table"]');
-    this.treeTableViewInPickerModal = this.sidebarModal.locator('umb-table-tree-view');
-    this.treeTableRowInPickerModal = this.sidebarModal.locator('umb-table-tree-view uui-table-row');
-    this.selectableTreeTableRowInPickerModal = this.sidebarModal.locator('umb-table-tree-view uui-table-row[selectable]');
+    // Trees may render the table view through their own element extending the base one.
+    this.treeTableViewInPickerModal = this.sidebarModal.locator('umb-table-tree-view, umb-document-table-tree-view');
+    this.treeTableRowInPickerModal = this.treeTableViewInPickerModal.locator('uui-table-row');
+    this.selectableTreeTableRowInPickerModal = this.treeTableViewInPickerModal.locator('uui-table-row[selectable]');
     // Public Access
     this.containerSetupBtn = this.container.getByLabel('Setup');
     this.containerEditBtn = this.container.getByLabel('Edit');
@@ -623,12 +631,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async openContentCaretButtonForName(name: string) {
-    const menuItem = this.menuItemTree.filter({hasText: name}).last();
-    const isCaretButtonOpen = await menuItem.getAttribute('show-children');
-
-    if (isCaretButtonOpen === null) {
-      await this.clickCaretButtonForContentName(name);
-    }
+    await this.openCaretButtonForName(name);
   }
 
   async clickCaretButtonForContentName(name: string) {
@@ -768,8 +771,16 @@ export class ContentUiHelper extends UiBaseLocators {
     return contentId;
   }
 
+  private async waitForContentToBeUpdated(save: () => Promise<void>) {
+    return await this.waitForWorkspaceToBeSaved(save, ConstantHelper.apiEndpoints.document, ConstantHelper.workspaceActions.documentSave);
+  }
+
+  private async waitForContentToBePublished(publish: () => Promise<void>) {
+    return await this.waitForWorkspaceToBePublished(publish, "document", ConstantHelper.workspaceActions.documentSaveAndPublish);
+  }
+
   async clickSaveModalButtonAndWaitForContentToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.document, this.clickSaveModalButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForContentToBeUpdated(() => this.click(this.saveModalBtn));
   }
 
   async clickSaveAndPublishButtonAndWaitForContentToBeCreated() {
@@ -781,7 +792,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForContentToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.document, this.clickSaveButtonForContent(), ConstantHelper.statusCodes.ok);
+    return await this.waitForContentToBeUpdated(() => this.click(this.saveContentBtn));
   }
 
   /**
@@ -794,14 +805,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickSaveAndPublishButtonAndWaitForContentToBePublished() {
-    // New content publishes via POST .../document/create-and-publish (201); existing content via
-    // PUT .../document/{id}/update-and-publish (200). A single waiter can't match both, so wait on the
-    // generic document endpoint + 200: the post-publish GET .../document/{id} fires in both cases.
-    return await this.waitForResponseAfterExecutingPromise(
-      ConstantHelper.apiEndpoints.document,
-      this.clickSaveAndPublishButton(),
-      ConstantHelper.statusCodes.ok,
-    );
+    return await this.waitForContentToBePublished(() => this.click(this.saveAndPublishBtn));
   }
 
   private async clickContainerSaveButton() {
@@ -809,19 +813,11 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickContainerSaveButtonAndWaitForContentToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(
-      ConstantHelper.apiEndpoints.document,
-      this.clickContainerSaveButton(),
-      ConstantHelper.statusCodes.ok,
-    );
+    return await this.waitForContentToBeUpdated(() => this.clickContainerSaveButton());
   }
 
   async clickContainerSaveAndPublishButtonAndWaitForContentToBePublished() {
-    return await this.waitForResponseAfterExecutingPromise(
-      ConstantHelper.apiEndpoints.document,
-      this.clickContainerSaveAndPublishButton(),
-      ConstantHelper.statusCodes.ok,
-    );
+    return await this.waitForContentToBePublished(() => this.click(this.containerSaveAndPublishBtn));
   }
 
   async clickDocumentTypeByName(documentTypeName: string) {
@@ -1216,11 +1212,6 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.page.locator('.variant.culture-variant').filter({hasText: contentName}).locator(this.expandSegmentBtn).click();
   }
 
-  async clickSegmentVariantButton(segmentName: string) {
-    await this.click(this.page.getByRole('button', {name: segmentName}));
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
-  }
-
   async clickVariantAddModeButtonForLanguageName(language: string) {
     await this.click(this.variantAddModeBtn.getByText(language));
     await this.page.waitForTimeout(ConstantHelper.wait.short);
@@ -1340,6 +1331,10 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async isDocumentReadOnly(isVisible: boolean = true) {
     await this.isVisible(this.documentReadOnly, isVisible, ConstantHelper.timeout.long);
+  }
+
+  async doesDocumentNameInputHaveValue(name: string) {
+    await expect(this.contentNameTxt).toHaveValue(name, {timeout: ConstantHelper.timeout.long});
   }
 
   async isDocumentNameInputEditable(isEditable: boolean = true) {
@@ -1706,7 +1701,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickEditBlockListEntryWithName(blockListElementName: string) {
-    await this.click(this.blockListEntry.filter({hasText: blockListElementName}).getByLabel('edit'), {force: true});
+    await this.click(this.blockListEntry.filter({hasText: blockListElementName}).getByLabel('edit'));
   }
 
   async clickEditBlockGridEntryWithName(blockGridElementName: string) {
@@ -1739,10 +1734,17 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickBlockElementWithName(elementTypeName: string) {
-    await this.click(
-      this.page.getByRole("link", { name: elementTypeName, exact: true }),
-      { force: true },
-    );
+    await this.click(this.page.getByRole("link", { name: elementTypeName, exact: true }));
+  }
+
+  // With a single block type the rich text editor can open the block workspace on top of the catalogue, which only a forced click tolerates.
+  async clickBlockElementWithNameInRichTextEditor(elementTypeName: string) {
+    await this.click(this.page.getByRole("link", { name: elementTypeName, exact: true }), { force: true });
+  }
+
+  // The block workspace offers its submit button before its properties, and a property is only validated once its editor is shown.
+  async waitForBlockPropertyEditorToBeVisible() {
+    await this.isVisible(this.blockPropertyEditor);
   }
 
   async enterPropertyValue(propertyName: string, value: string) {
@@ -2113,6 +2115,11 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.containsText(this.documentVariantLanguagePicker, name);
   }
 
+  async isAppLanguageReadOnly(isReadOnly: boolean = true) {
+    const tag = this.documentLanguageSelect.getByText('Read-only');
+    await this.isVisible(tag, isReadOnly);
+  }
+
   async clickSchedulePublishLanguageButton(languageName: string) {
     await this.click(this.page.getByRole('menu').filter({hasText: languageName}));
   }
@@ -2312,6 +2319,12 @@ export class ContentUiHelper extends UiBaseLocators {
     await expect(propertyLocator).toBeEditable({editable: isEditable});
   }
 
+  async clickCloseButtonInBlockWorkspace(elementTypeName: string) {
+    const blockWorkspace = this.blockModal.filter({has: this.page.getByTestId('layout-headline').filter({hasText: elementTypeName})});
+    await this.click(blockWorkspace.getByRole('button', {name: 'Close', exact: true}));
+    await this.isVisible(blockWorkspace, false);
+  }
+
   async clickEditNestedBlockListEntry(parentElementTypeName: string, blockListElementName: string) {
     const innerEntry = this.blockModal
       .filter({has: this.page.getByTestId('layout-headline').filter({hasText: parentElementTypeName})})
@@ -2362,6 +2375,10 @@ export class ContentUiHelper extends UiBaseLocators {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.domains, this.click(this.sidebarSaveBtn), ConstantHelper.statusCodes.ok);
   }
 
+  async isDocumentBlueprintSaveButtonDisabled() {
+    await expect(this.documentBlueprintSaveBtn).toBeDisabled({timeout: ConstantHelper.timeout.medium});
+  }
+
   async clickSaveModalButtonAndWaitForDocumentBlueprintToBeCreated() {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprint, () => this.click(this.documentBlueprintSaveBtn), ConstantHelper.statusCodes.created);
   }
@@ -2402,8 +2419,12 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.hasValue(this.textAreaTxt, expectedValue);
   }
 
-  async addElementPicker(elementName: string) {
+  async clickChooseElementPickerButton() {
     await this.click(this.chooseModalLink);
+  }
+
+  async addElementPicker(elementName: string) {
+    await this.clickChooseElementPickerButton();
     await this.click(this.sidebarModal.getByText(elementName, {exact: true}));
     await this.click(this.chooseModalBtn);
     // Wait for the picked row so a follow-up add doesn't race the closing modal.

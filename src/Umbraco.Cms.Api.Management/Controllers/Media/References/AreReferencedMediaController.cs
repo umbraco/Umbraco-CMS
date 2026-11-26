@@ -2,11 +2,9 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security.Authorization;
@@ -31,24 +29,7 @@ public class AreReferencedMediaController : MediaControllerBase
     /// </summary>
     /// <param name="trackedReferencesSkipTakeService">Service for retrieving tracked media references with support for pagination (skip and take).</param>
     /// <param name="umbracoMapper">The Umbraco mapper used for mapping between models.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public AreReferencedMediaController(
-        ITrackedReferencesService trackedReferencesSkipTakeService,
-        IUmbracoMapper umbracoMapper)
-        : this(
-            trackedReferencesSkipTakeService,
-            umbracoMapper,
-            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Media.References.AreReferencedMediaController"/> class.
-    /// </summary>
-    /// <param name="trackedReferencesSkipTakeService">Service for retrieving tracked media references with support for pagination (skip and take).</param>
-    /// <param name="umbracoMapper">The Umbraco mapper used for mapping between models.</param>
     /// <param name="authorizationService">The service used to authorize access to the requested items.</param>
-    [ActivatorUtilitiesConstructor]
     public AreReferencedMediaController(
         ITrackedReferencesService trackedReferencesSkipTakeService,
         IUmbracoMapper umbracoMapper,

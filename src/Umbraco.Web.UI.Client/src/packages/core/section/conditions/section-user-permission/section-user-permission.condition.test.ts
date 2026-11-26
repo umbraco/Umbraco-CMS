@@ -79,7 +79,7 @@ describe('UmbSectionUserPermissionCondition', () => {
 			});
 		});
 
-		expect(callbackCount).to.equal(0);
+		expect(callbackCount).to.equal(1);
 		condition.hostDisconnected();
 	});
 });

@@ -114,10 +114,6 @@ public class EmailSender : IEmailSender
         await SendAsyncInternal(message, emailType, enableNotification, expires);
 
     /// <inheritdoc/>
-    [Obsolete("Please use IsEmailConfigured to check configuration only, or IsEmailAvailableAsync to also check that the transport can currently be reached. Scheduled for removal in Umbraco 19.")]
-    public bool CanSendRequiredEmail() => IsEmailConfigured();
-
-    /// <inheritdoc/>
     /// <remarks>
     ///     We assume this is possible if either an event handler is registered or an smtp server is configured
     ///     or a pickup directory location is configured.

@@ -359,6 +359,26 @@ public class RichTextParserTests : PropertyValueConverterTests
 
     [TestCase(true)]
     [TestCase(false)]
+    public void ParseElement_CleansUpBlocks_RemovesLayoutKey(bool inlineBlock)
+    {
+        var parser = CreateRichTextElementParser();
+        var id = Guid.NewGuid();
+        var layoutKey = Guid.NewGuid();
+
+        var tagName = $"umb-rte-block{(inlineBlock ? "-inline" : string.Empty)}";
+        var element = parser.Parse($"<p><{tagName} data-key=\"{layoutKey:N}\" data-content-key=\"{id:N}\"><!--Umbraco-Block--></{tagName}></p>", RichTextBlockModel.Empty) as RichTextRootElement;
+        Assert.IsNotNull(element);
+        var paragraph = element.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(paragraph);
+        var block = paragraph.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(block);
+        Assert.AreEqual(1, block.Attributes.Count);
+        Assert.IsTrue(block.Attributes.ContainsKey("content-id"));
+        Assert.AreEqual(id, block.Attributes["content-id"]);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
     public void ParseElement_AppendsBlocks(bool inlineBlock)
     {
         var parser = CreateRichTextElementParser();

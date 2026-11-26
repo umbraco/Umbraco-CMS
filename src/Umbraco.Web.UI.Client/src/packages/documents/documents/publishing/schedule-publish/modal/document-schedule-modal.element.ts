@@ -13,8 +13,11 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { umbBindToValidation, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import type { UmbEntityReferencesConfig } from '@umbraco-cms/backoffice/relations';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
 import type { UUIBooleanInputElement, UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+
+import '@umbraco-cms/backoffice/relations';
 
 @customElement('umb-document-schedule-modal')
 export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
@@ -43,6 +46,9 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _submitButtonState?: UUIButtonState;
+
+	@state()
+	private _referencesConfig?: UmbEntityReferencesConfig;
 
 	#validation = new UmbValidationContext(this);
 
@@ -91,6 +97,17 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	override firstUpdated() {
 		this._internalValues = this.data?.prevalues ? [...this.data.prevalues] : [];
 		this.#configureSelectionManager();
+		this.#configureReferences();
+	}
+
+	#configureReferences() {
+		if (!this.data) return;
+		const { unique, itemRepositoryAlias, referenceRepositoryAlias } = this.data;
+		if (!unique) return;
+		if (!itemRepositoryAlias) return;
+		if (!referenceRepositoryAlias) return;
+
+		this._referencesConfig = { unique, itemRepositoryAlias, referenceRepositoryAlias };
 	}
 
 	async #configureSelectionManager() {
@@ -149,6 +166,11 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		return this._selection.some((s) => s.unique === unique);
 	}
 
+	#hasSelectableOption() {
+		const isAllowed = this.#selectionManager.getAllowLimitation();
+		return this._options.some((option) => isAllowed(option.unique));
+	}
+
 	#onSelectAllChange(event: Event) {
 		const allUniques = this._options.map((o) => o.unique);
 		const filter = this.#selectionManager.getAllowLimitation();
@@ -197,6 +219,14 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 					</p>`,
 			)}
 			${this.#renderOptions()}
+			${when(
+				this._referencesConfig,
+				() =>
+					html`<umb-entity-references-summary
+						.config=${this._referencesConfig}
+						.entitiesNeedingAttention=${this.data
+							?.entitiesNeedingAttention}></umb-entity-references-summary>`,
+			)}
 
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
@@ -220,7 +250,8 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 						<uui-checkbox
 							@change=${this.#onSelectAllChange}
 							label=${this.localize.term('general_selectAll')}
-							.checked=${this._isAllSelected}></uui-checkbox>
+							.checked=${this._isAllSelected}
+							?disabled=${!this.#hasSelectableOption()}></uui-checkbox>
 						<uui-checkbox
 							@change=${this.#onScheduleForAllChange}
 							label=${this.localize.term('content_scheduleForAllLanguages')}

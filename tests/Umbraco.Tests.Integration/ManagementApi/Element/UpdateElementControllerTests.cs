@@ -68,7 +68,7 @@ public class UpdateElementControllerTests : ManagementApiUserGroupTestBase<Updat
         var updateModel = new UpdateElementRequestModel
         {
             Values = [],
-            Variants = [new ElementVariantRequestModel { Culture = null, Segment = null, Name = "Updated Element" }],
+            Variants = [new ElementVariantRequestModel { Culture = null, Name = "Updated Element" }],
         };
 
         return await Client.PutAsync(Url, JsonContent.Create(updateModel));

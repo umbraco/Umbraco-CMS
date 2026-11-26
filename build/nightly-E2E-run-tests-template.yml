@@ -27,6 +27,7 @@ steps:
   # Ensures we have the package wait-on installed
   - pwsh: npm install wait-on
     displayName: Install wait-on package
+    retryCountOnTaskFailure: 2
 
   # Wait for either the port of the aspnetcore url
   - pwsh: |
@@ -46,6 +47,7 @@ steps:
   # Install Playwright and dependencies
   - pwsh: npx playwright install chromium
     displayName: Install Playwright only with Chromium browser
+    retryCountOnTaskFailure: 2
     workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
   # Test
@@ -56,6 +58,8 @@ steps:
       CI: true
       CommitId: $(Build.SourceVersion)
       AgentOs: $(Agent.OS)
+      PlaywrightReportUrl: $(PlaywrightReportUrl)
+      UmbracoVersion: $(umbracoVersion)
       AZUREADB2CTESTUSEREMAIL: ${{ parameters.AZUREB2CTESTUSEREMAIL }}
       AZUREADB2CTESTUSERPASSWORD: ${{ parameters.AZUREB2CTESTUSERPASSWORD }}
 

@@ -1,18 +1,20 @@
-﻿using System.Security.Claims;
+﻿using System.Globalization;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.Net.Http.Headers;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
+using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Umbraco.Cms.Api.Management.Configuration;
 
@@ -21,6 +23,8 @@ namespace Umbraco.Cms.Api.Management.Configuration;
 /// </summary>
 public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAuthenticationOptions>
 {
+    private const string LastStampValidationUtcKey = ".umb.stamp-validated";
+
     private readonly IDataProtectionProvider _dataProtection;
     private readonly GlobalSettings _globalSettings;
     private readonly IIpResolver _ipResolver;
@@ -80,6 +84,13 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
             _globalSettings.UseHttps ? CookieSecurePolicy.Always : CookieSecurePolicy.SameAsRequest;
         options.Cookie.Path = "/";
 
+        // SameSite=None (requires HTTPS) lets the cookie ride cross-site requests when the back office
+        // is served from a different origin than the server (dev server). An unparseable value is a
+        // configuration mistake rather than something to paper over, so it fails the boot.
+        options.Cookie.SameSite = TryParseAuthCookieSameSite(_securitySettings.AuthCookieSameSite, out SameSiteMode result)
+            ? result
+            : throw new ConfigurationException("The provided AuthCookieSameSite value from SecuritySettings could not be parsed into as SameSiteMode value.");
+
         // NOTE: matches route in BackOfficeLoginController
         const string backOfficeLoginPath = "/umbraco/login";
         options.LoginPath = backOfficeLoginPath;
@@ -109,7 +120,8 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
             // https://github.com/dotnet/aspnetcore/blob/master/src/Security/Authentication/Cookies/src/CookieAuthenticationEvents.cs#L58
             // It would be possible to re-use the default behavior if any of these need to be set but that must be taken into account else
             // our back office requests will not function correctly. For now we don't need to set/configure any of these callbacks because
-            // the defaults work fine with our setup.
+            // the defaults work fine with our setup: they answer with a status code rather than a redirect for any endpoint carrying
+            // IDisableCookieRedirectMetadata (e.g. [ApiController]) unless it opts back in with IAllowCookieRedirectMetadata.
             OnValidatePrincipal = async ctx =>
             {
                 // We need to resolve the BackOfficeSecurityStampValidator per request as a requirement (even in aspnetcore they do this)
@@ -130,9 +142,11 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                 // ensure the thread culture is set
                 backOfficeIdentity?.EnsureCulture();
 
-                EnsureTicketRenewalIfKeepUserLoggedIn(ctx);
-
                 // add or update a claim to track when the cookie expires, we use this to track time remaining
+                // NOTE: this runs before the ExpiresUtc reset below, so on a renewing request the claim
+                // still carries the pre-renewal expiry and only catches up on the next request. That is
+                // why the client re-reads the expiry from user/current/configuration after a keep-alive
+                // rather than trusting the claim on the keep-alive response itself.
                 backOfficeIdentity?.AddOrUpdateClaim(new Claim(
                     Constants.Security.TicketExpiresClaimType,
                     ctx.Properties.ExpiresUtc!.Value.ToString("o"),
@@ -141,21 +155,41 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                     Constants.Security.BackOfficeAuthenticationType,
                     backOfficeIdentity));
 
+                // The cookie middleware stamps IssuedUtc with the time of every renewal, and the
+                // SecurityStampValidator measures its ValidationInterval from IssuedUtc. The session is
+                // renewed on activity, so IssuedUtc can't serve as the time of the last stamp validation:
+                // a client making requests more often than the interval would never be re-validated.
+                // That time is tracked separately and presented to the validator as IssuedUtc.
+                DateTimeOffset? lastStampValidationUtc = GetLastStampValidationUtc(ctx.Properties);
+                if (lastStampValidationUtc is not null)
+                {
+                    ctx.Properties.IssuedUtc = lastStampValidationUtc;
+                }
+
                 await securityStampValidator.ValidateAsync(ctx);
 
-                // Only reset timestamps when a renewal was already triggered (by the SecurityStampValidator
-                // or by EnsureTicketRenewalIfKeepUserLoggedIn above).
-                // When the SecurityStampValidator refreshes the principal, it sets ShouldRenew but updates
-                // IssuedUtc without updating ExpiresUtc, causing the effective cookie lifetime to shrink
-                // with each validation. The manual reset here fixes that drift.
-                // IMPORTANT: Do NOT unconditionally set ShouldRenew or reset IssuedUtc - doing so prevents
-                // the SecurityStampValidator from ever exceeding its ValidationInterval during active use,
-                // which breaks AllowConcurrentLogins enforcement.
+                // ctx.ShouldRenew is true here only when the SecurityStampValidator itself decided to
+                // refresh the principal, i.e. its ValidationInterval had elapsed and the stamp was still
+                // valid. That's a genuine re-validation, so a fresh validation interval starts now.
                 if (ctx.ShouldRenew)
                 {
                     DateTimeOffset now = _timeProvider.GetUtcNow();
                     ctx.Properties.IssuedUtc = now;
                     ctx.Properties.ExpiresUtc = now.Add(_globalSettings.TimeOut);
+                    ctx.Properties.Items[LastStampValidationUtcKey] = now.ToString("o");
+                }
+                else if (ctx.Principal is not null)
+                {
+                    // The stamp was not re-validated (the ValidationInterval hasn't elapsed yet), but any
+                    // request bearing a valid principal still refreshes the session on activity. The
+                    // cookie middleware re-issues a renewed ticket as now + (ExpiresUtc - IssuedUtc), so
+                    // that span is kept at the session timeout, and the time of the last stamp validation
+                    // is carried over so the interval keeps running.
+                    DateTimeOffset issuedUtc = ctx.Properties.IssuedUtc ?? _timeProvider.GetUtcNow();
+                    ctx.ShouldRenew = true;
+                    ctx.Properties.IssuedUtc = issuedUtc;
+                    ctx.Properties.ExpiresUtc = issuedUtc.Add(_globalSettings.TimeOut);
+                    ctx.Properties.Items[LastStampValidationUtcKey] = issuedUtc.ToString("o");
                 }
             },
             OnSigningIn = ctx =>
@@ -229,69 +263,31 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
 
                 return Task.CompletedTask;
             },
-            // FIXME: We want to change this over to using an attribute on the backoffice controllers
-            // See this for more: https://github.com/dotnet/aspnetcore/issues/63093#issuecomment-3201530217
-            OnRedirectToLogin = context =>
-            {
-                if (IsXhr(context.Request))
-                {
-                    context.Response.Headers.Location = context.RedirectUri;
-                    context.Response.StatusCode = 401;
-                }
-                else
-                {
-                    context.Response.Redirect(context.RedirectUri);
-                }
-
-                return Task.CompletedTask;
-            },
-            OnRedirectToAccessDenied = context =>
-            {
-                if (IsXhr(context.Request))
-                {
-                    context.Response.Headers.Location = context.RedirectUri;
-                    context.Response.StatusCode = 403;
-                }
-                else
-                {
-                    context.Response.Redirect(context.RedirectUri);
-                }
-
-                return Task.CompletedTask;
-            },
         };
     }
 
-    private bool IsXhr(HttpRequest request) =>
-        string.Equals(request.Query[HeaderNames.XRequestedWith], "XMLHttpRequest", StringComparison.Ordinal) ||
-        string.Equals(request.Headers.XRequestedWith, "XMLHttpRequest", StringComparison.Ordinal);
+    private static DateTimeOffset? GetLastStampValidationUtc(AuthenticationProperties properties)
+        => properties.Items.TryGetValue(LastStampValidationUtcKey, out var value)
+            && DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTimeOffset parsed)
+                ? parsed
+                : properties.IssuedUtc;
 
     /// <summary>
-    ///     Ensures the ticket is renewed if the <see cref="SecuritySettings.KeepUserLoggedIn" /> is set to true
-    ///     and the current request is for the get user seconds endpoint
+    ///     Resolves the configured <see cref="SecuritySettings.AuthCookieSameSite" /> value.
     /// </summary>
-    /// <param name="context">The <see cref="CookieValidatePrincipalContext" /></param>
-    private void EnsureTicketRenewalIfKeepUserLoggedIn(CookieValidatePrincipalContext context)
+    /// <remarks>
+    ///     Enum.TryParse on its own accepts any integer, so an out-of-range value would yield an undefined
+    ///     mode - which makes the samesite attribute be omitted altogether, silently weakening the cookie.
+    ///     Enum.IsDefined rejects those, while still allowing a defined member to be configured numerically.
+    /// </remarks>
+    internal static bool TryParseAuthCookieSameSite(string value, out SameSiteMode mode)
     {
-        if (!_securitySettings.KeepUserLoggedIn)
+        if (Enum.TryParse(value, ignoreCase: true, out mode) && Enum.IsDefined(mode))
         {
-            return;
+            return true;
         }
 
-        DateTimeOffset currentUtc = _timeProvider.GetUtcNow();
-        DateTimeOffset? issuedUtc = context.Properties.IssuedUtc;
-        DateTimeOffset? expiresUtc = context.Properties.ExpiresUtc;
-
-        if (expiresUtc.HasValue && issuedUtc.HasValue)
-        {
-            TimeSpan timeElapsed = currentUtc.Subtract(issuedUtc.Value);
-            TimeSpan timeRemaining = expiresUtc.Value.Subtract(currentUtc);
-
-            // if it's time to renew, then do it
-            if (timeRemaining < timeElapsed)
-            {
-                context.ShouldRenew = true;
-            }
-        }
+        mode = SameSiteMode.Unspecified;
+        return false;
     }
 }

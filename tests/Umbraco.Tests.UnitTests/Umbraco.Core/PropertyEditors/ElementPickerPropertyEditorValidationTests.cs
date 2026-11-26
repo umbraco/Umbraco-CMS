@@ -190,7 +190,7 @@ public class ElementPickerPropertyEditorValidationTests
     {
         _valueEditor.ConfigurationObject = new ElementPickerConfiguration
         {
-            ValidationLimit = new ElementPickerConfiguration.NumberRange { Min = 2 },
+            ValidationLimit = new NumberRange { Min = 2 },
         };
 
         List<string>? value = isNull ? null : [];
@@ -203,7 +203,7 @@ public class ElementPickerPropertyEditorValidationTests
     {
         _valueEditor.ConfigurationObject = new ElementPickerConfiguration
         {
-            ValidationLimit = new ElementPickerConfiguration.NumberRange { Min = 2 },
+            ValidationLimit = new NumberRange { Min = 2 },
         };
 
         ValidationResult[] result = _valueEditor.Validate(value, true, null, PropertyValidationContext.Empty()).ToArray();

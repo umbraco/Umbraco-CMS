@@ -1,4 +1,6 @@
 import type { UmbWorkspaceSplitViewManager } from '../../controllers/workspace-split-view-manager.controller.js';
+import type { UmbVariantNameWriteGuardManager } from '../../namable/variant-name-write-guard.manager.js';
+import type { UmbWorkspaceVariantOptionsController } from '../../controllers/index.js';
 import type { UmbSubmittableWorkspaceContext } from './submittable-workspace-context.interface.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
@@ -9,6 +11,7 @@ import type { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/uti
 
 export interface UmbVariantDatasetWorkspaceContext<
 	VariantType extends UmbEntityVariantModel = UmbEntityVariantModel,
+	VariantOptionModelType extends UmbEntityVariantOptionModel = UmbEntityVariantOptionModel<VariantType>,
 > extends UmbSubmittableWorkspaceContext {
 	// Name:
 	getName(variantId?: UmbVariantId): string | undefined;
@@ -17,10 +20,13 @@ export interface UmbVariantDatasetWorkspaceContext<
 
 	// Variant:
 	variants: Observable<Array<VariantType>>;
-	variantOptions: Observable<Array<UmbEntityVariantOptionModel<VariantType>>>;
+	variantOptions: Observable<Array<VariantOptionModelType> | undefined>;
+	variantOptionsManager: UmbWorkspaceVariantOptionsController<VariantType, VariantOptionModelType>;
 	splitView: UmbWorkspaceSplitViewManager;
 	getVariant(variantId: UmbVariantId): VariantType | undefined;
 	readonly readOnlyGuard: UmbReadOnlyVariantGuardManager;
+	readonly nameWriteGuard?: UmbVariantNameWriteGuardManager;
+	isWritableVariant?(variantId: UmbVariantId): Observable<boolean>;
 	varies: Observable<boolean | undefined>;
 	variesByCulture: Observable<boolean | undefined>;
 	variesBySegment: Observable<boolean | undefined>;

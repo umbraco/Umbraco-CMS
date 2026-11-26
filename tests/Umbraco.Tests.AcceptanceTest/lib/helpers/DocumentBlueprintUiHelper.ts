@@ -6,10 +6,16 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
   private readonly documentBlueprintTree: Locator;
   private readonly documentBlueprintNameTxt: Locator;
   private readonly deleteMenu: Locator;
+  private readonly documentBlueprintSidebarHeader: Locator;
+  private readonly actionMenuForDocumentBlueprintBtn: Locator;
+  private readonly itemPickerModal: Locator;
 
   constructor(page: Page) {
     super(page);
     this.documentBlueprintTree = page.locator('umb-tree[alias="Umb.Tree.DocumentBlueprint"]');
+    this.documentBlueprintSidebarHeader = page.locator('[data-mark="section-sidebar-app:Umb.SidebarMenu.DocumentBlueprint"]');
+    this.actionMenuForDocumentBlueprintBtn = this.documentBlueprintSidebarHeader.getByTestId('open-dropdown');
+    this.itemPickerModal = page.locator('umb-item-picker-modal');
     this.documentBlueprintNameTxt = page.locator('#name-input #input');
     this.deleteMenu = page.locator('umb-section-sidebar #menu-item').getByLabel('Delete');
   }
@@ -19,11 +25,24 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
   }
 
   async clickActionsMenuAtRoot() {
-    await this.clickActionsMenuForDocumentBlueprints('Document Blueprints');
+    await this.hover(this.documentBlueprintSidebarHeader);
+    await this.click(this.actionMenuForDocumentBlueprintBtn);
   }
 
-  async clickRootFolderCaretButton() {
-    await this.openCaretButtonForName('Document Blueprints');
+  async isDocumentBlueprintSidebarHeaderVisible(isVisible: boolean = true) {
+    return this.isVisible(this.documentBlueprintSidebarHeader, isVisible);
+  }
+
+  async isChildDocumentBlueprintInTreeVisible(parentName: string, childName: string, isVisible: boolean = true) {
+    await this.isVisible(this.documentBlueprintTree.locator(`[label="${parentName}"]`).locator(`uui-menu-item[label="${childName}"]`), isVisible);
+  }
+
+  async chooseDocumentTypeForDocumentBlueprint(documentTypeName: string) {
+    await this.click(this.itemPickerModal.locator(`umb-ref-item[name="${documentTypeName}"]`));
+  }
+
+  async isDocumentTypeVisibleForDocumentBlueprint(documentTypeName: string, isVisible: boolean = true) {
+    await this.isVisible(this.itemPickerModal.locator(`umb-ref-item[name="${documentTypeName}"]`), isVisible);
   }
 
   async clickSaveButtonAndWaitForDocumentBlueprintToBeCreated() {
@@ -31,15 +50,16 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
   }
 
   async clickSaveButtonAndWaitForDocumentBlueprintToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprint, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.clickSaveButtonAndWaitForWorkspaceToBeSaved(ConstantHelper.apiEndpoints.documentBlueprint, ConstantHelper.workspaceActions.documentBlueprintSave);
   }
 
   async reloadDocumentBlueprintsTree() {
-    await this.reloadTree('Document Blueprints');
+    await this.clickActionsMenuAtRoot();
+    await this.clickReloadChildrenActionMenuOption();
   }
 
   async goToDocumentBlueprint(blueprintName: string) {
-    await this.goToSection(ConstantHelper.sections.settings);
+    await this.goToSection(ConstantHelper.sections.library);
     await this.reloadDocumentBlueprintsTree();
     await this.clickTreeItemWithName(blueprintName);
   }
@@ -74,5 +94,20 @@ export class DocumentBlueprintUiHelper extends UiBaseLocators{
 
   async clickConfirmToDeleteButtonAndWaitForDocumentBlueprintToBeDeleted() {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprint, this.clickConfirmToDeleteButton(), ConstantHelper.statusCodes.ok);
+  }
+
+  async createDocumentBlueprintFolderAndWaitForFolderToBeCreated(folderName: string) {
+    await this.clickCreateActionMenuOption();
+    await this.clickFolderButton();
+    await this.enterFolderName(folderName);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprintFolder, this.clickConfirmCreateFolderButton(), ConstantHelper.statusCodes.created);
+  }
+
+  async clickConfirmRenameButtonAndWaitForFolderToBeRenamed() {
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprintFolder, this.clickConfirmRenameButton(), ConstantHelper.statusCodes.ok);
+  }
+
+  async clickConfirmToDeleteButtonAndWaitForFolderToBeDeleted() {
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.documentBlueprintFolder, this.clickConfirmToDeleteButton(), ConstantHelper.statusCodes.ok);
   }
 }

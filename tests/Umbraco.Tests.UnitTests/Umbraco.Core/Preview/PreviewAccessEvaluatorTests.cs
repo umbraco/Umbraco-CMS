@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -9,6 +8,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Preview;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Preview;
@@ -24,11 +24,35 @@ public class PreviewAccessEvaluatorTests
     private readonly Dictionary<Guid, string> _elementPaths = [];
 
     [Test]
-    public void Allows_Any_Document_Without_A_Preview_User()
+    public void Allows_Any_Document_Outside_A_Preview_Session()
+    {
+        PreviewAccessEvaluator evaluator = CreateEvaluator(user: null, out _, isInPreviewSession: false);
+
+        Assert.IsTrue(evaluator.CanPreviewDocument(Content(OutsideStartNodePath)));
+    }
+
+    [Test]
+    public void Refuses_Any_Document_In_A_Preview_Session_Without_A_User()
     {
         PreviewAccessEvaluator evaluator = CreateEvaluator(user: null, out _);
 
-        Assert.IsTrue(evaluator.CanPreviewDocument(Content(OutsideStartNodePath)));
+        Assert.IsFalse(evaluator.CanPreviewDocument(Content(InsideStartNodePath)));
+    }
+
+    [Test]
+    public void Refuses_Any_Document_In_A_Preview_Session_For_A_Disabled_User()
+    {
+        PreviewAccessEvaluator evaluator = CreateEvaluator(CreateUser(isApproved: false), out _);
+
+        Assert.IsFalse(evaluator.CanPreviewDocument(Content(InsideStartNodePath)));
+    }
+
+    [Test]
+    public void Refuses_Any_Document_In_A_Preview_Session_For_A_Locked_Out_User()
+    {
+        PreviewAccessEvaluator evaluator = CreateEvaluator(CreateUser(isLockedOut: true), out _);
+
+        Assert.IsFalse(evaluator.CanPreviewDocument(Content(InsideStartNodePath)));
     }
 
     [Test]
@@ -75,11 +99,27 @@ public class PreviewAccessEvaluatorTests
     }
 
     [Test]
-    public void Allows_Any_Element_Without_A_Preview_User()
+    public void Allows_Any_Element_Outside_A_Preview_Session()
+    {
+        PreviewAccessEvaluator evaluator = CreateEvaluator(user: null, out _, isInPreviewSession: false);
+
+        Assert.IsTrue(evaluator.CanPreviewElement(Element(OutsideStartNodePath)));
+    }
+
+    [Test]
+    public void Refuses_Any_Element_In_A_Preview_Session_Without_A_User()
     {
         PreviewAccessEvaluator evaluator = CreateEvaluator(user: null, out _);
 
-        Assert.IsTrue(evaluator.CanPreviewElement(Element(OutsideStartNodePath)));
+        Assert.IsFalse(evaluator.CanPreviewElement(Element(InsideStartNodePath)));
+    }
+
+    [Test]
+    public void Refuses_Any_Element_In_A_Preview_Session_For_A_Disabled_User()
+    {
+        PreviewAccessEvaluator evaluator = CreateEvaluator(CreateUser(isApproved: false), out _);
+
+        Assert.IsFalse(evaluator.CanPreviewElement(Element(InsideStartNodePath)));
     }
 
     [Test]
@@ -124,13 +164,15 @@ public class PreviewAccessEvaluatorTests
     private static IPublishedContent Content(string path)
         => Mock.Of<IPublishedContent>(x => x.Path == path && x.Key == Guid.NewGuid());
 
-    private IUser CreateUser(string[]? sections = null)
+    private IUser CreateUser(string[]? sections = null, bool isApproved = true, bool isLockedOut = false)
     {
         IReadOnlyUserGroup[] groups = [Mock.Of<IReadOnlyUserGroup>(x => x.StartContentId == StartNodeId && x.StartElementId == StartNodeId)];
 
         var user = new Mock<IUser>();
         user.SetupGet(x => x.Key).Returns(_userKey);
         user.SetupGet(x => x.Id).Returns(1234);
+        user.SetupGet(x => x.IsApproved).Returns(isApproved);
+        user.SetupGet(x => x.IsLockedOut).Returns(isLockedOut);
         user.SetupGet(x => x.AllowedSections).Returns(sections ?? [Constants.Applications.Content, Constants.Applications.Library]);
         user.SetupGet(x => x.Groups).Returns(groups);
         user.SetupGet(x => x.StartContentIds).Returns([]);
@@ -138,17 +180,17 @@ public class PreviewAccessEvaluatorTests
         return user.Object;
     }
 
-    private PreviewAccessEvaluator CreateEvaluator(IUser? user, out Mock<IUserService> userService, string[]? permissions = null)
+    private PreviewAccessEvaluator CreateEvaluator(
+        IUser? user,
+        out Mock<IUserService> userService,
+        string[]? permissions = null,
+        bool isInPreviewSession = true)
     {
-        var previewService = new Mock<IPreviewService>();
-        previewService
-            .Setup(x => x.TryGetPreviewClaimsIdentityAsync())
-            .ReturnsAsync(user is null
-                ? Attempt<ClaimsIdentity>.Fail()
-                : Attempt.Succeed(new ClaimsIdentity([new Claim(Constants.Security.OpenIdDictSubClaimType, _userKey.ToString())])));
+        var previewSessionService = Mock.Of<IPreviewSessionService>(x => x.IsActive() == isInPreviewSession);
+        var backOfficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>(
+            x => x.BackOfficeSecurity == Mock.Of<IBackOfficeSecurity>(security => security.CurrentUser == user));
 
         userService = new Mock<IUserService>();
-        userService.Setup(x => x.GetAsync(_userKey)).ReturnsAsync(user);
         userService
             .Setup(x => x.GetPermissionsForPath(It.IsAny<IUser>(), It.IsAny<string>()))
             .Returns(new EntityPermissionSet(
@@ -171,6 +213,11 @@ public class PreviewAccessEvaluatorTests
         // A request cache is required for the per-request memoization to be observable.
         var appCaches = new AppCaches(NoAppCache.Instance, new DictionaryAppCache(), new IsolatedCaches(_ => NoAppCache.Instance));
 
-        return new PreviewAccessEvaluator(previewService.Object, userService.Object, entityService.Object, appCaches);
+        return new PreviewAccessEvaluator(
+            previewSessionService,
+            backOfficeSecurityAccessor,
+            userService.Object,
+            entityService.Object,
+            appCaches);
     }
 }

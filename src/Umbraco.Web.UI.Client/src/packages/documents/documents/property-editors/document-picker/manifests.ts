@@ -1,15 +1,17 @@
+import { UMB_DOCUMENT_DYNAMIC_ROOT_PROPERTY_EDITOR_UI_ALIAS } from '../../dynamic-root/constants.js';
 import { manifest as schemaManifest } from './Umbraco.ContentPicker.js';
 import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
+
+const propertyEditorUiAlias = 'Umb.PropertyEditorUi.DocumentPicker';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.DocumentPicker',
+		alias: propertyEditorUiAlias,
 		name: 'Document Picker Property Editor UI',
 		element: () => import('./property-editor-ui-document-picker.element.js'),
 		meta: {
-			supportsVariantChange: true,
-			label: 'Document Picker',
+			label: 'Single Document Picker',
 			propertyEditorSchemaAlias: 'Umbraco.ContentPicker',
 			icon: 'icon-document',
 			group: '#propertyEditorUIGroups_pickers',
@@ -38,10 +40,24 @@ export const manifests: Array<UmbExtensionManifest> = [
 						],
 						weight: 20,
 					},
+					{
+						alias: 'dynamicRoot',
+						label: 'Dynamic root',
+						description: 'Resolve the start node from the content being edited, when no start node is set',
+						propertyEditorUiAlias: UMB_DOCUMENT_DYNAMIC_ROOT_PROPERTY_EDITOR_UI_ALIAS,
+						weight: 30,
+					},
 				],
 			},
 		},
 	},
 	schemaManifest,
 	...valueSummaryManifests,
+	{
+		type: 'propertyAction',
+		kind: 'clear',
+		alias: 'Umb.PropertyAction.DocumentPicker.Clear',
+		name: 'Clear Document Picker Property Action',
+		forPropertyEditorUis: [propertyEditorUiAlias],
+	},
 ];

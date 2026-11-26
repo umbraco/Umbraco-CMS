@@ -116,7 +116,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 
 			// A document is culture invariant when none of its variants carry a culture. It may still hold
 			// several variants, as any segment adds one.
-			this._isInvariant = itemVariants.every((variant) => UmbVariantId.Create(variant).isCultureInvariant());
+			this._isInvariant = itemVariants.every((variant) => new UmbVariantId(variant.culture).isCultureInvariant());
 			this.#selectCulture();
 
 			const cultures = itemVariants.map((x) => x.culture).filter((x) => x !== null) as Array<string>;

@@ -162,7 +162,8 @@ internal sealed class SyntheticPublishedMediaTreeFixture
             publishedModelFactory,
             Options.Create(new CacheSettings()),
             NullLogger<MediaCacheService>.Instance,
-            new ConvertedPublishedContentCacheFactory(null, NullLogger<ConvertedPublishedContentCacheFactory>.Instance));
+            new ConvertedPublishedContentCacheFactory(null, NullLogger<ConvertedPublishedContentCacheFactory>.Instance),
+            Mock.Of<IContentCacheDataSerializerFactory>());
 
         _hybridCache = hybridCache;
         _cacheService = cacheService;
@@ -180,7 +181,7 @@ internal sealed class SyntheticPublishedMediaTreeFixture
             }
         }
 
-        var mediaCache = new MediaCache(cacheService, contentTypeCache, navigationService);
+        var mediaCache = new MediaCache(cacheService, navigationService);
 
         NavigationQueryService = navigationService;
         StatusFilteringService = new PublishedMediaStatusFilteringService(mediaCache, cacheService);

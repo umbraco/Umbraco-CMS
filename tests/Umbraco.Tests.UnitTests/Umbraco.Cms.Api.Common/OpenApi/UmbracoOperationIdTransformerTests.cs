@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -31,8 +32,6 @@ internal sealed class UmbracoOperationIdTransformerTests
             },
             "PutDocumentByIdValidate1_1").SetName("Substitutes the dot in a minor API version");
 
-        // The Delivery API's operation IDs are published to headless consumers, so they keep the dot
-        // until a major. See the TODO in UmbracoOperationIdTransformer.
         yield return new TestCaseData(
             new OperationIdCase
             {
@@ -41,7 +40,7 @@ internal sealed class UmbracoOperationIdTransformerTests
                 MethodName = nameof(TestController.DeliveryVersion),
                 ControllerType = typeof(QueryContentApiController),
             },
-            "GetContent2.0").SetName("Leaves the Delivery API version suffix untouched");
+            "GetContent2_0").SetName("Substitutes the dot in a Delivery API version");
 
         yield return new TestCaseData(
             new OperationIdCase
@@ -91,6 +90,33 @@ internal sealed class UmbracoOperationIdTransformerTests
             CancellationToken.None);
 
         Assert.AreEqual(expected, operation.OperationId);
+    }
+
+    [Test]
+    public async Task Can_Generate_Operation_Id_With_The_Invariant_Culture()
+    {
+        CultureInfo culture = CultureInfo.CurrentCulture;
+        try
+        {
+            // tr-TR upper-cases "i" to a dotted "İ"
+            CultureInfo.CurrentCulture = new CultureInfo("tr-TR");
+            var operation = new OpenApiOperation();
+
+            await new UmbracoOperationIdTransformer().TransformAsync(
+                operation,
+                CreateContext(CreateApiDescription(new OperationIdCase
+                {
+                    HttpMethod = "GET",
+                    RelativePath = "umbraco/management/api/v1/item/document/{id}/info",
+                })),
+                CancellationToken.None);
+
+            Assert.AreEqual("GetItemDocumentByIdInfo", operation.OperationId);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = culture;
+        }
     }
 
     [Test]

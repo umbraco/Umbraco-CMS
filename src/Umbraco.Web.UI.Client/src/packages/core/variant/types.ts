@@ -5,29 +5,30 @@ import type { ScheduleRequestModel } from '@umbraco-cms/backoffice/external/back
 import type { UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
 import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
 
+/**
+ * Generic model for an object that has variant properties (culture and segment).
+ */
 export type UmbObjectWithVariantProperties = {
 	culture: string | null;
 	segment: string | null;
 };
 
+export interface UmbVariantPropertyValueModel extends UmbObjectWithVariantProperties, UmbPropertyValueData {}
+
+/** Model for Data of a Variant Entry (culture only)*/
 export interface UmbVariantDataModel {
 	culture: string | null;
-	segment: string | null;
 }
-
-export interface UmbVariantPropertyValueModel extends UmbVariantDataModel, UmbPropertyValueData {}
-
 export interface UmbEntityVariantModel {
 	name: string;
 	culture: string | null;
-	segment: string | null;
 	createDate: string | null;
 	updateDate: string | null;
-	// TODO: Can we remove partial from this one: [NL]
 	state?: string | null;
 	flags: Array<UmbEntityFlag>;
 }
 
+// TODO: Remove in v.21 [NL]
 /** @deprecated use `UmbEntityVariantModel` instead */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbVariantModel extends UmbEntityVariantModel {}
@@ -38,7 +39,6 @@ export interface UmbEntityVariantOptionModel<VariantType extends UmbEntityVarian
 	segmentInfo?: {
 		alias: string;
 		name: string;
-		cultures?: string[] | null;
 	};
 	/**
 	 * The unique identifier is a VariantId string.
@@ -47,6 +47,13 @@ export interface UmbEntityVariantOptionModel<VariantType extends UmbEntityVarian
 	culture: string | null;
 	segment: string | null;
 }
+
+/**
+ * A variant option as it is supplied to a workspace, before its language has been resolved from the culture.
+ */
+export type UmbEntityVariantOptionSourceModel<
+	VariantOptionType extends UmbEntityVariantOptionModel = UmbEntityVariantOptionModel,
+> = Omit<VariantOptionType, 'language'>;
 
 /** @deprecated use `UmbEntityVariantOptionModel` instead */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

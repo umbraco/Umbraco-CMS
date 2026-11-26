@@ -73,7 +73,7 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 			if (isAuthorized === undefined) return;
 
 			if (isAuthorized) {
-				this.#initHubConnection('[redacted]').catch((error) => {
+				this.#initHubConnection().catch((error) => {
 					this.#isConnected.setValue(false);
 					console.error('Failed to initialize the server event hub connection', error);
 				});
@@ -87,7 +87,7 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 		});
 	}
 
-	async #initHubConnection(token: string) {
+	async #initHubConnection() {
 		// Each call supersedes any earlier one, so an init that is still awaiting the previous stop must not
 		// go on to build a connection once a newer init or a logout has happened.
 		const generation = ++this.#connectionGeneration;
@@ -110,9 +110,7 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 
 		const skipNegotiation = this.#serverContext?.getServerConnection()?.getSignalRSkipNegotiation() ?? false;
 
-		const hubOptions: IHttpConnectionOptions = {
-			accessTokenFactory: () => token,
-		};
+		const hubOptions: IHttpConnectionOptions = {};
 
 		if (skipNegotiation) {
 			hubOptions.skipNegotiation = true;

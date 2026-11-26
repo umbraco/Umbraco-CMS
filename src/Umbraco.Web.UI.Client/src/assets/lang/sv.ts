@@ -59,6 +59,17 @@ export default {
 		unpublish: 'Avpublicera',
 		update: 'Uppdatera',
 	},
+	actionGroups: {
+		clipboard: 'Urklipp',
+		create: 'Skapa',
+		edit: 'Redigera',
+		importExport: 'Import och export',
+		notifications: 'Meddelanden',
+		other: 'Övrigt',
+		publishing: 'Publicering',
+		routing: 'Routning',
+		structure: 'Struktur',
+	},
 	actionCategories: {
 		administration: 'Administration',
 		structure: 'Struktur',
@@ -161,6 +172,8 @@ export default {
 	validation: {
 		entriesShort: 'Minsta %0% poster, kräver <strong>%1%</strong> mer.',
 		entriesExceed: 'Max %0% poster, <strong>%1%</strong> för många.',
+		itemMissingValueMessage: 'Objekt %0% saknar ett värde',
+		invalidEmpty: 'Värdet kan inte vara tomt',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Skapa en ny innehållsmall för <em>%0%</em>',
@@ -426,7 +439,7 @@ export default {
 		addLink: 'Lägg till länk',
 		assignDomain: 'Hantera domännamn',
 		closeThisWindow: 'Stäng fönstret',
-		confirmdelete: 'Är du säker på att du vill ta bort',
+		confirmdelete: (name: string) => `Är du säker på att du vill ta bort${name ? ` <strong>${name}</strong>` : ''}?`,
 		confirmdeleteNumberOfItems:
 			'Är du säker på att du vill ta bort <strong>%0%</strong> av <strong>%1%</strong> objekt',
 		confirmdisable: 'Är du säker på att du vill avaktivera',
@@ -965,6 +978,8 @@ export default {
 		publishAll: 'Publicera %0% och alla dess underordnade sidor',
 		publishHelp:
 			'Klicka på <em>ok</em> för att publicera <strong>%0%</strong>. Därmed blir innehållet publikt.<br/><br /> Du kan publicera denna sida och alla dess undersidor genom att kryssa i <em>publicera alla undersidor</em>. ',
+		publishedNotificationTitle: 'Publicerat',
+		publishedNotificationDescription: '%0% är nu offentligt tillgängligt',
 	},
 	references: {
 		itemHasNoReferences: 'Det här objektet har inga referenser.',
@@ -1068,6 +1083,7 @@ export default {
 		editContentPublishedFailedByParent:
 			'Det gick inte att publicera sidan eftersom dess överordnade sida inte är publicerad',
 		editContentPublishedHeader: 'Innehållet är publicerat',
+		editElementPublishedHeader: 'Elementet är publicerat',
 		editContentPublishedText: 'och syns på webbplatsen',
 		editContentSavedHeader: 'Innehållet har sparats',
 		editContentSavedText: 'Kom ihåg att publicera för att ändringarna ska synas på webbplatsen',

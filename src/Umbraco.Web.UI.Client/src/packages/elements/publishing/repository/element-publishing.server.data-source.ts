@@ -12,7 +12,7 @@ import type {
 	UpdateAndPublishElementRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { umbVariantIdsToCultures, type UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
@@ -90,7 +90,7 @@ export class UmbElementPublishingServerDataSource {
 	 * @returns {Array<string>} The distinct culture codes to publish
 	 */
 	#mapCulturesToPublish(variantIds: Array<UmbVariantId>): Array<string> {
-		return [...new Set(variantIds.filter((x) => !x.isCultureInvariant()).map((x) => x.toCultureString()))];
+		return umbVariantIdsToCultures(variantIds).filter((x): x is string => x !== null);
 	}
 
 	/**

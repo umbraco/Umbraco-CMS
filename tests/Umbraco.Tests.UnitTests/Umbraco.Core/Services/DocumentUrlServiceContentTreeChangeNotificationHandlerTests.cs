@@ -12,8 +12,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 public class DocumentUrlServiceContentTreeChangeNotificationHandlerTests
 {
     private static (DocumentUrlServiceContentTreeChangeNotificationHandler Handler,
-        Mock<IDocumentUrlService> UrlService,
-        Mock<IDocumentUrlAliasService> AliasService) CreateHandler(bool isInitialized = true)
+        Mock<IDocumentUrlService> UrlService) CreateHandler(bool isInitialized = true)
     {
         var urlServiceMock = new Mock<IDocumentUrlService>();
         urlServiceMock.Setup(x => x.IsInitialized).Returns(isInitialized);
@@ -22,16 +21,9 @@ public class DocumentUrlServiceContentTreeChangeNotificationHandlerTests
         urlServiceMock.Setup(x => x.CreateOrUpdateUrlSegmentsWithDescendantsAsync(It.IsAny<Guid>()))
             .Returns(Task.CompletedTask);
 
-        var aliasServiceMock = new Mock<IDocumentUrlAliasService>();
-        aliasServiceMock.Setup(x => x.CreateOrUpdateAliasesAsync(It.IsAny<Guid>()))
-            .Returns(Task.CompletedTask);
-        aliasServiceMock.Setup(x => x.CreateOrUpdateAliasesWithDescendantsAsync(It.IsAny<Guid>()))
-            .Returns(Task.CompletedTask);
+        var handler = new DocumentUrlServiceContentTreeChangeNotificationHandler(urlServiceMock.Object);
 
-        var handler = new DocumentUrlServiceContentTreeChangeNotificationHandler(
-            urlServiceMock.Object, aliasServiceMock.Object);
-
-        return (handler, urlServiceMock, aliasServiceMock);
+        return (handler, urlServiceMock);
     }
 
     private static Mock<IContent> MakeContent()
@@ -46,19 +38,10 @@ public class DocumentUrlServiceContentTreeChangeNotificationHandlerTests
             [new TreeChange<IContent>(content, changeType)],
             new EventMessages());
 
-    // Aliases are persisted inside the content transaction by DocumentUrlAliasContentRefreshNotificationHandler;
-    // this handler must not write them a second time after the commit.
-    private static void VerifyAliasServiceNotCalled(Mock<IDocumentUrlAliasService> aliasService)
-    {
-        aliasService.Verify(x => x.CreateOrUpdateAliasesAsync(It.IsAny<Guid>()), Times.Never);
-        aliasService.Verify(x => x.CreateOrUpdateAliasesWithDescendantsAsync(It.IsAny<Guid>()), Times.Never);
-        aliasService.Verify(x => x.PersistAliasesAsync(It.IsAny<IContent>(), It.IsAny<bool>()), Times.Never);
-    }
-
     [Test]
     public async Task HandleAsync_WhenNotInitialized_DoesNotCallAnyServiceMethods()
     {
-        var (handler, urlService, aliasService) = CreateHandler(isInitialized: false);
+        var (handler, urlService) = CreateHandler(isInitialized: false);
         var content = MakeContent();
         var notification = SingleChange(content.Object, TreeChangeTypes.RefreshNode);
 
@@ -66,14 +49,12 @@ public class DocumentUrlServiceContentTreeChangeNotificationHandlerTests
 
         urlService.Verify(x => x.CreateOrUpdateUrlSegmentsAsync(It.IsAny<IEnumerable<IContent>>()), Times.Never);
         urlService.Verify(x => x.CreateOrUpdateUrlSegmentsWithDescendantsAsync(It.IsAny<Guid>()), Times.Never);
-        aliasService.Verify(x => x.CreateOrUpdateAliasesAsync(It.IsAny<Guid>()), Times.Never);
-        aliasService.Verify(x => x.CreateOrUpdateAliasesWithDescendantsAsync(It.IsAny<Guid>()), Times.Never);
     }
 
     [Test]
-    public async Task HandleAsync_WithSingleRefreshNode_CallsUrlSegmentsWithItem_AndNotTheAliasService()
+    public async Task HandleAsync_WithSingleRefreshNode_CallsUrlSegmentsWithItem()
     {
-        var (handler, urlService, aliasService) = CreateHandler();
+        var (handler, urlService) = CreateHandler();
         var content = MakeContent();
         var key = content.Object.Key;
         var notification = SingleChange(content.Object, TreeChangeTypes.RefreshNode);
@@ -84,13 +65,12 @@ public class DocumentUrlServiceContentTreeChangeNotificationHandlerTests
             x => x.CreateOrUpdateUrlSegmentsAsync(It.Is<IEnumerable<IContent>>(items => items.Any(i => i.Key == key))),
             Times.Once);
         urlService.Verify(x => x.CreateOrUpdateUrlSegmentsWithDescendantsAsync(It.IsAny<Guid>()), Times.Never);
-        VerifyAliasServiceNotCalled(aliasService);
     }
 
     [Test]
-    public async Task HandleAsync_WithMultipleRefreshNodes_BatchesUrlSegments_AndNotTheAliasService()
+    public async Task HandleAsync_WithMultipleRefreshNodes_BatchesUrlSegments()
     {
-        var (handler, urlService, aliasService) = CreateHandler();
+        var (handler, urlService) = CreateHandler();
         var content1 = MakeContent();
         var content2 = MakeContent();
         var notification = new ContentTreeChangeNotification(
@@ -104,13 +84,12 @@ public class DocumentUrlServiceContentTreeChangeNotificationHandlerTests
         await handler.HandleAsync(notification, CancellationToken.None);
 
         urlService.Verify(x => x.CreateOrUpdateUrlSegmentsAsync(It.IsAny<IEnumerable<IContent>>()), Times.Once);
-        VerifyAliasServiceNotCalled(aliasService);
     }
 
     [Test]
-    public async Task HandleAsync_WithRefreshBranch_CallsUrlSegmentsWithDescendants_AndNotTheAliasService()
+    public async Task HandleAsync_WithRefreshBranch_CallsUrlSegmentsWithDescendants()
     {
-        var (handler, urlService, aliasService) = CreateHandler();
+        var (handler, urlService) = CreateHandler();
         var content = MakeContent();
         var key = content.Object.Key;
         var notification = SingleChange(content.Object, TreeChangeTypes.RefreshBranch);
@@ -119,13 +98,12 @@ public class DocumentUrlServiceContentTreeChangeNotificationHandlerTests
 
         urlService.Verify(x => x.CreateOrUpdateUrlSegmentsWithDescendantsAsync(key), Times.Once);
         urlService.Verify(x => x.CreateOrUpdateUrlSegmentsAsync(It.IsAny<IEnumerable<IContent>>()), Times.Never);
-        VerifyAliasServiceNotCalled(aliasService);
     }
 
     [Test]
     public async Task HandleAsync_WithRemoveChange_DoesNotCallAnyCreateOrUpdateMethods()
     {
-        var (handler, urlService, aliasService) = CreateHandler();
+        var (handler, urlService) = CreateHandler();
         var content = MakeContent();
         var notification = SingleChange(content.Object, TreeChangeTypes.Remove);
 
@@ -133,14 +111,12 @@ public class DocumentUrlServiceContentTreeChangeNotificationHandlerTests
 
         urlService.Verify(x => x.CreateOrUpdateUrlSegmentsAsync(It.IsAny<IEnumerable<IContent>>()), Times.Never);
         urlService.Verify(x => x.CreateOrUpdateUrlSegmentsWithDescendantsAsync(It.IsAny<Guid>()), Times.Never);
-        aliasService.Verify(x => x.CreateOrUpdateAliasesAsync(It.IsAny<Guid>()), Times.Never);
-        aliasService.Verify(x => x.CreateOrUpdateAliasesWithDescendantsAsync(It.IsAny<Guid>()), Times.Never);
     }
 
     [Test]
     public async Task HandleAsync_WithRefreshAll_DoesNotCallCreateOrUpdateMethods()
     {
-        var (handler, urlService, aliasService) = CreateHandler();
+        var (handler, urlService) = CreateHandler();
         var content = MakeContent();
         var notification = SingleChange(content.Object, TreeChangeTypes.RefreshAll);
 
@@ -148,14 +124,12 @@ public class DocumentUrlServiceContentTreeChangeNotificationHandlerTests
 
         urlService.Verify(x => x.CreateOrUpdateUrlSegmentsAsync(It.IsAny<IEnumerable<IContent>>()), Times.Never);
         urlService.Verify(x => x.CreateOrUpdateUrlSegmentsWithDescendantsAsync(It.IsAny<Guid>()), Times.Never);
-        aliasService.Verify(x => x.CreateOrUpdateAliasesAsync(It.IsAny<Guid>()), Times.Never);
-        aliasService.Verify(x => x.CreateOrUpdateAliasesWithDescendantsAsync(It.IsAny<Guid>()), Times.Never);
     }
 
     [Test]
     public async Task HandleAsync_WithEmptyChanges_DoesNotCallAnyMethods()
     {
-        var (handler, urlService, aliasService) = CreateHandler();
+        var (handler, urlService) = CreateHandler();
         var notification = new ContentTreeChangeNotification(
             Array.Empty<TreeChange<IContent>>(),
             new EventMessages());
@@ -164,14 +138,12 @@ public class DocumentUrlServiceContentTreeChangeNotificationHandlerTests
 
         urlService.Verify(x => x.CreateOrUpdateUrlSegmentsAsync(It.IsAny<IEnumerable<IContent>>()), Times.Never);
         urlService.Verify(x => x.CreateOrUpdateUrlSegmentsWithDescendantsAsync(It.IsAny<Guid>()), Times.Never);
-        aliasService.Verify(x => x.CreateOrUpdateAliasesAsync(It.IsAny<Guid>()), Times.Never);
-        aliasService.Verify(x => x.CreateOrUpdateAliasesWithDescendantsAsync(It.IsAny<Guid>()), Times.Never);
     }
 
     [Test]
-    public async Task HandleAsync_WithBothRefreshNodeAndBranch_CallsTheUrlSegmentMethodForEach_AndNotTheAliasService()
+    public async Task HandleAsync_WithBothRefreshNodeAndBranch_CallsTheUrlSegmentMethodForEach()
     {
-        var (handler, urlService, aliasService) = CreateHandler();
+        var (handler, urlService) = CreateHandler();
         var nodeContent = MakeContent();
         var branchContent = MakeContent();
         var nodeKey = nodeContent.Object.Key;
@@ -191,6 +163,5 @@ public class DocumentUrlServiceContentTreeChangeNotificationHandlerTests
             x => x.CreateOrUpdateUrlSegmentsAsync(It.Is<IEnumerable<IContent>>(items => items.Any(i => i.Key == nodeKey))),
             Times.Once);
         urlService.Verify(x => x.CreateOrUpdateUrlSegmentsWithDescendantsAsync(branchKey), Times.Once);
-        VerifyAliasServiceNotCalled(aliasService);
     }
 }

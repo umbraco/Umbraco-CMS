@@ -16,7 +16,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Text Box Property Editor UI',
 		element: () => import('./property-editor-ui-text-box.element.js'),
 		meta: {
-			supportsVariantChange: true,
 			label: 'Text Box',
 			propertyEditorSchemaAlias: 'Umbraco.TextBox',
 			icon: 'icon-autofill',
@@ -81,7 +80,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Email Property Editor UI',
 		element: () => import('./property-editor-ui-text-box.element.js'),
 		meta: {
-			supportsVariantChange: true,
 			label: 'Email',
 			propertyEditorSchemaAlias: 'Umbraco.EmailAddress',
 			icon: 'icon-message',

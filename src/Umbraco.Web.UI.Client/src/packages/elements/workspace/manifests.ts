@@ -6,7 +6,7 @@ import {
 } from '../user-permissions/constants.js';
 import { UMB_ELEMENT_WORKSPACE_ALIAS } from './constants.js';
 import { manifests as elementRoot } from './element-root/manifests.js';
-import { UmbSubmitWorkspaceAction, UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveWorkspaceAction, UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 import type { ManifestWorkspaceContextMenuStructureKind } from '@umbraco-cms/backoffice/menu';
 import type {
@@ -53,7 +53,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Element.Save',
 		name: 'Save Element Workspace Action',
-		api: UmbSubmitWorkspaceAction,
+		api: UmbSaveWorkspaceAction,
 		meta: {
 			label: '#buttons_save',
 			look: 'secondary',

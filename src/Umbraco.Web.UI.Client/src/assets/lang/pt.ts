@@ -665,38 +665,6 @@ export default {
 		changeKeyError: "A chave '%0%' já existe.",
 		overviewTitle: 'Visão geral do dicionário',
 	},
-	examineManagement: {
-		configuredSearchers: 'Pesquisadores Configurados',
-		configuredSearchersDescription:
-			'Mostra propriedades e ferramentas para qualquer Pesquisador configurado (por exemplo, um pesquisador de múltiplos índices)',
-		fieldValues: 'Valores do campo',
-		healthStatus: 'Estado de saúde',
-		healthStatusDescription: 'O estado de saúde do índice e se pode ser lido',
-		indexers: 'Indexadores',
-		indexInfo: 'Informação do índice',
-		contentInIndex: 'Conteúdo no índice',
-		indexInfoDescription: 'Lista as propriedades do índice',
-		manageIndexes: 'Gerir índices Examine',
-		manageIndexesDescription:
-			'Permite visualizar os detalhes de cada índice e fornece algumas ferramentas para gerir os índices',
-		rebuildIndex: 'Reconstruir índice',
-		rebuildIndexWarning:
-			'Isto fará com que o índice seja reconstruído.<br /> Dependendo da quantidade de conteúdo no seu site, isto pode demorar algum tempo.<br /> Não é recomendado reconstruir um índice durante períodos de tráfego elevado no website ou quando os editores estão a editar conteúdo.',
-		searchers: 'Pesquisadores',
-		searchDescription: 'Pesquisar no índice e visualizar os resultados',
-		tools: 'Ferramentas',
-		toolsDescription: 'Ferramentas para gerir o índice',
-		fields: 'campos',
-		indexCannotRead: 'O índice não pode ser lido e precisará de ser reconstruído',
-		processIsTakingLonger:
-			'O processo está a demorar mais do que o esperado, verifique o log do Umbraco para ver se ocorreram erros durante esta operação',
-		indexCannotRebuild: 'Este índice não pode ser reconstruído porque não tem nenhum atribuído',
-		iIndexPopulator: 'IIndexPopulator',
-		noResults: 'Nenhum resultado foi encontrado',
-		searchResultsFound: 'A mostrar %0% - %1% de %2% resultado(s) - Página %3% de %4%',
-		corruptStatus: 'Possível índice corrompido detetado',
-		corruptErrorDescription: 'Erro recebido ao avaliar o índice:',
-	},
 	placeholders: {
 		username: 'Introduza o seu nome de utilizador',
 		password: 'Introduza a sua palavra-passe',
@@ -1292,6 +1260,9 @@ export default {
 			'Permissões de utilizador insuficientes para publicar todos os documentos descendentes',
 		contentPublishedFailedReqCultureValidationError:
 			"Falha na validação para o idioma obrigatório '%0%'. Este idioma foi guardado mas não publicado.",
+		publishedNotificationTitle: 'Publicado',
+		publishedNotificationDescription: '%0% está agora publicamente disponível',
+		publishedVariantNotificationDescription: '%1% está agora publicamente disponível em %0%',
 	},
 	colorpicker: {
 		noColors: 'Não configurou nenhuma cor aprovada',
@@ -1491,6 +1462,7 @@ export default {
 		editContentPublishedFailedByValidation: 'O documento não pôde ser publicado, mas guardámo-lo para si',
 		editContentPublishedFailedByParent: 'O documento não pôde ser publicado, porque uma página pai não está publicada',
 		editContentPublishedHeader: 'Documento publicado',
+		editElementPublishedHeader: 'Elemento publicado',
 		editContentPublishedText: 'e está visível no website',
 		editContentUnpublishedHeader: 'Documento despublicado',
 		editContentUnpublishedText: 'e já não está visível no website',
@@ -2383,7 +2355,6 @@ export default {
 		contentRedirectManager: 'Gestão de URL de Redirecionamento',
 		mediaFolderBrowser: 'Conteúdo',
 		settingsWelcome: 'Bem-vindo(a)',
-		settingsExamine: 'Gerir Examine',
 		settingsPublishedStatus: 'Estado de Publicação',
 		settingsModelsBuilder: 'Gerador de Modelos',
 		settingsHealthCheck: 'Verificação de Saúde',
@@ -2885,5 +2856,10 @@ export default {
 		browseTab: 'Procurar',
 		searchTab: 'Pesquisar',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'item selecionado' : 'itens selecionados'}`,
+	},
+	elements: {
+		confirmPublishDescription: 'A publicação tornará isto publicamente disponível.',
+		confirmBulkPublishDescription: 'A publicação tornará os itens selecionados publicamente disponíveis.',
+		confirmBulkUnpublishDescription: 'Os itens selecionados deixarão de estar publicamente disponíveis.',
 	},
 } as UmbLocalizationDictionary;

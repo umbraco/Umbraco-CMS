@@ -12,11 +12,7 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 public class DocumentPublishStatusService :
     PublishStatusService,
     IDocumentPublishStatusQueryService,
-    IDocumentPublishStatusManagementService,
-#pragma warning disable CS0618 // Type or member is obsolete
-    IPublishStatusManagementService,
-    IPublishStatusQueryService
-#pragma warning restore CS0618 // Type or member is obsolete
+    IDocumentPublishStatusManagementService
 {
     private readonly IPublishStatusRepository _publishStatusRepository;
     private readonly ICoreScopeProvider _coreScopeProvider;
@@ -110,6 +106,15 @@ public class DocumentPublishStatusService :
         scope.Complete();
     }
 
+    /// <inheritdoc />
+    public void AddOrUpdateStatus(Guid documentKey)
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        ISet<string> publishedCultures = _publishStatusRepository.GetPublishStatus(documentKey);
+        SetStatus(documentKey, publishedCultures);
+        scope.Complete();
+    }
+
     /// <inheritdoc/>
     public Task RemoveAsync(Guid documentKey, CancellationToken cancellationToken)
     {
@@ -124,6 +129,22 @@ public class DocumentPublishStatusService :
         using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
         {
             publishStatus = await _publishStatusRepository.GetDescendantsOrSelfPublishStatusAsync(rootDocumentKey, cancellationToken);
+            scope.Complete();
+        }
+
+        foreach ((Guid documentKey, ISet<string> publishedCultures) in publishStatus)
+        {
+            SetStatus(documentKey, publishedCultures);
+        }
+    }
+
+    /// <inheritdoc />
+    public void AddOrUpdateStatusWithDescendants(Guid rootDocumentKey)
+    {
+        IDictionary<Guid, ISet<string>> publishStatus;
+        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
+        {
+            publishStatus = _publishStatusRepository.GetDescendantsOrSelfPublishStatus(rootDocumentKey);
             scope.Complete();
         }
 

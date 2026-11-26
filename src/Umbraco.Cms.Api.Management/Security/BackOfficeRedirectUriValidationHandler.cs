@@ -49,7 +49,6 @@ internal sealed class BackOfficeRedirectUriValidationHandler
             return ValueTask.CompletedTask;
         }
 
-        // The back-office client hides the authorization code from the response; it only does so for the query response mode.
         if (clientId is Constants.OAuthClientIds.BackOffice
             && context.Request.ResponseMode.IsNullOrWhiteSpace() is false
             && context.Request.ResponseMode is not OpenIddictConstants.ResponseModes.Query)

@@ -76,7 +76,7 @@ public class UpdateMediaControllerTests : ManagementApiUserGroupTestBase<UpdateM
         {
             Variants = new MediaVariantRequestModel[]
             {
-                new() { Culture = null, Segment = null, Name = "NewName", },
+                new() { Culture = null, Name = "NewName", },
             },
         };
 

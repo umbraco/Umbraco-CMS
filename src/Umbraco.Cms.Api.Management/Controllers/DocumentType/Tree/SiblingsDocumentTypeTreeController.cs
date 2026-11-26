@@ -16,10 +16,12 @@ public class SiblingsDocumentTypeTreeController : DocumentTypeTreeControllerBase
     /// Initializes a new instance of the <see cref="SiblingsDocumentTypeTreeController"/> class.
     /// </summary>
     /// <param name="entityService">Service used for entity operations within the controller.</param>
+    /// <param name="entitySearchService">The <see cref="IEntitySearchService"/> used to search entities.</param>
+    /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> used to map between identifiers and keys.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for document type tree nodes.</param>
     /// <param name="contentTypeService">Service used for managing content types.</param>
-    public SiblingsDocumentTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IContentTypeService contentTypeService)
-        : base(entityService, flagProviders, contentTypeService)
+    public SiblingsDocumentTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IEntitySearchService entitySearchService, IIdKeyMap idKeyMap, IContentTypeService contentTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap, contentTypeService)
     {
     }
 

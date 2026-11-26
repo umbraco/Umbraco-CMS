@@ -101,9 +101,9 @@ internal sealed class UmbracoBuilderOpenApiExtensionsTests : UmbracoTestServerTe
         JsonObject doc = await ParseDocumentAsync();
 
         // [MapToApiVersion("2.0")] on the action — default API version is 1.0, so the transformer
-        // appends "2.0" to the operation ID. Default-version actions (above) get no suffix.
+        // appends "2.0" to the operation ID, substituting the dot so it becomes "2_0". Default-version actions (above) get no suffix.
         Assert.AreEqual(
-            "GetTestBackOfficeApiAppleSpecial2.0",
+            "GetTestBackOfficeApiAppleSpecial2_0",
             (string?)doc["paths"]?[$"/{ApiName}/apple/special"]?["get"]?["operationId"]);
     }
 

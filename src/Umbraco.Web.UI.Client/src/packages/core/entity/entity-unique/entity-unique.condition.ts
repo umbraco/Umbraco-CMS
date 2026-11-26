@@ -19,7 +19,10 @@ export class UmbEntityUniqueCondition
 
 	#check(value: UmbEntityUnique | undefined) {
 		if (value === undefined) {
-			this.permitted = false;
+			// Only go back to false, once permitted is no longer undefined.
+			if (this.permitted !== undefined) {
+				this.permitted = false;
+			}
 			return;
 		}
 

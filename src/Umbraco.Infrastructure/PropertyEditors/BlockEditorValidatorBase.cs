@@ -21,12 +21,45 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
         : base(propertyValidationService)
         => _elementTypeCache = elementTypeCache;
 
+    /// <summary>
+    /// Gets the validation models for the content and settings of the blocks in a block editor value.
+    /// </summary>
+    /// <param name="blockEditorData">The block editor data to validate.</param>
+    /// <param name="validationContext">The context of the property value being validated.</param>
+    /// <returns>The validation models, one for each block item validated per culture and segment.</returns>
+    /// <remarks>
+    /// <para>
+    /// Culture variant values are validated for the blocks exposed in their culture. Culture invariant values are
+    /// validated for the blocks exposed in any culture, as they apply to every culture the blocks are exposed in.
+    /// Settings are validated along with their content.
+    /// </para>
+    /// <para>
+    /// Segments are not managed, so other than the segment in <paramref name="validationContext"/>, the segments
+    /// validated are the default segment and the ones present among the block values.
+    /// </para>
+    /// <para>
+    /// A mandatory property is only required to have an entry for the default segment. A missing entry for another
+    /// segment is not validated, as that segment falls back to the default segment. An entry for a segment being
+    /// validated is validated like any other, so an empty value fails a mandatory check.
+    /// </para>
+    /// </remarks>
     protected IEnumerable<ElementTypeValidationModel> GetBlockEditorDataValidation(BlockEditorData<TValue, TLayout> blockEditorData, PropertyValidationContext validationContext)
     {
         var elementTypeValidation = new List<ElementTypeValidationModel>();
         var isWildcardCulture = validationContext.Culture == "*";
         var validationContextCulture = isWildcardCulture ? null : validationContext.Culture.NullOrWhiteSpaceAsNull();
-        elementTypeValidation.AddRange(GetBlockEditorDataValidation(blockEditorData, validationContextCulture, validationContext.Segment));
+
+        // We don't have managed segments, so we will simply trust the ones present in the model.
+        var segmentsByCulture = blockEditorData
+            .BlockValue.ContentData.SelectMany(cd => cd.Values)
+            .Union(blockEditorData.BlockValue.SettingsData.SelectMany(cd => cd.Values))
+            .GroupBy(v => v.Culture)
+            .Select(g => new
+            {
+                Culture = g.Key,
+                Segments = g.Select(v => v.Segment).WhereNotNull().Distinct().Union([null]).ToArray(),
+            })
+            .ToArray();
 
         if (validationContextCulture is null)
         {
@@ -34,9 +67,12 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
             IEnumerable<string> validationContextCulturesBeingValidated = isWildcardCulture
                 ? blockEditorData.BlockValue.Expose.Select(e => e.Culture).WhereNotNull().Distinct()
                 : validationContext.CulturesBeingValidated;
-            foreach (var culture in validationContextCulturesBeingValidated)
+
+            // Include null for the invariant culture, so culture-invariant values are validated for each segment too.
+            foreach (var culture in validationContextCulturesBeingValidated.Prepend<string?>(null))
             {
-                foreach (var segment in validationContext.SegmentsBeingValidated.DefaultIfEmpty(null))
+                var segmentsToValidate = segmentsByCulture.FirstOrDefault(s => s.Culture.InvariantEquals(culture))?.Segments ?? [];
+                foreach (var segment in segmentsToValidate.DefaultIfEmpty(null))
                 {
                     elementTypeValidation.AddRange(GetBlockEditorDataValidation(blockEditorData, culture, segment));
                 }
@@ -44,8 +80,12 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
         }
         else
         {
-            // make sure we extend validation to invariant block values (no element level variation)
-            foreach (var segment in validationContext.SegmentsBeingValidated.DefaultIfEmpty(null))
+            elementTypeValidation.AddRange(GetBlockEditorDataValidation(blockEditorData, validationContextCulture, validationContext.Segment));
+
+            // only the segments present among the invariant values apply here; segments found on another
+            // culture's values are not overrides of the invariant ones.
+            var segmentsToValidate = segmentsByCulture.FirstOrDefault(s => s.Culture is null)?.Segments ?? [];
+            foreach (var segment in segmentsToValidate.DefaultIfEmpty(null))
             {
                 elementTypeValidation.AddRange(GetBlockEditorDataValidation(blockEditorData, null, segment));
             }
@@ -124,7 +164,12 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
 
                     if (segment != "*")
                     {
-                        if (propertyType.VariesBySegment() != (segment is not null) || blockPropertyValue.Segment.InvariantEquals(segment) is false)
+                        if (propertyType.VariesBySegment() is false && segment is not null)
+                        {
+                            continue;
+                        }
+
+                        if (propertyType.VariesBySegment() && blockPropertyValue.Segment.InvariantEquals(segment) is false)
                         {
                             continue;
                         }
@@ -134,26 +179,27 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
                         new PropertyTypeValidationModel(propertyType, blockPropertyValue.Value, $"{group.Path}[{i}].{valuesJsonPathPart}[{j}].value"));
                 }
 
-                var handledPropertyTypeAliases = elementValidation.PropertyTypeValidation.Select(v => v.PropertyType.Alias).ToArray();
-                foreach (IPropertyType propertyType in elementType.CompositionPropertyTypes)
+                // in non-segmented validation paths, we need to include a null value for non-existing properties, so the
+                // validation service has something to validate mandatory properties against.
+                if (segment is null)
                 {
-                    if (handledPropertyTypeAliases.Contains(propertyType.Alias))
+                    var handledPropertyTypeAliases = elementValidation.PropertyTypeValidation.Select(v => v.PropertyType.Alias).ToList();
+                    foreach (IPropertyType propertyType in elementType.CompositionPropertyTypes)
                     {
-                        continue;
-                    }
+                        if (handledPropertyTypeAliases.Contains(propertyType.Alias))
+                        {
+                            continue;
+                        }
 
-                    if (propertyType.VariesByCulture() != (culture is not null))
-                    {
-                        continue;
-                    }
+                        if (propertyType.VariesByCulture() != (culture is not null))
+                        {
+                            continue;
+                        }
 
-                    if (segment == "*" || propertyType.VariesBySegment() != (segment is not null))
-                    {
-                        continue;
+                        elementValidation.AddPropertyTypeValidation(
+                            new PropertyTypeValidationModel(propertyType, null, $"{group.Path}[{i}].{valuesJsonPathPart}[{JsonPathExpression.MissingPropertyValue(propertyType.Alias, culture, null)}].value"));
+                        handledPropertyTypeAliases.Add(propertyType.Alias);
                     }
-
-                    elementValidation.AddPropertyTypeValidation(
-                        new PropertyTypeValidationModel(propertyType, null, $"{group.Path}[{i}].{valuesJsonPathPart}[{JsonPathExpression.MissingPropertyValue(propertyType.Alias, culture, segment)}].value"));
                 }
 
                 yield return elementValidation;

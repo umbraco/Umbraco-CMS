@@ -20,6 +20,13 @@ export interface UmbBlockAction<ArgsMetaType> extends UmbAction<UmbBlockActionAr
 	getHref(): Promise<string | undefined>;
 
 	/**
+	 * An optional reactive observable for the href location.
+	 * When provided, the default kind element subscribes to it and updates the link reactively,
+	 * rather than resolving `getHref()` once at initialisation time.
+	 */
+	href?: Observable<string | undefined>;
+
+	/**
 	 * The `execute` method, the action will act as a button.
 	 * @returns {Promise<void>}
 	 */
@@ -42,4 +49,12 @@ export interface UmbBlockAction<ArgsMetaType> extends UmbAction<UmbBlockActionAr
 	 * @returns {Promise<Observable<string | undefined> | undefined> | undefined}
 	 */
 	getValidationDataPathObservable?(): Promise<Observable<string | undefined> | undefined> | undefined;
+
+	/**
+	 * An optional reactive observable for the validation data path.
+	 * When provided, the default kind element subscribes to it and updates the validation
+	 * state controller reactively, rather than resolving `getValidationDataPath()` once at
+	 * initialisation time.
+	 */
+	validationDataPath?: Observable<string | undefined>;
 }

@@ -69,6 +69,17 @@ export default {
 		resendInvite: 'Einladung erneut versenden',
 		viewActionsFor: (name: string) => (name ? `Aktionen anzeigen für ${name}` : 'Aktionen anzeigen'),
 	},
+	actionGroups: {
+		clipboard: 'Zwischenablage',
+		create: 'Erstellen',
+		edit: 'Bearbeiten',
+		importExport: 'Import und Export',
+		notifications: 'Benachrichtigungen',
+		other: 'Sonstiges',
+		publishing: 'Veröffentlichung',
+		routing: 'Routing',
+		structure: 'Struktur',
+	},
 	actionCategories: {
 		content: 'Inhalt',
 		administration: 'Administration',
@@ -625,33 +636,6 @@ export default {
 		displayName: 'Name der Kultur',
 		changeKeyError: "Der Wert '%0%' ist bereits vorhanden.",
 		overviewTitle: 'Wörterbuch Übersicht',
-	},
-	examineManagement: {
-		configuredSearchers: '<em>Sucher</em> einrichten ',
-		configuredSearchersDescription:
-			'\n    Zeigt die Eigenschaften und Werkzeuge für eingerichtete <em>Sucher</em> (z.B.: multi-index searcher)',
-		fieldValues: 'Feldwerte',
-		healthStatus: 'Gesundheitsstatus',
-		healthStatusDescription: 'Der Gesundheitsstatus und Lesbarkeit des Indizes.',
-		indexers: 'Indizierer',
-		indexInfo: 'Indexinformationen',
-		contentInIndex: 'Inhalt des Indexes',
-		indexInfoDescription: 'Zeigt die Eigenschaften des Indizes',
-		manageIndexes: 'Examine Index-Verwaltung',
-		manageIndexesDescription: '\n      Index Detailanzeige und Verwaltungswerkzeuge\n    ',
-		rebuildIndex: 'Index erneuern',
-		rebuildIndexWarning:
-			'\n      Dies erzeugt den Index neu.<br />\n      Abhängig von der Inhaltsmenge Ihrer <em>Website</em> kann das eingie Zeit dauern.<br />\n      Es wird davon abgeraten, einen Index einer <em>Website</em> während hoher Auslastung- oder Inhaltbearbeitungszeiten zu erneuern.\n     ',
-		searchers: 'Sucher',
-		searchDescription: 'Durchsuche den Index und betrachte die Ergebnisse',
-		tools: 'Werkzeuge',
-		toolsDescription: 'Werkzeuge zur Indexverwaltung',
-		fields: 'Felder',
-		indexCannotRead: 'Der Index kann nicht gelesen werden und wird deshalb neu erstellt.',
-		processIsTakingLonger:
-			'Der Prozess dauert länger als erwartet, checken Sie die Umbraco Logs um zu sehen ob\n      Fehler passiert sind.\n    ',
-		indexCannotRebuild: 'Der Index kann nicht rebuilded werden weil er nicht zugewissen wurde.',
-		iIndexPopulator: 'IIndexPopulator',
 	},
 	placeholders: {
 		username: 'Benutzername eingeben',
@@ -1255,6 +1239,9 @@ export default {
 		publishAll: '%0% und alle untergeordneten Elemente veröffentlichen',
 		publishHelp:
 			'\n    Klicken Sie <em>Sichern und Veröffentlichen</em>, um <strong>%0%</strong> zu veröffentlicht und auf der Website sichtbar zu machen.<br><br>\n    Sie können dieses Element mitsamt seinen untergeordneten Elementen veröffentlichen, indem Sie <em>Unveröffentlichte Unterelemente einschließen</em> markieren.\n    ',
+		publishedNotificationTitle: 'Veröffentlicht',
+		publishedNotificationDescription: '%0% ist jetzt öffentlich verfügbar',
+		publishedVariantNotificationDescription: '%1% ist jetzt öffentlich verfügbar in %0%',
 	},
 	colorpicker: {
 		noColors: 'Sie haben keine freigegeben Farben konfiguriert',
@@ -1396,6 +1383,7 @@ export default {
 		dataTypeSaved: 'Datentyp gespeichert',
 		dictionaryItemSaved: 'Wörterbucheintrag gespeichert',
 		editContentPublishedHeader: 'Inhalt veröffentlicht',
+		editElementPublishedHeader: 'Element veröffentlicht',
 		editContentPublishedText: 'und ist auf der Website sichtbar',
 		editMultiContentPublishedText: '%0% Documente veröffentlicht und auf der Website sichtbar',
 		editVariantPublishedText: '%0% veröffentlicht und auf der Website sichtbar',
@@ -2042,7 +2030,6 @@ export default {
 		contentRedirectManager: 'URL-Weiterleitungen verwalten',
 		mediaFolderBrowser: 'Inhalt',
 		settingsWelcome: 'Begrüßung',
-		settingsExamine: 'Examine Management',
 		settingsPublishedStatus: 'Status der Veröffentlichungen',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Systemzustand prüfen',
@@ -2132,5 +2119,10 @@ export default {
 		browseTab: 'Durchsuchen',
 		searchTab: 'Suchen',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'Element' : 'Elemente'} ausgewählt`,
+	},
+	elements: {
+		confirmPublishDescription: 'Durch das Veröffentlichen wird dies öffentlich verfügbar.',
+		confirmBulkPublishDescription: 'Durch das Veröffentlichen werden die ausgewählten Einträge öffentlich verfügbar.',
+		confirmBulkUnpublishDescription: 'Die ausgewählten Einträge sind nicht mehr öffentlich verfügbar.',
 	},
 } as UmbLocalizationDictionary;

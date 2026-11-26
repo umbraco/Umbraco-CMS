@@ -8,7 +8,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
@@ -79,6 +78,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
             mediaUrlGenerators,
             dataValueReferences,
             DataTypeService,
+            IdKeyMap,
             JsonSerializer,
             Mock.Of<IEventAggregator>(),
             Mock.Of<IRepositoryCacheVersionService>(),
@@ -402,6 +402,18 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 
             // Assert
             Assert.That(result.Count(), Is.GreaterThanOrEqualTo(2)); // There should be two entities on level 2: File and Media
+        }
+    }
+
+    [Test]
+    public void Querying_Media_Breaks_Sort_Order_Ties_By_Id()
+    {
+        using (ScopeProvider.CreateScope())
+        {
+            var repository = CreateRepository(ScopeProvider, out _);
+            var query = ScopeProvider.CreateQuery<IMedia>().Where(x => x.Level == 2);
+
+            OrderingAssert.BreaksSortOrderTiesById(ScopeAccessor, () => repository.Get(query).ToArray());
         }
     }
 

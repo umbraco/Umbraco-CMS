@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Extensions;
@@ -43,26 +42,6 @@ public sealed partial class HtmlImageSourceParser
     {
         _publishedUrlProvider = publishedUrlProvider;
         _imageUrlTokenGenerator = imageUrlTokenGenerator;
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="HtmlImageSourceParser"/> class.
-    /// </summary>
-    /// <param name="getMediaUrl">A function that retrieves the media URL for a given GUID.</param>
-    [Obsolete("Please use the constructor that accepts IImageUrlTokenGenerator. Scheduled for removal in Umbraco 19.")]
-    public HtmlImageSourceParser(Func<Guid, string> getMediaUrl)
-        : this(getMediaUrl, StaticServiceProvider.Instance.GetRequiredService<IImageUrlTokenGenerator>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="HtmlImageSourceParser"/> class.
-    /// </summary>
-    /// <param name="publishedUrlProvider">The published URL provider for resolving media URLs.</param>
-    [Obsolete("Please use the constructor that accepts IImageUrlTokenGenerator. Scheduled for removal in Umbraco 19.")]
-    public HtmlImageSourceParser(IPublishedUrlProvider publishedUrlProvider)
-        : this(publishedUrlProvider, StaticServiceProvider.Instance.GetRequiredService<IImageUrlTokenGenerator>())
-    {
     }
 
     /// <summary>
@@ -142,7 +121,7 @@ public sealed partial class HtmlImageSourceParser
                 : mediaUrl.AppendQueryStringToUrl(queryString);
             var refreshedSrc = _imageUrlTokenGenerator.RefreshSignature(composedUrl);
 
-            return match.Value.Replace(src.Value, $"src=\"{refreshedSrc}\"");
+            return match.Value.Remove(src.Index, src.Length).Insert(src.Index, $"src=\"{refreshedSrc}\"");
         });
     }
 
@@ -166,14 +145,15 @@ public sealed partial class HtmlImageSourceParser
             // Find the src attribute
             Match src = _srcAttributeRegex.Match(match.Value);
 
+            // Only remove the path from the src attribute, other attributes may hold the same value.
             return src.Success == false || string.IsNullOrWhiteSpace(src.Groups[1].Value) ?
-                match.Value : match.Value.Replace(src.Groups[1].Value, string.Empty);
+                match.Value : match.Value.Remove(src.Groups[1].Index, src.Groups[1].Length);
         });
 
     [GeneratedRegex(@"<img[^>]*(data-udi=""([^""]*)"")[^>]*>", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
     private static partial Regex ResolveImgRegex();
 
-    [GeneratedRegex(@"src=""([^""\?]*)(\?[^""]*)?""", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
+    [GeneratedRegex(@"(?<![\w-])src=""([^""\?]*)(\?[^""]*)?""", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
     private static partial Regex SrcAttributeRegex();
 
     [GeneratedRegex(@"data-udi=\\?(?:""|')(?<udi>umb://[A-z0-9\-]+/[A-z0-9]+)\\?(?:""|')", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant)]

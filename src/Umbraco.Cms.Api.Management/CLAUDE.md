@@ -11,7 +11,7 @@ RESTful API for Umbraco backoffice operations. Manages content, media, users, an
 ## 1. Architecture
 
 ### Target Framework
-- **.NET 10.0** (`net10.0`)
+- **.NET 11.0** (`net11.0`)
 - **C# 12** with nullable reference types enabled
 - **ASP.NET Core** Web API
 
@@ -113,6 +113,9 @@ These are firm design rules for this API. Prefer an extra round-trip over bendin
      (see `BatchDataTypesController`, `BatchUsersController`). The batch controller lives under
      the resource's normal controller base so it carries the **same authorization** as the
      single-item `GET` (section access + per-resource checks).
+     Exception: a batch endpoint for a resource that other sections render as references may use a
+     broader section policy covering those sections, provided it filters every requested id through
+     per-resource permission checks (see `BatchElementsController`).
 
 2. **Do not add data to item endpoints (`/item/{resource}`).**
    Item endpoints (`Item*Controller`, used to hydrate pickers/lists) sit on
@@ -200,7 +203,7 @@ dotnet list src/Umbraco.Cms.Api.Management package --vulnerable
 ```
 
 ### Environment Setup
-1. **Prerequisites**: .NET 10 SDK
+1. **Prerequisites**: .NET 11 SDK
 2. **IDE**: Visual Studio 2022 or Rider (with .editorconfig support)
 3. **Configuration**: Inherits from `Umbraco.Web.UI` appsettings (no app settings in this library)
 

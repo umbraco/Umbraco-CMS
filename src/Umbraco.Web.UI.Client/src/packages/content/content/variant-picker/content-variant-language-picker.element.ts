@@ -81,6 +81,11 @@ export class UmbContentVariantLanguagePickerElement extends UmbLitElement {
 		}
 	}
 
+	#hasSelectableOption() {
+		const isAllowed = this.selectionManager.getAllowLimitation();
+		return this.variantLanguageOptions.some((option) => isAllowed(option.unique));
+	}
+
 	#onSelectAllChange(event: Event) {
 		const allUniques = this.variantLanguageOptions.map((o) => o.unique);
 		const filter = this.selectionManager.getAllowLimitation();
@@ -113,13 +118,26 @@ export class UmbContentVariantLanguagePickerElement extends UmbLitElement {
 			<uui-checkbox
 				@change=${this.#onSelectAllChange}
 				label=${this.localize.term('general_selectAll')}
-				.checked=${this._isAllSelected}></uui-checkbox>
+				.checked=${this._isAllSelected}
+				?disabled=${!this.#hasSelectableOption()}></uui-checkbox>
 			${repeat(
 				this.variantLanguageOptions,
 				(option) => option.unique,
 				(option) => this.#renderItem(option),
 			)}
 		`;
+	}
+
+	#onSelectableChange(event: Event, unique: string, select: boolean) {
+		if (select) {
+			this.selectionManager.select(unique);
+		} else {
+			this.selectionManager.deselect(unique);
+		}
+		// The selection manager has the final say, as a host may keep an item selected; cancel the item's own toggle then.
+		if (this.selectionManager.isSelected(unique) !== select) {
+			event.preventDefault();
+		}
 	}
 
 	#renderItem(option: UmbEntityVariantOptionModel) {
@@ -132,8 +150,8 @@ export class UmbContentVariantLanguagePickerElement extends UmbLitElement {
 				?selectable=${pickable}
 				?disabled=${!pickable}
 				label=${option.variant?.name ?? option.language.name}
-				@selected=${() => this.selectionManager.select(option.unique)}
-				@deselected=${() => this.selectionManager.deselect(option.unique)}
+				@selected=${(event: Event) => this.#onSelectableChange(event, option.unique, true)}
+				@deselected=${(event: Event) => this.#onSelectableChange(event, option.unique, false)}
 				?selected=${selected}>
 				<uui-icon slot="icon" name="icon-globe"></uui-icon>
 				${UmbContentVariantLanguagePickerElement.renderLabel(option, mustSelect, this.renderAdditionalLabel)}
@@ -177,6 +195,9 @@ export class UmbContentVariantLanguagePickerElement extends UmbLitElement {
 	static override readonly styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: block;
+			}
 			.required {
 				color: var(--uui-color-danger);
 				--uui-menu-item-color-hover: var(--uui-color-danger-emphasis);

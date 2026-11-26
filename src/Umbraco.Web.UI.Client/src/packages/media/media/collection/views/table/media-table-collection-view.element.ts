@@ -175,7 +175,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 	#getPropertyValueByAlias(item: UmbMediaCollectionItemModel, alias: string) {
 		switch (alias) {
 			case 'contentTypeAlias':
-				return item.contentTypeAlias;
+				return item.contentType?.alias;
 			case 'createDate':
 				return item.createDate.toLocaleString(this.localize.lang());
 			case 'name':

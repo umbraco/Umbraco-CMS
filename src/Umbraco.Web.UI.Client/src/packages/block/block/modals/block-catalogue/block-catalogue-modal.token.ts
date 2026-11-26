@@ -8,19 +8,16 @@ export interface UmbBlockCatalogueModalData {
 	blockGroups?: Array<UmbBlockTypeGroup>;
 	createBlockInWorkspace?: boolean;
 	openClipboard?: boolean;
+	openLibrary?: boolean;
 	clipboardFilter?: (clipboardDetailEntryModel: UmbClipboardEntryDetailModel) => Promise<boolean>;
 	originData: UmbBlockWorkspaceData['originData'];
+	libraryAllowedElementTypeKeys?: Array<string>;
 }
 
 export type UmbBlockCatalogueModalValue =
-	| {
-			create?: {
-				contentElementTypeKey: string;
-			};
-			clipboard?: {
-				selection: Array<string>;
-			};
-	  }
+	| { create: { contentElementTypeKey: string } }
+	| { clipboard: { selection: Array<string> } }
+	| { library: { elementKey: string } }
 	| undefined;
 
 export const UMB_BLOCK_CATALOGUE_MODAL = new UmbModalToken<UmbBlockCatalogueModalData, UmbBlockCatalogueModalValue>(

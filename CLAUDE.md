@@ -1,6 +1,6 @@
 # Umbraco CMS - Multi-Project Repository
 
-Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production projects organized in a layered architecture with clear separation of concerns.
+Enterprise-grade CMS built on .NET 11.0. This repository contains 21 production projects organized in a layered architecture with clear separation of concerns.
 
 **Repository**: https://github.com/umbraco/Umbraco-CMS
 **License**: MIT
@@ -28,7 +28,7 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 3. **Specialized Features** (Pluggable Modules)
    - Persistence: EF Core (modern), NPoco (legacy) for SQL Server & SQLite
    - Caching: `PublishedCache.HybridCache` (in-memory + distributed)
-   - Search: `Examine.Lucene` (full-text search)
+   - Search: `Umbraco.Cms.Search.*` (search abstractions + Examine/Lucene provider)
    - Imaging: `Imaging.ImageSharp` v1 & v2 (image processing)
    - Other: Static assets, targets, development tools
 
@@ -42,7 +42,7 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 
 ### Key Technologies
 
-- **.NET 10.0** - Target framework for all projects
+- **.NET 11.0** - Target framework for all projects
 - **ASP.NET Core** - Web framework
 - **Entity Framework Core** - Modern ORM
 - **OpenIddict** - OAuth 2.0/OpenID Connect authentication
@@ -78,7 +78,8 @@ Umbraco-CMS/
 │   ├── Umbraco.Cms.Api.Common/            # Shared API infrastructure
 │   │   └── CLAUDE.md                      # ⭐ API patterns guide
 │   ├── Umbraco.PublishedCache.HybridCache/ # Content caching
-│   ├── Umbraco.Examine.Lucene/            # Search indexing
+│   ├── Umbraco.Cms.Search.Core/           # Search abstractions
+│   ├── Umbraco.Cms.Search.Provider.Examine/ # Examine (Lucene) search provider
 │   ├── Umbraco.Cms.Persistence.EFCore/    # EF Core data access
 │   ├── Umbraco.Cms.Persistence.EFCore.Sqlite/
 │   ├── Umbraco.Cms.Persistence.EFCore.SqlServer/
@@ -134,7 +135,8 @@ Web.UI → Web.Common → Infrastructure → Core
 **Infrastructure Layer**:
 - `Umbraco.Infrastructure` → `Umbraco.Core`
 - `Umbraco.PublishedCache.*` → `Umbraco.Infrastructure`
-- `Umbraco.Examine.Lucene` → `Umbraco.Infrastructure`
+- `Umbraco.Cms.Search.Core` → `Umbraco.Infrastructure`
+- `Umbraco.Cms.Search.Provider.Examine` → `Umbraco.Cms.Search.Core` + `Umbraco.Web.Common` + `Umbraco.Cms.Api.Common` + `Umbraco.Cms.Api.Management`
 - `Umbraco.Cms.Persistence.*` → `Umbraco.Infrastructure`
 
 **Web Layer**:
@@ -241,7 +243,7 @@ Project ownership is distributed across teams. Check individual project director
    - Infrastructure implements contracts that need Infrastructure-owned machinery
    - Web/APIs consume implementations via DI
 
-   **Where service implementations live**: Services whose dependencies are satisfiable from Core interfaces alone (repositories, scope, config, other Core services) live in `Umbraco.Core/Services/` — this covers the majority of domain services (`MemberService`, `ContentService`, `MediaService`, `ContentTypeService`, `EntityService`, `AuditService`, `ExternalMemberService`, etc.). Service implementations only live in `Umbraco.Infrastructure/Services/Implement/` when they genuinely need Infrastructure concerns — Examine indexes (`ContentSearchService`, `MediaSearchService`, `IndexedEntitySearchService`), log files (`LogViewerRepository`), packaging internals (`PackagingService`), webhook firing (`WebhookFiringService`), distributed-job coordination (`DistributedJobService`). When adding a new service, default to Core and only move to Infrastructure if a concrete dependency forces it.
+   **Where service implementations live**: Services whose dependencies are satisfiable from Core interfaces alone (repositories, scope, config, other Core services) live in `Umbraco.Core/Services/` — this covers the majority of domain services (`MemberService`, `ContentService`, `MediaService`, `ContentTypeService`, `EntityService`, `AuditService`, `ExternalMemberService`, etc.). Service implementations only live in `Umbraco.Infrastructure/Services/Implement/` when they genuinely need Infrastructure concerns — log files (`LogViewerRepository`), packaging internals (`PackagingService`), webhook firing (`WebhookFiringService`), distributed-job coordination (`DistributedJobService`). When adding a new service, default to Core and only move to Infrastructure if a concrete dependency forces it.
 
 2. **Interface-First Design**
    - All services defined as interfaces in Core
@@ -426,20 +428,26 @@ The repository contains BOTH (actively supported):
 
 **Note**: The codebase is actively migrating to EF Core, but NPoco remains the primary persistence layer and is not deprecated. Both are fully supported.
 
-### Authentication: OpenIddict
+### Authentication
 
-All APIs use **OpenIddict** (OAuth 2.0/OpenID Connect):
-- Reference tokens (not JWT) for better security
-- **Secure cookie-based token storage** (v17+) - tokens stored in HTTP-only cookies with `__Host-` prefix
-- Tokens are redacted from client-side responses and passed via secure cookies only (`[redacted]` placeholder)
-- ASP.NET Core Data Protection for token encryption
-- Configured in `Umbraco.Cms.Api.Common`
-- API requests must include credentials (`credentials: include` for fetch)
+**Back office (v19+)**: a single HTTP-only authentication cookie — no client-side tokens and no
+OpenIddict flow. The back-office authorization policies accept both the cookie scheme
+(`Constants.Security.BackOfficeAuthenticationType`) and the OpenIddict validation scheme; see
+`BackOfficeAuthPolicyBuilderExtensions`. Cookie behaviour (expiry, renewal, SameSite) is
+configured in `ConfigureBackOfficeCookieOptions`. Whether an unauthenticated request gets a
+401/403 or a 302 to the login page follows ASP.NET Core's endpoint metadata: `[ApiController]` on
+`ManagementApiControllerBase` disables the redirect, and `[AllowCookieRedirect]` opts an endpoint
+back in (the OAuth `authorize` action).
+
+**API users / external clients**: **OpenIddict** (OAuth 2.0/OpenID Connect) with reference tokens
+(not JWT), configured in `Umbraco.Cms.Api.Common`.
+
+- ASP.NET Core Data Protection protects both the auth cookie and OpenIddict tokens
+- Back-office requests must include credentials (`credentials: include` for fetch)
 
 **Load Balancing Requirement**: All servers must share the same Data Protection key ring.
 
 **Frontend auth pitfalls** — see `src/Umbraco.Web.UI.Client/docs/edge-cases.md` (Auth & Cross-tab section) and `docs/security.md`. Key points:
-- Never call `validateToken()` per API request — it revokes the previous reference token (ID2019 errors)
 - `window.opener` is set for ANY `window.open()` target, not only OAuth popups — scope guards to the pathname too
 - BroadcastChannel does not deliver messages to the sender's own tab
 
@@ -639,7 +647,8 @@ SQL Server-specific tests use `BaseTestDatabase.IsSqlite()` to skip when running
 | **Umbraco.Cms.Api.Delivery** | Library | Delivery API (headless CMS) |
 | **Umbraco.Cms.Api.Common** | Library | Shared API infrastructure |
 | **Umbraco.PublishedCache.HybridCache** | Library | Published content caching |
-| **Umbraco.Examine.Lucene** | Library | Full-text search indexing |
+| **Umbraco.Cms.Search.Core** | Library | Search abstractions and indexing pipeline |
+| **Umbraco.Cms.Search.Provider.Examine** | Library | Examine (Lucene) search provider |
 
 ### Important Files
 

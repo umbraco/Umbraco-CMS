@@ -1,16 +1,8 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Preview;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.AspNetCore;
-using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Middleware;
@@ -22,22 +14,14 @@ namespace Umbraco.Cms.Web.Common.Middleware;
 public class PreviewAuthenticationMiddleware : IMiddleware
 {
     private readonly ILogger<PreviewAuthenticationMiddleware> _logger;
-#pragma warning disable CS0618 // Type or member is obsolete - all usage has been removed up in V19
-    private readonly IPreviewTokenGenerator _previewTokenGenerator;
-#pragma warning restore CS0618 // Type or member is obsolete
-    private readonly IPreviewService _previewService;
-
+    private readonly IPreviewSessionService _previewSessionService;
 
     public PreviewAuthenticationMiddleware(
         ILogger<PreviewAuthenticationMiddleware> logger,
-#pragma warning disable CS0618 // Type or member is obsolete - all usage has been removed up in V19
-        IPreviewTokenGenerator previewTokenGenerator,
-#pragma warning restore CS0618 // Type or member is obsolete
-        IPreviewService previewService)
+        IPreviewSessionService previewSessionService)
     {
         _logger = logger;
-        _previewTokenGenerator = previewTokenGenerator;
-        _previewService = previewService;
+        _previewSessionService = previewSessionService;
     }
 
     /// <inheritdoc />
@@ -54,23 +38,30 @@ public class PreviewAuthenticationMiddleware : IMiddleware
 
         try
         {
+            // The Delivery API has its own preview mechanism, and its responses are built from the shared published
+            // cache, so the website preview cookie must not put its requests into a preview session.
             var isPreview = request.HasPreviewCookie()
-                            && !request.IsBackOfficeRequest();
+                            && !request.IsBackOfficeRequest()
+                            && !request.IsDeliveryApiRequest();
 
             if (isPreview)
             {
-                Attempt<ClaimsIdentity> backOfficeIdentityAttempt = await _previewService.TryGetPreviewClaimsIdentityAsync();
-
-                if (backOfficeIdentityAttempt.Success)
+                AuthenticateResult authenticateResult = await context.AuthenticateAsync(Core.Constants.Security.BackOfficeAuthenticationType);
+                if (authenticateResult.Succeeded)
                 {
-                    // Ok, we've got a real ticket, now we can add this ticket's identity to the current
-                    // Principal, this means we'll have 2 identities assigned to the principal which we can
-                    // use to authorize the preview and allow for a back office User.
-                    context.User.AddIdentity(backOfficeIdentityAttempt.Result!);
-                }
-                else
-                {
-                    _logger.LogDebug("Could not transform previewCookie value into a claimsIdentity");
+                    ClaimsIdentity? umbracoIdentity = authenticateResult.Principal.GetUmbracoIdentity();
+                    if (umbracoIdentity is not null)
+                    {
+                        // Ok, we've got a real ticket, now we can add this ticket's identity to the current
+                        // Principal, this means we'll have 2 identities assigned to the principal which we can
+                        // use to authorize the preview and allow for a back office User.
+                        context.User.AddIdentity(umbracoIdentity);
+                        _previewSessionService.Start();
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Could not get the current Umbraco user for preview.");
+                    }
                 }
             }
         }

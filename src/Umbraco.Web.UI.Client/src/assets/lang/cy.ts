@@ -601,36 +601,6 @@ export default {
 		changeKeyError: "Mae'r allwedd '%0%' yn bodoli eisoes.",
 		overviewTitle: 'Trosolwg Geiriadur',
 	},
-	examineManagement: {
-		configuredSearchers: "Chwilwyr wedi'u Ffurfweddu",
-		configuredSearchersDescription:
-			"Yn dangos priodweddau ac offer ar gyfer unrhyw Chwiliwr wedi'i ffurfweddu (h.y. fel chwiliwr aml-fynegai)",
-		fieldValues: 'Gwerthoedd maes',
-		healthStatus: 'Statws iechyd',
-		healthStatusDescription: 'Statws iechyd y mynegai ac os gellir ei ddarllen',
-		indexers: 'Mynegewyr',
-		indexInfo: 'Gwybodaeth mynegai',
-		indexInfoDescription: "Yn rhestru priodweddau'r mynegai",
-		manageIndexes: 'Rheoli mynegeion Examine',
-		manageIndexesDescription:
-			"Yn caniatáu ichi weld manylion pob mynegai ac yn darparu rhai offer ar gyfer rheoli'r mynegeion",
-		rebuildIndex: 'Ailadeiladu mynegai ',
-		rebuildIndexWarning:
-			"\n            Bydd hyn yn achosi i'r mynegai gael ei ailadeiladu.<br />\n            Yn dibynnu ar faint o gynnwys sydd yn eich gwefan, gallai hyn gymryd cryn amser.<br />\n            Ni argymhellir ailadeiladu mynegai ar adegau o draffig gwefan uchel neu pan fydd golygyddion yn golygu cynnwys.\n            ",
-		searchers: 'Chwilwyr',
-		searchDescription: 'Chwiliwch y mynegai a gweld y canlyniadau',
-		tools: 'Offer',
-		toolsDescription: "Offer i reoli'r mynegai",
-		fields: 'meysydd',
-		indexCannotRead: 'Ni ellir darllen yr mynegai a bydd angen ei ailadeiladu',
-		processIsTakingLonger:
-			"Mae'r broses yn cymryd mwy o amser na'r disgwyl, gwiriwch y log Umbraco i weld os mae wedi bod unrhyw wall yn ystod y gweithrediad hwn",
-		indexCannotRebuild: "Ni ellir ailadeiladu'r mynegai hwn oherwydd nad yw wedi'i aseinio",
-		iIndexPopulator: 'IIndexPopulator',
-		contentInIndex: 'Cynnwys yn y mynegai',
-		noResults: 'Ni ddarganfuwyd unrhyw ganlyniadau',
-		searchResultsFound: 'Dangos %0% - %1% o %2% canlyniad(au) - Tudalen %3% o %4%',
-	},
 	placeholders: {
 		username: 'Darparwch eich enw defnyddiwr',
 		password: 'Darparwch eich cyfrinair',
@@ -1181,6 +1151,9 @@ export default {
 		publishAll: 'Cyhoeddi %0% ac ei holl is-dudalennau',
 		publishHelp:
 			"Cliciwch <em>Cyhoeddi</em> er mwyn cyhoeddi <strong>%0%</strong> a felly yn gwneud i'r cynnwys berthnasol fod ar gael i'r cyhoedd.<br/><br />\n      Gallwch gyhoeddi'r dudalen yma ac ei holl is-dudalennau wrth dicio <em>Cynnwys tudalennau heb eu cyhoeddi</em> isod.\n      ",
+		publishedNotificationTitle: "Wedi'i gyhoeddi",
+		publishedNotificationDescription: "Mae %0% bellach ar gael i'r cyhoedd",
+		publishedVariantNotificationDescription: "Mae %1% bellach ar gael i'r cyhoedd yn %0%",
 	},
 	colorpicker: {
 		noColors: "Nid ydych chi wedi ffurfweddu unrhyw liwiau sydd wedi'u cymeradwyo",
@@ -1365,6 +1338,7 @@ export default {
 		dataTypeSaved: "Math o ddata wedi'i achub",
 		dictionaryItemSaved: "Eitem geiriadur wedi'i achub",
 		editContentPublishedHeader: "Cynnwys wedi'i gyhoeddi",
+		editElementPublishedHeader: "Elfen wedi'i chyhoeddi",
 		editContentPublishedText: 'ac yn weladwy ar y wefan',
 		editMultiContentPublishedText: "%0% dogfennau wedi'i gyhoeddi ac yn gweledig ar y wefan",
 		editVariantPublishedText: '%0% gyhoeddi ac yn gweledig ar y wefan',
@@ -2168,7 +2142,6 @@ export default {
 		contentRedirectManager: 'Rheolaeth Ailgyfeirio URL',
 		mediaFolderBrowser: 'Cynnwys',
 		settingsWelcome: 'Croeso',
-		settingsExamine: 'Rheolaeth Examine',
 		settingsPublishedStatus: 'Statws Cyhoeddedig',
 		settingsModelsBuilder: 'Adeiladwr Modelau',
 		settingsHealthCheck: 'Gwiriad Iechyd',
@@ -2509,5 +2482,10 @@ export default {
 		minimalLevelDescription: 'Byddwn ond yn anfon ID safle dienw i roi gwybod i ni bod y wefan yn bodoli.',
 		basicLevelDescription: "Byddwn yn anfon ID safle dienw, fersiwn Umbraco, a phecynnau wedi'u gosod",
 		detailedLevelDescription: '\n          Byddwn yn anfon:\n          ',
+	},
+	elements: {
+		confirmPublishDescription: "Bydd cyhoeddi yn gwneud hyn ar gael i'r cyhoedd.",
+		confirmBulkPublishDescription: "Bydd cyhoeddi yn gwneud yr eitemau a ddewiswyd ar gael i'r cyhoedd.",
+		confirmBulkUnpublishDescription: "Ni fydd yr eitemau a ddewiswyd ar gael i'r cyhoedd mwyach.",
 	},
 } as UmbLocalizationDictionary;

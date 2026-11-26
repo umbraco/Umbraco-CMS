@@ -7,7 +7,6 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 const ObserveRepositoryAlias = Symbol();
 
@@ -127,19 +126,6 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 
 	itemByUnique(unique: string) {
 		return this.#items.asObservablePart((items) => items.find((item) => item.unique === unique));
-	}
-
-	/**
-	 * @deprecated - This is resolved by setUniques, no need to update statuses.
-	 * @param {string} unique - The unique identifier of the item to remove the status of.
-	 */
-	removeStatus(unique: string) {
-		new UmbDeprecation({
-			removeInVersion: '18.0.0',
-			deprecated: 'removeStatus',
-			solution: 'Statuses are removed automatically when setting uniques',
-		}).warn();
-		this.#statuses.filter((status) => status.unique !== unique);
 	}
 
 	async getItemByUnique(unique: string) {

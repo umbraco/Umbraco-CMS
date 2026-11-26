@@ -21,6 +21,61 @@ public interface IElementCacheService : IContentCacheService
     Task<IPublishedElement?> GetByKeyAsync(Guid key, bool? preview = null);
 
     /// <summary>
+    /// Gets a published element by its unique key, for synchronous callers.
+    /// </summary>
+    /// <param name="key">The unique key of the element.</param>
+    /// <param name="preview">Optional value indicating whether to include unpublished content. If <c>null</c>, uses the default preview setting.</param>
+    /// <returns>The published element, or <c>null</c> if not found.</returns>
+    /// <remarks>
+    /// Implementations should avoid blocking on <see cref="GetByKeyAsync"/>, and read synchronously from the
+    /// backing stores that support it: a caller blocked on asynchronous work needs a second thread to complete it.
+    /// A store with no synchronous read, for example a distributed cache, may still have to be waited on.
+    /// The default implementation blocks on <see cref="GetByKeyAsync"/>.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation and reference to it in the remarks.
+    IPublishedElement? GetByKey(Guid key, bool? preview = null)
+        => GetByKeyAsync(key, preview).GetAwaiter().GetResult();
+
+    /// <summary>
+    /// Gets multiple published elements by their unique keys, fetching any not already cached
+    /// from the database in a single batched query rather than one at a time.
+    /// </summary>
+    /// <param name="keys">The unique keys of the elements to retrieve.</param>
+    /// <param name="preview">Optional value indicating whether to include unpublished content. If <c>null</c>, uses the default preview setting.</param>
+    /// <returns>The published elements that exist, in the same order as <paramref name="keys"/> (missing elements omitted).</returns>
+    /// <remarks>
+    /// Used to materialise sets of keys without the per-element database round trip of repeated
+    /// <see cref="GetByKeyAsync"/> calls when the cache is cold.
+    /// The default implementation falls back to per-key retrieval so existing implementations keep working.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation and reference to it in the remarks.
+    async Task<IReadOnlyList<IPublishedElement>> GetByKeysAsync(IReadOnlyCollection<Guid> keys, bool? preview = null)
+    {
+        var result = new List<IPublishedElement>(keys.Count);
+        foreach (Guid key in keys)
+        {
+            IPublishedElement? element = await GetByKeyAsync(key, preview);
+            if (element is not null)
+            {
+                result.Add(element);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Gets multiple published elements by their unique keys, for synchronous callers.
+    /// </summary>
+    /// <param name="keys">The unique keys of the elements to retrieve.</param>
+    /// <param name="preview">Optional value indicating whether to include unpublished content. If <c>null</c>, uses the default preview setting.</param>
+    /// <returns>The published elements that exist, in the same order as <paramref name="keys"/> (missing elements omitted).</returns>
+    /// <remarks>See <see cref="GetByKey"/>. The default implementation blocks on <see cref="GetByKeysAsync"/>.</remarks>
+    // TODO (V20): Remove the default implementation and reference to it in the remarks.
+    IReadOnlyList<IPublishedElement> GetByKeys(IReadOnlyCollection<Guid> keys, bool? preview = null)
+        => GetByKeysAsync(keys, preview).GetAwaiter().GetResult();
+
+    /// <summary>
     /// Attempts to retrieve an element from the in-memory converted-content cache without
     /// touching the distributed cache or the database.
     /// </summary>
@@ -35,12 +90,7 @@ public interface IElementCacheService : IContentCacheService
     /// async path. The default implementation always returns <c>false</c> so the caller takes the
     /// async path.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    bool TryGetCached(Guid key, bool preview, out IPublishedElement? element)
-    {
-        element = null;
-        return false;
-    }
+    bool TryGetCached(Guid key, bool preview, out IPublishedElement? element);
 
     /// <summary>
     /// Refreshes the cache entry for the specified element.
@@ -48,6 +98,20 @@ public interface IElementCacheService : IContentCacheService
     /// <param name="element">The element to refresh in the cache.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task RefreshElementAsync(IElement element);
+
+    /// <summary>
+    /// Refreshes the cache for the specified element without leaving the calling thread.
+    /// </summary>
+    /// <param name="element">The element to refresh.</param>
+    /// <remarks>
+    /// Runs inside the transaction that persists the element, under the element tree lock. Until the lock wait and
+    /// the notification pipeline are asynchronous, awaiting there needs a second thread-pool thread while the first
+    /// is blocked, which under load stretches the time the lock is held. Implementations should avoid awaiting here
+    /// wherever their backing store allows it.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation once locks and notification publishing are asynchronous.
+    void RefreshElement(IElement element)
+        => RefreshElementAsync(element).GetAwaiter().GetResult();
 
     /// <summary>
     /// Gets all published elements of the specified content type.

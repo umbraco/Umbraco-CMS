@@ -4,6 +4,13 @@ import type { UmbPropertyValueCloner } from '@umbraco-cms/backoffice/property';
 
 export type UmbBlockPropertyValueClonerArgs = {
 	contentIdUpdatedCallback?: (oldContentKey: string, newContentKey: string) => void;
+	/**
+	 * Called when a cloned layout entry gets a new key. Called for external content as well, and before `contentIdUpdatedCallback`.
+	 * @param oldLayoutKey - The key of the original layout entry.
+	 * @param newLayoutKey - The key of the cloned layout entry.
+	 * @param contentKey - The content key of the original layout entry, from before it is renewed.
+	 */
+	layoutKeyUpdatedCallback?: (oldLayoutKey: string | undefined, newLayoutKey: string, contentKey: string) => void;
 };
 
 export abstract class UmbBlockPropertyValueCloner<
@@ -11,6 +18,7 @@ export abstract class UmbBlockPropertyValueCloner<
 	LayoutEntryType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 > implements UmbPropertyValueCloner<ValueType> {
 	#contentIdUpdatedCallback?: UmbBlockPropertyValueClonerArgs['contentIdUpdatedCallback'];
+	#layoutKeyUpdatedCallback?: UmbBlockPropertyValueClonerArgs['layoutKeyUpdatedCallback'];
 
 	#propertyEditorAlias: string;
 	#contentData?: ValueType['contentData'];
@@ -20,6 +28,7 @@ export abstract class UmbBlockPropertyValueCloner<
 	constructor(propertyEditorAlias: string, args?: UmbBlockPropertyValueClonerArgs) {
 		this.#propertyEditorAlias = propertyEditorAlias;
 		this.#contentIdUpdatedCallback = args?.contentIdUpdatedCallback;
+		this.#layoutKeyUpdatedCallback = args?.layoutKeyUpdatedCallback;
 	}
 
 	async cloneValue(value: ValueType) {
@@ -55,27 +64,32 @@ export abstract class UmbBlockPropertyValueCloner<
 		const contentKey = layoutEntry.contentKey;
 		const settingsKey = layoutEntry.settingsKey;
 
-		// Generate new contentKey and settingsKey:
-		const newContentKey = UmbId.new();
-		clonedLayoutEntry.contentKey = newContentKey;
+		clonedLayoutEntry.key = UmbId.new();
+		this.#layoutKeyUpdatedCallback?.(layoutEntry.key, clonedLayoutEntry.key, contentKey);
 
-		// Replace contentKeys in contentData
-		this.#contentData = this.#contentData?.map((contentData) => {
-			if (contentData.key === contentKey) {
-				return { ...contentData, key: newContentKey };
-			}
-			return contentData;
-		});
+		// External content is referenced by its contentKey, so the key must be kept:
+		if (!layoutEntry.isExternalContent) {
+			const newContentKey = UmbId.new();
+			clonedLayoutEntry.contentKey = newContentKey;
 
-		// Replace contentKey in expose:
-		this.#expose = this.#expose?.map((expose) => {
-			if (expose.contentKey === contentKey) {
-				return { ...expose, contentKey: newContentKey };
-			}
-			return expose;
-		});
+			// Replace contentKeys in contentData
+			this.#contentData = this.#contentData?.map((contentData) => {
+				if (contentData.key === contentKey) {
+					return { ...contentData, key: newContentKey };
+				}
+				return contentData;
+			});
 
-		this.#contentIdUpdatedCallback?.(contentKey, newContentKey);
+			// Replace contentKey in expose:
+			this.#expose = this.#expose?.map((expose) => {
+				if (expose.contentKey === contentKey) {
+					return { ...expose, contentKey: newContentKey };
+				}
+				return expose;
+			});
+
+			this.#contentIdUpdatedCallback?.(contentKey, newContentKey);
+		}
 
 		if (settingsKey) {
 			const newSettingsKey = UmbId.new();

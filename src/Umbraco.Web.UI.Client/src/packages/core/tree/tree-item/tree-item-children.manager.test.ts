@@ -14,7 +14,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { aTimeout, expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
-type RequestCall = { parentUnique: string | null };
+type RequestCall = { parentUnique: string | null; paging?: any };
 
 class UmbTestTreeRepository {
 	public itemsOfCalls: Array<RequestCall> = [];
@@ -41,7 +41,7 @@ class UmbTestTreeRepository {
 	}
 
 	async requestTreeItemsOf(args: any) {
-		this.itemsOfCalls.push({ parentUnique: args.parent.unique });
+		this.itemsOfCalls.push({ parentUnique: args.parent.unique, paging: args.paging });
 		return { data: { items: this.items, total: this.items.length, totalBefore: 0, totalAfter: 0 } };
 	}
 
@@ -356,6 +356,72 @@ describe('UmbTreeItemChildrenManager', () => {
 			await manager.loadChildren();
 
 			expect(repository.rootCalls).to.equal(1);
+		});
+	});
+
+	describe('target window', () => {
+		const collection: UmbTreeItemModel = {
+			unique: 'collection-id',
+			entityType: 'test-entity-type',
+			name: 'Collection',
+			hasChildren: true,
+			isFolder: false,
+			parent: { unique: null, entityType: 'test-root-entity-type' },
+		};
+
+		const children: Array<UmbTreeItemModel> = Array.from({ length: 3 }, (_, i) => ({
+			unique: `child-${i}`,
+			entityType: 'test-entity-type',
+			name: `Child ${i}`,
+			hasChildren: false,
+			isFolder: false,
+			parent: { unique: collection.unique, entityType: collection.entityType },
+		}));
+
+		const reloadChildrenOfCollection = async () => {
+			actionEventContext.dispatchEvent(
+				new UmbRequestReloadChildrenOfEntityEvent({ entityType: collection.entityType, unique: collection.unique }),
+			);
+			await aTimeout(0);
+		};
+
+		beforeEach(() => {
+			repository.items = children;
+			manager.setTreeItem(collection);
+			manager.setTargetTakeSize(0, 0);
+		});
+
+		it('loads no children on reload when there is no target', async () => {
+			await reloadChildrenOfCollection();
+
+			expect(repository.itemsOfCalls.length).to.equal(0);
+			expect(manager.hasLoadedChildren()).to.be.false;
+		});
+
+		it('loads no children when there is no target', async () => {
+			await manager.loadChildren();
+
+			expect(repository.itemsOfCalls.length).to.equal(0);
+			expect(manager.hasLoadedChildren()).to.be.false;
+		});
+
+		it('keeps the children reported by the tree item when nothing is loaded', async () => {
+			await reloadChildrenOfCollection();
+
+			expect(manager.getHasChildren()).to.be.true;
+		});
+
+		it('reloads the target window when the target is not among the loaded items', async () => {
+			manager.targetPagination.setBaseTarget(children[1]);
+
+			await reloadChildrenOfCollection();
+
+			expect(repository.itemsOfCalls.length).to.equal(1);
+			expect(repository.itemsOfCalls[0].paging).to.deep.equal({
+				target: { unique: children[1].unique, entityType: children[1].entityType },
+				takeBefore: 0,
+				takeAfter: 0,
+			});
 		});
 	});
 });

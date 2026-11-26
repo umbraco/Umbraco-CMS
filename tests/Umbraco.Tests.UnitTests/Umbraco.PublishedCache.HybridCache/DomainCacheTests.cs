@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HybridCache;
 
@@ -89,6 +90,7 @@ internal sealed class DomainCacheTests
         var defaultCultureAccessor = new DefaultCultureAccessor(
             languageService.Object,
             runtimeState.Object,
+            Mock.Of<ICoreScopeProvider>(),
             globalSettingsMonitor);
 
         return new DomainCache(defaultCultureAccessor, Mock.Of<IDomainCacheService>(), runtimeState.Object);

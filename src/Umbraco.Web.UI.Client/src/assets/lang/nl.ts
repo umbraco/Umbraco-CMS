@@ -64,6 +64,17 @@ export default {
 		createblueprint: 'Inhoudssjabloon aanmaken',
 		resendInvite: 'Uitnodiging opnieuw versturen',
 	},
+	actionGroups: {
+		clipboard: 'Klembord',
+		create: 'Aanmaken',
+		edit: 'Bewerken',
+		importExport: 'Importeren en exporteren',
+		notifications: 'Meldingen',
+		other: 'Overig',
+		publishing: 'Publicatie',
+		routing: 'Routering',
+		structure: 'Structuur',
+	},
 	actionCategories: {
 		content: 'Inhoud',
 		administration: 'Administratie',
@@ -543,33 +554,6 @@ export default {
 		displayName: 'Cultuurnaam',
 		changeKeyError: "De key '%0%' bestaat al.",
 		overviewTitle: 'Woordenboek overzicht',
-	},
-	examineManagement: {
-		configuredSearchers: 'Ingestelde Zoekers',
-		configuredSearchersDescription:
-			'Toont eigenschappen en hulpmiddelen voor elke geconfigureerde Zoeker\n      (bijv. zoals een multi-indexzoeker)\n    ',
-		fieldValues: 'Veldwaarden',
-		healthStatus: 'Gezondheidsstatus',
-		healthStatusDescription: 'De gezondheidsstatus van de index en of het kan gelezen worden',
-		indexers: 'Indexeerders',
-		indexInfo: 'Index info',
-		indexInfoDescription: 'De eigenschappen oplijsten van de index',
-		manageIndexes: 'Beheer de indexen van Examine',
-		manageIndexesDescription:
-			'Bekijk de details van elke index en gebruik hulpmiddelen voor het beheer er\n      van\n    ',
-		rebuildIndex: 'Index opnieuw bouwen',
-		rebuildIndexWarning:
-			'\n      Hierdoor wordt de index opnieuw opgebouwd.<br />\n      Afhankelijk van hoeveel inhoud er op je site staat, kan dit even duren.<br />\n      Het wordt niet aanbevolen om een index opnieuw op te bouwen terwijl er veel verkeer op de website is of wanneer editors inhoud bewerken.\n     ',
-		searchers: 'Zoekers',
-		searchDescription: 'Zoek in de index en bekijk de resultaten',
-		tools: 'Hulpmiddelen',
-		toolsDescription: 'Hulpmiddelen om de index te beheren',
-		fields: 'velden',
-		indexCannotRead: 'De index kan niet gelezen worden en moet opnieuw worden gebouwd',
-		processIsTakingLonger:
-			'Het proces duurt langer dan verwacht, controleer het Umbraco logboek om te kijken\n      of er geen fouten waren tijdens deze operatie\n    ',
-		indexCannotRebuild: 'Deze index kan niet opnieuw worden opgebouwd want het heeft geen toegewezen',
-		iIndexPopulator: 'IIndexPopulator',
 	},
 	placeholders: {
 		username: 'Typ jouw gebruikersnaam',
@@ -1136,6 +1120,9 @@ export default {
 		publishAll: 'Publiceer %0% en alle subitems',
 		publishHelp:
 			"Klik <em>ok</em> om <strong>%0%</strong> te publiceren en de wijzigingen zichtbaar te maken voor bezoekers.<br/><br />\n      Je kunt deze pagina publiceren en alle onderliggende sub-pagina's door <em>publiceer alle subitems</em> aan te vinken hieronder.\n    ",
+		publishedNotificationTitle: 'Gepubliceerd',
+		publishedNotificationDescription: '%0% is nu openbaar beschikbaar',
+		publishedVariantNotificationDescription: '%1% is nu openbaar beschikbaar in %0%',
 	},
 	colorpicker: {
 		noColors: 'Je hebt geen goedgekeurde kleuren geconfigureerd',
@@ -1270,6 +1257,7 @@ export default {
 		dataTypeSaved: 'Datatype opgeslagen',
 		dictionaryItemSaved: 'Woordenboek item opgeslagen',
 		editContentPublishedHeader: 'Inhoud gepubliceerd',
+		editElementPublishedHeader: 'Element gepubliceerd',
 		editContentPublishedText: 'en zichtbaar op de website',
 		editMultiContentPublishedText: '%0% documenten gepubliceerd en zichtbaar op de website',
 		editVariantPublishedText: '%0% gepubliceerd en zichtbaar op de website',
@@ -1973,7 +1961,6 @@ export default {
 		contentRedirectManager: 'Redirect URL Beheer',
 		mediaFolderBrowser: 'Inhoud',
 		settingsWelcome: 'Welkom',
-		settingsExamine: 'Examine Beheer',
 		settingsPublishedStatus: 'Publicatiestatus',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Gezondheidscontrole',
@@ -2230,5 +2217,10 @@ export default {
 		browseTab: 'Bladeren',
 		searchTab: 'Zoeken',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} geselecteerd`,
+	},
+	elements: {
+		confirmPublishDescription: 'Publiceren maakt dit openbaar beschikbaar.',
+		confirmBulkPublishDescription: 'Publiceren maakt de geselecteerde items openbaar beschikbaar.',
+		confirmBulkUnpublishDescription: 'De geselecteerde items zijn niet langer openbaar beschikbaar.',
 	},
 } as UmbLocalizationDictionary;

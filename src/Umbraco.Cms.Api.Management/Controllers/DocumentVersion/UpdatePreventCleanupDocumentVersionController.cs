@@ -2,10 +2,8 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
@@ -33,7 +31,6 @@ public class UpdatePreventCleanupDocumentVersionController : DocumentVersionCont
     /// <param name="contentVersionService">Service used to manage content versions.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     /// <param name="authorizationService">Service for handling authorization checks for the current user.</param>
-    [ActivatorUtilitiesConstructor]
     public UpdatePreventCleanupDocumentVersionController(
         IContentVersionService contentVersionService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -42,23 +39,6 @@ public class UpdatePreventCleanupDocumentVersionController : DocumentVersionCont
         _contentVersionService = contentVersionService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _authorizationService = authorizationService;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UpdatePreventCleanupDocumentVersionController"/> class,
-    /// which manages requests to update the prevent cleanup status of document versions.
-    /// </summary>
-    /// <param name="contentVersionService">Service used to manage content versions.</param>
-    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public UpdatePreventCleanupDocumentVersionController(
-        IContentVersionService contentVersionService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : this(
-            contentVersionService,
-            backOfficeSecurityAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>())
-    {
     }
 
     /// <summary>

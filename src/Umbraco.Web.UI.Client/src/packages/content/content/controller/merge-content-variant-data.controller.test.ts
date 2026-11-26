@@ -7,7 +7,7 @@ import type {
 } from '@umbraco-cms/backoffice/property';
 import { UmbVariantId, type UmbEntityVariantModel, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
 import { UmbMergeContentVariantDataController } from './merge-content-variant-data.controller.js';
-import type { UmbContentLikeDetailModel, UmbElementValueModel, UmbPotentialContentValueModel } from '../types.js';
+import type { UmbContentLikeDetailModel, UmbEntryValueModel, UmbPotentialContentValueModel } from '../types.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
@@ -316,26 +316,10 @@ describe('UmbMergeContentVariantDataController', () => {
 
 			expect(result.variants!.map((v) => v.culture)).to.deep.equal(['da-dk', 'en-us', 'zz-zz']);
 		});
-
-		it('sorts segments of a culture with the unsegmented variant first', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
-			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
-
-			const data = { values: [], variants: [variant('en-us', 's1'), variant('en-us'), variant('da-dk')] };
-
-			const variants = [new UmbVariantId('en-us', 's1'), new UmbVariantId('en-us'), new UmbVariantId('da-dk')];
-			const result = await ctrl.process(data, data, variants, variants);
-
-			expect(result.variants!.map((v) => `${v.culture}|${v.segment}`)).to.deep.equal([
-				'da-dk|null',
-				'en-us|null',
-				'en-us|s1',
-			]);
-		});
 	});
 
 	describe('Value ordering', () => {
-		const value = (alias: string, culture: string | null, segment: string | null = null): UmbElementValueModel => ({
+		const value = (alias: string, culture: string | null, segment: string | null = null): UmbEntryValueModel => ({
 			editorAlias: 'some-editor',
 			alias,
 			culture,
@@ -369,6 +353,55 @@ describe('UmbMergeContentVariantDataController', () => {
 			const result = await ctrl.process(data, data, variants, [...variants, UmbVariantId.CreateInvariant()]);
 
 			expect(result.values.map((v) => v.segment)).to.deep.equal([null, 's1', 's2']);
+		});
+
+		it('parses the segment values of a processed culture', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			const persistedData: UmbContentLikeDetailModel = {
+				values: [{ ...value('title', 'en-us', 's1'), value: 'old' }],
+			};
+			const runtimeData: UmbContentLikeDetailModel = {
+				values: [{ ...value('title', 'en-us', 's1'), value: 'new' }],
+			};
+
+			const variants = [new UmbVariantId('en-us')];
+			const result = await ctrl.process(persistedData, runtimeData, variants, [
+				...variants,
+				UmbVariantId.CreateInvariant(),
+			]);
+
+			expect(result.values.find((v) => v.segment === 's1')?.value).to.equal('new');
+		});
+
+		it('keeps the persisted segment values of a culture that is not being processed', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbMergeContentVariantDataController(ctrlHost);
+
+			const persistedData: UmbContentLikeDetailModel = {
+				values: [
+					{ ...value('title', 'en-us', 's1'), value: 'old-en' },
+					{ ...value('title', 'da-dk', 's1'), value: 'old-da' },
+				],
+			};
+			const runtimeData: UmbContentLikeDetailModel = {
+				values: [
+					{ ...value('title', 'en-us', 's1'), value: 'new-en' },
+					{ ...value('title', 'da-dk', 's1'), value: 'new-da' },
+				],
+			};
+
+			const variants = [new UmbVariantId('en-us')];
+			const result = await ctrl.process(persistedData, runtimeData, variants, [
+				...variants,
+				UmbVariantId.CreateInvariant(),
+			]);
+
+			const valueOf = (culture: string) =>
+				result.values.find((v) => v.culture === culture && v.segment === 's1')?.value;
+			expect(valueOf('en-us')).to.equal('new-en');
+			expect(valueOf('da-dk')).to.equal('old-da');
 		});
 
 		it('places a draft-only new culture by culture, not at the end', async () => {

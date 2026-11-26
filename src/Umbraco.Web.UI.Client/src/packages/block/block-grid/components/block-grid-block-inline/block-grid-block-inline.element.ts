@@ -1,7 +1,7 @@
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../block-grid-entry/constants.js';
 import type { UmbBlockGridWorkspaceOriginData } from '../../workspace/block-grid-workspace.modal-token.js';
 import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from '../block-grid-entries/constants.js';
-import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { UmbExtensionApiInitializer, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -20,6 +20,8 @@ import type {
 	UMB_BLOCK_WORKSPACE_CONTEXT,
 } from '@umbraco-cms/backoffice/block';
 
+import '../../../block/components/block-state-tag/block-state-tag.element.js';
+
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
 };
@@ -34,7 +36,7 @@ export class UmbBlockGridBlockInlineElement extends UmbBlockRefNameSlotMixin(Umb
 	#blockContext?: typeof UMB_BLOCK_GRID_ENTRY_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#variantId: UmbVariantId | undefined;
-	#contentKey?: string;
+	#key?: string;
 	#parentUnique?: string | null;
 	#areaKey?: string | null;
 
@@ -78,11 +80,11 @@ export class UmbBlockGridBlockInlineElement extends UmbBlockRefNameSlotMixin(Umb
 			this.#blockContext = blockContext;
 			this.observe(
 				this.#blockContext?.unique,
-				(contentKey) => {
-					this.#contentKey = contentKey;
+				(key) => {
+					this.#key = key;
 					this.#load();
 				},
-				'observeContentKey',
+				'observeKey',
 			);
 		});
 
@@ -177,8 +179,8 @@ export class UmbBlockGridBlockInlineElement extends UmbBlockRefNameSlotMixin(Umb
 	}
 
 	#load() {
-		if (!this.#workspaceContext || !this.#contentKey) return;
-		this.#workspaceContext.load(this.#contentKey);
+		if (!this.#workspaceContext || !this.#key) return;
+		this.#workspaceContext.load(this.#key);
 	}
 
 	#generatePropertyDataPath() {
@@ -217,14 +219,7 @@ export class UmbBlockGridBlockInlineElement extends UmbBlockRefNameSlotMixin(Umb
 				</span>
 				<div id="info">${this.renderNameSlot(blockValue)}</div>
 			</span>
-			${when(
-				this.unpublished,
-				() => html`
-					<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}>
-						<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
-					</uui-tag>
-				`,
-			)}
+			<umb-block-state-tag slot="name"></umb-block-state-tag>
 		`;
 	}
 
@@ -356,13 +351,6 @@ export class UmbBlockGridBlockInlineElement extends UmbBlockRefNameSlotMixin(Umb
 				justify-content: center;
 				height: 100%;
 				padding-left: var(--uui-size-2, 6px);
-			}
-
-			uui-tag {
-				margin-left: 0.5em;
-				margin-bottom: -0.3em;
-				margin-top: -0.3em;
-				vertical-align: text-top;
 			}
 
 			:host(:not([disabled])) #open-part:hover #icon {

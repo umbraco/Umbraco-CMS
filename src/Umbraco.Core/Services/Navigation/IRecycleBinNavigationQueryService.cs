@@ -47,18 +47,7 @@ public interface IRecycleBinNavigationQueryService
     ///     Prefer this over <see cref="TryGetChildrenKeysInBin" /> when only the existence of children
     ///     is needed, as it avoids building and caching the ordered set of child keys.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    bool TryGetHasChildrenInBin(Guid parentKey, out bool hasChildren)
-    {
-        if (TryGetChildrenKeysInBin(parentKey, out IEnumerable<Guid> childrenKeys))
-        {
-            hasChildren = childrenKeys.Any();
-            return true;
-        }
-
-        hasChildren = false;
-        return false;
-    }
+    bool TryGetHasChildrenInBin(Guid parentKey, out bool hasChildren);
 
     /// <summary>
     ///     Attempts to get all descendant node keys of a parent node in the recycle bin.

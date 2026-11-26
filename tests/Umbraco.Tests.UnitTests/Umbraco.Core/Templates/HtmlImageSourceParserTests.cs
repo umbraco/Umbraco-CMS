@@ -68,6 +68,22 @@ public class HtmlImageSourceParserTests
         @"<img src=""/media/12345/test.jpg"" />",
         ExpectedResult = @"<img src=""/media/12345/test.jpg"" />",
         TestName = "Do not remove image source without data-udi set")]
+    [TestCase(
+        @"<img src=""/media/12354/test.jpg"" data-absolute-url=""/media/12354/test.jpg"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        ExpectedResult = @"<img src="""" data-absolute-url=""/media/12354/test.jpg"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        TestName = "Remove image source but keep the path in other attributes after src")]
+    [TestCase(
+        @"<img data-absolute-url=""/media/12354/test.jpg"" src=""/media/12354/test.jpg"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        ExpectedResult = @"<img data-absolute-url=""/media/12354/test.jpg"" src="""" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        TestName = "Remove image source but keep the path in other attributes before src")]
+    [TestCase(
+        @"<img src=""/media/12354/test.jpg?width=400&height=400"" data-absolute-url=""/media/12354/test.jpg?width=400&height=400"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        ExpectedResult = @"<img src=""?width=400&height=400"" data-absolute-url=""/media/12354/test.jpg?width=400&height=400"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        TestName = "Remove image source with querystring but keep other attributes")]
+    [TestCase(
+        @"<img data-src=""/media/12354/test.jpg"" src=""/media/12354/test.jpg"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        ExpectedResult = @"<img data-src=""/media/12354/test.jpg"" src="""" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" />",
+        TestName = "Remove image source from src and not from a data-src before it")]
     [Category("Remove image sources")]
     public string Remove_Image_Sources(string sourceHtml)
     {
@@ -194,6 +210,14 @@ public class HtmlImageSourceParserTests
                 <img src=""/media/1001/image.jpg?asd"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD6""/>
               </div>",
         TestName = "Multiple img tags are handled")]
+    [TestCase(
+        @"<div><img data-src=""/media/12354/test.jpg"" src="""" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
+        ExpectedResult = @"<div><img data-src=""/media/12354/test.jpg"" src=""/media/1001/image.jpg"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
+        TestName = "Source is updated and a data-src before it is not")]
+    [TestCase(
+        @"<div><img data-src=""/media/12354/test.jpg"" src=""/media/12354/test.jpg"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
+        ExpectedResult = @"<div><img data-src=""/media/12354/test.jpg"" src=""/media/1001/image.jpg"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
+        TestName = "Source is updated and a data-src before it with the same value is not")]
     [Category("Ensure image sources")]
     public string Ensure_ImageSources_Processing(string sourceHtml)
     {

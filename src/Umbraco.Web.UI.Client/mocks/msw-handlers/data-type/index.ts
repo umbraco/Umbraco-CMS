@@ -1,3 +1,4 @@
+import { configurationHandlers } from './configuration.handlers.js';
 import { folderHandlers } from './folder.handlers.js';
 import { treeHandlers } from './tree.handlers.js';
 import { detailHandlers } from './detail.handlers.js';
@@ -7,6 +8,7 @@ import { copyHandlers } from './copy.handlers.js';
 import { filterHandlers } from './filter.handlers.js';
 
 export const handlers = [
+	...configurationHandlers,
 	...treeHandlers,
 	...itemHandlers,
 	...folderHandlers,

@@ -1,4 +1,3 @@
-import { UmbContentPickerDynamicRootRepository } from './dynamic-root/repository/index.js';
 import type { UmbInputContentElement } from './components/input-content/index.js';
 import type { UmbContentPickerSource, UmbContentPickerSourceType } from './types.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
@@ -6,9 +5,13 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
-import { UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
+import { UMB_DOCUMENT_ENTITY_TYPE, UmbDocumentDynamicRootResolver } from '@umbraco-cms/backoffice/document';
+import { UMB_MEDIA_ENTITY_TYPE, type UmbMediaClipboardConfig } from '@umbraco-cms/backoffice/media';
+import {
+	UMB_CLIPBOARD_PROPERTY_CONTEXT,
+	type UmbClipboardCopyRequestEvent,
+	type UmbClipboardPasteRequestEvent,
+} from '@umbraco-cms/backoffice/clipboard';
 import { UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
 import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
@@ -16,9 +19,8 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
-import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
-import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 // import of local component
 import './components/input-content/index.js';
@@ -53,13 +55,7 @@ export class UmbPropertyEditorUIContentPickerElement
 	private _min = 0;
 
 	@state()
-	private _minMessage = '';
-
-	@state()
 	private _max = Infinity;
-
-	@state()
-	private _maxMessage = '';
 
 	@state()
 	private _allowedContentTypeUniques?: string;
@@ -79,8 +75,11 @@ export class UmbPropertyEditorUIContentPickerElement
 	@state()
 	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
 
+	@state()
+	private _clipboardConfig?: UmbMediaClipboardConfig;
+
 	#dynamicRoot?: UmbContentPickerSource['dynamicRoot'];
-	#dynamicRootRepository = new UmbContentPickerDynamicRootRepository(this);
+	#dynamicRootResolver = new UmbDocumentDynamicRootResolver(this);
 
 	#entityTypeDictionary: { [type in UmbContentPickerSourceType]: string } = {
 		content: UMB_DOCUMENT_ENTITY_TYPE,
@@ -92,6 +91,8 @@ export class UmbPropertyEditorUIContentPickerElement
 		memoryUniquePrefix: 'UmbContentPicker',
 	});
 
+	#clipboardContext?: typeof UMB_CLIPBOARD_PROPERTY_CONTEXT.TYPE;
+
 	constructor() {
 		super();
 
@@ -102,6 +103,83 @@ export class UmbPropertyEditorUIContentPickerElement
 			},
 			null,
 		);
+
+		this.consumeContext(UMB_CLIPBOARD_PROPERTY_CONTEXT, (context) => {
+			this.#clipboardContext = context;
+
+			this.observe(
+				context?.copyAvailable,
+				(available) => {
+					this.#clipboardCopyAvailable = available ?? false;
+					this.#updateClipboardConfig();
+				},
+				'observeClipboardCopyAvailable',
+			);
+
+			this.observe(
+				context?.pasteAvailable,
+				async (available) => {
+					this.#clipboardPasteTypes = available ? await context!.getSupportedPasteEntryValueTypes() : undefined;
+					this.#updateClipboardConfig();
+				},
+				'observeClipboardPasteAvailable',
+			);
+		});
+	}
+
+	#clipboardCopyAvailable = false;
+	#clipboardPasteTypes?: Array<string>;
+
+	// Every clipboard entry value type this editor can translate is a media one, so a picker configured for
+	// documents or members has nothing to offer.
+	#updateClipboardConfig() {
+		const clipboardContext = this.#clipboardContext;
+		const types = this.#clipboardPasteTypes;
+
+		this._clipboardConfig =
+			this._type === 'media' && clipboardContext
+				? {
+						copy: { enabled: this.#clipboardCopyAvailable },
+						paste: {
+							enabled: !!types?.length,
+							types: types ?? [],
+							pickableFilter: (entry) => clipboardContext.isEntryPastable(entry),
+						},
+					}
+				: undefined;
+	}
+
+	async #onClipboardCopyRequest(event: UmbClipboardCopyRequestEvent) {
+		const reference = this.value?.find((item) => item.unique === event.unique);
+
+		if (!reference) {
+			throw new Error(`Could not find a content picker value for the item with unique: ${event.unique}`);
+		}
+
+		await this.#clipboardContext?.write({
+			propertyValue: [structuredClone(reference)],
+			itemName: event.name,
+			icon: event.icon,
+		});
+	}
+
+	async #onClipboardPasteRequest(event: UmbClipboardPasteRequestEvent) {
+		if (!this.#clipboardContext) return;
+
+		const propertyValues = await this.#clipboardContext.readMultiple<UmbContentPickerValueType>(event.entryUniques);
+		const pasted = propertyValues.flat();
+
+		const currentValue = this.value ?? [];
+		const additions = pasted.filter(
+			(addition) => !currentValue.some((reference) => reference.unique === addition.unique),
+		);
+
+		if (!additions.length) return;
+
+		// Not clamped to the configured limit: as when picking, an over-long selection is for validation to
+		// report and the user to trim.
+		this.value = [...currentValue, ...additions];
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -115,6 +193,7 @@ export class UmbPropertyEditorUIContentPickerElement
 			this._rootUnique = startNode.id;
 			this._rootEntityType = this.#entityTypeDictionary[startNode.type];
 			this.#dynamicRoot = startNode.dynamicRoot;
+			this.#updateClipboardConfig();
 
 			// NOTE: Filter out any items that do not match the entity type. [LK]
 			this._invalidData = this.value?.filter((x) => x.type !== this._rootEntityType);
@@ -123,13 +202,11 @@ export class UmbPropertyEditorUIContentPickerElement
 			}
 		}
 
-		this._min = this.#parseInt(config.getValueByAlias('minNumber'), 0);
-		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
+		const minMax = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
+		this._min = this.#parseInt(minMax?.min, 0);
+		this._max = this.#parseInt(minMax?.max, Infinity);
 
 		this._allowedContentTypeUniques = config.getValueByAlias('filter');
-
-		this._minMessage = `${this.localize.term('validation_minCount')} ${this._min} ${this.localize.term('validation_items')}`;
-		this._maxMessage = `${this.localize.term('validation_maxCount')} ${this._max} ${this.localize.term('validation_itemsSelected')}`;
 	}
 
 	#parseInt(value: unknown, fallback: number): number {
@@ -144,7 +221,7 @@ export class UmbPropertyEditorUIContentPickerElement
 
 		if (this._min && this._max && this._min > this._max) {
 			console.warn(
-				`Property (Content Picker) has been misconfigured, 'minNumber' is greater than 'maxNumber'. Please correct your data type configuration.`,
+				`Property (Content Picker) has been misconfigured, the minimum is greater than the maximum. Please correct your data type configuration.`,
 				this,
 			);
 		}
@@ -157,31 +234,12 @@ export class UmbPropertyEditorUIContentPickerElement
 	async #setPickerRootUnique() {
 		// If we have a root unique value, we don't need to fetch it from the dynamic root
 		if (this._rootUnique) return;
+
 		if (!this.#dynamicRoot) return;
 
-		// Use passContextAliasMatches to skip past block element workspaces and find the document workspace.
-		const workspaceContext = await this.getContext(UMB_CONTENT_WORKSPACE_CONTEXT, {
-			passContextAliasMatches: true,
-		}).catch(() => undefined);
-
-		// For new documents, the unique is a client-generated GUID that doesn't exist in the DB.
-		// The backend expects null for CurrentKey when creating new content and falls back to ParentKey.
-		const isNew =
-			workspaceContext &&
-			'getIsNew' in workspaceContext &&
-			(workspaceContext as UmbSubmittableWorkspaceContext).getIsNew() === true;
-
-		const unique = isNew ? null : (workspaceContext?.getUnique() ?? null);
-
-		// Use parent entity context to get the parent unique. Its observable starts as undefined,
-		// so asPromise() properly waits for the async structure loading to complete.
-		const parentContext = await this.getContext(UMB_PARENT_ENTITY_CONTEXT);
-		const parent = await this.observe(parentContext?.parent, () => {})?.asPromise();
-		const parentUnique = parent?.unique ?? null;
-
-		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique, parentUnique);
-		this._rootUnique = result?.[0];
-		this._rootUniques = result;
+		const resolved = await this.#dynamicRootResolver.resolveStartNodeUniques(this.#dynamicRoot);
+		this._rootUnique = resolved?.[0];
+		this._rootUniques = resolved;
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputContentElement }) {
@@ -229,9 +287,7 @@ export class UmbPropertyEditorUIContentPickerElement
 				.selection=${this.value ?? []}
 				.type=${this._type}
 				.min=${this._min}
-				.minMessage=${this._minMessage}
 				.max=${this._max}
-				.maxMessage=${this._maxMessage}
 				.startNode=${startNode}
 				.startNodes=${startNodes}
 				.allowedContentTypeIds=${this._allowedContentTypeUniques}
@@ -239,6 +295,9 @@ export class UmbPropertyEditorUIContentPickerElement
 				?required=${this.mandatory}
 				.requiredMessage=${this.mandatoryMessage}
 				@change=${this.#onChange}
+				.mediaClipboardConfig=${this._clipboardConfig}
+				@clipboard-copy-request=${this.#onClipboardCopyRequest}
+				@clipboard-paste-request=${this.#onClipboardPasteRequest}
 				.interactionMemories=${this._interactionMemories}
 				@interaction-memories-change=${this.#onInputInteractionMemoriesChange}>
 			</umb-input-content>

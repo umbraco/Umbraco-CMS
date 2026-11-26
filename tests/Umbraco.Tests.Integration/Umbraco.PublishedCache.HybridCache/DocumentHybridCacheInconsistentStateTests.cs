@@ -1,3 +1,6 @@
+using System.Collections.Concurrent;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -6,6 +9,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -24,10 +28,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class DocumentHybridCacheInconsistentStateTests : UmbracoIntegrationTestWithContent
 {
+    private readonly CapturingLogger<DatabaseCacheRepository> _logger = new();
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
+        builder.Services.AddSingleton<ILogger<DatabaseCacheRepository>>(_logger);
     }
 
     private IPublishedContentCache PublishedContentCache => GetRequiredService<IPublishedContentCache>();
@@ -117,6 +124,51 @@ internal sealed class DocumentHybridCacheInconsistentStateTests : UmbracoIntegra
         Assert.That(returnedKeys, Does.Contain(Subpage.Key), "Healthy sibling should still be returned");
     }
 
+    [Test]
+    public async Task GetDocumentSourcesAsync_Skips_And_Logs_Corrupt_Node()
+    {
+        await ContentPublishingService.PublishBranchAsync(
+            Textpage.Key,
+            [],
+            PublishBranchFilter.All,
+            Constants.Security.SuperUserKey,
+            false);
+
+        await CorruptPublishedVersionFlag(Textpage.Id, Textpage.Key);
+        _logger.Messages.Clear();
+
+        var databaseCacheRepository = GetRequiredService<IDatabaseCacheRepository>();
+
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        var nodes = (await databaseCacheRepository.GetDocumentSourcesAsync([Textpage.Key, Subpage.Key])).ToList();
+
+        var returnedKeys = nodes.Select(n => n.Key).ToHashSet();
+        Assert.That(returnedKeys, Does.Not.Contain(Textpage.Key), "Corrupt node should be skipped");
+        Assert.That(returnedKeys, Does.Contain(Subpage.Key), "Healthy sibling should still be returned");
+        Assert.That(
+            _logger.Messages,
+            Has.Some.Contains(Textpage.Key.ToString()).And.Some.Contains("inconsistent database state"),
+            "A skipped corrupt node should be logged the same way regardless of how it was read");
+    }
+
+    [Test]
+    public async Task GetDocumentSourceForPublishStatesAsync_Returns_Draft_Only_For_Corrupt_Node()
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new()], Constants.Security.SuperUserKey);
+        await CorruptPublishedVersionFlag(Textpage.Id, Textpage.Key);
+        _logger.Messages.Clear();
+
+        var databaseCacheRepository = GetRequiredService<IDatabaseCacheRepository>();
+
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        (ContentCacheNode? draft, ContentCacheNode? published) =
+            await databaseCacheRepository.GetDocumentSourceForPublishStatesAsync(Textpage.Key);
+
+        Assert.That(draft, Is.Not.Null);
+        Assert.That(published, Is.Null);
+        Assert.That(_logger.Messages, Has.Some.Contains(Textpage.Key.ToString()));
+    }
+
     /// <summary>
     /// Publishes the Textpage and then corrupts the database state by clearing the published flag
     /// from all umbracoDocumentVersion rows for that node, while leaving umbracoDocument.published = 1.
@@ -194,5 +246,29 @@ internal sealed class DocumentHybridCacheInconsistentStateTests : UmbracoIntegra
         // Clear cache again to ensure the corrupted state is read fresh from DB
         await hybridCache.RemoveAsync($"{nodeKey}");
         await hybridCache.RemoveAsync($"{nodeKey}+draft");
+    }
+
+    private sealed class CapturingLogger<T> : ILogger<T>
+    {
+        public ConcurrentQueue<string> Messages { get; } = new();
+
+        public IDisposable? BeginScope<TState>(TState state)
+            where TState : notnull
+            => null;
+
+        public bool IsEnabled(LogLevel logLevel) => logLevel >= LogLevel.Warning;
+
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
+        {
+            if (IsEnabled(logLevel))
+            {
+                Messages.Enqueue(formatter(state, exception));
+            }
+        }
     }
 }

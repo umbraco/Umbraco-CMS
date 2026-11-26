@@ -582,33 +582,6 @@ export default {
 		changeKeyError: "La chiave '%0%' esiste già.",
 		overviewTitle: 'Panoramica del Dizionario',
 	},
-	examineManagement: {
-		configuredSearchers: 'Searchers configurati',
-		configuredSearchersDescription:
-			'Visualizza le proprietà e gli strumenti per ogni Searcher configurato (per esempio un multi-index searcher)',
-		fieldValues: 'Valori del campo',
-		healthStatus: 'Stato di salute',
-		healthStatusDescription: "Lo stato di salute dell'index e se può essere letto",
-		indexers: 'Indexers',
-		indexInfo: 'Index info',
-		indexInfoDescription: "Elenca le proprietà dell'index",
-		manageIndexes: 'Gestisci gli indexes di Examine',
-		manageIndexesDescription:
-			'Permette di visualizzare i dettagli di ogni index e fornisce alcuni strumenti\n      per gestire gli index\n    ',
-		rebuildIndex: 'Ricostruisci index',
-		rebuildIndexWarning:
-			"\n      Questo causerà la ricostruzione dell'index.<br />\n      A seconda della quantità di contenuti presenti nel tuo sito, potrebbe volerci un po' di tempo.<br />\n      Non è consigliabile ricostruire un indice durante i periodi di elevato traffico del sito Web o quando gli editor modificano i contenuti.\n     ",
-		searchers: 'Searchers',
-		searchDescription: "Cerca nell'index e visualizza i risultati",
-		tools: 'Strumenti',
-		toolsDescription: "Strumenti per gestire l'index",
-		fields: 'Campi',
-		indexCannotRead: "L'indice non può essere letto e dovrà essere ricostruito",
-		processIsTakingLonger:
-			'Il processo sta impiegando più tempo del previsto, controlla il log di Umbraco per vedere se ci sono stati errori durante questa operazione',
-		indexCannotRebuild: 'Questo indice non può essere ricostruito perché non ha assegnato',
-		iIndexPopulator: 'IIndexPopulator',
-	},
 	placeholders: {
 		username: 'Inserisci il tuo username',
 		password: 'Inserisci la tua password',
@@ -1179,6 +1152,9 @@ export default {
 		publishAll: 'Pubblica %0% e tutte le sue sottopagine',
 		publishHelp:
 			'Click <em>Pubblica</em> per pubblicare <strong>%0%</strong> e quindi rendere visibile pubblicamente il suo contenuto.<br/><br />\n      Puoi pubblicare questa pagina e tutte le sue sottopagine spuntando <em>Includi le sottopagine non pubblicate</em> sotto.\n      ',
+		publishedNotificationTitle: 'Pubblicato',
+		publishedNotificationDescription: '%0% è ora disponibile pubblicamente',
+		publishedVariantNotificationDescription: '%1% è ora disponibile pubblicamente in %0%',
 	},
 	colorpicker: {
 		noColors: 'Non hai configurato nessun colore',
@@ -1313,6 +1289,7 @@ export default {
 		dataTypeSaved: 'Tipo di dato salvato',
 		dictionaryItemSaved: 'Elemento del dizionario salvato',
 		editContentPublishedHeader: 'Contenuto pubblicato',
+		editElementPublishedHeader: 'Elemento pubblicato',
 		editContentPublishedText: 'e visibile sul sito web',
 		editMultiContentPublishedText: '%0% documenti pubblicati e visibili sul sito web',
 		editVariantPublishedText: '%0% pubblicati e visibili sul sito web',
@@ -2084,7 +2061,6 @@ export default {
 		contentRedirectManager: 'Gestione Redirect URL',
 		mediaFolderBrowser: 'Contenuto',
 		settingsWelcome: 'Benvenuto',
-		settingsExamine: 'Gestione Examine',
 		settingsPublishedStatus: 'Stato di pubblicazione',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Health Check',
@@ -2322,5 +2298,10 @@ export default {
 		browseTab: 'Sfoglia',
 		searchTab: 'Cerca',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'elemento selezionato' : 'elementi selezionati'}`,
+	},
+	elements: {
+		confirmPublishDescription: 'La pubblicazione renderà questo disponibile pubblicamente.',
+		confirmBulkPublishDescription: 'La pubblicazione renderà gli oggetti selezionati disponibili pubblicamente.',
+		confirmBulkUnpublishDescription: 'Gli oggetti selezionati non saranno più disponibili pubblicamente.',
 	},
 } as UmbLocalizationDictionary;

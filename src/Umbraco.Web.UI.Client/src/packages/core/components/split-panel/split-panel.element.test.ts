@@ -1,111 +1,98 @@
 import { UmbSplitPanelElement } from './split-panel.element.js';
-import { expect, fixture, html, nextFrame, oneEvent } from '@open-wc/testing';
+import { expect, fixture, html } from '@open-wc/testing';
+
+const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve));
 
 describe('UmbSplitPanelElement', () => {
-	for (const lock of ['start', 'end'] as const) {
-		describe(`with the ${lock} panel locked`, () => {
+	for (const dir of ['ltr', 'rtl'] as const) {
+		describe(`in a ${dir} layout`, () => {
 			let element: UmbSplitPanelElement;
 			let container: HTMLDivElement;
 
+			const startPanelWidth = () => container.querySelector('[slot="start"]')!.getBoundingClientRect().width;
+			const inlineStartEdge = () => {
+				const { left, right } = container.getBoundingClientRect();
+				return dir === 'rtl' ? right : left;
+			};
+			const towardsInlineEnd = dir === 'rtl' ? -1 : 1;
+
 			beforeEach(async () => {
-				container = await fixture(html`
-					<div style="width: 800px; height: 200px">
-						<umb-split-panel lock=${lock} position="25%">
-							<div slot="start">Start</div>
-							<div slot="end">End</div>
+				container = await fixture<HTMLDivElement>(
+					html`<div dir=${dir} style="width: 1000px; height: 200px;">
+						<umb-split-panel lock="start" style="--umb-split-panel-initial-position: 300px;">
+							<div slot="start"></div>
+							<div slot="end"></div>
 						</umb-split-panel>
-					</div>
-				`);
+					</div>`,
+				);
 				element = container.querySelector('umb-split-panel')!;
 				await nextFrame();
+				await nextFrame();
 				await element.updateComplete;
 			});
 
-			function expectColumns(start: number, end: number) {
-				expect(getComputedStyle(element.mainElement).display).to.equal('grid');
-				expect(getComputedStyle(element.mainElement).gridTemplateColumns).to.equal(`${start}px 0px ${end}px`);
-				const columns = element.mainElement.style.gridTemplateColumns.replace(/\s+/g, ' ').trim();
-				expect(columns).to.equal(
-					`minmax(var(--umb-split-panel-start-min-width), ${lock === 'start' ? `${start}px` : '1fr'}) 0px minmax(var(--umb-split-panel-end-min-width), ${lock === 'end' ? `${end}px` : '1fr'})`,
+			it('sizes the start panel from the initial position', () => {
+				expect(element.position).to.equal('30%');
+				expect(startPanelWidth()).to.be.closeTo(300, 1);
+			});
+
+			it('sizes the start panel from the pointer distance to the inline start while dragging', async () => {
+				const touchArea = element.shadowRoot!.querySelector('#divider-touch-area')!;
+
+				touchArea.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
+				document.dispatchEvent(
+					new PointerEvent('pointermove', { clientX: inlineStartEdge() + 400 * towardsInlineEnd }),
 				);
-			}
+				document.dispatchEvent(new PointerEvent('pointerup'));
+				await element.updateComplete;
 
-			it('initializes pixel-locked grid columns from a percentage position', () => {
-				expect(element).to.be.instanceOf(UmbSplitPanelElement);
-				expect(element.position).to.equal('25%');
-				expectColumns(200, 600);
+				expect(element.position).to.equal('40%');
+				expect(startPanelWidth()).to.be.closeTo(400, 1);
 			});
 
-			it('reinitializes grid columns after a slot change without changing position', async () => {
-				const slot = element.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="end"]')!;
-				const changed = oneEvent(slot, 'slotchange');
-				container.style.width = '1000px';
+			it('reads no computed styles while the pointer moves', () => {
+				const touchArea = element.shadowRoot!.querySelector('#divider-touch-area')!;
+				touchArea.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
+
+				const getComputedStyle = window.getComputedStyle;
+				let reads = 0;
+				window.getComputedStyle = (...args) => {
+					reads++;
+					return getComputedStyle(...args);
+				};
+				try {
+					for (let i = 1; i <= 5; i++) {
+						document.dispatchEvent(
+							new PointerEvent('pointermove', { clientX: inlineStartEdge() + 100 * i * towardsInlineEnd }),
+						);
+					}
+				} finally {
+					window.getComputedStyle = getComputedStyle;
+					document.dispatchEvent(new PointerEvent('pointerup'));
+				}
+
+				expect(reads).to.equal(0);
+			});
+
+			it('moves the divider in the direction of the arrow key', async () => {
+				const divider = element.shadowRoot!.querySelector('#divider')!;
+				const before = divider.getBoundingClientRect().left;
+
 				element
-					.querySelector('[slot="end"]')!
-					.replaceWith(Object.assign(document.createElement('div'), { slot: 'end' }));
-				await changed;
-
-				expect(element.position).to.equal('25%');
-				expectColumns(250, 750);
-				await nextFrame();
+					.shadowRoot!.querySelector('#divider-touch-area')!
+					.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
 				await element.updateComplete;
-				expect(element.position).to.equal('25%');
-				expectColumns(250, 750);
+
+				expect(divider.getBoundingClientRect().left).to.be.closeTo(before - 10, 1);
 			});
 
-			it('reinitializes grid columns when the element reconnects without changing position', async () => {
-				element.remove();
-				container.style.width = '1000px';
-				container.append(element);
-				await nextFrame();
-				await element.updateComplete;
+			it('extends the divider touch area into the end panel', () => {
+				const touchArea = element.shadowRoot!.querySelector('#divider-touch-area')!.getBoundingClientRect();
+				const endPanel = container.querySelector('[slot="end"]')!.getBoundingClientRect();
+				const overlap = Math.min(touchArea.right, endPanel.right) - Math.max(touchArea.left, endPanel.left);
 
-				expect(element.position).to.equal('25%');
-				expectColumns(250, 750);
+				expect(overlap).to.be.closeTo(touchArea.width - 1, 1);
 			});
-
-			it('reconnects both panels without changing position', async () => {
-				const slot = element.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="end"]')!;
-				const removed = oneEvent(slot, 'slotchange');
-				const endPanel = element.querySelector('[slot="end"]')!;
-				endPanel.remove();
-				await removed;
-				await element.updateComplete;
-				expect(getComputedStyle(element.mainElement).display).to.equal('flex');
-
-				container.style.width = '1000px';
-				const added = oneEvent(slot, 'slotchange');
-				element.append(endPanel);
-				await added;
-
-				expect(element.position).to.equal('25%');
-				expectColumns(250, 750);
-				await nextFrame();
-				await element.updateComplete;
-				expect(element.position).to.equal('25%');
-				expectColumns(250, 750);
-			});
-
-			for (const initialPosition of [undefined, '30%']) {
-				it(`initializes locked columns using the ${initialPosition ? 'overridden' : 'documented default'} CSS variable`, async () => {
-					const defaultContainer = await fixture<HTMLDivElement>(html`
-						<div style="width: 800px; height: 200px">
-							<umb-split-panel
-								lock=${lock}
-								style=${initialPosition ? `--umb-split-panel-initial-position: ${initialPosition}` : ''}>
-								<div slot="start">Start</div>
-								<div slot="end">End</div>
-							</umb-split-panel>
-						</div>
-					`);
-					element = defaultContainer.querySelector('umb-split-panel')!;
-					await nextFrame();
-					await element.updateComplete;
-
-					expect(element.position).to.equal(initialPosition ?? '50%');
-					expectColumns(initialPosition ? 240 : 400, initialPosition ? 560 : 400);
-				});
-			}
 		});
 	}
 });

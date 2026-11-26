@@ -32,6 +32,7 @@ export class NotificationConstantHelper {
     publishWithDescendants: 'and subpages have been published',
     elementPublished: 'Element published',
     elementUnpublished: 'Element unpublished',
+    nowPubliclyAvailable: 'is now publicly available',
   }
 
   public static readonly error = {

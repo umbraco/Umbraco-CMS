@@ -404,6 +404,7 @@ export default {
 		createdBlueprintMessage: "已从 '%0%' 创建文档蓝图",
 		duplicateBlueprintMessage: '已存在同名的文档蓝图',
 		blueprintDescription: '文档蓝图是预定义的内容，编辑者可选择将其作为创建新内容的基础',
+		noAccessToBlueprints: '您没有管理文档蓝图的权限。请联系管理员为您授予访问权限。',
 	},
 
 	entityDetail: {
@@ -1386,6 +1387,9 @@ export default {
 		contentPublishedFailedByMissingName: '无法发布 %0%，因为它缺少名称。',
 		invalidPublishBranchPermissions: '用户权限不足，无法发布所有子级文档',
 		contentPublishedFailedReqCultureValidationError: "必选语言 '%0%' 验证失败。该语言已保存但未发布。",
+		publishedNotificationTitle: '已发布',
+		publishedNotificationDescription: '%0% 现已对外公开',
+		publishedVariantNotificationDescription: '%1% 现已在 %0% 中对外公开',
 	},
 	unpublish: {
 		inProgress: '正在取消发布，请稍候…',
@@ -2262,6 +2266,7 @@ export default {
 		languageHelp: '设置你在菜单和对话框中看到的语言',
 		allowAccessToAllDocuments: '允许访问所有文档',
 		allowAccessToAllElements: '允许访问所有元素',
+		allowAccessToAllDocumentBlueprints: '允许访问所有文档蓝图',
 		allowAccessToAllMedia: '允许访问所有媒体',
 		startnodes: '内容起始节点',
 		startnodehelp: '将内容树限制为特定的起始节点',
@@ -2271,6 +2276,8 @@ export default {
 		mediastartnodeshelp: '将媒体库限制为特定的起始节点',
 		selectElementStartNode: '选择元素起始节点',
 		selectElementStartNodeDescription: '将元素库限制为特定的起始节点',
+		selectDocumentBlueprintStartNode: '选择文档蓝图起始节点',
+		selectDocumentBlueprintStartNodeDescription: '将用户可管理的文档蓝图限制为特定的起始节点',
 		noStartNode: '未选择起始节点',
 		noStartNodes: '未选择起始节点',
 		selectUserGroup: (multiple: boolean) => (multiple ? '选择用户组' : '选择用户组'),
@@ -3081,5 +3088,10 @@ export default {
 		emptyDate: '请选择一个日期',
 		emptyTimeZone: '请选择一个时区',
 		invalidTimeZone: '所选时区无效',
+	},
+	elements: {
+		confirmPublishDescription: '发布将使其对外公开。',
+		confirmBulkPublishDescription: '发布将使所选项对外公开。',
+		confirmBulkUnpublishDescription: '所选项将不再对外公开。',
 	},
 } as UmbLocalizationDictionary;

@@ -1,13 +1,11 @@
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 
 /**
- * Parses the numeric value of the given config alias.
- * @param {UmbPropertyEditorConfig} config - The property editor configuration.
- * @param {string} alias - The config alias to look up.
+ * Parses a numeric range bound.
+ * @param {unknown} value - The bound value to parse.
  * @returns {number | undefined} The parsed number, or `undefined` if not set or not a valid number.
  */
-function parseNumberConfig(config: UmbPropertyEditorConfig, alias: string): number | undefined {
-	const value = config.find((x) => x.alias === alias)?.value;
+function parseBound(value: unknown): number | undefined {
 	if (value === undefined || value === null || value === '') {
 		return undefined;
 	}
@@ -16,17 +14,22 @@ function parseNumberConfig(config: UmbPropertyEditorConfig, alias: string): numb
 }
 
 /**
- * Resolves the value a numeric property should be preset with, based on its `min`/`max` configuration.
+ * Resolves the value a numeric property should be preset with, based on its `validationRange` configuration.
  * @param {UmbPropertyEditorConfig} config - The property editor configuration.
  * @returns {number | undefined} The value to preset, or `undefined` to leave the field empty.
  */
 export function umbResolveNumberPresetValue(config: UmbPropertyEditorConfig): number | undefined {
-	const min = parseNumberConfig(config, 'min');
+	const range = config.find((x) => x.alias === 'validationRange')?.value as
+		| { min?: unknown; max?: unknown }
+		| null
+		| undefined;
+
+	const min = parseBound(range?.min);
 	if (min !== undefined && min > 0) {
 		return min;
 	}
 
-	const max = parseNumberConfig(config, 'max');
+	const max = parseBound(range?.max);
 	if (max !== undefined && max < 0) {
 		return max;
 	}

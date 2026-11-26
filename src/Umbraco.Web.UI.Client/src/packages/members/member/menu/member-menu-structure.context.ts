@@ -33,8 +33,6 @@ export class UmbMemberMenuStructureWorkspaceContext
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT);
-		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
-		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 
 		this.#parentContext.setParent({ unique: null, entityType: UMB_MEMBER_ROOT_ENTITY_TYPE });
 
@@ -77,7 +75,7 @@ export class UmbMemberMenuStructureWorkspaceContext
 			{
 				unique: null,
 				entityType: UMB_MEMBER_ROOT_ENTITY_TYPE,
-				variants: [{ name: '#treeHeaders_member', culture: null, segment: null }],
+				variants: [{ name: '#treeHeaders_member', culture: null }],
 			},
 		];
 
@@ -88,7 +86,6 @@ export class UmbMemberMenuStructureWorkspaceContext
 				variants: variants.map((variant) => ({
 					name: variant.name,
 					culture: variant.culture,
-					segment: variant.segment,
 				})),
 			});
 		}

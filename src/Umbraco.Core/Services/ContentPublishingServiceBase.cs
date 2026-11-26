@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
@@ -24,6 +25,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
     private readonly ILanguageService _languageService;
     private ContentSettings _contentSettings;
     private readonly IRelationService _relationService;
+    private readonly IUserService _userService;
     private readonly ILogger<ContentPublishingServiceBase<TContent, TContentService>> _logger;
 
     protected abstract int WriteLockId { get; }
@@ -37,6 +39,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         ILanguageService languageService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
+        IUserService userService,
         ILogger<ContentPublishingServiceBase<TContent, TContentService>> logger)
     {
         _coreScopeProvider = coreScopeProvider;
@@ -46,6 +49,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         _contentTypeService = contentTypeService;
         _languageService = languageService;
         _relationService = relationService;
+        _userService = userService;
         _logger = logger;
         _contentSettings = optionsMonitor.CurrentValue;
         optionsMonitor.OnChange((contentSettings) =>
@@ -65,6 +69,10 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
 
         ContentScheduleCollection schedules = _contentService.GetContentScheduleByContentId(key);
 
+        // The release runs without an editor, so it applies the access of the user scheduling it.
+        bool includeInvariantForVariant = culturesToPublishOrSchedule.Any(c => c.Schedule?.PublishDate is not null)
+            && (await _userService.GetRequiredUserAsync(userKey)).HasAccessToInvariantForVariant();
+
         foreach (CulturePublishScheduleModel cultureToSchedule in culturesToPublishOrSchedule.Where(c => c.Schedule is not null))
         {
             var culture = cultureToSchedule.Culture ?? Constants.System.InvariantCulture;
@@ -75,7 +83,11 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             }
             else
             {
-                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule!.PublishDate.Value.UtcDateTime, ContentScheduleAction.Release);
+                schedules.AddOrUpdate(
+                    culture,
+                    cultureToSchedule.Schedule!.PublishDate.Value.UtcDateTime,
+                    ContentScheduleAction.Release,
+                    includeInvariantForVariant);
             }
 
             if (cultureToSchedule.Schedule!.UnpublishDate is null)
@@ -84,7 +96,11 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             }
             else
             {
-                schedules.AddOrUpdate(culture, cultureToSchedule.Schedule!.UnpublishDate.Value.UtcDateTime, ContentScheduleAction.Expire);
+                schedules.AddOrUpdate(
+                    culture,
+                    cultureToSchedule.Schedule!.UnpublishDate.Value.UtcDateTime,
+                    ContentScheduleAction.Expire,
+                    includeInvariantForVariant: true);
             }
         }
 
@@ -94,11 +110,23 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             Schedules = schedules,
         };
 
-        return await PublishAsync(key, cultureAndSchedule, userKey);
+        return await RunInWritePathAsync(
+            () => PublishAsync(key, cultureAndSchedule, userKey),
+            callerIsInScope: _coreScopeProvider.Context is not null);
     }
 
-    // TODO - Integrate this implementation into the one above.
-    [Obsolete("Use non obsoleted version instead. Scheduled for removal in v17")]
+    /// <summary>
+    /// Runs the publish once the caller may enter the write path. Runs it directly unless a derived service gates it.
+    /// </summary>
+    /// <param name="publish">The publish to run.</param>
+    /// <param name="callerIsInScope">Whether the caller is already inside a scope.</param>
+    /// <returns>The publish result.</returns>
+    // TODO (V20): Remove once the content tree lock can be awaited, so that waiting for it no longer holds a thread.
+    protected virtual Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> RunInWritePathAsync(
+        Func<Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>>> publish,
+        bool callerIsInScope)
+        => publish();
+
     private async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
         Guid key,
         CultureAndScheduleModel cultureAndSchedule,
@@ -182,7 +210,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             }
         }
 
-        ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, cultures);
+        ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, cultures, userKey);
         if (validationResult.ValidationErrors.Any())
         {
             scope.Complete();
@@ -231,8 +259,13 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             });
     }
 
-    private async Task<ContentValidationResult> ValidateCurrentContentAsync(TContent content, string[] cultures)
+    /// <summary>
+    /// Validates the current (draft) property values of the content for the specified cultures, including all segment values.
+    /// </summary>
+    protected async Task<ContentValidationResult> ValidateCurrentContentAsync(TContent content, string[] cultures, Guid userKey)
     {
+        IUser user = await _userService.GetRequiredUserAsync(userKey);
+
         IEnumerable<string?> effectiveCultures = content.ContentType.VariesByCulture()
             ? cultures.Union([null])
             : [null];
@@ -240,28 +273,37 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         // Would be better to be able to use a mapper/factory, but currently all that functionality is very much presentation logic.
         var model = new ContentUpdateModel()
         {
-            // NOTE KJA: this needs redoing; we need to make an informed decision whether to include invariant properties, depending on if editing invariant properties is allowed on all variants, or if the default language is included in cultures
             Properties = effectiveCultures.SelectMany(culture =>
-                content.Properties.Select(property => property.PropertyType.VariesByCulture() == (culture is not null)
-                    ? new PropertyValueModel
+                content.Properties
+                    .Where(property => property.PropertyType.VariesByCulture() == (culture is not null))
+                    .SelectMany(property =>
                     {
-                        Alias = property.Alias,
-                        Value = property.GetValue(culture: culture, segment: null, published: false),
-                        Culture = culture
-                    }
-                    : null)
-                .WhereNotNull())
+                        IEnumerable<string?> segments = property.PropertyType.VariesBySegment()
+                            ? property.Values
+                                .Where(propertyValue => propertyValue.Culture.InvariantEquals(culture))
+                                .Select(propertyValue => propertyValue.Segment)
+                                .Union([null])
+                                .Distinct()
+                            : [null];
+
+                        return segments.Select(segment => new PropertyValueModel
+                        {
+                            Alias = property.Alias,
+                            Value = property.GetValue(culture: culture, segment: segment, published: false),
+                            Culture = culture,
+                            Segment = segment,
+                        });
+                    }))
                 .ToArray(),
             Variants = cultures.Select(culture => new VariantModel()
             {
                 Name = content.GetPublishName(culture) ?? string.Empty,
-                Culture = culture,
-                Segment = null
+                Culture = culture
             }).ToArray()
         };
 
         IContentType? contentType = _contentTypeService.Get(content.ContentType.Key)!;
-        ContentValidationResult validationResult = await _contentValidationService.ValidatePropertiesAsync(model, contentType, cultures);
+        ContentValidationResult validationResult = await _contentValidationService.ValidatePropertiesAsync(model, contentType, cultures, user.HasAccessToInvariantForVariant());
         return validationResult;
     }
 

@@ -149,16 +149,16 @@ public class DomainService : RepositoryService, IDomainService
         scope.WriteLock(Constants.Locks.Domains);
 
         // delete any obsolete domain assignments
-        if (DeleteAll(currentlyAssignedDomains.Except(newAssignedDomains).ToArray(), scope, eventMessages) == false)
+        if (await DeleteAllAsync(currentlyAssignedDomains.Except(newAssignedDomains).ToArray(), scope, eventMessages) == false)
         {
             scope.Complete();
 
-            // this is the only error scenario in DeleteAll
+            // this is the only error scenario in DeleteAllAsync
             return Attempt.FailWithStatus(DomainOperationStatus.CancelledByNotification, new DomainUpdateResult());
         }
 
         // update all domain assignments (also current ones, in case sort order or ISO code has changed)
-        var result = SaveAll(newAssignedDomains, scope, eventMessages);
+        var result = await SaveAllAsync(newAssignedDomains, scope, eventMessages);
         scope.Complete();
 
         return result
@@ -244,7 +244,7 @@ public class DomainService : RepositoryService, IDomainService
     /// <summary>
     /// Handles deletion of one or more domains incl. notifications
     /// </summary>
-    private bool DeleteAll(IDomain[] domainsToDelete, ICoreScope scope, EventMessages eventMessages)
+    private async Task<bool> DeleteAllAsync(IDomain[] domainsToDelete, ICoreScope scope, EventMessages eventMessages)
     {
         if (domainsToDelete.Any() == false)
         {
@@ -252,7 +252,7 @@ public class DomainService : RepositoryService, IDomainService
         }
 
         var deletingNotification = new DomainDeletingNotification(domainsToDelete, eventMessages);
-        if (scope.Notifications.PublishCancelable(deletingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
         {
             return false;
         }
@@ -269,7 +269,7 @@ public class DomainService : RepositoryService, IDomainService
     /// <summary>
     /// Handles saving of one or more domains incl. notifications
     /// </summary>
-    private bool SaveAll(IDomain[] domainsToSave, ICoreScope scope, EventMessages eventMessages)
+    private async Task<bool> SaveAllAsync(IDomain[] domainsToSave, ICoreScope scope, EventMessages eventMessages)
     {
         if (domainsToSave.Any() == false)
         {
@@ -277,7 +277,7 @@ public class DomainService : RepositoryService, IDomainService
         }
 
         var savingNotification = new DomainSavingNotification(domainsToSave, eventMessages);
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             return false;
         }

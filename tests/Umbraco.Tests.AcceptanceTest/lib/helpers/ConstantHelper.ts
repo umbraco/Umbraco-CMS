@@ -4,6 +4,7 @@
     short: 1000,
     medium: 5000,
     long: 10000,
+    action: 15000,
     veryLong: 20000,
     navigation: 30000,
     pageLoad: 60000
@@ -46,6 +47,7 @@
     emptyManualLinkPicker: 'Please enter an URL or Anchor.',
     needMoreItems: 'This field needs more items',
     minimumTwoEntriesRequiresOneMore: 'Minimum 2 entries, requires 1 more.',
+    invalidObjectType: 'The selected item is of the wrong type.',
   }
 
   public static readonly inputTypes = {
@@ -69,7 +71,8 @@
   public static readonly contentPickerSettings = {
     0: ['Accepted types', 'Limit to specific types'],
     1: ['Start node', ''],
-    2: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.']
+    2: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
+    3: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.']
   }
 
   public static readonly datePickerSettings = {
@@ -78,9 +81,12 @@
   }
 
   public static readonly dropdownSettings = {
-    0: ['Enable multiple choice', ''],
-    1: ['Add options', ''],
-    2: ['Placeholder', '']
+    0: ['Add options', '']
+  }
+
+  public static readonly singleDropdownSettings = {
+    0: ['Add options', ''],
+    1: ['Placeholder', '']
   }
 
   public static readonly imageCropperSettings = {
@@ -89,17 +95,23 @@
 
   public static readonly mediaPickerSettings = {
     0: ['Accepted types', 'Limit to specific types'],
-    1: ['Pick multiple items', 'Outputs a IEnumerable'],
-    2: ['Amount', 'The minimum applies once items have been added. To require a value, mark the property as mandatory.'],
-    3: ['Start node', ''],
-    4: ['Enable Focal Point', ''],
-    5: ['Image Crops', 'Local crops, stored on document'],
-    6: ['Ignore User Start Nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
+    1: ['Amount', 'The minimum applies once items have been added. To require a value, mark the property as mandatory.'],
+    2: ['Start node', ''],
+    3: ['Enable Focal Point', ''],
+    4: ['Image Crops', 'Local crops, stored on document'],
+    5: ['Ignore User Start Nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
+  }
+
+  public static readonly singleMediaPickerSettings = {
+    0: ['Accepted types', 'Limit to specific types'],
+    1: ['Start node', ''],
+    2: ['Enable Focal Point', ''],
+    3: ['Image Crops', 'Local crops, stored on document'],
+    4: ['Ignore User Start Nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."],
   }
 
   public static readonly labelSettings = {
-    0: ['Value type', 'The type of value to store'],
-    1: ['Label template', 'Enter a template for the label.'],
+    0: ['Label template', 'Enter a template for the label.'],
   }
 
   public static readonly listViewSettings = {
@@ -113,19 +125,55 @@
     7: ['Show Content Workspace View First', "Enable this to show the Content Workspace View by default instead of the Collection's."],
   }
 
+  public static readonly sliderSettings = {
+    0: ['Value range', 'Set the minimum and maximum value of the slider.'],
+    1: ['Initial value', ''],
+    2: ['Step increments', '']
+  }
+
+  public static readonly rangeSliderSettings = {
+    0: ['Value range', 'Set the minimum and maximum value of the slider.'],
+    1: ['Minimum range', ''],
+    2: ['Initial low value', ''],
+    3: ['Initial high value', ''],
+    4: ['Step increments', '']
+  }
+
+  public static readonly multipleDocumentPickerSettings = {
+    0: ['Accepted types', 'Limit to specific types'],
+    1: ['Amount', 'The minimum applies once items have been added. To require a value, mark the property as mandatory.'],
+    2: ['Start node', ''],
+    3: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
+    4: ['Ignore user start nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."]
+  }
+
+  public static readonly memberPickerSettings = {
+    0: ['Accepted types', 'Limit to specific member types']
+  }
+
+  public static readonly multipleMemberPickerSettings = {
+    0: ['Accepted types', 'Limit to specific member types'],
+    1: ['Amount', 'The minimum applies once items have been added. To require a value, mark the property as mandatory.']
+  }
+
+  public static readonly singleUrlPickerSettings = {
+    0: ['Ignore user start nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."],
+    1: ['Overlay Size', 'Select the width of the overlay.'],
+    2: ['Hide anchor/query string input', 'Selecting this hides the anchor/query string input field in the link picker overlay.'],
+    3: ['Culture-specific document links', 'Enable specifying a culture when linking to documents.']
+  }
+
   public static readonly multiURLPickerSettings = {
-    0: ['Minimum number of items', ''],
-    1: ['Maximum number of items', ''],
-    2: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
-    3: ['Overlay Size', 'Select the width of the overlay.'],
-    4: ['Hide anchor/query string input', 'Selecting this hides the anchor/query string input field in the link picker overlay.'],
-    5: ['Culture-specific document links', 'Enable specifying a culture when linking to documents.']
+    0: ['Amount', 'The minimum applies once items have been added. To require a value, mark the property as mandatory.'],
+    1: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
+    2: ['Overlay Size', 'Select the width of the overlay.'],
+    3: ['Hide anchor/query string input', 'Selecting this hides the anchor/query string input field in the link picker overlay.'],
+    4: ['Culture-specific document links', 'Enable specifying a culture when linking to documents.']
   }
 
   public static readonly numericSettings = {
-    0: ['Minimum', 'Enter the minimum amount of number to be entered'],
-    1: ['Maximum', 'Enter the maximum amount of number to be entered'],
-    2: ['Step size', 'Enter the intervals amount between each step of number to be entered']
+    0: ['Value range', 'Set the minimum and maximum value that can be entered'],
+    1: ['Step size', 'Enter the intervals amount between each step of number to be entered']
   }
 
   public static readonly radioboxSettings = {
@@ -190,8 +238,9 @@
   public static readonly userGroupAssignAccessSettings = {
     0: ['Sections', 'Add sections to give users access'],
     1: ['Languages', 'Limit the languages users have access to edit'],
-    2: ['Select content start node', 'Limit the content tree to a specific start node'],
-    3: ['Select media start node', 'Limit the media library to a specific start node']
+    2: ['Allow editing shared content', 'Allows editing of content shared across languages. Does not apply to culture-invariant content.'],
+    3: ['Select content start node', 'Limit the content tree to a specific start node'],
+    4: ['Select media start node', 'Limit the media library to a specific start node']
   }
 
   public static readonly userGroupDefaultPermissionsSettings = {
@@ -298,6 +347,30 @@
     delete: 'DELETE'
   }
 
+  public static readonly workspaceActions = {
+    dataTypeSave: 'Umb.WorkspaceAction.DataType.Save',
+    dictionarySave: 'Umb.WorkspaceAction.Dictionary.Save',
+    documentSave: 'Umb.WorkspaceAction.Document.Save',
+    documentSaveAndPublish: 'Umb.WorkspaceAction.Document.SaveAndPublish',
+    documentBlueprintSave: 'Umb.WorkspaceAction.DocumentBlueprint.Save',
+    documentTypeSave: 'Umb.WorkspaceAction.DocumentType.Save',
+    elementSave: 'Umb.WorkspaceAction.Element.Save',
+    elementSaveAndPublish: 'Umb.WorkspaceAction.Element.SaveAndPublish',
+    languageSave: 'Umb.WorkspaceAction.Language.Save',
+    mediaSave: 'Umb.WorkspaceAction.Media.Save',
+    mediaTypeSave: 'Umb.WorkspaceAction.MediaType.Save',
+    memberSave: 'Umb.WorkspaceAction.Member.Save',
+    memberGroupSave: 'Umb.WorkspaceAction.MemberGroup.Save',
+    memberTypeSave: 'Umb.WorkspaceAction.MemberType.Save',
+    partialViewSave: 'Umb.WorkspaceAction.PartialView.Save',
+    scriptSave: 'Umb.WorkspaceAction.Script.Save',
+    stylesheetSave: 'Umb.WorkspaceAction.Stylesheet.Save',
+    templateSave: 'Umb.WorkspaceAction.Template.Save',
+    userSave: 'Umb.WorkspaceAction.User.Save',
+    userGroupSave: 'Umb.WorkspaceAction.UserGroup.Save',
+    webhookSave: 'Umb.WorkspaceAction.Webhook.Save'
+  }
+
   // Matched against response URLs via url().includes(), so entries are either full paths
   // (e.g. '/umbraco/management/api/v1/document') or path fragments.
   public static readonly apiEndpoints = {
@@ -306,6 +379,7 @@
     documentType: '/umbraco/management/api/v1/document-type',
     documentTypeFolder: '/umbraco/management/api/v1/document-type/folder',
     documentBlueprint: '/umbraco/management/api/v1/document-blueprint',
+    documentBlueprintFolder: '/umbraco/management/api/v1/document-blueprint/folder',
     dataType: '/umbraco/management/api/v1/data-type',
     dataTypeFolder: '/umbraco/management/api/v1/data-type/folder',
     dictionary: '/umbraco/management/api/v1/dictionary',
@@ -335,7 +409,10 @@
     domains: '/domains',
     notifications: '/notifications',
     currentUser: '/umbraco/management/api/v1/user/current',
-    revoke: '/umbraco/management/api/v1/security/back-office/revoke',
+    currentUserConfiguration: '/umbraco/management/api/v1/user/current/configuration',
+    backOfficeLogin: '/umbraco/management/api/v1/security/back-office/login',
+    backOfficeSignOut: '/umbraco/management/api/v1/security/back-office/signout',
+    backOfficeKeepAlive: '/umbraco/management/api/v1/security/back-office/keep-alive',
     documentSearch: '/umbraco/management/api/v1/item/document/search',
     mediaSearch: '/umbraco/management/api/v1/item/media/search',
     memberSearch: '/umbraco/management/api/v1/item/member/search',
@@ -345,7 +422,10 @@
     treeElementRoot: '/umbraco/management/api/v1/tree/element/root',
     treeElementChildren: '/umbraco/management/api/v1/tree/element/children',
     currentUserProfile: '/umbraco/management/api/v1/user/current/profile',
-    currentUserAvatar: '/umbraco/management/api/v1/user/current/avatar'
+    currentUserAvatar: '/umbraco/management/api/v1/user/current/avatar',
+    searchIndexes: '/umbraco/management/api/v1/search/indexes',
+    searchRebuild: '/umbraco/management/api/v1/search/rebuild',
+    searchQuery: '/umbraco/management/api/v1/search/search'
   }
 
   public static readonly userGroupDescriptionValues = {

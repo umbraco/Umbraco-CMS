@@ -14,7 +14,7 @@ export const UMB_ENTITY_BULK_ACTION_DELETE_KIND_MANIFEST: UmbExtensionManifestKi
 		type: 'entityBulkAction',
 		kind: UMB_ENTITY_BULK_ACTION_DELETE_KIND,
 		api: UmbDeleteEntityBulkAction,
-		weight: 1100,
+		weight: 799,
 		meta: {
 			icon: 'icon-trash',
 			label: '#actions_delete',

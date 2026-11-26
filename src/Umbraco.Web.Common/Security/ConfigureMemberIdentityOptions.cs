@@ -19,14 +19,6 @@ public sealed class ConfigureMemberIdentityOptions : IConfigureOptions<IdentityO
         _securitySettings = securitySettings.Value;
     }
 
-    [Obsolete("Use the constructor that only takes IOptions<SecuritySettings> instead. Scheduled for removal in Umbraco 19.")]
-    public ConfigureMemberIdentityOptions(
-        IOptions<MemberPasswordConfigurationSettings> memberPasswordConfiguration,
-        IOptions<SecuritySettings> securitySettings)
-        : this(securitySettings)
-    {
-    }
-
     public void Configure(IdentityOptions options)
     {
         options.SignIn.RequireConfirmedAccount = true; // uses our custom IUserConfirmation
