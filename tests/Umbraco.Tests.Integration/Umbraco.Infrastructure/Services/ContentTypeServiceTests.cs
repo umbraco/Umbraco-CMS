@@ -1343,6 +1343,103 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Cannot_Add_Composition_With_PropertyType_Alias_That_Conflicts_With_Composing_Type()
+    {
+        /*
+         * Child -> Page (composition), Child has 'dup'
+         * Comp :: Composition, has 'dup'
+         *
+         * Adding Comp to Page should fail, as Child would end up with two 'dup' properties
+        */
+
+        // Arrange
+        var page = ContentTypeBuilder.CreateBasicContentType("page", "Page");
+        await CreateContentTypeAsync(page);
+
+        var child = ContentTypeBuilder.CreateBasicContentType("child", "Child");
+        child.AddContentType(page);
+        child.AddPropertyType(CreateDupPropertyType(), "content", "Content");
+        await CreateContentTypeAsync(child);
+
+        var comp = ContentTypeBuilder.CreateBasicContentType("comp", "Comp");
+        comp.AddPropertyType(CreateDupPropertyType(), "comp", "Comp");
+        await CreateContentTypeAsync(comp);
+
+        Assert.That(page.AddContentType(comp), Is.True);
+
+        // Act
+        var exception = Assert.ThrowsAsync<InvalidCompositionException>(
+            async () => await ContentTypeService.UpdateAsync(page, Constants.Security.SuperUserKey));
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(exception?.PropertyTypeAliases ?? [], Is.EquivalentTo(new[] { "dup" }));
+            Assert.That(CountDupPropertyTypes(child), Is.EqualTo(1));
+        });
+    }
+
+    [Test]
+    public async Task Cannot_Add_Composition_With_PropertyType_Alias_That_Conflicts_With_Other_Composition_Of_Composing_Type()
+    {
+        /*
+         * Child -> Page (composition), Child -> Seo (composition), Seo has 'dup'
+         * Comp :: Composition, has 'dup'
+         *
+         * Adding Comp to Page should fail, as Child would end up with two 'dup' properties
+        */
+
+        // Arrange
+        var page = ContentTypeBuilder.CreateBasicContentType("page", "Page");
+        await CreateContentTypeAsync(page);
+
+        var seo = ContentTypeBuilder.CreateBasicContentType("seo", "Seo");
+        seo.AddPropertyType(CreateDupPropertyType(), "seo", "Seo");
+        await CreateContentTypeAsync(seo);
+
+        var child = ContentTypeBuilder.CreateBasicContentType("child", "Child");
+        child.AddContentType(page);
+        child.AddContentType(seo);
+        await CreateContentTypeAsync(child);
+
+        var comp = ContentTypeBuilder.CreateBasicContentType("comp", "Comp");
+        comp.AddPropertyType(CreateDupPropertyType(), "comp", "Comp");
+        await CreateContentTypeAsync(comp);
+
+        Assert.That(page.AddContentType(comp), Is.True);
+
+        // Act
+        var exception = Assert.ThrowsAsync<InvalidCompositionException>(
+            async () => await ContentTypeService.UpdateAsync(page, Constants.Security.SuperUserKey));
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(exception?.PropertyTypeAliases ?? [], Is.EquivalentTo(new[] { "dup" }));
+            Assert.That(CountDupPropertyTypes(child), Is.EqualTo(1));
+        });
+    }
+
+    private async Task CreateContentTypeAsync(IContentType contentType)
+    {
+        var result = await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        Assert.That(result.Success, Is.True, $"Failed to create '{contentType.Alias}': {result.Result}");
+    }
+
+    private PropertyType CreateDupPropertyType() =>
+        new(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "dup")
+        {
+            Name = "Dup",
+            Description = string.Empty,
+            Mandatory = false,
+            SortOrder = 1,
+            DataTypeId = Constants.DataTypes.Textbox,
+        };
+
+    private int CountDupPropertyTypes(IContentType contentType)
+        => ContentTypeService.Get(contentType.Key)!.CompositionPropertyTypes.Count(x => x.Alias == "dup");
+
+    [Test]
     public void Cannot_Save_ContentType_With_Empty_Name()
     {
         // Arrange
