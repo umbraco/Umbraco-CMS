@@ -27,6 +27,10 @@ public class BackOfficeGraphicsController : Controller
     public const string LoginBackGroundRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginBackground);
     public const string LoginLogoRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginLogo);
     public const string LoginLogoAlternativeRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginLogoAlternative);
+
+    /// <summary>
+    /// The route name of the <see cref="Favicon"/> endpoint.
+    /// </summary>
     public const string FaviconRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(Favicon);
 
     private readonly IOptions<ContentSettings> _contentSettings;
@@ -108,6 +112,9 @@ public class BackOfficeGraphicsController : Controller
     [MapToApiVersion("1.0")]
     public IActionResult Favicon() => HandleFileRequest(_contentSettings.Value.BackOfficeFavicon);
 
+    private static EntityTagHeaderValue CreateEntityTag(IFileInfo fileInfo)
+        => new($"\"{fileInfo.LastModified.UtcTicks:x}-{fileInfo.Length:x}\"");
+
     private IActionResult HandleFileRequest(string virtualPath)
     {
         var filePath = $"{Constants.SystemDirectories.Umbraco}/{virtualPath}".TrimStart(Constants.CharArrays.Tilde);
@@ -126,7 +133,4 @@ public class BackOfficeGraphicsController : Controller
 
         return StatusCode(StatusCodes.Status412PreconditionFailed);
     }
-
-    private static EntityTagHeaderValue CreateEntityTag(IFileInfo fileInfo)
-        => new($"\"{fileInfo.LastModified.UtcTicks:x}-{fileInfo.Length:x}\"");
 }
