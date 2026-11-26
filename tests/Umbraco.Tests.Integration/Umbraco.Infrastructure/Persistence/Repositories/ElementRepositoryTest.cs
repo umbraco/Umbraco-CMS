@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -938,6 +939,47 @@ internal sealed class ElementRepositoryTest : UmbracoIntegrationTest
         scope.Complete();
 
         Assert.That(startElementId, Is.Null);
+    }
+
+    [Test]
+    public async Task SaveAsync_FetchesOnlyTheSiblingsWhoseNameCanCollide()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        foreach (string name in new[] { "Alpha", "Beta", "Report" })
+        {
+            await repository.SaveAsync(ElementBuilder.CreateSimpleElement(_elementType, name), CancellationToken.None);
+        }
+
+        Element duplicate = ElementBuilder.CreateSimpleElement(_elementType, "Report");
+        CommandCounter.Reset();
+        CommandCounter.Enabled = true;
+        await repository.SaveAsync(duplicate, CancellationToken.None);
+        CommandCounter.Enabled = false;
+        scope.Complete();
+
+        IReadOnlyList<string> siblingFetches = [.. CommandCounter.Commands.Where(command => command.Contains("umbracoNode") && Regex.IsMatch(command, @"text\W+LIKE", RegexOptions.IgnoreCase))];
+        Assert.Multiple(() =>
+        {
+            Assert.That(duplicate.Name, Is.EqualTo("Report (1)"));
+            Assert.That(siblingFetches, Is.Not.Empty, "the sibling names are fetched narrowed by a LIKE on the text column");
+        });
+    }
+
+    [TestCase("[draft]")]
+    [TestCase("50% off")]
+    [TestCase("a_b")]
+    public async Task SaveAsync_EscapesWildcardsInTheNameWhenFetchingSiblings(string name)
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        await repository.SaveAsync(ElementBuilder.CreateSimpleElement(_elementType, name), CancellationToken.None);
+
+        Element duplicate = ElementBuilder.CreateSimpleElement(_elementType, name);
+        await repository.SaveAsync(duplicate, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(duplicate.Name, Is.EqualTo($"{name} (1)"), "a wildcard in the name must still find the sibling with the same name");
     }
 
     [Test]

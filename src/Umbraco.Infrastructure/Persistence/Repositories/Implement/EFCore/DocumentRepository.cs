@@ -128,9 +128,6 @@ internal class DocumentRepository
         await db.Documents.Where(document => document.NodeId == nodeId).ExecuteDeleteAsync();
         await db.DocumentCultureVariations.Where(cultureVariation => cultureVariation.NodeId == nodeId).ExecuteDeleteAsync();
 
-        IQueryable<int> versionIdQuery = db.ContentVersions.Where(contentVersion => contentVersion.NodeId == nodeId).Select(contentVersion => contentVersion.Id);
-        await db.DocumentVersions.Where(documentVersion => versionIdQuery.Contains(documentVersion.Id)).ExecuteDeleteAsync();
-
         IQueryable<Guid> accessIdQuery = db.Access
             .Where(access => access.NodeId == nodeId || access.LoginNodeId == nodeId || access.NoAccessNodeId == nodeId)
             .Select(access => access.Id);
