@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 1d62f47f-f4cd-4020-bc2d-5258c53ab109
-  modified: 2026-11-20T09:29:03.240Z
+  modified: 2026-11-26T12:03:15.006Z
 ---
 
 Created 20-11-2026, right after main was merged into `v18/feature/ef-core-repositories` (merge commit `450b951b298`).
@@ -30,3 +30,5 @@ F infrastructure · G `DatabaseCacheRepository`/`IndexDocumentRepository`/`UserI
 **20-11-2026 (later):** campaign A split in the JSON: A = media (planned, plan in `ef-core-media-repository/`), A2 = members (proposed, depends on A, retires the NPoco bases and the `Async*` prefixes); H depends on A2 as well. Board for A: [[project_ef_core_media_repository_campaign]].
 
 **20-11-2026 (later still):** campaign A set to `in-progress` on the map (PR 1 of the media campaign open as draft #24724, PR 1b added); the map's `why` text for A now says nine PRs.
+
+**26-11-2026:** first easy win done outside a campaign plan: `DataTypeUsageRepository` and `PropertyTypeUsageRepository` moved to EF Core in #24780 (`186ab8c64de`); both are in `done.repositories`, removed from campaign D and the easy-wins list (D stays `proposed` with only `DataTypeRepository`). `done.lines` was bumped by the two new files (77) only, not recounted. The sibling-name loose end (#23447) is closed by media PR 3; the culture-aware published ordering TODO is still in `PublishableContentRepositoryBase`.

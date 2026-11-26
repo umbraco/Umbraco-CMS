@@ -2,7 +2,7 @@
   "campaign": "Media Repository Campaign",
   "targetBranch": "v18/feature/ef-core-repositories",
   "planFile": ".claude/campaign/ef-core-media-repository/CAMPAIGN.md",
-  "updated": "24-11-2026",
+  "updated": "26-11-2026",
   "artifact": {
     "url": "https://claude.ai/artifact/5rY17CDCK6o6AiY7q62bVd",
     "title": "Media Repository Campaign"
@@ -75,14 +75,14 @@
       "id": 3,
       "slug": "hoist-write-path",
       "title": "Hoist the generic write, delete and naming path into AsyncContentRepositoryBase",
-      "status": "in-review",
+      "status": "merged",
       "branch": "v20/feature/ef-core-media-repository-3-hoist-write-path",
       "pr": "#24776",
       "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24776",
       "dependsOn": [2],
       "summary": "Persist skeletons with publishing extension points, node/content/version/property-data persistence, the generic delete (with the entity-specific hook) and invariant unique naming moved to the wide base; the publishable base keeps published state, entity rows, culture variations, flag flips, templates and variant names.",
       "tasks": [
-        { "text": "Extension-point design agreed before moving code: shared protected steps plus a per-persist options record", "done": true },
+        { "text": "Extension-point design agreed before moving code: shared protected steps taking plain parameters (no options record needed)", "done": true },
         { "text": "PersistNewItemAsync / PersistUpdatedItemAsync skeletons on the wide base; publishable overrides compose them", "done": true },
         { "text": "PersistNewNode/Content/Versions, PersistNew/UpdatedPropertyDataAsync, BuildWriteRow hoisted", "done": true },
         { "text": "PersistDeletedItemAsync hoisted with the PersistEntitySpecificDeleteClausesAsync hook; schedules delete stays publishable", "done": true },
@@ -90,14 +90,14 @@
         { "text": "Write-path and delete tests of the document and element fixtures green at unchanged counts", "done": true }
       ],
       "acceptance": "As PR 2 plus every write-path test green; the publishable base ends near its publishing-only content; the wide base has no Set<TEntityDto> and no PublishedState reference.",
-      "notes": "Started 24-11-2026, cut from PR 2's branch at 1d880d7b519 (stacked; PR targets PR 2's branch until #24762 merges). Implemented 24-11-2026 as one scripted transplant: PublishableContentRepositoryBase 1478 to 1107 lines; wide base has no Set<TEntityDto> and no PublishedState reference; snapshots untouched; normalised diff of every moved member shows only the step substitutions. Decisions in CAMPAIGN.md §8 dated 24-11-2026. Verification: unit project 8239 passed; document, blueprint, element, content service, content publishing, content editing and HybridCache integration fixtures 1353 passed on SQLite; repository fixtures 231 passed on SQL Server (one SQLite-only skip); full --no-incremental solution build clean; independent review found one must-fix (two usings left unused by the move, removed) and recorded the no-op save of an unchanged item as a media behaviour change (§4b change 7). The sort order of a new item became a hook on the user's decision: the wide default takes the next free sort order as NPoco media does, the publishable base keeps the document rule (§4b keep 11); the document fixture's sort-order collision test covers the override. Committed as c6c8dda58fb and opened as draft PR #24776 against PR 2's branch on 24-11-2026; rebase onto the integration branch once #24762 merges. Rebased onto PR 2's review round 2 head as 833801a54ef on 24-11-2026 (one doc-block conflict, PR 3's side taken); repository fixtures 231 green after the rebase. After the PR 2 squash: rebased onto the integration branch as 3ed1a87f678 (git rebase --onto 1aae294e917 0c5aa93e53e), fixtures 231 green, force-pushed with a lease, PR retargeted to v18/feature/ef-core-repositories. Review round 1 (the review bot, approved): the delete order restored through a virtual no-op PersistIntermediateDeleteClausesAsync the publishable base overrides for schedules; the plain persist flow's test list recorded on PR 4.",
-      "mergeCommit": ""
+      "notes": "Started 24-11-2026, cut from PR 2's branch at 1d880d7b519 (stacked; PR targets PR 2's branch until #24762 merges). Implemented 24-11-2026 as one scripted transplant: PublishableContentRepositoryBase 1478 to 1107 lines; wide base has no Set<TEntityDto> and no PublishedState reference; snapshots untouched; normalised diff of every moved member shows only the step substitutions. Decisions in CAMPAIGN.md §8 dated 24-11-2026. Verification: unit project 8239 passed; document, blueprint, element, content service, content publishing, content editing and HybridCache integration fixtures 1353 passed on SQLite; repository fixtures 231 passed on SQL Server (one SQLite-only skip); full --no-incremental solution build clean; independent review found one must-fix (two usings left unused by the move, removed) and recorded the no-op save of an unchanged item as a media behaviour change (§4b change 7). The sort order of a new item became a hook on the user's decision: the wide default takes the next free sort order as NPoco media does, the publishable base keeps the document rule (§4b keep 11); the document fixture's sort-order collision test covers the override. Committed as c6c8dda58fb and opened as draft PR #24776 against PR 2's branch on 24-11-2026; rebase onto the integration branch once #24762 merges. Rebased onto PR 2's review round 2 head as 833801a54ef on 24-11-2026 (one doc-block conflict, PR 3's side taken); repository fixtures 231 green after the rebase. After the PR 2 squash: rebased onto the integration branch as 3ed1a87f678 (git rebase --onto 1aae294e917 0c5aa93e53e), fixtures 231 green, force-pushed with a lease, PR retargeted to v18/feature/ef-core-repositories. Review round 1 (the review bot, approved): the delete order restored through a virtual no-op PersistIntermediateDeleteClausesAsync the publishable base overrides for schedules; the plain persist flow's test list recorded on PR 4. PR 3b (#24779) was merged into this branch first (46bcd86f61d), so its narrowing and tests are part of the squash. Squash-merged on 26-11-2026 as c09a6044156 (four branch commits: 3ed1a87f678, 68ac4cb2f45, 3be2575a95f, 04a2651e499).",
+      "mergeCommit": "c09a6044156"
     },
     {
       "id": 4,
       "slug": "narrow-sibling-fetch",
       "title": "PR 3b: Narrow the unique-name sibling fetch to names sharing the base text",
-      "status": "in-review",
+      "status": "merged",
       "branch": "v20/feature/ef-core-media-repository-3b-narrow-sibling-fetch",
       "pr": "#24779",
       "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24779",
@@ -108,8 +108,8 @@
         { "text": "StartsWith filter on the base text; the TODO comment and the grand-plan backlog row removed", "done": true }
       ],
       "acceptance": "Document and element fixtures at unchanged counts; the new test green and red first.",
-      "notes": "Numbered 3b in CAMPAIGN.md. Started 24-11-2026, stacked on PR 3 at 68ac4cb2f45. Design: the wide default EnsureUniqueNodeNameAsync fetches only siblings whose name starts with SimilarNodeName.GetBaseText(name), as NPoco's virtual EnsureUniqueNodeName does; GetUniqueNodeNameAndSiblingsAsync keeps the full fetch for DocumentRepository's URL-segment check, as NPoco's out-siblings variant does. Implemented 24-11-2026: element test proven red (no LIKE in any save command) then green; naming fixtures 73 green on SQLite, element and document insert fixtures 49 green on SQL Server; full solution build clean; independent review found only nits (comment grammar, presence instead of a count assertion), applied. Grand plan loose end #23447 closed. Committed as d4dfd1720d8 and opened as draft PR #24779 against PR 3's branch on 24-11-2026; rebase onto the integration branch once #24776 merges. Review round 1 (the review bot, approved) applied in d67bb47c473: a remarks note that the narrowed fetch folds case the way the database does (NPoco parity; non-ASCII case variants are fetched on SQL Server CI collations, not on SQLite); the test assertion tied to the text column; three wildcard cases ([draft], 50% off, a_b) pin EF Core's parameter escaping, green on SQLite and SQL Server.",
-      "mergeCommit": ""
+      "notes": "Numbered 3b in CAMPAIGN.md. Started 24-11-2026, stacked on PR 3 at 68ac4cb2f45. Design: the wide default EnsureUniqueNodeNameAsync fetches only siblings whose name starts with SimilarNodeName.GetBaseText(name), as NPoco's virtual EnsureUniqueNodeName does; GetUniqueNodeNameAndSiblingsAsync keeps the full fetch for DocumentRepository's URL-segment check, as NPoco's out-siblings variant does. Implemented 24-11-2026: element test proven red (no LIKE in any save command) then green; naming fixtures 73 green on SQLite, element and document insert fixtures 49 green on SQL Server; full solution build clean; independent review found only nits (comment grammar, presence instead of a count assertion), applied. Grand plan loose end #23447 closed. Committed as d4dfd1720d8 and opened as draft PR #24779 against PR 3's branch on 24-11-2026; rebase onto the integration branch once #24776 merges. Review round 1 (the review bot, approved) applied in d67bb47c473: a remarks note that the narrowed fetch folds case the way the database does (NPoco parity; non-ASCII case variants are fetched on SQL Server CI collations, not on SQLite); the test assertion tied to the text column; three wildcard cases ([draft], 50% off, a_b) pin EF Core's parameter escaping, green on SQLite and SQL Server. Merged into PR 3's branch on 26-11-2026 as 46bcd86f61d and reached the integration branch inside the PR 3 squash c09a6044156 the same day; no separate squash commit.",
+      "mergeCommit": "c09a6044156"
     },
     {
       "id": 5,
@@ -197,6 +197,7 @@
     }
   ],
   "log": [
+    { "date": "26-11-2026", "text": "PR 3 (#24776) squash-merged as c09a6044156 with PR 3b (#24779, merged into its branch as 46bcd86f61d) inside it. The usage repositories easy win #24780 merged as 186ab8c64de. No campaign PR is open; PR 4 (AsyncMediaRepository, depends on 1 and 3b) and PR 5 (service engine hoist) are both unblocked and not started." },
     { "date": "24-11-2026", "text": "Review bot approved PR 3 (#24776), PR 3b (#24779) and the usage PR (#24780); all three await human review. PR 5 (service engine hoist) is the next unblocked step." },
     { "date": "24-11-2026", "text": "PR 3b review round 1 applied (d67bb47c473): case-folding remark, assertion tied to the text column, wildcard-escaping cases green on both providers." },
     { "date": "24-11-2026", "text": "Easy win from the map opened as draft #24780 (usage repositories to EF Core), outside the campaign numbering." },

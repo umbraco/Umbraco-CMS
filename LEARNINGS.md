@@ -7,7 +7,7 @@ Campaigns so far:
 | Campaign | Folder | Ran | PRs |
 |---|---|---|---|
 | Element repository and service | `ef-core-element-repository/` | 08-10-2026 to 19-11-2026 | Nine, all merged; last one `cfaf78790e7` (#24678) |
-| Media repository and service | `ef-core-media-repository/` | planned 20-11-2026 | Nine planned (1, 1b, 2, 3, 3b, 4, 5, 6, 7); PR 1 open as draft #24724 |
+| Media repository and service | `ef-core-media-repository/` | planned 20-11-2026 | Nine planned (1, 1b, 2, 3, 3b, 4, 5, 6, 7); 1, 1b, 2, 3 and 3b merged by 26-11-2026, PR 4 and 5 next |
 
 ## How this branch is organised
 

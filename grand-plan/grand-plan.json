@@ -1,6 +1,6 @@
 {
   "title": "NPoco to EF Core: the grand plan",
-  "updated": "24-11-2026",
+  "updated": "26-11-2026",
   "integrationBranch": "v18/feature/ef-core-repositories",
   "inventoryCommit": "450b951b298",
   "artifact": {
@@ -10,14 +10,15 @@
   "planFile": ".claude/campaign/grand-plan/GRAND-PLAN.md",
   "done": {
     "note": "Concrete repositories that read and write through UmbracoDbContext on the integration branch.",
-    "lines": 12099,
-    "linesNote": "Lines of the EF Core repositories and bases on the inventory day, counted the same way as the NPoco side.",
+    "lines": 12176,
+    "linesNote": "Lines of the EF Core repositories and bases on the inventory day, counted the same way as the NPoco side; the two usage repositories (77 lines, 26-11-2026) added on top, the rest not recounted.",
     "repositories": [
       "AuditEntryRepository",
       "AuditRepository",
       "ConsentRepository",
       "ContentTypeCommonRepository",
       "ContentTypeRepository",
+      "DataTypeUsageRepository",
       "DictionaryRepository",
       "DistributedJobRepository",
       "DocumentBlueprintRepository",
@@ -32,6 +33,7 @@
       "MediaTypeRepository",
       "MemberTypeRepository",
       "PublicAccessRepository",
+      "PropertyTypeUsageRepository",
       "RedirectUrlRepository",
       "RelationRepository",
       "RelationTypeRepository",
@@ -64,7 +66,7 @@
       "id": "A",
       "title": "Media on the content tier",
       "status": "in-progress",
-      "why": "Planned 20-11-2026 as its own campaign (nine PRs; PR 1 in review as #24724 since the same day): hoist the generic read, write and tree logic down to the wide bases, then add MediaRepository and MediaService as thin subclasses. The publishable base, row and hook shapes, factories and test patterns exist, so media is mostly a hoist and a cutover. Progress 24-11-2026: PR 1 (media DTO), PR 1b (SQL Server index filters) and PR 2 (read-path hoist) merged; PR 3 (write-path hoist, #24776) open; PR 3b, 4, 5, 6 and 7 to go.",
+      "why": "Planned 20-11-2026 as its own campaign (nine PRs; PR 1 in review as #24724 since the same day): hoist the generic read, write and tree logic down to the wide bases, then add MediaRepository and MediaService as thin subclasses. The publishable base, row and hook shapes, factories and test patterns exist, so media is mostly a hoist and a cutover. Progress 26-11-2026: PR 1 (media DTO), PR 1b (SQL Server index filters), PR 2 (read-path hoist) and PR 3 with 3b (write-path hoist, narrowed sibling fetch) merged; the wide base owns the generic read and write paths. PR 4 (media repository), 5, 6 and 7 to go.",
       "dependsOn": [],
       "repositories": [
         {
@@ -117,7 +119,7 @@
           "name": "ContentRepositoryBase",
           "lines": 1430,
           "base": "NPoco base, retired by this campaign",
-          "note": "The sibling-name prefix fetch (#23447) is ported to the EF Core wide base in media PR 3b; nothing left to port before deleting."
+          "note": "The sibling-name prefix fetch (#23447) is on the EF Core wide base since media PR 3b (#24776); nothing left to port before deleting."
         }
       ],
       "alsoCloses": [
@@ -234,7 +236,7 @@
       "id": "D",
       "title": "Data types",
       "status": "proposed",
-      "why": "Data type reads sit on every property editor path; the usage repositories are tiny and go with it.",
+      "why": "Data type reads sit on every property editor path. The two usage repositories went first as an easy win (#24780, merged 26-11-2026); DataTypeRepository remains.",
       "dependsOn": [],
       "repositories": [
         {
@@ -242,18 +244,6 @@
           "lines": 720,
           "base": "EntityRepositoryBase<int, IDataType>",
           "note": "IDataTypeService already has 12 async members."
-        },
-        {
-          "name": "DataTypeUsageRepository",
-          "lines": 53,
-          "base": "IDataTypeUsageRepository",
-          "note": "EF Core port in review as draft #24780."
-        },
-        {
-          "name": "PropertyTypeUsageRepository",
-          "lines": 64,
-          "base": "IPropertyTypeUsageRepository",
-          "note": "EF Core port in review as draft #24780."
         }
       ],
       "alsoCloses": []
@@ -438,20 +428,8 @@
     }
   ],
   "easyWins": {
-    "note": "Small repositories that can go one PR at a time, in any order, outside a campaign. The first group needs no new DTO: every table it touches already has an EF Core DTO and configuration, so there is no migration or snapshot work. The second group needs one new DTO plus a no-op snapshot migration each.",
+    "note": "Small repositories that can go one PR at a time, in any order, outside a campaign. The first group needs no new DTO: every table it touches already has an EF Core DTO and configuration, so there is no migration or snapshot work. The second group needs one new DTO plus a no-op snapshot migration each. DataTypeUsageRepository and PropertyTypeUsageRepository were the first to go (#24780, 26-11-2026).",
     "noNewDto": [
-      {
-        "name": "DataTypeUsageRepository",
-        "lines": 53,
-        "campaign": "D",
-        "note": "Node, PropertyData, PropertyType. In review as draft #24780 (24-11-2026); review bot approved after one doc nit."
-      },
-      {
-        "name": "PropertyTypeUsageRepository",
-        "lines": 64,
-        "campaign": "D",
-        "note": "Same tables as DataTypeUsageRepository; do both in one PR. In review as draft #24780 (24-11-2026); review bot approved after one doc nit."
-      },
       {
         "name": "NodeCountRepository",
         "lines": 66,
@@ -577,6 +555,14 @@
     }
   ],
   "log": [
+    {
+      "date": "26-11-2026",
+      "text": "Usage repositories merged: DataTypeUsageRepository and PropertyTypeUsageRepository are on EF Core (#24780, 186ab8c64de); both moved to the done list and left campaign D and the easy wins. done.lines counts their 77 new lines."
+    },
+    {
+      "date": "26-11-2026",
+      "text": "Media (A): PR 3 (#24776) merged as c09a6044156 with PR 3b (#24779) inside it. Five of nine media PRs are in; PR 4 and PR 5 are next."
+    },
     {
       "date": "24-11-2026",
       "text": "Usage repositories PR #24780: review bot approved; the one doc nit applied (693466e032c). Awaiting human review."
