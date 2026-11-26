@@ -2015,12 +2015,6 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository, TConten
     protected override Task PersistUpdatedItemAsync(TEntity item) =>
         AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            if (!item.IsDirty() && !item.IsAnyUserPropertyDirty())
-            {
-                // no change to save, do nothing, don't even update dates
-                return true;
-            }
-
             ContentVersionDto version = await GetCurrentVersionRowAsync(db, item);
 
             item.UpdatingEntity();
