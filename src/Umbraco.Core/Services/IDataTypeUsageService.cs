@@ -11,6 +11,7 @@ public interface IDataTypeUsageService
     /// Checks if there are any saved property values using a given data type.
     /// </summary>
     /// <param name="dataTypeKey">The key of the data type to check.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An attempt with status and result if there are any property values using the data type, otherwise false.</returns>
-    Task<Attempt<bool, DataTypeOperationStatus>> HasSavedValuesAsync(Guid dataTypeKey);
+    Task<Attempt<bool, DataTypeOperationStatus>> HasSavedValuesAsync(Guid dataTypeKey, CancellationToken cancellationToken);
 }

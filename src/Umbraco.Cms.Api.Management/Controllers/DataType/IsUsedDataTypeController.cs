@@ -36,7 +36,7 @@ public class IsUsedDataTypeController : DataTypeControllerBase
     [EndpointDescription("Checks if the data type identified by the provided Id is used in any content, media, or member types.")]
     public async Task<IActionResult> IsUsed(CancellationToken cancellationToken, Guid id)
     {
-        Attempt<bool, DataTypeOperationStatus> result = await _dataTypeUsageService.HasSavedValuesAsync(id);
+        Attempt<bool, DataTypeOperationStatus> result = await _dataTypeUsageService.HasSavedValuesAsync(id, cancellationToken);
 
         return result.Success
             ? Ok(result.Result)

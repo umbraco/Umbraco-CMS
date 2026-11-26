@@ -31,7 +31,7 @@ public class DataTypeUsageService : IDataTypeUsageService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<bool, DataTypeOperationStatus>> HasSavedValuesAsync(Guid dataTypeKey)
+    public async Task<Attempt<bool, DataTypeOperationStatus>> HasSavedValuesAsync(Guid dataTypeKey, CancellationToken cancellationToken)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
@@ -41,7 +41,7 @@ public class DataTypeUsageService : IDataTypeUsageService
             return Attempt.FailWithStatus(DataTypeOperationStatus.NotFound, false);
         }
 
-        var hasSavedValues = await _dataTypeUsageRepository.HasSavedValuesAsync(dataTypeKey);
+        var hasSavedValues = await _dataTypeUsageRepository.HasSavedValuesAsync(dataTypeKey, cancellationToken);
 
         return Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, hasSavedValues);
     }
