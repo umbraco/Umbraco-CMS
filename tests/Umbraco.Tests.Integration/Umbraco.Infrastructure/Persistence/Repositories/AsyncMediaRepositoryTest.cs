@@ -222,6 +222,7 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
             Assert.That(image.GetValue<string>(Constants.Conventions.Media.File), Is.EqualTo("/media/test-image.png"));
             Assert.That(image.GetValue<string>(Constants.Conventions.Media.Extension), Is.EqualTo("png"));
         });
+        TestHelper.AssertPropertyValuesAreEqual(image, saved);
     }
 
     [Test]
@@ -610,10 +611,14 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
 
+        Media inSizedFolder = MediaBuilder.CreateMediaImage(_imageType, Constants.System.Root);
+        inSizedFolder.SetValue(Constants.Conventions.Media.File, "/media/dir_1x1.v2/test-image.png");
+        await repository.SaveAsync(inSizedFolder, CancellationToken.None);
+
         IMedia? byPath = await repository.GetMediaByPathAsync("/media/test-image.png", CancellationToken.None);
         IMedia? byResizedPath = await repository.GetMediaByPathAsync("/media/test-image_403x328.png", CancellationToken.None);
         IMedia? missing = await repository.GetMediaByPathAsync("/media/missing.png", CancellationToken.None);
-        IMedia? sizeInFolderName = await repository.GetMediaByPathAsync("/media/1x1_dir/test-image.png", CancellationToken.None);
+        IMedia? sizeInFolderName = await repository.GetMediaByPathAsync("/media/dir_1x1.v2/test-image.png", CancellationToken.None);
         scope.Complete();
 
         Assert.Multiple(() =>
@@ -622,7 +627,7 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
             Assert.That(byPath!.Properties.Count, Is.Not.Zero);
             Assert.That(byResizedPath?.Key, Is.EqualTo(_testImage.Key));
             Assert.That(missing, Is.Null);
-            Assert.That(sizeInFolderName, Is.Null, "only a suffix directly before the extension is a rendition marker");
+            Assert.That(sizeInFolderName?.Key, Is.EqualTo(inSizedFolder.Key), "a size token in a directory name is not a rendition marker, so the path is looked up as given");
         });
     }
 
@@ -912,6 +917,38 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
         {
             Assert.That(beforeTrashing, Is.False);
             Assert.That(afterTrashing, Is.True);
+        });
+    }
+
+    [Test]
+    public async Task RecycleBinSmellsAsync_CachesTheAnswerUnderTheMediaRecycleBinKey()
+    {
+        AppCaches appCaches = CreateRealAppCaches();
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository(appCaches);
+
+        bool? first = null;
+        bool? second = null;
+        bool? afterClear = null;
+        var firstCount = await CountCommandsAsync(async () => first = await repository.RecycleBinSmellsAsync(CancellationToken.None));
+        var secondCount = await CountCommandsAsync(async () => second = await repository.RecycleBinSmellsAsync(CancellationToken.None));
+
+        Media trashed = MediaBuilder.CreateMediaFolder(_folderType, Constants.System.RecycleBinMedia);
+        trashed.Trashed = true;
+        await repository.SaveAsync(trashed, CancellationToken.None);
+        appCaches.RuntimeCache.ClearByKey(CacheKeys.MediaRecycleBinCacheKey);
+
+        var afterClearCount = await CountCommandsAsync(async () => afterClear = await repository.RecycleBinSmellsAsync(CancellationToken.None));
+        scope.Complete();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(first, Is.False);
+            Assert.That(firstCount, Is.GreaterThan(0), "the first answer comes from the database");
+            Assert.That(second, Is.False);
+            Assert.That(secondCount, Is.Zero, "the second answer is served from the cache");
+            Assert.That(afterClear, Is.True, "clearing the media recycle bin key makes the next call look again");
+            Assert.That(afterClearCount, Is.GreaterThan(0));
         });
     }
 
