@@ -52,12 +52,12 @@ public class ServerInformationServiceTests
     }
 
     [Test]
-    public void GetServerInformation_Returns_DeniedPermissions_From_EnvironmentPermissions_In_Ordinal_Order()
+    public void GetServerInformation_Returns_DeniedPermissions_From_EnvironmentPermissions()
     {
         ServerInformation result = CreateSut(deniedPermissions: ["Umb.Template.Update", "Umb.DataType.Create", "Umb.DataType.Update"])
             .GetServerInformation();
 
-        Assert.That(result.DeniedPermissions, Is.EqualTo(new[] { "Umb.DataType.Create", "Umb.DataType.Update", "Umb.Template.Update" }));
+        Assert.That(result.DeniedPermissions, Is.EquivalentTo(new[] { "Umb.DataType.Create", "Umb.DataType.Update", "Umb.Template.Update" }));
     }
 
     [Test]

@@ -66,7 +66,7 @@ public class ServerInformationService : IServerInformationService
     /// <param name="timeProvider">The time provider for timezone information.</param>
     /// <param name="runtimeSettingsOptionsMonitor">The runtime settings monitor.</param>
     /// <param name="hostingEnvironment">The hosting environment.</param>
-    /// <param name="environmentPermissions">The permission verbs the environment denies.</param>
+    /// <param name="environmentPermissions">The environment permissions, which supply the denied permission verbs.</param>
     public ServerInformationService(
         IUmbracoVersion umbracoVersion,
         TimeProvider timeProvider,
@@ -89,5 +89,5 @@ public class ServerInformationService : IServerInformationService
             _timeProvider.LocalTimeZone,
             _runtimeSettings.Mode,
             _hostingEnvironment.IsDebugMode,
-            _environmentPermissions.DeniedPermissions.Order(StringComparer.Ordinal).ToArray());
+            _environmentPermissions.DeniedPermissions);
 }
