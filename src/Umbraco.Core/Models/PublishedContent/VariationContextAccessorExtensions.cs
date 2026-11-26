@@ -11,6 +11,8 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class VariationContextAccessorExtensions
 {
+    private static readonly Func<IEnumerable<string>?> _noAvailableSegments = () => null;
+
     /// <summary>
     ///     Contextualizes the variation based on the content variation settings and property alias.
     /// </summary>
@@ -25,7 +27,7 @@ public static class VariationContextAccessorExtensions
         string? propertyAlias,
         ref string? culture,
         ref string? segment)
-        => variationContextAccessor.ContextualizeVariation(variations, null, propertyAlias, ref culture, ref segment);
+        => variationContextAccessor.ContextualizeVariation(variations, null, propertyAlias, ref culture, ref segment, null);
 
     /// <summary>
     ///     Contextualizes the variation based on the content variation settings, content ID, and property alias.
@@ -43,7 +45,27 @@ public static class VariationContextAccessorExtensions
         string? propertyAlias,
         ref string? culture,
         ref string? segment)
-        => variationContextAccessor.ContextualizeVariation(variations, (int?)contentId, propertyAlias, ref culture, ref segment);
+        => variationContextAccessor.ContextualizeVariation(variations, (int?)contentId, propertyAlias, ref culture, ref segment, null);
+
+    /// <summary>
+    ///     Contextualizes the variation based on the content variation settings, content ID, and property alias.
+    /// </summary>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
+    /// <param name="variations">The content variation settings.</param>
+    /// <param name="contentId">The content ID.</param>
+    /// <param name="propertyAlias">The property alias.</param>
+    /// <param name="culture">The culture, which may be set based on the variation context.</param>
+    /// <param name="segment">The segment, which may be set based on the variation context.</param>
+    /// <param name="propertySegmentsForCulture">A factory method to resolve the available property value segments for a given culture at source level. It returns an empty collection when the property is known to have no segment values, and null when no segment information is available. Overloads without this parameter, such as those used when resolving a value through the published value fallback, provide no segment information, so the factory handed to the variation context returns null.</param>
+    public static void ContextualizeVariation(
+        this IVariationContextAccessor variationContextAccessor,
+        ContentVariation variations,
+        int contentId,
+        string? propertyAlias,
+        ref string? culture,
+        ref string? segment,
+        Func<string?, IEnumerable<string>?>? propertySegmentsForCulture)
+        => variationContextAccessor.ContextualizeVariation(variations, (int?)contentId, propertyAlias, ref culture, ref segment, propertySegmentsForCulture);
 
     private static void ContextualizeVariation(
         this IVariationContextAccessor variationContextAccessor,
@@ -51,7 +73,8 @@ public static class VariationContextAccessorExtensions
         int? contentId,
         string? propertyAlias,
         ref string? culture,
-        ref string? segment)
+        ref string? segment,
+        Func<string?, IEnumerable<string>?>? propertySegmentsForCulture)
     {
         if (culture != null && segment != null)
         {
@@ -74,7 +97,7 @@ public static class VariationContextAccessorExtensions
                 {
                     segment = propertyAlias == null ?
                         publishedVariationContext?.GetSegment(contentId.Value) :
-                        publishedVariationContext?.GetSegment(contentId.Value, propertyAlias);
+                        GetPropertySegment(publishedVariationContext, contentId.Value, propertyAlias, culture, propertySegmentsForCulture);
                 }
             }
             else
@@ -83,4 +106,19 @@ public static class VariationContextAccessorExtensions
             }
         }
     }
+
+    private static string? GetPropertySegment(
+        VariationContext? variationContext,
+        int contentId,
+        string propertyAlias,
+        string? culture,
+        Func<string?, IEnumerable<string>?>? propertySegmentsForCulture)
+        => variationContext?.GetSegment(
+            contentId,
+            propertyAlias,
+            propertySegmentsForCulture is null ? _noAvailableSegments : BindCulture(propertySegmentsForCulture, culture));
+
+    // Kept separate from GetPropertySegment so the closure is only allocated when there is a factory to bind.
+    private static Func<IEnumerable<string>?> BindCulture(Func<string?, IEnumerable<string>?> propertySegmentsForCulture, string? culture)
+        => () => propertySegmentsForCulture(culture);
 }

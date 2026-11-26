@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
@@ -35,6 +34,10 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     // the variant source and inter values
     private readonly Lock _locko = new();
     private ConcurrentDictionary<CompositeStringStringKey, SourceInterValue>? _sourceValues;
+
+    private static readonly IReadOnlyList<string> _noSegments = Array.AsReadOnly(Array.Empty<string>());
+
+    private Dictionary<string, IReadOnlyList<string>>? _sourceSegmentsByCulture;
 
     // initializes a published content property with a value
     public PublishedProperty(
@@ -103,7 +106,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     // determines whether a property has value
     public override bool HasValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_variations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment, SegmentsForCultureFactory(_variations, segment));
 
         var value = GetSourceValue(culture, segment);
         var isValue = PropertyType.IsValue(value, PropertyValueLevel.Source);
@@ -127,7 +130,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetSourceValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_sourceVariations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_sourceVariations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment, SegmentsForCultureFactory(_sourceVariations, segment));
 
         // source values are tightly bound to the property/schema culture and segment configurations, so we need to
         // sanitize the contextualized culture/segment states before using them to access the source values.
@@ -170,7 +173,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_variations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment, SegmentsForCultureFactory(_variations, segment));
 
         // Include the fallback policy in the cache key so that different fallback strategies
         // produce separate cached values (e.g., block editors filter differently with Fallback.ToLanguage).
@@ -239,7 +242,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_variations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment, SegmentsForCultureFactory(_variations, segment));
 
         object? value;
         CacheValue cacheValues = GetCacheValues(expanding ? PropertyType.DeliveryApiCacheLevelForExpansion : PropertyType.DeliveryApiCacheLevel).For(culture, segment);
@@ -394,4 +397,50 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     }
 
     private int ContentIdForContextualization => _owningContentId ?? _element.Id;
+
+    private Func<string?, IEnumerable<string>?>? SegmentsForCultureFactory(ContentVariation variations, string? segment)
+        => segment is null && variations.VariesBySegment() ? SourceSegmentsForCulture : null;
+
+    private IEnumerable<string>? SourceSegmentsForCulture(string? culture)
+    {
+        if (_sourceValues is null)
+        {
+            return _noSegments;
+        }
+
+        // Computed lazily on this hot path (property rendering) to avoid adding memory to every published property,
+        // even when segments are not in play. Source values are only populated by the constructor, so the result
+        // never goes stale.
+        if (_sourceSegmentsByCulture is null)
+        {
+            var segmentsByCulture = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+            foreach (SourceInterValue sourceValue in _sourceValues.Values)
+            {
+                var valueCulture = sourceValue.Culture ?? string.Empty;
+                if (segmentsByCulture.TryGetValue(valueCulture, out List<string>? segments) is false)
+                {
+                    segments = new List<string>();
+                    segmentsByCulture[valueCulture] = segments;
+                }
+
+                if (sourceValue.Segment.IsNullOrWhiteSpace() is false)
+                {
+                    segments.Add(sourceValue.Segment);
+                }
+            }
+
+            // Read-only, as the segments are shared across requests and handed out to variation contexts.
+            var sourceSegmentsByCulture = new Dictionary<string, IReadOnlyList<string>>(segmentsByCulture.Count, StringComparer.OrdinalIgnoreCase);
+            foreach (KeyValuePair<string, List<string>> segmentsForCulture in segmentsByCulture)
+            {
+                sourceSegmentsByCulture[segmentsForCulture.Key] = Array.AsReadOnly(segmentsForCulture.Value.ToArray());
+            }
+
+            _sourceSegmentsByCulture = sourceSegmentsByCulture;
+        }
+
+        return _sourceSegmentsByCulture.TryGetValue(_sourceVariations.VariesByCulture() ? culture ?? string.Empty : string.Empty, out var sourceSegmentsForCulture)
+            ? sourceSegmentsForCulture
+            : _noSegments;
+    }
 }

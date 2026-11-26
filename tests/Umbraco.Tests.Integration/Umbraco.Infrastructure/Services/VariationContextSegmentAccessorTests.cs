@@ -783,10 +783,10 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
 
     private class ContextTrackingVariationContext : VariationContext
     {
-        public override string GetSegment(int contentId, string propertyAlias)
+        public override string GetSegment(int contentId, string propertyAlias, Func<IEnumerable<string>?> availableSegments)
         {
             LastTrackedContentId = contentId;
-            return base.GetSegment(contentId, propertyAlias);
+            return base.GetSegment(contentId, propertyAlias, availableSegments);
         }
 
         public int LastTrackedContentId { get; private set; }
