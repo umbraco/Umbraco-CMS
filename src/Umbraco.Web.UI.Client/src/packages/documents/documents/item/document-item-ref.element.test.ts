@@ -114,7 +114,10 @@ describe('UmbDocumentItemRefElement', () => {
 	});
 
 	describe('ancestor path', () => {
-		const createAncestor = (unique: string, variants: Array<{ culture: string | null; name: string }>) => ({
+		const createAncestor = (
+			unique: string,
+			variants: Array<{ culture: string | null; name: string }>,
+		): UmbDocumentItemModel => ({
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			unique,
 			documentType: { unique: 'dt-1', icon: 'icon-document', collection: null },
