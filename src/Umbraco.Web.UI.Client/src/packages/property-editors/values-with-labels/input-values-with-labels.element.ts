@@ -85,26 +85,39 @@ export class UmbInputValuesWithLabelsElement extends UmbFormControlMixin<undefin
 	constructor() {
 		super();
 
+		// The label is checked first: typing a repeated label into an added option also repeats the value filled in from it.
+		this.#addUniquenessValidator('general_label', () => this.#duplicateLabel());
+		this.#addUniquenessValidator('general_value', () => this.#duplicateValue());
+	}
+
+	#addUniquenessValidator(fieldKey: UmbKnownLocalizationKey, getDuplicate: () => string | undefined) {
 		this.addValidator(
 			'customError',
 			() =>
 				this.localize.term(
-					'validation_valueMustBeUnique',
-					escapeHTML(this.#duplicateValues().values().next().value ?? ''),
+					'validation_duplicateFieldValue',
+					this.localize.term(fieldKey),
+					escapeHTML(getDuplicate() ?? ''),
 				),
-			() => this.#duplicateValues().size > 0,
+			() => getDuplicate() !== undefined,
 		);
 	}
 
-	#duplicateValues() {
-		const seen = new Set<string>();
-		const duplicates = new Set<string>();
-		for (const { value } of this._entries) {
-			const key = value.trim() === '' ? '' : value;
-			if (seen.has(key)) duplicates.add(key);
-			seen.add(key);
-		}
-		return duplicates;
+	#findDuplicate(items: Array<string>) {
+		return items.find((item, index) => items.indexOf(item) !== index);
+	}
+
+	#duplicateValue() {
+		return this.#findDuplicate(this._entries.map(({ value }) => (value.trim() === '' ? '' : value)));
+	}
+
+	// Missing labels are reported by the required rule.
+	#duplicateLabel() {
+		return this.#findDuplicate(this._entries.map(({ label }) => label.trim()).filter((label) => label !== ''));
+	}
+
+	#hasDuplicates() {
+		return this.#duplicateValue() !== undefined || this.#duplicateLabel() !== undefined;
 	}
 
 	#onAdd() {
@@ -124,7 +137,7 @@ export class UmbInputValuesWithLabelsElement extends UmbFormControlMixin<undefin
 	}
 
 	#onOptionFocusOut() {
-		if (this.#duplicateValues().size > 0) super.checkValidity();
+		if (this.#hasDuplicates()) super.checkValidity();
 	}
 
 	override checkValidity() {

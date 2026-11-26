@@ -47,7 +47,7 @@
     needMoreItems: 'This field needs more items',
     minimumTwoEntriesRequiresOneMore: 'Minimum 2 entries, requires 1 more.',
     invalidObjectType: 'The selected item is of the wrong type.',
-    valueNotUnique: 'Values must be unique',
+    duplicateFieldValue: (field: string, value: string) => `${field} "${value}" is used more than once`,
   }
 
   public static readonly inputTypes = {

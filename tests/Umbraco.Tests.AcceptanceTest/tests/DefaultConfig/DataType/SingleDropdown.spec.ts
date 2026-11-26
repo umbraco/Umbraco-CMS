@@ -126,11 +126,28 @@ test('cannot save two options with the same value', async ({umbracoApi, umbracoU
 
   // Act
   await umbracoUi.dataType.clickAddOptionButton();
+  await umbracoUi.dataType.enterOptionLabel('Another option');
+  await umbracoUi.dataType.enterOptionValue('testOption');
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isValidationMessageVisible(ConstantHelper.validationMessages.duplicateFieldValue('Value', 'testOption'));
+  const dataType = await umbracoApi.dataType.getByName(customDataTypeName);
+  expect(dataType.values.find(item => item.alias === 'items').value).toHaveLength(1);
+});
+
+test('cannot save two options with the same label', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.dataType.createSingleDropdownDataType(customDataTypeName, [{value: 'testOption', label: 'Test option'}]);
+  await umbracoUi.dataType.goToDataType(customDataTypeName);
+
+  // Act
+  await umbracoUi.dataType.clickAddOptionButton();
   await umbracoUi.dataType.enterOptionLabel('Test option');
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isValidationMessageVisible(ConstantHelper.validationMessages.valueNotUnique);
+  await umbracoUi.dataType.isValidationMessageVisible(ConstantHelper.validationMessages.duplicateFieldValue('Label', 'Test option'));
   const dataType = await umbracoApi.dataType.getByName(customDataTypeName);
   expect(dataType.values.find(item => item.alias === 'items').value).toHaveLength(1);
 });
@@ -147,7 +164,7 @@ test('cannot save two options with an empty value', async ({umbracoApi, umbracoU
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isValidationMessageVisible(ConstantHelper.validationMessages.valueNotUnique);
+  await umbracoUi.dataType.isValidationMessageVisible(ConstantHelper.validationMessages.duplicateFieldValue('Value', ''));
   const dataType = await umbracoApi.dataType.getByName(customDataTypeName);
   expect(dataType.values.find(item => item.alias === 'items').value).toHaveLength(1);
 });

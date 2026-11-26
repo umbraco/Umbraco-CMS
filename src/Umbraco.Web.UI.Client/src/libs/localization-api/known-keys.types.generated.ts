@@ -2753,6 +2753,7 @@ declare global {
 		validation_customValidation: string;
 		validation_disallowedExtensions: string;
 		validation_duplicateEmail: string;
+		validation_duplicateFieldValue: string;
 		validation_duplicateMemberGroupName: string;
 		validation_duplicateUserGroupName: string;
 		validation_duplicateUsername: string;
@@ -2801,7 +2802,6 @@ declare global {
 		validation_validationPattern: string;
 		validation_validationRegExp: string;
 		validation_validationRegExpMessage: string;
-		validation_valueMustBeUnique: string;
 		visuallyHiddenTexts_activeListLayout: string;
 		visuallyHiddenTexts_addImageCaption: string;
 		visuallyHiddenTexts_addNewRow: string;

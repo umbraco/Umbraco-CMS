@@ -3,6 +3,8 @@ import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbInputValueWithLabelElement } from './input-value-with-label.element.js';
+import type { UmbLocalizationSet } from '@umbraco-cms/backoffice/localization-api';
+import { UMB_DEFAULT_LOCALIZATION_CULTURE, umbLocalizationManager } from '@umbraco-cms/backoffice/localization-api';
 
 describe('UmbPropertyEditorUIValuesWithLabelsElement', () => {
 	let element: UmbPropertyEditorUIValuesWithLabelsElement;
@@ -25,11 +27,33 @@ describe('UmbPropertyEditorUIValuesWithLabelsElement', () => {
 		return row.shadowRoot!.querySelector(`uui-input.${field}`) as UUIInputElement;
 	}
 
-	// The uniqueness rule is the only custom validator of the list.
-	function hasUniquenessError() {
+	// The uniqueness rules are the only custom validators of the list.
+	function getUniquenessMessage() {
 		getInput().checkValidity();
-		return getInput().validity.customError === true;
+		return getInput().validity.customError === true ? getInput().validationMessage : undefined;
 	}
+
+	const messages: UmbLocalizationSet = {
+		$code: UMB_DEFAULT_LOCALIZATION_CULTURE,
+		$dir: 'ltr',
+		general_label: 'Label',
+		general_value: 'Value',
+		validation_duplicateFieldValue: '%0% "%1%" is used more than once',
+	};
+	let previousFallback: ReturnType<typeof umbLocalizationManager.localizations.get>;
+
+	before(() => {
+		previousFallback = umbLocalizationManager.localizations.get(UMB_DEFAULT_LOCALIZATION_CULTURE);
+		umbLocalizationManager.registerLocalization(messages);
+	});
+
+	after(() => {
+		if (previousFallback) {
+			umbLocalizationManager.localizations.set(UMB_DEFAULT_LOCALIZATION_CULTURE, previousFallback);
+		} else {
+			umbLocalizationManager.localizations.delete(UMB_DEFAULT_LOCALIZATION_CULTURE);
+		}
+	});
 
 	async function add() {
 		(getInput().shadowRoot!.querySelector('#action') as HTMLElement).click();
@@ -92,7 +116,7 @@ describe('UmbPropertyEditorUIValuesWithLabelsElement', () => {
 
 		await setValue([{ value: 'a', label: 'Ay' }]);
 		const columns = Array.from(getHeader()!.querySelectorAll('span')).map((column) => column.textContent!.trim());
-		expect(columns).to.deep.equal(['general_label', 'general_value']);
+		expect(columns).to.deep.equal(['Label', 'Value']);
 	});
 
 	it('emits the edited label next to the value', async () => {
@@ -222,10 +246,10 @@ describe('UmbPropertyEditorUIValuesWithLabelsElement', () => {
 		]);
 	});
 
-	it('reports a value that is used more than once as not unique', async () => {
+	it('reports a value that is used more than once, naming the value', async () => {
 		await setValue([{ value: 'a' }, { value: 'b' }, { value: 'a' }]);
 
-		expect(hasUniquenessError()).to.be.true;
+		expect(getUniquenessMessage()).to.equal('Value "a" is used more than once');
 	});
 
 	it('reports blank values as duplicates of each other', async () => {
@@ -234,21 +258,57 @@ describe('UmbPropertyEditorUIValuesWithLabelsElement', () => {
 			{ value: ' ', label: 'Nothing' },
 		]);
 
-		expect(hasUniquenessError()).to.be.true;
+		expect(getUniquenessMessage()).to.equal('Value "" is used more than once');
+	});
+
+	it('reports a label that is used more than once, ignoring surrounding whitespace, naming the label', async () => {
+		await setValue([
+			{ value: 'a', label: 'Small' },
+			{ value: 'b', label: ' Small ' },
+		]);
+
+		expect(getUniquenessMessage()).to.equal('Label "Small" is used more than once');
+	});
+
+	it('compares labels case-sensitively, and leaves missing labels to the required rule', async () => {
+		await setValue([
+			{ value: 'a', label: 'Small' },
+			{ value: 'b', label: 'small' },
+			{ value: 'c', label: '' },
+			{ value: 'd', label: ' ' },
+		]);
+
+		expect(getUniquenessMessage()).to.be.undefined;
+	});
+
+	it('reports a repeated label before the value filled in from it', async () => {
+		await setValue([{ value: 'small', label: 'Small' }]);
+		await add();
+
+		await type(getRows()[1], 'label', 'Small');
+
+		expect(element.value).to.deep.equal([
+			{ value: 'small', label: 'Small' },
+			{ value: 'small', label: 'Small' },
+		]);
+		expect(getUniquenessMessage()).to.equal('Label "Small" is used more than once');
 	});
 
 	it('shows the uniqueness message in the list once an option is left', async () => {
-		await setValue([{ value: 'a' }, { value: 'b' }]);
+		await setValue([
+			{ value: 'a', label: 'A' },
+			{ value: 'b', label: 'B' },
+		]);
 		const message = getInput().shadowRoot!.querySelector('umb-form-validation-message')!;
 
 		await type(getRows()[1], 'value', 'a');
 		await message.updateComplete;
-		expect(message.shadowRoot!.textContent).to.not.contain('MustBeUnique');
+		expect(message.shadowRoot!.textContent).to.not.contain('is used more than once');
 
 		await leave(getRows()[1]);
 		await getInput().updateComplete;
 		await message.updateComplete;
-		expect(message.shadowRoot!.textContent).to.contain('MustBeUnique');
+		expect(message.shadowRoot!.textContent).to.contain('Value "a" is used more than once');
 	});
 
 	it('dispatches one change for each edit and one for each removal', async () => {
