@@ -1,6 +1,7 @@
 import { css, customElement, html, nothing, property, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
@@ -61,7 +62,7 @@ export class UmbInputValueListOptionElement extends UUIFormControlWithBasicsMixi
 	#onLabelInput(event: UUIInputEvent) {
 		event.stopPropagation();
 		this.label = (event.currentTarget as UUIInputElement).value as string;
-		if (this.isNew && !this.#valueEdited) this.value = this.label;
+		if (this.isNew && !this.#valueEdited) this.value = generateAlias(this.label);
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 

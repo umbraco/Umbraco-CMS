@@ -19,6 +19,7 @@ test.afterEach(async ({umbracoApi}) => {
 test('can add option', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const optionName = 'Test option';
+  const optionValue = 'testOption';
   await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
 
@@ -28,7 +29,7 @@ test('can add option', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveOption(customDataTypeName, optionName, optionName)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveOption(customDataTypeName, optionValue, optionName)).toBeTruthy();
 });
 
 test('can remove option', async ({umbracoApi, umbracoUi}) => {
@@ -87,7 +88,7 @@ test('fills in the value from the label of an added option', async ({umbracoApi,
   await umbracoUi.dataType.enterOptionLabel('Test option');
 
   // Assert
-  await umbracoUi.dataType.doesLastOptionHaveValueAndLabel('Test option', 'Test option');
+  await umbracoUi.dataType.doesLastOptionHaveValueAndLabel('testOption', 'Test option');
 });
 
 test('stops filling in the value once it has been edited', async ({umbracoApi, umbracoUi}) => {
@@ -137,7 +138,7 @@ test('can save an option with an empty value', async ({umbracoApi, umbracoUi}) =
 
 test('cannot save two options with the same value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName, [{value: 'Test option', label: 'Test option'}]);
+  await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName, [{value: 'testOption', label: 'Test option'}]);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act

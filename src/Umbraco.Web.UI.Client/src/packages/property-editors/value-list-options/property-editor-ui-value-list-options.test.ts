@@ -152,15 +152,15 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 		expect(getField(filledRow, 'label').validity.valid).to.be.true;
 	});
 
-	it('fills in the value of an added option from its label until the value is edited', async () => {
+	it('fills in the value of an added option with an alias of its label until the value is edited', async () => {
 		await setValue([{ value: 'a', label: 'A' }]);
 		await add();
 		const row = getRows()[1];
 
-		await type(row, 'label', 'Bee');
+		await type(row, 'label', 'Bumble Bee');
 		expect(element.value).to.deep.equal([
 			{ value: 'a', label: 'A' },
-			{ value: 'Bee', label: 'Bee' },
+			{ value: 'bumbleBee', label: 'Bumble Bee' },
 		]);
 
 		await type(row, 'value', 'b');
