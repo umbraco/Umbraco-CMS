@@ -38,6 +38,31 @@ describe('UmbVariantValidationToHintsManager', () => {
 		expect(all[0].variantId?.compare(variantId)).to.be.true;
 	});
 
+	it('adds the hint to the segment of the variant validation message', () => {
+		const variantId = new UmbVariantId('da-dk', 'vip');
+		validation.messages.addMessage('custom', variantNamePath(variantId), 'error', 'msg-1');
+
+		const all = hints.getAll();
+		expect(all).to.have.length(1);
+		expect(all[0].variantId?.culture).to.equal('da-dk');
+		expect(all[0].variantId?.segment).to.equal('vip');
+	});
+
+	it('adds the hint to the variant of a validation message nested within the variant data', () => {
+		const variantId = new UmbVariantId('da-dk', 'vip');
+		validation.messages.addMessage(
+			'custom',
+			`$.variants[${UmbDataPathVariantQuery(variantId)}].schedule[?(@.type == 'publish')].date`,
+			'error',
+			'msg-1',
+		);
+
+		const all = hints.getAll();
+		expect(all).to.have.length(1);
+		expect(all[0].variantId?.culture).to.equal('da-dk');
+		expect(all[0].variantId?.segment).to.equal('vip');
+	});
+
 	it('removes the hint when the validation message is removed', () => {
 		validation.messages.addMessage('custom', variantNamePath(new UmbVariantId('da-dk', null)), 'error', 'msg-1');
 
