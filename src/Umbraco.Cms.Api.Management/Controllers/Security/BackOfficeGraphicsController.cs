@@ -22,10 +22,29 @@ namespace Umbraco.Cms.Api.Management.Controllers.Security;
 [ApiExplorerSettings(IgnoreApi = true)]
 public class BackOfficeGraphicsController : Controller
 {
+    /// <summary>
+    /// The route name of the <see cref="Logo"/> endpoint.
+    /// </summary>
     public const string LogoRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(Logo);
+
+    /// <summary>
+    /// The route name of the <see cref="LogoAlternative"/> endpoint.
+    /// </summary>
     public const string LogoAlternativeRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LogoAlternative);
+
+    /// <summary>
+    /// The route name of the <see cref="LoginBackground"/> endpoint.
+    /// </summary>
     public const string LoginBackGroundRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginBackground);
+
+    /// <summary>
+    /// The route name of the <see cref="LoginLogo"/> endpoint.
+    /// </summary>
     public const string LoginLogoRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginLogo);
+
+    /// <summary>
+    /// The route name of the <see cref="LoginLogoAlternative"/> endpoint.
+    /// </summary>
     public const string LoginLogoAlternativeRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginLogoAlternative);
 
     /// <summary>
@@ -120,7 +139,7 @@ public class BackOfficeGraphicsController : Controller
         var filePath = $"{Constants.SystemDirectories.Umbraco}/{virtualPath}".TrimStart(Constants.CharArrays.Tilde);
         IFileInfo fileInfo = _webHostEnvironment.WebRootFileProvider.GetFileInfo(filePath);
 
-        if (!fileInfo.Exists || fileInfo.PhysicalPath is null)
+        if (fileInfo.Exists is false || fileInfo.PhysicalPath is null)
         {
             return NotFound();
         }
