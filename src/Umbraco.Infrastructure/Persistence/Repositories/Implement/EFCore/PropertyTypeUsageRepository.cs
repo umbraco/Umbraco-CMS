@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 /// </summary>
 internal sealed class PropertyTypeUsageRepository : IPropertyTypeUsageRepository
 {
-    private static readonly List<Guid> _contentTypeObjectTypes =
+    private static readonly IReadOnlyList<Guid> _contentTypeObjectTypes =
     [
         Constants.ObjectTypes.DocumentType, Constants.ObjectTypes.MediaType, Constants.ObjectTypes.MemberType,
     ];
