@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Text.Json.Nodes;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -8,6 +9,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -551,6 +553,107 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         Assert.IsAssignableFrom(typeof(MissingPropertyEditor), actual.Editor);
         Assert.AreEqual("Test Editor", actual.EditorAlias, "The alias should be the same as the original editor");
         Assert.AreEqual("Umb.PropertyEditorUi.Missing", actual.EditorUiAlias, "The editor UI alias should be the Missing Editor UI");
+    }
+
+    [Test]
+    public async Task Can_Save_Value_List_With_Labelled_Options()
+    {
+        var dataType = CreateValueListDataType("""[{"value":"a","label":"A"},{"value":"b","label":"B"}]""");
+
+        var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        IDataType? actual = await DataTypeService.GetAsync(dataType.Key);
+        var configuration = actual!.ConfigurationObject as ValueListConfiguration;
+        Assert.IsNotNull(configuration);
+        Assert.AreEqual(2, configuration!.Items.Count);
+        Assert.AreEqual("a", configuration.Items[0].Value);
+        Assert.AreEqual("A", configuration.Items[0].Label);
+        Assert.AreEqual("b", configuration.Items[1].Value);
+        Assert.AreEqual("B", configuration.Items[1].Label);
+
+        Assert.IsTrue(JsonNode.DeepEquals(JsonNode.Parse("""[{"value":"a","label":"A"},{"value":"b","label":"B"}]"""), GetStoredItems(actual.Id)));
+    }
+
+    [Test]
+    public async Task Cannot_Save_Value_List_With_Plain_String_Options()
+    {
+        var dataType = CreateValueListDataType("""["a","b"]""");
+
+        var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DataTypeOperationStatus.InvalidConfiguration, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Save_Value_List_With_Duplicate_Values()
+    {
+        var dataType = CreateValueListDataType("""[{"value":"a","label":"A"},{"value":"a","label":"B"}]""");
+
+        var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DataTypeOperationStatus.InvalidConfiguration, result.Status);
+    }
+
+    [TestCase("""[{"value":"a"}]""")]
+    [TestCase("""[{"value":"a","label":""}]""")]
+    [TestCase("""[{"value":"","label":""}]""")]
+    public async Task Cannot_Save_Value_List_With_Option_Without_Label(string itemsJson)
+    {
+        var dataType = CreateValueListDataType(itemsJson);
+
+        var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DataTypeOperationStatus.InvalidConfiguration, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Save_Value_List_With_Blank_Value_Option()
+    {
+        var dataType = CreateValueListDataType("""[{"value":"","label":"None"},{"value":"a","label":"A"}]""");
+
+        var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        IDataType? actual = await DataTypeService.GetAsync(dataType.Key);
+        var configuration = actual!.ConfigurationObject as ValueListConfiguration;
+        Assert.IsNotNull(configuration);
+        Assert.AreEqual(2, configuration!.Items.Count);
+        Assert.AreEqual(string.Empty, configuration.Items[0].Value);
+    }
+
+    [Test]
+    public async Task Cannot_Save_Value_List_With_Duplicate_Blank_Values()
+    {
+        var dataType = CreateValueListDataType("""[{"value":"","label":"None"},{"value":"","label":"Nothing"}]""");
+
+        var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DataTypeOperationStatus.InvalidConfiguration, result.Status);
+    }
+
+    private IDataEditor GetValueListEditor()
+        => GetRequiredService<PropertyEditorCollection>()[Constants.PropertyEditors.Aliases.CheckBoxList]!;
+
+    private DataType CreateValueListDataType(string itemsJson)
+        => new(GetValueListEditor(), ConfigurationEditorJsonSerializer)
+        {
+            Name = "Value list",
+            DatabaseType = ValueStorageType.Nvarchar,
+            ConfigurationData = ConfigurationEditorJsonSerializer.Deserialize<Dictionary<string, object>>($$"""{"items":{{itemsJson}}}""")!,
+        };
+
+    private JsonNode? GetStoredItems(int dataTypeId)
+    {
+        using IScope scope = ScopeProvider.CreateScope();
+        var config = scope.Database.ExecuteScalar<string>("SELECT config FROM umbracoDataType WHERE nodeId = @0", dataTypeId);
+        scope.Complete();
+
+        return JsonNode.Parse(config)!["items"];
     }
 
     private class TestEditor : DataEditor

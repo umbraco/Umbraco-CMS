@@ -2760,6 +2760,7 @@ declare global {
 		validation_customValidation: string;
 		validation_disallowedExtensions: string;
 		validation_duplicateEmail: string;
+		validation_duplicateFieldValue: string;
 		validation_duplicateMemberGroupName: string;
 		validation_duplicateUserGroupName: string;
 		validation_duplicateUsername: string;
@@ -2771,6 +2772,7 @@ declare global {
 		validation_invalidDate: string;
 		validation_invalidEmail: string;
 		validation_invalidEmpty: string;
+		validation_invalidEmptyField: string;
 		validation_invalidExtensions: string;
 		validation_invalidFalse: string;
 		validation_invalidMemberGroupName: string;

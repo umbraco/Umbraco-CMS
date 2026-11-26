@@ -1,7 +1,8 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
+import {ValueListOptionBuilder} from './valueListBuilder';
 
 export class RadioboxDataTypeBuilder extends DataTypeBuilder {
-  items: string[];
+  optionBuilders: ValueListOptionBuilder<RadioboxDataTypeBuilder>[] = [];
 
   constructor() {
     super();
@@ -9,18 +10,19 @@ export class RadioboxDataTypeBuilder extends DataTypeBuilder {
     this.editorUiAlias = 'Umb.PropertyEditorUi.RadioButtonList';
   }
 
-  withItems(items: string[]) {
-    this.items = items;
-    return this;
+  addItem() {
+    const builder = new ValueListOptionBuilder<RadioboxDataTypeBuilder>(this);
+    this.optionBuilders.push(builder);
+    return builder;
   }
 
   getValues() {
     let values: any[] = [];
 
-    if (this.items && this.items.length > 0) {
+    if (this.optionBuilders.length > 0) {
       values.push({
         alias: 'items',
-        value: this.items
+        value: this.optionBuilders.map(builder => builder.getValues())
       });
     }
     return values;

@@ -1280,7 +1280,11 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'items',
-				value: ['One', 'Two', 'Three'],
+				value: [
+					{ value: 'One', label: 'One' },
+					{ value: 'Two', label: 'Two' },
+					{ value: 'Three', label: 'Three' },
+				],
 			},
 			{
 				alias: 'umbMigrationV14',
@@ -1305,7 +1309,11 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'items',
-				value: ['One', 'Two', 'Three'],
+				value: [
+					{ value: 'One', label: 'One' },
+					{ value: 'Two', label: 'Two' },
+					{ value: 'Three', label: 'Three' },
+				],
 			},
 			{
 				alias: 'umbMigrationV14',
@@ -1330,7 +1338,11 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'items',
-				value: ['Red', 'Green', 'Blue'],
+				value: [
+					{ value: 'Red', label: 'Red' },
+					{ value: 'Green', label: 'Green' },
+					{ value: 'Blue', label: 'Blue' },
+				],
 			},
 			{
 				alias: 'placeholder',
@@ -3392,7 +3404,11 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'items',
-				value: ['One', 'Two', 'Three'],
+				value: [
+					{ value: 'One', label: 'One' },
+					{ value: 'Two', label: 'Two' },
+					{ value: 'Three', label: 'Three' },
+				],
 			},
 			{
 				alias: 'umbMigrationV14',
@@ -4358,7 +4374,13 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'items',
-				value: ['One', 'Two', 'Three', 'Four', 'Five'],
+				value: [
+					{ value: 'One', label: 'One' },
+					{ value: 'Two', label: 'Two' },
+					{ value: 'Three', label: 'Three' },
+					{ value: 'Four', label: 'Four' },
+					{ value: 'Five', label: 'Five' },
+				],
 			},
 			{
 				alias: 'umbMigrationV14',

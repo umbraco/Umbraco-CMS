@@ -13,6 +13,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class ValueListUniqueValueValidator : IValueValidator
 {
+    private static readonly string[] _itemsMemberNames = ["items"];
+
     private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
 
     /// <summary>
@@ -23,15 +25,15 @@ public class ValueListUniqueValueValidator : IValueValidator
         => _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
 
     /// <summary>
-    /// Validates that all values in the provided list are unique.
+    /// Validates that all values in the provided list are unique and that every option has a label.
     /// </summary>
-    /// <param name="value">The value to validate, expected to be either an <see cref="IEnumerable{String}"/> or a JSON-serialized string array representing the list of values.</param>
+    /// <param name="value">The value list options to validate, as a collection or as JSON. Each option is an object holding a value and a label.</param>
     /// <param name="valueType">The type of the value being validated (may be used for context).</param>
     /// <param name="dataTypeConfiguration">The configuration object for the data type (may be used for context).</param>
     /// <param name="validationContext">The context for property validation.</param>
     /// <returns>
-    /// An <see cref="IEnumerable{ValidationResult}"/> containing a <see cref="ValidationResult"/> for each duplicate value found in the list; returns an error if the value cannot be parsed as a list.
-    /// If all values are unique or the input is null, returns an empty sequence.
+    /// An <see cref="IEnumerable{ValidationResult}"/> containing a <see cref="ValidationResult"/> for each duplicate value and each missing label found in the list; returns an error if the value cannot be parsed as a list.
+    /// If all values are unique, every option has a label, or the input is null, returns an empty sequence.
     /// </returns>
     public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
     {
@@ -40,27 +42,29 @@ public class ValueListUniqueValueValidator : IValueValidator
             yield break;
         }
 
-        var items = value as IEnumerable<string>;
-        if (items is null)
+        IEnumerable<ValueListOption>? options = null;
+        try
         {
-            try
+            options = value switch
             {
-                items = _configurationEditorJsonSerializer.Deserialize<string[]>(value.ToString() ?? string.Empty);
-            }
-            catch
-            {
-                // swallow and report error below
-            }
+                IEnumerable<ValueListOption> typedOptions => typedOptions,
+                string json => _configurationEditorJsonSerializer.Deserialize<ValueListOption[]>(json),
+                _ => _configurationEditorJsonSerializer.Deserialize<ValueListOption[]>(_configurationEditorJsonSerializer.Serialize(value)),
+            };
+        }
+        catch
+        {
+            // swallow and report error below
         }
 
-        if (items is null)
+        if (options is null)
         {
-            yield return new ValidationResult($"The configuration value {value} is not a valid value list configuration", ["items"]);
+            yield return new ValidationResult($"The configuration value {value} is not a valid value list configuration", _itemsMemberNames);
             yield break;
         }
 
-        var duplicateValues = items
-            .Select(item => item)
+        var duplicateValues = options
+            .Select(option => string.IsNullOrWhiteSpace(option.Value) ? string.Empty : option.Value)
             .GroupBy(v => v)
             .Where(group => group.Count() > 1)
             .Select(group => group.First())
@@ -68,7 +72,12 @@ public class ValueListUniqueValueValidator : IValueValidator
 
         foreach (var duplicateValue in duplicateValues)
         {
-            yield return new ValidationResult($"The value \"{duplicateValue}\" must be unique", new[] { "items" });
+            yield return new ValidationResult($"The value \"{duplicateValue}\" must be unique", _itemsMemberNames);
+        }
+
+        foreach (ValueListOption option in options.Where(option => string.IsNullOrWhiteSpace(option.Label)))
+        {
+            yield return new ValidationResult($"The value \"{option.Value}\" must have a label", _itemsMemberNames);
         }
     }
 }

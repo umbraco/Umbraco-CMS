@@ -60,27 +60,27 @@ test('can publish content with the checkbox list data type', async ({umbracoApi,
 
 test('can create content with the custom checkbox list data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const optionValues = ['testOption1', 'testOption2'];
-  const customDataTypeId = await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName, optionValues);
+  const options = [{value: 'testOption1', label: 'Test Option 1'}, {value: 'testOption2', label: 'Test Option 2'}];
+  const customDataTypeId = await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName, options);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.chooseCheckboxListOption(optionValues[0]);
+  await umbracoUi.content.chooseCheckboxListOption(options[0].value);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual([optionValues[0]]);
+  expect(contentData.values[0].value).toEqual([options[0].value]);
 });
 
 test('can not publish a mandatory checkbox list with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const optionValues = ['testOption1', 'testOption2'];
-  const customDataTypeId = await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName, optionValues);
+  const options = [{value: 'testOption1', label: 'Test Option 1'}, {value: 'testOption2', label: 'Test Option 2'}];
+  const customDataTypeId = await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName, options);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'Test Group', false, false, true);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
@@ -93,22 +93,22 @@ test('can not publish a mandatory checkbox list with an empty value', {tag: '@re
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   // Select a checkbox list value and the validation error disappears
-  await umbracoUi.content.chooseCheckboxListOption(optionValues[0]);
+  await umbracoUi.content.chooseCheckboxListOption(options[0].value);
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
-  expect(contentData.values[0].value).toEqual([optionValues[0]]);
+  expect(contentData.values[0].value).toEqual([options[0].value]);
 });
 
 test('can navigate away from content with a checkbox list value without seeing discard changes', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const optionValues = ['testOption1', 'testOption2'];
-  const customDataTypeId = await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName, optionValues);
+  const options = [{value: 'testOption1', label: 'Test Option 1'}, {value: 'testOption2', label: 'Test Option 2'}];
+  const customDataTypeId = await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName, options);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
-  await umbracoApi.document.createDocumentWithPropertyValue(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), [optionValues[0]]);
+  await umbracoApi.document.createDocumentWithPropertyValue(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), [options[0].value]);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
@@ -122,13 +122,13 @@ test('can navigate away from content with a checkbox list value without seeing d
 
 test('can see discard changes when navigating away from content with a changed checkbox list value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const optionValues = ['testOption1', 'testOption2'];
-  const customDataTypeId = await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName, optionValues);
+  const options = [{value: 'testOption1', label: 'Test Option 1'}, {value: 'testOption2', label: 'Test Option 2'}];
+  const customDataTypeId = await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName, options);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
-  await umbracoApi.document.createDocumentWithPropertyValue(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), [optionValues[0]]);
+  await umbracoApi.document.createDocumentWithPropertyValue(contentName, documentTypeId, AliasHelper.toAlias(customDataTypeName), [options[0].value]);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.chooseCheckboxListOption(optionValues[1]);
+  await umbracoUi.content.chooseCheckboxListOption(options[1].value);
 
   // Act
   await umbracoUi.content.goToSection(ConstantHelper.sections.settings);

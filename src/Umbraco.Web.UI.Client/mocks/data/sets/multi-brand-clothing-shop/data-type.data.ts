@@ -237,7 +237,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		{ alias: 'storageType', value: 'Json' },
 	]),
 	dataType(DATA_TYPE_IDS.sizes, 'Sizes', 'Umbraco.CheckBoxList', 'Umb.PropertyEditorUi.CheckBoxList', [
-		{ alias: 'items', value: SIZES },
+		{ alias: 'items', value: SIZES.map((value) => ({ value, label: value })) },
 	]),
 	dataType(
 		DATA_TYPE_IDS.multiUrlPickerSingle,
@@ -317,7 +317,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		'Umb.PropertyEditorUi.Dropdown',
 		[
 			{ alias: 'multiple', value: false },
-			{ alias: 'items', value: [...PRODUCT_DOCUMENT_CATEGORIES] },
+			{ alias: 'items', value: PRODUCT_DOCUMENT_CATEGORIES.map((value) => ({ value, label: value })) },
 		],
 	),
 	dataType(DATA_TYPE_IDS.integer, 'Integer', 'Umbraco.Integer', 'Umb.PropertyEditorUi.Integer'),

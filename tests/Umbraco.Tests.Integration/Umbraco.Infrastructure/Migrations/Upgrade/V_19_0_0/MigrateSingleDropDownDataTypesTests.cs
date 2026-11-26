@@ -64,7 +64,7 @@ internal sealed class MigrateSingleDropDownDataTypesTests : UmbracoIntegrationTe
             multiple: false,
             additionalConfiguration: new Dictionary<string, object>
             {
-                ["items"] = new List<string> { "One", "Two", "Three" },
+                ["items"] = new List<ValueListOption> { new() { Value = "One", Label = "One" }, new() { Value = "Two", Label = "Two" }, new() { Value = "Three", Label = "Three" } },
             });
 
         await ExecuteMigration();
@@ -73,7 +73,7 @@ internal sealed class MigrateSingleDropDownDataTypesTests : UmbracoIntegrationTe
         var configuration = migrated.ConfigurationAs<SingleDropDownConfiguration>()!;
         Assert.Multiple(() =>
         {
-            Assert.That(configuration.Items, Is.EqualTo(new[] { "One", "Two", "Three" }));
+            Assert.That(configuration.Items.Select(x => x.Value), Is.EqualTo(new[] { "One", "Two", "Three" }));
             Assert.That(migrated.ConfigurationData.ContainsKey("multiple"), Is.False);
         });
     }

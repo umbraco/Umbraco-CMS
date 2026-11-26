@@ -103,7 +103,7 @@ public class MultiValuePropertyEditorTests
         dataType.ConfigurationData = configurationEditor.FromConfigurationObject(
             new ValueListConfiguration
             {
-                Items = ["Item 1", "Item 2", "Item 3"]
+                Items = [new() { Value = "Item 1" }, new() { Value = "Item 2" }, new() { Value = "Item 3" }]
             },
             serializer);
 
@@ -113,9 +113,9 @@ public class MultiValuePropertyEditorTests
 
         Assert.NotNull(result);
         Assert.AreEqual(3, result.Items.Count);
-        Assert.AreEqual("Item 1", result.Items[0]);
-        Assert.AreEqual("Item 2", result.Items[1]);
-        Assert.AreEqual("Item 3", result.Items[2]);
+        Assert.AreEqual("Item 1", result.Items[0].Value);
+        Assert.AreEqual("Item 2", result.Items[1].Value);
+        Assert.AreEqual("Item 3", result.Items[2].Value);
     }
 
     [TestCase("", true, "")]
@@ -128,7 +128,7 @@ public class MultiValuePropertyEditorTests
         var editor = CreateValueEditor();
         editor.ConfigurationObject = new ValueListConfiguration
         {
-            Items = ["Red", "Green", "Blue"],
+            Items = [new() { Value = "Red" }, new() { Value = "Green" }, new() { Value = "Blue" }],
         };
         var result = editor.Validate(values.Split(','), false, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
@@ -142,6 +142,22 @@ public class MultiValuePropertyEditorTests
             var validationResult = result.First();
             Assert.AreEqual($"validation_{expectedValidationMessageKey}", validationResult.ErrorMessage);
         }
+    }
+
+    [TestCase("Red", true)]
+    [TestCase("Rood", false)]
+    [TestCase("Red,Groen", false)]
+    public void MultipleValueEditor_Validates_Against_Option_Values_Not_Labels(string values, bool expectedSuccess)
+    {
+        var editor = CreateValueEditor();
+        editor.ConfigurationObject = new ValueListConfiguration
+        {
+            Items = [new() { Value = "Red", Label = "Rood" }, new() { Value = "Green", Label = "Groen" }],
+        };
+
+        var result = editor.Validate(values.Split(','), false, null, PropertyValidationContext.Empty());
+
+        Assert.AreEqual(expectedSuccess ? 0 : 1, result.Count());
     }
 
     private static MultipleValueEditor CreateValueEditor()
@@ -171,7 +187,7 @@ public class MultiValuePropertyEditorTests
             .FromConfigurationObject(
                 new ValueListConfiguration
                 {
-                    Items = ["Value 1", "Value 2", "Value 3"]
+                    Items = [new() { Value = "Value 1" }, new() { Value = "Value 2" }, new() { Value = "Value 3" }],
                 },
                 serializer);
         return dataType;

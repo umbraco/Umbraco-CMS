@@ -141,4 +141,23 @@ describe('UmbPropertyEditorUISelectElement', () => {
 			verifySelectValueAndDOM(element, 'Yellow', 'Yellow');
 		});
 	});
+
+	describe('labelled options', () => {
+		it('shows the label of an option', async () => {
+			element.config = {
+				getValueByAlias: (alias: string) =>
+					alias === 'items'
+						? [
+								{ value: 'one', label: 'One' },
+								{ value: 'two', label: 'Two' },
+							]
+						: undefined,
+			} as any;
+			await element.updateComplete;
+
+			const select = getSelectElement(element) as unknown as { options: Array<{ name: string; value: string }> };
+			expect(select.options.map((option) => option.name)).to.deep.equal(['One', 'Two']);
+			expect(select.options.map((option) => option.value)).to.deep.equal(['one', 'two']);
+		});
+	});
 });

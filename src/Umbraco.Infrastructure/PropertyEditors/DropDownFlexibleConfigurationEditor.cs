@@ -19,4 +19,11 @@ internal sealed class DropDownFlexibleConfigurationEditor : ConfigurationEditor<
         ConfigurationField items = Fields.First(x => x.Key == "items");
         items.Validators.Add(new ValueListUniqueValueValidator(configurationEditorJsonSerializer));
     }
+
+    /// <inheritdoc />
+    // TODO (V22): Remove this override along with LegacyValueListItemsHelper.
+    public override IDictionary<string, object> FromDatabase(string? configuration, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => base.FromDatabase(LegacyValueListItemsHelper.ConvertPlainStringItems(configuration), configurationEditorJsonSerializer);
+#pragma warning restore CS0618 // Type or member is obsolete
 }

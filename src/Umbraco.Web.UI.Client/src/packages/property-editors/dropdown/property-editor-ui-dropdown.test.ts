@@ -254,4 +254,54 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 			expect(getNativeSelectElement()).to.not.exist;
 		});
 	});
+
+	describe('labelled options', () => {
+		function setItems(items: Array<unknown>) {
+			element.config = {
+				getValueByAlias: (alias: string) => (alias === 'items' ? items : undefined),
+			} as any;
+		}
+
+		it('shows the label of an option, in the single dropdown', async () => {
+			await createSingleDropdown();
+			setItems([
+				{ value: 'one', label: 'One' },
+				{ value: 'two', label: 'Two' },
+			]);
+			await element.updateComplete;
+			const dropdownInput = getLocalDropdownInput();
+			await dropdownInput?.updateComplete;
+
+			const select = dropdownInput?.shadowRoot?.querySelector('uui-select') as unknown as {
+				options: Array<{ name: string; value: string }>;
+			};
+			const options = select.options.filter((option) => option.value !== '');
+			expect(options.map((option) => option.name)).to.deep.equal(['One', 'Two']);
+			expect(options.map((option) => option.value)).to.deep.equal(['one', 'two']);
+		});
+
+		it('shows the label of an option, in the multiple dropdown', async () => {
+			setItems([
+				{ value: 'one', label: 'One' },
+				{ value: 'two', label: 'Two' },
+			]);
+			await element.updateComplete;
+
+			const options = Array.from(getNativeSelectElement()?.options ?? []);
+			expect(options.map((option) => option.textContent)).to.deep.equal(['One', 'Two']);
+			expect(options.map((option) => option.value)).to.deep.equal(['one', 'two']);
+		});
+
+		it('shows the labels of the selected options when read-only', async () => {
+			element.value = ['one', 'two'];
+			setItems([
+				{ value: 'one', label: 'One' },
+				{ value: 'two', label: 'Two' },
+			]);
+			element.readonly = true;
+			await element.updateComplete;
+
+			expect(element.shadowRoot?.querySelector('div')?.textContent).to.equal('One, Two');
+		});
+	});
 });

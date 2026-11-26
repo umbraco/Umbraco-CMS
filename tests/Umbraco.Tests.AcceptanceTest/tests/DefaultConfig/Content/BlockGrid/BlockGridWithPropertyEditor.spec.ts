@@ -21,7 +21,7 @@ const elementGroupName = 'ElementGroup';
 // Property Editor
 const propertyEditorName = 'ProperyEditorInBlockName';
 let propertyEditorId = null;
-const optionValues = ['testOption1', 'testOption2'];
+const options = [{value: 'testOption1', label: 'Test Option 1'}, {value: 'testOption2', label: 'Test Option 2'}];
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
@@ -33,7 +33,7 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('cannot publish a block grid with a mandatory radiobox without a value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  propertyEditorId = await umbracoApi.dataType.createRadioboxDataType(propertyEditorName, optionValues);
+  propertyEditorId = await umbracoApi.dataType.createRadioboxDataType(propertyEditorName, options);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
   blockGridId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridName, elementTypeId, true);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridName, blockGridId, documentTypeGroupName);
@@ -51,7 +51,7 @@ test('cannot publish a block grid with a mandatory radiobox without a value', as
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
   // Select a radiobox value and the validation error disappears
-  await umbracoUi.content.chooseRadioboxOption(optionValues[0]);
+  await umbracoUi.content.chooseRadioboxOption(options[0].value);
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
@@ -63,7 +63,7 @@ test('cannot publish a block grid with a mandatory radiobox without a value', as
 
 test('cannot publish a block grid with a mandatory checkbox list without a value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  propertyEditorId = await umbracoApi.dataType.createCheckboxListDataType(propertyEditorName, optionValues);
+  propertyEditorId = await umbracoApi.dataType.createCheckboxListDataType(propertyEditorName, options);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
   blockGridId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridName, elementTypeId, true);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridName, blockGridId, documentTypeGroupName);
@@ -81,7 +81,7 @@ test('cannot publish a block grid with a mandatory checkbox list without a value
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
   // Select a checkbox list value and the validation error disappears
-  await umbracoUi.content.chooseCheckboxListOption(optionValues[0]);
+  await umbracoUi.content.chooseCheckboxListOption(options[0].value);
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
@@ -93,7 +93,7 @@ test('cannot publish a block grid with a mandatory checkbox list without a value
 
 test('cannot publish a block grid with a mandatory dropdown without a value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  propertyEditorId = await umbracoApi.dataType.createDropdownDataType(propertyEditorName, false, optionValues);
+  propertyEditorId = await umbracoApi.dataType.createDropdownDataType(propertyEditorName, false, options);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
   blockGridId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridName, elementTypeId, true);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridName, blockGridId, documentTypeGroupName);
@@ -111,7 +111,7 @@ test('cannot publish a block grid with a mandatory dropdown without a value', as
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
   // Select a dropdown value and the validation error disappears
-  await umbracoUi.content.chooseDropdownOption([optionValues[0]]);
+  await umbracoUi.content.chooseDropdownOption([options[0].label]);
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();

@@ -1,4 +1,5 @@
 import { updateItemsSelectedState } from '../utils/property-editor-ui-state-manager.js';
+import { umbParseValueListOptions } from '../utils/value-list-options.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
@@ -28,13 +29,14 @@ export class UmbPropertyEditorUISelectElement extends UmbLitElement implements U
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		const items = config.getValueByAlias('items');
+		const options = umbParseValueListOptions(config.getValueByAlias('items'));
 
-		if (Array.isArray(items) && items.length > 0) {
-			this._options =
-				typeof items[0] === 'string'
-					? items.map((item) => ({ name: item, value: item, selected: item === this._value }))
-					: items.map((item) => ({ name: item.name, value: item.value, selected: item.value === this._value }));
+		if (options.length > 0) {
+			this._options = options.map((option) => ({
+				name: option.label,
+				value: option.value,
+				selected: option.value === this._value,
+			}));
 		}
 	}
 
@@ -62,7 +64,9 @@ export class UmbPropertyEditorUISelectElement extends UmbLitElement implements U
 	}
 
 	override render() {
-		return html`<uui-select .options=${this._options} @change=${this.#onChange}></uui-select>`;
+		return html`<uui-select
+			.options=${this._options.map((option) => ({ ...option, name: this.localize.string(option.name) }))}
+			@change=${this.#onChange}></uui-select>`;
 	}
 }
 

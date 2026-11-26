@@ -10,6 +10,7 @@
     <DocumentSet importMode="root">
       <NewType key="9c9b55d0-2fbf-4f12-afea-023bd7b2519d" id="1148" parentID="-1" level="1" creatorID="0" sortOrder="9" createDate="2013-07-23T12:06:07" updateDate="2013-07-23T15:56:37" nodeName="DoIt" urlName="doit" path="-1,1148" isDoc="" nodeType="1134" creatorName="admin" writerName="admin" writerID="0" template="1133" nodeTypeAlias="NewType">
         <testList><![CDATA[test3]]></testList>
+        <testListWithLabels><![CDATA[second]]></testListWithLabels>
       </NewType>
     </DocumentSet>
   </Documents>
@@ -43,6 +44,18 @@
           </Validation>
           <Description><![CDATA[]]></Description>
         </GenericProperty>
+        <GenericProperty>
+          <Name>testListWithLabels</Name>
+          <Alias>testListWithLabels</Alias>
+          <Type>Umbraco.CheckBoxList</Type>
+          <Definition>71a3b1de-eba4-462c-ba4f-208bd99f5297</Definition>
+          <Tab>
+          </Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
       </GenericProperties>
       <Tabs />
     </DocumentType>
@@ -55,6 +68,9 @@
   <DataTypes>
     <DataType Name="NewCheckBox" Id="Umbraco.CheckBoxList" Definition="8dacee1a-1bbd-46c0-b07f-8ffd49fcca7c" DatabaseType="Nvarchar"
               Configuration="{&quot;items&quot;:[&quot;test&quot;,&quot;test3&quot;,&quot;test2&quot;]}">
+    </DataType>
+    <DataType Name="NewCheckBoxWithLabels" Id="Umbraco.CheckBoxList" Definition="71a3b1de-eba4-462c-ba4f-208bd99f5297" DatabaseType="Nvarchar"
+              Configuration="{&quot;items&quot;:[{&quot;value&quot;:&quot;first&quot;,&quot;label&quot;:&quot;First option&quot;},{&quot;value&quot;:&quot;second&quot;,&quot;label&quot;:&quot;Second option&quot;}]}">
     </DataType>
   </DataTypes>
 </umbPackage>

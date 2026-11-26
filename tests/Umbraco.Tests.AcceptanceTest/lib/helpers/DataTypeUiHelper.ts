@@ -29,6 +29,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly rangeHighValueTxt: Locator;
   private readonly stepSizeTxt: Locator;
   private readonly optionTxt: Locator;
+  private readonly optionLabelTxt: Locator;
   private readonly addOptionBtn: Locator;
   private readonly maximumAllowedCharsTxt: Locator;
   private readonly numberOfRowsTxt: Locator;
@@ -201,7 +202,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.allowDecimalsToggle = page.locator('umb-property[label="Allow decimals"] #toggle');
 
     // Radiobox
-    this.optionTxt = page.getByTestId('property:items').locator('#input');
+    this.optionTxt = page.getByTestId('property:items').locator('uui-input.value #input');
+    this.optionLabelTxt = page.getByTestId('property:items').locator('uui-input.label #input');
     this.addOptionBtn = page.getByTestId('property:items').getByLabel('Add', {exact: true});
 
     // Textarea - Textstring
@@ -602,13 +604,26 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   // Radiobox
-  async removeOptionByName(name: string) {
-    await this.click(this.page.locator(`uui-button[label='Remove ${name}'] svg`));
-    await this.click(this.confirmToDeleteBtn);
+  async removeOption(index: number) {
+    await this.click(this.page.getByTestId('property:items').locator('umb-input-value-with-label').nth(index).getByLabel('Delete', {exact: true}));
   }
 
-  async enterOptionName(name: string) {
-    await this.enterText(this.optionTxt.last(), name);
+  async enterOptionLabel(label: string, index?: number) {
+    await this.enterText(index === undefined ? this.optionLabelTxt.last() : this.optionLabelTxt.nth(index), label);
+  }
+
+  async enterOptionValue(value: string) {
+    await this.enterText(this.optionTxt.last(), value);
+  }
+
+  async doesLastOptionHaveValueAndLabel(value: string, label: string) {
+    await this.hasValue(this.optionTxt.last(), value);
+    await this.hasValue(this.optionLabelTxt.last(), label);
+  }
+
+  async doesOptionFieldShowError(index: number, field: 'label' | 'value') {
+    const row = this.page.getByTestId('property:items').locator('umb-input-value-with-label').nth(index);
+    await expect(row.locator(`umb-form-validation-message:has(uui-input.${field}) #messages`)).toHaveText(/\S/);
   }
 
   async clickAddOptionButton() {

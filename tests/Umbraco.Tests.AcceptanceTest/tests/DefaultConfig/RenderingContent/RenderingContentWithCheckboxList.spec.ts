@@ -14,26 +14,25 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 const checkboxList = [
-  {type: 'an empty list of checkboxes', value: []},
-  {type: 'one checkbox', value: ['Test checkbox']},
-  {type: 'multiple checkboxes', value: ['Test checkbox 1', 'Test checkbox 2', 'Test checkbox 3']},
+  {type: 'an empty list of checkboxes', options: []},
+  {type: 'one checkbox', options: [{value: 'Test checkbox', label: 'Test checkbox label'}]},
+  {type: 'multiple checkboxes', options: [{value: 'Test checkbox 1', label: 'Test checkbox 1 label'}, {value: 'Test checkbox 2', label: 'Test checkbox 2 label'}, {value: 'Test checkbox 3', label: 'Test checkbox 3 label'}]},
 ];
 
 for (const checkbox of checkboxList) {
   test(`can render content with ${checkbox.type}`, async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const checkboxValue = checkbox.value;
-    const dataTypeId = await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName, checkboxValue);
+    const dataTypeId = await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName, checkbox.options);
     const templateId = await umbracoApi.template.createTemplateWithDisplayingMulitpleStringValue(templateName, AliasHelper.toAlias(propertyName));
-    const contentKey = await umbracoApi.document.createPublishedDocumentWithValue(contentName, checkboxValue, dataTypeId, templateId, propertyName, documentTypeName);
+    const contentKey = await umbracoApi.document.createPublishedDocumentWithValue(contentName, checkbox.options.map(option => option.value), dataTypeId, templateId, propertyName, documentTypeName);
     const contentURL = await umbracoApi.document.getDocumentUrl(contentKey);
 
     // Act
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
     // Assert
-    for (const value of checkboxValue) {
-      await umbracoUi.contentRender.doesContentRenderValueContainText(value);
+    for (const option of checkbox.options) {
+      await umbracoUi.contentRender.doesContentRenderValueContainText(option.value);
     }
   });
 }

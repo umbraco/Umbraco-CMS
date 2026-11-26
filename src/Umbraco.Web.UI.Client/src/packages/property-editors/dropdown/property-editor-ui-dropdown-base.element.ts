@@ -1,4 +1,5 @@
 import { ensureArray, updateItemsSelectedState } from '../utils/property-editor-ui-state-manager.js';
+import { umbParseValueListOptions } from '../utils/value-list-options.js';
 import { css, html, map, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -67,17 +68,14 @@ export abstract class UmbDropdownPropertyEditorUIElementBase
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		const items = config.getValueByAlias('items');
+		const options = umbParseValueListOptions(config.getValueByAlias('items'));
 
-		if (Array.isArray(items) && items.length > 0) {
-			this._options =
-				typeof items[0] === 'string'
-					? items.map((item) => ({ name: item, value: item, selected: this.#selection.includes(item) }))
-					: items.map((item) => ({
-							name: item.name,
-							value: item.value,
-							selected: this.#selection.includes(item.value),
-						}));
+		if (options.length > 0) {
+			this._options = options.map((option) => ({
+				name: option.label,
+				value: option.value,
+				selected: this.#selection.includes(option.value),
+			}));
 
 			// If selection includes a value that is not in the list, add it to the list
 			this.#selection.forEach((value) => {
@@ -154,7 +152,7 @@ export abstract class UmbDropdownPropertyEditorUIElementBase
 
 	#renderDropdownMultiple() {
 		if (this.readonly) {
-			return html`<div>${this.value?.join(', ')}</div>`;
+			return html`<div>${this.#selection.map((value) => this.#getOptionName(value)).join(', ')}</div>`;
 		}
 
 		return html`
@@ -166,10 +164,16 @@ export abstract class UmbDropdownPropertyEditorUIElementBase
 				@change=${this.#onChangeMultiple}>
 				${map(
 					this._options,
-					(item) => html`<option value=${item.value} ?selected=${item.selected}>${item.name}</option>`,
+					(item) =>
+						html`<option value=${item.value} ?selected=${item.selected}>${this.localize.string(item.name)}</option>`,
 				)}
 			</select>
 		`;
+	}
+
+	#getOptionName(value: string) {
+		const option = this._options.find((item) => item.value === value && !item.invalid);
+		return option ? this.localize.string(option.name) : value;
 	}
 
 	#renderDropdownSingle() {

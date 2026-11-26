@@ -136,6 +136,9 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_19_0_0.MigrateDecimalMinMaxToRange>("{F5C8EB06-7D91-4EDC-9052-4B6DAFBEC508}");
         To<V_19_0_0.MigrateSliderMinMaxToRange>("{06D9FC17-8EA2-4FED-A163-5C7EB0CFD619}");
         To<V_19_0_0.MigrateBlockGridAreaMinMaxToRange>("{17EA0D28-9FB3-40FE-B274-6D8FC1D0E72A}");
+
+        // To 20.0.0
+        To<V_20_0_0.MigrateValueListItemsToOptions>("{3B8E5D41-7A2C-4F96-8D1E-6C0A9F2B4E73}");
     }
 
     /// <summary>
