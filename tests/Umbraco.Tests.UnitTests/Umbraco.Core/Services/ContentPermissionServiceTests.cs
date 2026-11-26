@@ -481,6 +481,28 @@ public class ContentPermissionServiceTests
         Assert.That(result, Is.Empty);
     }
 
+    [Test]
+    public async Task Filter_Authorized_Access_Excludes_Recycle_Bin_Content_For_Data_Type_Ignoring_Start_Nodes()
+    {
+        // Arrange
+        var contentKey = Guid.NewGuid();
+        var user = CreateUser(startContentId: UnrelatedStartNodeId);
+        _entityServiceMock
+            .Setup(x => x.GetAllPaths(UmbracoObjectTypes.Document, It.Is<Guid[]>(keys => keys.Contains(contentKey))))
+            .Returns([CreateTreeEntityPath(contentKey, ContentNodeId, $"{Constants.System.RecycleBinContentPathPrefix}{ContentNodeId}")]);
+        _entityServiceMock
+            .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+            .Returns([CreateTreeEntityPath(Guid.NewGuid(), UnrelatedStartNodeId, $"-1,{UnrelatedStartNodeId}")]);
+        SetupBatchPermissions(user, [Constants.System.RecycleBinContent, ContentNodeId], ["F"]);
+        Guid dataTypeKey = SetupDataType(ignoreUserStartNodes: true);
+
+        // Act
+        ISet<Guid> result = await _sut.FilterAuthorizedAccessAsync(user, [contentKey], new HashSet<string> { "F" }, dataTypeKey);
+
+        // Assert
+        Assert.That(result, Is.Empty);
+    }
+
     private void SetupFilterScenario(IUser user, Guid contentKey, string[] assignedPermissions)
     {
         _entityServiceMock

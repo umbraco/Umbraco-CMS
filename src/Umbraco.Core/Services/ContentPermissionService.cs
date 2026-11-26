@@ -217,7 +217,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
         }
 
         var authorizedKeys = new HashSet<Guid>();
-        int[]? startNodeIds = ignoreUserStartNodes ? null : user.CalculateContentStartNodeIds(_entityService, _appCaches);
+        int[]? startNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
 
         // Check path access and collect all unique node IDs across all paths.
         var pathDataByKey = new Dictionary<Guid, int[]>();
@@ -225,7 +225,10 @@ internal sealed class ContentPermissionService : IContentPermissionService
 
         foreach (TreeEntityPath entityPath in entityPaths)
         {
-            if (ignoreUserStartNodes is false
+            // Ignoring start nodes does not extend to the recycle bin, which stays restricted to users with root access.
+            var bypassStartNodes = ignoreUserStartNodes
+                && entityPath.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix) is false;
+            if (bypassStartNodes is false
                 && ContentPermissions.HasPathAccess(entityPath.Path, startNodeIds, Constants.System.RecycleBinContent) == false)
             {
                 continue;
