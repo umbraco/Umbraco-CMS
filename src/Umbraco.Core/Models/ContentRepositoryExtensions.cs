@@ -158,7 +158,18 @@ public static class ContentRepositoryExtensions
     /// <summary>
     ///     Copies values from another document.
     /// </summary>
-    public static void CopyFrom(this IPublishableContentBase content, IPublishableContentBase other, string? culture = "*")
+    /// <param name="content">The content to copy values onto.</param>
+    /// <param name="other">The content to copy values from.</param>
+    /// <param name="culture">The culture to copy, or <c>"*"</c> for all cultures, or <c>null</c> for invariant only.</param>
+    /// <param name="includeInvariant">
+    /// Whether invariant (<see cref="ContentVariation.Nothing"/>) properties are copied along with
+    /// <paramref name="culture"/>'s variant properties. Defaults to <c>true</c> (today's behavior): invariant
+    /// properties are always copied regardless of <paramref name="culture"/>, since a single-culture copy is
+    /// normally still expected to bring shared invariant data along with it. Pass <c>false</c> to copy only
+    /// <paramref name="culture"/>'s own variant properties and leave invariant properties untouched - e.g. when
+    /// a caller needs to decide separately (and possibly not at all) whether invariant properties should move.
+    /// </param>
+    public static void CopyFrom(this IPublishableContentBase content, IPublishableContentBase other, string? culture = "*", bool includeInvariant = true)
     {
         if (other.ContentTypeId != content.ContentTypeId)
         {
@@ -185,9 +196,11 @@ public static class ContentRepositoryExtensions
         // clear all existing properties for the specified culture
         foreach (IProperty property in content.Properties)
         {
+            var propertyIsInvariant = property.PropertyType?.Variations == ContentVariation.Nothing;
+
             // each property type may or may not support the variation
             if ((!property.PropertyType?.SupportsVariation(culture, "*", true) ?? false) &&
-                    !(property.PropertyType?.Variations == ContentVariation.Nothing))
+                    !(propertyIsInvariant && includeInvariant))
             {
                 continue;
             }
@@ -196,7 +209,7 @@ public static class ContentRepositoryExtensions
             {
                 if (((property.PropertyType?.SupportsVariation(pvalue.Culture, pvalue.Segment, true) ?? false) &&
                     (culture == "*" || (pvalue.Culture?.InvariantEquals(culture) ?? false))) ||
-                    property.PropertyType?.Variations == ContentVariation.Nothing)
+                    (propertyIsInvariant && includeInvariant))
                 {
                     property.SetValue(null, pvalue.Culture, pvalue.Segment);
                 }
@@ -207,8 +220,10 @@ public static class ContentRepositoryExtensions
         IPropertyCollection otherProperties = other.Properties;
         foreach (IProperty otherProperty in otherProperties)
         {
+            var otherPropertyIsInvariant = otherProperty?.PropertyType?.Variations == ContentVariation.Nothing;
+
             if ((!otherProperty?.PropertyType?.SupportsVariation(culture, "*", true) ?? true) &&
-                    !(otherProperty?.PropertyType?.Variations == ContentVariation.Nothing))
+                    !(otherPropertyIsInvariant && includeInvariant))
             {
                 continue;
             }
@@ -220,7 +235,7 @@ public static class ContentRepositoryExtensions
                 {
                     if (((otherProperty?.PropertyType?.SupportsVariation(pvalue.Culture, pvalue.Segment, true) ?? false) &&
                         (culture == "*" ||(pvalue.Culture?.InvariantEquals(culture) ?? false))) ||
-                         otherProperty?.PropertyType?.Variations == ContentVariation.Nothing)
+                         (otherPropertyIsInvariant && includeInvariant))
                     {
                         var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
                         content.SetValue(alias, value, pvalue.Culture, pvalue.Segment);

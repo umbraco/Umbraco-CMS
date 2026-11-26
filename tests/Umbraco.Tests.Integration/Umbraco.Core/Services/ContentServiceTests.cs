@@ -17,6 +17,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -3035,6 +3036,64 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(content.Edited); //Still edited, change of behaviour
         Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
         Assert.AreEqual("Jane Doe", content.GetValue("author"));
+    }
+
+    [Test]
+    public async Task Can_Rollback_To_A_Promoted_Draft_Branchs_Superseded_Version()
+    {
+        // Rollback treats its version source purely as a read-only value provider for CopyFrom. Prove that
+        // holds even for a version that used to belong to a named draft branch: promoting deletes the branch
+        // row immediately (clearing that version row's BranchId along with it), but the row itself survives
+        // as ordinary, superseded history - rollback should be unaffected by any of that.
+        var parent = ContentService.GetById(Textpage.Id);
+        ContentService.Save(parent);
+        ContentService.Publish(parent, parent.AvailableCultures.ToArray()); // publishing parent, so Subpage can be published.
+
+        var content = ContentService.GetById(Subpage.Id);
+        content.Name = "Original";
+        ContentService.Save(content);
+        ContentService.Publish(content, content.AvailableCultures.ToArray());
+
+        IContentDraftBranchService branchService = GetRequiredService<IContentDraftBranchService>();
+        Attempt<IContentDraftBranch?, ContentDraftBranchOperationStatus> created =
+            await branchService.CreateAsync(content.Key, "Feature Branch", Constants.Security.SuperUserKey);
+        IContentDraftBranch branch = created.Result!;
+
+        IContent branchContent = branchService.GetContent(content.Key, branch.Key)!;
+        branchContent.Name = "Branch Edit";
+        Attempt<ContentDraftBranchOperationStatus> saveResult =
+            await branchService.SaveAsync(content.Key, branch.Key, branchContent, Constants.Security.SuperUserKey);
+        Assert.That(saveResult.Success, Is.True);
+        var branchVersionId = branchContent.VersionId;
+
+        Attempt<ContentDraftBranchOperationStatus> promoteResult =
+            await branchService.PromoteAsync(content.Key, branch.Key, branchContent.AvailableCultures.ToHashSet(), Constants.Security.SuperUserKey);
+        Assert.That(promoteResult.Success, Is.True);
+
+        // the default draft now reflects the branch's edit - promoting doesn't publish it on its own, so
+        // publish it explicitly to keep this scenario's premise (a published version descending from a
+        // promoted branch)
+        IContent afterBranchPromote = ContentService.GetById(content.Id);
+        Assert.AreEqual("Branch Edit", afterBranchPromote.Name);
+        ContentService.Publish(afterBranchPromote, afterBranchPromote.AvailableCultures.ToArray());
+        IContent afterBranchPublish = ContentService.GetById(content.Id);
+        Assert.AreEqual("Branch Edit", afterBranchPublish.Name);
+
+        // a further, direct edit on the default draft, so there is something newer to roll back away from
+        afterBranchPublish.Name = "Further Direct Edit";
+        ContentService.Save(afterBranchPublish);
+        ContentService.Publish(afterBranchPublish, afterBranchPublish.AvailableCultures.ToArray());
+        Assert.AreEqual("Further Direct Edit", ContentService.GetById(content.Id).Name);
+
+        // roll back to the branch's own, now-superseded version (its BranchId was cleared when the branch
+        // itself was deleted on promotion)
+        OperationResult rollbackResult = ContentService.Rollback(content.Id, branchVersionId, "*", Constants.Security.SuperUserId);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(OperationResultType.Success, rollbackResult.Result);
+            Assert.AreEqual("Branch Edit", ContentService.GetById(content.Id).Name);
+        });
     }
 
     [Test]

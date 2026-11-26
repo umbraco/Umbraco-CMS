@@ -196,6 +196,10 @@ internal sealed class ContentEditingService
     public async Task<Attempt<ContentUpdateResult, ContentEditingAndPublishingStatus>> UpdateAndPublishAsync(Guid key, ContentUpdateModel updateModel, ISet<string> culturesToPublish, Guid userKey)
         => await HandleUpdateAsync(key, updateModel, culturesToPublish, userKey);
 
+    /// <inheritdoc />
+    public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> MapUpdateAsync(IContent content, ContentUpdateModel updateModel)
+        => await MapUpdate<ContentUpdateResult>(content, updateModel);
+
     private async Task<Attempt<ContentUpdateResult, ContentEditingAndPublishingStatus>> HandleUpdateAsync(Guid key, ContentUpdateModel updateModel, ISet<string>? culturesToPublish, Guid userKey)
     {
         IContent? content = ContentService.GetById(key);

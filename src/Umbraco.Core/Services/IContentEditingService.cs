@@ -64,6 +64,17 @@ public interface IContentEditingService
     Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ContentUpdateModel updateModel, Guid userKey);
 
     /// <summary>
+    ///     Maps an update model onto an already-loaded content item's properties and variants, without persisting
+    ///     it. Unlike <see cref="UpdateAsync"/>, this does not load the content by key itself - the caller supplies
+    ///     it - so it can be used against content loaded via a different path than the default draft (e.g. a named
+    ///     draft branch's own version).
+    /// </summary>
+    /// <param name="content">The content item to apply the update model onto.</param>
+    /// <param name="updateModel">The model containing the updated content data.</param>
+    /// <returns>An attempt containing the update result (with validation result) or an error status.</returns>
+    Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> MapUpdateAsync(IContent content, ContentUpdateModel updateModel);
+
+    /// <summary>
     ///     Updates and publishes an existing content item.
     /// </summary>
     /// <param name="key">The unique identifier of the content item to update.</param>

@@ -183,6 +183,10 @@ internal sealed class ElementEditingService
     public async Task<Attempt<ElementUpdateResult, ContentEditingAndPublishingStatus>> UpdateAndPublishAsync(Guid key, ElementUpdateModel updateModel, ISet<string> culturesToPublish, Guid userKey)
         => await HandleUpdateAsync(key, updateModel, culturesToPublish, userKey);
 
+    /// <inheritdoc />
+    public async Task<Attempt<ElementUpdateResult, ContentEditingOperationStatus>> MapUpdateAsync(IElement element, ElementUpdateModel updateModel)
+        => await MapUpdate<ElementUpdateResult>(element, updateModel);
+
     private async Task<Attempt<ElementUpdateResult, ContentEditingAndPublishingStatus>> HandleUpdateAsync(Guid key, ElementUpdateModel updateModel, ISet<string>? culturesToPublish, Guid userKey)
     {
         IElement? element = ContentService.GetById(key);
