@@ -169,6 +169,47 @@ internal sealed class ContentDraftBranchRequirementTests : UmbracoIntegrationTes
         Assert.That(ContentService.GetVersions(Textpage.Id).Select(version => version.Name), Does.Not.Contain("Rejected idea"));
     }
 
+    // 5. Conflict detection and resolution.
+    // NOTE: conflict handling might be slated for a follow-up. These tests are kept failing on purpose, as a reminder.
+
+    [Test]
+    public async Task The_Branchs_Base_Values_Survive_A_Save_Of_The_Default_Draft()
+    {
+        (IContentDraftBranch branch, _) = await CreateBranchAsync(Textpage);
+
+        IContent defaultDraft = ContentService.GetById(Textpage.Key)!;
+        defaultDraft.Name = "Changed after fork";
+        ContentService.Save(defaultDraft);
+
+        // BasedOnVersionId points at the default draft's current version, which a plain save updates in place.
+        // Wherever the base ends up being stored, it must still hold the values the branch started from.
+        IContent? baseVersion = ContentService.GetVersion(branch.BasedOnVersionId!.Value);
+        Assert.That(baseVersion?.Name, Is.EqualTo("Textpage"));
+    }
+
+    [Test]
+    public async Task PromoteAsync_Keeps_Changes_Made_To_Other_Properties_On_The_Default_Draft_Since_The_Branch_Was_Created()
+    {
+        (IContentDraftBranch branch, IContent branchContent) = await CreateBranchAsync(Textpage);
+        branchContent.SetValue("bodyText", "Changed in the branch");
+        await SaveBranchAsync(Textpage, branch, branchContent);
+
+        IContent defaultDraft = ContentService.GetById(Textpage.Key)!;
+        defaultDraft.SetValue("author", "Changed on the default draft");
+        ContentService.Save(defaultDraft);
+
+        Attempt<ContentDraftBranchOperationStatus> promoted = await ContentDraftBranchService.PromoteAsync(
+            Textpage.Key, branch.Key, new HashSet<string>(), Constants.Security.SuperUserKey);
+        Assert.That(promoted.Success, Is.True, "promote");
+
+        IContent result = ContentService.GetById(Textpage.Key)!;
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.GetValue<string>("bodyText"), Is.EqualTo("Changed in the branch"));
+            Assert.That(result.GetValue<string>("author"), Is.EqualTo("Changed on the default draft"));
+        });
+    }
+
     private async Task<(IContentDraftBranch Branch, IContent Content)> CreateBranchAsync(IContent content)
     {
         Attempt<IContentDraftBranch?, ContentDraftBranchOperationStatus> created =
