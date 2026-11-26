@@ -25,10 +25,12 @@ export class RedirectManagementUiHelper extends UiBaseLocators {
     await this.click(this.redirectManagementTab);
   }
 
+  /** @deprecated The URL tracker is no longer toggled from the backoffice; use the Umbraco:CMS:WebRouting:DisableRedirectUrlTracking setting. */
   async clickEnableURLTrackerButton() {
     await this.click(this.enableURLTrackerBtn);
   }
 
+  /** @deprecated The URL tracker is no longer toggled from the backoffice; use the Umbraco:CMS:WebRouting:DisableRedirectUrlTracking setting. */
   async clickDisableURLTrackerButton() {
     await this.click(this.disableURLTrackerBtn);
   }

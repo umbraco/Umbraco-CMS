@@ -28,7 +28,8 @@ test('can add allow vary by culture for a document type', {tag: '@smoke'}, async
   expect(documentTypeData.variesByCulture).toBeTruthy();
 });
 
-// On V16 Segments will not be allowed through the UI, but the server.
+// Needs its own config project: the toggle is gated on Umbraco:CMS:Segments:Enabled, which no acceptance setup
+// turns on, so it cannot pass under defaultConfig.
 test.skip('can add allow segmentation for a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);

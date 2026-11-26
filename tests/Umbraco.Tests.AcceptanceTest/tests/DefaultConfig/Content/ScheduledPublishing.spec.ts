@@ -226,8 +226,8 @@ test('can schedule the publishing of variant published child content', async ({u
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
 });
 
-// Remove .fixme when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18554
-test.fixme('cannot schedule the publishing of child content if parent not published', async ({umbracoApi, umbracoUi}) => {
+// Open issue (https://github.com/umbraco/Umbraco-CMS/issues/18554): scheduling a child under an unpublished parent shows no error.
+test.skip('cannot schedule the publishing of child content if parent not published', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(childDocumentTypeName, dataTypeName, dataTypeId);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);

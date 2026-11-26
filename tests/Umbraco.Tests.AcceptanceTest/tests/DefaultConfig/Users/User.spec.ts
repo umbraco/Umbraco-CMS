@@ -612,8 +612,16 @@ test('can order by newest user', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.isUserWithNameTheFirstUserInList(nameOfTheUser);
 });
 
-test.fixme('can change from grid to table view', async ({page, umbracoApi, umbracoUi}) => {
-  // TODO: Implement it later
+test('can change from grid to table view', async ({umbracoUi}) => {
+  // Arrange
+  await umbracoUi.user.goToUsers();
+
+  // Act
+  await umbracoUi.user.changeToListView();
+
+  // Assert
+  await umbracoUi.user.isUserTableViewVisible();
+  await umbracoUi.user.isUserGridViewVisible(false);
 });
 
 test('can remove admin user group from a user', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -654,8 +662,7 @@ test('cannot remove all user group from a user', {tag: '@release'}, async ({umbr
   await umbracoUi.user.isErrorNotificationVisible();
 });
 
-// Currently user cannot add a element folder as start node
-test.fixme('can add an element start node to a user', async ({umbracoApi, umbracoUi}) => {
+test('can add an element start node to a user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
@@ -676,8 +683,7 @@ test.fixme('can add an element start node to a user', async ({umbracoApi, umbrac
   await umbracoApi.element.ensureNameNotExists(elementFolderName);
 });
 
-// Currently user cannot add a element folder as start node
-test.fixme('can remove an element start node from a user', async ({umbracoApi, umbracoUi}) => {
+test('can remove an element start node from a user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
@@ -702,8 +708,7 @@ test.fixme('can remove an element start node from a user', async ({umbracoApi, u
   await umbracoApi.element.ensureNameNotExists(elementFolderName);
 });
 
-// Currently element start node configuration is not saved after updating
-test.fixme('can allow access to all elements for a user', async ({umbracoApi, umbracoUi}) => {
+test('can allow access to all elements for a user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
