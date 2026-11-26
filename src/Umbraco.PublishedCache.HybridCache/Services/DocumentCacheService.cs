@@ -848,7 +848,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         if (content.Trashed)
         {
             // Keep database cache rows for trashed content: restored descendants stay Published without being
-            // rewritten, and database cache readers already exclude trashed items.
+            // rewritten, and the queries that load content from these rows exclude trashed items.
             if (content.PublishedState is PublishedState.Publishing)
             {
                 var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
@@ -890,7 +890,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         if (content.Trashed)
         {
             // Keep database cache rows for trashed content: restored descendants stay Published without being
-            // rewritten, and database cache readers already exclude trashed items.
+            // rewritten, and the queries that load content from these rows exclude trashed items.
             if (content.PublishedState is PublishedState.Publishing)
             {
                 var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
