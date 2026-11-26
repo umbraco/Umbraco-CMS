@@ -5,7 +5,7 @@ import { manifest as numberRange } from './number-range/manifests.js';
 import { manifest as orderDirection } from './order-direction/manifests.js';
 import { manifest as overlaySize } from './overlay-size/manifests.js';
 import { manifest as select } from './select/manifests.js';
-import { manifest as valueListOptions } from './value-list-options/manifests.js';
+import { manifest as valuesWithLabels } from './values-with-labels/manifests.js';
 import { manifest as valueType } from './value-type/manifests.js';
 import { manifest as timeZonePicker } from './time-zone-picker/manifests.js';
 import { manifests as checkboxListManifests } from './checkbox-list/manifests.js';
@@ -56,7 +56,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	orderDirection,
 	overlaySize,
 	select,
-	valueListOptions,
+	valuesWithLabels,
 	valueType,
 	timeZonePicker,
 ];

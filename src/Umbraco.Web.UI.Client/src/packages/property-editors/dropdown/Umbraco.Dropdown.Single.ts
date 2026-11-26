@@ -11,7 +11,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 				{
 					alias: 'items',
 					label: 'Add options',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ValueListOptions',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ValuesWithLabels',
 				},
 			],
 		},

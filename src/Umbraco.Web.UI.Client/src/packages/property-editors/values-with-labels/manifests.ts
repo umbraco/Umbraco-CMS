@@ -2,11 +2,11 @@ import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-
 
 export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
-	alias: 'Umb.PropertyEditorUi.ValueListOptions',
-	name: 'Value List Options Property Editor UI',
-	element: () => import('./property-editor-ui-value-list-options.element.js'),
+	alias: 'Umb.PropertyEditorUi.ValuesWithLabels',
+	name: 'Values With Labels Property Editor UI',
+	element: () => import('./property-editor-ui-values-with-labels.element.js'),
 	meta: {
-		label: 'Value List Options',
+		label: 'Values With Labels',
 		icon: 'icon-ordered-list',
 		group: '#propertyEditorUIGroups_lists',
 		supportsReadOnly: true,

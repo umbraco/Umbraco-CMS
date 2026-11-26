@@ -605,7 +605,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   // Radiobox
   async removeOption(index: number) {
-    await this.click(this.page.getByTestId('property:items').locator('umb-input-value-list-option').nth(index).getByLabel('Delete', {exact: true}));
+    await this.click(this.page.getByTestId('property:items').locator('umb-input-value-with-label').nth(index).getByLabel('Delete', {exact: true}));
   }
 
   async enterOptionLabel(label: string, index?: number) {
@@ -622,7 +622,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async doesOptionFieldShowError(index: number, field: 'label' | 'value') {
-    const row = this.page.getByTestId('property:items').locator('umb-input-value-list-option').nth(index);
+    const row = this.page.getByTestId('property:items').locator('umb-input-value-with-label').nth(index);
     await expect(row.locator(`umb-form-validation-message:has(uui-input.${field}) #messages`)).toHaveText(/\S/);
   }
 

@@ -1,11 +1,11 @@
-import { UmbPropertyEditorUIValueListOptionsElement } from './property-editor-ui-value-list-options.element.js';
+import { UmbPropertyEditorUIValuesWithLabelsElement } from './property-editor-ui-values-with-labels.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbInputValueListOptionElement } from './input-value-list-option.element.js';
+import type { UmbInputValueWithLabelElement } from './input-value-with-label.element.js';
 
-describe('UmbPropertyEditorUIValueListOptionsElement', () => {
-	let element: UmbPropertyEditorUIValueListOptionsElement;
+describe('UmbPropertyEditorUIValuesWithLabelsElement', () => {
+	let element: UmbPropertyEditorUIValuesWithLabelsElement;
 
 	async function setValue(value: unknown) {
 		element.value = value as typeof element.value;
@@ -14,14 +14,14 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 	}
 
 	function getInput() {
-		return element.shadowRoot!.querySelector('umb-input-value-list-options')!;
+		return element.shadowRoot!.querySelector('umb-input-values-with-labels')!;
 	}
 
 	function getRows() {
-		return Array.from(getInput().shadowRoot!.querySelectorAll<UmbInputValueListOptionElement>('.option'));
+		return Array.from(getInput().shadowRoot!.querySelectorAll<UmbInputValueWithLabelElement>('.option'));
 	}
 
-	function getField(row: UmbInputValueListOptionElement, field: 'value' | 'label') {
+	function getField(row: UmbInputValueWithLabelElement, field: 'value' | 'label') {
 		return row.shadowRoot!.querySelector(`uui-input.${field}`) as UUIInputElement;
 	}
 
@@ -37,18 +37,18 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 		await getRows().at(-1)!.updateComplete;
 	}
 
-	async function leave(row: UmbInputValueListOptionElement, field: 'value' | 'label' = 'value') {
+	async function leave(row: UmbInputValueWithLabelElement, field: 'value' | 'label' = 'value') {
 		getField(row, field).dispatchEvent(new FocusEvent('focusout', { bubbles: true, composed: true }));
 		await row.updateComplete;
 	}
 
-	async function getFieldMessage(row: UmbInputValueListOptionElement, field: 'value' | 'label') {
+	async function getFieldMessage(row: UmbInputValueWithLabelElement, field: 'value' | 'label') {
 		const wrapper = getField(row, field).closest('umb-form-validation-message')!;
 		await wrapper.updateComplete;
 		return wrapper.shadowRoot!.textContent!.trim();
 	}
 
-	async function type(row: UmbInputValueListOptionElement, field: 'value' | 'label', text: string) {
+	async function type(row: UmbInputValueWithLabelElement, field: 'value' | 'label', text: string) {
 		const input = getField(row, field);
 		input.value = text;
 		input.dispatchEvent(new CustomEvent('input', { bubbles: true, composed: true }));
@@ -58,12 +58,12 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 
 	beforeEach(async () => {
 		element = await fixture(html`
-			<umb-property-editor-ui-value-list-options></umb-property-editor-ui-value-list-options>
+			<umb-property-editor-ui-values-with-labels></umb-property-editor-ui-values-with-labels>
 		`);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbPropertyEditorUIValueListOptionsElement);
+		expect(element).to.be.instanceOf(UmbPropertyEditorUIValuesWithLabelsElement);
 	});
 
 	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {

@@ -1,21 +1,21 @@
-import type { UmbInputValueListOptionElement } from './input-value-list-option.element.js';
+import type { UmbInputValueWithLabelElement } from './input-value-with-label.element.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { escapeHTML } from '@umbraco-cms/backoffice/utils';
-import './input-value-list-option.element.js';
+import './input-value-with-label.element.js';
 
 /**
  * An option as it is stored in the configuration of a value list: the value and the label.
  */
-export interface UmbValueListOptionConfiguration {
+export interface UmbValueWithLabelConfiguration {
 	value: string;
 	label: string;
 }
 
-interface UmbValueListOptionEntry {
+interface UmbValueWithLabelEntry {
 	id: string;
 	value: string;
 	label: string;
@@ -26,16 +26,16 @@ interface UmbValueListOptionEntry {
 const preventFocusLoss = (event: MouseEvent) => event.preventDefault();
 
 /**
- * @element umb-input-value-list-options
+ * @element umb-input-values-with-labels
  */
-@customElement('umb-input-value-list-options')
-export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefined | string, typeof UmbLitElement>(
+@customElement('umb-input-values-with-labels')
+export class UmbInputValuesWithLabelsElement extends UmbFormControlMixin<undefined | string, typeof UmbLitElement>(
 	UmbLitElement,
 ) {
-	readonly #sorter = new UmbSorterController<UmbValueListOptionEntry>(this, {
+	readonly #sorter = new UmbSorterController<UmbValueWithLabelEntry>(this, {
 		getUniqueOfElement: (element) => element.dataset.sortEntryId,
 		getUniqueOfModel: (entry) => entry.id,
-		identifier: 'Umb.SorterIdentifier.ValueListOptions',
+		identifier: 'Umb.SorterIdentifier.ValuesWithLabels',
 		itemSelector: '.option',
 		containerSelector: '#sorter-wrapper',
 		onChange: ({ model }) => {
@@ -45,14 +45,14 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 	});
 
 	@state()
-	private _entries: Array<UmbValueListOptionEntry> = [];
+	private _entries: Array<UmbValueWithLabelEntry> = [];
 
 	/**
 	 * The options, each with a value and a label.
-	 * @type {Array<UmbValueListOptionConfiguration>}
+	 * @type {Array<UmbValueWithLabelConfiguration>}
 	 */
 	@property({ type: Array })
-	public set items(items: Array<UmbValueListOptionConfiguration>) {
+	public set items(items: Array<UmbValueWithLabelConfiguration>) {
 		if (JSON.stringify(items) === JSON.stringify(this.items)) return;
 
 		this._entries = items.map(({ value, label }) => ({
@@ -62,7 +62,7 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 		}));
 		this.#sorter.setModel(this._entries);
 	}
-	public get items(): Array<UmbValueListOptionConfiguration> {
+	public get items(): Array<UmbValueWithLabelConfiguration> {
 		return this._entries.map(({ value, label }) => ({ value, label }));
 	}
 
@@ -115,7 +115,7 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 	}
 
 	#onChange(event: Event, id: string) {
-		const { value, label } = event.currentTarget as UmbInputValueListOptionElement;
+		const { value, label } = event.currentTarget as UmbInputValueWithLabelElement;
 		this._entries = this._entries.map((entry) =>
 			entry.id === id ? { ...entry, value: value as string, label } : entry,
 		);
@@ -128,7 +128,7 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 	}
 
 	override checkValidity() {
-		const rows = Array.from(this.shadowRoot?.querySelectorAll<UmbInputValueListOptionElement>('.option') ?? []);
+		const rows = Array.from(this.shadowRoot?.querySelectorAll<UmbInputValueWithLabelElement>('.option') ?? []);
 		const rowsAreValid = rows.map((row) => row.checkValidity()).every(Boolean);
 		return super.checkValidity() && rowsAreValid;
 	}
@@ -141,7 +141,7 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 
 	async #focusNewEntry() {
 		await this.updateComplete;
-		const options = this.shadowRoot?.querySelectorAll<UmbInputValueListOptionElement>('.option');
+		const options = this.shadowRoot?.querySelectorAll<UmbInputValueWithLabelElement>('.option');
 		options?.[options.length - 1]?.focus();
 	}
 
@@ -173,7 +173,7 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 			this._entries,
 			(entry) => entry.id,
 			(entry) => html`
-				<umb-input-value-list-option
+				<umb-input-value-with-label
 					class="option"
 					data-sort-entry-id=${entry.id}
 					.value=${entry.value}
@@ -182,7 +182,7 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 					?readonly=${this.readonly}
 					@focusout=${this.#onOptionFocusOut}
 					@change=${(event: Event) => this.#onChange(event, entry.id)}
-					@delete=${() => this.#onDelete(entry.id)}></umb-input-value-list-option>
+					@delete=${() => this.#onDelete(entry.id)}></umb-input-value-with-label>
 			`,
 		);
 	}
@@ -253,10 +253,10 @@ export class UmbInputValueListOptionsElement extends UmbFormControlMixin<undefin
 	];
 }
 
-export default UmbInputValueListOptionsElement;
+export default UmbInputValuesWithLabelsElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-value-list-options': UmbInputValueListOptionsElement;
+		'umb-input-values-with-labels': UmbInputValuesWithLabelsElement;
 	}
 }

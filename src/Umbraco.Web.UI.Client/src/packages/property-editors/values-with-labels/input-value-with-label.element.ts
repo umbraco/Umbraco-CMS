@@ -7,10 +7,10 @@ import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/ext
 
 /**
  * A single option of a value list: its value and its label.
- * @element umb-input-value-list-option
+ * @element umb-input-value-with-label
  */
-@customElement('umb-input-value-list-option')
-export class UmbInputValueListOptionElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
+@customElement('umb-input-value-with-label')
+export class UmbInputValueWithLabelElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
 	/**
 	 * The label shown for the option.
 	 * @type {string}
@@ -167,10 +167,10 @@ export class UmbInputValueListOptionElement extends UUIFormControlWithBasicsMixi
 	];
 }
 
-export default UmbInputValueListOptionElement;
+export default UmbInputValueWithLabelElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-value-list-option': UmbInputValueListOptionElement;
+		'umb-input-value-with-label': UmbInputValueWithLabelElement;
 	}
 }
