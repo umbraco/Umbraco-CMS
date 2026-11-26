@@ -44,7 +44,7 @@ public class ServerInformationService : IServerInformationService
     /// <param name="timeProvider">The time provider for timezone information.</param>
     /// <param name="runtimeSettingsOptionsMonitor">The runtime settings monitor.</param>
     /// <param name="hostingEnvironment">The hosting environment.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 21.")]
     public ServerInformationService(
         IUmbracoVersion umbracoVersion,
         TimeProvider timeProvider,

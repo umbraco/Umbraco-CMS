@@ -27,7 +27,7 @@ public class ServerInformation
     /// <param name="timeZoneInfo">The time zone information for the server.</param>
     /// <param name="runtimeMode">The current runtime mode of the server.</param>
     /// <param name="isDebugMode">A value indicating whether the server is running in debug mode.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 21.")]
     public ServerInformation(SemVersion semVersion, TimeZoneInfo timeZoneInfo, RuntimeMode runtimeMode, bool isDebugMode)
         : this(semVersion, timeZoneInfo, runtimeMode, isDebugMode, Array.Empty<string>())
     {
