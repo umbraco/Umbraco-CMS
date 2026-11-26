@@ -171,18 +171,18 @@ describe('UmbPropertyEditorUIValueListOptionsElement', () => {
 		]);
 	});
 
-	it('fills in the value from the label again once the value has been emptied', async () => {
+	it('keeps the value of an added option empty once it has been emptied', async () => {
 		await setValue([{ value: 'a', label: 'A' }]);
 		await add();
 		const row = getRows()[1];
 
-		await type(row, 'label', 'Bee');
+		await type(row, 'label', 'None');
 		await type(row, 'value', '');
-		await type(row, 'label', 'Bees');
+		await type(row, 'label', 'No size');
 
 		expect(element.value).to.deep.equal([
 			{ value: 'a', label: 'A' },
-			{ value: 'Bees', label: 'Bees' },
+			{ value: '', label: 'No size' },
 		]);
 	});
 

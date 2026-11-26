@@ -2489,6 +2489,7 @@ export default {
 		invalidEmail: 'Invalid email',
 		invalidNull: 'Value cannot be null',
 		invalidEmpty: 'Value cannot be empty',
+		invalidEmptyField: '%0% cannot be empty',
 		invalidFalse: 'This field must be turned on',
 		invalidPattern: 'Value is invalid, it does not match the correct pattern',
 		invalidValue: 'Value is invalid',

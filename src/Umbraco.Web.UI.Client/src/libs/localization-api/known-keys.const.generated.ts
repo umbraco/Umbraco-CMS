@@ -2737,6 +2737,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'validation_invalidDate',
 	'validation_invalidEmail',
 	'validation_invalidEmpty',
+	'validation_invalidEmptyField',
 	'validation_invalidExtensions',
 	'validation_invalidFalse',
 	'validation_invalidMemberGroupName',

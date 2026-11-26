@@ -2,7 +2,6 @@ import { css, customElement, html, nothing, property, query } from '@umbraco-cms
 import { UmbChangeEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY } from '@umbraco-cms/backoffice/validation';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
@@ -40,11 +39,11 @@ export class UmbInputValueListOptionElement extends UUIFormControlWithBasicsMixi
 	@query('uui-input')
 	protected _firstInput?: UUIInputElement;
 
-	// The label as it was before the last edit.
-	#previousLabel = '';
+	#valueEdited = false;
 
 	#onValueInput(event: UUIInputEvent) {
 		event.stopPropagation();
+		this.#valueEdited = true;
 		this.value = (event.currentTarget as UUIInputElement).value as string;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
@@ -62,8 +61,7 @@ export class UmbInputValueListOptionElement extends UUIFormControlWithBasicsMixi
 	#onLabelInput(event: UUIInputEvent) {
 		event.stopPropagation();
 		this.label = (event.currentTarget as UUIInputElement).value as string;
-		if (this.isNew && (this.value === '' || this.value === this.#previousLabel)) this.value = this.label;
-		this.#previousLabel = this.label;
+		if (this.isNew && !this.#valueEdited) this.value = this.label;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -110,7 +108,7 @@ export class UmbInputValueListOptionElement extends UUIFormControlWithBasicsMixi
 					.value=${this.label}
 					?readonly=${this.readonly}
 					required
-					required-message=${UMB_VALIDATION_EMPTY_LOCALIZATION_KEY}
+					required-message=${this.localize.term('validation_invalidEmptyField', this.localize.term('general_label'))}
 					@input=${this.#onLabelInput}
 					@focusout=${this.#onFieldFocusOut}></uui-input>
 			</umb-form-validation-message>

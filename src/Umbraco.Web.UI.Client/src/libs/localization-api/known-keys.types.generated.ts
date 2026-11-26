@@ -2764,6 +2764,7 @@ declare global {
 		validation_invalidDate: string;
 		validation_invalidEmail: string;
 		validation_invalidEmpty: string;
+		validation_invalidEmptyField: string;
 		validation_invalidExtensions: string;
 		validation_invalidFalse: string;
 		validation_invalidMemberGroupName: string;
