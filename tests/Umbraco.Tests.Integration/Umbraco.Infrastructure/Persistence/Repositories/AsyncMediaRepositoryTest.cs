@@ -206,6 +206,11 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
             Assert.That(saved.HasIdentity, Is.True);
             Assert.That(propertyDataRows, Is.EqualTo(saved.Properties.Count), "one row per property, for the single version only");
             Assert.That(image!.Id, Is.EqualTo(saved.Id));
+            Assert.That(image.Key, Is.EqualTo(saved.Key));
+            Assert.That(image.SortOrder, Is.EqualTo(saved.SortOrder));
+            Assert.That(image.Trashed, Is.False);
+            Assert.That(image.CreatorId, Is.EqualTo(Constants.Security.UnknownUserId), "the builder leaves the creator unknown, which round-trips through a null user column");
+            Assert.That(image.WriterId, Is.EqualTo(Constants.Security.UnknownUserId));
             Assert.That(image.CreateDate, Is.GreaterThan(DateTime.MinValue));
             Assert.That(image.UpdateDate, Is.GreaterThan(DateTime.MinValue));
             Assert.That(image.ParentId, Is.EqualTo(Constants.System.Root));
@@ -216,6 +221,28 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
             Assert.That(image.Level, Is.EqualTo(1));
             Assert.That(image.GetValue<string>(Constants.Conventions.Media.File), Is.EqualTo("/media/test-image.png"));
             Assert.That(image.GetValue<string>(Constants.Conventions.Media.Extension), Is.EqualTo("png"));
+        });
+    }
+
+    [Test]
+    public async Task SaveAsync_ThenGetAsync_RoundTripsAKnownCreatorAndWriter()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        Media saved = MediaBuilder.CreateMediaImage(_imageType, Constants.System.Root);
+        saved.CreatorId = Constants.Security.SuperUserId;
+        saved.WriterId = Constants.Security.SuperUserId;
+        await repository.SaveAsync(saved, CancellationToken.None);
+
+        IMedia? image = await repository.GetAsync(saved.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(image, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(image!.CreatorId, Is.EqualTo(Constants.Security.SuperUserId));
+            Assert.That(image.WriterId, Is.EqualTo(Constants.Security.SuperUserId));
         });
     }
 
@@ -636,19 +663,22 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         (int nodeRows, int versionRows, int mediaVersionRows, int propertyDataRows) = await CountMediaRowsAsync(_testImage.Id, _testImage.VersionId);
+        (int NodeRows, int VersionRows, int MediaVersionRows, int PropertyDataRows) fileRowsBefore = await CountMediaRowsAsync(_testFile.Id, _testFile.VersionId);
         Assert.Multiple(() =>
         {
             Assert.That(nodeRows, Is.EqualTo(1), "precondition: the node row exists");
             Assert.That(versionRows, Is.EqualTo(1), "precondition: the single version exists");
             Assert.That(mediaVersionRows, Is.EqualTo(1), "precondition: the media version row exists");
-            Assert.That(propertyDataRows, Is.EqualTo(5), "precondition: a row per property value of the version");
+            Assert.That(propertyDataRows, Is.GreaterThan(0), "precondition: the version has property rows");
+            Assert.That((fileRowsBefore.NodeRows, fileRowsBefore.VersionRows, fileRowsBefore.MediaVersionRows), Is.EqualTo((1, 1, 1)), "precondition: the other item has its rows");
+            Assert.That(fileRowsBefore.PropertyDataRows, Is.GreaterThan(0), "precondition: the other item has property rows");
         });
 
         IMedia image = (await repository.GetAsync(_testImage.Key, CancellationToken.None))!;
         await repository.DeleteAsync(image, CancellationToken.None);
 
         (nodeRows, versionRows, mediaVersionRows, propertyDataRows) = await CountMediaRowsAsync(_testImage.Id, _testImage.VersionId);
-        (int fileNodeRows, int fileVersionRows, int fileMediaVersionRows, int filePropertyDataRows) = await CountMediaRowsAsync(_testFile.Id, _testFile.VersionId);
+        (int NodeRows, int VersionRows, int MediaVersionRows, int PropertyDataRows) fileRowsAfter = await CountMediaRowsAsync(_testFile.Id, _testFile.VersionId);
         int documentRows = await ScopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
             db.Documents.CountAsync(row => row.NodeId == document.Id));
         scope.Complete();
@@ -659,7 +689,7 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
             Assert.That(versionRows, Is.Zero);
             Assert.That(mediaVersionRows, Is.Zero);
             Assert.That(propertyDataRows, Is.Zero);
-            Assert.That((fileNodeRows, fileVersionRows, fileMediaVersionRows, filePropertyDataRows), Is.EqualTo((1, 1, 1, 3)));
+            Assert.That(fileRowsAfter, Is.EqualTo(fileRowsBefore));
             Assert.That(documentRows, Is.EqualTo(1));
         });
     }
@@ -767,6 +797,67 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
             Assert.That(folders.Select(folder => folder.Name).Append(_testFolder.Name).Distinct().Count(), Is.EqualTo(13));
             Assert.That(folders[0].Name, Is.EqualTo("Test Folder (1)"));
             Assert.That(folders[11].Name, Is.EqualTo("Test Folder (12)"));
+        });
+    }
+
+    [Test]
+    public async Task GetChildrenAsync_WithAnEmptyAliasList_PagesTheDirectChildrenInSortOrderWithoutProperties()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        Media subFolder = MediaBuilder.CreateMediaFolder(_folderType, _testFolder.Id);
+        await repository.SaveAsync(subFolder, CancellationToken.None);
+        Media grandchild = MediaBuilder.CreateMediaImage(_imageType, subFolder.Id);
+        await repository.SaveAsync(grandchild, CancellationToken.None);
+
+        PagedModel<IMedia> all = await repository.GetChildrenAsync(_testFolder.Key, 0, 10, [], Ordering.By("sortOrder"), CancellationToken.None);
+        PagedModel<IMedia> secondOfOne = await repository.GetChildrenAsync(_testFolder.Key, 1, 1, [], Ordering.By("sortOrder"), CancellationToken.None);
+        PagedModel<IMedia> ofRoot = await repository.GetChildrenAsync(null, 0, 10, [], Ordering.By("sortOrder"), CancellationToken.None);
+        scope.Complete();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(all.Total, Is.EqualTo(3));
+            Assert.That(all.Items.Select(media => media.Key), Is.EqualTo(new[] { _testImage.Key, _testFile.Key, subFolder.Key }), "direct children only, in sort order");
+            Assert.That(all.Items.Select(media => media.Properties.Count), Is.All.Zero, "an empty alias list asks for no properties at all");
+            Assert.That(all.Items.Select(media => media.ParentKey), Is.All.EqualTo(_testFolder.Key));
+            Assert.That(secondOfOne.Total, Is.EqualTo(3));
+            Assert.That(secondOfOne.Items.Select(media => media.Key), Is.EqualTo(new[] { _testFile.Key }));
+            Assert.That(ofRoot.Items.Select(media => media.Key), Is.EqualTo(new[] { _testFolder.Key }), "a null parent key is the root of the media tree");
+        });
+    }
+
+    [Test]
+    public async Task GetDescendantsAsync_ReturnsEveryDepthInPathOrder_AndCanLeaveOutTrashedItems()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        Media subFolder = MediaBuilder.CreateMediaFolder(_folderType, _testFolder.Id);
+        await repository.SaveAsync(subFolder, CancellationToken.None);
+        Media grandchild = MediaBuilder.CreateMediaImage(_imageType, subFolder.Id);
+        await repository.SaveAsync(grandchild, CancellationToken.None);
+        Media trashedGrandchild = MediaBuilder.CreateMediaFile(_imageType, subFolder.Id);
+        trashedGrandchild.Trashed = true;
+        await repository.SaveAsync(trashedGrandchild, CancellationToken.None);
+
+        PagedModel<IMedia> withTrashed = await repository.GetDescendantsAsync(_testFolder.Key, 0, 10, Ordering.By("path"), CancellationToken.None);
+        PagedModel<IMedia> withoutTrashed = await repository.GetDescendantsAsync(_testFolder.Key, 0, 10, Ordering.By("path"), CancellationToken.None, includeTrashed: false);
+        PagedModel<IMedia> page = await repository.GetDescendantsAsync(_testFolder.Key, 2, 2, Ordering.By("path"), CancellationToken.None, includeTrashed: false);
+        PagedModel<IMedia> ofLeaf = await repository.GetDescendantsAsync(grandchild.Key, 0, 10, Ordering.By("path"), CancellationToken.None);
+        scope.Complete();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(withTrashed.Total, Is.EqualTo(5));
+            Assert.That(withTrashed.Items.Select(media => media.Key), Is.EqualTo(new[] { _testImage.Key, _testFile.Key, subFolder.Key, grandchild.Key, trashedGrandchild.Key }));
+            Assert.That(withoutTrashed.Total, Is.EqualTo(4));
+            Assert.That(withoutTrashed.Items.Select(media => media.Key), Is.EqualTo(new[] { _testImage.Key, _testFile.Key, subFolder.Key, grandchild.Key }));
+            Assert.That(page.Total, Is.EqualTo(4));
+            Assert.That(page.Items.Select(media => media.Key), Is.EqualTo(new[] { subFolder.Key, grandchild.Key }));
+            Assert.That(ofLeaf.Total, Is.Zero);
+            Assert.That(ofLeaf.Items, Is.Empty);
         });
     }
 
