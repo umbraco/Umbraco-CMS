@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -120,9 +121,12 @@ public class BackOfficeGraphicsController : Controller
         if (_contentTypeProvider.TryGetContentType(fileInfo.PhysicalPath, out var contentType))
         {
             Stream fileStream = fileInfo.CreateReadStream();
-            return File(fileStream, contentType);
+            return File(fileStream, contentType, fileInfo.LastModified, CreateEntityTag(fileInfo));
         }
 
         return StatusCode(StatusCodes.Status412PreconditionFailed);
     }
+
+    private static EntityTagHeaderValue CreateEntityTag(IFileInfo fileInfo)
+        => new($"\"{fileInfo.LastModified.UtcTicks:x}-{fileInfo.Length:x}\"");
 }

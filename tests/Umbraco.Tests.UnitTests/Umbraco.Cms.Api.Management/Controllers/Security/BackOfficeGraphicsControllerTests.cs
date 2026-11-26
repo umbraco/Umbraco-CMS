@@ -1,7 +1,14 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -55,12 +62,109 @@ public class BackOfficeGraphicsControllerTests
         AssertServesFile(result, expectedContentType);
     }
 
-    [Test]
-    public void Graphics_Return_Not_Found_When_The_Configured_File_Does_Not_Exist()
+    [TestCaseSource(nameof(GraphicsEndpoints))]
+    public void Graphics_Return_Not_Found_When_The_Configured_File_Does_Not_Exist(
+        Action<ContentSettings, string> configure,
+        Func<BackOfficeGraphicsController, IActionResult> endpoint)
     {
-        IActionResult result = CreateController(new ContentSettings { BackOfficeFavicon = "custom/missing.ico" }).Favicon();
+        IActionResult result = endpoint(CreateController(Configure(configure, "custom/missing.svg")));
 
         Assert.That(result, Is.InstanceOf<NotFoundResult>());
+    }
+
+    [TestCaseSource(nameof(GraphicsEndpoints))]
+    public async Task Graphics_Send_Cache_Validators(
+        Action<ContentSettings, string> configure,
+        Func<BackOfficeGraphicsController, IActionResult> endpoint)
+    {
+        CreateWebRootFile("umbraco/custom/graphic.svg");
+
+        HttpContext httpContext = await ExecuteAsync(endpoint(CreateController(Configure(configure, "custom/graphic.svg"))));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+            Assert.That(httpContext.Response.Headers.ETag.ToString(), Is.Not.Empty);
+            Assert.That(httpContext.Response.Headers.LastModified.ToString(), Is.Not.Empty);
+        });
+    }
+
+    [TestCaseSource(nameof(GraphicsEndpoints))]
+    public async Task Graphics_Return_Not_Modified_When_The_ETag_Matches(
+        Action<ContentSettings, string> configure,
+        Func<BackOfficeGraphicsController, IActionResult> endpoint)
+    {
+        CreateWebRootFile("umbraco/custom/graphic.svg");
+        ContentSettings contentSettings = Configure(configure, "custom/graphic.svg");
+        HttpContext firstRequest = await ExecuteAsync(endpoint(CreateController(contentSettings)));
+
+        HttpContext secondRequest = await ExecuteAsync(
+            endpoint(CreateController(contentSettings)),
+            request => request.Headers.IfNoneMatch = firstRequest.Response.Headers.ETag);
+
+        Assert.That(secondRequest.Response.StatusCode, Is.EqualTo(StatusCodes.Status304NotModified));
+    }
+
+    [TestCaseSource(nameof(GraphicsEndpoints))]
+    public async Task Graphics_Return_The_New_File_When_It_Has_Been_Replaced(
+        Action<ContentSettings, string> configure,
+        Func<BackOfficeGraphicsController, IActionResult> endpoint)
+    {
+        var path = CreateWebRootFile("umbraco/custom/graphic.svg");
+        File.SetLastWriteTimeUtc(path, new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+        ContentSettings contentSettings = Configure(configure, "custom/graphic.svg");
+        HttpContext firstRequest = await ExecuteAsync(endpoint(CreateController(contentSettings)));
+
+        File.WriteAllText(path, "a replaced graphic");
+        File.SetLastWriteTimeUtc(path, new DateTime(2026, 2, 1, 0, 0, 0, DateTimeKind.Utc));
+        HttpContext secondRequest = await ExecuteAsync(
+            endpoint(CreateController(contentSettings)),
+            request => request.Headers.IfNoneMatch = firstRequest.Response.Headers.ETag);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(secondRequest.Response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+            Assert.That(secondRequest.Response.Headers.ETag.ToString(), Is.Not.EqualTo(firstRequest.Response.Headers.ETag.ToString()));
+        });
+    }
+
+    private static IEnumerable<TestCaseData> GraphicsEndpoints()
+    {
+        yield return Endpoint(nameof(BackOfficeGraphicsController.LoginBackground), (s, p) => s.LoginBackgroundImage = p, c => c.LoginBackground());
+        yield return Endpoint(nameof(BackOfficeGraphicsController.Logo), (s, p) => s.BackOfficeLogo = p, c => c.Logo());
+        yield return Endpoint(nameof(BackOfficeGraphicsController.LogoAlternative), (s, p) => s.BackOfficeLogoAlternative = p, c => c.LogoAlternative());
+        yield return Endpoint(nameof(BackOfficeGraphicsController.LoginLogo), (s, p) => s.LoginLogoImage = p, c => c.LoginLogo());
+        yield return Endpoint(nameof(BackOfficeGraphicsController.LoginLogoAlternative), (s, p) => s.LoginLogoImageAlternative = p, c => c.LoginLogoAlternative());
+        yield return Endpoint(nameof(BackOfficeGraphicsController.Favicon), (s, p) => s.BackOfficeFavicon = p, c => c.Favicon());
+
+        static TestCaseData Endpoint(
+            string name,
+            Action<ContentSettings, string> configure,
+            Func<BackOfficeGraphicsController, IActionResult> endpoint)
+            => new TestCaseData(configure, endpoint).SetArgDisplayNames(name);
+    }
+
+    private static ContentSettings Configure(Action<ContentSettings, string> configure, string path)
+    {
+        var contentSettings = new ContentSettings();
+        configure(contentSettings, path);
+        return contentSettings;
+    }
+
+    private static async Task<HttpContext> ExecuteAsync(IActionResult result, Action<HttpRequest>? configureRequest = null)
+    {
+        var services = new ServiceCollection()
+            .AddSingleton<ILoggerFactory>(NullLoggerFactory.Instance)
+            .AddSingleton<IActionResultExecutor<FileStreamResult>, FileStreamResultExecutor>()
+            .BuildServiceProvider();
+
+        var httpContext = new DefaultHttpContext { RequestServices = services };
+        httpContext.Request.Method = HttpMethods.Get;
+        httpContext.Response.Body = new MemoryStream();
+        configureRequest?.Invoke(httpContext.Request);
+
+        await result.ExecuteResultAsync(new ActionContext(httpContext, new RouteData(), new ActionDescriptor()));
+        return httpContext;
     }
 
     private BackOfficeGraphicsController CreateController(ContentSettings contentSettings)
@@ -74,11 +178,12 @@ public class BackOfficeGraphicsControllerTests
             webHostEnvironment.Object);
     }
 
-    private void CreateWebRootFile(string relativePath)
+    private string CreateWebRootFile(string relativePath)
     {
         var fullPath = Path.Combine(_webRootPath, relativePath);
         Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
         File.WriteAllText(fullPath, "icon");
+        return fullPath;
     }
 
     private static void AssertServesFile(IActionResult result, string expectedContentType)
