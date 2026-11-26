@@ -52333,6 +52333,7 @@
         "required": [
           "assemblyVersion",
           "baseUtcOffset",
+          "deniedPermissions",
           "isDebugMode",
           "runtimeMode",
           "version"
@@ -52353,6 +52354,12 @@
           },
           "isDebugMode": {
             "type": "boolean"
+          },
+          "deniedPermissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "additionalProperties": false

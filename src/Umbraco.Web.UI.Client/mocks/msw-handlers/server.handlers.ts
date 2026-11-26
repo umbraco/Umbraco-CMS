@@ -47,6 +47,7 @@ export const serverInformationHandlers = [
 			baseUtcOffset: '01:00:00',
 			runtimeMode: RuntimeModeModel.BACKOFFICE_DEVELOPMENT,
 			isDebugMode: true,
+			deniedPermissions: [],
 		});
 	}),
 	http.get(umbracoPath('/server/troubleshooting'), () => {
