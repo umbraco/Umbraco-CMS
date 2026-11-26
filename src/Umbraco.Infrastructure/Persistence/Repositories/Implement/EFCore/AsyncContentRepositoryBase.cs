@@ -1953,6 +1953,7 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository, TConten
             IQueryable<int> versionIdQuery = db.ContentVersions.Where(contentVersion => contentVersion.NodeId == nodeId).Select(contentVersion => contentVersion.Id);
             await db.PropertyData.Where(propertyData => versionIdQuery.Contains(propertyData.VersionId)).ExecuteDeleteAsync();
             await db.ContentVersionCultureVariations.Where(cultureVariation => versionIdQuery.Contains(cultureVariation.VersionId)).ExecuteDeleteAsync();
+            await db.Set<TVersionDto>().Where(entityVersion => versionIdQuery.Contains(entityVersion.Id)).ExecuteDeleteAsync();
             await db.ContentVersions.Where(contentVersion => contentVersion.NodeId == nodeId).ExecuteDeleteAsync();
             await db.Content.Where(content => content.NodeId == nodeId).ExecuteDeleteAsync();
             await db.Nodes.Where(node => node.NodeId == nodeId).ExecuteDeleteAsync();
@@ -1971,7 +1972,8 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository, TConten
     /// <summary>
     ///     Deletes the rows in tables specific to this content kind (e.g. Document's redirect URLs, domains,
     ///     access rules) that reference the node being deleted. Called by <see cref="PersistDeletedItemAsync" />
-    ///     before the tables shared across all content kinds.
+    ///     before the tables shared across all content kinds. The <typeparamref name="TVersionDto" /> rows are not
+    ///     part of this: the caller deletes them with the versions they belong to.
     /// </summary>
     /// <param name="db">The EF Core context for the ambient scope.</param>
     /// <param name="nodeId">The node identifier of the content being deleted.</param>

@@ -97,9 +97,6 @@ internal sealed class ElementRepository
 
         await db.Elements.Where(element => element.NodeId == nodeId).ExecuteDeleteAsync();
         await db.ElementCultureVariations.Where(cultureVariation => cultureVariation.NodeId == nodeId).ExecuteDeleteAsync();
-
-        IQueryable<int> versionIdQuery = db.ContentVersions.Where(contentVersion => contentVersion.NodeId == nodeId).Select(contentVersion => contentVersion.Id);
-        await db.ElementVersions.Where(elementVersion => versionIdQuery.Contains(elementVersion.Id)).ExecuteDeleteAsync();
     }
 
     /// <inheritdoc />
