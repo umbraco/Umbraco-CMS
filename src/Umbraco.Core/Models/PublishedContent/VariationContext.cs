@@ -43,7 +43,13 @@ public class VariationContext
     /// </summary>
     /// <param name="contentId">The content Id.</param>
     /// <param name="propertyAlias">The property alias.</param>
-    /// <param name="availableSegments">A factory method to resolve the available property value segments at source level. It returns null when no segment information is available (for example, when the caller does not supply it), and must only be invoked during the call.</param>
+    /// <param name="availableSegments">A factory method to resolve the available property value segments at source level. It returns null when no segment information is available (for example, when the caller does not supply it), and an empty collection when the property is known to have no segment values. It must only be invoked during the call.</param>
+    /// <remarks>
+    ///     This can be called more than once while resolving a single property value: for example, once to check whether
+    ///     the property has a value and again to get it, and again if the value is resolved through the published value
+    ///     fallback, where no segment information is available. Return the same segment for the same inputs. A language
+    ///     fallback reuses the segment resolved for the requested culture.
+    /// </remarks>
     public virtual string GetSegment(int contentId, string propertyAlias, Func<IEnumerable<string>?> availableSegments)
         // TODO (V22): Remove the delegation to the obsolete overload when it is removed.
 #pragma warning disable CS0618 // Type or member is obsolete

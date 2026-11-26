@@ -35,6 +35,8 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     private readonly Lock _locko = new();
     private ConcurrentDictionary<CompositeStringStringKey, SourceInterValue>? _sourceValues;
 
+    private static readonly IReadOnlyList<string> _noSegments = Array.AsReadOnly(Array.Empty<string>());
+
     private Dictionary<string, IReadOnlyList<string>>? _sourceSegmentsByCulture;
 
     // initializes a published content property with a value
@@ -403,7 +405,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     {
         if (_sourceValues is null)
         {
-            return null;
+            return _noSegments;
         }
 
         // Computed lazily on this hot path (property rendering) to avoid adding memory to every published property,
@@ -439,6 +441,6 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
         return _sourceSegmentsByCulture.TryGetValue(_sourceVariations.VariesByCulture() ? culture ?? string.Empty : string.Empty, out var sourceSegmentsForCulture)
             ? sourceSegmentsForCulture
-            : null;
+            : _noSegments;
     }
 }

@@ -56,7 +56,7 @@ public static class VariationContextAccessorExtensions
     /// <param name="propertyAlias">The property alias.</param>
     /// <param name="culture">The culture, which may be set based on the variation context.</param>
     /// <param name="segment">The segment, which may be set based on the variation context.</param>
-    /// <param name="propertySegmentsForCulture">A factory method to resolve the available property value segments for a given culture at source level, or null if none is available. Overloads without this parameter, such as those used when resolving a value through the published value fallback, provide no segment information.</param>
+    /// <param name="propertySegmentsForCulture">A factory method to resolve the available property value segments for a given culture at source level. It returns an empty collection when the property is known to have no segment values, and null when no segment information is available. Overloads without this parameter, such as those used when resolving a value through the published value fallback, provide no segment information, so the factory handed to the variation context returns null.</param>
     public static void ContextualizeVariation(
         this IVariationContextAccessor variationContextAccessor,
         ContentVariation variations,

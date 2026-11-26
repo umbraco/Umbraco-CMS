@@ -245,13 +245,13 @@ public class SegmentTrackingVariationContextAccessorTests : UmbracoIntegrationTe
         // A culture with only a default segment value.
         Assert.AreEqual("Default segment, DA", content.Value("title", "da-DK"));
         var titleCall = TrackingContext.Calls.First(call => call.PropertyAlias == "title");
-        Assert.That(titleCall.AvailableSegments ?? [], Is.Empty);
+        Assert.That(titleCall.AvailableSegments, Is.Not.Null.And.Empty);
 
         // A property with no stored values at all.
         TrackingContext.Calls.Clear();
         Assert.IsFalse(content.HasValue("bodyText", "en-US"));
         var bodyTextCall = TrackingContext.Calls.First(call => call.PropertyAlias == "bodyText");
-        Assert.That(bodyTextCall.AvailableSegments ?? [], Is.Empty);
+        Assert.That(bodyTextCall.AvailableSegments, Is.Not.Null.And.Empty);
     }
 
     [Test]
@@ -264,6 +264,21 @@ public class SegmentTrackingVariationContextAccessorTests : UmbracoIntegrationTe
 
         Assert.AreEqual("Default segment", titleValue);
         CollectionAssert.AreEquivalent(new[] { "segment-1", "segment-2" }, TrackingContext.Calls.First().AvailableSegments);
+    }
+
+    [Test]
+    public async Task Available_Segments_Are_Null_When_Segment_Is_Resolved_Through_Value_Fallback()
+    {
+        var content = await CreateSegmentVariantContent();
+        TrackingContext.ForcedSegment = "segment-not-stored";
+
+        var titleValue = content.Value("title");
+        Assert.AreEqual("Default segment", titleValue);
+
+        var titleCalls = TrackingContext.Calls.Where(call => call.PropertyAlias == "title").ToArray();
+        Assert.AreEqual(2, titleCalls.Length);
+        Assert.IsNotNull(titleCalls[0].AvailableSegments);
+        Assert.IsNull(titleCalls[1].AvailableSegments);
     }
 
     [Test]
