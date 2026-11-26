@@ -1,17 +1,17 @@
-import { readContentPickerConfig } from './content-picker-config.js';
+import { readContentPickerConfig } from './utils.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type {
 	UmbPropertyEditorConfig,
-	UmbPropertyEditorConfigConverter,
+	UmbPropertyEditorSchemaConfigConverter,
 } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * Converts the Multi Node Tree Picker's settings for the member pickers. Its filter carries over unchanged, as the
  * member pickers name it the same, and members have no start node.
  */
-export class UmbContentPickerToMemberPickerConfigConverter
+export class UmbContentPickerToMemberPickerSchemaConfigConverter
 	extends UmbControllerBase
-	implements UmbPropertyEditorConfigConverter
+	implements UmbPropertyEditorSchemaConfigConverter
 {
 	convert(config: UmbPropertyEditorConfig): UmbPropertyEditorConfig {
 		const { entityType } = readContentPickerConfig(config);
@@ -21,4 +21,4 @@ export class UmbContentPickerToMemberPickerConfigConverter
 	}
 }
 
-export { UmbContentPickerToMemberPickerConfigConverter as api };
+export { UmbContentPickerToMemberPickerSchemaConfigConverter as api };

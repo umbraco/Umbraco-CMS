@@ -6,7 +6,7 @@ import { UMB_EDIT_DATA_TYPE_FOLDER_WORKSPACE_PATH_PATTERN } from '../tree/folder
 import type { UmbDataTypeDetailRepository } from '../repository/index.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import { UMB_DATA_TYPE_WORKSPACE_ALIAS } from './constants.js';
-import { UmbDataTypeConfigConverterController } from './data-type-config-converter.controller.js';
+import { UmbDataTypeSchemaConfigConverterController } from './data-type-schema-config-converter.controller.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbInvariantDatasetWorkspaceContext,
@@ -94,7 +94,7 @@ export class UmbDataTypeWorkspaceContext
 	// The property editor schema the current settings were made for.
 	#valuesEditorAlias?: string;
 
-	#configConverter = new UmbDataTypeConfigConverterController(this);
+	#schemaConfigConverter = new UmbDataTypeSchemaConfigConverterController(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -361,7 +361,7 @@ export class UmbDataTypeWorkspaceContext
 			fromSchemaAlias &&
 			toSchemaAlias &&
 			fromSchemaAlias !== toSchemaAlias &&
-			this.#configConverter.hasConverter(fromSchemaAlias, toSchemaAlias)
+			this.#schemaConfigConverter.hasConverter(fromSchemaAlias, toSchemaAlias)
 		) {
 			void this.#transferConvertedConfig(fromSchemaAlias, toSchemaAlias, this.#savedValues);
 			return;
@@ -379,7 +379,7 @@ export class UmbDataTypeWorkspaceContext
 		toSchemaAlias: string,
 		savedValues: Array<UmbDataTypePropertyValueModel>,
 	) {
-		const convertedValues = await this.#configConverter.convert(fromSchemaAlias, toSchemaAlias, savedValues);
+		const convertedValues = await this.#schemaConfigConverter.convert(fromSchemaAlias, toSchemaAlias, savedValues);
 
 		// A later change of property editor supersedes this conversion.
 		if (this.getPropertyEditorSchemaAlias() !== toSchemaAlias) return;

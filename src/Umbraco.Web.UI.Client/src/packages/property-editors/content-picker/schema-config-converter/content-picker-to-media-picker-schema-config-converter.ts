@@ -1,17 +1,17 @@
-import { readContentPickerConfig, withValues } from './content-picker-config.js';
+import { readContentPickerConfig, withValues } from './utils.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type {
 	UmbPropertyEditorConfig,
-	UmbPropertyEditorConfigConverter,
+	UmbPropertyEditorSchemaConfigConverter,
 } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * Converts the Multi Node Tree Picker's settings for the media pickers. Its filter carries over unchanged, as the media
  * pickers name it the same.
  */
-export class UmbContentPickerToMediaPickerConfigConverter
+export class UmbContentPickerToMediaPickerSchemaConfigConverter
 	extends UmbControllerBase
-	implements UmbPropertyEditorConfigConverter
+	implements UmbPropertyEditorSchemaConfigConverter
 {
 	convert(config: UmbPropertyEditorConfig): UmbPropertyEditorConfig {
 		const { entityType, startNodeId } = readContentPickerConfig(config);
@@ -23,4 +23,4 @@ export class UmbContentPickerToMediaPickerConfigConverter
 	}
 }
 
-export { UmbContentPickerToMediaPickerConfigConverter as api };
+export { UmbContentPickerToMediaPickerSchemaConfigConverter as api };

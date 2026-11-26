@@ -1,11 +1,11 @@
-import { UmbContentPickerToDocumentPickerConfigConverter } from './content-picker-to-document-picker-config-converter.js';
-import { UmbContentPickerToMediaPickerConfigConverter } from './content-picker-to-media-picker-config-converter.js';
-import { UmbContentPickerToMemberPickerConfigConverter } from './content-picker-to-member-picker-config-converter.js';
+import { UmbContentPickerToDocumentPickerSchemaConfigConverter } from './content-picker-to-document-picker-schema-config-converter.js';
+import { UmbContentPickerToMediaPickerSchemaConfigConverter } from './content-picker-to-media-picker-schema-config-converter.js';
+import { UmbContentPickerToMemberPickerSchemaConfigConverter } from './content-picker-to-member-picker-schema-config-converter.js';
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
-@customElement('test-content-picker-config-converter-host')
+@customElement('test-content-picker-schema-config-converter-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 const dynamicRoot = {
@@ -13,7 +13,7 @@ const dynamicRoot = {
 	querySteps: [{ unique: 'step-1', alias: 'NearestDescendantOrSelf', anyOfDocTypeKeys: ['section-type'] }],
 };
 
-describe('Multi Node Tree Picker config converters', () => {
+describe('Multi Node Tree Picker schema config converters', () => {
 	let host: UmbTestControllerHostElement;
 
 	beforeEach(() => {
@@ -22,9 +22,9 @@ describe('Multi Node Tree Picker config converters', () => {
 		document.body.appendChild(host);
 	});
 
-	describe('UmbContentPickerToDocumentPickerConfigConverter', () => {
+	describe('UmbContentPickerToDocumentPickerSchemaConfigConverter', () => {
 		it('renames the filter, and moves the start node and dynamic root out of the start node', () => {
-			const result = new UmbContentPickerToDocumentPickerConfigConverter(host).convert([
+			const result = new UmbContentPickerToDocumentPickerSchemaConfigConverter(host).convert([
 				{ alias: 'startNode', value: { type: 'content', id: 'start-node', dynamicRoot } },
 				{ alias: 'filter', value: 'type-1,type-2' },
 				{ alias: 'ignoreUserStartNodes', value: true },
@@ -38,7 +38,7 @@ describe('Multi Node Tree Picker config converters', () => {
 		});
 
 		it('treats a missing start node type as documents', () => {
-			const result = new UmbContentPickerToDocumentPickerConfigConverter(host).convert([
+			const result = new UmbContentPickerToDocumentPickerSchemaConfigConverter(host).convert([
 				{ alias: 'filter', value: 'type-1' },
 			]);
 
@@ -46,7 +46,7 @@ describe('Multi Node Tree Picker config converters', () => {
 		});
 
 		it('leaves out null and empty settings', () => {
-			const result = new UmbContentPickerToDocumentPickerConfigConverter(host).convert([
+			const result = new UmbContentPickerToDocumentPickerSchemaConfigConverter(host).convert([
 				{ alias: 'startNode', value: { type: 'content', id: null, dynamicRoot: null, query: null } },
 				{ alias: 'filter', value: '' },
 			]);
@@ -55,7 +55,7 @@ describe('Multi Node Tree Picker config converters', () => {
 		});
 
 		it('converts nothing for a media or member start node', () => {
-			const result = new UmbContentPickerToDocumentPickerConfigConverter(host).convert([
+			const result = new UmbContentPickerToDocumentPickerSchemaConfigConverter(host).convert([
 				{ alias: 'startNode', value: { type: 'media', id: 'media-folder' } },
 				{ alias: 'filter', value: 'image' },
 			]);
@@ -64,9 +64,9 @@ describe('Multi Node Tree Picker config converters', () => {
 		});
 	});
 
-	describe('UmbContentPickerToMediaPickerConfigConverter', () => {
+	describe('UmbContentPickerToMediaPickerSchemaConfigConverter', () => {
 		it('moves the media start node out of the start node', () => {
-			const result = new UmbContentPickerToMediaPickerConfigConverter(host).convert([
+			const result = new UmbContentPickerToMediaPickerSchemaConfigConverter(host).convert([
 				{ alias: 'startNode', value: { type: 'media', id: 'media-folder', dynamicRoot } },
 				{ alias: 'filter', value: 'image' },
 			]);
@@ -75,7 +75,7 @@ describe('Multi Node Tree Picker config converters', () => {
 		});
 
 		it('clears the filter when the start node is for documents', () => {
-			const result = new UmbContentPickerToMediaPickerConfigConverter(host).convert([
+			const result = new UmbContentPickerToMediaPickerSchemaConfigConverter(host).convert([
 				{ alias: 'startNode', value: { type: 'content', id: 'start-node' } },
 				{ alias: 'filter', value: 'document-type' },
 			]);
@@ -84,9 +84,9 @@ describe('Multi Node Tree Picker config converters', () => {
 		});
 	});
 
-	describe('UmbContentPickerToMemberPickerConfigConverter', () => {
+	describe('UmbContentPickerToMemberPickerSchemaConfigConverter', () => {
 		it('converts nothing for a member start node, as the filter carries over', () => {
-			const result = new UmbContentPickerToMemberPickerConfigConverter(host).convert([
+			const result = new UmbContentPickerToMemberPickerSchemaConfigConverter(host).convert([
 				{ alias: 'startNode', value: { type: 'member' } },
 				{ alias: 'filter', value: 'member-type' },
 			]);
@@ -95,7 +95,7 @@ describe('Multi Node Tree Picker config converters', () => {
 		});
 
 		it('clears the filter when the start node is for documents', () => {
-			const result = new UmbContentPickerToMemberPickerConfigConverter(host).convert([
+			const result = new UmbContentPickerToMemberPickerSchemaConfigConverter(host).convert([
 				{ alias: 'filter', value: 'document-type' },
 			]);
 

@@ -11,7 +11,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 import type {
 	UmbPropertyEditorConfig,
-	UmbPropertyEditorConfigConverter,
+	UmbPropertyEditorSchemaConfigConverter,
 } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-test-data-type-workspace-host')
@@ -23,19 +23,19 @@ class UmbTestDataTypeWorkspaceHostElement extends UmbControllerHostElementMixin(
 	}
 }
 
-class UmbTestRenamingConverter extends UmbControllerBase implements UmbPropertyEditorConfigConverter {
+class UmbTestRenamingConverter extends UmbControllerBase implements UmbPropertyEditorSchemaConfigConverter {
 	convert(config: UmbPropertyEditorConfig): UmbPropertyEditorConfig {
 		return [{ alias: 'newName', value: config.find((x) => x.alias === 'oldName')?.value }];
 	}
 }
 
-class UmbTestFailingConverter extends UmbControllerBase implements UmbPropertyEditorConfigConverter {
+class UmbTestFailingConverter extends UmbControllerBase implements UmbPropertyEditorSchemaConfigConverter {
 	convert(): UmbPropertyEditorConfig {
 		throw new Error('Test converter failure');
 	}
 }
 
-const DATA_TYPE_ID = 'data-type-workspace-config-converter-test';
+const DATA_TYPE_ID = 'data-type-workspace-schema-config-converter-test';
 
 // Three property editors: "From" and "To" name a setting differently and have a converter between them; "Other"
 // shares only one setting with "From" and has no converter. A converter that fails is registered for "Failing".
@@ -64,17 +64,17 @@ const TEST_MANIFESTS: Array<UmbExtensionManifest> = [
 	...(editor('Other', ['shared']) as Array<UmbExtensionManifest>),
 	...(editor('Failing', ['newName', 'shared']) as Array<UmbExtensionManifest>),
 	{
-		type: 'propertyEditorConfigConverter',
-		alias: 'Test.ConfigConverter.FromTo',
-		name: 'Test From To Config Converter',
+		type: 'propertyEditorSchemaConfigConverter',
+		alias: 'Test.SchemaConfigConverter.FromTo',
+		name: 'Test From To Schema Config Converter',
 		api: UmbTestRenamingConverter,
 		fromPropertyEditorSchemaAlias: 'Test.From',
 		forPropertyEditorSchemaAlias: 'Test.To',
 	},
 	{
-		type: 'propertyEditorConfigConverter',
-		alias: 'Test.ConfigConverter.FromFailing',
-		name: 'Test From Failing Config Converter',
+		type: 'propertyEditorSchemaConfigConverter',
+		alias: 'Test.SchemaConfigConverter.FromFailing',
+		name: 'Test From Failing Schema Config Converter',
 		api: UmbTestFailingConverter,
 		fromPropertyEditorSchemaAlias: 'Test.From',
 		forPropertyEditorSchemaAlias: 'Test.Failing',
@@ -99,7 +99,7 @@ describe('UmbDataTypeWorkspaceContext', () => {
 			umbDataTypeMockDb.create({
 				id: DATA_TYPE_ID,
 				parent: null,
-				name: 'Config Converter Test',
+				name: 'Schema Config Converter Test',
 				editorAlias: 'Test.From',
 				editorUiAlias: 'Test.Ui.From',
 				values: [

@@ -2,16 +2,16 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type {
-	ManifestPropertyEditorConfigConverter,
+	ManifestPropertyEditorSchemaConfigConverter,
 	UmbPropertyEditorConfig,
-	UmbPropertyEditorConfigConverter,
+	UmbPropertyEditorSchemaConfigConverter,
 } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * Converts a data type's settings from one property editor schema to another, using the registered
- * `propertyEditorConfigConverter` extensions.
+ * `propertyEditorSchemaConfigConverter` extensions.
  */
-export class UmbDataTypeConfigConverterController extends UmbControllerBase {
+export class UmbDataTypeSchemaConfigConverterController extends UmbControllerBase {
 	/**
 	 * Whether any converter is registered for moving from one property editor schema to another.
 	 * @param {string} fromSchemaAlias - The alias of the property editor schema the data type is moving from.
@@ -38,7 +38,7 @@ export class UmbDataTypeConfigConverterController extends UmbControllerBase {
 		const converted: UmbPropertyEditorConfig = [];
 
 		for (const manifest of this.#getManifests(fromSchemaAlias, toSchemaAlias)) {
-			let api: UmbPropertyEditorConfigConverter | undefined;
+			let api: UmbPropertyEditorSchemaConfigConverter | undefined;
 			try {
 				api = await createExtensionApi(this, manifest);
 				for (const setting of (await api?.convert(config)) ?? []) {
@@ -47,7 +47,10 @@ export class UmbDataTypeConfigConverterController extends UmbControllerBase {
 					}
 				}
 			} catch (error) {
-				console.error(`The property editor config converter "${manifest.alias}" failed, so it was skipped.`, error);
+				console.error(
+					`The property editor schema config converter "${manifest.alias}" failed, so it was skipped.`,
+					error,
+				);
 			} finally {
 				api?.destroy();
 			}
@@ -58,10 +61,10 @@ export class UmbDataTypeConfigConverterController extends UmbControllerBase {
 
 	#getManifests(fromSchemaAlias: string, toSchemaAlias: string) {
 		return umbExtensionsRegistry.getByTypeAndFilter<
-			'propertyEditorConfigConverter',
-			ManifestPropertyEditorConfigConverter
+			'propertyEditorSchemaConfigConverter',
+			ManifestPropertyEditorSchemaConfigConverter
 		>(
-			'propertyEditorConfigConverter',
+			'propertyEditorSchemaConfigConverter',
 			(manifest) =>
 				manifest.fromPropertyEditorSchemaAlias === fromSchemaAlias &&
 				manifest.forPropertyEditorSchemaAlias === toSchemaAlias,

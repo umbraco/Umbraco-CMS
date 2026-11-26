@@ -1,19 +1,19 @@
-import { UmbDataTypeConfigConverterController } from './data-type-config-converter.controller.js';
+import { UmbDataTypeSchemaConfigConverterController } from './data-type-schema-config-converter.controller.js';
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type {
-	ManifestPropertyEditorConfigConverter,
+	ManifestPropertyEditorSchemaConfigConverter,
 	UmbPropertyEditorConfig,
-	UmbPropertyEditorConfigConverter,
+	UmbPropertyEditorSchemaConfigConverter,
 } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('test-data-type-config-converter-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-class UmbTestRenamingConverter extends UmbControllerBase implements UmbPropertyEditorConfigConverter {
+class UmbTestRenamingConverter extends UmbControllerBase implements UmbPropertyEditorSchemaConfigConverter {
 	convert(config: UmbPropertyEditorConfig): UmbPropertyEditorConfig {
 		return [
 			{ alias: 'newName', value: config.find((x) => x.alias === 'oldName')?.value },
@@ -22,13 +22,13 @@ class UmbTestRenamingConverter extends UmbControllerBase implements UmbPropertyE
 	}
 }
 
-class UmbTestHeavierConverter extends UmbControllerBase implements UmbPropertyEditorConfigConverter {
+class UmbTestHeavierConverter extends UmbControllerBase implements UmbPropertyEditorSchemaConfigConverter {
 	async convert(): Promise<UmbPropertyEditorConfig> {
 		return [{ alias: 'shared', value: 'from the heavier converter' }];
 	}
 }
 
-class UmbTestFailingConverter extends UmbControllerBase implements UmbPropertyEditorConfigConverter {
+class UmbTestFailingConverter extends UmbControllerBase implements UmbPropertyEditorSchemaConfigConverter {
 	convert(): UmbPropertyEditorConfig {
 		throw new Error('Test converter failure');
 	}
@@ -37,18 +37,18 @@ class UmbTestFailingConverter extends UmbControllerBase implements UmbPropertyEd
 const fromSchemaAlias = 'Test.From';
 const toSchemaAlias = 'Test.To';
 
-const manifests: Array<ManifestPropertyEditorConfigConverter> = [
+const manifests: Array<ManifestPropertyEditorSchemaConfigConverter> = [
 	{
-		type: 'propertyEditorConfigConverter',
-		alias: 'Test.ConfigConverter.Renaming',
+		type: 'propertyEditorSchemaConfigConverter',
+		alias: 'Test.SchemaConfigConverter.Renaming',
 		name: 'Test Renaming Config Converter',
 		api: UmbTestRenamingConverter,
 		fromPropertyEditorSchemaAlias: fromSchemaAlias,
 		forPropertyEditorSchemaAlias: toSchemaAlias,
 	},
 	{
-		type: 'propertyEditorConfigConverter',
-		alias: 'Test.ConfigConverter.Heavier',
+		type: 'propertyEditorSchemaConfigConverter',
+		alias: 'Test.SchemaConfigConverter.Heavier',
 		name: 'Test Heavier Config Converter',
 		api: UmbTestHeavierConverter,
 		weight: 100,
@@ -57,14 +57,14 @@ const manifests: Array<ManifestPropertyEditorConfigConverter> = [
 	},
 ];
 
-describe('UmbDataTypeConfigConverterController', () => {
-	let controller: UmbDataTypeConfigConverterController;
+describe('UmbDataTypeSchemaConfigConverterController', () => {
+	let controller: UmbDataTypeSchemaConfigConverterController;
 
 	beforeEach(() => {
 		const host = new UmbTestControllerHostElement();
 		document.body.innerHTML = '';
 		document.body.appendChild(host);
-		controller = new UmbDataTypeConfigConverterController(host);
+		controller = new UmbDataTypeSchemaConfigConverterController(host);
 		umbExtensionsRegistry.registerMany(manifests);
 	});
 
@@ -93,9 +93,9 @@ describe('UmbDataTypeConfigConverterController', () => {
 		});
 
 		it('skips a converter that fails, so the others still apply', async () => {
-			const failing: ManifestPropertyEditorConfigConverter = {
-				type: 'propertyEditorConfigConverter',
-				alias: 'Test.ConfigConverter.Failing',
+			const failing: ManifestPropertyEditorSchemaConfigConverter = {
+				type: 'propertyEditorSchemaConfigConverter',
+				alias: 'Test.SchemaConfigConverter.Failing',
 				name: 'Test Failing Config Converter',
 				api: UmbTestFailingConverter,
 				weight: 1000,
