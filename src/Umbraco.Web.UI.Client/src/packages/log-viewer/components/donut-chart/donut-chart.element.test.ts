@@ -578,6 +578,19 @@ describe('UmbDonutChartElement', () => {
 			expect(detailsText(element)).to.equal('Information 50,000 messages (>99.9%)');
 		});
 
+		it('keeps the details of a hovered slice when keyboard focus leaves the chart', async () => {
+			const focused = svgOf(element).querySelectorAll('a')[0];
+			focused.focus();
+			await element.updateComplete;
+			hover(element, 1);
+			await element.updateComplete;
+
+			focused.blur();
+			await element.updateComplete;
+
+			expect(detailsText(element)).to.equal('Fatal 1 messages (<0.1%)');
+		});
+
 		it('shows the details inside the hole of the ring, clear of every slice', async () => {
 			hover(element, 1);
 			await element.updateComplete;

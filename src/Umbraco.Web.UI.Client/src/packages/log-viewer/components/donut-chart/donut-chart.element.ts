@@ -213,8 +213,8 @@ export class UmbDonutChartElement extends UmbLitElement {
 	};
 
 	#onFocusOut = () => {
+		if (this._activeIndex === this._focusIndex) this._activeIndex = undefined;
 		this._focusIndex = undefined;
-		this._activeIndex = undefined;
 	};
 
 	#onKeyDown = (event: KeyboardEvent) => {
