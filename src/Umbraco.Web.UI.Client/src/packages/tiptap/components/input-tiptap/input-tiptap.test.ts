@@ -90,6 +90,40 @@ describe('UmbInputTiptapElement (stylesheets)', () => {
 		expect(hrefs).to.include('/umbraco/backoffice/css/rte-content.css');
 		expect(hrefs).to.include(`${window.location.origin}/mycss/rte-test.css`);
 	});
+
+	it('gives configured stylesheet rules precedence over extension styles, regardless of selector specificity', async function () {
+		this.timeout(20000);
+
+		const stub = {
+			getHostElement: () => document.body,
+			getServerUrl: () => '',
+			getServerConnection: () => ({ umbracoCssPath: of('/mycss') }),
+		} as unknown as UmbServerContext;
+		provider = new UmbContextProvider(document.body, UMB_SERVER_CONTEXT, stub);
+		provider.hostConnected();
+
+		const config = new UmbPropertyEditorConfigCollection([{ alias: 'extensions', value: ['Umb.Tiptap.CodeBlock'] }]);
+
+		const element = await fixture<UmbInputTiptapElement>(html`
+			<umb-input-tiptap
+				.label=${'Rich Text Editor'}
+				.configuration=${config}
+				.value=${'<p><code>x</code></p>'}></umb-input-tiptap>
+		`);
+
+		await waitUntil(
+			() => !!element.shadowRoot?.querySelector('#editor[data-loaded] code'),
+			'editor did not finish loading',
+			{ timeout: 15000 },
+		);
+
+		const configured = document.createElement('style');
+		configured.textContent = 'code { background-color: rgb(255, 0, 0); }';
+		element.shadowRoot!.appendChild(configured);
+
+		const code = element.shadowRoot!.querySelector('#editor code')!;
+		expect(getComputedStyle(code).backgroundColor).to.equal('rgb(255, 0, 0)');
+	});
 });
 
 // The interaction-memory wiring only exists once the element's controllers have connected, so this

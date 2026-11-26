@@ -241,7 +241,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		});
 
 		if (collectedStyles.length) {
-			this._extensionStyles = unsafeCSS(collectedStyles.map((s) => s.toString()).join(''));
+			this._extensionStyles = unsafeCSS(
+				`@layer umb-tiptap-extensions { ${collectedStyles.map((s) => s.toString()).join('')} }`,
+			);
 		}
 
 		this._toolbar = this.configuration?.getValueByAlias<UmbTiptapToolbarValue>('toolbar') ?? [[[]]];
