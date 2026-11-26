@@ -16,6 +16,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
     private readonly IUserService _userService;
     private readonly AppCaches _appCaches;
     private readonly ILanguageService _languageService;
+    private readonly IDataTypeService _dataTypeService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentPermissionService"/> class.
@@ -25,18 +26,21 @@ internal sealed class ContentPermissionService : IContentPermissionService
     /// <param name="userService">The user service.</param>
     /// <param name="appCaches">The application caches.</param>
     /// <param name="languageService">The language service.</param>
+    /// <param name="dataTypeService">The data type service.</param>
     public ContentPermissionService(
         IContentService contentService,
         IEntityService entityService,
         IUserService userService,
         AppCaches appCaches,
-        ILanguageService languageService)
+        ILanguageService languageService,
+        IDataTypeService dataTypeService)
     {
         _contentService = contentService;
         _entityService = entityService;
         _userService = userService;
         _appCaches = appCaches;
         _languageService = languageService;
+        _dataTypeService = dataTypeService;
     }
 
     /// <inheritdoc/>
@@ -172,10 +176,30 @@ internal sealed class ContentPermissionService : IContentPermissionService
     }
 
     /// <inheritdoc/>
+    [Obsolete("Please use the overload that accepts a dataTypeKey parameter. Scheduled for removal in Umbraco 20.")]
     public Task<ISet<Guid>> FilterAuthorizedAccessAsync(
         IUser user,
         IEnumerable<Guid> contentKeys,
         ISet<string> permissionsToCheck)
+        => FilterAuthorizedAccess(user, contentKeys, permissionsToCheck, ignoreUserStartNodes: false);
+
+    /// <inheritdoc/>
+    public async Task<ISet<Guid>> FilterAuthorizedAccessAsync(
+        IUser user,
+        IEnumerable<Guid> contentKeys,
+        ISet<string> permissionsToCheck,
+        Guid? dataTypeKey)
+    {
+        var ignoreUserStartNodes = dataTypeKey is not null
+            && await _dataTypeService.IsDataTypeIgnoringUserStartNodesAsync(dataTypeKey.Value);
+        return await FilterAuthorizedAccess(user, contentKeys, permissionsToCheck, ignoreUserStartNodes);
+    }
+
+    private Task<ISet<Guid>> FilterAuthorizedAccess(
+        IUser user,
+        IEnumerable<Guid> contentKeys,
+        ISet<string> permissionsToCheck,
+        bool ignoreUserStartNodes)
     {
         Guid[] keysArray = [.. contentKeys];
 
@@ -193,7 +217,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
         }
 
         var authorizedKeys = new HashSet<Guid>();
-        int[]? startNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
+        int[]? startNodeIds = ignoreUserStartNodes ? null : user.CalculateContentStartNodeIds(_entityService, _appCaches);
 
         // Check path access and collect all unique node IDs across all paths.
         var pathDataByKey = new Dictionary<Guid, int[]>();
@@ -201,7 +225,8 @@ internal sealed class ContentPermissionService : IContentPermissionService
 
         foreach (TreeEntityPath entityPath in entityPaths)
         {
-            if (ContentPermissions.HasPathAccess(entityPath.Path, startNodeIds, Constants.System.RecycleBinContent) == false)
+            if (ignoreUserStartNodes is false
+                && ContentPermissions.HasPathAccess(entityPath.Path, startNodeIds, Constants.System.RecycleBinContent) == false)
             {
                 continue;
             }

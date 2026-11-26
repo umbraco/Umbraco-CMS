@@ -100,6 +100,7 @@ public interface IContentPermissionAuthorizer
     ///     for each key individually. Override this method for better performance with batch authorization.
     /// </remarks>
     // TODO (V18): Remove default implementation.
+    [Obsolete("Please use the overload that accepts a dataTypeKey parameter. Scheduled for removal in Umbraco 20.")]
     async Task<ISet<Guid>> FilterAuthorizedAsync(IUser currentUser, IEnumerable<Guid> contentKeys, ISet<string> permissionsToCheck)
     {
         var authorizedKeys = new HashSet<Guid>();
@@ -113,4 +114,22 @@ public interface IContentPermissionAuthorizer
 
         return authorizedKeys;
     }
+
+    /// <summary>
+    ///     Filters the specified content keys to only those the user has access to, for a request originating from a data type.
+    /// </summary>
+    /// <param name="currentUser">The current user.</param>
+    /// <param name="contentKeys">The keys of the content items to filter.</param>
+    /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
+    /// <param name="dataTypeKey">The identifier of the data type the request originates from, if any.</param>
+    /// <returns>Returns the keys of content items the user has access to.</returns>
+    /// <remarks>
+    ///     When <paramref name="dataTypeKey" /> refers to a data type configured to ignore user start nodes, the user's
+    ///     start nodes are not applied, but <paramref name="permissionsToCheck" /> still are.
+    /// </remarks>
+    // TODO (V20): Remove the default implementation when the obsolete overload is removed.
+    Task<ISet<Guid>> FilterAuthorizedAsync(IUser currentUser, IEnumerable<Guid> contentKeys, ISet<string> permissionsToCheck, Guid? dataTypeKey)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => FilterAuthorizedAsync(currentUser, contentKeys, permissionsToCheck);
+#pragma warning restore CS0618 // Type or member is obsolete
 }

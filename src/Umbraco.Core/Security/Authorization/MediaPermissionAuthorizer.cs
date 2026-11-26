@@ -51,5 +51,5 @@ internal sealed class MediaPermissionAuthorizer : IMediaPermissionAuthorizer
 
     /// <inheritdoc/>
     public async Task<ISet<Guid>> FilterAuthorizedAsync(IUser currentUser, IEnumerable<Guid> mediaKeys) =>
-        await _mediaPermissionService.FilterAuthorizedAccessAsync(currentUser, mediaKeys);
+        await _mediaPermissionService.FilterAuthorizedAccessAsync(currentUser, mediaKeys, dataTypeKey: null);
 }

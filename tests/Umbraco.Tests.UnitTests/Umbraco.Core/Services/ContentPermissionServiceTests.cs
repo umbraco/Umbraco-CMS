@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -28,6 +29,7 @@ public class ContentPermissionServiceTests
     private Mock<IEntityService> _entityServiceMock;
     private Mock<IUserService> _userServiceMock;
     private Mock<ILanguageService> _languageServiceMock;
+    private Mock<IDataTypeService> _dataTypeServiceMock;
     private IContentPermissionService _sut;
 
     [SetUp]
@@ -37,12 +39,14 @@ public class ContentPermissionServiceTests
         _entityServiceMock = new Mock<IEntityService>();
         _userServiceMock = new Mock<IUserService>();
         _languageServiceMock = new Mock<ILanguageService>();
+        _dataTypeServiceMock = new Mock<IDataTypeService>();
         _sut = new ContentPermissionService(
             _contentServiceMock.Object,
             _entityServiceMock.Object,
             _userServiceMock.Object,
             AppCaches.Disabled,
-            _languageServiceMock.Object);
+            _languageServiceMock.Object,
+            _dataTypeServiceMock.Object);
     }
 
     [Test]
@@ -412,6 +416,89 @@ public class ContentPermissionServiceTests
 
         // Assert
         Assert.That(result, Is.EquivalentTo(new[] { "A", "B", "C" }));
+    }
+
+    [Test]
+    public async Task Filter_Authorized_Access_Excludes_Content_Outside_Start_Nodes()
+    {
+        // Arrange
+        var contentKey = Guid.NewGuid();
+        var user = CreateUser(startContentId: UnrelatedStartNodeId);
+        SetupFilterScenario(user, contentKey, ["F"]);
+
+        // Act
+        ISet<Guid> result = await _sut.FilterAuthorizedAccessAsync(user, [contentKey], new HashSet<string> { "F" }, null);
+
+        // Assert
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public async Task Filter_Authorized_Access_Includes_Content_Outside_Start_Nodes_For_Data_Type_Ignoring_Start_Nodes()
+    {
+        // Arrange
+        var contentKey = Guid.NewGuid();
+        var user = CreateUser(startContentId: UnrelatedStartNodeId);
+        SetupFilterScenario(user, contentKey, ["F"]);
+        Guid dataTypeKey = SetupDataType(ignoreUserStartNodes: true);
+
+        // Act
+        ISet<Guid> result = await _sut.FilterAuthorizedAccessAsync(user, [contentKey], new HashSet<string> { "F" }, dataTypeKey);
+
+        // Assert
+        Assert.That(result, Is.EquivalentTo(new[] { contentKey }));
+    }
+
+    [Test]
+    public async Task Filter_Authorized_Access_Excludes_Content_Outside_Start_Nodes_For_Data_Type_Not_Ignoring_Start_Nodes()
+    {
+        // Arrange
+        var contentKey = Guid.NewGuid();
+        var user = CreateUser(startContentId: UnrelatedStartNodeId);
+        SetupFilterScenario(user, contentKey, ["F"]);
+        Guid dataTypeKey = SetupDataType(ignoreUserStartNodes: false);
+
+        // Act
+        ISet<Guid> result = await _sut.FilterAuthorizedAccessAsync(user, [contentKey], new HashSet<string> { "F" }, dataTypeKey);
+
+        // Assert
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public async Task Filter_Authorized_Access_Applies_Permissions_For_Data_Type_Ignoring_Start_Nodes()
+    {
+        // Arrange
+        var contentKey = Guid.NewGuid();
+        var user = CreateUser(startContentId: UnrelatedStartNodeId);
+        SetupFilterScenario(user, contentKey, ["A"]);
+        Guid dataTypeKey = SetupDataType(ignoreUserStartNodes: true);
+
+        // Act
+        ISet<Guid> result = await _sut.FilterAuthorizedAccessAsync(user, [contentKey], new HashSet<string> { "F" }, dataTypeKey);
+
+        // Assert
+        Assert.That(result, Is.Empty);
+    }
+
+    private void SetupFilterScenario(IUser user, Guid contentKey, string[] assignedPermissions)
+    {
+        _entityServiceMock
+            .Setup(x => x.GetAllPaths(UmbracoObjectTypes.Document, It.Is<Guid[]>(keys => keys.Contains(contentKey))))
+            .Returns([CreateTreeEntityPath(contentKey, ContentNodeId, ContentNodePath)]);
+        _entityServiceMock
+            .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+            .Returns([CreateTreeEntityPath(Guid.NewGuid(), UnrelatedStartNodeId, $"-1,{UnrelatedStartNodeId}")]);
+        SetupBatchPermissions(user, [UserStartNodeId, ContentNodeId], assignedPermissions);
+    }
+
+    private Guid SetupDataType(bool ignoreUserStartNodes)
+    {
+        var dataTypeKey = Guid.NewGuid();
+        var dataType = Mock.Of<IDataType>(x =>
+            x.ConfigurationObject == new MultiNodePickerConfiguration { IgnoreUserStartNodes = ignoreUserStartNodes });
+        _dataTypeServiceMock.Setup(x => x.GetAsync(dataTypeKey)).ReturnsAsync(dataType);
+        return dataTypeKey;
     }
 
     private void SetupPermissions(IUser user, string path, string[] assignedPermissions)

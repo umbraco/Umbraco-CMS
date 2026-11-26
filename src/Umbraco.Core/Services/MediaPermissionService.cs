@@ -75,7 +75,22 @@ internal sealed class MediaPermissionService : IMediaPermissionService
             : MediaAuthorizationStatus.UnauthorizedMissingBinAccess);
 
     /// <inheritdoc/>
+    [Obsolete("Please use the overload that accepts a dataTypeKey parameter. Scheduled for removal in Umbraco 20.")]
     public Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> mediaKeys)
+        => FilterAuthorizedAccess(user, mediaKeys);
+
+    /// <inheritdoc/>
+    public async Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> mediaKeys, Guid? dataTypeKey)
+    {
+        if (dataTypeKey is not null && await _dataTypeService.IsDataTypeIgnoringUserStartNodesAsync(dataTypeKey.Value))
+        {
+            return mediaKeys.ToHashSet();
+        }
+
+        return await FilterAuthorizedAccess(user, mediaKeys);
+    }
+
+    private Task<ISet<Guid>> FilterAuthorizedAccess(IUser user, IEnumerable<Guid> mediaKeys)
     {
         Guid[] keysArray = mediaKeys.ToArray();
 
@@ -107,16 +122,5 @@ internal sealed class MediaPermissionService : IMediaPermissionService
         }
 
         return Task.FromResult<ISet<Guid>>(authorizedKeys);
-    }
-
-    /// <inheritdoc/>
-    public async Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> mediaKeys, Guid? dataTypeKey)
-    {
-        if (dataTypeKey is not null && await _dataTypeService.IsDataTypeIgnoringUserStartNodesAsync(dataTypeKey.Value))
-        {
-            return mediaKeys.ToHashSet();
-        }
-
-        return await FilterAuthorizedAccessAsync(user, mediaKeys);
     }
 }

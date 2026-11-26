@@ -103,8 +103,28 @@ public interface IContentPermissionService
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>A task resolving into the set of authorized content keys.</returns>
     // TODO (V18): Remove default implementation.
+    [Obsolete("Please use the overload that accepts a dataTypeKey parameter. Scheduled for removal in Umbraco 20.")]
     Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> contentKeys, ISet<string> permissionsToCheck)
         => Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
+
+    /// <summary>
+    ///     Filters content keys to only those the user has access to, for a request originating from a data type.
+    /// </summary>
+    /// <remarks>
+    ///     A data type configured to ignore user start nodes, such as a content picker, may legitimately reference content
+    ///     outside the user's start nodes. When <paramref name="dataTypeKey" /> refers to such a data type, the user's start
+    ///     nodes are not applied, but <paramref name="permissionsToCheck" /> still are.
+    /// </remarks>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
+    /// <param name="contentKeys">The identifiers of the content items to filter.</param>
+    /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
+    /// <param name="dataTypeKey">The identifier of the data type the request originates from, if any.</param>
+    /// <returns>A task resolving into the set of authorized content keys.</returns>
+    // TODO (V20): Remove the default implementation when the obsolete overload is removed.
+    Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> contentKeys, ISet<string> permissionsToCheck, Guid? dataTypeKey)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => FilterAuthorizedAccessAsync(user, contentKeys, permissionsToCheck);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Gets the effective permissions for a user on the specified content items.

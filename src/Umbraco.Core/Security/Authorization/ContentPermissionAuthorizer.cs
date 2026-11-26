@@ -80,9 +80,18 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
     }
 
     /// <inheritdoc/>
+    [Obsolete("Please use the overload that accepts a dataTypeKey parameter. Scheduled for removal in Umbraco 20.")]
     public async Task<ISet<Guid>> FilterAuthorizedAsync(
         IUser currentUser,
         IEnumerable<Guid> contentKeys,
         ISet<string> permissionsToCheck) =>
-        await _contentPermissionService.FilterAuthorizedAccessAsync(currentUser, contentKeys, permissionsToCheck);
+        await FilterAuthorizedAsync(currentUser, contentKeys, permissionsToCheck, dataTypeKey: null);
+
+    /// <inheritdoc/>
+    public async Task<ISet<Guid>> FilterAuthorizedAsync(
+        IUser currentUser,
+        IEnumerable<Guid> contentKeys,
+        ISet<string> permissionsToCheck,
+        Guid? dataTypeKey) =>
+        await _contentPermissionService.FilterAuthorizedAccessAsync(currentUser, contentKeys, permissionsToCheck, dataTypeKey);
 }

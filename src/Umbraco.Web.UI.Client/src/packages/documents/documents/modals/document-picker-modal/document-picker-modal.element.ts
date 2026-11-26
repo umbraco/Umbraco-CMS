@@ -1,4 +1,5 @@
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../../collection/constants.js';
+import type { UmbDocumentCollectionFilterModel } from '../../collection/types.js';
 import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import type { UmbDocumentPickerModalData, UmbDocumentPickerModalValue } from './types.js';
 import { UMB_CONTENT_SECTION_ALIAS, UmbContentCollectionConfigurationContext } from '@umbraco-cms/backoffice/content';
@@ -549,8 +550,10 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 	}
 
 	#renderCollection() {
-		const config: UmbCollectionConfiguration = {
+		const config: UmbCollectionConfiguration & Pick<UmbDocumentCollectionFilterModel, 'originDataTypeId'> = {
 			...this._collectionConfig,
+			// Lets the server apply this picker's configuration, such as ignoring user start nodes, to the items listed.
+			originDataTypeId: this._pickerContext.dataType?.unique,
 			selectionConfiguration: this._collectionSelectionConfiguration,
 			bulkActionConfiguration: { enabled: false },
 			hideItemActions: true,

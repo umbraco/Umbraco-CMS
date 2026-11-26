@@ -13,11 +13,12 @@ import { UmbTreeItemOpenEvent } from '@umbraco-cms/backoffice/tree';
 import type { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import { UMB_CONTENT_SECTION_ALIAS } from '@umbraco-cms/backoffice/content';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 const TREE_ALIAS = 'Umb.Test.DocumentPicker.Tree';
 const TREE_REPOSITORY_ALIAS = 'Umb.Test.DocumentPicker.TreeRepository';
 const OPENER_UNIQUE = 'the-opening-document';
+const PICKER_DATA_TYPE_UNIQUE = 'the-picker-data-type';
 
 const ROOT = { unique: null, entityType: 'test-root', name: 'Root' };
 
@@ -80,6 +81,20 @@ class UmbTestCurrentUserContext {
 	}
 }
 
+/** Stands in for the property the picker is opened from, exposing only the `dataType` part the picker context reads. */
+class UmbTestPropertyContext {
+	#host: UmbElement;
+	readonly dataType = new UmbObjectState({ unique: PICKER_DATA_TYPE_UNIQUE }).asObservable();
+
+	constructor(host: UmbElement) {
+		this.#host = host;
+	}
+
+	getHostElement() {
+		return this.#host;
+	}
+}
+
 /** Stands in for the element that opened the modal, so the modal's own entity context has something to shadow. */
 @customElement('test-document-picker-opener')
 class UmbTestOpenerElement extends UmbElementMixin(HTMLElement) {
@@ -91,6 +106,7 @@ class UmbTestOpenerElement extends UmbElementMixin(HTMLElement) {
 		this.entityContext.setEntityType('test-item');
 		this.entityContext.setUnique(OPENER_UNIQUE);
 		this.provideContext(UMB_CURRENT_USER_CONTEXT, this.currentUserContext as never);
+		this.provideContext('UmbPropertyTypeBasedPropertyContext', new UmbTestPropertyContext(this) as never);
 	}
 }
 
@@ -217,6 +233,16 @@ describe('UmbDocumentPickerModalElement', () => {
 			expect(hasCollection()).to.be.true;
 			// The tree must not be shown in the collection's place, not even while the data type is still loading.
 			expect(getTree()).to.not.exist;
+		});
+
+		it('tells the collection which data type the picker originates from', async () => {
+			await browseTo('with-collection');
+			// Stands in for the configuration the data type store would resolve.
+			(element as unknown as { _collectionConfig: object })._collectionConfig = {};
+			await element.updateComplete;
+
+			const config = getCollection()?.config as { originDataTypeId?: string } | undefined;
+			expect(config?.originDataTypeId).to.equal(PICKER_DATA_TYPE_UNIQUE);
 		});
 	});
 

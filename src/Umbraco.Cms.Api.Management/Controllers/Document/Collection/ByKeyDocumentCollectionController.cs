@@ -84,6 +84,37 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
     /// <param name="skip">The number of items to skip for paging. Defaults to 0.</param>
     /// <param name="take">The number of items to take for paging. Defaults to 100.</param>
     /// <returns>A <see cref="Task"/> that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a paged list of <see cref="DocumentCollectionResponseModel"/>.</returns>
+    [NonAction]
+    [Obsolete("Please use the overload that accepts an originDataTypeId parameter. Scheduled for removal in Umbraco 20.")]
+    public async Task<IActionResult> ByKey(
+        CancellationToken cancellationToken,
+        Guid id,
+        Guid? dataTypeId = null,
+        string orderBy = "updateDate",
+        string? orderCulture = null,
+        Direction orderDirection = Direction.Ascending,
+        string? filter = null,
+        int skip = 0,
+        int take = 100)
+        => await ByKey(cancellationToken, id, dataTypeId, orderBy, orderCulture, orderDirection, filter, skip, take, originDataTypeId: null);
+
+    /// <summary>
+    /// Retrieves a paged collection of documents identified by the provided unique identifier.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier (key) of the document collection.</param>
+    /// <param name="dataTypeId">An optional data type identifier to filter the collection.</param>
+    /// <param name="orderBy">The field by which to order the collection. Defaults to <c>"updateDate"</c>.</param>
+    /// <param name="orderCulture">An optional culture code to use for ordering.</param>
+    /// <param name="orderDirection">The direction to order the collection. Defaults to <see cref="Direction.Ascending"/>.</param>
+    /// <param name="filter">An optional filter string to filter the collection.</param>
+    /// <param name="skip">The number of items to skip for paging. Defaults to 0.</param>
+    /// <param name="take">The number of items to take for paging. Defaults to 100.</param>
+    /// <param name="originDataTypeId">
+    /// An optional identifier of the data type the request originates from, such as a picker browsing the collection.
+    /// When that data type is configured to ignore user start nodes, the user's start nodes are not applied to the items.
+    /// </param>
+    /// <returns>A <see cref="Task"/> that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a paged list of <see cref="DocumentCollectionResponseModel"/>.</returns>
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DocumentCollectionResponseModel>), StatusCodes.Status200OK)]
@@ -100,7 +131,8 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
         Direction orderDirection = Direction.Ascending,
         string? filter = null,
         int skip = 0,
-        int take = 100)
+        int take = 100,
+        Guid? originDataTypeId = null)
     {
         Attempt<ListViewPagedModel<IContent>?, ContentCollectionOperationStatus> collectionAttempt = await _contentListViewService.GetListViewItemsByKeyAsync(
             CurrentUser(_backOfficeSecurityAccessor),
@@ -111,7 +143,8 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
             orderDirection,
             filter,
             skip,
-            take);
+            take,
+            originDataTypeId);
 
         if (collectionAttempt.Success is false)
         {

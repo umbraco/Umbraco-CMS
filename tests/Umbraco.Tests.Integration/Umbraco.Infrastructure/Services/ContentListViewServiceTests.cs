@@ -50,7 +50,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Direction.Ascending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -87,7 +88,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Direction.Ascending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -118,7 +120,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Direction.Ascending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -172,7 +175,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Direction.Ascending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(async () =>
@@ -224,7 +228,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Direction.Ascending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -278,7 +283,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Direction.Ascending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -306,7 +312,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Direction.Ascending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -344,7 +351,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Direction.Ascending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(async () =>
@@ -374,7 +382,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Direction.Ascending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -404,7 +413,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Direction.Ascending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -433,7 +443,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Direction.Ascending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -460,7 +471,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Direction.Ascending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -489,7 +501,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             orderAscending ? Direction.Ascending : Direction.Descending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -533,7 +546,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             orderAscending ? Direction.Ascending : Direction.Descending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -573,7 +587,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             orderAscending ? Direction.Ascending : Direction.Descending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -619,7 +634,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Direction.Ascending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -664,7 +680,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Direction.Ascending,
             filter,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -701,7 +718,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Direction.Ascending,
             Guid.NewGuid().ToString(),
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -762,7 +780,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Direction.Ascending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -801,7 +820,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             orderAscending ? Direction.Ascending : Direction.Descending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -988,7 +1008,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Direction.Ascending,
             null,
             0,
-            10);
+            10,
+            null);
 
         // Assert
         Assert.Multiple(() =>
@@ -1125,6 +1146,78 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         }
 
         return root;
+    }
+
+    [TestCase(true, 5)]
+    [TestCase(false, 0)]
+    public async Task Can_Get_List_View_Items_Outside_User_Start_Nodes_For_Origin_Data_Type_Ignoring_Start_Nodes(bool ignoreUserStartNodes, int expectedCount)
+    {
+        // Arrange
+        var root = await CreateRootContentWithFiveChildrenAsListViewItems();
+
+        var startNodeContentType = ContentTypeBuilder.CreateSimpleContentType("startNode", "Start Node");
+        startNodeContentType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(startNodeContentType, Constants.Security.SuperUserKey);
+        var startNodeCreateResult = await ContentEditingService.CreateAsync(
+            new ContentCreateModel { ContentTypeKey = startNodeContentType.Key, Variants = [new () { Name = "Start Node" }] },
+            Constants.Security.SuperUserKey);
+
+        var userGroup = new UserGroupBuilder()
+            .WithAlias("test")
+            .WithName("Test")
+            .WithPermissions(new HashSet<string> { ActionBrowse.ActionLetter })
+            .WithAllowedSections(new[] { "content" })
+            .WithStartContentId(startNodeCreateResult.Result.Content!.Id)
+            .Build();
+        var userGroupCreateResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
+
+        var userCreateResult = await UserService.CreateAsync(
+            Constants.Security.SuperUserKey,
+            new UserCreateModel
+            {
+                UserName = "testUser@mail.com",
+                Email = "testUser@mail.com",
+                Name = "Test user",
+                UserGroupKeys = new HashSet<Guid> { userGroupCreateResult.Result.Key },
+            },
+            true);
+
+        var pickerDataType = new DataType(
+            PropertyEditorCollection[Constants.PropertyEditors.Aliases.MultiNodeTreePicker],
+            GetRequiredService<IConfigurationEditorJsonSerializer>())
+        {
+            ConfigurationData = new Dictionary<string, object>
+            {
+                { Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes, ignoreUserStartNodes },
+            },
+            Name = "Picker",
+            DatabaseType = ValueStorageType.Ntext,
+            ParentId = Constants.System.Root,
+        };
+        var pickerDataTypeCreateResult = await DataTypeService.CreateAsync(pickerDataType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(pickerDataTypeCreateResult.Success);
+
+        // Act
+        var result = await ContentListViewService.GetListViewItemsByKeyAsync(
+            userCreateResult.Result.CreatedUser!,
+            root.Key,
+            null,
+            "updateDate",
+            null,
+            Direction.Ascending,
+            null,
+            0,
+            10,
+            pickerDataTypeCreateResult.Result.Key);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
+            Assert.IsNotNull(result.Result);
+        });
+        Assert.AreEqual(expectedCount, result.Result!.Items.Items.Count());
     }
 
     private async Task<IContent> CreateRootContentWithFiveChildrenAsListViewItems(Guid? listViewDataTypeKey = null)
