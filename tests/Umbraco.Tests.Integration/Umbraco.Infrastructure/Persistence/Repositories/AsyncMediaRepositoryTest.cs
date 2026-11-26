@@ -250,7 +250,7 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task SaveAsync_OfAnItemWithABlankName_IsRejected()
+    public void SaveAsync_OfAnItemWithABlankName_IsRejected()
     {
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -260,7 +260,7 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
 
         Assert.ThrowsAsync<InvalidOperationException>(
             () => repository.SaveAsync(blank, CancellationToken.None),
-            "a media item needs a name to be read back, so a blank one is rejected rather than stored");
+            "a blank name is rejected, as for documents and elements, rather than auto-named as the NPoco repository does");
         Assert.That(blank.HasIdentity, Is.False);
     }
 
