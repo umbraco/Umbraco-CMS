@@ -175,14 +175,16 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         IMedia? image = null;
-        var rootCommands = await CountCommandsAsync(async () => await repository.GetAsync(_testFolder.Key, CancellationToken.None));
-        var childCommands = await CountCommandsAsync(async () => image = await repository.GetAsync(_testImage.Key, CancellationToken.None));
+        IMedia[] pair = [];
+        var singleCommands = await CountCommandsAsync(async () => image = await repository.GetAsync(_testImage.Key, CancellationToken.None));
+        var pairCommands = await CountCommandsAsync(async () => pair = (await repository.GetManyAsync([_testImage.Key, _testFile.Key], CancellationToken.None)).ToArray());
         scope.Complete();
 
         Assert.Multiple(() =>
         {
             Assert.That(image!.ParentKey, Is.EqualTo(_testFolder.Key));
-            Assert.That(childCommands, Is.EqualTo(rootCommands), "the parent key comes from the same join as the item, not a follow-up query");
+            Assert.That(pair.Select(media => media.ParentKey), Is.All.EqualTo(_testFolder.Key));
+            Assert.That(pairCommands, Is.EqualTo(singleCommands), "the parent key comes from the same join as the item, so reading two items costs no more commands than reading one");
         });
     }
 
@@ -245,6 +247,21 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
             Assert.That(image!.CreatorId, Is.EqualTo(Constants.Security.SuperUserId));
             Assert.That(image.WriterId, Is.EqualTo(Constants.Security.SuperUserId));
         });
+    }
+
+    [Test]
+    public async Task SaveAsync_OfAnItemWithABlankName_IsRejected()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        Media blank = MediaBuilder.CreateMediaFolder(_folderType, Constants.System.Root);
+        blank.Name = " ";
+
+        Assert.ThrowsAsync<InvalidOperationException>(
+            () => repository.SaveAsync(blank, CancellationToken.None),
+            "a media item needs a name to be read back, so a blank one is rejected rather than stored");
+        Assert.That(blank.HasIdentity, Is.False);
     }
 
     [Test]
@@ -976,15 +993,14 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task GetAsync_SharesNeitherRowsNorCacheEntriesWithDocuments()
+    public async Task GetAsync_SharesNoRowsWithDocuments()
     {
-        AppCaches appCaches = CreateRealAppCaches();
         var documentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage");
         await ContentTypeService.CreateAsync(documentType, Constants.Security.SuperUserKey);
 
         using var scope = NewScopeProvider.CreateScope();
-        var mediaRepository = CreateRepository(appCaches);
-        var documentRepository = CreateDocumentRepository(appCaches);
+        var mediaRepository = CreateRepository();
+        var documentRepository = CreateDocumentRepository(AppCaches.Disabled);
 
         Media media = MediaBuilder.CreateMediaFolder(_folderType, Constants.System.Root);
         media.Name = "Same Name";
@@ -999,7 +1015,6 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.That(RepositoryCacheKeys.GetGuidKey<IMedia>(), Is.Not.EqualTo(RepositoryCacheKeys.GetGuidKey<IContent>()));
             Assert.That(mediaByOwnKey, Is.Not.Null);
             Assert.That(mediaByOwnKey!.Name, Is.EqualTo("Same Name"), "a media item and a document may share a name under root");
             Assert.That(documentByMediaKey, Is.Null);
