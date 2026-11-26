@@ -356,7 +356,6 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
         file.Name = "Test File Updated";
         await repository.SaveAsync(file, CancellationToken.None);
         var afterUpdate = (await repository.GetAllVersionsAsync(file.Key, CancellationToken.None)).Count();
-        await repository.DeleteVersionAsync(file.VersionId, CancellationToken.None);
         await repository.DeleteVersionsAsync(file.Key, DateTime.UtcNow.AddDays(1), CancellationToken.None);
         var afterSecondDelete = (await repository.GetAllVersionsAsync(file.Key, CancellationToken.None)).Count();
         scope.Complete();
@@ -368,6 +367,25 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
             Assert.That(afterUpdate, Is.EqualTo(1), "a save of media does not create a version");
             Assert.That(afterSecondDelete, Is.EqualTo(1));
         });
+    }
+
+    [Test]
+    public async Task DeleteVersionAsync_RefusesTheCurrentVersion_AndIgnoresAMissingOne()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IMedia file = (await repository.GetAsync(_testFile.Key, CancellationToken.None))!;
+
+        Assert.ThrowsAsync<InvalidOperationException>(
+            () => repository.DeleteVersionAsync(file.VersionId, CancellationToken.None),
+            "the single version of a media item is its current one, which cannot be deleted");
+        Assert.DoesNotThrowAsync(() => repository.DeleteVersionAsync(int.MaxValue, CancellationToken.None));
+
+        var versions = (await repository.GetAllVersionsAsync(file.Key, CancellationToken.None)).Count();
+        scope.Complete();
+
+        Assert.That(versions, Is.EqualTo(1));
     }
 
     [Test]

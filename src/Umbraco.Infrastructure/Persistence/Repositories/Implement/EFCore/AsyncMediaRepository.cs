@@ -162,9 +162,23 @@ internal sealed partial class AsyncMediaRepository
             .ExecuteUpdateAsync(setters => setters.SetProperty(userGroup => userGroup.StartMediaId, (int?)null));
 
     /// <inheritdoc />
-    // A media item has exactly one version, which is its current one, so there is never a version to delete.
+    // A media item has exactly one version, which is its current one, so an existing version can only ever be
+    // refused; the guard is here so a caller gets the same answer as from the other content kinds.
     protected override Task PerformDeleteVersionAsync(int versionId, CancellationToken cancellationToken) =>
-        Task.CompletedTask;
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            bool? current = await db.ContentVersions
+                .Where(contentVersion => contentVersion.Id == versionId)
+                .Select(contentVersion => (bool?)contentVersion.Current)
+                .SingleOrDefaultAsync(cancellationToken);
+
+            if (current is true)
+            {
+                throw new InvalidOperationException("Cannot delete the current version.");
+            }
+
+            return true;
+        });
 
     /// <inheritdoc />
     protected override Task OnUowRefreshedEntityAsync(IMedia entity, CancellationToken cancellationToken)
