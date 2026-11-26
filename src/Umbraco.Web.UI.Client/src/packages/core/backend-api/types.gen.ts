@@ -11388,6 +11388,7 @@ export type GetCollectionMediaData = {
         id?: string;
         dataTypeId?: string;
         orderBy?: string;
+        orderCulture?: string;
         orderDirection?: DirectionModel;
         filter?: string;
         skip?: number;

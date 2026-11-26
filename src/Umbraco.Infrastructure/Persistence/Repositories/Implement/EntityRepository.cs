@@ -162,6 +162,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
         BuildVariants(entities.OfType<DocumentEntitySlim>());
         BuildVariants(entities.OfType<ElementEntitySlim>());
+        BuildMediaVariants(entities.OfType<MediaEntitySlim>());
 
         return entities;
     }
@@ -206,6 +207,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         }
 
         EntitySlim entity = BuildEntity(dto);
+
+        if (entity is MediaEntitySlim mediaEntity)
+        {
+            BuildMediaVariants([mediaEntity]);
+        }
 
         return entity;
     }
@@ -523,6 +529,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
         EntitySlim[] entities = dtos.Select(BuildEntity).ToArray();
 
+        if (isMedia)
+        {
+            BuildMediaVariants(entities.OfType<MediaEntitySlim>());
+        }
+
         return entities;
     }
 
@@ -829,9 +840,81 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return entitiesList;
     }
 
+    /// <summary>
+    /// Loads culture variant data for media slim entities.
+    /// Media has no publishing, so only culture names and availability are loaded
+    /// from ContentVersionCultureVariation records.
+    /// </summary>
+    private void BuildMediaVariants(IEnumerable<MediaEntitySlim> entities)
+    {
+        List<MediaEntitySlim>? v = null;
+        var entitiesList = entities.ToList();
+        foreach (MediaEntitySlim e in entitiesList)
+        {
+            if (e.Variations.VariesByCulture())
+            {
+                (v ??= new List<MediaEntitySlim>()).Add(e);
+            }
+        }
+
+        if (v == null)
+        {
+            return;
+        }
+
+        // fetch all variant info dtos
+        IEnumerable<VariantInfoDto> dtos = Database.FetchByGroups<VariantInfoDto, int>(
+            v.Select(x => x.Id),
+            Constants.Sql.MaxParameterCount,
+            GetMediaVariantInfos);
+
+        // group by node id (each group contains all languages)
+        var xdtos = dtos.GroupBy(x => x.NodeId).ToDictionary(x => x.Key, x => x);
+
+        foreach (MediaEntitySlim e in v)
+        {
+            if (xdtos.TryGetValue(e.Id, out IGrouping<int, VariantInfoDto>? edtos))
+            {
+                e.CultureNames = edtos.Where(x => x.CultureAvailable).ToDictionary(x => x.IsoCode, x => x.Name);
+            }
+        }
+    }
+
     #endregion
 
     #region Sql
+
+    /// <summary>
+    /// Gets variant info for media entities. Media has no document-level culture variation table,
+    /// so we query ContentVersionCultureVariation directly (which stores per-culture names).
+    /// </summary>
+    private Sql<ISqlContext> GetMediaVariantInfos(IEnumerable<int> ids) =>
+        Sql()
+            .Select<NodeDto>(x => x.NodeId)
+            .AndSelect<LanguageDto>(x => x.IsoCode)
+            .Append(", CAST(0 AS bit) AS " + SqlContext.SqlSyntax.GetQuotedColumnName(nameof(VariantInfoDto.DocumentPublished)))
+            .Append(", CAST(0 AS bit) AS " + SqlContext.SqlSyntax.GetQuotedColumnName(nameof(VariantInfoDto.DocumentEdited)))
+            .Append(", CASE WHEN cvcv." + SqlContext.SqlSyntax.GetQuotedColumnName("id") + " IS NOT NULL THEN CAST(1 AS bit) ELSE CAST(0 AS bit) END AS " + SqlContext.SqlSyntax.GetQuotedColumnName(nameof(VariantInfoDto.CultureAvailable)))
+            .Append(", CAST(0 AS bit) AS " + SqlContext.SqlSyntax.GetQuotedColumnName(nameof(VariantInfoDto.CulturePublished)))
+            .Append(", CAST(0 AS bit) AS " + SqlContext.SqlSyntax.GetQuotedColumnName(nameof(VariantInfoDto.CultureEdited)))
+            .Append(", cvcv." + SqlContext.SqlSyntax.GetQuotedColumnName("name") + " AS " + SqlContext.SqlSyntax.GetQuotedColumnName(nameof(VariantInfoDto.Name)))
+
+            // from node x language
+            .From<NodeDto>()
+            .CrossJoin<LanguageDto>()
+
+            // join to current content version
+            .InnerJoin<ContentVersionDto>()
+            .On<NodeDto, ContentVersionDto>((node, cv) => node.NodeId == cv.NodeId && cv.Current)
+
+            // left-join to content version culture variation - matches cultures that have names set
+            .Append("LEFT JOIN " + SqlContext.SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation) + " cvcv ON cvcv."
+                + SqlContext.SqlSyntax.GetQuotedColumnName("versionId") + " = " + SqlContext.SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.ContentVersion) + "." + SqlContext.SqlSyntax.GetQuotedColumnName("id")
+                + " AND cvcv." + SqlContext.SqlSyntax.GetQuotedColumnName("languageId") + " = " + SqlContext.SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Language) + "." + SqlContext.SqlSyntax.GetQuotedColumnName("id"))
+
+            // for selected nodes
+            .WhereIn<NodeDto>(x => x.NodeId, ids)
+            .OrderBy<LanguageDto>(x => x.Id);
 
     private Sql<ISqlContext> GetDocumentVariantInfos(IEnumerable<int> ids) =>
         Sql()
@@ -1345,6 +1428,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         /// Gets or sets the path to the media item, such as a file system path or URL.
         /// </summary>
         public string? MediaPath { get; set; }
+
+        /// <summary>
+        /// Gets or sets the content type variations (culture/segment) for this media type.
+        /// </summary>
+        public ContentVariation Variations { get; set; }
     }
 
     /// <summary>
@@ -1586,10 +1674,12 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         if (dto is MediaEntityDto mediaEntityDto)
         {
             entity.MediaPath = mediaEntityDto.MediaPath;
+            entity.Variations = mediaEntityDto.Variations;
         }
         else if (dto is GenericContentEntityDto genericContentEntityDto)
         {
             entity.MediaPath = genericContentEntityDto.MediaPath;
+            entity.Variations = genericContentEntityDto.Variations;
         }
 
         return entity;

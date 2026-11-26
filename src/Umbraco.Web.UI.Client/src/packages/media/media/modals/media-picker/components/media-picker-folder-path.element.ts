@@ -1,8 +1,9 @@
 import type { UmbMediaPathModel } from '../types.js';
-import type { UmbMediaDetailModel } from '../../../types.js';
+import type { UmbMediaDetailModel, UmbMediaItemVariantModel } from '../../../types.js';
 import { UmbMediaDetailRepository } from '../../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../../tree/index.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../../entity.js';
+import { resolveVariantName } from '../../../item/index.js';
 import {
 	css,
 	html,
@@ -15,9 +16,14 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbMediaTypeStructureRepository, type UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
+import {
+	UmbMediaTypeDetailRepository,
+	UmbMediaTypeStructureRepository,
+	type UmbAllowedMediaTypeModel,
+} from '@umbraco-cms/backoffice/media-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
@@ -26,6 +32,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 	#mediaTreeRepository = new UmbMediaTreeRepository(this); // used to get file structure
 	#mediaDetailRepository = new UmbMediaDetailRepository(this); // used to create folders
 	#mediaTypeStructureRepository = new UmbMediaTypeStructureRepository(this);
+	#mediaTypeDetailRepository = new UmbMediaTypeDetailRepository(this);
 
 	@property({ attribute: false })
 	startNode?: UmbMediaPathModel = root;
@@ -62,6 +69,29 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 	// Cache for all folder media types to avoid repeated API calls
 	#folderTypesPromise: Promise<UmbAllowedMediaTypeModel[]> | null = null;
 
+	#displayCulture?: string | null;
+	#fallbackCulture?: string | null;
+	#activeCulture?: string | null;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
+			this.observe(context?.displayCulture, (displayCulture) => {
+				this.#displayCulture = displayCulture;
+			});
+			this.observe(context?.fallbackCulture, (fallbackCulture) => {
+				this.#fallbackCulture = fallbackCulture;
+			});
+			this.observe(context?.culture, (culture) => {
+				this.#activeCulture = culture;
+			});
+		});
+	}
+
+	#resolveName(variants: Array<UmbMediaItemVariantModel>): string {
+		return resolveVariantName(variants, this.#displayCulture, this.#fallbackCulture);
+	}
+
 	protected override firstUpdated(_changedProperties: PropertyValues): void {
 		super.firstUpdated(_changedProperties);
 		this.#loadPath();
@@ -80,7 +110,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 			: [];
 
 		const paths: Array<UmbMediaPathModel> = items.map((item) => ({
-			name: item.name,
+			name: this.#resolveName(item.variants),
 			unique: item.unique,
 			entityType: item.entityType,
 			mediaType: { unique: item.mediaType.unique },
@@ -176,6 +206,12 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		const parentUnique = this._paths[this._paths.length - 1].unique;
 		const folderTypeUnique = this.#selectedFolderType.unique;
 
+		// A culture-variant folder type has no invariant variant — create the variant for the culture the user is
+		// currently working in, rather than an invalid invariant (culture: null) variant.
+		const { data: folderTypeData } = await this.#mediaTypeDetailRepository.requestByUniques([folderTypeUnique]);
+		const variesByCulture = folderTypeData?.[0]?.variesByCulture ?? false;
+		const culture = variesByCulture ? (this.#activeCulture ?? null) : null;
+
 		const preset: Partial<UmbMediaDetailModel> = {
 			unique: newUnique,
 			mediaType: {
@@ -184,7 +220,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 			},
 			variants: [
 				{
-					culture: null,
+					culture,
 					name: newName,
 					createDate: null,
 					updateDate: null,
@@ -198,7 +234,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		const { data } = await this.#mediaDetailRepository.create(scaffold, parentUnique);
 		if (!data) return;
 
-		const name = data.variants[0].name;
+		const name = this.#resolveName(data.variants);
 		const unique = data.unique;
 		const entityType = data.entityType;
 		const mediaType = { unique: folderTypeUnique };

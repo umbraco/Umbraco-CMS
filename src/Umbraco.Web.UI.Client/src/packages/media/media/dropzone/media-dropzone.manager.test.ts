@@ -7,7 +7,7 @@ import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controlle
 import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbFileDropzoneItemStatus, type UmbUploadableItem } from '@umbraco-cms/backoffice/dropzone';
-import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
+import { UmbMediaTypeDetailRepository, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { TemporaryFileStatus } from '@umbraco-cms/backoffice/temporary-file';
 
 @customElement('test-media-dropzone-manager-host')
@@ -84,6 +84,9 @@ const mockRepositories = (state: TestState) => {
 	override(state, UmbMediaTypeStructureRepository.prototype, 'requestMediaTypesOf', async ({ fileExtension }: any) =>
 		mediaTypesForExtension(fileExtension),
 	);
+	override(state, UmbMediaTypeDetailRepository.prototype, 'requestByUniques', async (uniques: Array<string>) => ({
+		data: uniques.map((unique) => ({ unique, variesByCulture: false })),
+	}));
 	override(state, UmbMediaDetailRepository.prototype, 'createScaffold', async (preset: any) => ({ data: preset }));
 	override(state, UmbMediaDetailRepository.prototype, 'createSilently', async (model: any) => {
 		state.createdMediaTypes.push(model.mediaType.unique);

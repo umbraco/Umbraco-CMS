@@ -6,6 +6,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import { UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from '@umbraco-cms/backoffice/workspace';
 
 // TODO: Refactor across all four content workspace editors (document, document blueprint, media, member) to use a base component. [NL]
 @customElement('umb-media-workspace-editor')
@@ -17,6 +19,7 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	#workspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
 
 	#workspaceRoute?: string;
+	#appCulture?: string;
 	#variants?: Array<Pick<UmbMediaVariantOptionModel, 'culture' | 'segment' | 'unique'>>;
 
 	@state()
@@ -27,6 +30,14 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
+			this.observe(instance?.appLanguageCulture, (appCulture) => {
+				const previousCulture = this.#appCulture;
+				this.#appCulture = appCulture;
+				this.#syncUrlToCulture(previousCulture, appCulture);
+			});
+		});
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
@@ -61,6 +72,39 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 				this._loading = loading ?? false;
 			},
 			'_observeLoading',
+		);
+	}
+
+	#syncUrlToCulture(previousCulture: string | undefined, appCulture: string | undefined) {
+		if (!previousCulture || !appCulture || previousCulture === appCulture || !this.#workspaceRoute) return;
+
+		const currentPath = window.location.pathname;
+		const routePrefix = this.#workspaceRoute + '/';
+
+		if (!currentPath.startsWith(routePrefix)) return;
+
+		const remainingPath = currentPath.substring(routePrefix.length);
+
+		// Skip split-view paths
+		if (remainingPath.includes(UMB_WORKSPACE_PATH_VARIANT_DELIMITER)) return;
+
+		// Separate the variant unique from any trailing path (e.g., /view/info)
+		const slashIndex = remainingPath.indexOf('/');
+		const variantUnique = slashIndex === -1 ? remainingPath : remainingPath.substring(0, slashIndex);
+		const pathSuffix = slashIndex === -1 ? '' : remainingPath.substring(slashIndex);
+
+		// Find the current variant to verify its culture matches the previous one
+		const currentVariant = this.#variants?.find((v) => v.unique === variantUnique);
+		if (currentVariant?.culture !== previousCulture) return;
+
+		// Find the equivalent variant with the new culture, preserving the segment
+		const newVariant = this.#variants?.find((v) => v.culture === appCulture && v.segment === currentVariant.segment);
+		if (!newVariant) return;
+
+		history.replaceState(
+			null,
+			'',
+			`${this.#workspaceRoute}/${newVariant.unique}${pathSuffix}${window.location.search}`,
 		);
 	}
 
@@ -109,7 +153,12 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 					const view = openCollection ? `/view/collection` : '';
 
 					// Is there a path matching the current culture?
-					let variant = this.#variants?.find((v) => !v.culture);
+					let variant = this.#variants?.find((v) => v.culture === this.#appCulture);
+
+					if (!variant) {
+						// If no match on app culture, then try to find a variant with no culture:
+						variant = this.#variants?.find((v) => !v.culture);
+					}
 
 					if (!variant) {
 						// If none then just use the first variant as a fallback.

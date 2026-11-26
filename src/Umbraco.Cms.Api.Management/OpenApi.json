@@ -19183,6 +19183,13 @@
             }
           },
           {
+            "name": "orderCulture",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "orderDirection",
             "in": "query",
             "schema": {

@@ -1,4 +1,5 @@
 import type { UmbMediaTreeItemModel, UmbMediaTreeRootModel } from '../types.js';
+import { UmbMediaItemDataResolver } from '../../item/index.js';
 import { UmbDefaultTreeItemContext } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
@@ -8,6 +9,9 @@ import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 export class UmbMediaTreeItemContext extends UmbDefaultTreeItemContext<UmbMediaTreeItemModel, UmbMediaTreeRootModel> {
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
+	#item = new UmbMediaItemDataResolver(this);
+
+	readonly name = this.#item.name;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -15,6 +19,7 @@ export class UmbMediaTreeItemContext extends UmbDefaultTreeItemContext<UmbMediaT
 		this.observe(
 			this.treeItem,
 			(item) => {
+				this.#item.setData(item);
 				this.#isTrashedContext.setIsTrashed(item?.isTrashed || false);
 
 				// TODO (V20): drop the `mediaType` fallback when the deprecated field is removed.

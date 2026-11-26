@@ -1,10 +1,18 @@
 import type { UmbMediaTreeItemModel } from '../types.js';
 import type { UmbMediaTreeItemContext } from './media-tree-item.context.js';
-import { css, html, customElement, nothing, classMap, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, nothing, classMap, when, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-media-tree-item')
 export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTreeItemModel, UmbMediaTreeItemContext> {
+	public override set api(value: UmbMediaTreeItemContext | undefined) {
+		this.observe(value?.name, (name) => (this._name = name || ''));
+		super.api = value;
+	}
+
+	@state()
+	private _name = '';
+
 	override renderIconContainer() {
 		return html`
 			<div id="icon-container" slot="icon">
@@ -20,9 +28,7 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 	}
 
 	override renderLabel() {
-		return html`<span id="label" slot="label" class=${classMap({ noAccess: this._noAccess })}>
-			${this._item?.variants[0].name}
-		</span> `;
+		return html`<span id="label" slot="label" class=${classMap({ noAccess: this._noAccess })}> ${this._name} </span> `;
 	}
 
 	// TODO (V20): drop the `mediaType` fallback when the deprecated field is removed.

@@ -52,6 +52,7 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
     /// <param name="id">The unique key identifying the media collection to retrieve items from.</param>
     /// <param name="dataTypeId">An optional data type identifier to filter the media items.</param>
     /// <param name="orderBy">The field by which to order the results. Defaults to "updateDate".</param>
+    /// <param name="orderCulture">An optional culture code to use for ordering.</param>
     /// <param name="orderDirection">The direction in which to order the results. Defaults to ascending.</param>
     /// <param name="filter">An optional string to filter the media items.</param>
     /// <param name="skip">The number of items to skip for pagination. Defaults to 0.</param>
@@ -69,6 +70,7 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
         Guid? id,
         Guid? dataTypeId = null,
         string orderBy = "updateDate",
+        string? orderCulture = null,
         Direction orderDirection = Direction.Ascending,
         string? filter = null,
         int skip = 0,
@@ -79,6 +81,7 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
             id,
             dataTypeId,
             orderBy,
+            orderCulture,
             orderDirection,
             filter,
             skip,

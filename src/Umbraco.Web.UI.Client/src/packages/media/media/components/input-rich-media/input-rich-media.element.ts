@@ -3,6 +3,7 @@ import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValueEntry 
 import type { UmbMediaClipboardConfig } from '../../clipboard/types.js';
 import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
+import { resolveVariantName } from '../../item/index.js';
 import { UmbMediaPickerInputContext } from '../input-media/input-media.context.js';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
@@ -22,6 +23,7 @@ import {
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 import '@umbraco-cms/backoffice/imaging';
 import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
@@ -210,8 +212,22 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		this.#pickerInputContext.interactionMemory,
 	);
 
+	#displayCulture?: string | null;
+	#fallbackCulture?: string | null;
+
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
+			this.observe(context?.displayCulture, (displayCulture) => {
+				this.#displayCulture = displayCulture;
+				this.#populateCards();
+			});
+			this.observe(context?.fallbackCulture, (fallbackCulture) => {
+				this.#fallbackCulture = fallbackCulture;
+				this.#populateCards();
+			});
+		});
 
 		this.observe(
 			this.#itemManager.items,
@@ -323,7 +339,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 					entityType: media?.entityType ?? UMB_MEDIA_ENTITY_TYPE,
 					unique: item.key,
 					media: item.mediaKey,
-					name: media?.name ?? '',
+					name: media ? resolveVariantName(media.variants, this.#displayCulture, this.#fallbackCulture) : '',
 					icon: media?.mediaType?.icon,
 					extension: media?.extension,
 					isTrashed: media?.isTrashed ?? false,

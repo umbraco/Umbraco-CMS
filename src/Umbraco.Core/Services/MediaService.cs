@@ -826,7 +826,9 @@ namespace Umbraco.Cms.Core.Services
                 }
 
                 // poor man's validation?
-                if (string.IsNullOrWhiteSpace(media.Name))
+                // For culture-variant media, the invariant name may not be set explicitly
+                // (names are per-culture). Only validate name for invariant media.
+                if (string.IsNullOrWhiteSpace(media.Name) && media.ContentType.VariesByCulture() == false)
                 {
                     throw new ArgumentException("Media has no name.", nameof(media));
                 }

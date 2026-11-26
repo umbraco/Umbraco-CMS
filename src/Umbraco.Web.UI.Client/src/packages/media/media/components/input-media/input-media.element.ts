@@ -1,4 +1,5 @@
 import type { UmbMediaCardItemModel } from '../../types.js';
+import { resolveVariantName } from '../../item/index.js';
 import { UmbMediaPickerFolderFilter, UmbMediaPickerInputContext } from './input-media.context.js';
 import type { UmbMediaClipboardConfig } from '../../clipboard/types.js';
 import { UmbClipboardCopyRequestEvent, UmbClipboardPasteRequestEvent } from '@umbraco-cms/backoffice/clipboard';
@@ -20,6 +21,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
@@ -173,6 +175,12 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	@state()
 	private _statuses: Array<UmbRepositoryItemsStatus> = [];
 
+	@state()
+	private _displayCulture?: string | null;
+
+	@state()
+	private _fallbackCulture?: string | null;
+
 	#pickerInputContext = new UmbMediaPickerInputContext(this);
 	#interactionMemoryManager = new UmbEntityInputInteractionMemoryManager(
 		this,
@@ -190,6 +198,15 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 			.observeRouteBuilder((routeBuilder) => {
 				this._editMediaPath = routeBuilder({});
 			});
+
+		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
+			this.observe(context?.displayCulture, (displayCulture) => {
+				this._displayCulture = displayCulture;
+			});
+			this.observe(context?.fallbackCulture, (fallbackCulture) => {
+				this._fallbackCulture = fallbackCulture;
+			});
+		});
 
 		this.observe(this.#pickerInputContext.selection, (selection) => (this.value = selection.join(',')), null);
 
@@ -308,10 +325,11 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		// for cleaner semantics and styling (no greyed-out display, no "disabled" screen-reader announcement) and visual
 		// consistency with document refs.
 		const href = this.readonly || !this._editMediaPath ? undefined : `${this._editMediaPath}edit/${item.unique}`;
+		const name = resolveVariantName(item.variants, this._displayCulture, this._fallbackCulture);
 		return html`
 			<uui-card-media
-				title=${ifDefined(item.name === null ? undefined : item.name)}
-				name=${ifDefined(item.name === null ? undefined : item.name)}
+				title=${name}
+				name=${name}
 				data-mark="${item.entityType}:${unique}"
 				data-unique="${unique}"
 				href="${ifDefined(href)}"
@@ -319,7 +337,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				?disabled=${!this._editMediaPath}>
 				<umb-media-thumbnail
 					unique=${unique}
-					alt=${item.name}
+					alt=${name}
 					icon=${item.mediaType.icon}
 					file-ext=${ifDefined(item.extension)}></umb-media-thumbnail>
 				${this.#renderIsTrashed(item)}
