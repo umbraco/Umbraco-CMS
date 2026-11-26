@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -27,6 +28,8 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     {
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
+        builder.Services.AddSingleton(sp => new RestoreObservingNavigationManagementService(sp.GetRequiredService<DocumentNavigationService>()));
+        builder.Services.AddUnique<IDocumentNavigationManagementService>(sp => sp.GetRequiredService<RestoreObservingNavigationManagementService>());
     }
 
     private IPublishedContentCache PublishedContentHybridCache => GetRequiredService<IPublishedContentCache>();
@@ -667,6 +670,29 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
     }
 
     [Test]
+    public async Task Restored_Published_Descendant_Stays_Hidden_While_The_Restore_Is_Refreshed()
+    {
+        Guid childKey = await CreatePublishedChildAsync("Published Child");
+        await TrashPublishedTextPageAsync();
+
+        var restoreSeen = false;
+        IPublishedContent? childOnRestore = null;
+        GetRequiredService<RestoreObservingNavigationManagementService>().RestoredFromBin = restoredKey =>
+        {
+            if (restoredKey == PublishedTextPage.Key)
+            {
+                restoreSeen = true;
+                childOnRestore = PublishedContentHybridCache.GetById(childKey);
+            }
+        };
+
+        await RestorePublishedTextPageAsync(includeDescendants: true);
+
+        Assert.IsTrue(restoreSeen, "The cache refresher should restore the branch in navigation");
+        Assert.IsNull(childOnRestore, "The child should stay hidden once navigation has it back under its restored, unpublished parent");
+    }
+
+    [Test]
     public async Task Descendant_Unpublished_In_Recycle_Bin_Stays_Out_Of_Published_Cache_When_Parent_Is_Restored_And_Republished()
     {
         Guid childKey = await CreatePublishedChildAsync("Published Child");
@@ -782,5 +808,35 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
             Assert.AreEqual(property.Alias, publishedProperty.Alias);
             Assert.AreEqual(property.Value, publishedProperty.GetSourceValue());
         });
+    }
+
+    /// <summary>
+    /// Runs a callback after navigation restores a node from the recycle bin, which the cache refresher does while
+    /// it handles the restore.
+    /// </summary>
+    internal sealed class RestoreObservingNavigationManagementService(IDocumentNavigationManagementService inner) : IDocumentNavigationManagementService
+    {
+        public Action<Guid>? RestoredFromBin { get; set; }
+
+        public bool RestoreFromBin(Guid key, Guid? targetParentKey = null)
+        {
+            var restored = inner.RestoreFromBin(key, targetParentKey);
+            RestoredFromBin?.Invoke(key);
+            return restored;
+        }
+
+        public Task RebuildAsync() => inner.RebuildAsync();
+
+        public bool MoveToBin(Guid key) => inner.MoveToBin(key);
+
+        public bool Add(Guid key, Guid contentTypeKey, Guid? parentKey = null, int? sortOrder = null) => inner.Add(key, contentTypeKey, parentKey, sortOrder);
+
+        public bool Move(Guid key, Guid? targetParentKey = null) => inner.Move(key, targetParentKey);
+
+        public bool UpdateSortOrder(Guid key, int newSortOrder) => inner.UpdateSortOrder(key, newSortOrder);
+
+        public Task RebuildBinAsync() => inner.RebuildBinAsync();
+
+        public bool RemoveFromBin(Guid key) => inner.RemoveFromBin(key);
     }
 }

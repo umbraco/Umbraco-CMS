@@ -264,8 +264,10 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 HandleRouting(payload);
             }
 
-            HandleNavigation(payload);
+            // Publish status is read from the database, not from navigation, so it can come first. A branch restored
+            // from the recycle bin must not pass the published-ancestor check against the status its root had there.
             HandlePublished(payload);
+            HandleNavigation(payload);
 
             HandleMemoryCache(payload);
 
