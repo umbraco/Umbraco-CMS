@@ -5,12 +5,13 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { ensureLocalPath } from '@umbraco-cms/backoffice/utils';
 
 /**
- * Lander for the external-login popup flow (`{BackOfficeHost}/auth-callback`, hardcoded server-side in
- * `BackOfficeController.ExternalLoginSuccessRedirectUrl`). The server callback has already set the auth
+ * Lander for external logins and the sign-in popup (`{BackOfficeHost}/auth-callback`, hardcoded server-side
+ * in `BackOfficeController.ExternalLoginSuccessRedirectUrl`). The server callback has already set the auth
  * cookie and redirected here; the boot probe + `authorized` broadcast also already ran (`auth-callback`
  * isn't in `UmbAppElement#setup`'s skip list). So this element only waits for `isAuthorized` to settle:
- * on success it closes — no `window.opener`/`postMessage`, since the same-origin broadcast already
- * reached the opener — and on failure it reports, rather than closing on a session that never arrived.
+ * on success it returns to the backoffice, and on failure it reports, rather than returning on a session
+ * that never arrived. It never closes its own window: a script may close any tab another page opened, and
+ * only the window that opened a sign-in popup can tell it is one, so that window closes it.
  */
 @customElement('umb-app-auth-callback')
 export class UmbAppAuthCallbackElement extends UmbLitElement {
@@ -18,6 +19,7 @@ export class UmbAppAuthCallbackElement extends UmbLitElement {
 	private _failed = false;
 
 	#backofficePath = '/umbraco';
+	#returnTimeout?: ReturnType<typeof setTimeout>;
 
 	constructor() {
 		super();
@@ -31,14 +33,13 @@ export class UmbAppAuthCallbackElement extends UmbLitElement {
 				authContext?.isAuthorized,
 				(isAuthorized) => {
 					if (isAuthorized) {
-						this.#close();
+						this.#return();
 						return;
 					}
 
 					// The boot probe has already run and resolved by the time the router mounts this
 					// element, so an unauthorized state here means the sign-in produced no session.
-					// Say so instead of closing: a silent close leaves the opener waiting forever for
-					// an `authorized` broadcast that is never coming.
+					// Say so instead of returning: the backoffice would only send the user back to sign in.
 					this._failed = true;
 				},
 				'observeIsAuthorized',
@@ -46,14 +47,15 @@ export class UmbAppAuthCallbackElement extends UmbLitElement {
 		});
 	}
 
-	#close(): void {
-		window.close();
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		clearTimeout(this.#returnTimeout);
+	}
 
-		// window.close() is a silent no-op when the browser refuses it — e.g. this route loaded in an
-		// ordinary tab (the full-page redirect flow) rather than the script-opened popup. Fall back to
-		// the server-carried returnUrl (re-validated local), else the backoffice root — never leave a
-		// bare loader up indefinitely.
-		setTimeout(() => {
+	#return(): void {
+		// Give the window that opened a sign-in popup time to close it, before loading the backoffice in it.
+		// Return to the server-carried returnUrl (re-validated local), else the backoffice root.
+		this.#returnTimeout = setTimeout(() => {
 			if (!window.closed) {
 				window.location.href = this.#fallbackUrl();
 			}

@@ -75,7 +75,7 @@ public class MultipleDocumentPickerValueConverter : PropertyValueConverterBase, 
 
     /// <inheritdoc />
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
-        => GetDocuments(inter, preview).Select(_apiContentBuilder.Build).ToArray();
+        => GetDocuments(inter, preview).Select(_apiContentBuilder.Build).WhereNotNull().ToArray();
 
     private IPublishedContent[] GetDocuments(object? inter, bool preview)
     {

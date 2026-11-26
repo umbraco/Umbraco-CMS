@@ -129,6 +129,17 @@ export class UiHelpers {
     await this.page.goto(umbracoConfig.environment.baseUrl + '/umbraco');
   }
 
+  // Opens the backoffice the way another site links to it: in a new tab, which a script is allowed to close.
+  async goToBackOfficeInNewTab() {
+    const backOfficeUrl = umbracoConfig.environment.baseUrl + '/umbraco';
+    await this.page.setContent(`<a href="${backOfficeUrl}" target="_blank">Open the backoffice</a>`);
+    const [backOfficeTab] = await Promise.all([
+      this.page.context().waitForEvent('page'),
+      this.page.getByRole('link', {name: 'Open the backoffice'}).click(),
+    ]);
+    return backOfficeTab;
+  }
+
   async waitForTimeout(timeout: number) {
     await this.page.waitForTimeout(timeout);
   }

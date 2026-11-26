@@ -9,3 +9,4 @@ export const UMB_USER_PERMISSION_ELEMENT_UNPUBLISH = 'Umb.Element.Unpublish';
 export const UMB_USER_PERMISSION_ELEMENT_UPDATE = 'Umb.Element.Update';
 
 export * from './conditions/constants.js';
+export * from './repository/constants.js';

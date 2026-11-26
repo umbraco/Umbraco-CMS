@@ -62,6 +62,68 @@ const elementOneElementType: UmbMockDocumentTypeModel = {
 	flags: [],
 };
 
+const blockSettingsElementType: UmbMockDocumentTypeModel = {
+	allowedTemplates: [],
+	defaultTemplate: null,
+	id: '5b3e9d7a-2c14-4a68-8f0b-6d1e4a9c7b23',
+	alias: 'blockSettingsElementType',
+	name: 'Block Settings',
+	description: null,
+	icon: 'icon-settings color-deep-purple',
+	allowedAsRoot: false,
+	allowedInLibrary: false,
+	variesByCulture: false,
+	variesBySegment: false,
+	isElement: true,
+	hasChildren: false,
+	noAccess: false,
+	parent: null,
+	isFolder: false,
+	properties: [
+		{
+			id: 'pt-163',
+			container: {
+				id: '8a2d6f4b-1e97-4c35-b0a8-3f5c9e7d1a46',
+			},
+			alias: 'textSize',
+			name: 'Text Size',
+			description: null,
+			dataType: {
+				id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+			},
+			variesByCulture: false,
+			variesBySegment: false,
+			sortOrder: 0,
+			validation: {
+				mandatory: false,
+				mandatoryMessage: null,
+				regEx: null,
+				regExMessage: null,
+			},
+			appearance: {
+				labelOnTop: false,
+			},
+		},
+	],
+	containers: [
+		{
+			id: '8a2d6f4b-1e97-4c35-b0a8-3f5c9e7d1a46',
+			parent: null,
+			name: 'Settings',
+			type: 'Group',
+			sortOrder: 0,
+		},
+	],
+	allowedDocumentTypes: [],
+	compositions: [],
+	cleanup: {
+		preventCleanup: false,
+		keepAllVersionsNewerThanDays: null,
+		keepLatestVersionPerDayForDays: null,
+	},
+	flags: [],
+};
+
 const elementTwoElementType: UmbMockDocumentTypeModel = {
 	allowedTemplates: [],
 	defaultTemplate: null,
@@ -721,6 +783,7 @@ const libraryElementMisconfigurationsDocumentType = createLibraryElementStatesDo
 
 export const data: Array<UmbMockDocumentTypeModel> = [
 	elementOneElementType,
+	blockSettingsElementType,
 	elementTwoElementType,
 	richTextEditorDocumentType,
 	blockListDocumentType,

@@ -226,6 +226,18 @@ describe('UmbBlockManagerContext', () => {
 			await waitUntil(() => !hasContent('e1'));
 			expect(hasContent('e2')).to.be.true;
 		});
+
+		it('never stores content or expose state for external content', () => {
+			manager.setLayouts([layout('l1', 'e1'), { key: 'l2', contentKey: 'local-content' }]);
+
+			manager.setOneContent(blockData('e1'));
+			manager.setOneExpose('e1', new UmbVariantId(null));
+			manager.setOneContent(blockData('local-content'));
+			manager.setOneExpose('local-content', new UmbVariantId(null));
+
+			expect(manager.getContents().map((x) => x.key)).to.deep.equal(['local-content']);
+			expect(manager.getExposes().map((x) => x.contentKey)).to.deep.equal(['local-content']);
+		});
 	});
 
 	describe('expose ordering', () => {
