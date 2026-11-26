@@ -83,6 +83,47 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
+    ///     Creates a <see cref="Core.Models.Media" /> entity from the EF Core rows a read query returns for one
+    ///     version of a media item.
+    /// </summary>
+    /// <param name="node">The node row.</param>
+    /// <param name="contentVersion">The content version row of the version being built.</param>
+    /// <param name="mediaType">The media type; required, a media item cannot exist without one.</param>
+    /// <returns>A <see cref="Core.Models.Media" /> instance populated from the rows.</returns>
+    public static Core.Models.Media BuildEntity(
+        EFCoreDtos.NodeDto node,
+        EFCoreDtos.ContentVersionDto contentVersion,
+        IMediaType mediaType)
+    {
+        var entity = new Core.Models.Media(contentVersion.Text ?? string.Empty, node.ParentId, mediaType);
+
+        try
+        {
+            entity.DisableChangeTracking();
+
+            entity.Id = node.NodeId;
+            entity.Key = node.UniqueId;
+            entity.VersionId = contentVersion.Id;
+            entity.Path = node.Path;
+            entity.Level = node.Level;
+            entity.ParentId = node.ParentId;
+            entity.SortOrder = node.SortOrder;
+            entity.Trashed = node.Trashed;
+            entity.CreatorId = node.UserId ?? Constants.Security.UnknownUserId;
+            entity.WriterId = contentVersion.UserId ?? Constants.Security.UnknownUserId;
+            entity.CreateDate = node.CreateDate.EnsureUtc();
+            entity.UpdateDate = contentVersion.VersionDate.EnsureUtc();
+
+            entity.ResetDirtyProperties(false);
+            return entity;
+        }
+        finally
+        {
+            entity.EnableChangeTracking();
+        }
+    }
+
+    /// <summary>
     ///     Constructs a Media item entity from the provided data transfer object (DTO) and media type.
     /// </summary>
     /// <param name="dto">The <see cref="ContentDto"/> containing the data for the media item.</param>
@@ -402,25 +443,34 @@ internal sealed class ContentBaseFactory
             Text = entity.Name,
         };
 
-    private static MediaVersionDto BuildMediaVersionDto(MediaUrlGeneratorCollection mediaUrlGenerators, IMedia entity, ContentDto contentDto)
-    {
-        // try to get a path from the string being stored for media
-        // TODO: only considering umbracoFile
-        string? path = null;
-
-        if (entity.Properties.TryGetValue(Constants.Conventions.Media.File, out IProperty? property)
-            && mediaUrlGenerators.TryGetMediaPath(property.PropertyType.PropertyEditorAlias, property.GetValue(), out var mediaPath))
+    private static MediaVersionDto BuildMediaVersionDto(MediaUrlGeneratorCollection mediaUrlGenerators, IMedia entity, ContentDto contentDto) =>
+        new()
         {
-            path = mediaPath;
-        }
-
-        var dto = new MediaVersionDto
-        {
-            Id = entity.VersionId, Path = path, ContentVersionDto = BuildContentVersionDto(entity, contentDto),
+            Id = entity.VersionId,
+            Path = ResolveMediaPath(mediaUrlGenerators, entity),
+            ContentVersionDto = BuildContentVersionDto(entity, contentDto),
         };
 
-        return dto;
-    }
+    /// <summary>
+    ///     Builds the EF Core <see cref="EFCoreDtos.MediaVersionDto" /> row for the entity's current version, with the
+    ///     path of the file its file property stores.
+    /// </summary>
+    /// <param name="entity">The media entity whose current version is being persisted.</param>
+    /// <param name="mediaUrlGenerators">The generators that resolve a file path from the file property's value.</param>
+    /// <returns>An EF Core <see cref="EFCoreDtos.MediaVersionDto" /> for the entity's current version.</returns>
+    internal static EFCoreDtos.MediaVersionDto BuildEFCoreMediaVersionDto(IMedia entity, MediaUrlGeneratorCollection mediaUrlGenerators) =>
+        new()
+        {
+            Id = entity.VersionId,
+            Path = ResolveMediaPath(mediaUrlGenerators, entity),
+        };
+
+    // Only the conventional file property is considered; a media type storing files under another alias keeps a null path.
+    private static string? ResolveMediaPath(MediaUrlGeneratorCollection mediaUrlGenerators, IMedia entity) =>
+        entity.Properties.TryGetValue(Constants.Conventions.Media.File, out IProperty? property)
+            && mediaUrlGenerators.TryGetMediaPath(property.PropertyType.PropertyEditorAlias, property.GetValue(), out var mediaPath)
+            ? mediaPath
+            : null;
 
     /// <summary>
     ///     Populates <paramref name="content"/> from the EF Core rows a read query returns for one version of a
