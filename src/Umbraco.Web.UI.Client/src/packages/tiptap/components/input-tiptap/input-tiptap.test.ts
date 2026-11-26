@@ -119,7 +119,7 @@ describe('UmbInputTiptapElement (stylesheets)', () => {
 
 		const configured = document.createElement('style');
 		configured.textContent = 'code { background-color: rgb(255, 0, 0); }';
-		element.shadowRoot!.appendChild(configured);
+		element.shadowRoot!.prepend(configured);
 
 		const code = element.shadowRoot!.querySelector('#editor code')!;
 		expect(getComputedStyle(code).backgroundColor).to.equal('rgb(255, 0, 0)');

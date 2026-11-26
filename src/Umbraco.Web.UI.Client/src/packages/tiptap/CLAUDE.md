@@ -189,7 +189,7 @@ To register the new extension's API class, add a re-export line to `extensions/e
 
 ### Extension with Custom Styles
 
-Override `getStyles()` to inject CSS into the editor's Shadow DOM:
+Override `getStyles()` to inject CSS into the editor's Shadow DOM. These styles sit in a cascade layer, so any unlayered rule in the editor, including the data type's configured stylesheets, takes precedence regardless of selector specificity:
 
 ```typescript
 export default class UmbTiptapTableExtensionApi extends UmbTiptapExtensionApiBase {

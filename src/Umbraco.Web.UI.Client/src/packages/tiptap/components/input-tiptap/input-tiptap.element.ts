@@ -32,6 +32,17 @@ const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
 
 const RTE_CONTENT_STYLESHEET = '/umbraco/backoffice/css/rte-content.css';
 
+/**
+ * Flattens a `CSSResultGroup` (a `CSSResult`, a native `CSSStyleSheet`, or nested arrays of them) into CSS text.
+ * @param {CSSResultGroup} styles The styles to flatten.
+ * @returns {string} The CSS text.
+ */
+function toCssText(styles: CSSResultGroup): string {
+	if (Array.isArray(styles)) return styles.map(toCssText).join('');
+	if (styles instanceof CSSStyleSheet) return Array.from(styles.cssRules, (rule) => rule.cssText).join('');
+	return styles.cssText;
+}
+
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
 	readonly #context = new UmbTiptapRteContext(this);
@@ -241,9 +252,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		});
 
 		if (collectedStyles.length) {
-			this._extensionStyles = unsafeCSS(
-				`@layer umb-tiptap-extensions { ${collectedStyles.map((s) => s.toString()).join('')} }`,
-			);
+			this._extensionStyles = unsafeCSS(`@layer umb-tiptap-extensions { ${collectedStyles.map(toCssText).join('')} }`);
 		}
 
 		this._toolbar = this.configuration?.getValueByAlias<UmbTiptapToolbarValue>('toolbar') ?? [[[]]];
