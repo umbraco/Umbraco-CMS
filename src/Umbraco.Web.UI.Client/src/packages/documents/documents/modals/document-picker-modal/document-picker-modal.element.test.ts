@@ -244,6 +244,23 @@ describe('UmbDocumentPickerModalElement', () => {
 			const config = getCollection()?.config as { originDataTypeId?: string } | undefined;
 			expect(config?.originDataTypeId).to.equal(PICKER_DATA_TYPE_UNIQUE);
 		});
+
+		it('re-creates the collection when the origin data type resolves after it was rendered', async () => {
+			const modal = element as unknown as { _collectionConfig: object; _originDataTypeUnique?: string };
+			modal._originDataTypeUnique = undefined;
+			await browseTo('with-collection');
+			modal._collectionConfig = {};
+			await element.updateComplete;
+			const first = getCollection();
+			expect((first?.config as { originDataTypeId?: string }).originDataTypeId).to.be.undefined;
+
+			modal._originDataTypeUnique = PICKER_DATA_TYPE_UNIQUE;
+			await element.updateComplete;
+
+			const second = getCollection();
+			expect(second).to.not.equal(first);
+			expect((second?.config as { originDataTypeId?: string }).originDataTypeId).to.equal(PICKER_DATA_TYPE_UNIQUE);
+		});
 	});
 
 	// The Collection endpoint authorizes against the Content section alone, while the Tree endpoint accepts any
