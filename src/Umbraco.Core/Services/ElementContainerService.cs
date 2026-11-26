@@ -1,4 +1,3 @@
-using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -241,7 +240,30 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             return Attempt.Fail(EntityContainerOperationStatus.CancelledByNotification);
         }
 
-        List<IElement> deletedElements = DeleteDescendantsLocked(Constants.System.RecycleBinElementKey, UmbracoObjectTypes.ElementRecycleBin, scope, eventMessages, pageSize);
+        // Folders at the root of the recycle bin are deleted with their contents, as when deleting a folder on its own,
+        // so each gets a deleting notification whose state is shared with everything deleted along with it.
+        var rootContainerNotificationStates = new Dictionary<int, IDictionary<string, object?>>();
+        foreach (EntityContainer rootContainer in GetRecycleBinRootContainers(pageSize))
+        {
+            var containerDeletingNotification = new EntityContainerDeletingNotification(rootContainer, eventMessages);
+            if (await scope.Notifications.PublishCancelableAsync(containerDeletingNotification))
+            {
+                return Attempt.Fail(EntityContainerOperationStatus.CancelledByNotification);
+            }
+
+            rootContainerNotificationStates[rootContainer.Id] = containerDeletingNotification.State;
+        }
+
+        // Paths of items in the recycle bin start with the root and the recycle bin, followed by the root-most item in the bin.
+        List<IElement> deletedElements = DeleteDescendantsLocked(
+            Constants.System.RecycleBinElementKey,
+            UmbracoObjectTypes.ElementRecycleBin,
+            scope,
+            eventMessages,
+            item => rootContainerNotificationStates.TryGetValue(item.Path.GetIdsFromPath()[2], out IDictionary<string, object?>? state)
+                ? state
+                : deletingNotification.State,
+            pageSize);
 
         await AuditAsync(AuditType.Delete, userKey, Constants.System.RecycleBinElement, "Recycle bin emptied");
 
@@ -403,7 +425,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
 
         List<IElement> deletedElements = mode is ContainerDeleteMode.Direct
             ? []
-            : DeleteDescendantsLocked(container.Key, UmbracoObjectTypes.ElementContainer, scope, eventMessages);
+            : DeleteDescendantsLocked(container.Key, UmbracoObjectTypes.ElementContainer, scope, eventMessages, _ => deletingNotification.State);
 
         DeleteContainerRelations(container);
         _entityContainerRepository.Delete(container);
@@ -417,7 +439,13 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         return Attempt.SucceedWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.Success, container);
     }
 
-    private List<IElement> DeleteDescendantsLocked(Guid key, UmbracoObjectTypes objectType, ICoreScope scope, EventMessages eventMessages, int pageSize = DescendantsIteratorPageSize)
+    private List<IElement> DeleteDescendantsLocked(
+        Guid key,
+        UmbracoObjectTypes objectType,
+        ICoreScope scope,
+        EventMessages eventMessages,
+        Func<IEntitySlim, IDictionary<string, object?>> getNotificationState,
+        int pageSize = DescendantsIteratorPageSize)
     {
         var deletedElements = new List<IElement>();
 
@@ -472,7 +500,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
                     continue;
                 }
 
-                IUmbracoEntity deletedEntity = DeleteItem(scope, descendant, eventMessages);
+                IUmbracoEntity deletedEntity = DeleteItem(scope, descendant, eventMessages, getNotificationState(descendant));
                 if (deletedEntity is IElement deletedElement)
                 {
                     deletedElements.Add(deletedElement);
@@ -486,7 +514,24 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         return deletedElements;
     }
 
-    private IUmbracoEntity DeleteItem(ICoreScope scope, IEntitySlim descendant, EventMessages eventMessages)
+    private List<EntityContainer> GetRecycleBinRootContainers(int pageSize)
+    {
+        var rootContainers = new List<EntityContainer>();
+        long pageIndex = 0;
+        long total;
+        do
+        {
+            IEntitySlim[] page = _entityService
+                .GetPagedTrashedChildren(Constants.System.RecycleBinElement, UmbracoObjectTypes.ElementContainer, pageIndex++, pageSize, out total)
+                .ToArray();
+            rootContainers.AddRange(page.Select(x => _entityContainerRepository.Get(x.Id)).WhereNotNull());
+        }
+        while (pageIndex * pageSize < total);
+
+        return rootContainers;
+    }
+
+    private IUmbracoEntity DeleteItem(ICoreScope scope, IEntitySlim descendant, EventMessages eventMessages, IDictionary<string, object?> notificationState)
     {
         if (descendant.NodeObjectType == Constants.ObjectTypes.ElementContainer)
         {
@@ -494,14 +539,14 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             EntityContainer descendantContainer = _entityContainerRepository.Get(descendant.Id)
                                                   ?? throw new InvalidOperationException($"Descendant container with ID {descendant.Id} was not found.");
             _entityContainerRepository.Delete(descendantContainer);
-            scope.Notifications.Publish(new EntityContainerDeletedNotification(descendantContainer, eventMessages));
+            scope.Notifications.Publish(new EntityContainerDeletedNotification(descendantContainer, eventMessages).WithState(notificationState));
             return descendantContainer;
         }
 
         IElement descendantElement = _elementRepository.Get(descendant.Id)
                                      ?? throw new InvalidOperationException($"Descendant element with ID {descendant.Id} was not found.");
         _elementRepository.Delete(descendantElement);
-        scope.Notifications.Publish(new ElementDeletedNotification(descendantElement, eventMessages));
+        scope.Notifications.Publish(new ElementDeletedNotification(descendantElement, eventMessages).WithState(notificationState));
         return descendantElement;
     }
 

@@ -10,8 +10,15 @@ namespace Umbraco.Cms.Core.Notifications;
 /// </summary>
 /// <typeparam name="T">The type of entities being deleted.</typeparam>
 /// <remarks>
-///     This notification is cancelable, allowing handlers to prevent the delete operation.
-///     The notification is published before the entities are removed from the database.
+///     <para>
+///         This notification is cancelable, allowing handlers to prevent the delete operation.
+///         The notification is published before the entities are removed from the database.
+///     </para>
+///     <para>
+///         It lists the entities chosen for deletion. The operation may also delete entities it doesn't list, for example
+///         descendants. Each deleted entity gets a <see cref="DeletedNotification{T}"/> that shares this notification's
+///         <see cref="StatefulNotification.State"/>, so key any per-entity state by entity.
+///     </para>
 /// </remarks>
 public abstract class DeletingNotification<T> : CancelableEnumerableObjectNotification<T>
 {

@@ -12,6 +12,8 @@ namespace Umbraco.Cms.Core.Notifications;
 /// <remarks>
 ///     This notification is cancelable, allowing handlers to prevent the delete operation
 ///     by setting <see cref="ICancelableNotification.Cancel"/> to <c>true</c>.
+///     Where a container's contents are deleted with it, for example an element folder deleted from the recycle bin,
+///     the deleted notifications for those items share this notification's state.
 /// </remarks>
 public class EntityContainerDeletingNotification : DeletingNotification<EntityContainer>
 {

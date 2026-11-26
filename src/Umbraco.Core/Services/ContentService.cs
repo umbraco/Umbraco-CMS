@@ -1474,7 +1474,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                         continue;
                     }
 
-                    DeleteLocked(scope, content, eventMessages);
+                    DeleteLocked(scope, content, eventMessages, deletingContentNotification.State);
                     deleted.Add(content);
                 }
             }
@@ -1996,7 +1996,8 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 return;
             }
 
-            if (scope.Notifications.PublishCancelable(new ContentDeletingNotification(contents, eventMessages)))
+            var deletingNotification = new ContentDeletingNotification(contents, eventMessages);
+            if (scope.Notifications.PublishCancelable(deletingNotification))
             {
                 scope.Complete();
                 return;
@@ -2030,7 +2031,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
                 // delete content
                 // triggers the deleted event (and handles the files)
-                DeleteLocked(scope, content, eventMessages);
+                DeleteLocked(scope, content, eventMessages, deletingNotification.State);
                 changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.Remove));
             }
 
@@ -2338,11 +2339,15 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     protected override ILogger<ContentService> Logger => _logger;
 
     protected override void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs)
+        => DeleteLocked(scope, content, evtMsgs, null);
+
+    /// <inheritdoc />
+    protected override void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs, IDictionary<string, object?>? notificationState)
     {
         void DoDelete(IContent c)
         {
             _documentRepository.Delete(c);
-            scope.Notifications.Publish(new ContentDeletedNotification(c, evtMsgs));
+            scope.Notifications.Publish(new ContentDeletedNotification(c, evtMsgs).WithState(notificationState));
 
             // media files deleted by QueuingEventDispatcher
         }
