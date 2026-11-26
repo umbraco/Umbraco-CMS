@@ -48,6 +48,8 @@ internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrati
 
     private IPublishStatusQueryService PublishStatusQueryService => GetRequiredService<IPublishStatusQueryService>();
 
+    private IPublishStatusManagementService PublishStatusManagementService => GetRequiredService<IPublishStatusManagementService>();
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
@@ -182,9 +184,13 @@ internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrati
         var unpublishAttempt = await ContentPublishingService.UnpublishAsync(rootContent.Key, new HashSet<string> { _danishIsoCode }, Constants.Security.SuperUserKey);
         Assert.IsTrue(unpublishAttempt.Success);
 
+        // Drop the publish status of the child, so that only a new read of the branch brings it back.
+        await PublishStatusManagementService.RemoveAsync(childNode.Key, CancellationToken.None);
+
         await RestoreRootAsync();
 
         Assert.IsFalse(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(rootContent.Key), "A root restored as unpublished should not be reported as published in any culture");
+        Assert.IsTrue(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(childNode.Key), "The restore should read the publish status of the branch again");
         Assert.IsNull(await PublishedContentCache.GetByIdAsync(childNode.Key, false), "Child should stay hidden while its restored parent is unpublished");
     }
 

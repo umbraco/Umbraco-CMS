@@ -606,18 +606,18 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task RefreshContentAsync_Of_Trashed_Published_Content_Keeps_The_Published_Record()
     {
-        IContent trashedContent = TrashPublishedTextpage();
+        IContent trashedContent = GetPublishedTextpageMarkedAsTrashed();
 
         await DocumentCacheService.RefreshContentAsync(trashedContent);
 
         Assert.That(CountRecords(Textpage.Id, published: true), Is.EqualTo(1));
+        Assert.That(CountRecords(Textpage.Id, published: false), Is.EqualTo(1));
     }
 
     [Test]
     public async Task RefreshContentAsync_Of_Trashed_Content_Being_Unpublished_Removes_The_Published_Record()
     {
-        IContent trashedContent = TrashPublishedTextpage();
-        Assert.That(CountRecords(Textpage.Id, published: true), Is.EqualTo(1), "The published record should still be there after the move to the recycle bin");
+        IContent trashedContent = GetPublishedTextpageMarkedAsTrashed();
         trashedContent.PublishedState = PublishedState.Unpublishing;
 
         await DocumentCacheService.RefreshContentAsync(trashedContent);
@@ -626,11 +626,16 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
         Assert.That(CountRecords(Textpage.Id, published: false), Is.EqualTo(1), "The draft record should stay");
     }
 
-    private IContent TrashPublishedTextpage()
+    // Marks the content as trashed in memory only. The records are then the ones that the publish wrote,
+    // whatever a move to the recycle bin does with them.
+    private IContent GetPublishedTextpageMarkedAsTrashed()
     {
         Assert.That(ContentService.Publish(Textpage, ["*"]).Success, Is.True);
-        Assert.That(ContentService.MoveToRecycleBin(Textpage).Success, Is.True);
-        return ContentService.GetById(Textpage.Key)!;
+        var content = (Content)ContentService.GetById(Textpage.Key)!;
+        content.Trashed = true;
+        Assert.That(CountRecords(Textpage.Id, published: true), Is.EqualTo(1));
+        Assert.That(CountRecords(Textpage.Id, published: false), Is.EqualTo(1));
+        return content;
     }
 
     private int CountRecords(int nodeId, bool published)

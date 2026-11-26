@@ -83,6 +83,8 @@ internal sealed class DocumentHybridCacheSynchronousPersistenceTests : UmbracoIn
     public void Trash_KeepsTheRows_AndClearsTheMemoryCache()
     {
         Assert.That(ContentService.Publish(Textpage, ["*"]).Success, Is.True);
+        Assert.That(PublishedContentCache.GetById(false, Textpage.Key), Is.Not.Null);
+        Assert.That(PublishedContentCache.GetById(true, Textpage.Key), Is.Not.Null);
         Repository.Reset();
 
         Assert.That(ContentService.MoveToRecycleBin(Textpage).Success, Is.True);
@@ -91,7 +93,8 @@ internal sealed class DocumentHybridCacheSynchronousPersistenceTests : UmbracoIn
         {
             Assert.That(Repository.AsynchronousWrites, Is.Zero);
             Assert.That(Repository.SynchronousWrites, Is.Zero);
-            Assert.That(PublishedContentCache.GetById(Textpage.Key), Is.Null);
+            Assert.That(PublishedContentCache.GetById(false, Textpage.Key), Is.Null, "The published entry must be gone from the memory cache.");
+            Assert.That(PublishedContentCache.GetById(true, Textpage.Key), Is.Null, "The draft entry must be gone from the memory cache.");
         });
     }
 
