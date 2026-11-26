@@ -845,13 +845,28 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
-        // Keep database cache rows for trashed content: restored descendants stay Published without being
-        // rewritten, and database cache readers already exclude trashed items.
-        if (content.Trashed is false)
+        if (content.Trashed)
         {
-            var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
-            _databaseCacheRepository.RefreshContent(draftCacheNode);
+            // Keep database cache rows for trashed content: restored descendants stay Published without being
+            // rewritten, and database cache readers already exclude trashed items.
+            if (content.PublishedState is PublishedState.Publishing)
+            {
+                var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
+                _databaseCacheRepository.RefreshContent(publishedCacheNode);
+            }
+            else if (content.PublishedState is PublishedState.Unpublishing)
+            {
+                _databaseCacheRepository.RemovePublishedContent(content.Id);
+            }
+
+            // TODO (V20): await the memory-cache removals once the notification pipeline is asynchronous.
+            RemoveFromMemoryCacheUnorderedAsync(content.Key).GetAwaiter().GetResult();
+            scope.Complete();
+            return;
         }
+
+        var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
+        _databaseCacheRepository.RefreshContent(draftCacheNode);
 
         if (content.PublishedState is PublishedState.Publishing)
         {
@@ -861,15 +876,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         else if (content.PublishedState is PublishedState.Unpublishing)
         {
             _databaseCacheRepository.RemovePublishedContent(content.Id);
-        }
-
-        if (content.Trashed)
-        {
-            // TODO (V20): await the memory-cache removals once the notification pipeline is asynchronous.
-            RemoveFromMemoryCacheUnorderedAsync(content.Key).GetAwaiter().GetResult();
-        }
-        else if (content.PublishedState is PublishedState.Unpublishing)
-        {
             ClearPublishedCacheAsync(content.Key).GetAwaiter().GetResult();
         }
 
@@ -881,16 +887,30 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
-        // Keep database cache rows for trashed content: restored descendants stay Published without being
-        // rewritten, and database cache readers already exclude trashed items.
-        if (content.Trashed is false)
+        if (content.Trashed)
         {
-            // Always set draft node
-            // We have nodes seperate in the cache, cause 99% of the time, you are only using one
-            // and thus we won't get too much data when retrieving from the cache.
-            var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
-            await _databaseCacheRepository.RefreshContentAsync(draftCacheNode);
+            // Keep database cache rows for trashed content: restored descendants stay Published without being
+            // rewritten, and database cache readers already exclude trashed items.
+            if (content.PublishedState is PublishedState.Publishing)
+            {
+                var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
+                await _databaseCacheRepository.RefreshContentAsync(publishedCacheNode);
+            }
+            else if (content.PublishedState is PublishedState.Unpublishing)
+            {
+                await _databaseCacheRepository.RemovePublishedContentAsync(content.Id);
+            }
+
+            await RemoveFromMemoryCacheUnorderedAsync(content.Key);
+            scope.Complete();
+            return;
         }
+
+        // Always set draft node
+        // We have nodes seperate in the cache, cause 99% of the time, you are only using one
+        // and thus we won't get too much data when retrieving from the cache.
+        var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
+        await _databaseCacheRepository.RefreshContentAsync(draftCacheNode);
 
         if (content.PublishedState is PublishedState.Publishing)
         {
@@ -900,14 +920,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         else if (content.PublishedState is PublishedState.Unpublishing)
         {
             await _databaseCacheRepository.RemovePublishedContentAsync(content.Id);
-        }
-
-        if (content.Trashed)
-        {
-            await RemoveFromMemoryCacheUnorderedAsync(content.Key);
-        }
-        else if (content.PublishedState is PublishedState.Unpublishing)
-        {
             await ClearPublishedCacheAsync(content.Key);
         }
 
