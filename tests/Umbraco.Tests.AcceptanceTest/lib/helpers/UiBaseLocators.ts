@@ -630,7 +630,7 @@ export class UiBaseLocators extends BasePage {
     );
 
     // Block
-    this.blockTypeCard = page.locator("uui-card-block-type");
+    this.blockTypeCard = page.locator("umb-block-type-card");
   }
 
   // Helper Methods

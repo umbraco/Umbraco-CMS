@@ -268,11 +268,11 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		const imgSrc = path ? new URL(path, this.#serverUrl)?.href : undefined;
 
 		return html`
-			<uui-card-block-type
+			<umb-figure-card
 				href=${ifDefined(href)}
 				name=${block.name}
 				description=${ifDefined(block.description)}
-				.background=${block.backgroundColor}
+				.backgroundColor=${block.backgroundColor}
 				@open=${() => this.#chooseBlock(block.contentElementTypeKey)}>
 				${when(
 					imgSrc,
@@ -280,7 +280,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 					() => html`<umb-icon name=${block.icon ?? ''} color=${ifDefined(block.iconColor)}></umb-icon>`,
 				)}
 				<slot name="actions" slot="actions"> </slot>
-			</uui-card-block-type>
+			</umb-figure-card>
 		`;
 	}
 
