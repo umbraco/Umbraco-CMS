@@ -398,7 +398,7 @@ public interface IMyService
 
 When editing those steps:
 
-- **Output filenames and artifacts** (`bom-dotnet.xml`, `bom-login.xml`, `bom-backoffice.xml`, `bom-e2e.xml`) are mapped to Dependency-Track projects in the stage's `build/templates/dependency-track.yml` parameters — keep them in step.
+- **Output filenames and artifacts** (`bom-dotnet.xml`, `bom-login.xml`, `bom-backoffice.xml`, `bom-e2e.xml`) are mapped to Dependency-Track projects in the `Upload_Dependency_Track` stage of `build/azure-pipelines-release.yml` (which uses `build/templates/dependency-track.yml`) — keep them in step.
 - **Usage**: `umbraco-sbom <path> --output-file <full-path> [policy flags]`. Only `--output-file` plus policy flags (`--allow-package`, `--allow-commercial`, `--allow-copyleft`, `--fail-on-unknown`, `--policy-allow-file`) exist.
 - **Commercial packages** need `--allow-package`, else **exit 50**. Backend uses `nuget:SixLabors.*` (covers both `SixLabors.ImageSharp` and `.ImageSharp.Web`).
 - **`isLatest`**: DT allows one latest version per project name, and projects are `Umbraco-CMS` (children `Umbraco-CMS-Backend` etc.) versioned by major. Only a stable public release of `main`'s major (read from `main`'s `version.json` at upload time) is marked latest; older-major releases upload with `false`.

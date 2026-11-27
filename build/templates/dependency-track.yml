@@ -1,4 +1,6 @@
 parameters:
+  - name: pipeline # pipeline resource alias to download the BOM artifacts from
+    type: string
   - name: dependsOn
     type: object
     default: []
@@ -79,7 +81,7 @@ jobs:
     steps:
       - checkout: none
 
-      - download: current
+      - download: ${{ parameters.pipeline }}
         artifact: ${{ project.artifact }}
         displayName: Download ${{ project.artifact }} artifact
 
@@ -94,5 +96,5 @@ jobs:
           dtrackParentProjName: ${{ parameters.projectName }}
           dtrackParentProjVersion: ${{ parameters.umbracoVersion }}
           dtrackIsLatest: $(isLatest)
-          bomFilePath: '$(Pipeline.Workspace)/${{ project.artifact }}/${{ project.bomFilePath }}'
+          bomFilePath: '$(Pipeline.Workspace)/${{ parameters.pipeline }}/${{ project.artifact }}/${{ project.bomFilePath }}'
         displayName: Upload ${{ project.name }} BOM to Dependency Track
