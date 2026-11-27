@@ -3,6 +3,8 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
@@ -254,5 +256,76 @@ internal sealed partial class PublishStatusServiceTests
         Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, "da-DK"));
         Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, "en-US"));
         Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, Constants.System.InvariantCulture));
+    }
+
+    [Test]
+    public async Task Unpublished_Variant_Document_With_Stale_Culture_Flags_Reports_No_Published_Cultures()
+    {
+        var languageService = GetRequiredService<ILanguageService>();
+        var publishStatusManagementService = GetRequiredService<IPublishStatusManagementService>();
+
+        await languageService.CreateAsync(
+            new LanguageBuilder().WithCultureInfo("da-DK").WithIsMandatory(true).Build(),
+            Constants.Security.SuperUserKey);
+
+        var contentTypeKey = Guid.NewGuid();
+        IContentType contentType = new ContentTypeBuilder()
+            .WithKey(contentTypeKey)
+            .WithAlias("mandatoryVariant")
+            .WithContentVariation(ContentVariation.Culture)
+            .WithAllowAsRoot(true)
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        contentType.AllowedContentTypes = [new ContentTypeSort(contentTypeKey, 1, "mandatoryVariant")];
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+
+        IContent root = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "Root EN")
+            .WithCultureName("da-DK", "Root DA")
+            .Build();
+        ContentService.Save(root);
+
+        IContent child = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "Child EN")
+            .WithCultureName("da-DK", "Child DA")
+            .WithParent(root)
+            .Build();
+        ContentService.Save(child);
+
+        var publishResults = ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["en-US", "da-DK"]);
+        Assert.IsTrue(publishResults.All(x => x.Success));
+
+        // Unpublishing a mandatory culture unpublishes the whole document (umbracoDocument.published = 0)
+        // while leaving other cultures' umbracoDocumentCultureVariation.published = 1.
+        root = ContentService.GetById(root.Key)!;
+        Assert.IsTrue(ContentService.Unpublish(root, "da-DK").Success);
+        Assert.IsFalse(ContentService.GetById(root.Key)!.Published, "The document should be unpublished as a whole");
+        Assert.AreEqual(1, CountCulturesFlaggedAsPublished(root.Id), "One culture should still be flagged as published");
+
+        // The unpublish refreshed the status of the branch; a full load reads every document again.
+        AssertRootIsUnpublishedAndHidesChild("after the branch refresh");
+        await publishStatusManagementService.InitializeAsync(CancellationToken.None);
+        AssertRootIsUnpublishedAndHidesChild("after a full load");
+
+        void AssertRootIsUnpublishedAndHidesChild(string when) =>
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(root.Key, "en-US"), when);
+                Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(root.Key, Constants.System.InvariantCulture), when);
+                Assert.IsFalse(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(root.Key), when);
+                Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(child.Key), when);
+            });
+    }
+
+    private int CountCulturesFlaggedAsPublished(int nodeId)
+    {
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        var selectSql = GetRequiredService<ISqlContext>().Sql()
+            .SelectCount()
+            .From<DocumentCultureVariationDto>()
+            .Where<DocumentCultureVariationDto>(x => x.NodeId == nodeId && x.Published);
+        return ScopeAccessor.AmbientScope!.Database.ExecuteScalar<int>(selectSql);
     }
 }

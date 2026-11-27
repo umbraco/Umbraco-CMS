@@ -144,8 +144,11 @@ public PublishStatusService(
         if (_publishedCultures.TryGetValue(documentKey, out ISet<string>? publishedCultures))
         {
             // If "*" is provided as the culture, we consider this as "published in any culture". This aligns
-            // with behaviour in Umbraco 13.
-            return culture == Constants.System.InvariantCulture || publishedCultures.Contains(culture, StringComparer.InvariantCultureIgnoreCase);
+            // with behaviour in Umbraco 13. A full load keeps an empty set for an unpublished document, so
+            // "any culture" needs at least one.
+            return culture == Constants.System.InvariantCulture
+                ? publishedCultures.Count > 0
+                : publishedCultures.Contains(culture, StringComparer.InvariantCultureIgnoreCase);
         }
 
         _logger.LogDebug("Document {DocumentKey} not found in the publish status cache", documentKey);
