@@ -2030,6 +2030,21 @@ internal partial class UserService : RepositoryService, IUserService
                 ResetPasswordToken = token
             });
 
+        // A valid reset token proves control of the account's email, so it also lifts a lockout caused by failed login attempts.
+        if (changePasswordAttempt.Success && user.IsLockedOut)
+        {
+            ICoreBackOfficeUserManager userManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
+            Attempt<UserUnlockResult, UserOperationStatus> unlockAttempt = await userManager.UnlockUser(user);
+            if (unlockAttempt.Success is false)
+            {
+                _logger.LogWarning(
+                    "Could not unlock user {UserId} {UserKey} after resetting their password. Status: {Status}.",
+                    user.Id,
+                    user.Key,
+                    unlockAttempt.Status);
+            }
+        }
+
         scope.Complete();
         return changePasswordAttempt;
     }

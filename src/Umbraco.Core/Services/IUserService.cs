@@ -438,6 +438,9 @@ public interface IUserService : IMembershipUserService
     /// <summary>
     ///     Changes the user's password.
     /// </summary>
+    /// <remarks>
+    ///     A successful reset also unlocks a user who is locked out.
+    /// </remarks>
     /// <param name="userKey">The unique key of the user.</param>
     /// <param name="token">The reset password token.</param>
     /// <param name="password">The new password of the user.</param>
