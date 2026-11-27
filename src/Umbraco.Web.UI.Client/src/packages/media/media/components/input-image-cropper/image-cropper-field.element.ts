@@ -1,6 +1,7 @@
 import type { UmbImageCropChangeEvent } from './crop-change.event.js';
 import type { UmbFocalPointChangeEvent } from './focalpoint-change.event.js';
 import type { UmbImageCropperElement } from './image-cropper.element.js';
+import type { UmbImageCropperPreviewElement } from './image-cropper-preview.element.js';
 import type {
 	UmbImageCropperCrop,
 	UmbImageCropperCrops,
@@ -106,6 +107,13 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 		if (index === -1) return;
 
 		this.currentCrop = { ...this.crops[index] };
+		this.#focusCropper();
+	}
+
+	// Move focus into the cropper, as the crop tiles come after it in DOM order and Tab would otherwise skip the editor.
+	async #focusCropper() {
+		await this.updateComplete;
+		this.shadowRoot?.querySelector<UmbImageCropperElement>('umb-image-cropper')?.focus();
 	}
 
 	#onCropChange = (event: UmbImageCropChangeEvent) => {
@@ -121,7 +129,19 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 		this.crops[index] = value;
 		this.currentCrop = undefined;
 		this.#updateValue();
+		this.#focusCropPreview(value.alias);
 	};
+
+	// Return focus to the crop's tile after Save or Cancel, so keyboard users do not land on the page body.
+	async #focusCropPreview(alias: string) {
+		await this.updateComplete;
+		const previews = this.shadowRoot?.querySelectorAll<UmbImageCropperPreviewElement>('umb-image-cropper-preview');
+		const preview = Array.from(previews ?? []).find((x) => x.crop?.alias === alias);
+		if (!preview) return;
+		// The tile is re-created after a change, so wait for its button to render before focusing it.
+		await preview.updateComplete;
+		preview.focus();
+	}
 
 	#onFocalPointChange = (event: UmbFocalPointChangeEvent) => {
 		this.focalPoint = { top: event.focalPoint.top, left: event.focalPoint.left };

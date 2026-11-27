@@ -1488,6 +1488,7 @@ export default {
 		updateEditCrop: 'Done',
 		undoEditCrop: 'Undo edits',
 		customCrop: 'User defined',
+		zoom: 'Zoom',
 	},
 	rollback: {
 		changes: 'Changes',
