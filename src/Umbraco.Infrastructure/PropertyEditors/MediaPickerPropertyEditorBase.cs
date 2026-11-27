@@ -264,7 +264,7 @@ public abstract class MediaPickerPropertyEditorBase : DataEditor, IValueSchemaPr
                 return;
             }
 
-            IEnumerable<IMedia> mediaItems = _mediaService.GetByIds(mediaKeys);
+            IEnumerable<IMedia> mediaItems = _mediaService.GetByIdsAsync(mediaKeys, CancellationToken.None).GetAwaiter().GetResult();
             foreach (IMedia media in mediaItems)
             {
                 CacheMediaById(media, _appCaches.RequestCache);
@@ -626,7 +626,7 @@ public abstract class MediaPickerPropertyEditorBase : DataEditor, IValueSchemaPr
                     .Select(x => x.MediaKey)
                     .Distinct()
                     .ToArray();
-                IMedia[] retrievedMedia = _mediaService.GetByIds(retrievedMediaKeys).ToArray();
+                IMedia[] retrievedMedia = _mediaService.GetByIdsAsync(retrievedMediaKeys, CancellationToken.None).GetAwaiter().GetResult().ToArray();
 
                 // If any of the media we had to look up (to resolve the type) could not be found, the selection
                 // references media that no longer exists, so the configured allowed types cannot be verified.

@@ -234,7 +234,11 @@ public class UserEditorAuthorizationHelper
                 }
                 else
                 {
-                    IMedia? media = _mediaService.GetById(mediaId);
+                    // TODO (V20): await this once the UserEditorAuthorizationHelper contract goes async.
+                    Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(mediaId, UmbracoObjectTypes.Media).GetAwaiter().GetResult();
+                    IMedia? media = keyAttempt.Success
+                        ? _mediaService.GetByIdAsync(keyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
+                        : null;
                     if (media == null)
                     {
                         continue;

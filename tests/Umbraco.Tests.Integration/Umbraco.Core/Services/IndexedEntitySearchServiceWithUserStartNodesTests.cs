@@ -50,8 +50,8 @@ public class IndexedEntitySearchServiceWithUserStartNodesTests : BackOfficeTestB
         IContent[] contentAtRoot = (await ContentService.GetRootContentAsync(CancellationToken.None)).OrderBy(content => content.SortOrder).ToArray();
         await ContentService.MoveToRecycleBinAsync(contentAtRoot.Last(), Constants.Security.SuperUserKey, CancellationToken.None);
 
-        IMedia[] mediaAtRoot = MediaService.GetRootMedia().OrderBy(media => media.SortOrder).ToArray();
-        MediaService.MoveToRecycleBin(mediaAtRoot.Last());
+        IMedia[] mediaAtRoot = (await MediaService.GetRootMediaAsync(CancellationToken.None)).OrderBy(media => media.SortOrder).ToArray();
+        await MediaService.MoveToRecycleBinAsync(mediaAtRoot.Last(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         int rootContentId = (await ContentService.GetRootContentAsync(CancellationToken.None)).First().Id;
         await ElementContainerService.MoveToRecycleBinAsync(ElementContainers.Last().Key, Constants.Security.SuperUserKey);
@@ -61,7 +61,7 @@ public class IndexedEntitySearchServiceWithUserStartNodesTests : BackOfficeTestB
             .WithEmail("limited@local")
             .WithName("Limited User")
             .WithStartContentId(rootContentId)
-            .WithStartMediaId(MediaService.GetRootMedia().First().Id)
+            .WithStartMediaId((await MediaService.GetRootMediaAsync(CancellationToken.None)).First().Id)
             .WithStartElementId(ElementContainers.First().Id)
             .Build();
         GetRequiredService<IUserService>().Save(limitedUser);

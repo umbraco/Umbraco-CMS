@@ -266,7 +266,7 @@ internal sealed partial class UserServiceCrudTests
         var mediaService = GetRequiredService<IMediaService>();
         var elementContainerService = GetRequiredService<IElementContainerService>();
         var contentStartNode = (await contentService.GetRootContentAsync(CancellationToken.None)).First();
-        var mediaStartNode = mediaService.CreateMediaWithIdentity("test", -1, "Image");
+        var mediaStartNode = await mediaService.CreateAndSaveAsync("test", parentKey: null, "Image", Constants.Security.SuperUserKey, CancellationToken.None);
         var elementContainerResult = await elementContainerService.CreateAsync(null, "TestElementFolder", null, Constants.Security.SuperUserKey);
         Assert.IsTrue(elementContainerResult.Success);
         var elementContainer = elementContainerResult.Result!;
@@ -384,7 +384,7 @@ internal sealed partial class UserServiceCrudTests
         var mediaService = GetRequiredService<IMediaService>();
         var elementContainerService = GetRequiredService<IElementContainerService>();
         var contentStartNode = (await contentService.GetRootContentAsync(CancellationToken.None)).First();
-        var mediaStartNode = mediaService.CreateMediaWithIdentity("test", -1, "Image");
+        var mediaStartNode = await mediaService.CreateAndSaveAsync("test", parentKey: null, "Image", Constants.Security.SuperUserKey, CancellationToken.None);
 
         var elementContainerResult = await elementContainerService.CreateAsync(null, "TestElementFolder", null, Constants.Security.SuperUserKey);
         Assert.IsTrue(elementContainerResult.Success);
@@ -661,7 +661,7 @@ internal sealed partial class UserServiceCrudTests
     private async Task<(IUser PerformingUser, UserUpdateModel UpdateModel, IUser TargetUser)> CreateRestrictedUserAndTargetUser(IUserService userService)
     {
         var mediaService = GetRequiredService<IMediaService>();
-        var mediaStartNode = mediaService.CreateMediaWithIdentity("restricted", Constants.System.Root, Constants.Conventions.MediaTypes.Folder);
+        var mediaStartNode = await mediaService.CreateAndSaveAsync("restricted", parentKey: null, Constants.Conventions.MediaTypes.Folder, Constants.Security.SuperUserKey, CancellationToken.None);
         var elementStartNode = await CreateElementFolderAsync("restricted", null);
 
         IUserGroup userGroup = new UserGroup(ShortStringHelper)

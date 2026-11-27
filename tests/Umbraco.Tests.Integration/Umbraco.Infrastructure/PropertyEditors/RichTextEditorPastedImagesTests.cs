@@ -83,7 +83,7 @@ internal sealed class RichTextEditorPastedImagesTests : UmbracoIntegrationTest
         var subject = Services.GetRequiredService<RichTextEditorPastedImages>();
 
         var result = await subject.FindAndPersistPastedTempImagesAsync(html, Guid.Empty, Constants.Security.SuperUserKey);
-        AssertContainsMedia(result, Constants.Conventions.MediaTypes.Image);
+        await AssertContainsMediaAsync(result, Constants.Conventions.MediaTypes.Image);
     }
 
     [Test]
@@ -93,7 +93,7 @@ internal sealed class RichTextEditorPastedImagesTests : UmbracoIntegrationTest
         var subject = Services.GetRequiredService<RichTextEditorPastedImages>();
 
         var result = await subject.FindAndPersistPastedTempImagesAsync(html, Guid.Empty, Constants.Security.SuperUserKey);
-        AssertContainsMedia(result, Constants.Conventions.MediaTypes.VectorGraphicsAlias);
+        await AssertContainsMediaAsync(result, Constants.Conventions.MediaTypes.VectorGraphicsAlias);
     }
 
     [Test]
@@ -125,10 +125,12 @@ internal sealed class RichTextEditorPastedImagesTests : UmbracoIntegrationTest
         Assert.AreNotEqual(udis.First().Guid, udis.Last().Guid);
 
         var mediaService = Services.GetRequiredService<IMediaService>();
+        var firstMedia = await mediaService.GetByIdAsync(udis.First().Guid, CancellationToken.None);
+        var lastMedia = await mediaService.GetByIdAsync(udis.Last().Guid, CancellationToken.None);
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(mediaService.GetById(udis.First().Guid));
-            Assert.IsNotNull(mediaService.GetById(udis.Last().Guid));
+            Assert.IsNotNull(firstMedia);
+            Assert.IsNotNull(lastMedia);
         });
     }
 
@@ -150,10 +152,10 @@ internal sealed class RichTextEditorPastedImagesTests : UmbracoIntegrationTest
         Assert.AreEqual(udis.First().Guid, udis.Last().Guid);
 
         var mediaService = Services.GetRequiredService<IMediaService>();
-        Assert.IsNotNull(mediaService.GetById(udis.First().Guid));
+        Assert.IsNotNull(await mediaService.GetByIdAsync(udis.First().Guid, CancellationToken.None));
     }
 
-    private void AssertContainsMedia(string result, string expectedMediaTypeAlias)
+    private async Task AssertContainsMediaAsync(string result, string expectedMediaTypeAlias)
     {
         Assert.IsFalse(result.Contains("data-tmpimg"));
 
@@ -169,7 +171,7 @@ internal sealed class RichTextEditorPastedImagesTests : UmbracoIntegrationTest
         Assert.IsTrue(UdiParser.TryParse(imageNode.Attributes["data-udi"].Value, out GuidUdi udi));
         Assert.AreEqual(Constants.UdiEntityType.Media, udi.EntityType);
 
-        var media = Services.GetRequiredService<IMediaService>().GetById(udi.Guid);
+        var media = await Services.GetRequiredService<IMediaService>().GetByIdAsync(udi.Guid, CancellationToken.None);
         Assert.IsNotNull(media);
         Assert.AreEqual(expectedMediaTypeAlias, media.ContentType.Alias);
     }

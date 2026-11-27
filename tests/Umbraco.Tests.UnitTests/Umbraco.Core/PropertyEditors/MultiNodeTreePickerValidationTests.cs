@@ -206,7 +206,7 @@ public class MultiNodeTreePickerValidationTests
 
         var mediaMock = new Mock<IMedia>();
         mediaMock.Setup(x => x.ContentType).Returns(contentTypeMock.Object);
-        mediaService.Setup(x => x.GetById(expectedEntityKey)).Returns(mediaMock.Object);
+        mediaService.Setup(x => x.GetByIdAsync(expectedEntityKey, It.IsAny<CancellationToken>())).ReturnsAsync(mediaMock.Object);
 
         var memberMock = new Mock<IMember>();
         memberMock.Setup(x => x.ContentType).Returns(contentTypeMock.Object);

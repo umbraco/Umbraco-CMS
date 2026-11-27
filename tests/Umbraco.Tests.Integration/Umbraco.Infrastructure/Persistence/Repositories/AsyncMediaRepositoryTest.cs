@@ -54,13 +54,13 @@ internal sealed class AsyncMediaRepositoryTest : UmbracoIntegrationTest
         await MediaTypeService.CreateAsync(_imageType, Constants.Security.SuperUserKey);
 
         _testFolder = MediaBuilder.CreateMediaFolder(_folderType, Constants.System.Root);
-        Assert.That(MediaService.Save(_testFolder).Success, Is.True);
+        Assert.That((await MediaService.SaveAsync(_testFolder, Constants.Security.SuperUserKey, CancellationToken.None)).Success, Is.True);
 
         _testImage = MediaBuilder.CreateMediaImage(_imageType, _testFolder.Id);
-        Assert.That(MediaService.Save(_testImage).Success, Is.True);
+        Assert.That((await MediaService.SaveAsync(_testImage, Constants.Security.SuperUserKey, CancellationToken.None)).Success, Is.True);
 
         _testFile = MediaBuilder.CreateMediaFile(_imageType, _testFolder.Id);
-        Assert.That(MediaService.Save(_testFile).Success, Is.True);
+        Assert.That((await MediaService.SaveAsync(_testFile, Constants.Security.SuperUserKey, CancellationToken.None)).Success, Is.True);
     }
 
     protected override void ConfigureTestServices(IServiceCollection services)

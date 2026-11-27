@@ -319,7 +319,7 @@ internal sealed class HybridCacheEntityTypeIsolationTests : UmbracoIntegrationTe
         await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         Media media = MediaBuilder.CreateSimpleMedia(mediaType, "Test Media", Constants.System.Root);
-        MediaService.Save(media);
+        await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
         return media.Key;
     }
 }

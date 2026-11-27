@@ -124,52 +124,6 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Constructs a Media item entity from the provided data transfer object (DTO) and media type.
-    /// </summary>
-    /// <param name="dto">The <see cref="ContentDto"/> containing the data for the media item.</param>
-    /// <param name="contentType">The <see cref="IMediaType"/> representing the type of the media item, or <c>null</c> if not specified.</param>
-    /// <returns>A <see cref="Media"/> entity built from the specified DTO and media type.</returns>
-    public static Core.Models.Media BuildEntity(ContentDto dto, IMediaType? contentType)
-    {
-        NodeDto nodeDto = dto.NodeDto;
-        ContentVersionDto contentVersionDto = dto.ContentVersionDto;
-
-        var content = new Core.Models.Media(
-            nodeDto.Text ?? throw new ArgumentException("The media did not have a name", nameof(dto)),
-            nodeDto.ParentId,
-            contentType);
-
-        try
-        {
-            content.DisableChangeTracking();
-
-            content.Id = dto.NodeId;
-            content.Key = nodeDto.UniqueId;
-            content.VersionId = contentVersionDto.Id;
-
-            // TODO: missing names?
-            content.Path = nodeDto.Path;
-            content.Level = nodeDto.Level;
-            content.ParentId = nodeDto.ParentId;
-            content.SortOrder = nodeDto.SortOrder;
-            content.Trashed = nodeDto.Trashed;
-
-            content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
-            content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-            content.CreateDate = nodeDto.CreateDate.EnsureUtc();
-            content.UpdateDate = contentVersionDto.VersionDate.EnsureUtc();
-
-            // reset dirty initial properties (U4-1946)
-            content.ResetDirtyProperties(false);
-            return content;
-        }
-        finally
-        {
-            content.EnableChangeTracking();
-        }
-    }
-
-    /// <summary>
     /// Builds a <see cref="Member"/> instance from the specified data transfer object and member type.
     /// </summary>
     /// <param name="dto">The <see cref="MemberDto"/> containing the member data.</param>
@@ -232,26 +186,6 @@ internal sealed class ContentBaseFactory
         {
             content.EnableChangeTracking();
         }
-    }
-
-    /// <summary>
-    ///     Creates a <see cref="MediaDto"/> instance from the specified <see cref="IMedia"/> entity.
-    /// </summary>
-    /// <param name="mediaUrlGenerators">A collection of media URL generators used to resolve media URLs.</param>
-    /// <param name="entity">The <see cref="IMedia"/> entity to convert to a DTO.</param>
-    /// <returns>A <see cref="MediaDto"/> representing the provided media entity.</returns>
-    public static MediaDto BuildDto(MediaUrlGeneratorCollection mediaUrlGenerators, IMedia entity)
-    {
-        ContentDto contentDto = BuildContentDto(entity, Constants.ObjectTypes.Media);
-
-        var dto = new MediaDto
-        {
-            NodeId = entity.Id,
-            ContentDto = contentDto,
-            MediaVersionDto = BuildMediaVersionDto(mediaUrlGenerators, entity, contentDto),
-        };
-
-        return dto;
     }
 
     /// <summary>
@@ -441,14 +375,6 @@ internal sealed class ContentBaseFactory
             UserId = entity.WriterId == 0 ? null : entity.WriterId,
             Current = !publishing,
             Text = entity.Name,
-        };
-
-    private static MediaVersionDto BuildMediaVersionDto(MediaUrlGeneratorCollection mediaUrlGenerators, IMedia entity, ContentDto contentDto) =>
-        new()
-        {
-            Id = entity.VersionId,
-            Path = ResolveMediaPath(mediaUrlGenerators, entity),
-            ContentVersionDto = BuildContentVersionDto(entity, contentDto),
         };
 
     /// <summary>

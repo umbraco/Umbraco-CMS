@@ -388,21 +388,21 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="importedDocumentTypes">A dictionary mapping media type aliases to their imported media types.</param>
         /// <param name="userId">The identifier of the user performing the import operation.</param>
         /// <param name="typeService">The media type service.</param>
-        /// <param name="service">The service used to manage content base items.</param>
+        /// <param name="service">The async service used to manage content base items.</param>
         /// <returns>A read-only list containing the imported content base items.</returns>
         public IReadOnlyList<TContentBase> ImportContentBase<TContentBase>(
             IEnumerable<CompiledPackageContentBase> docs,
             IDictionary<string, IMediaType> importedDocumentTypes,
             int userId,
             IMediaTypeService typeService,
-            IContentServiceBase<TContentBase> service)
+            IAsyncContentServiceBase<TContentBase> service)
             where TContentBase : class, IContentBase
             => ImportContentBase(
                 docs,
                 importedDocumentTypes,
                 userId,
                 alias => typeService.GetAsync(alias).GetAwaiter().GetResult(),
-                service.GetById,
+                key => service.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult(),
                 (contents, saveUserId) => SaveImportedContent(contents, saveUserId, service));
 
         private IReadOnlyList<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
@@ -2443,24 +2443,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 _logger.LogError(
                     "Failed to save imported content while installing package data: {Status}.",
                     result.Result);
-            }
-
-            return result.Success;
-        }
-
-        private bool SaveImportedContent<TContentBase>(
-            IEnumerable<TContentBase> contents,
-            int userId,
-            IContentServiceBase<TContentBase> service)
-            where TContentBase : class, IContentBase
-        {
-            Attempt<OperationResult?> result = service.Save(contents, userId);
-
-            if (result.Success is false)
-            {
-                _logger.LogError(
-                    "Failed to save imported content while installing package data: {Status}.",
-                    result.Result?.Result);
             }
 
             return result.Success;

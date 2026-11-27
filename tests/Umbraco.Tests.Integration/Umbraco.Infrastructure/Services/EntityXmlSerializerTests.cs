@@ -162,7 +162,7 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
 
         var media = MediaBuilder.CreateMediaImage(mediaType, -1);
         media.WriterId = -1; // else it's zero and that's not a user and it breaks the tests
-        MediaService.Save(media);
+        await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // so we have to force-reset these values because the property editor has cleared them
         media.SetValue(Constants.Conventions.Media.Width, "200");

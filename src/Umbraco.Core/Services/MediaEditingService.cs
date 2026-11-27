@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -70,16 +71,13 @@ internal sealed class MediaEditingService
     protected override string? RelateParentOnDeleteAlias => Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
 
     /// <inheritdoc />
-    public override Task<IMedia?> GetAsync(Guid key)
-    {
-        IMedia? media = ContentService.GetById(key);
-        return Task.FromResult(media);
-    }
+    public override async Task<IMedia?> GetAsync(Guid key)
+        => await ContentService.GetByIdAsync(key, CancellationToken.None);
 
     /// <inheritdoc />
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, MediaUpdateModel updateModel)
     {
-        IMedia? media = ContentService.GetById(key);
+        IMedia? media = await ContentService.GetByIdAsync(key, CancellationToken.None);
         return media is not null
             ? await ValidatePropertiesAsync(updateModel, media.ContentType.Key)
             : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
@@ -119,8 +117,7 @@ internal sealed class MediaEditingService
 
         IMedia media = result.Result.Content!;
 
-        var currentUserId = await GetUserIdAsync(userKey);
-        ContentEditingOperationStatus operationStatus = Save(media, currentUserId);
+        ContentEditingOperationStatus operationStatus = await SaveAsync(media, userKey);
         return operationStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus(validationStatus, new MediaCreateResult { Content = media })
             : Attempt.FailWithStatus(operationStatus, new MediaCreateResult { Content = media });
@@ -129,7 +126,7 @@ internal sealed class MediaEditingService
     /// <inheritdoc />
     public async Task<Attempt<MediaUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, MediaUpdateModel updateModel, Guid userKey)
     {
-        IMedia? media = ContentService.GetById(key);
+        IMedia? media = await ContentService.GetByIdAsync(key, CancellationToken.None);
         if (media is null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new MediaUpdateResult());
@@ -146,8 +143,7 @@ internal sealed class MediaEditingService
         ContentEditingOperationStatus validationStatus = result.Status;
         ContentValidationResult validationResult = result.Result.ValidationResult;
 
-        var currentUserId = await GetUserIdAsync(userKey);
-        ContentEditingOperationStatus operationStatus = Save(media, currentUserId);
+        ContentEditingOperationStatus operationStatus = await SaveAsync(media, userKey);
         return operationStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus(validationStatus, new MediaUpdateResult { Content = media, ValidationResult = validationResult })
             : Attempt.FailWithStatus(operationStatus, new MediaUpdateResult { Content = media });
@@ -191,9 +187,15 @@ internal sealed class MediaEditingService
     /// <inheritdoc />
     protected override async Task<ContentEditingOperationStatus> MoveAsync(IMedia media, Guid? parentKey, bool includeDescendants, Guid userKey)
     {
-        var userId = await GetUserIdAsync(userKey);
-        Attempt<OperationResult?> result = ContentService.Move(media, ResolveParentId(parentKey), includeDescendants, userId);
-        return OperationResultToOperationStatus(result.Result);
+        Attempt<ContentMoveOperationStatus> result = await ContentService.MoveAsync(media, parentKey, includeDescendants, userKey, CancellationToken.None);
+        return result.Result switch
+        {
+            ContentMoveOperationStatus.Success => ContentEditingOperationStatus.Success,
+            ContentMoveOperationStatus.CancelledByNotification => ContentEditingOperationStatus.CancelledByNotification,
+            ContentMoveOperationStatus.ParentNotFound => ContentEditingOperationStatus.ParentNotFound,
+            ContentMoveOperationStatus.ParentTrashed => ContentEditingOperationStatus.InTrash,
+            _ => ContentEditingOperationStatus.Unknown,
+        };
     }
 
     /// <inheritdoc />
@@ -204,85 +206,62 @@ internal sealed class MediaEditingService
     /// <inheritdoc />
     protected override async Task<OperationResult?> MoveToRecycleBinAsync(IMedia media, Guid userKey)
     {
-        var userId = await GetUserIdAsync(userKey);
-        return ContentService.MoveToRecycleBin(media, userId).Result;
+        Attempt<ContentMoveToRecycleBinOperationStatus> result = await ContentService.MoveToRecycleBinAsync(media, userKey, CancellationToken.None);
+        return result.Success
+            ? OperationResult.Succeed(new EventMessages())
+            : OperationResult.Cancel(new EventMessages());
     }
 
     /// <inheritdoc />
     protected override async Task<OperationResult?> DeleteAsync(IMedia media, Guid userKey)
     {
-        var userId = await GetUserIdAsync(userKey);
-        return ContentService.Delete(media, userId).Result;
+        Attempt<ContentDeleteOperationStatus> result = await ContentService.DeleteAsync(media, userKey, CancellationToken.None);
+        return result.Success ? OperationResult.Succeed(new EventMessages()) : OperationResult.Cancel(new EventMessages());
     }
 
     /// <inheritdoc />
     protected override Task<PagedModel<IMedia>> GetPagedChildrenAsync(Guid? parentKey, int pageIndex, int pageSize, Ordering? ordering)
-    {
-        IEnumerable<IMedia> pagedChildren = ContentService.GetPagedChildren(ResolveParentId(parentKey), pageIndex, pageSize, out long total, filter: null, ordering: ordering);
-        return Task.FromResult(new PagedModel<IMedia>(total, pagedChildren));
-    }
+        => ContentService.GetChildrenAsync(parentKey, pageIndex * pageSize, pageSize, propertyAliases: null, ordering, CancellationToken.None);
 
     /// <inheritdoc />
     protected override async Task<ContentEditingOperationStatus> SortAsync(IReadOnlyList<Guid> orderedKeys, Guid userKey, CancellationToken cancellationToken)
     {
-        var userId = await GetUserIdAsync(userKey);
-        Dictionary<Guid, IMedia> itemsByKey = ContentService.GetByIds(orderedKeys).ToDictionary(item => item.Key);
-        IEnumerable<IMedia> orderedItems = orderedKeys.Where(itemsByKey.ContainsKey).Select(key => itemsByKey[key]);
-
-        return ContentService.Sort(orderedItems, userId)
-            ? ContentEditingOperationStatus.Success
-            : ContentEditingOperationStatus.CancelledByNotification;
+        Attempt<ContentSortOperationStatus> result = await ContentService.SortAsync(orderedKeys, userKey, cancellationToken);
+        OperationResult operationResult = result.Result switch
+        {
+            ContentSortOperationStatus.Success => OperationResult.Succeed(new EventMessages()),
+            ContentSortOperationStatus.NoOperation => new OperationResult(OperationResultType.NoOperation, new EventMessages()),
+            _ => OperationResult.Cancel(new EventMessages()),
+        };
+        return OperationResultToOperationStatus(operationResult);
     }
 
     /// <inheritdoc />
     protected override async Task<ContentEditingOperationStatus> SortChildrenInBulkAsync(Guid? parentKey, IReadOnlyList<Guid> orderedChildKeys, Guid userKey)
     {
-        var userId = await GetUserIdAsync(userKey);
-        Dictionary<Guid, int> idsByKey = ContentService.GetByIds(orderedChildKeys).ToDictionary(child => child.Key, child => child.Id);
-        List<int> orderedChildIds = orderedChildKeys.Where(idsByKey.ContainsKey).Select(key => idsByKey[key]).ToList();
-
-        OperationResult result = ContentService.SortChildren(ResolveParentId(parentKey), orderedChildIds, userId);
-        return OperationResultToOperationStatus(result);
+        Attempt<ContentSortChildrenOperationStatus> result = await ContentService.SortChildrenAsync(parentKey, orderedChildKeys, userKey, CancellationToken.None);
+        OperationResult operationResult = result.Result switch
+        {
+            ContentSortChildrenOperationStatus.Success => OperationResult.Succeed(new EventMessages()),
+            ContentSortChildrenOperationStatus.NoOperation => new OperationResult(OperationResultType.NoOperation, new EventMessages()),
+            _ => OperationResult.Cancel(new EventMessages()),
+        };
+        return OperationResultToOperationStatus(operationResult);
     }
 
-    // The media service still identifies parents by id; the recycle bin and the root have fixed ids and every
-    // other parent is looked up by its key.
-    private int ResolveParentId(Guid? parentKey)
-    {
-        if (parentKey is null)
-        {
-            return Constants.System.Root;
-        }
-
-        if (parentKey == Constants.System.RecycleBinMediaKey)
-        {
-            return Constants.System.RecycleBinMedia;
-        }
-
-        return ContentService.GetById(parentKey.Value)?.Id ?? Constants.System.Root;
-    }
-
-    /// <summary>
-    ///     Saves a media item to the repository.
-    /// </summary>
-    /// <param name="media">The <see cref="IMedia"/> item to save.</param>
-    /// <param name="userId">The identifier of the user performing the save operation.</param>
-    /// <returns>A <see cref="ContentEditingOperationStatus"/> indicating the outcome of the save operation.</returns>
-    private ContentEditingOperationStatus Save(IMedia media, int userId)
+    private async Task<ContentEditingOperationStatus> SaveAsync(IMedia media, Guid userKey)
     {
         try
         {
-            Attempt<OperationResult?> saveResult = ContentService.Save(media, userId);
-            return saveResult.Result?.Result switch
+            Attempt<ContentSaveOperationStatus> saveResult = await ContentService.SaveAsync(media, userKey, CancellationToken.None);
+            return saveResult.Result switch
             {
-                // these are the only result states currently expected from Save
-                OperationResultType.Success => ContentEditingOperationStatus.Success,
-                OperationResultType.FailedCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
-                OperationResultType.FailedDuplicateKey => ContentEditingOperationStatus.DuplicateKey,
-                OperationResultType.FailedInvalidKey => ContentEditingOperationStatus.InvalidKey,
-
-                // for any other state we'll return "unknown" so we know that we need to amend this
-                _ => ContentEditingOperationStatus.Unknown
+                ContentSaveOperationStatus.Success => ContentEditingOperationStatus.Success,
+                ContentSaveOperationStatus.CancelledByNotification => ContentEditingOperationStatus.CancelledByNotification,
+                ContentSaveOperationStatus.InvalidName => ContentEditingOperationStatus.InvalidName,
+                ContentSaveOperationStatus.DuplicateKey => ContentEditingOperationStatus.DuplicateKey,
+                ContentSaveOperationStatus.InvalidKey => ContentEditingOperationStatus.InvalidKey,
+                _ => ContentEditingOperationStatus.Unknown,
             };
         }
         catch (Exception ex)

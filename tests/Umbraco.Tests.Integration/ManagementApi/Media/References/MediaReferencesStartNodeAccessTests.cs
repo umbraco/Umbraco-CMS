@@ -24,11 +24,11 @@ public class MediaReferencesStartNodeAccessTests : StartNodeAccessTestBase<Refer
     [SetUp]
     public async Task SetUpMediaAndUser()
     {
-        IMedia deniedRoot = CreateFolder(Constants.System.Root);
-        IMedia allowedRoot = CreateFolder(Constants.System.Root);
+        IMedia deniedRoot = await CreateFolderAsync(null);
+        IMedia allowedRoot = await CreateFolderAsync(null);
 
-        _inaccessibleMedia = CreateFolder(deniedRoot.Id);
-        _accessibleMedia = CreateFolder(allowedRoot.Id);
+        _inaccessibleMedia = await CreateFolderAsync(deniedRoot.Key);
+        _accessibleMedia = await CreateFolderAsync(allowedRoot.Key);
 
         await AuthenticateRestrictedUserAsync([Constants.Applications.Media], startMediaId: allowedRoot.Id);
     }
@@ -73,6 +73,6 @@ public class MediaReferencesStartNodeAccessTests : StartNodeAccessTestBase<Refer
     private string AreReferencedUrl(params Guid[] ids) =>
         WithIds(GetManagementApiUrl<AreReferencedMediaController>(x => x.GetPagedReferencedItems(CancellationToken.None, new HashSet<Guid>(), 0, 20)), ids);
 
-    private IMedia CreateFolder(int parentId)
-        => MediaService.CreateMediaWithIdentity(Guid.NewGuid().ToString(), parentId, Constants.Conventions.MediaTypes.Folder);
+    private async Task<IMedia> CreateFolderAsync(Guid? parentKey)
+        => await MediaService.CreateAndSaveAsync(Guid.NewGuid().ToString(), parentKey, Constants.Conventions.MediaTypes.Folder, Constants.Security.SuperUserKey, CancellationToken.None);
 }

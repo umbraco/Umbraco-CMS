@@ -22,9 +22,10 @@ public static class MediaServiceExtensions
     /// </summary>
     /// <param name="mediaService">The media service.</param>
     /// <param name="ids">The collection of UDIs to retrieve.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A collection of media items.</returns>
     /// <exception cref="InvalidOperationException">Thrown when a UDI is not of type <see cref="GuidUdi"/>.</exception>
-    public static IEnumerable<IMedia> GetByIds(this IMediaService mediaService, IEnumerable<Udi> ids)
+    public static Task<IEnumerable<IMedia>> GetByIdsAsync(this IMediaService mediaService, IEnumerable<Udi> ids, CancellationToken cancellationToken)
     {
         var guids = new List<GuidUdi>();
         foreach (Udi udi in ids)
@@ -38,28 +39,6 @@ public static class MediaServiceExtensions
             guids.Add(guidUdi);
         }
 
-        return mediaService.GetByIds(guids.Select(x => x.Guid));
-    }
-
-    /// <summary>
-    ///     Creates a new media item under a parent specified by UDI.
-    /// </summary>
-    /// <param name="mediaService">The media service.</param>
-    /// <param name="name">The name of the new media item.</param>
-    /// <param name="parentId">The UDI of the parent media item.</param>
-    /// <param name="mediaTypeAlias">The alias of the media type.</param>
-    /// <param name="userId">The ID of the user creating the media item.</param>
-    /// <returns>The newly created media item.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when the UDI is not of type <see cref="GuidUdi"/>.</exception>
-    public static IMedia CreateMedia(this IMediaService mediaService, string name, Udi parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
-    {
-        if (parentId is not GuidUdi guidUdi)
-        {
-            throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) +
-                                                " which is required by media");
-        }
-
-        IMedia? parent = mediaService.GetById(guidUdi.Guid);
-        return mediaService.CreateMedia(name, parent, mediaTypeAlias, userId);
+        return mediaService.GetByIdsAsync(guids.Select(x => x.Guid), cancellationToken);
     }
 }

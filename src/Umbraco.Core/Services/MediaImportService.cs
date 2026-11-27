@@ -67,22 +67,29 @@ internal sealed class MediaImportService : IMediaImportService
         var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
         var mediaItemName = safeFileName.ToFriendlyName();
 
-        IMedia mediaFile;
-
-        if (parentId is null)
+        Guid? parentKey = parentId;
+        if (parentKey is null)
         {
+            // without an explicit parent the file lands under the user's first media start node, or at the root
             int[]? userStartNodes = user.CalculateMediaStartNodeIds(_entityService, _appCaches);
+            int startNodeId = userStartNodes is { Length: > 0 } ? userStartNodes[0] : Constants.System.Root;
+            if (startNodeId != Constants.System.Root)
+            {
+                Attempt<Guid> startNodeKey = _entityService.GetKey(startNodeId, UmbracoObjectTypes.Media);
+                if (startNodeKey.Success is false)
+                {
+                    throw new InvalidOperationException($"The media start node {startNodeId} of the user does not exist.");
+                }
 
-            mediaFile = _mediaService.CreateMedia(mediaItemName, userStartNodes != null && userStartNodes.Any() ? userStartNodes[0] : Constants.System.Root, mediaTypeAlias ?? Constants.Conventions.MediaTypes.File, user.Id);
+                parentKey = startNodeKey.Result;
+            }
         }
-        else
-        {
-            mediaFile = _mediaService.CreateMedia(mediaItemName, parentId.Value, mediaTypeAlias ?? Constants.Conventions.MediaTypes.File, user.Id);
-        }
+
+        IMedia mediaFile = await _mediaService.CreateAsync(mediaItemName, parentKey, mediaTypeAlias ?? Constants.Conventions.MediaTypes.File, userKey, CancellationToken.None);
 
         mediaFile.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fileStream);
 
-        _mediaService.Save(mediaFile, user.Id);
+        await _mediaService.SaveAsync(mediaFile, userKey, CancellationToken.None);
 
         return mediaFile;
     }

@@ -32,9 +32,9 @@ internal sealed class MediaVersionDtoMappingTests : UmbracoIntegrationTest
         await MediaTypeService.CreateAsync(folderType, Constants.Security.SuperUserKey);
 
         IMedia image = MediaBuilder.CreateMediaImage(imageType, Constants.System.Root);
-        Assert.That(MediaService.Save(image).Success, Is.True);
+        Assert.That((await MediaService.SaveAsync(image, Constants.Security.SuperUserKey, CancellationToken.None)).Success, Is.True);
         IMedia folder = MediaBuilder.CreateMediaFolder(folderType, Constants.System.Root);
-        Assert.That(MediaService.Save(folder).Success, Is.True);
+        Assert.That((await MediaService.SaveAsync(folder, Constants.Security.SuperUserKey, CancellationToken.None)).Success, Is.True);
 
         var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
         using var scope = NewScopeProvider.CreateScope();

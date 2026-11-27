@@ -506,7 +506,7 @@ public class DataValueEditor : IDataValueEditor
     {
         if (requestCache.IsAvailable is false)
         {
-            return mediaService.GetById(key);
+            return mediaService.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult();
         }
 
         var cacheKey = string.Format(MediaCacheKeyFormat, key);
@@ -514,7 +514,7 @@ public class DataValueEditor : IDataValueEditor
 
         if (media is null)
         {
-            media = mediaService.GetById(key);
+            media = mediaService.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult();
             if (media is not null)
             {
                 requestCache.Set(cacheKey, media);

@@ -1,27 +1,21 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Xml.Linq;
-using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 using File = System.IO.File;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging;
@@ -221,7 +215,7 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
         var mt = MediaTypeBuilder.CreateImageMediaType("testImage");
         await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
         var m1 = MediaBuilder.CreateMediaFile(mt, -1);
-        MediaService.Save(m1);
+        await MediaService.SaveAsync(m1, Constants.Security.SuperUserKey, CancellationToken.None);
 
         //Ensure a file exist
         var fullPath =

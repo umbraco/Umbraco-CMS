@@ -120,7 +120,7 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
         }
 
         if (persistedUserGroup?.StartMediaId != userGroup.StartMediaId
-            && HasAccessToMediaStartNode(user, userGroup) is false)
+            && await HasAccessToMediaStartNodeAsync(user, userGroup) is false)
         {
             return UserGroupAuthorizationStatus.UnauthorizedMissingMediaStartNodeAccess;
         }
@@ -214,7 +214,7 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     /// <param name="user"><see cref="IUser" /> to check for access.</param>
     /// <param name="userGroup">The user group being created or updated.</param>
     /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
-    private bool HasAccessToMediaStartNode(IUser user, IUserGroup userGroup)
+    private async Task<bool> HasAccessToMediaStartNodeAsync(IUser user, IUserGroup userGroup)
     {
         if (userGroup.StartMediaId is null)
         {
@@ -226,7 +226,10 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
             return user.HasMediaRootAccess(_entityService, _appCaches);
         }
 
-        IMedia? media = _mediaService.GetById(userGroup.StartMediaId.Value);
+        Attempt<Guid> keyAttempt = await _idKeyMap.GetKeyForIdAsync(userGroup.StartMediaId.Value, UmbracoObjectTypes.Media);
+        IMedia? media = keyAttempt.Success
+            ? await _mediaService.GetByIdAsync(keyAttempt.Result, CancellationToken.None)
+            : null;
 
         if (media is null)
         {

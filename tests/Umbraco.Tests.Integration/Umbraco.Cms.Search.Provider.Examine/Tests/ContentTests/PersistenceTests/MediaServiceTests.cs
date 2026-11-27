@@ -94,11 +94,9 @@ public class MediaServiceTests : UmbracoIntegrationTest
         // Update the media name
         _rootMedia.Name = "Updated Root Media";
 
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMedia, () =>
-        {
-            MediaService.Save(_rootMedia);
-            return Task.CompletedTask;
-        });
+        await WaitForIndexing(
+            global::Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMedia,
+            async () => await MediaService.SaveAsync(_rootMedia, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None));
 
         using (ScopeProvider.CreateScope(autoComplete: true))
         {
@@ -123,11 +121,9 @@ public class MediaServiceTests : UmbracoIntegrationTest
         }
 
         // Delete the media
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMedia, () =>
-        {
-            MediaService.Delete(_rootMedia);
-            return Task.CompletedTask;
-        });
+        await WaitForIndexing(
+            global::Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMedia,
+            async () => await MediaService.DeleteAsync(_rootMedia, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None));
 
         using (ScopeProvider.CreateScope(autoComplete: true))
         {
@@ -151,15 +147,14 @@ public class MediaServiceTests : UmbracoIntegrationTest
             .Build();
         await MediaTypeService.CreateAsync(mediaType, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey);
 
-        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMedia, () =>
+        await WaitForIndexing(global::Umbraco.Cms.Core.Constants.Search.IndexAliases.DraftMedia, async () =>
         {
             _rootMedia = new MediaBuilder()
                 .WithMediaType(mediaType)
                 .WithName("Root Media")
                 .WithPropertyValues(new { altText = "The media alt text" })
                 .Build();
-            MediaService.Save(_rootMedia);
-            return Task.CompletedTask;
+            await MediaService.SaveAsync(_rootMedia, global::Umbraco.Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         });
     }
 

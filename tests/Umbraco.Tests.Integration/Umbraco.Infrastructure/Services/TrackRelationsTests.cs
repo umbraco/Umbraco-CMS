@@ -60,8 +60,8 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
         var m1 = MediaBuilder.CreateSimpleMedia(mt, "hello 1", -1);
         var m2 = MediaBuilder.CreateSimpleMedia(mt, "hello 1", -1);
-        MediaService.Save(m1);
-        MediaService.Save(m2);
+        await MediaService.SaveAsync(m1, Constants.Security.SuperUserKey, CancellationToken.None);
+        await MediaService.SaveAsync(m2, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var memberType = MemberTypeBuilder.CreateSimpleMemberType("testMemberType", "Test Member Type");
         await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
@@ -114,7 +114,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
         await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
         var media = MediaBuilder.CreateSimpleMedia(mt, "media", -1);
-        MediaService.Save(media);
+        await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
@@ -151,8 +151,8 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
         var m1 = MediaBuilder.CreateSimpleMedia(mt, "media 1", -1);
         var m2 = MediaBuilder.CreateSimpleMedia(mt, "media 2", -1);
-        MediaService.Save(m1);
-        MediaService.Save(m2);
+        await MediaService.SaveAsync(m1, Constants.Security.SuperUserKey, CancellationToken.None);
+        await MediaService.SaveAsync(m2, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
@@ -184,8 +184,8 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
         var m1 = MediaBuilder.CreateSimpleMedia(mt, "media 1", -1);
         var m2 = MediaBuilder.CreateSimpleMedia(mt, "media 2", -1);
-        MediaService.Save(m1);
-        MediaService.Save(m2);
+        await MediaService.SaveAsync(m1, Constants.Security.SuperUserKey, CancellationToken.None);
+        await MediaService.SaveAsync(m2, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
@@ -220,7 +220,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
         await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
         var m1 = MediaBuilder.CreateSimpleMedia(mt, "media 1", -1);
-        MediaService.Save(m1);
+        await MediaService.SaveAsync(m1, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);
@@ -253,7 +253,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
         await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
         var m1 = MediaBuilder.CreateSimpleMedia(mt, "media 1", -1);
-        MediaService.Save(m1);
+        await MediaService.SaveAsync(m1, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey, CancellationToken.None);

@@ -82,9 +82,9 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
         MediaItem1 = new MediaBuilder().WithName("Image 1").WithMediaType(MediaType).Build();
         MediaItem2 = new MediaBuilder().WithName("Image 2").WithMediaType(MediaType).Build();
         MediaItem3 = new MediaBuilder().WithName("Image 3").WithMediaType(MediaType).Build();
-        MediaService.Save(MediaItem1);
-        MediaService.Save(MediaItem2);
-        MediaService.Save(MediaItem3);
+        await MediaService.SaveAsync(MediaItem1, Constants.Security.SuperUserKey, CancellationToken.None);
+        await MediaService.SaveAsync(MediaItem2, Constants.Security.SuperUserKey, CancellationToken.None);
+        await MediaService.SaveAsync(MediaItem3, Constants.Security.SuperUserKey, CancellationToken.None);
     }
 
     [Test]

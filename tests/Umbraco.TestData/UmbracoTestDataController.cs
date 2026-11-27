@@ -209,7 +209,7 @@ public class UmbracoTestDataController : SurfaceController
     private IEnumerable<Udi> CreateMediaTree(string company, Faker faker, int count, int depth)
     {
         var parent =
-            Services.MediaService.CreateMediaWithIdentity(company, -1, Constants.Conventions.MediaTypes.Folder);
+            Services.MediaService.CreateAndSaveAsync(company, parentKey: null, Constants.Conventions.MediaTypes.Folder, Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
         return CreateHierarchy(parent, count, depth, currParent =>
         {
@@ -223,13 +223,13 @@ public class UmbracoTestDataController : SurfaceController
             // if we don't do this we don't get thumbnails in the back office.
             imageUrl += "&ext=.jpg";
 
-            var media = Services.MediaService.CreateMedia(faker.Commerce.ProductName(), currParent, Constants.Conventions.MediaTypes.Image);
+            var media = Services.MediaService.CreateAsync(faker.Commerce.ProductName(), currParent, Constants.Conventions.MediaTypes.Image, Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
             media.SetValue(Constants.Conventions.Media.File, imageUrl);
-            Services.MediaService.Save(media);
+            Services.MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
             return (media, () =>
             {
                 // create a folder to contain child media
-                var container = Services.MediaService.CreateMediaWithIdentity(faker.Commerce.Department(), currParent, Constants.Conventions.MediaTypes.Folder);
+                var container = Services.MediaService.CreateAndSaveAsync(faker.Commerce.Department(), currParent, Constants.Conventions.MediaTypes.Folder, Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
                 return container;
             }
             );

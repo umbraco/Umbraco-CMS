@@ -517,10 +517,8 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
         var allowedContentChild = ContentBuilder.CreateSimpleContent(contentType, "allowed child", allowedContent.Id);
         await ContentService.SaveAsync(allowedContentChild, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
-        var allowedMedia = MediaService.CreateMedia("allowed", Constants.System.Root, Constants.Conventions.MediaTypes.Folder);
-        MediaService.Save(allowedMedia);
-        var allowedMediaChild = MediaService.CreateMedia("allowed child", allowedMedia.Id, Constants.Conventions.MediaTypes.Folder);
-        MediaService.Save(allowedMediaChild);
+        var allowedMedia = await MediaService.CreateAndSaveAsync("allowed", parentKey: null, Constants.Conventions.MediaTypes.Folder, Constants.Security.SuperUserKey, CancellationToken.None);
+        var allowedMediaChild = await MediaService.CreateAndSaveAsync("allowed child", allowedMedia, Constants.Conventions.MediaTypes.Folder, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var allowedElementFolder = await CreateElementFolderAsync("allowed", null);
         var allowedElementFolderChild = await CreateElementFolderAsync("allowed child", allowedElementFolder.Key);

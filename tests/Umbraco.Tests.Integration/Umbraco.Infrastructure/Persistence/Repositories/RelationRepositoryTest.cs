@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -221,7 +219,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         var imageType = MediaTypeBuilder.CreateImageMediaType("myImage");
         await MediaTypeService.CreateAsync(imageType, Constants.Security.SuperUserKey);
         var media = MediaBuilder.CreateMediaImage(imageType, -1);
-        MediaService.Save(media);
+        await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
         var relType = await RelationService.GetRelationTypeByAliasAsync(Constants.Conventions.RelationTypes.RelatedMediaAlias);
         await RelationService.RelateAsync(media.Id, media.Id, relType!);
 
@@ -354,7 +352,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         for (var i = 0; i < 3; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(imageType, -1);
-            MediaService.Save(c1);
+            await MediaService.SaveAsync(c1, Constants.Security.SuperUserKey, CancellationToken.None);
             createdMedia.Add(c1);
         }
 
@@ -455,7 +453,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         for (var i = 0; i < 3; i++)
         {
             var m1 = MediaBuilder.CreateMediaImage(imageType, -1);
-            MediaService.Save(m1);
+            await MediaService.SaveAsync(m1, Constants.Security.SuperUserKey, CancellationToken.None);
             trashedMedia.Add(m1);
         }
 

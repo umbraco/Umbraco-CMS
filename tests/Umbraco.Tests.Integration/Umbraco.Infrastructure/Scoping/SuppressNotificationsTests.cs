@@ -3,7 +3,6 @@
 
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
@@ -75,7 +74,7 @@ internal sealed class SuppressNotificationsTests : UmbracoIntegrationTest
 
             asserted = TestContext.CurrentContext.AssertCount;
             var media = MediaBuilder.CreateMediaImage(mediaType, -1);
-            MediaService.Save(media);
+            await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         Assert.AreEqual(asserted + 1, TestContext.CurrentContext.AssertCount);

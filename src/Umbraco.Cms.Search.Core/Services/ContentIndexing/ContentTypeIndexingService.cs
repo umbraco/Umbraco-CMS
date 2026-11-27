@@ -84,7 +84,7 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
         => objectType switch
         {
             UmbracoObjectTypes.Document => await GetDocumentKeysByContentTypesAsync(contentTypeKeys, cancellationToken),
-            UmbracoObjectTypes.Media => await GetMediaKeysByMediaTypesAsync(contentTypeKeys),
+            UmbracoObjectTypes.Media => await GetMediaKeysByMediaTypesAsync(contentTypeKeys, cancellationToken),
             UmbracoObjectTypes.Member => await GetMemberKeysByMemberTypesAsync(contentTypeKeys),
             _ => [],
         };
@@ -162,7 +162,7 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
         return keys.ToArray();
     }
 
-    private async Task<Guid[]> GetMediaKeysByMediaTypesAsync(Guid[] mediaTypeKeys)
+    private async Task<Guid[]> GetMediaKeysByMediaTypesAsync(Guid[] mediaTypeKeys, CancellationToken cancellationToken)
     {
         int[] directMediaTypeIds = (await _mediaTypeService.GetManyAsync(mediaTypeKeys))
             .Select(mt => mt.Id)
@@ -174,18 +174,23 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
         }
 
         int[] allMediaTypeIds = await ExpandWithDependentMediaTypesAsync(directMediaTypeIds);
+        Guid[] allMediaTypeKeys = (await _mediaTypeService.GetManyAsync(allMediaTypeIds))
+            .Select(mt => mt.Key)
+            .ToArray();
 
         var keys = new List<Guid>();
-        var pageIndex = 0L;
+        var skip = 0;
+        const int take = 1000;
 
         while (true)
         {
-            IMedia[] page = _mediaService.GetPagedOfTypes(
-                allMediaTypeIds, pageIndex, 1000, out long totalRecords, null, null).ToArray();
-            keys.AddRange(page.Select(m => m.Key));
-            pageIndex++;
+            PagedModel<IMedia> page = await _mediaService.GetPagedOfTypesAsync(allMediaTypeKeys, skip, take, ordering: null, cancellationToken);
+            Guid[] pageKeys = page.Items.Select(m => m.Key).ToArray();
+            keys.AddRange(pageKeys);
+            skip += take;
 
-            if (keys.Count >= totalRecords)
+            // An empty page means there is nothing further to read whatever the reported total says.
+            if (pageKeys.Length == 0 || keys.Count >= page.Total)
             {
                 break;
             }

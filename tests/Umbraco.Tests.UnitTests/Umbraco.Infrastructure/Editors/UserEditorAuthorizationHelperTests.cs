@@ -302,9 +302,11 @@ public class UserEditorAuthorizationHelperTests
 
         var contentService = new Mock<IContentService>();
         var idKeyMap = new Mock<IIdKeyMap>();
+        idKeyMap.Setup(x => x.GetKeyForIdAsync(It.IsAny<int>(), It.IsAny<UmbracoObjectTypes>()))
+            .ReturnsAsync((int id, UmbracoObjectTypes _) => Attempt.Succeed(KeyForId(id)));
         var mediaService = new Mock<IMediaService>();
-        mediaService.Setup(x => x.GetById(It.IsAny<int>()))
-            .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
+        mediaService.Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Guid key, CancellationToken _) => Mock.Of<IMedia>(media => media.Path == nodePaths[IdForKey(key)]));
         var entityService = new Mock<IEntityService>();
         entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns((UmbracoObjectTypes objType, int[] ids) =>
@@ -336,9 +338,11 @@ public class UserEditorAuthorizationHelperTests
 
         var contentService = new Mock<IContentService>();
         var idKeyMap = new Mock<IIdKeyMap>();
+        idKeyMap.Setup(x => x.GetKeyForIdAsync(It.IsAny<int>(), It.IsAny<UmbracoObjectTypes>()))
+            .ReturnsAsync((int id, UmbracoObjectTypes _) => Attempt.Succeed(KeyForId(id)));
         var mediaService = new Mock<IMediaService>();
-        mediaService.Setup(x => x.GetById(It.IsAny<int>()))
-            .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
+        mediaService.Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Guid key, CancellationToken _) => Mock.Of<IMedia>(media => media.Path == nodePaths[IdForKey(key)]));
         var entityService = new Mock<IEntityService>();
         entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns((UmbracoObjectTypes objType, int[] ids) =>
@@ -370,9 +374,11 @@ public class UserEditorAuthorizationHelperTests
 
         var contentService = new Mock<IContentService>();
         var idKeyMap = new Mock<IIdKeyMap>();
+        idKeyMap.Setup(x => x.GetKeyForIdAsync(It.IsAny<int>(), It.IsAny<UmbracoObjectTypes>()))
+            .ReturnsAsync((int id, UmbracoObjectTypes _) => Attempt.Succeed(KeyForId(id)));
         var mediaService = new Mock<IMediaService>();
-        mediaService.Setup(x => x.GetById(It.IsAny<int>()))
-            .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
+        mediaService.Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Guid key, CancellationToken _) => Mock.Of<IMedia>(media => media.Path == nodePaths[IdForKey(key)]));
         var entityService = new Mock<IEntityService>();
         entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns((UmbracoObjectTypes objType, int[] ids) =>
@@ -404,9 +410,11 @@ public class UserEditorAuthorizationHelperTests
 
         var contentService = new Mock<IContentService>();
         var idKeyMap = new Mock<IIdKeyMap>();
+        idKeyMap.Setup(x => x.GetKeyForIdAsync(It.IsAny<int>(), It.IsAny<UmbracoObjectTypes>()))
+            .ReturnsAsync((int id, UmbracoObjectTypes _) => Attempt.Succeed(KeyForId(id)));
         var mediaService = new Mock<IMediaService>();
-        mediaService.Setup(x => x.GetById(It.IsAny<int>()))
-            .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
+        mediaService.Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Guid key, CancellationToken _) => Mock.Of<IMedia>(media => media.Path == nodePaths[IdForKey(key)]));
         var entityService = new Mock<IEntityService>();
         entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns((UmbracoObjectTypes objType, int[] ids) =>
@@ -727,8 +735,8 @@ public class UserEditorAuthorizationHelperTests
     }
 
     // Deterministic int <-> Guid mapping so a mocked IIdKeyMap.GetKeyForIdAsync(id) and the
-    // matching IContentService.GetByIdAsync(key) setup agree on which node a key represents,
-    // without needing a shared lookup dictionary.
+    // matching IContentService/IMediaService.GetByIdAsync(key) setup agree on which node a key
+    // represents, without needing a shared lookup dictionary.
     private static Guid KeyForId(int id) => new(id, 0, 0, new byte[8]);
 
     private static int IdForKey(Guid key) => BitConverter.ToInt32(key.ToByteArray(), 0);

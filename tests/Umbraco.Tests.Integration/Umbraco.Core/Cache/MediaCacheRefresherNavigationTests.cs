@@ -37,9 +37,9 @@ internal sealed class MediaCacheRefresherNavigationTests : UmbracoIntegrationTes
         MediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("navigationTestFolder", "Navigation test folder");
         await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
         Media folder = MediaBuilder.CreateMediaFolder(mediaType, -1);
-        MediaService.Save(folder);
+        await MediaService.SaveAsync(folder, Constants.Security.SuperUserKey, CancellationToken.None);
         Media child = MediaBuilder.CreateMediaFolder(mediaType, folder.Id);
-        MediaService.Save(child);
+        await MediaService.SaveAsync(child, Constants.Security.SuperUserKey, CancellationToken.None);
         Assume.That(NavigationQueryService.TryGetParentKey(folder.Key, out _), Is.False, "The parent is already in navigation, so this test proves nothing.");
 
         MediaCacheRefresher.Refresh([new MediaCacheRefresher.JsonPayload(child.Id, child.Key, TreeChangeTypes.RefreshNode)]);
@@ -59,17 +59,17 @@ internal sealed class MediaCacheRefresherNavigationTests : UmbracoIntegrationTes
         MediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("navigationTestFolder", "Navigation test folder");
         await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
         Media folder = MediaBuilder.CreateMediaFolder(mediaType, -1);
-        MediaService.Save(folder);
+        await MediaService.SaveAsync(folder, Constants.Security.SuperUserKey, CancellationToken.None);
         Media child = MediaBuilder.CreateMediaFolder(mediaType, folder.Id);
-        MediaService.Save(child);
+        await MediaService.SaveAsync(child, Constants.Security.SuperUserKey, CancellationToken.None);
         MediaCacheRefresher.Refresh([Payload(folder), Payload(child)]);
 
         // Another server creates a new folder and moves the child into it; nothing runs against this server's structures.
         Media newParent = MediaBuilder.CreateMediaFolder(mediaType, -1);
         using (IScope scope = ScopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.None))
         {
-            MediaService.Save(newParent);
-            MediaService.Move(MediaService.GetById(child.Id)!, newParent.Id);
+            await MediaService.SaveAsync(newParent, Constants.Security.SuperUserKey, CancellationToken.None);
+            await MediaService.MoveAsync((await MediaService.GetByIdAsync(child.Key, CancellationToken.None))!, newParent.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
             scope.Complete();
         }
 

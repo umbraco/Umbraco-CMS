@@ -155,18 +155,18 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void MediaTelemetry_Can_Get_Media_In_Folders()
+    public async Task MediaTelemetry_Can_Get_Media_In_Folders()
     {
-        var folderType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
-        var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
+        var folderType = await MediaTypeService.GetAsync(1031);
+        var imageMediaType = await MediaTypeService.GetAsync(1032);
 
         var root = MediaBuilder.CreateMediaFolder(folderType, -1);
-        MediaService.Save(root);
+        await MediaService.SaveAsync(root, Constants.Security.SuperUserKey, CancellationToken.None);
         var createdMediaCount = 10;
         for (var i = 0; i < createdMediaCount; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(imageMediaType, root.Id);
-            MediaService.Save(c1);
+            await MediaService.SaveAsync(c1, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         var result = MediaTelemetryProvider.GetInformation()
@@ -175,14 +175,14 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void MediaTelemetry_Can_Get_Media_In_Root()
+    public async Task MediaTelemetry_Can_Get_Media_In_Root()
     {
-        var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
+        var imageMediaType = await MediaTypeService.GetAsync(1032);
         var createdMediaCount = 10;
         for (var i = 0; i < createdMediaCount; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(imageMediaType, -1);
-            MediaService.Save(c1);
+            await MediaService.SaveAsync(c1, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         var result = MediaTelemetryProvider.GetInformation()

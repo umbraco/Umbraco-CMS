@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services;
@@ -38,7 +37,7 @@ public class DistributedContentIndexRefresherMediaTests : TestBase
             .WithMediaType(mediaType)
             .WithName("Media one")
             .Build();
-        MediaService.Save(mediaOne);
+        await MediaService.SaveAsync(mediaOne, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         _mediaTwoKey = Guid.NewGuid();
         IMedia mediaTwo = new MediaBuilder()
@@ -46,7 +45,7 @@ public class DistributedContentIndexRefresherMediaTests : TestBase
             .WithMediaType(mediaType)
             .WithName("Media two")
             .Build();
-        MediaService.Save(mediaTwo);
+        await MediaService.SaveAsync(mediaTwo, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IndexerAndSearcher.Reset();
     }
@@ -77,7 +76,7 @@ public class DistributedContentIndexRefresherMediaTests : TestBase
         Assert.That(dump.Select(d => d.Id), Is.EquivalentTo(new[] { _mediaOneKey, _mediaTwoKey }));
     }
 
-    private IMedia MediaOne() => MediaService.GetById(_mediaOneKey) ?? throw new InvalidOperationException("Media one was not found");
+    private IMedia MediaOne() => MediaService.GetByIdAsync(_mediaOneKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Media one was not found");
 
-    private IMedia MediaTwo() => MediaService.GetById(_mediaTwoKey) ?? throw new InvalidOperationException("Media two was not found");
+    private IMedia MediaTwo() => MediaService.GetByIdAsync(_mediaTwoKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Media two was not found");
 }

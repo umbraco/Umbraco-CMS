@@ -240,7 +240,7 @@ internal sealed class PickerValueConvertersColdReadTests : UmbracoIntegrationTes
         for (var i = 0; i < PickedItemCount; i++)
         {
             Media media = MediaBuilder.CreateSimpleMedia(mediaType, $"Picked media {i}", -1);
-            MediaService.Save(media, -1);
+            await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
             keys.Add(media.Key);
         }
 

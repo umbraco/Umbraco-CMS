@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -255,7 +253,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
-            IMedia? media = _mediaService.GetById(payload.Id);
+            IMedia? media = _mediaService.GetByIdAsync(payload.Key.Value, CancellationToken.None).GetAwaiter().GetResult();
 
             if (media is null)
             {
@@ -267,14 +265,14 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
-            IMedia? media = _mediaService.GetById(payload.Id);
+            IMedia? media = _mediaService.GetByIdAsync(payload.Key.Value, CancellationToken.None).GetAwaiter().GetResult();
 
             if (media is null)
             {
                 return;
             }
 
-            IEnumerable<IMedia> descendants = _mediaService.GetPagedDescendants(media.Id, 0, int.MaxValue, out _);
+            IEnumerable<IMedia> descendants = _mediaService.GetDescendantsAsync(media.Key, 0, int.MaxValue, ordering: null, CancellationToken.None).GetAwaiter().GetResult().Items;
             foreach (IMedia descendant in media.Yield().Concat(descendants))
             {
                 HandleNavigationForSingleMedia(descendant);

@@ -1,16 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -18,7 +12,6 @@ using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
@@ -64,7 +57,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                service.Save(media);
+                service.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
                 scope.Complete();
             }
         }
@@ -231,14 +224,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                         Assert.IsNull(currentScope);
 
                         string name1 = "test-" + Guid.NewGuid();
-                        IMedia media1 = mediaService.CreateMedia(name1, -1, Constants.Conventions.MediaTypes.Folder);
+                        IMedia media1 = mediaService.CreateAsync(name1, (Guid?)null, Constants.Conventions.MediaTypes.Folder, Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
                         log.LogInformation("[{0}] Saving media #1.", Thread.CurrentThread.ManagedThreadId);
                         Save(mediaService, media1);
 
                         Thread.Sleep(100); // quick pause for maximum overlap!
 
                         string name2 = "test-" + Guid.NewGuid();
-                        IMedia media2 = mediaService.CreateMedia(name2, -1, Constants.Conventions.MediaTypes.Folder);
+                        IMedia media2 = mediaService.CreateAsync(name2, (Guid?)null, Constants.Conventions.MediaTypes.Folder, Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
                         log.LogInformation("[{0}] Saving media #2.", Thread.CurrentThread.ManagedThreadId);
                         Save(mediaService, media2);
                     }
@@ -269,7 +262,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             if (exceptions.Count == 0)
             {
                 // now look up all items, there should be 40!
-                IEnumerable<IMedia> items = mediaService.GetRootMedia();
+                IEnumerable<IMedia> items = mediaService.GetRootMediaAsync(CancellationToken.None).GetAwaiter().GetResult();
                 Assert.AreEqual(2 * MaxThreadCount, items.Count());
             }
             else

@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -41,7 +42,7 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
             .WithName("Test Media Item")
             .WithMediaType(mediaType)
             .Build();
-        MediaService.Save(_mediaItem);
+        await MediaService.SaveAsync(_mediaItem, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentData = new ContentData(
             _mediaItem.Name,
@@ -257,9 +258,9 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
     {
         IMediaType mediaType = (await MediaTypeService.GetAsync("image"))!;
         var mediaB = new MediaBuilder().WithName("Test Media Item B").WithMediaType(mediaType).Build();
-        MediaService.Save(mediaB);
+        await MediaService.SaveAsync(mediaB, Constants.Security.SuperUserKey, CancellationToken.None);
         var mediaC = new MediaBuilder().WithName("Test Media Item C").WithMediaType(mediaType).Build();
-        MediaService.Save(mediaC);
+        await MediaService.SaveAsync(mediaC, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
         await hybridCache.RemoveAsync($"{_mediaItem.Key}");

@@ -43,7 +43,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<ExternalLoginRepository>();
         builder.Services.AddUnique<IExternalLoginWithKeyRepository>(factory => factory.GetRequiredService<ExternalLoginRepository>());
         builder.Services.AddUnique<ILanguageRepository, LanguageRepository>();
-        builder.Services.AddUnique<IMediaRepository, MediaRepository>();
         builder.Services.AddUnique<IAsyncMediaRepository, AsyncMediaRepository>();
         builder.Services.AddUnique<IMediaTypeContainerRepository, MediaTypeContainerRepository>();
         builder.Services.AddUnique<IMediaTypeRepository, MediaTypeRepository>();
