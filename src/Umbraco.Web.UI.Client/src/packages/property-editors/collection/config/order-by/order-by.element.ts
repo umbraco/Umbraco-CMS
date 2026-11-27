@@ -1,3 +1,4 @@
+import { resolveCollectionOrderByAlias } from './resolve-collection-order-by-alias.function.js';
 import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -31,13 +32,17 @@ export class UmbPropertyEditorUICollectionOrderByElement extends UmbLitElement i
 				await workspace?.propertyValueByAlias<Array<UmbCollectionColumnConfiguration>>('includeProperties'),
 				(includeProperties) => {
 					if (!includeProperties) return;
+					const selectedAlias = resolveCollectionOrderByAlias(this.value, [
+						'name',
+						...includeProperties.map((property) => property.alias),
+					]);
 					const options = includeProperties.map((property) => ({
 						name: property.header,
 						value: property.alias,
-						selected: property.alias === this.value,
+						selected: property.alias === selectedAlias,
 					}));
 					this._options = [
-						{ name: this.localize.term('general_name'), value: 'name', selected: 'name' === this.value },
+						{ name: this.localize.term('general_name'), value: 'name', selected: 'name' === selectedAlias },
 						...options,
 					];
 				},
