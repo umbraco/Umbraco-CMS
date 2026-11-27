@@ -6784,6 +6784,7 @@ export type GetCollectionDocumentByIdData = {
         filter?: string;
         skip?: number;
         take?: number;
+        originDataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/collection/document/{id}';
 };

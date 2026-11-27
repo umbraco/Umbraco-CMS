@@ -20,6 +20,7 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 
 		const query = {
 			dataTypeId: filter.dataTypeId ?? '',
+			originDataTypeId: filter.originDataTypeId,
 			orderBy: filter.orderBy ?? 'updateDate',
 			orderCulture: filter.orderCulture ?? 'en-US',
 			orderDirection: filter.orderDirection === 'asc' ? DirectionModel.ASCENDING : DirectionModel.DESCENDING,

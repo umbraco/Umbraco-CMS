@@ -47,6 +47,16 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
     protected virtual Task<ISet<Guid>> FilterAuthorizedKeysAsync(IUser user, IEnumerable<Guid> keys)
         => Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
 
+    /// <summary>
+    ///     Filters the specified content keys to only those the user has access to, for a request originating from a data type.
+    /// </summary>
+    /// <param name="user">The user to check access for.</param>
+    /// <param name="keys">The keys of the content items to filter.</param>
+    /// <param name="originDataTypeKey">The key of the data type the request originates from, if any.</param>
+    /// <returns>A set of keys that the user has access to.</returns>
+    protected virtual Task<ISet<Guid>> FilterAuthorizedKeysAsync(IUser user, IEnumerable<Guid> keys, Guid? originDataTypeKey)
+        => FilterAuthorizedKeysAsync(user, keys);
+
     protected async Task<Attempt<ListViewPagedModel<TContent>?, ContentCollectionOperationStatus>> GetListViewResultAsync(
         IUser user,
         TContent? content,
@@ -56,7 +66,8 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         Direction orderDirection,
         string? filter,
         int skip,
-        int take)
+        int take,
+        Guid? originDataTypeKey = null)
     {
         Attempt<ListViewConfiguration?, ContentCollectionOperationStatus> configurationAttempt = await GetListViewConfigurationAsync(content?.ContentType.Key, dataTypeKey);
 
@@ -76,7 +87,7 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         // load the properties we need to populate the collection view).
         string[]? customPropertyAliases = ExtractCustomPropertyAliases(configurationAttempt.Result, orderingAttempt.Result);
 
-        PagedModel<TContent> items = await GetAllowedListViewItemsAsync(user, content?.Key, filter, orderingAttempt.Result, customPropertyAliases, skip, take);
+        PagedModel<TContent> items = await GetAllowedListViewItemsAsync(user, content?.Key, filter, orderingAttempt.Result, customPropertyAliases, skip, take, originDataTypeKey);
 
         var result = new ListViewPagedModel<TContent>
         {
@@ -262,14 +273,14 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         return [.. customAliases];
     }
 
-    private async Task<PagedModel<TContent>> GetAllowedListViewItemsAsync(IUser user, Guid? contentId, string? filter, Ordering? ordering, string[]? propertyAliases, int skip, int take)
+    private async Task<PagedModel<TContent>> GetAllowedListViewItemsAsync(IUser user, Guid? contentId, string? filter, Ordering? ordering, string[]? propertyAliases, int skip, int take, Guid? originDataTypeKey)
     {
         // Collection views don't need templates loaded, so we pass loadTemplates: false for performance
         PagedModel<TContent> pagedChildren = await _contentSearchService.SearchChildrenAsync(filter, contentId, propertyAliases, ordering, loadTemplates: false, skip, take);
 
         // Filtering out child nodes after getting a paged result is an active choice here, even though the pagination might get off.
         // This has been the case with this functionality in Umbraco for a long time.
-        IEnumerable<TContent> items = await FilterItemsBasedOnAccessAsync(user, pagedChildren.Items);
+        IEnumerable<TContent> items = await FilterItemsBasedOnAccessAsync(user, pagedChildren.Items, originDataTypeKey);
 
         var pagedResult = new PagedModel<TContent>
         {
@@ -280,7 +291,7 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         return pagedResult;
     }
 
-    private async Task<IEnumerable<TContent>> FilterItemsBasedOnAccessAsync(IUser user, IEnumerable<TContent> items)
+    private async Task<IEnumerable<TContent>> FilterItemsBasedOnAccessAsync(IUser user, IEnumerable<TContent> items, Guid? originDataTypeKey)
     {
         TContent[] itemsArray = items.ToArray();
         if (itemsArray.Length == 0)
@@ -289,7 +300,7 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         }
 
         // Authorize all items at once (so we execute a single database query instead of N queries).
-        ISet<Guid> authorizedKeys = await FilterAuthorizedKeysAsync(user, itemsArray.Select(i => i.Key));
+        ISet<Guid> authorizedKeys = await FilterAuthorizedKeysAsync(user, itemsArray.Select(i => i.Key), originDataTypeKey);
 
         // Filter items based on authorized keys.
         return itemsArray.Where(item => authorizedKeys.Contains(item.Key));

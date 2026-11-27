@@ -50,6 +50,7 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
     /// <returns>
     /// A task representing the asynchronous operation. The result contains an <see cref="Attempt{T, TStatus}"/> with a paged list view model of content items if successful, or a failure status otherwise.
     /// </returns>
+    [Obsolete("Please use the overload that accepts an originDataTypeKey parameter. Scheduled for removal in Umbraco 20.")]
     public async Task<Attempt<ListViewPagedModel<IContent>?, ContentCollectionOperationStatus>> GetListViewItemsByKeyAsync(
         IUser user,
         Guid key,
@@ -60,6 +61,20 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
         string? filter,
         int skip,
         int take)
+        => await GetListViewItemsByKeyAsync(user, key, dataTypeKey, orderBy, orderCulture, orderDirection, filter, skip, take, originDataTypeKey: null);
+
+    /// <inheritdoc/>
+    public async Task<Attempt<ListViewPagedModel<IContent>?, ContentCollectionOperationStatus>> GetListViewItemsByKeyAsync(
+        IUser user,
+        Guid key,
+        Guid? dataTypeKey,
+        string orderBy,
+        string? orderCulture,
+        Direction orderDirection,
+        string? filter,
+        int skip,
+        int take,
+        Guid? originDataTypeKey)
     {
         IContent? content = _contentService.GetById(key);
         if (content == null)
@@ -67,7 +82,7 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
             return Attempt.FailWithStatus<ListViewPagedModel<IContent>?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.ContentNotFound, null);
         }
 
-        return await GetListViewResultAsync(user, content, dataTypeKey, orderBy, orderCulture, orderDirection, filter, skip, take);
+        return await GetListViewResultAsync(user, content, dataTypeKey, orderBy, orderCulture, orderDirection, filter, skip, take, originDataTypeKey);
     }
 
     // We can use an authorizer here, as it already handles all the necessary checks for this filtering.
@@ -86,8 +101,13 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
 
     /// <inheritdoc/>
     protected override async Task<ISet<Guid>> FilterAuthorizedKeysAsync(IUser user, IEnumerable<Guid> keys) =>
+        await FilterAuthorizedKeysAsync(user, keys, originDataTypeKey: null);
+
+    /// <inheritdoc/>
+    protected override async Task<ISet<Guid>> FilterAuthorizedKeysAsync(IUser user, IEnumerable<Guid> keys, Guid? originDataTypeKey) =>
         await _contentPermissionAuthorizer.FilterAuthorizedAsync(
             user,
             keys,
-            new HashSet<string> { ActionBrowse.ActionLetter });
+            new HashSet<string> { ActionBrowse.ActionLetter },
+            originDataTypeKey);
 }

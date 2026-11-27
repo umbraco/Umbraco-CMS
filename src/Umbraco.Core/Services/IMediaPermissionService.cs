@@ -47,6 +47,7 @@ public interface IMediaPermissionService
     /// <param name="mediaKeys">The identifiers of the media items to filter.</param>
     /// <returns>A task resolving into the set of authorized media keys.</returns>
     // TODO (V18): Remove default implementation.
+    [Obsolete("Please use the overload that accepts a dataTypeKey parameter. Scheduled for removal in Umbraco 20.")]
     Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> mediaKeys)
         => Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
 
@@ -61,7 +62,9 @@ public interface IMediaPermissionService
     /// <param name="mediaKeys">The identifiers of the media items to filter.</param>
     /// <param name="dataTypeKey">The identifier of the data type the request originates from, if any.</param>
     /// <returns>A task resolving into the set of authorized media keys.</returns>
-    // TODO (V19): Remove default implementation.
+    // TODO (V20): Remove the default implementation when the obsolete overload is removed.
     Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> mediaKeys, Guid? dataTypeKey)
+#pragma warning disable CS0618 // Type or member is obsolete
         => FilterAuthorizedAccessAsync(user, mediaKeys);
+#pragma warning restore CS0618 // Type or member is obsolete
 }

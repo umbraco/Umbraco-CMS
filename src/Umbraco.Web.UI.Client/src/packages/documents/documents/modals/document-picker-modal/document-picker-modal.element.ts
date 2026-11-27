@@ -1,7 +1,12 @@
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../../collection/constants.js';
+import type { UmbDocumentCollectionFilterModel } from '../../collection/types.js';
 import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import type { UmbDocumentPickerModalData, UmbDocumentPickerModalValue } from './types.js';
-import { UMB_CONTENT_SECTION_ALIAS, UmbContentCollectionConfigurationContext } from '@umbraco-cms/backoffice/content';
+import {
+	UMB_CONTENT_SECTION_ALIAS,
+	UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT,
+	UmbContentCollectionConfigurationContext,
+} from '@umbraco-cms/backoffice/content';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import {
 	css,
@@ -121,6 +126,10 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 	@state()
 	private _treeAlias?: string;
 
+	/** The data type of the property this picker is opened from, which the collection passes on to the server. */
+	@state()
+	private _originDataTypeUnique?: string;
+
 	/**
 	 * Answers `UMB_ENTITY_CONTEXT` for the node being browsed. Without it the collection would bind to the entity of
 	 * whichever element opened the modal, because a modal re-dispatches unanswered context requests onto its opener.
@@ -152,6 +161,7 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 		this.#observeCollectionInteractionMemories();
 		this.#observeCollectionConfiguration();
 		this.#observeContentSectionAccess();
+		this.#observeOriginDataType();
 		this.#observeLocation();
 	}
 
@@ -347,6 +357,18 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 			},
 			null,
 		);
+	}
+
+	#observeOriginDataType() {
+		this.consumeContext(UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT, (context) => {
+			this.observe(
+				context?.dataType,
+				(dataType) => {
+					this._originDataTypeUnique = dataType?.unique;
+				},
+				'umbDocumentPickerOriginDataTypeObserver',
+			);
+		});
 	}
 
 	/** The Collection endpoint requires Content-section access; the Tree endpoint accepts any section. */
@@ -549,8 +571,9 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 	}
 
 	#renderCollection() {
-		const config: UmbCollectionConfiguration = {
+		const config: UmbCollectionConfiguration & Pick<UmbDocumentCollectionFilterModel, 'originDataTypeId'> = {
 			...this._collectionConfig,
+			originDataTypeId: this._originDataTypeUnique,
 			selectionConfiguration: this._collectionSelectionConfiguration,
 			bulkActionConfiguration: { enabled: false },
 			hideItemActions: true,
@@ -559,8 +582,9 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 
 		// Re-created per browsed node: a collection cannot be retargeted once configured, and a fresh instance also
 		// resets pagination and the per-view registrations.
+		// The origin data type is part of the key, as it decides which items the server returns.
 		return keyed(
-			this.#getCollectionMemoryKey(),
+			`${this.#getCollectionMemoryKey()}|${this._originDataTypeUnique ?? ''}`,
 			html`<umb-collection
 				alias=${UMB_DOCUMENT_COLLECTION_ALIAS}
 				.config=${config}

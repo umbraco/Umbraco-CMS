@@ -8521,6 +8521,14 @@
               "format": "int32",
               "default": 100
             }
+          },
+          {
+            "name": "originDataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
