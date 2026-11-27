@@ -4,6 +4,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -27,7 +28,11 @@ public abstract class StartNodeAccessTestBase<T> : ManagementApiTest<T>
     protected static string WithIds(string url, IEnumerable<Guid> ids)
         => $"{url}{(url.Contains('?') ? '&' : '?')}{string.Join('&', ids.Select(id => $"id={id}"))}";
 
-    protected async Task AuthenticateRestrictedUserAsync(string[] sections, int? startContentId = null, int? startMediaId = null)
+    protected async Task AuthenticateRestrictedUserAsync(
+        string[] sections,
+        int? startContentId = null,
+        int? startMediaId = null,
+        IList<IGranularPermission>? granularPermissions = null)
     {
         var alias = $"restricted{Guid.NewGuid():N}";
 
@@ -35,7 +40,8 @@ public abstract class StartNodeAccessTestBase<T> : ManagementApiTest<T>
             .WithAlias(alias)
             .WithName(alias)
             .WithAllowedSections(sections)
-            .WithPermissions(new HashSet<string> { ActionBrowse.ActionLetter });
+            .WithPermissions(new HashSet<string> { ActionBrowse.ActionLetter })
+            .WithGranularPermissions(granularPermissions ?? []);
         if (startContentId is not null)
         {
             builder.WithStartContentId(startContentId.Value);

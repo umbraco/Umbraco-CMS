@@ -1,5 +1,6 @@
 import type { UmbManagementApiInFlightRequestCache } from '../inflight-request/cache.js';
 import type {
+	UmbManagementApiTreeAncestorsOfBatchRequestArgs,
 	UmbManagementApiTreeAncestorsOfRequestArgs,
 	UmbManagementApiTreeBatchRequestArgs,
 	UmbManagementApiTreeChildrenOfRequestArgs,
@@ -19,6 +20,11 @@ import type {
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
 
+export interface UmbManagementApiTreeAncestorsOfBatchItem<TreeItemType> {
+	id: string;
+	ancestors: Array<TreeItemType>;
+}
+
 export interface UmbManagementApiTreeDataRequestManagerArgs<
 	TreeItemType,
 	RootItemsRequestArgsType extends UmbManagementApiTreeRootItemsRequestArgs,
@@ -34,6 +40,15 @@ export interface UmbManagementApiTreeDataRequestManagerArgs<
 		items: Array<TreeItemType>;
 		total: number;
 	},
+	AncestorsOfBatchRequestArgsType extends UmbManagementApiTreeAncestorsOfBatchRequestArgs =
+		UmbManagementApiTreeAncestorsOfBatchRequestArgs,
+	AncestorsOfBatchDataResponseType extends {
+		items: Array<UmbManagementApiTreeAncestorsOfBatchItem<TreeItemType>>;
+		total: number;
+	} = {
+		items: Array<UmbManagementApiTreeAncestorsOfBatchItem<TreeItemType>>;
+		total: number;
+	},
 > {
 	getRootItems: (args: RootItemsRequestArgsType) => Promise<UmbApiResponse<{ data?: RootItemsDataResponseType }>>;
 	getChildrenOf: (args: ChildrenOfRequestArgsType) => Promise<UmbApiResponse<{ data?: ChildrenOfDataResponseType }>>;
@@ -45,6 +60,13 @@ export interface UmbManagementApiTreeDataRequestManagerArgs<
 	 * Optional request for tree items by unique. When omitted, `getBatch` cannot be used.
 	 */
 	getBatch?: (args: BatchRequestArgsType) => Promise<UmbApiResponse<{ data?: BatchDataResponseType }>>;
+	/**
+	 * Optional request for the ancestors of several tree items by unique. When omitted, `getAncestorsOfBatch` cannot be
+	 * used.
+	 */
+	getAncestorsOfBatch?: (
+		args: AncestorsOfBatchRequestArgsType,
+	) => Promise<UmbApiResponse<{ data?: AncestorsOfBatchDataResponseType }>>;
 	/**
 	 * Optional in-flight deduplication cache. When provided, concurrent identical requests
 	 * share a single in-flight call instead of each hitting the network independently.
@@ -67,12 +89,22 @@ export class UmbManagementApiTreeDataRequestManager<
 		items: Array<TreeItemType>;
 		total: number;
 	},
+	AncestorsOfBatchRequestArgsType extends UmbManagementApiTreeAncestorsOfBatchRequestArgs =
+		UmbManagementApiTreeAncestorsOfBatchRequestArgs,
+	AncestorsOfBatchDataResponseType extends {
+		items: Array<UmbManagementApiTreeAncestorsOfBatchItem<TreeItemType>>;
+		total: number;
+	} = {
+		items: Array<UmbManagementApiTreeAncestorsOfBatchItem<TreeItemType>>;
+		total: number;
+	},
 > extends UmbControllerBase {
 	#getRootItems;
 	#getChildrenOf;
 	#getAncestorsOf;
 	#getSiblingsFrom;
 	#getBatch;
+	#getAncestorsOfBatch;
 	#inflightRequestCache?: UmbManagementApiInFlightRequestCache<unknown>;
 	#defaultTakeSize = 50;
 
@@ -89,7 +121,9 @@ export class UmbManagementApiTreeDataRequestManager<
 			SiblingsFromRequestArgsType,
 			SiblingsFromDataResponseType,
 			BatchRequestArgsType,
-			BatchDataResponseType
+			BatchDataResponseType,
+			AncestorsOfBatchRequestArgsType,
+			AncestorsOfBatchDataResponseType
 		>,
 	) {
 		super(host);
@@ -98,6 +132,7 @@ export class UmbManagementApiTreeDataRequestManager<
 		this.#getAncestorsOf = args.getAncestorsOf;
 		this.#getSiblingsFrom = args.getSiblingsFrom;
 		this.#getBatch = args.getBatch;
+		this.#getAncestorsOfBatch = args.getAncestorsOfBatch;
 		this.#inflightRequestCache = args.inflightRequestCache;
 	}
 
@@ -290,6 +325,40 @@ export class UmbManagementApiTreeDataRequestManager<
 		const controller = new UmbItemDataApiGetRequestController(this, {
 			api: async ({ uniques }) => {
 				const response = await getBatch({ ...args, uniques });
+				if (response.error) throw response.error;
+				return { data: response.data?.items ?? [] };
+			},
+			uniques: args.uniques,
+		});
+
+		const { data, error } = await controller.request();
+		controller.destroy();
+
+		return { data, error };
+	}
+
+	/**
+	 * Gets the ancestors of each of the tree items with the given uniques, in the requested order. Large requests are
+	 * split into several smaller ones, so that no single request URL becomes too long.
+	 * @param {AncestorsOfBatchRequestArgsType} args - The uniques to request the ancestors of, along with any additional
+	 * request arguments
+	 * @returns {Promise<UmbApiResponse<{ data?: Array<UmbManagementApiTreeAncestorsOfBatchItem<TreeItemType>> }>>} The
+	 * ancestors of each tree item that could be found, ordered from the root down
+	 */
+	async getAncestorsOfBatch(
+		args: AncestorsOfBatchRequestArgsType,
+	): Promise<UmbApiResponse<{ data?: Array<UmbManagementApiTreeAncestorsOfBatchItem<TreeItemType>> }>> {
+		const getAncestorsOfBatch = this.#getAncestorsOfBatch;
+		if (!getAncestorsOfBatch) {
+			return {
+				data: undefined,
+				error: new UmbError('Requesting the ancestors of tree items by unique is not supported.'),
+			};
+		}
+
+		const controller = new UmbItemDataApiGetRequestController(this, {
+			api: async ({ uniques }) => {
+				const response = await getAncestorsOfBatch({ ...args, uniques });
 				if (response.error) throw response.error;
 				return { data: response.data?.items ?? [] };
 			},

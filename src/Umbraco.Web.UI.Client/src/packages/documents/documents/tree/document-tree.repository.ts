@@ -2,22 +2,31 @@ import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../enti
 import { UmbDocumentTreeItemDataResolver } from './document-tree-item-data-resolver.js';
 import { UmbDocumentTreeServerDataSource } from './server-data-source/document-tree.server.data-source.js';
 import { UMB_DOCUMENT_TREE_STORE_CONTEXT } from './document-tree.store.context-token.js';
-import type { UmbDocumentTreeItemModel, UmbDocumentTreeRootModel } from './types.js';
+import type {
+	UmbAncestorsOfDocumentTreeItemsRequestArgs,
+	UmbDocumentTreeItemModel,
+	UmbDocumentTreeRootModel,
+} from './types.js';
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
 import type {
 	UmbCreateTreeItemDataResolverArgs,
+	UmbAncestorsOfTreeItemModel,
 	UmbTreeItemDataResolver,
 	UmbTreeRepository,
 } from '@umbraco-cms/backoffice/tree';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 
 export class UmbDocumentTreeRepository
 	extends UmbTreeRepositoryBase<UmbDocumentTreeItemModel, UmbDocumentTreeRootModel>
 	implements UmbApi, UmbTreeRepository<UmbDocumentTreeItemModel, UmbDocumentTreeRootModel>
 {
+	#documentTreeSource: UmbDocumentTreeServerDataSource;
+
 	constructor(host: UmbControllerHost) {
 		super(host, UmbDocumentTreeServerDataSource, UMB_DOCUMENT_TREE_STORE_CONTEXT);
+		this.#documentTreeSource = this._treeSource as UmbDocumentTreeServerDataSource;
 	}
 
 	async requestTreeRoot() {
@@ -33,6 +42,19 @@ export class UmbDocumentTreeRepository
 		};
 
 		return { data };
+	}
+
+	/**
+	 * Requests the ancestors of each of the given items, ordered from the root down. Items whose ancestors cannot be
+	 * returned are left out.
+	 * @param {UmbAncestorsOfDocumentTreeItemsRequestArgs} args - The request arguments
+	 * @returns {Promise<UmbRepositoryResponse<Array<UmbAncestorsOfTreeItemModel<UmbDocumentTreeItemModel>>>>} The ancestors of each item
+	 * @memberof UmbDocumentTreeRepository
+	 */
+	async requestAncestorsOfTreeItems(
+		args: UmbAncestorsOfDocumentTreeItemsRequestArgs,
+	): Promise<UmbRepositoryResponse<Array<UmbAncestorsOfTreeItemModel<UmbDocumentTreeItemModel>>>> {
+		return this.#documentTreeSource.getAncestorsOfItems(args);
 	}
 
 	createTreeItemDataResolver(

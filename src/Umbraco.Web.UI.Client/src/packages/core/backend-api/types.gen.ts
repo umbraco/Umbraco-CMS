@@ -107,6 +107,11 @@ export type BatchResponseModelDocumentBlueprintTreeItemResponseModel = {
     items: Array<DocumentBlueprintTreeItemResponseModel>;
 };
 
+export type BatchResponseModelDocumentTreeAncestorsResponseModel = {
+    total: number;
+    items: Array<DocumentTreeAncestorsResponseModel>;
+};
+
 export type BatchResponseModelDocumentTreeItemResponseModel = {
     total: number;
     items: Array<DocumentTreeItemResponseModel>;
@@ -832,6 +837,11 @@ export type DocumentResponseModel = {
     documentType: DocumentTypeReferenceResponseModel;
     template?: ReferenceByIdModel | null;
     isTrashed: boolean;
+};
+
+export type DocumentTreeAncestorsResponseModel = {
+    id: string;
+    ancestors: Array<DocumentTreeItemResponseModel>;
 };
 
 export type DocumentTreeItemResponseModel = {
@@ -3359,6 +3369,11 @@ export type BatchResponseModelDocumentBlueprintTreeItemResponseModelWritable = {
     items: Array<DocumentBlueprintTreeItemResponseModelWritable>;
 };
 
+export type BatchResponseModelDocumentTreeAncestorsResponseModelWritable = {
+    total: number;
+    items: Array<DocumentTreeAncestorsResponseModelWritable>;
+};
+
 export type BatchResponseModelDocumentTreeItemResponseModelWritable = {
     total: number;
     items: Array<DocumentTreeItemResponseModelWritable>;
@@ -3452,6 +3467,11 @@ export type DocumentResponseModelWritable = {
     documentType: DocumentTypeReferenceResponseModel;
     template?: ReferenceByIdModel | null;
     isTrashed: boolean;
+};
+
+export type DocumentTreeAncestorsResponseModelWritable = {
+    id: string;
+    ancestors: Array<DocumentTreeItemResponseModelWritable>;
 };
 
 export type DocumentTreeItemResponseModelWritable = {
@@ -8457,6 +8477,36 @@ export type GetTreeDocumentAncestorsResponses = {
 };
 
 export type GetTreeDocumentAncestorsResponse = GetTreeDocumentAncestorsResponses[keyof GetTreeDocumentAncestorsResponses];
+
+export type GetTreeDocumentAncestorsBatchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+        dataTypeId?: string;
+    };
+    url: '/umbraco/management/api/v1/tree/document/ancestors/batch';
+};
+
+export type GetTreeDocumentAncestorsBatchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeDocumentAncestorsBatchResponses = {
+    /**
+     * OK
+     */
+    200: BatchResponseModelDocumentTreeAncestorsResponseModel;
+};
+
+export type GetTreeDocumentAncestorsBatchResponse = GetTreeDocumentAncestorsBatchResponses[keyof GetTreeDocumentAncestorsBatchResponses];
 
 export type GetTreeDocumentBatchData = {
     body?: never;

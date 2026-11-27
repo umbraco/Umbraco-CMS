@@ -181,4 +181,84 @@ describe('UmbManagementApiTreeDataRequestManager', () => {
 			expect(error).to.not.be.undefined;
 		});
 	});
+
+	describe('getAncestorsOfBatch', () => {
+		interface TestAncestorsOfBatchRequestArgs {
+			uniques: Array<string>;
+			dataType?: { unique: string };
+		}
+
+		const createAncestorsOfBatchManager = (
+			getAncestorsOfBatch?: (args: TestAncestorsOfBatchRequestArgs) => Promise<
+				UmbApiResponse<{
+					data?: { items: Array<{ id: string; ancestors: Array<TestTreeItemModel> }>; total: number };
+				}>
+			>,
+		) =>
+			new UmbManagementApiTreeDataRequestManager(hostElement, {
+				getRootItems: async () => ({ data: { items: [], total: 0 } }),
+				getChildrenOf: async () => ({ data: { items: [], total: 0 } }),
+				getAncestorsOf: async () => ({ data: [] }),
+				getSiblingsFrom: async () => ({ data: { items: [], totalBefore: 0, totalAfter: 0 } }),
+				getAncestorsOfBatch,
+			});
+
+		let ancestorsOfBatchManager: ReturnType<typeof createAncestorsOfBatchManager> | undefined;
+
+		afterEach(() => {
+			ancestorsOfBatchManager?.destroy();
+			ancestorsOfBatchManager = undefined;
+		});
+
+		it('requests at most 40 uniques at a time and returns the ancestors in the requested order', async () => {
+			const requestedChunks: Array<Array<string>> = [];
+			const uniques = Array.from({ length: 85 }, (_, index) => `item-${index}`);
+			ancestorsOfBatchManager = createAncestorsOfBatchManager(async (args) => {
+				requestedChunks.push(args.uniques);
+				const items = args.uniques.map((unique) => ({ id: unique, ancestors: [{ parent: null }] }));
+				return { data: { items, total: items.length } };
+			});
+
+			const { data, error } = await ancestorsOfBatchManager.getAncestorsOfBatch({ uniques });
+
+			expect(error).to.be.undefined;
+			expect(requestedChunks.map((chunk) => chunk.length)).to.deep.equal([40, 40, 5]);
+			expect(data?.map((item) => item.id)).to.deep.equal(uniques);
+			expect(data?.[0].ancestors).to.deep.equal([{ parent: null }]);
+		});
+
+		it('passes additional request arguments through to every request', async () => {
+			const requests: Array<TestAncestorsOfBatchRequestArgs> = [];
+			ancestorsOfBatchManager = createAncestorsOfBatchManager(async (args) => {
+				requests.push(args);
+				return { data: { items: [], total: 0 } };
+			});
+
+			await ancestorsOfBatchManager.getAncestorsOfBatch({
+				uniques: Array.from({ length: 41 }, (_, index) => `item-${index}`),
+				dataType: { unique: 'data-type' },
+			});
+
+			expect(requests).to.have.length(2);
+			expect(requests.every((request) => request.dataType?.unique === 'data-type')).to.be.true;
+		});
+
+		it('returns an error when the request resolves with an error', async () => {
+			ancestorsOfBatchManager = createAncestorsOfBatchManager(async () => ({ error: new UmbError('Request failed') }));
+
+			const { data, error } = await ancestorsOfBatchManager.getAncestorsOfBatch({ uniques: ['item-0'] });
+
+			expect(data).to.be.undefined;
+			expect(error).to.not.be.undefined;
+		});
+
+		it('returns an error when no request is configured', async () => {
+			ancestorsOfBatchManager = createAncestorsOfBatchManager();
+
+			const { data, error } = await ancestorsOfBatchManager.getAncestorsOfBatch({ uniques: ['item-0'] });
+
+			expect(data).to.be.undefined;
+			expect(error).to.not.be.undefined;
+		});
+	});
 });

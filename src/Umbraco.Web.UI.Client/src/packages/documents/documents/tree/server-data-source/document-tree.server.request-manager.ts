@@ -11,6 +11,7 @@ import {
 	UmbManagementApiTreeDataRequestManager,
 } from '@umbraco-cms/backoffice/management-api';
 import type {
+	BatchResponseModelDocumentTreeAncestorsResponseModel,
 	BatchResponseModelDocumentTreeItemResponseModel,
 	DocumentTreeItemResponseModel,
 	PagedDocumentTreeItemResponseModel,
@@ -18,6 +19,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
+	UmbManagementApiTreeAncestorsOfBatchRequestArgs,
 	UmbManagementApiTreeAncestorsOfRequestArgs,
 	UmbManagementApiTreeBatchRequestArgs,
 	UmbManagementApiTreeChildrenOfRequestArgs,
@@ -40,6 +42,9 @@ interface UmbManagementApiDocumentTreeSiblingsFromRequestArgs extends UmbManagem
 interface UmbManagementApiDocumentTreeBatchRequestArgs
 	extends UmbManagementApiTreeBatchRequestArgs, Pick<UmbDocumentTreeItemsRequestArgs, 'dataType'> {}
 
+interface UmbManagementApiDocumentTreeAncestorsOfBatchRequestArgs
+	extends UmbManagementApiTreeAncestorsOfBatchRequestArgs, Pick<UmbDocumentTreeItemsRequestArgs, 'dataType'> {}
+
 export class UmbManagementApiDocumentTreeDataRequestManager extends UmbManagementApiTreeDataRequestManager<
 	DocumentTreeItemResponseModel,
 	UmbManagementApiDocumentTreeRootItemsRequestArgs,
@@ -51,7 +56,9 @@ export class UmbManagementApiDocumentTreeDataRequestManager extends UmbManagemen
 	UmbManagementApiDocumentTreeSiblingsFromRequestArgs,
 	SubsetDocumentTreeItemResponseModel,
 	UmbManagementApiDocumentTreeBatchRequestArgs,
-	BatchResponseModelDocumentTreeItemResponseModel
+	BatchResponseModelDocumentTreeItemResponseModel,
+	UmbManagementApiDocumentTreeAncestorsOfBatchRequestArgs,
+	BatchResponseModelDocumentTreeAncestorsResponseModel
 > {
 	static #inflightRequestCache = new UmbManagementApiInFlightRequestCache<unknown>();
 
@@ -95,6 +102,14 @@ export class UmbManagementApiDocumentTreeDataRequestManager extends UmbManagemen
 
 			getBatch: (args) =>
 				DocumentService.getTreeDocumentBatch({
+					query: {
+						id: args.uniques,
+						dataTypeId: args.dataType?.unique,
+					},
+				}),
+
+			getAncestorsOfBatch: (args) =>
+				DocumentService.getTreeDocumentAncestorsBatch({
 					query: {
 						id: args.uniques,
 						dataTypeId: args.dataType?.unique,

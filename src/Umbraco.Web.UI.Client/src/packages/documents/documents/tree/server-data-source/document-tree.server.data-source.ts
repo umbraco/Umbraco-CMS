@@ -1,5 +1,6 @@
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import type {
+	UmbAncestorsOfDocumentTreeItemsRequestArgs,
 	UmbDocumentTreeChildrenOfRequestArgs,
 	UmbDocumentTreeItemModel,
 	UmbDocumentTreeItemsRequestArgs,
@@ -8,7 +9,12 @@ import type {
 import { UmbManagementApiDocumentTreeDataRequestManager } from './document-tree.server.request-manager.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbTreeAncestorsOfRequestArgs, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbAncestorsOfTreeItemModel,
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeDataSource,
+} from '@umbraco-cms/backoffice/tree';
+import type { UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Document tree that fetches data from the server
@@ -60,6 +66,27 @@ export class UmbDocumentTreeServerDataSource
 		const mappedData = data?.map((item) => this.#mapItem(item));
 
 		return { data: mappedData, error };
+	}
+
+	async getAncestorsOfItems(
+		args: UmbAncestorsOfDocumentTreeItemsRequestArgs,
+	): Promise<UmbRepositoryResponse<Array<UmbAncestorsOfTreeItemModel<UmbDocumentTreeItemModel>>>> {
+		const treeItemByUnique = new Map(args.treeItems.map((treeItem) => [treeItem.unique, treeItem]));
+
+		const { data, error } = treeItemByUnique.size
+			? await this.#treeRequestManager.getAncestorsOfBatch({
+					uniques: [...treeItemByUnique.keys()],
+					dataType: args.dataType,
+				})
+			: { data: [], error: undefined };
+		if (error || !data) return { error };
+
+		return {
+			data: data.flatMap((item) => {
+				const treeItem = treeItemByUnique.get(item.id);
+				return treeItem ? [{ treeItem, ancestors: item.ancestors.map((ancestor) => this.#mapItem(ancestor)) }] : [];
+			}),
+		};
 	}
 
 	#mapItem(item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel {

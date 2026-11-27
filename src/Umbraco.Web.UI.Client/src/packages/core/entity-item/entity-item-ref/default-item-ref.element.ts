@@ -28,6 +28,7 @@ export class UmbDefaultItemRefElement extends UmbLitElement {
 				?selectable=${this.selectable}
 				readonly>
 				<slot name="actions" slot="actions"></slot>
+				<slot name="detail" slot="detail"></slot>
 				${this.#renderIcon(this.item)}
 			</uui-ref-node>
 		`;

@@ -98,12 +98,13 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
 
     /// <inheritdoc />
     protected override IEntitySlim[] GetBatchEntities(Guid[] keys)
-    {
-        IEntitySlim[] entities = base.GetBatchEntities(keys);
-        return ShouldBypassStartNodeFiltering()
+        => FilterEntitiesByUserAccess(base.GetBatchEntities(keys));
+
+    /// <inheritdoc />
+    protected override IEntitySlim[] FilterEntitiesByUserAccess(IEntitySlim[] entities)
+        => ShouldBypassStartNodeFiltering()
             ? entities
             : MapAccessEntities(_treeFilterService.GetFilteredEntities(entities));
-    }
 
     /// <inheritdoc />
     protected override IEntitySlim[] GetSiblingEntities(Guid target, int before, int after, out long totalBefore, out long totalAfter)

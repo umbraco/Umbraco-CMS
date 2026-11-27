@@ -102,6 +102,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		this.#item.observe(this.#item.isDraft, (isDraft) => (this._isDraft = isDraft ?? false));
 	}
 
+	// TODO: Render the path with umb-document-ancestor-path once the ancestors are tree items. [MR]
 	#setAncestors(ancestors: Array<UmbDocumentItemModel> | undefined) {
 		this.#ancestorResolvers.forEach((resolver) => resolver.destroy());
 		this.#ancestorResolvers = (ancestors ?? []).map((ancestor) => {
@@ -164,8 +165,11 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 				@selected=${this.#onSelected}
 				@deselected=${this.#onDeselected}>
 				<slot name="actions" slot="actions"></slot>
+				<slot name="detail" slot="detail"></slot>
 				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()}
-				${this._ancestorPath ? html`<span slot="detail" class="ancestor-path">${this._ancestorPath}</span>` : nothing}
+				${this._ancestorPath
+					? html`<span slot="detail" class="ancestor-path"><bdi>${this._ancestorPath}</bdi></span>`
+					: nothing}
 			</uui-ref-node>
 		`;
 	}

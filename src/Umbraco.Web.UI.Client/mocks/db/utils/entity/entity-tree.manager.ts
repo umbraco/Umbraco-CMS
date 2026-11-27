@@ -52,6 +52,13 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		return items.reverse().map((item) => this.#treeItemMapper(item));
 	}
 
+	getAncestorsOfBatch({ ids }: { ids: Array<string> }) {
+		const items = ids
+			.filter((id) => this.#db.read(id) !== undefined)
+			.map((id) => ({ id, ancestors: this.getAncestorsOf({ descendantId: id }).slice(0, -1) }));
+		return { items, total: items.length };
+	}
+
 	/** Returns the requested items that exist, in the order requested and without duplicates. Unknown ids are omitted. */
 	getItems({ ids }: { ids: Array<string> }) {
 		const items = [...new Set(ids)].map((id) => this.#db.read(id)).filter((item): item is T => item !== undefined);

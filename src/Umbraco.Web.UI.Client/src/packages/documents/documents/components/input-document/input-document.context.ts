@@ -5,10 +5,24 @@ import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../item/constants.js';
 import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import { isDocumentTreeItem } from '../../tree/utils.js';
 import { UmbDocumentItemDataResolver } from '../../item/index.js';
+import { UmbDocumentTreeRepository } from '../../tree/document-tree.repository.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeEntityType } from '@umbraco-cms/backoffice/document-type';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+
+export interface UmbDocumentPickerInputSelectedItemAncestorsModel {
+	treeItem: { unique: string; entityType: string };
+	/**
+	 * The ancestors ordered from the root down, or `null` when they were requested but none were returned.
+	 */
+	ancestors: Array<UmbDocumentTreeItemModel> | null;
+}
 
 interface UmbDocumentPickerInputContextOpenArgs {
 	allowedContentTypes?: Array<{ unique: string; entityType: UmbDocumentTypeEntityType }>;
@@ -21,8 +35,109 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 	UmbDocumentPickerModalData,
 	UmbDocumentPickerModalValue
 > {
+	#treeRepository = new UmbDocumentTreeRepository(this);
+	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+	#ancestorChains = new UmbArrayState<UmbDocumentPickerInputSelectedItemAncestorsModel>([], (x) => x.treeItem.unique);
+	#pendingAncestors = new Set<string>();
+	#dataType?: { unique: string };
+
+	/**
+	 * The ancestors of each selected document whose ancestors have been requested. A document whose ancestors have not
+	 * been requested yet has no entry.
+	 */
+	public readonly selectedItemsAncestors = this.#ancestorChains.asObservable();
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_PICKER_MODAL);
+
+		this.observe(this.selectedItems, (items) => this.#onSelectedItemsChange(items), null);
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
+			this.#actionEventContext?.removeEventListener(
+				UmbRequestReloadStructureForEntityEvent.TYPE,
+				this.#onReloadStructureForEntityRequest as EventListener,
+			);
+			this.#actionEventContext = instance;
+			this.#actionEventContext?.addEventListener(
+				UmbRequestReloadStructureForEntityEvent.TYPE,
+				this.#onReloadStructureForEntityRequest as EventListener,
+			);
+		});
+
+		// TODO: Receive the data type from the consumer instead, so the picker does not depend on property contexts. The
+		// picker modal's tree and picker contexts consume it the same way and need a fallback and deprecation period to
+		// move with it. [MR]
+		this.consumeContext(UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT, (context) => {
+			this.observe(
+				context?.dataType,
+				(dataType) => {
+					if (dataType?.unique === this.#dataType?.unique) return;
+					this.#dataType = dataType;
+					this.#requestAncestors(this.#ancestorChains.getValue().map((chain) => chain.treeItem));
+				},
+				'umbObserveDataType',
+			);
+		});
+	}
+
+	#onSelectedItemsChange(items: Array<UmbEntityModel>) {
+		const uniques = items.map((item) => item.unique);
+		this.#ancestorChains.filter((chain) => uniques.includes(chain.treeItem.unique));
+		const missing = items.filter(
+			(item): item is UmbEntityModel & { unique: string } =>
+				item.unique !== null &&
+				!this.#ancestorChains.getHasOne(item.unique) &&
+				!this.#pendingAncestors.has(item.unique),
+		);
+		this.#requestAncestors(missing.map((item) => ({ unique: item.unique, entityType: item.entityType })));
+	}
+
+	readonly #onReloadStructureForEntityRequest = (event: UmbRequestReloadStructureForEntityEvent) => {
+		const entityType = event.getEntityType();
+		const unique = event.getUnique();
+		const isEntity = (entity: UmbEntityModel) => entity.entityType === entityType && entity.unique === unique;
+
+		const affected = this.#ancestorChains
+			.getValue()
+			.filter((chain) => isEntity(chain.treeItem) || chain.ancestors?.some(isEntity))
+			.map((chain) => chain.treeItem);
+		this.#requestAncestors(affected);
+	};
+
+	async #requestAncestors(treeItems: Array<{ unique: string; entityType: string }>) {
+		if (!treeItems.length) return;
+		treeItems.forEach((treeItem) => this.#pendingAncestors.add(treeItem.unique));
+
+		const dataType = this.#dataType;
+		const { data } = await this.#treeRepository.requestAncestorsOfTreeItems({ treeItems, dataType });
+
+		treeItems.forEach((treeItem) => this.#pendingAncestors.delete(treeItem.unique));
+		const uniques = this.getSelectedItems().map((item) => item.unique);
+
+		// The data type decides which ancestors the user may see, so a response for an outdated one is requested again.
+		if (dataType?.unique !== this.#dataType?.unique) {
+			this.#requestAncestors(treeItems.filter((treeItem) => uniques.includes(treeItem.unique)));
+			return;
+		}
+
+		if (!data) return;
+
+		const ancestorsByUnique = new Map(data.map((chain) => [chain.treeItem.unique, chain.ancestors]));
+		this.#ancestorChains.append(
+			treeItems
+				.filter((treeItem) => uniques.includes(treeItem.unique))
+				.map((treeItem) => ({ treeItem, ancestors: ancestorsByUnique.get(treeItem.unique) ?? null })),
+		);
+	}
+
+	override destroy() {
+		this.#actionEventContext?.removeEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureForEntityRequest as EventListener,
+		);
+		this.#actionEventContext = undefined;
+		this.#ancestorChains.destroy();
+		super.destroy();
 	}
 
 	override async openPicker(

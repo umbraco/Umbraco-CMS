@@ -181,11 +181,13 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 				component.addEventListener(UmbSelectedEvent.TYPE, this.#boundOnSelected);
 				component.addEventListener(UmbDeselectedEvent.TYPE, this.#boundOnDeselected);
 
-				// Proxy the actions slot to the component
-				const slotElement = document.createElement('slot');
-				slotElement.name = 'actions';
-				slotElement.setAttribute('slot', 'actions');
-				component.appendChild(slotElement);
+				// Proxy the actions and detail slots to the component
+				for (const slotName of ['actions', 'detail']) {
+					const slotElement = document.createElement('slot');
+					slotElement.name = slotName;
+					slotElement.setAttribute('slot', slotName);
+					component.appendChild(slotElement);
+				}
 
 				this._component = component;
 			},

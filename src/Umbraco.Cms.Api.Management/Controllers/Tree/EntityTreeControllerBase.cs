@@ -113,7 +113,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         (entities, _) = await FilterTreeEntities(entities, entities.Length);
 
         IDictionary<int, Guid> parentKeysById = GetBatchParentKeys(entities);
-        Dictionary<Guid, TItem> treeItemViewModelsByKey = entities
+        var treeItemViewModelsByKey = entities
             .GroupBy(entity => entity.ParentId)
             .SelectMany(siblings => MapTreeItemViewModels(
                 parentKeysById.TryGetValue(siblings.Key, out Guid parentKey) ? parentKey : null,
@@ -135,6 +135,97 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             Items = treeItemViewModels,
         });
     }
+
+    /// <summary>
+    /// Gets the ancestors of each of the tree items identified by the provided keys.
+    /// </summary>
+    /// <typeparam name="TAncestors">The tree-specific response model for the ancestors of an item.</typeparam>
+    /// <param name="descendantKeys">The keys of the tree items to get the ancestors of.</param>
+    /// <returns>
+    /// The ancestors of each tree item, ordered from the root down and excluding the item itself, in the order
+    /// requested. Tree items that do not exist or that <see cref="FilterEntitiesByUserAccess"/> excludes are omitted,
+    /// as are excluded ancestors.
+    /// </returns>
+    /// <remarks>
+    /// Unlike <see cref="GetBatch"/>, the results are not filtered by <c>FilterTreeEntities</c>, so the ancestors
+    /// of an item are returned even when the user could not browse to them in the tree.
+    /// </remarks>
+    protected async Task<ActionResult<BatchResponseModel<TAncestors>>> GetBatchAncestors<TAncestors>(Guid[] descendantKeys)
+        where TAncestors : TreeItemAncestorsResponseModel<TItem>, new()
+    {
+        if (descendantKeys.Length == 0)
+        {
+            return Ok(new BatchResponseModel<TAncestors>());
+        }
+
+        IEntitySlim[] descendants = GetEntitiesByKeys(descendantKeys);
+        IEntitySlim[] ancestors = GetEntitiesByIds(descendants.SelectMany(descendant => descendant.AncestorIds()).ToArray());
+        IEntitySlim[] fetched = descendants.Concat(ancestors).DistinctBy(entity => entity.Key).ToArray();
+
+        IEntitySlim[] visible = FilterEntitiesByUserAccess(fetched);
+
+        Dictionary<int, IEntitySlim> visibleById = visible.ToDictionary(entity => entity.Id);
+        Dictionary<int, Guid> keysById = fetched.ToDictionary(entity => entity.Id, entity => entity.Key);
+        Dictionary<Guid, IEntitySlim> descendantsByKey = descendants.ToDictionary(entity => entity.Key);
+
+        IEntitySlim[] visibleDescendants = descendantKeys
+            .Distinct()
+            .Select(descendantsByKey.GetValueOrDefault)
+            .WhereNotNull()
+            .Where(descendant => visibleById.ContainsKey(descendant.Id))
+            .ToArray();
+
+        var viewModelsByKey = visibleDescendants
+            .SelectMany(descendant => descendant.AncestorIds())
+            .Distinct()
+            .Select(visibleById.GetValueOrDefault)
+            .WhereNotNull()
+            .GroupBy(ancestor => ancestor.ParentId)
+            .SelectMany(siblings => MapTreeItemViewModels(
+                keysById.TryGetValue(siblings.Key, out Guid parentKey) ? parentKey : null,
+                [.. siblings]))
+            .ToDictionary(viewModel => viewModel.Id);
+
+        TAncestors[] items = visibleDescendants
+            .Select(descendant => new TAncestors
+            {
+                Id = descendant.Key,
+                Ancestors = descendant.AncestorIds()
+                    .Select(id => keysById.TryGetValue(id, out Guid key) ? viewModelsByKey.GetValueOrDefault(key) : null)
+                    .WhereNotNull()
+                    .ToArray(),
+            })
+            .ToArray();
+
+        foreach (IEntitySlim descendant in visibleDescendants)
+        {
+            int[] missingAncestorIds = descendant.AncestorIds()
+                .Where(id => id > 0 && keysById.ContainsKey(id) is false)
+                .ToArray();
+            if (missingAncestorIds.Length > 0)
+            {
+                LogMissingAncestors(missingAncestorIds, descendant.Key);
+            }
+        }
+
+        await PopulateFlags([.. viewModelsByKey.Values]);
+
+        return Ok(new BatchResponseModel<TAncestors>
+        {
+            Total = items.Length,
+            Items = items,
+        });
+    }
+
+    /// <summary>
+    /// Filters the specified entities to those the current user can access.
+    /// </summary>
+    /// <param name="entities">The entities to filter.</param>
+    /// <returns>The entities the current user can access.</returns>
+    /// <remarks>
+    /// The default implementation returns the entities unchanged.
+    /// </remarks>
+    protected virtual IEntitySlim[] FilterEntitiesByUserAccess(IEntitySlim[] entities) => entities;
 
     /// <summary>
     /// Filters the specified collection of tree entities and returns the filtered results asynchronously.
@@ -206,15 +297,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         if (missingParentIds is not null)
         {
-            // Will use the static logger factory here, given this is an exception case and to avoid having to
-            // make widespread changes to support logging in the base controller.
-            ILogger logger = StaticApplicationLogging.CreateLogger<EntityTreeControllerBase<TItem>>();
-            logger.LogWarning(
-                "Ancestor(s) with ID(s) {MissingAncestorIds} not found in the ancestors collection for descendant {DescendantKey}. "
-                + "This indicates a data integrity issue in the entity path; consider running the database integrity health check "
-                + "and/or moving the entity to another location and back to rebuild its path.",
-                missingParentIds,
-                descendantKey);
+            LogMissingAncestors(missingParentIds, descendantKey);
         }
 
         await PopulateFlags(treeItemViewModels);
@@ -290,6 +373,35 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected virtual TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
         => entities.Select(entity => MapTreeItemViewModel(parentKey, entity)).ToArray();
+
+    private static void LogMissingAncestors(IEnumerable<int> missingAncestorIds, Guid descendantKey)
+    {
+        // Will use the static logger factory here, given this is an exception case and to avoid having to
+        // make widespread changes to support logging in the base controller.
+        ILogger logger = StaticApplicationLogging.CreateLogger<EntityTreeControllerBase<TItem>>();
+        logger.LogWarning(
+            "Ancestor(s) with ID(s) {MissingAncestorIds} not found in the ancestors collection for descendant {DescendantKey}. "
+            + "This indicates a data integrity issue in the entity path; consider running the database integrity health check "
+            + "and/or moving the entity to another location and back to rebuild its path.",
+            missingAncestorIds,
+            descendantKey);
+    }
+
+    private IEntitySlim[] GetEntitiesByKeys(Guid[] keys)
+        => keys
+            .Distinct()
+            .InGroupsOf(Constants.Sql.MaxParameterCount)
+            .SelectMany(group => EntityService.GetAll(ItemObjectType, group.ToArray()))
+            .ToArray();
+
+    private IEntitySlim[] GetEntitiesByIds(int[] ids)
+        => ids.Length == 0
+            ? []
+            : ids
+                .Distinct()
+                .InGroupsOf(Constants.Sql.MaxParameterCount)
+                .SelectMany(group => EntityService.GetAll(ItemObjectType, group.ToArray()))
+                .ToArray();
 
     /// <summary>
     /// Gets the keys of the parents of the provided entities.
