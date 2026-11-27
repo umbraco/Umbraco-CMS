@@ -93,6 +93,83 @@ describe('UmbValidationController', () => {
 			await ctrl.validate().catch(() => undefined);
 			expect(ctrl.isValid).to.be.true;
 		});
+
+		it('is valid when holding default segment messages in a segmented variant', async () => {
+			ctrl.setVariantId(new UmbVariantId(null, 'mySegment'));
+			ctrl.messages.addMessage(
+				'server',
+				"$.values[?(@.alias == 'my-property' && @.culture == null && @.segment == null)].value",
+				'test',
+			);
+
+			await ctrl.validate().catch(() => undefined);
+			expect(ctrl.isValid).to.be.true;
+		});
+
+		describe('Nested values', () => {
+			const nestedSegmentedPath =
+				"$.values[?(@.alias == 'my-blocks' && @.culture == null && @.segment == null)].value.contentData[?(@.key == 'my-key')].values[?(@.alias == 'my-property' && @.culture == null && @.segment == 'mySegment')].value";
+			const nestedInSegmentedPath =
+				"$.values[?(@.alias == 'my-blocks' && @.culture == null && @.segment == 'mySegment')].value.contentData[?(@.key == 'my-key')].values[?(@.alias == 'my-property' && @.culture == null && @.segment == null)].value";
+			const nestedCultureAndSegmentedPath =
+				"$.values[?(@.alias == 'my-blocks' && @.culture == 'en-us' && @.segment == null)].value.contentData[?(@.key == 'my-key')].values[?(@.alias == 'my-property' && @.culture == null && @.segment == 'mySegment')].value";
+
+			it('is invalid when a nested value holds the segment of the variant', async () => {
+				ctrl.setVariantId(new UmbVariantId(null, 'mySegment'));
+				ctrl.messages.addMessage('server', nestedSegmentedPath, 'test');
+
+				await ctrl.validate().catch(() => undefined);
+				expect(ctrl.isValid).to.be.false;
+			});
+
+			it('is valid when a nested value holds a segment in the default segment variant', async () => {
+				ctrl.setVariantId(new UmbVariantId(null, null));
+				ctrl.messages.addMessage('server', nestedSegmentedPath, 'test');
+
+				await ctrl.validate().catch(() => undefined);
+				expect(ctrl.isValid).to.be.true;
+			});
+
+			it('is valid when a nested value holds another segment', async () => {
+				ctrl.setVariantId(new UmbVariantId(null, 'anotherSegment'));
+				ctrl.messages.addMessage('server', nestedSegmentedPath, 'test');
+
+				await ctrl.validate().catch(() => undefined);
+				expect(ctrl.isValid).to.be.true;
+			});
+
+			it('is invalid when an outer value holds the segment of the variant', async () => {
+				ctrl.setVariantId(new UmbVariantId(null, 'mySegment'));
+				ctrl.messages.addMessage('server', nestedInSegmentedPath, 'test');
+
+				await ctrl.validate().catch(() => undefined);
+				expect(ctrl.isValid).to.be.false;
+			});
+
+			it('is valid when an outer value holds a segment in the default segment variant', async () => {
+				ctrl.setVariantId(new UmbVariantId(null, null));
+				ctrl.messages.addMessage('server', nestedInSegmentedPath, 'test');
+
+				await ctrl.validate().catch(() => undefined);
+				expect(ctrl.isValid).to.be.true;
+			});
+
+			it('is invalid when a nested value holds the segment and an outer value the culture of the variant', async () => {
+				ctrl.setVariantId(new UmbVariantId('en-us', 'mySegment'));
+				ctrl.messages.addMessage('server', nestedCultureAndSegmentedPath, 'test');
+
+				await ctrl.validate().catch(() => undefined);
+				expect(ctrl.isValid).to.be.false;
+			});
+
+			it('is valid when a nested value holds the segment but an outer value another culture', async () => {
+				ctrl.setVariantId(new UmbVariantId('da', 'mySegment'));
+				ctrl.messages.addMessage('server', nestedCultureAndSegmentedPath, 'test');
+
+				await ctrl.validate().catch(() => undefined);
+				expect(ctrl.isValid).to.be.true;
+			});
+		});
 	});
 
 	describe('Inheritance', () => {
