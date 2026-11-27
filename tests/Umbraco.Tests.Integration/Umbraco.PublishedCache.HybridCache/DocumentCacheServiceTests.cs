@@ -603,6 +603,51 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
             "SqlBulkCopy with SqlBulkCopyOptions.Default causes constraints to become untrusted.");
     }
 
+    [Test]
+    public async Task RefreshContentAsync_Of_Trashed_Published_Content_Keeps_The_Published_Record()
+    {
+        IContent trashedContent = GetPublishedTextpageMarkedAsTrashed();
+
+        await DocumentCacheService.RefreshContentAsync(trashedContent);
+
+        Assert.That(CountRecords(Textpage.Id, published: true), Is.EqualTo(1));
+        Assert.That(CountRecords(Textpage.Id, published: false), Is.EqualTo(1));
+    }
+
+    [Test]
+    public async Task RefreshContentAsync_Of_Trashed_Content_Being_Unpublished_Removes_The_Published_Record()
+    {
+        IContent trashedContent = GetPublishedTextpageMarkedAsTrashed();
+        trashedContent.PublishedState = PublishedState.Unpublishing;
+
+        await DocumentCacheService.RefreshContentAsync(trashedContent);
+
+        Assert.That(CountRecords(Textpage.Id, published: true), Is.Zero);
+        Assert.That(CountRecords(Textpage.Id, published: false), Is.EqualTo(1), "The draft record should stay");
+    }
+
+    // Marks the content as trashed in memory only. The records are then the ones that the publish wrote,
+    // whatever a move to the recycle bin does with them.
+    private IContent GetPublishedTextpageMarkedAsTrashed()
+    {
+        Assert.That(ContentService.Publish(Textpage, ["*"]).Success, Is.True);
+        var content = (Content)ContentService.GetById(Textpage.Key)!;
+        content.Trashed = true;
+        Assert.That(CountRecords(Textpage.Id, published: true), Is.EqualTo(1));
+        Assert.That(CountRecords(Textpage.Id, published: false), Is.EqualTo(1));
+        return content;
+    }
+
+    private int CountRecords(int nodeId, bool published)
+    {
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        var selectSql = SqlContext.Sql()
+            .SelectCount()
+            .From<ContentNuDto>()
+            .Where<ContentNuDto>(x => x.NodeId == nodeId && x.Published == published);
+        return ScopeAccessor.AmbientScope!.Database.ExecuteScalar<int>(selectSql);
+    }
+
     [GeneratedRegex(@"""dt"":""[^""]+""")]
     private static partial Regex RemoveDatesFromJsonSerialization();
 }

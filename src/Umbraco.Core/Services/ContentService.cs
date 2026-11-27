@@ -2953,15 +2953,7 @@ public class ContentService : RepositoryService, IContentService
             // trashed and are re-homed under the recycle bin root - see PerformMoveLocked
             var leaveDescendantsInRecycleBin = includeDescendants is false && content.Trashed && parentId != Constants.System.RecycleBinContent;
 
-            // if the content was trashed under another content, and so has a published version,
-            // it cannot move back as published but has to be unpublished first - that's for the
-            // root content, everything underneath will retain its published status
-            if (content.Trashed && content.Published)
-            {
-                // however, it had been masked when being trashed, so there's no need for
-                // any special event here - just change its state
-                content.PublishedState = PublishedState.Unpublishing;
-            }
+            string[]? culturesUnpublishedByRestore = UnpublishRestoredRoot(content);
 
             PerformMoveLocked(content, parentId, parent, userId, moves, trashed, includeDescendants);
 
@@ -2975,12 +2967,16 @@ public class ContentService : RepositoryService, IContentService
                     .Where(x => x.ParentId == Constants.System.RecycleBinContent)
                     .ToArray();
                 scope.Notifications.Publish(
-                    new ContentTreeChangeNotification(content.Yield().Concat(rehomedChildren), TreeChangeTypes.RefreshBranch, eventMessages));
+                    new ContentTreeChangeNotification(
+                        rehomedChildren
+                            .Select(child => new TreeChange<IContent>(child, TreeChangeTypes.RefreshBranch))
+                            .Prepend(new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch, null, culturesUnpublishedByRestore)),
+                        eventMessages));
             }
             else
             {
                 scope.Notifications.Publish(
-                    new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
+                    new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, null, culturesUnpublishedByRestore, eventMessages));
             }
 
             // changes
@@ -3000,6 +2996,32 @@ public class ContentService : RepositoryService, IContentService
             scope.Complete();
             return OperationResult.Succeed(eventMessages);
         }
+    }
+
+    // If the content was trashed under another content, and so has a published version,
+    // it cannot move back as published but has to be unpublished first - that's for the
+    // root content, everything underneath will retain its published status. Unpublish all
+    // cultures and report them on the tree change so publish status and memory cache update.
+    // A restored root that is already unpublished reports an empty set instead of null: no culture
+    // is unpublished here, but saving the root rewrites its culture flags, so publish status must be read again.
+    private static string[]? UnpublishRestoredRoot(IContent content)
+    {
+        if (content.Trashed is false)
+        {
+            return null;
+        }
+
+        if (content.Published is false)
+        {
+            return [];
+        }
+
+        string[] unpublishedCultures = content.ContentType.VariesByCulture()
+            ? content.PublishedCultures.ToArray()
+            : ["*"];
+        content.UnpublishCulture("*");
+        content.PublishedState = PublishedState.Unpublishing;
+        return unpublishedCultures;
     }
 
     // MUST be called from within WriteLock

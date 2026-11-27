@@ -883,7 +883,17 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
         if (content.Trashed)
         {
-            _databaseCacheRepository.DeleteContentItem(content.Id);
+            // Keep database cache rows for trashed content: restored descendants stay Published without being
+            // rewritten, and the queries that load content from these rows exclude trashed items.
+            if (content.PublishedState is PublishedState.Publishing)
+            {
+                var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
+                _databaseCacheRepository.RefreshContent(publishedCacheNode);
+            }
+            else if (content.PublishedState is PublishedState.Unpublishing)
+            {
+                _databaseCacheRepository.RemovePublishedContent(content.Id);
+            }
 
             // TODO (V20): await the memory-cache removals once the notification pipeline is asynchronous.
             RemoveFromMemoryCacheUnorderedAsync(content.Key).GetAwaiter().GetResult();
@@ -915,7 +925,18 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
         if (content.Trashed)
         {
-            await _databaseCacheRepository.DeleteContentItemAsync(content.Id);
+            // Keep database cache rows for trashed content: restored descendants stay Published without being
+            // rewritten, and the queries that load content from these rows exclude trashed items.
+            if (content.PublishedState is PublishedState.Publishing)
+            {
+                var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
+                await _databaseCacheRepository.RefreshContentAsync(publishedCacheNode);
+            }
+            else if (content.PublishedState is PublishedState.Unpublishing)
+            {
+                await _databaseCacheRepository.RemovePublishedContentAsync(content.Id);
+            }
+
             await RemoveFromMemoryCacheUnorderedAsync(content.Key);
             scope.Complete();
             return;

@@ -3,10 +3,12 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -40,7 +42,13 @@ internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrati
 
     private IContentPublishingService ContentPublishingService => GetRequiredService<IContentPublishingService>();
 
+    private IEntityService EntityService => GetRequiredService<IEntityService>();
+
     private IPublishedContentCache PublishedContentCache => GetRequiredService<IPublishedContentCache>();
+
+    private IPublishStatusQueryService PublishStatusQueryService => GetRequiredService<IPublishStatusQueryService>();
+
+    private IPublishStatusManagementService PublishStatusManagementService => GetRequiredService<IPublishStatusManagementService>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -130,6 +138,92 @@ internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrati
         CacheTestsHelper.AssertPage(grandChildNode, publishedGrandChild, false);
         Assert.IsTrue(publishedGrandChild!.IsPublished(_danishIsoCode));
         Assert.IsFalse(publishedGrandChild.IsPublished(_englishIsoCode));
+    }
+
+    [Test]
+    public async Task Restored_Published_Descendants_Return_In_All_Cultures_When_Parent_Is_Republished()
+    {
+        await PublishAndTrashBranchAsync();
+        await RestoreRootAsync();
+        var restoredRootEntity = EntityService.Get(rootContent.Key, UmbracoObjectTypes.Document) as IDocumentEntitySlim;
+        Assert.IsNotNull(restoredRootEntity);
+        Assert.IsEmpty(restoredRootEntity!.PublishedCultures, "Restored root should have no published cultures in the entity tree");
+        Assert.IsNull(await PublishedContentCache.GetByIdAsync(childNode.Key, false), "Child should stay hidden while its restored parent is unpublished");
+
+        await RepublishRootAsync();
+
+        var publishedChild = await PublishedContentCache.GetByIdAsync(childNode.Key, false);
+        Assert.IsNotNull(publishedChild, "Restored published child should be back in the published cache once its parent is republished");
+        Assert.IsTrue(publishedChild!.IsPublished(_englishIsoCode));
+        Assert.IsTrue(publishedChild.IsPublished(_danishIsoCode));
+    }
+
+    [Test]
+    public async Task Culture_Unpublished_In_Recycle_Bin_Stays_Unpublished_When_Parent_Is_Restored_And_Republished()
+    {
+        await PublishAndTrashBranchAsync();
+        var unpublishAttempt = await ContentPublishingService.UnpublishAsync(childNode.Key, new HashSet<string> { _danishIsoCode }, Constants.Security.SuperUserKey);
+        Assert.IsTrue(unpublishAttempt.Success);
+
+        await RestoreRootAsync();
+        await RepublishRootAsync();
+
+        var publishedChild = await PublishedContentCache.GetByIdAsync(childNode.Key, false);
+        Assert.IsNotNull(publishedChild);
+        Assert.IsTrue(publishedChild!.IsPublished(_englishIsoCode));
+        Assert.IsFalse(publishedChild.IsPublished(_danishIsoCode), "A culture unpublished while in the recycle bin should not return to the published cache");
+    }
+
+    [Test]
+    public async Task Descendants_Stay_Hidden_When_Root_Unpublished_In_Recycle_Bin_By_Mandatory_Culture_Is_Restored()
+    {
+        await MakeDanishMandatoryAsync();
+        await PublishAndTrashBranchAsync();
+
+        // Unpublishing a mandatory culture unpublishes the whole document and leaves the other culture flagged as published.
+        var unpublishAttempt = await ContentPublishingService.UnpublishAsync(rootContent.Key, new HashSet<string> { _danishIsoCode }, Constants.Security.SuperUserKey);
+        Assert.IsTrue(unpublishAttempt.Success);
+
+        // Drop the publish status of the child, so that only a new read of the branch brings it back.
+        await PublishStatusManagementService.RemoveAsync(childNode.Key, CancellationToken.None);
+
+        await RestoreRootAsync();
+
+        Assert.IsFalse(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(rootContent.Key), "A root restored as unpublished should not be reported as published in any culture");
+        Assert.IsTrue(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(childNode.Key), "The restore should read the publish status of the branch again");
+        Assert.IsNull(await PublishedContentCache.GetByIdAsync(childNode.Key, false), "Child should stay hidden while its restored parent is unpublished");
+    }
+
+    private async Task MakeDanishMandatoryAsync()
+    {
+        ILanguage danish = (await LanguageService.GetAsync(_danishIsoCode))!;
+        danish.IsMandatory = true;
+        var updateAttempt = await LanguageService.UpdateAsync(danish, Constants.Security.SuperUserKey);
+        Assert.IsTrue(updateAttempt.Success);
+    }
+
+    private async Task PublishAndTrashBranchAsync()
+    {
+        var publishAttempt = await ContentPublishingService.PublishBranchAsync(rootContent.Key, [_englishIsoCode, _danishIsoCode], PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
+        Assert.IsTrue(publishAttempt.Success);
+
+        var trashAttempt = await ContentEditingService.MoveToRecycleBinAsync(rootContent.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(trashAttempt.Success);
+    }
+
+    private async Task RestoreRootAsync()
+    {
+        var restoreAttempt = await ContentEditingService.RestoreAsync(rootContent.Key, null, Constants.Security.SuperUserKey, includeDescendants: true);
+        Assert.IsTrue(restoreAttempt.Success);
+    }
+
+    private async Task RepublishRootAsync()
+    {
+        var republishAttempt = await ContentPublishingService.PublishAsync(
+            rootContent.Key,
+            [new() { Culture = _danishIsoCode }, new() { Culture = _englishIsoCode }],
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(republishAttempt.Success);
     }
 
     private async Task CreateTestData()

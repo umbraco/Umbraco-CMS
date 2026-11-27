@@ -264,8 +264,10 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 HandleRouting(payload);
             }
 
-            HandleNavigation(payload);
+            // Publish status is read from the database, not from navigation, so it can come first. A branch restored
+            // from the recycle bin must not pass the published-ancestor check against the status its root had there.
             HandlePublished(payload);
+            HandleNavigation(payload);
 
             HandleMemoryCache(payload);
 
@@ -305,8 +307,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             // There's no other way to detect trashed content as the change type is only Remove when deleted permanently
             var isTrashed = x.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch) && x.PublishedCultures is null && x.UnpublishedCultures is null;
 
-            // Skip blueprints and only clear the partial cache for removals or refreshes with changes
-            return x.Blueprint == false && (isTrashed || (isRelevantChangeType && hasChanges));
+            // Skip blueprints and only clear the partial cache for removals, restores or refreshes with changes
+            return x.Blueprint == false && (isTrashed || IsRestoreOfUnpublishedRoot(x) || (isRelevantChangeType && hasChanges));
         });
     }
 
@@ -535,7 +537,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         {
             _publishStatusManagementService.AddOrUpdateStatus(payload.Key.Value);
         }
-        else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch) && HasPublishStatusUpdates(payload))
+        else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch) && (HasPublishStatusUpdates(payload) || IsRestoreOfUnpublishedRoot(payload)))
         {
             _publishStatusManagementService.AddOrUpdateStatusWithDescendants(payload.Key.Value);
         }
@@ -544,6 +546,13 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     private static bool HasPublishStatusUpdates(JsonPayload payload) =>
         (payload.PublishedCultures is not null && payload.PublishedCultures.Length > 0) ||
         (payload.UnpublishedCultures is not null && payload.UnpublishedCultures.Length > 0);
+
+    // Restoring a root that was already unpublished reports an empty set of unpublished cultures, where a move or
+    // a trash reports none: no culture is unpublished, but the publish status held for the root can be stale.
+    private static bool IsRestoreOfUnpublishedRoot(JsonPayload payload) =>
+        payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch) &&
+        payload.PublishedCultures is null &&
+        payload.UnpublishedCultures is { Length: 0 };
 
     private void HandleIdKeyMap(JsonPayload payload)
     {
