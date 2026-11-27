@@ -12,6 +12,11 @@ internal sealed class RedirectUrlDto
     public const string TableName = Constants.DatabaseSchema.Tables.RedirectUrl;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
+    /// <summary>
+    /// The name of the index on the content key, used when redirect URLs are deleted for a node.
+    /// </summary>
+    internal const string ContentKeyIndexName = "IX_" + TableName + "_" + ContentKeyColumnName;
+
     private const string ContentKeyColumnName = "contentKey";
     private const string CreateDateUtcColumnName = "createDateUtc";
     private const string UrlColumnName = "url";
@@ -49,6 +54,7 @@ internal sealed class RedirectUrlDto
     [Column(ContentKeyColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [ForeignKey(typeof(NodeDto), Column = NodeDto.KeyColumnName)]
+    [Index(IndexTypes.NonClustered, Name = ContentKeyIndexName)]
     public Guid ContentKey { get; set; }
 
     /// <summary>
