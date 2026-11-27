@@ -902,22 +902,19 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		if (this.getVariesByCulture()) {
 			variantIds = variantIds.filter((variant) => !variant.isCultureInvariant());
 		}
-		const missingVariants = variantIds.filter((variant) => {
+		// A variant is created by giving it a name, so a selected variant that has not been created yet is missing its name.
+		const notCreatedVariantIds = variantIds.filter((variant) => {
 			return !saveData.variants.some((y) => variant.compare(y));
 		});
-		if (missingVariants.length > 0) {
-			throw new Error('One or more selected variants have not been created');
-		}
-		// Check variants have a name:
-		const variantsWithoutAName = saveData.variants.filter((x) => !x.name);
-		if (variantsWithoutAName.length > 0) {
-			variantsWithoutAName.forEach((variant) => {
-				const variantId = UmbVariantId.Create(variant);
+		const unnamedVariantIds = saveData.variants.filter((x) => !x.name).map((x) => UmbVariantId.Create(x));
+		const variantIdsWithoutAName = [...notCreatedVariantIds, ...unnamedVariantIds];
+		if (variantIdsWithoutAName.length > 0) {
+			variantIdsWithoutAName.forEach((variantId) => {
 				const key = 'umbMissingVariantName_' + variantId.toString();
 				// 'client' messages are owned by the form control, so this check owns its message and removes it once a name is set.
 				this.validationContext.messages.addMessage(
 					'custom',
-					`$.variants[${UmbDataPathVariantQuery(variant)}].name`,
+					`$.variants[${UmbDataPathVariantQuery(variantId)}].name`,
 					UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 					key,
 				);
@@ -933,7 +930,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			});
 			throw new Error(
 				'All variants must have a name, these variants are missing a name: ' +
-					variantsWithoutAName.map((x) => (x.culture ?? 'invariant') + '_' + (x.segment ?? '')).join(', '),
+					variantIdsWithoutAName.map((x) => (x.culture ?? 'invariant') + '_' + (x.segment ?? '')).join(', '),
 			);
 		}
 	}
