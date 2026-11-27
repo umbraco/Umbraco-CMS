@@ -590,6 +590,9 @@ export class UmbTableElement extends UmbLitElement {
 
 			uui-table {
 				box-shadow: var(--uui-shadow-depth-1);
+				/* uui-table clips its overflow; grow instead, so the nearest scroll container can reach every column and the head stays sticky. */
+				/* TODO: Remove when uui-table no longer clips its overflow. [JOV] */
+				min-width: min-content;
 			}
 
 			uui-table-head {
