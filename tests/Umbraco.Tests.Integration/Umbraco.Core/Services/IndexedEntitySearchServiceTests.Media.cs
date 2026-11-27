@@ -50,7 +50,7 @@ public partial class IndexedEntitySearchServiceTests
     [Test]
     public async Task Media_CanFindSpecificRootByQuery()
     {
-        IMedia root = MediaService.GetRootMedia().OrderBy(media => media.SortOrder).Skip(1).First();
+        IMedia root = (await MediaService.GetRootMediaAsync(CancellationToken.None)).OrderBy(media => media.SortOrder).Skip(1).First();
         PagedModel<IEntitySlim> result = await IndexedEntitySearchService.SearchAsync(
             UmbracoObjectTypes.Media,
             query: "single1root",
@@ -89,7 +89,7 @@ public partial class IndexedEntitySearchServiceTests
     [Test]
     public async Task Media_CanFindAllChildrenBelowParent()
     {
-        IMedia root = MediaService.GetRootMedia().Last();
+        IMedia root = (await MediaService.GetRootMediaAsync(CancellationToken.None)).Last();
         PagedModel<IEntitySlim> result = await IndexedEntitySearchService.SearchAsync(
             UmbracoObjectTypes.Media,
             query: string.Empty,
@@ -110,7 +110,7 @@ public partial class IndexedEntitySearchServiceTests
     [Test]
     public async Task Media_CanFindChildrenBelowParentByQuery()
     {
-        IMedia root = MediaService.GetRootMedia().Last();
+        IMedia root = (await MediaService.GetRootMediaAsync(CancellationToken.None)).Last();
         PagedModel<IEntitySlim> result = await IndexedEntitySearchService.SearchAsync(
             UmbracoObjectTypes.Media,
             query: "triple2child",
@@ -159,7 +159,7 @@ public partial class IndexedEntitySearchServiceTests
     [Test]
     public async Task Media_CanCombineParentAndMediaTypeFiltering()
     {
-        IMedia root = MediaService.GetRootMedia().Last();
+        IMedia root = (await MediaService.GetRootMediaAsync(CancellationToken.None)).Last();
         Guid mediaTypeKey = (await MediaTypeService.GetAsync("childMediaType"))?.Key
                             ?? throw new InvalidOperationException("Could not find childMediaType");
 

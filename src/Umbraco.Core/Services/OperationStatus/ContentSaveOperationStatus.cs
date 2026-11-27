@@ -25,4 +25,15 @@ public enum ContentSaveOperationStatus
     ///     use the dedicated publish method instead.
     /// </summary>
     InvalidPublishedState,
+
+    /// <summary>
+    ///     The content's key cannot be used by the kind's persistence, for example a key the kind's path scheme
+    ///     cannot use.
+    /// </summary>
+    InvalidKey,
+
+    /// <summary>
+    ///     The content is new but its key already belongs to an existing item of the kind.
+    /// </summary>
+    DuplicateKey,
 }

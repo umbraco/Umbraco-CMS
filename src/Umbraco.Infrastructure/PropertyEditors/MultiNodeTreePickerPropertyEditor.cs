@@ -506,7 +506,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
                 {
                     // TODO (V20): await this once the ITypedValidator contract goes async.
                     DocumentObjectType => _contentService.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult(),
-                    MediaObjectType => _mediaService.GetById(key),
+                    MediaObjectType => _mediaService.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult(),
                     MemberObjectType => _memberService.GetById(key),
                     _ => null,
                 };

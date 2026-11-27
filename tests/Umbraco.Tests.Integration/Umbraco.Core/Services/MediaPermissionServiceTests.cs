@@ -43,10 +43,10 @@ internal sealed class MediaPermissionServiceTests : UmbracoIntegrationTest
     [SetUp]
     public async Task SetUpMediaAndUser()
     {
-        IMedia deniedRoot = CreateFolder(Constants.System.Root);
-        IMedia allowedRoot = CreateFolder(Constants.System.Root);
-        _inaccessibleMedia = CreateFolder(deniedRoot.Id);
-        _accessibleMedia = CreateFolder(allowedRoot.Id);
+        IMedia deniedRoot = await CreateFolderAsync(null);
+        IMedia allowedRoot = await CreateFolderAsync(null);
+        _inaccessibleMedia = await CreateFolderAsync(deniedRoot.Key);
+        _accessibleMedia = await CreateFolderAsync(allowedRoot.Key);
 
         _user = await CreateUserWithStartMediaAsync(allowedRoot.Id);
     }
@@ -87,8 +87,8 @@ internal sealed class MediaPermissionServiceTests : UmbracoIntegrationTest
         Assert.That(result, Is.EquivalentTo(new[] { _accessibleMedia.Key }));
     }
 
-    private IMedia CreateFolder(int parentId)
-        => MediaService.CreateMediaWithIdentity(Guid.NewGuid().ToString(), parentId, Constants.Conventions.MediaTypes.Folder);
+    private async Task<IMedia> CreateFolderAsync(Guid? parentKey)
+        => await MediaService.CreateAndSaveAsync(Guid.NewGuid().ToString(), parentKey, Constants.Conventions.MediaTypes.Folder, Constants.Security.SuperUserKey, CancellationToken.None);
 
     private async Task<IUser> CreateUserWithStartMediaAsync(int startMediaId)
     {

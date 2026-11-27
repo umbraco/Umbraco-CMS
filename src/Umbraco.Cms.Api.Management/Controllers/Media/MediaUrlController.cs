@@ -66,7 +66,7 @@ public class MediaUrlController : MediaControllerBase
             CurrentUser(_backOfficeSecurityAccessor),
             ids,
             dataTypeId);
-        IEnumerable<IMedia> items = _mediaService.GetByIds(authorizedIds);
+        IEnumerable<IMedia> items = await _mediaService.GetByIdsAsync(authorizedIds, cancellationToken);
 
         return Ok(_mediaUrlFactory.CreateUrlSets(items));
     }

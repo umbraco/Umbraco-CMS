@@ -1,12 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq.Expressions;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
@@ -32,10 +30,6 @@ internal sealed class LiteralTextSearchTests : UmbracoIntegrationTest
 
     private IContentService ContentService => GetRequiredService<IContentService>();
 
-    private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
-
-    private IMediaService MediaService => GetRequiredService<IMediaService>();
-
     private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
 
     private IMemberService MemberService => GetRequiredService<IMemberService>();
@@ -47,30 +41,6 @@ internal sealed class LiteralTextSearchTests : UmbracoIntegrationTest
     private IRedirectUrlService RedirectUrlService => GetRequiredService<IRedirectUrlService>();
 
     private IKeyValueService KeyValueService => GetRequiredService<IKeyValueService>();
-
-    [Test]
-    public async Task Media_Queries_Match_Wildcard_Characters_Literally()
-    {
-        IMediaType mediaType = (await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.Folder))!;
-        foreach (var name in _texts)
-        {
-            Media media = MediaBuilder.CreateMediaFolder(mediaType, Constants.System.Root);
-            media.Name = name;
-            MediaService.Save(media);
-        }
-
-        IEnumerable<string> Find(Expression<Func<IMedia, bool>> predicate) => MediaService
-            .GetPagedChildren(Constants.System.Root, 0, 100, out _, null, ScopeProvider.CreateQuery<IMedia>().Where(predicate), null)
-            .Select(x => x.Name!);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(Find(x => x.Name!.Contains("0%")), Is.EquivalentTo(new[] { "50% off" }));
-            Assert.That(Find(x => x.Name!.Contains("a_b")), Is.EquivalentTo(new[] { "a_b" }));
-            Assert.That(Find(x => x.Name!.StartsWith("c[")), Is.EquivalentTo(new[] { "c[d]" }));
-            Assert.That(Find(x => x.Name!.EndsWith(@"e\")), Is.EquivalentTo(new[] { @"e\" }));
-        });
-    }
 
     [TestCase("0%", "50% off")]
     [TestCase("a_b", "a_b")]

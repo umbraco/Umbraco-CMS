@@ -1,9 +1,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Search.Querying;
 using Umbraco.Cms.Core.Search.Querying.Faceting;
@@ -27,7 +25,6 @@ public class ContentSearchServicePropertyLoadingTests
     private Mock<IContentService> _contentService = null!;
     private Mock<IMediaService> _mediaService = null!;
     private Mock<ISearcherResolver> _searcherResolver = null!;
-    private Mock<IIdKeyMap> _idKeyMap = null!;
 
     [SetUp]
     public void SetUp()
@@ -38,12 +35,8 @@ public class ContentSearchServicePropertyLoadingTests
             .ReturnsAsync([]);
         _mediaService = new Mock<IMediaService>();
         _mediaService
-            .Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>(), It.IsAny<string[]?>()))
-            .Returns([]);
-        _idKeyMap = new Mock<IIdKeyMap>();
-        _idKeyMap
-            .Setup(x => x.GetIdForKeyAsync(ParentKey, It.IsAny<UmbracoObjectTypes>()))
-            .ReturnsAsync(Attempt.Succeed(1234));
+            .Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<string[]?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
 
         var searcher = new Mock<ISearcher>();
         searcher
@@ -127,14 +120,13 @@ public class ContentSearchServicePropertyLoadingTests
         await sut.SearchChildrenAsync(null, ParentKey, Aliases, null, loadTemplates: false, skip: 0, take: 10);
 
         _mediaService.Verify(
-            x => x.GetPagedChildren(
-                1234,
+            x => x.GetChildrenAsync(
+                ParentKey,
                 0,
                 10,
-                out It.Ref<long>.IsAny,
                 It.Is<string[]?>(aliases => aliases != null && aliases.SequenceEqual(Aliases)),
-                null,
-                It.IsAny<Ordering?>()),
+                It.IsAny<Ordering?>(),
+                It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -146,9 +138,10 @@ public class ContentSearchServicePropertyLoadingTests
         await sut.SearchChildrenAsync("anything", ParentKey, Aliases, null, loadTemplates: false, skip: 0, take: 10);
 
         _mediaService.Verify(
-            x => x.GetByIds(
+            x => x.GetByIdsAsync(
                 It.Is<IEnumerable<Guid>>(keys => keys.SequenceEqual(new[] { ResultKey })),
-                It.Is<string[]?>(aliases => aliases != null && aliases.SequenceEqual(Aliases))),
+                It.Is<string[]?>(aliases => aliases != null && aliases.SequenceEqual(Aliases)),
+                It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -156,5 +149,5 @@ public class ContentSearchServicePropertyLoadingTests
         => new(_searcherResolver.Object, _contentService.Object, NullLogger<ContentSearchService>.Instance);
 
     private MediaSearchService CreateMediaSearchService()
-        => new(_searcherResolver.Object, _mediaService.Object, _idKeyMap.Object, NullLogger<MediaSearchService>.Instance);
+        => new(_searcherResolver.Object, _mediaService.Object, NullLogger<MediaSearchService>.Instance);
 }

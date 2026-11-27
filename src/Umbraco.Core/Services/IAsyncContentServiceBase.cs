@@ -6,11 +6,10 @@ namespace Umbraco.Cms.Core.Services;
 ///     Asynchronous counterpart of <see cref="IContentServiceBase" />.
 /// </summary>
 /// <remarks>
-///     The root of the asynchronous content-service hierarchy shared by documents, elements and members.
-///     <see cref="IContentService" /> and <see cref="IElementService" /> back it with asynchronous
-///     implementations; <see cref="IMemberService" /> implements it by delegating to its synchronous members so that
-///     members can share the asynchronous content editing base. <see cref="IMediaService" /> remains on
-///     <see cref="IContentServiceBase" /> alone.
+///     The root of the asynchronous content-service hierarchy shared by documents, elements, media and members.
+///     <see cref="IContentService" />, <see cref="IElementService" /> and <see cref="IMediaService" /> back it with
+///     asynchronous implementations; <see cref="IMemberService" /> implements it by delegating to its synchronous
+///     members so that members can share the asynchronous content editing base.
 /// </remarks>
 public interface IAsyncContentServiceBase : IService
 {

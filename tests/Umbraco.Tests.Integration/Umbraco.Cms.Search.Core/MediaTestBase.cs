@@ -23,15 +23,15 @@ public abstract class MediaTestBase : ContentBaseTestBase
 
     protected Guid GrandchildMediaKey { get; } = Guid.NewGuid();
 
-    protected IMedia RootFolder() => MediaService.GetById(RootFolderKey) ?? throw new InvalidOperationException("Root folder was not found");
+    protected IMedia RootFolder() => MediaService.GetByIdAsync(RootFolderKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Root folder was not found");
 
-    protected IMedia ChildFolder() => MediaService.GetById(ChildFolderKey) ?? throw new InvalidOperationException("Child folder was not found");
+    protected IMedia ChildFolder() => MediaService.GetByIdAsync(ChildFolderKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Child folder was not found");
 
-    protected IMedia RootMedia() => MediaService.GetById(RootMediaKey) ?? throw new InvalidOperationException("Root media was not found");
+    protected IMedia RootMedia() => MediaService.GetByIdAsync(RootMediaKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Root media was not found");
 
-    protected IMedia ChildMedia() => MediaService.GetById(ChildMediaKey) ?? throw new InvalidOperationException("Child media was not found");
+    protected IMedia ChildMedia() => MediaService.GetByIdAsync(ChildMediaKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Child media was not found");
 
-    protected IMedia GrandchildMedia() => MediaService.GetById(GrandchildMediaKey) ?? throw new InvalidOperationException("Child media was not found");
+    protected IMedia GrandchildMedia() => MediaService.GetByIdAsync(GrandchildMediaKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Child media was not found");
 
     [SetUp]
     public async Task SetupTest()
@@ -68,7 +68,7 @@ public abstract class MediaTestBase : ContentBaseTestBase
             .WithMediaType(folderType)
             .WithName("Root folder")
             .Build();
-        MediaService.Save(rootFolder);
+        await MediaService.SaveAsync(rootFolder, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         Media childFolder = new MediaBuilder()
             .WithKey(ChildFolderKey)
@@ -76,7 +76,7 @@ public abstract class MediaTestBase : ContentBaseTestBase
             .WithName("Child folder")
             .WithParentId(rootFolder.Id)
             .Build();
-        MediaService.Save(childFolder);
+        await MediaService.SaveAsync(childFolder, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         Media rootMedia = new MediaBuilder()
             .WithKey(RootMediaKey)
@@ -90,7 +90,7 @@ public abstract class MediaTestBase : ContentBaseTestBase
                     tags = "[\"tag1\",\"tag2\"]"
                 })
             .Build();
-        MediaService.Save(rootMedia);
+        await MediaService.SaveAsync(rootMedia, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         Media childMedia = new MediaBuilder()
             .WithKey(ChildMediaKey)
@@ -105,7 +105,7 @@ public abstract class MediaTestBase : ContentBaseTestBase
                     tags = "[\"tag3\",\"tag4\"]"
                 })
             .Build();
-        MediaService.Save(childMedia);
+        await MediaService.SaveAsync(childMedia, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         Media grandchildMedia = new MediaBuilder()
             .WithKey(GrandchildMediaKey)
@@ -120,7 +120,7 @@ public abstract class MediaTestBase : ContentBaseTestBase
                     tags = "[\"tag5\",\"tag6\"]"
                 })
             .Build();
-        MediaService.Save(grandchildMedia);
+        await MediaService.SaveAsync(grandchildMedia, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         IndexerAndSearcher.Reset();
     }

@@ -221,7 +221,7 @@ public abstract class BackOfficeTestBase : TestBase
                         title = $"root title single{i}root"
                     })
                 .Build();
-            MediaService.Save(folder);
+            await MediaService.SaveAsync(folder, Constants.Security.SuperUserKey, CancellationToken.None);
 
             for (var j = 0; j < 10; j++)
             {
@@ -237,7 +237,7 @@ public abstract class BackOfficeTestBase : TestBase
                         })
                     .WithParentId(folder.Id)
                     .Build();
-                MediaService.Save(child);
+                await MediaService.SaveAsync(child, Constants.Security.SuperUserKey, CancellationToken.None);
             }
         }
     }

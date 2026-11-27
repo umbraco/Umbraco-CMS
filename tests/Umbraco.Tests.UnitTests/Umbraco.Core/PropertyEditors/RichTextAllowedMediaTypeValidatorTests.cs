@@ -66,8 +66,8 @@ internal class RichTextAllowedMediaTypeValidatorTests
 
         var allowed = CreateMediaMock("Image");
         var disallowed = CreateMediaMock("File");
-        mediaServiceMock.Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>()))
-            .Returns([allowed.Object, disallowed.Object]);
+        mediaServiceMock.Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([allowed.Object, disallowed.Object]);
         SetupMediaType(mediaTypeServiceMock, "Image", AllowedTypeKey);
         SetupMediaType(mediaTypeServiceMock, "File", Guid.NewGuid());
 
@@ -80,7 +80,7 @@ internal class RichTextAllowedMediaTypeValidatorTests
     public void Media_Not_Found_Passes()
     {
         var (validator, mediaServiceMock, _) = CreateValidator();
-        mediaServiceMock.Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>())).Returns([]);
+        mediaServiceMock.Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
 
         var result = Validate(validator, BuildMarkup(Guid.NewGuid()));
 
@@ -92,7 +92,7 @@ internal class RichTextAllowedMediaTypeValidatorTests
     {
         var (validator, mediaServiceMock, mediaTypeServiceMock) = CreateValidator();
         var media = CreateMediaMock("Unknown");
-        mediaServiceMock.Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>())).Returns([media.Object]);
+        mediaServiceMock.Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>())).ReturnsAsync([media.Object]);
         mediaTypeServiceMock.Setup(x => x.GetAsync(It.IsAny<string>())).ReturnsAsync((IMediaType?)null);
 
         var result = Validate(validator, BuildMarkup(Guid.NewGuid()));
@@ -153,7 +153,7 @@ internal class RichTextAllowedMediaTypeValidatorTests
     private static void SetupMedia(Mock<IMediaService> mediaServiceMock, Mock<IMediaTypeService> mediaTypeServiceMock, string typeAlias, Guid typeKey)
     {
         var media = CreateMediaMock(typeAlias);
-        mediaServiceMock.Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>())).Returns([media.Object]);
+        mediaServiceMock.Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>())).ReturnsAsync([media.Object]);
         SetupMediaType(mediaTypeServiceMock, typeAlias, typeKey);
     }
 

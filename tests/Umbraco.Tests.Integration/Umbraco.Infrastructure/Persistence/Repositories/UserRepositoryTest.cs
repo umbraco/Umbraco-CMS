@@ -36,7 +36,7 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
 
     private IMediaTypeRepository MediaTypeRepository => GetRequiredService<IMediaTypeRepository>();
 
-    private IMediaRepository MediaRepository => GetRequiredService<IMediaRepository>();
+    private IAsyncMediaRepository MediaRepository => GetRequiredService<IAsyncMediaRepository>();
     private IEnumerable<IPermissionMapper> PermissionMappers => GetRequiredService<IEnumerable<IPermissionMapper>>();
 
     private IAppPolicyCache AppPolicyCache => GetRequiredService<IAppPolicyCache>();
@@ -767,7 +767,7 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
             var media = MediaBuilder.CreateSimpleMedia(mt, "asdf", -1);
 
             await DocumentRepository.SaveAsync(content, CancellationToken.None);
-            MediaRepository.Save(media);
+            await MediaRepository.SaveAsync(media, CancellationToken.None);
 
             var user = CreateAndCommitUserWithGroup(userRepository, userGroupRepository);
 

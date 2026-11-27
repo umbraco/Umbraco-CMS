@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.Locking;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -16,6 +17,9 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class MediaTypeService : AsyncContentTypeServiceBase<IMediaTypeRepository, IMediaType>, IMediaTypeService
 {
+    private readonly IIdKeyMap _idKeyMap;
+    private readonly ILogger<MediaTypeService> _logger;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="MediaTypeService"/> class.
     /// </summary>
@@ -30,6 +34,7 @@ public class MediaTypeService : AsyncContentTypeServiceBase<IMediaTypeRepository
     /// <param name="eventAggregator">The <see cref="IEventAggregator"/> for publishing events.</param>
     /// <param name="userIdKeyResolver">The <see cref="IUserIdKeyResolver"/> for resolving user IDs.</param>
     /// <param name="contentTypeFilters">The collection of content type filters.</param>
+    /// <param name="idKeyMap">The id/key map, which resolves the media type ids the deletion hook receives.</param>
     public MediaTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -41,7 +46,8 @@ public class MediaTypeService : AsyncContentTypeServiceBase<IMediaTypeRepository
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
         IUserIdKeyResolver userIdKeyResolver,
-        ContentTypeFilterCollection contentTypeFilters)
+        ContentTypeFilterCollection contentTypeFilters,
+        IIdKeyMap idKeyMap)
         : base(
             provider,
             loggerFactory,
@@ -55,6 +61,8 @@ public class MediaTypeService : AsyncContentTypeServiceBase<IMediaTypeRepository
             contentTypeFilters)
     {
         MediaService = mediaService;
+        _idKeyMap = idKeyMap;
+        _logger = loggerFactory.CreateLogger<MediaTypeService>();
     }
 
     /// <inheritdoc />
@@ -72,14 +80,41 @@ public class MediaTypeService : AsyncContentTypeServiceBase<IMediaTypeRepository
     private IMediaService MediaService { get; }
 
     /// <inheritdoc />
-    protected override Task DeleteItemsOfTypesAsync(IEnumerable<int> typeIds)
+    protected override async Task DeleteItemsOfTypesAsync(IEnumerable<int> typeIds)
     {
-        foreach (var typeId in typeIds)
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        var typeKeys = new List<Guid>();
+        foreach (int typeId in typeIds)
         {
-            MediaService.DeleteMediaOfType(typeId);
+            Attempt<Guid> keyAttempt = await _idKeyMap.GetKeyForIdAsync(typeId, UmbracoObjectTypes.MediaType);
+            if (keyAttempt.Success)
+            {
+                typeKeys.Add(keyAttempt.Result);
+            }
+            else
+            {
+                // Dropping it silently would leave media of that type behind while the caller is told the
+                // delete succeeded.
+                _logger.LogWarning(
+                    "Could not resolve a key for media type {MediaTypeId}; its media was not deleted.",
+                    typeId);
+            }
         }
 
-        return Task.CompletedTask;
+        if (typeKeys.Count > 0)
+        {
+            Attempt<ContentDeleteOfTypesOperationStatus> result = await MediaService.DeleteOfTypesAsync(typeKeys, Constants.Security.SuperUserKey, CancellationToken.None);
+            if (result.Success is false)
+            {
+                _logger.LogWarning(
+                    "The media of the media types {MediaTypeKeys} was not deleted ({Status}); deleting the types fails while media of them remains.",
+                    typeKeys,
+                    result.Result);
+            }
+        }
+
+        scope.Complete();
     }
 
     /// <inheritdoc />

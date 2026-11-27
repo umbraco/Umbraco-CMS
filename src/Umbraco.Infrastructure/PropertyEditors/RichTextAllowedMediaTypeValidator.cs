@@ -78,7 +78,7 @@ internal sealed class RichTextAllowedMediaTypeValidator : IValueValidator
             return [];
         }
 
-        IEnumerable<IMedia> mediaItems = _mediaService.GetByIds(mediaKeys);
+        IEnumerable<IMedia> mediaItems = _mediaService.GetByIdsAsync(mediaKeys, CancellationToken.None).GetAwaiter().GetResult();
 
         foreach (IMedia media in mediaItems)
         {

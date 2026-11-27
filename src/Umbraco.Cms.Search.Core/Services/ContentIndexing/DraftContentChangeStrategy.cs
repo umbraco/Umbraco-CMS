@@ -1,13 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
@@ -30,8 +27,6 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
     private readonly IElementService _elementService;
     private readonly IEntityService _entityService;
     private readonly IEventAggregator _eventAggregator;
-    private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
-    private readonly IIdKeyMap _idKeyMap;
     private readonly ILogger<DraftContentChangeStrategy> _logger;
 
     /// <inheritdoc />
@@ -47,9 +42,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
     /// <param name="elementService">The service used to retrieve elements.</param>
     /// <param name="entityService">The service used to enumerate elements, including those beneath element containers and in the recycle bin.</param>
     /// <param name="eventAggregator">The event aggregator used to publish the cancelable content indexing notification.</param>
-    /// <param name="umbracoDatabaseFactory">The database factory used to build queries for paged media descendant enumeration.</param>
-    /// <param name="idKeyMap">The map used to resolve a media root item's key to its numeric ID.</param>
-    /// <param name="logger">The logger used to record unresolvable root IDs, passed to the base class for rebuild cancellations.</param>
+    /// <param name="logger">The logger passed to the base class for rebuild cancellations.</param>
     public DraftContentChangeStrategy(
         IContentIndexingDataCollectionService contentIndexingDataCollectionService,
         IContentService contentService,
@@ -58,8 +51,6 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
         IElementService elementService,
         IEntityService entityService,
         IEventAggregator eventAggregator,
-        IUmbracoDatabaseFactory umbracoDatabaseFactory,
-        IIdKeyMap idKeyMap,
         ILogger<DraftContentChangeStrategy> logger)
         : base(logger)
     {
@@ -70,8 +61,6 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
         _elementService = elementService;
         _entityService = entityService;
         _eventAggregator = eventAggregator;
-        _umbracoDatabaseFactory = umbracoDatabaseFactory;
-        _idKeyMap = idKeyMap;
         _logger = logger;
     }
 
@@ -149,8 +138,8 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
         await RebuildAsync(
             indexInfo,
             UmbracoObjectTypes.Media,
-            () => Task.FromResult<IEnumerable<IContentBase>>(_mediaService.GetRootMedia()),
-            (pageIndex, pageSize) => Task.FromResult<IEnumerable<IContentBase>>(_mediaService.GetPagedChildren(Cms.Core.Constants.System.RecycleBinMedia, pageIndex, pageSize, out _)),
+            async () => await _mediaService.GetRootMediaAsync(cancellationToken),
+            async (pageIndex, pageSize) => (await _mediaService.GetChildrenAsync(Cms.Core.Constants.System.RecycleBinMediaKey, pageIndex * pageSize, pageSize, propertyAliases: null, ordering: null, cancellationToken)).Items,
             cancellationToken);
 
         if (cancellationToken.IsCancellationRequested)
@@ -226,22 +215,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
                     await EnumerateDescendantsByPath<IMedia>(
                         content.Key,
                         async (rootKey, skip, take, ordering) =>
-                        {
-                            Attempt<int> rootIdAttempt = await _idKeyMap.GetIdForKeyAsync(rootKey, UmbracoObjectTypes.Media);
-                            if (rootIdAttempt.Success is false)
-                            {
-                                _logger.LogWarning("Could not resolve ID for {objectType} item {rootId} - aborting enumeration of descendants.", UmbracoObjectTypes.Media, rootKey);
-                                return [];
-                            }
-
-                            IQuery<IMedia> query = _umbracoDatabaseFactory.SqlContext.Query<IMedia>();
-                            if (SupportsTrashedContent is false)
-                            {
-                                query = query.Where(media => media.Trashed == false);
-                            }
-
-                            return _mediaService.GetPagedDescendants(rootIdAttempt.Result, skip / take, take, out _, query, ordering).ToArray();
-                        },
+                            (await _mediaService.GetDescendantsAsync(rootKey, skip, take, ordering, cancellationToken, includeTrashed: SupportsTrashedContent)).Items.ToArray(),
                         async descendants =>
                             await UpdateIndexDescendantsAsync(applicableIndexInfos, descendants, change.ObjectType, cancellationToken));
                     break;
@@ -379,7 +353,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
         => change.ObjectType switch
         {
             UmbracoObjectTypes.Document => await _contentService.GetByIdAsync(change.Id, cancellationToken),
-            UmbracoObjectTypes.Media => _mediaService.GetById(change.Id),
+            UmbracoObjectTypes.Media => await _mediaService.GetByIdAsync(change.Id, cancellationToken),
             UmbracoObjectTypes.Member => _memberService.GetById(change.Id),
             UmbracoObjectTypes.Element => await _elementService.GetByIdAsync(change.Id, cancellationToken),
             _ => throw new ArgumentOutOfRangeException(nameof(change), change.ObjectType, "This strategy only supports documents, media, members and elements")

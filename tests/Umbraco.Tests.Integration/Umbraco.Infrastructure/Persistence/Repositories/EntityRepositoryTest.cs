@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -48,7 +46,7 @@ internal sealed class EntityRepositoryTest : UmbracoIntegrationTest
         for (var i = 0; i < 10; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(imageType, -1);
-            mediaService.Save(c1);
+            await mediaService.SaveAsync(c1, Constants.Security.SuperUserKey, CancellationToken.None);
             createdMedia.Add(c1);
         }
 

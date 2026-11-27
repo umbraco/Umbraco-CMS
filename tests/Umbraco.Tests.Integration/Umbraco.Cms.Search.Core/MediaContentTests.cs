@@ -2,7 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Search.Indexing;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
@@ -14,9 +14,9 @@ public class MediaContentTests : MediaTestBase
     private IContentIndexingService ContentIndexingService => GetRequiredService<IContentIndexingService>();
 
     [Test]
-    public void FullStructure_YieldsAllDocuments()
+    public async Task FullStructure_YieldsAllDocuments()
     {
-        MediaService.Save([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()]);
+        await MediaService.SaveAsync([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()], Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.Media);
         Assert.That(documents, Has.Count.EqualTo(5));
@@ -32,9 +32,9 @@ public class MediaContentTests : MediaTestBase
     }
 
     [Test]
-    public void FullStructure_YieldsStructuralFields()
+    public async Task FullStructure_YieldsStructuralFields()
     {
-        MediaService.Save([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()]);
+        await MediaService.SaveAsync([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()], Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.Media);
         Assert.That(documents, Has.Count.EqualTo(5));
@@ -50,9 +50,9 @@ public class MediaContentTests : MediaTestBase
     }
 
     [Test]
-    public void FullStructure_YieldsSystemFields()
+    public async Task FullStructure_YieldsSystemFields()
     {
-        MediaService.Save([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()]);
+        await MediaService.SaveAsync([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()], Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.Media);
         Assert.That(documents, Has.Count.EqualTo(5));
@@ -68,9 +68,9 @@ public class MediaContentTests : MediaTestBase
     }
 
     [Test]
-    public void FullStructure_UpdatesStructuralFieldsWhenChildrenAreMoved()
+    public async Task FullStructure_UpdatesStructuralFieldsWhenChildrenAreMoved()
     {
-        MediaService.Save([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()]);
+        await MediaService.SaveAsync([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var secondRootFolderKey = Guid.NewGuid();
         Media secondRootFolder = new MediaBuilder()
@@ -78,12 +78,12 @@ public class MediaContentTests : MediaTestBase
             .WithMediaType(MediaTypeService.GetAsync(RootFolder().ContentType.Key).GetAwaiter().GetResult()!)
             .WithName("Second Root folder")
             .Build();
-        MediaService.Save(secondRootFolder);
+        await MediaService.SaveAsync(secondRootFolder, Constants.Security.SuperUserKey, CancellationToken.None);
 
-        Attempt<OperationResult?> moveResult = MediaService.Move(ChildFolder(), secondRootFolder.Id);
-        Assert.That(moveResult.Result?.Result, Is.EqualTo(OperationResultType.Success));
-        moveResult = MediaService.Move(ChildMedia(), secondRootFolder.Id);
-        Assert.That(moveResult.Result?.Result, Is.EqualTo(OperationResultType.Success));
+        Attempt<ContentMoveOperationStatus> moveResult = await MediaService.MoveAsync(ChildFolder(), secondRootFolder.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.That(moveResult.Success, Is.True);
+        moveResult = await MediaService.MoveAsync(ChildMedia(), secondRootFolder.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.That(moveResult.Success, Is.True);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.Media);
         Assert.That(documents, Has.Count.EqualTo(6));
@@ -103,9 +103,9 @@ public class MediaContentTests : MediaTestBase
     }
 
     [Test]
-    public void FullStructure_UpdatesStructuralFieldsWhenRootsAreMoved()
+    public async Task FullStructure_UpdatesStructuralFieldsWhenRootsAreMoved()
     {
-        MediaService.Save([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()]);
+        await MediaService.SaveAsync([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()], Constants.Security.SuperUserKey, CancellationToken.None);
 
         var secondRootFolderKey = Guid.NewGuid();
         Media secondRootFolder = new MediaBuilder()
@@ -113,12 +113,12 @@ public class MediaContentTests : MediaTestBase
             .WithMediaType(MediaTypeService.GetAsync(RootFolder().ContentType.Key).GetAwaiter().GetResult()!)
             .WithName("Second Root folder")
             .Build();
-        MediaService.Save(secondRootFolder);
+        await MediaService.SaveAsync(secondRootFolder, Constants.Security.SuperUserKey, CancellationToken.None);
 
-        Attempt<OperationResult?> moveResult = MediaService.Move(RootFolder(), secondRootFolder.Id);
-        Assert.That(moveResult.Result?.Result, Is.EqualTo(OperationResultType.Success));
-        moveResult = MediaService.Move(RootMedia(), secondRootFolder.Id);
-        Assert.That(moveResult.Result?.Result, Is.EqualTo(OperationResultType.Success));
+        Attempt<ContentMoveOperationStatus> moveResult = await MediaService.MoveAsync(RootFolder(), secondRootFolder.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.That(moveResult.Success, Is.True);
+        moveResult = await MediaService.MoveAsync(RootMedia(), secondRootFolder.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.That(moveResult.Success, Is.True);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.Media);
         Assert.That(documents, Has.Count.EqualTo(6));
@@ -137,11 +137,11 @@ public class MediaContentTests : MediaTestBase
     }
 
     [Test]
-    public void FullStructure_UpdatesSystemFieldsWhenRootsAreTrashed()
+    public async Task FullStructure_UpdatesSystemFieldsWhenRootsAreTrashed()
     {
-        MediaService.Save([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()]);
-        MediaService.MoveToRecycleBin(RootFolder());
-        MediaService.MoveToRecycleBin(RootMedia());
+        await MediaService.SaveAsync([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()], Constants.Security.SuperUserKey, CancellationToken.None);
+        await MediaService.MoveToRecycleBinAsync(RootFolder(), Constants.Security.SuperUserKey, CancellationToken.None);
+        await MediaService.MoveToRecycleBinAsync(RootMedia(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.Media);
         Assert.That(documents, Has.Count.EqualTo(5));
@@ -157,11 +157,11 @@ public class MediaContentTests : MediaTestBase
     }
 
     [Test]
-    public void FullStructure_UpdatesStructuralFieldsWhenRootsAreTrashed()
+    public async Task FullStructure_UpdatesStructuralFieldsWhenRootsAreTrashed()
     {
-        MediaService.Save([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()]);
-        MediaService.MoveToRecycleBin(RootFolder());
-        MediaService.MoveToRecycleBin(RootMedia());
+        await MediaService.SaveAsync([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()], Constants.Security.SuperUserKey, CancellationToken.None);
+        await MediaService.MoveToRecycleBinAsync(RootFolder(), Constants.Security.SuperUserKey, CancellationToken.None);
+        await MediaService.MoveToRecycleBinAsync(RootMedia(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.Media);
         Assert.That(documents, Has.Count.EqualTo(5));
@@ -178,11 +178,11 @@ public class MediaContentTests : MediaTestBase
     }
 
     [Test]
-    public void FullStructure_UpdatesStructuralFieldsWhenChildrenAreTrashed()
+    public async Task FullStructure_UpdatesStructuralFieldsWhenChildrenAreTrashed()
     {
-        MediaService.Save([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()]);
-        MediaService.MoveToRecycleBin(ChildFolder());
-        MediaService.MoveToRecycleBin(ChildMedia());
+        await MediaService.SaveAsync([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()], Constants.Security.SuperUserKey, CancellationToken.None);
+        await MediaService.MoveToRecycleBinAsync(ChildFolder(), Constants.Security.SuperUserKey, CancellationToken.None);
+        await MediaService.MoveToRecycleBinAsync(ChildMedia(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.Media);
         Assert.That(documents, Has.Count.EqualTo(5));
@@ -202,16 +202,16 @@ public class MediaContentTests : MediaTestBase
 
     [TestCase(true)]
     [TestCase(false)]
-    public void FullStructure_RemovesAllDocumentsWhenRootIsDeleted(bool moveToRecycleBinBeforeDeleting)
+    public async Task FullStructure_RemovesAllDocumentsWhenRootIsDeleted(bool moveToRecycleBinBeforeDeleting)
     {
-        MediaService.Save([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()]);
+        await MediaService.SaveAsync([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()], Constants.Security.SuperUserKey, CancellationToken.None);
 
         if (moveToRecycleBinBeforeDeleting)
         {
-            MediaService.MoveToRecycleBin(RootFolder());
+            await MediaService.MoveToRecycleBinAsync(RootFolder(), Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
-        MediaService.Delete(RootFolder());
+        await MediaService.DeleteAsync(RootFolder(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.Media);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -225,16 +225,16 @@ public class MediaContentTests : MediaTestBase
 
     [TestCase(true)]
     [TestCase(false)]
-    public void FullStructure_RemovesAllDescendantDocumentsWhenChildIsDeleted(bool moveToRecycleBinBeforeDeleting)
+    public async Task FullStructure_RemovesAllDescendantDocumentsWhenChildIsDeleted(bool moveToRecycleBinBeforeDeleting)
     {
-        MediaService.Save([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()]);
+        await MediaService.SaveAsync([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()], Constants.Security.SuperUserKey, CancellationToken.None);
 
         if (moveToRecycleBinBeforeDeleting)
         {
-            MediaService.MoveToRecycleBin(ChildFolder());
+            await MediaService.MoveToRecycleBinAsync(ChildFolder(), Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
-        MediaService.Delete(ChildFolder());
+        await MediaService.DeleteAsync(ChildFolder(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.Media);
         Assert.That(documents, Has.Count.EqualTo(3));
@@ -250,11 +250,11 @@ public class MediaContentTests : MediaTestBase
 
     [TestCase(true)]
     [TestCase(false)]
-    public void DraftStructure_RebuildIndexYieldsAllDocuments(bool populateIndexBeforeRebuild)
+    public async Task DraftStructure_RebuildIndexYieldsAllDocuments(bool populateIndexBeforeRebuild)
     {
         if (populateIndexBeforeRebuild)
         {
-            MediaService.Save([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()]);
+            await MediaService.SaveAsync([RootFolder(), ChildFolder(), RootMedia(), ChildMedia(), GrandchildMedia()], Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         ContentIndexingService.Rebuild(IndexAliases.Media, DefaultOrigin);
@@ -282,10 +282,10 @@ public class MediaContentTests : MediaTestBase
     }
 
     [Test]
-    public void DraftStructure_RebuildIncludesTrashedContent()
+    public async Task DraftStructure_RebuildIncludesTrashedContent()
     {
-        MediaService.MoveToRecycleBin(ChildFolder());
-        MediaService.MoveToRecycleBin(RootMedia());
+        await MediaService.MoveToRecycleBinAsync(ChildFolder(), Constants.Security.SuperUserKey, CancellationToken.None);
+        await MediaService.MoveToRecycleBinAsync(RootMedia(), Constants.Security.SuperUserKey, CancellationToken.None);
 
         // at this point we have:
         // - RootFolder in the media tree root

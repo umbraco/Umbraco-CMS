@@ -92,8 +92,7 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         var enUsLanguage = await LanguageService.GetAsync("en-US");
         var daDkLanguage = await LanguageService.GetAsync("da-DK");
 
-        var rootMediaFolder = MediaService.CreateMedia("Pictures Folder", Constants.System.Root, "Folder");
-        MediaService.Save(rootMediaFolder);
+        var rootMediaFolder = await MediaService.CreateAndSaveAsync("Pictures Folder", parentKey: null, "Folder", Constants.Security.SuperUserKey, CancellationToken.None);
 
         var groupOne = await CreateUserGroup(
             "Group One",
@@ -140,8 +139,7 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         var subPageContentKey = Guid.Parse(SubPageKey);
         var subPage2ContentKey = Guid.Parse(SubPage2Key);
 
-        var rootMediaFolder = MediaService.CreateMedia("Pictures Folder", Constants.System.Root, "Folder");
-        MediaService.Save(rootMediaFolder);
+        var rootMediaFolder = await MediaService.CreateAndSaveAsync("Pictures Folder", parentKey: null, "Folder", Constants.Security.SuperUserKey, CancellationToken.None);
 
         var groupOne = await CreateUserGroup(
             "Group One",

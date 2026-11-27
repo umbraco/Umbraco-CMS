@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Attributes;
@@ -35,43 +36,36 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         {
             IMedia media = MediaBuilder.CreateSimpleMedia(mediaType, "Media " + i, -1);
             media.SetValue("title", "Title " + i);
-            MediaService.Save(media);
+            await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
             keys.Add(media.Key);
         }
 
-        // Mimic a partial load (e.g. a collection view): instances without property data (#23120).
-        List<IMedia> partial = keys
-            .Select(key =>
-            {
-                IMedia media = MediaService.GetById(key);
-                media.Properties = new PropertyCollection();
-                return media;
-            })
-            .ToList();
-
         // Rotate so every item's sort order changes (and is therefore re-saved).
+        Guid[] rotated = [keys[1], keys[2], keys[0]];
         if (useSortChildren)
         {
-            int[] rotated = [partial[1].Id, partial[2].Id, partial[0].Id];
-
-            var result = MediaService.SortChildren(Constants.System.Root, rotated);
+            var result = await MediaService.SortChildrenAsync(null, rotated, Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.That(result.Success, Is.True);
         }
         else
         {
-            IMedia[] rotated = [partial[1], partial[2], partial[0]];
-            Assert.That(MediaService.Sort(rotated), Is.True);
+            var result = await MediaService.SortAsync(rotated, Constants.Security.SuperUserKey, CancellationToken.None);
+            Assert.That(result.Success, Is.True);
         }
+
+        IMedia first = (await MediaService.GetByIdAsync(keys[0], CancellationToken.None))!;
+        IMedia second = (await MediaService.GetByIdAsync(keys[1], CancellationToken.None))!;
+        IMedia third = (await MediaService.GetByIdAsync(keys[2], CancellationToken.None))!;
 
         // Every sorted item must retain its property data, and the requested order must be applied.
         Assert.Multiple(() =>
         {
-            Assert.That(MediaService.GetById(keys[0]).GetValue<string>("title"), Is.EqualTo("Title 0"));
-            Assert.That(MediaService.GetById(keys[1]).GetValue<string>("title"), Is.EqualTo("Title 1"));
-            Assert.That(MediaService.GetById(keys[2]).GetValue<string>("title"), Is.EqualTo("Title 2"));
-            Assert.That(MediaService.GetById(keys[1]).SortOrder, Is.EqualTo(0));
-            Assert.That(MediaService.GetById(keys[2]).SortOrder, Is.EqualTo(1));
-            Assert.That(MediaService.GetById(keys[0]).SortOrder, Is.EqualTo(2));
+            Assert.That(first.GetValue<string>("title"), Is.EqualTo("Title 0"));
+            Assert.That(second.GetValue<string>("title"), Is.EqualTo("Title 1"));
+            Assert.That(third.GetValue<string>("title"), Is.EqualTo("Title 2"));
+            Assert.That(second.SortOrder, Is.EqualTo(0));
+            Assert.That(third.SortOrder, Is.EqualTo(1));
+            Assert.That(first.SortOrder, Is.EqualTo(2));
         });
     }
 
@@ -88,20 +82,24 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         var mediaType = await CreateMediaType();
         IMedia first = MediaBuilder.CreateSimpleMedia(mediaType, "First", -1);
         IMedia second = MediaBuilder.CreateSimpleMedia(mediaType, "Second", -1);
-        MediaService.Save(first);
-        MediaService.Save(second);
+        await MediaService.SaveAsync(first, Constants.Security.SuperUserKey, CancellationToken.None);
+        await MediaService.SaveAsync(second, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var recorder = GetRequiredService<SortingNotificationRecorder>();
         Assert.That(recorder.IsSortingValues, Is.EqualTo(new[] { false, false }));
         recorder.IsSortingValues.Clear();
 
-        Assert.That(MediaService.Sort(new[] { second, first }), Is.True);
+        var result = await MediaService.SortAsync([second.Key, first.Key], Constants.Security.SuperUserKey, CancellationToken.None);
+        Assert.That(result.Success, Is.True);
+
+        IMedia reloadedSecond = (await MediaService.GetByIdAsync(second.Key, CancellationToken.None))!;
+        IMedia reloadedFirst = (await MediaService.GetByIdAsync(first.Key, CancellationToken.None))!;
 
         Assert.Multiple(() =>
         {
             Assert.That(recorder.IsSortingValues, Is.EqualTo(new[] { true }));
-            Assert.That(MediaService.GetById(second.Id)!.SortOrder, Is.EqualTo(0));
-            Assert.That(MediaService.GetById(first.Id)!.SortOrder, Is.EqualTo(1));
+            Assert.That(reloadedSecond.SortOrder, Is.EqualTo(0));
+            Assert.That(reloadedFirst.SortOrder, Is.EqualTo(1));
         });
     }
 
@@ -124,9 +122,9 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         IMedia media = MediaBuilder.CreateSimpleMedia(mediaType, "Media", -1);
         media.SetValue("title", "Title");
         media.SetValue("bodyText", "Body text");
-        MediaService.Save(media);
+        await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
 
-        media = MediaService.GetById(media.Id);
+        media = await MediaService.GetByIdAsync(media.Key, CancellationToken.None);
 
         Assert.IsNotNull(media);
         Assert.AreEqual("Title", media.GetValue("title"));
@@ -140,10 +138,10 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
 
         IMedia media = MediaBuilder.CreateSimpleMedia(mediaType, "Media", -1);
         media.Key = Guid.CreateVersion7();
-        var mediaSaveAttempt = MediaService.Save(media);
+        var mediaSaveAttempt = await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.IsFalse(mediaSaveAttempt.Success);
-        Assert.AreEqual(OperationResultType.FailedInvalidKey, mediaSaveAttempt.Result.Result);
+        Assert.AreEqual(ContentSaveOperationStatus.InvalidKey, mediaSaveAttempt.Result);
     }
 
     private async Task<IMediaType> CreateMediaType()
@@ -162,17 +160,17 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         IMedia media = MediaBuilder.CreateSimpleMedia(mediaType, "hello", -1);
         media.SetValue("title", "title of mine");
         media.SetValue("bodyText", "hello world");
-        MediaService.Save(media);
+        await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // re-get
-        media = MediaService.GetById(media.Id);
+        media = await MediaService.GetByIdAsync(media.Key, CancellationToken.None);
         media.SetValue("title", "another title of mine"); // Change a value
         media.SetValue("bodyText", null); // Clear a value
         media.SetValue("author", "new author"); // Add a value
-        MediaService.Save(media);
+        await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // re-get
-        media = MediaService.GetById(media.Id);
+        media = await MediaService.GetByIdAsync(media.Key, CancellationToken.None);
         Assert.AreEqual("another title of mine", media.GetValue("title"));
         Assert.IsNull(media.GetValue("bodyText"));
         Assert.AreEqual("new author", media.GetValue("author"));
@@ -226,95 +224,70 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         for (var i = 0; i < 10; i++)
         {
             var m1 = MediaBuilder.CreateMediaImage(mediaType1, -1);
-            MediaService.Save(m1);
+            await MediaService.SaveAsync(m1, Constants.Security.SuperUserKey, CancellationToken.None);
             var m2 = MediaBuilder.CreateMediaImage(mediaType2, -1);
-            MediaService.Save(m2);
+            await MediaService.SaveAsync(m2, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
-        {
-            var filter = provider.CreateQuery<IMedia>()
-                .Where(x => new List<int> { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId));
+        Guid[] mediaTypeKeys = [mediaType1.Key, mediaType2.Key];
 
-            var result = MediaService.GetPagedChildren(
-                -1,
-                0,
-                11,
-                out var total,
-                filter,
-                Ordering.By("SortOrder"));
-            Assert.AreEqual(11, result.Count());
-            Assert.AreEqual(20, total);
+        var result = await MediaService.GetPagedOfTypesAsync(mediaTypeKeys, 0, 11, Ordering.By("sortOrder"), CancellationToken.None);
+        Assert.AreEqual(11, result.Items.Count());
+        Assert.AreEqual(20, result.Total);
 
-            result = MediaService.GetPagedChildren(
-                -1,
-                1,
-                11,
-                out total,
-                filter,
-                Ordering.By("SortOrder"));
-            Assert.AreEqual(9, result.Count());
-            Assert.AreEqual(20, total);
-        }
+        result = await MediaService.GetPagedOfTypesAsync(mediaTypeKeys, 11, 11, Ordering.By("sortOrder"), CancellationToken.None);
+        Assert.AreEqual(9, result.Items.Count());
+        Assert.AreEqual(20, result.Total);
     }
 
     [Test]
-    public void Can_Move_Media()
+    public async Task Can_Move_Media()
     {
-        // Arrange
-        var mediaItems = CreateTrashedTestMedia();
-        var media = MediaService.GetById(mediaItems.Item3.Id);
+        var mediaItems = await CreateTrashedTestMedia();
+        var media = await MediaService.GetByIdAsync(mediaItems.Item3.Key, CancellationToken.None);
 
-        // Act
-        MediaService.Move(media, mediaItems.Item2.Id);
+        var result = await MediaService.MoveAsync(media, mediaItems.Item2.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
-        // Assert
+        Assert.That(result.Success, Is.True);
         Assert.That(media.ParentId, Is.EqualTo(mediaItems.Item2.Id));
         Assert.That(media.Trashed, Is.False);
     }
 
     [Test]
-    public void Can_Move_Media_Populates_ParentKey()
+    public async Task Can_Move_Media_Populates_ParentKey()
     {
-        // Arrange
-        var mediaItems = CreateTrashedTestMedia();
-        var media = MediaService.GetById(mediaItems.Item3.Id);
+        var mediaItems = await CreateTrashedTestMedia();
+        var media = await MediaService.GetByIdAsync(mediaItems.Item3.Key, CancellationToken.None);
 
-        // Act
-        MediaService.Move(media, mediaItems.Item2.Id);
+        var result = await MediaService.MoveAsync(media, mediaItems.Item2.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
 
-        // Assert
+        Assert.That(result.Success, Is.True);
         Assert.That(media.ParentKey, Is.EqualTo(mediaItems.Item2.Key));
     }
 
     [Test]
-    public void Can_Move_Media_To_RecycleBin()
+    public async Task Can_Move_Media_To_RecycleBin()
     {
-        // Arrange
-        var mediaItems = CreateTrashedTestMedia();
-        var media = MediaService.GetById(mediaItems.Item1.Id);
+        var mediaItems = await CreateTrashedTestMedia();
+        var media = await MediaService.GetByIdAsync(mediaItems.Item1.Key, CancellationToken.None);
 
-        // Act
-        MediaService.MoveToRecycleBin(media);
+        var result = await MediaService.MoveToRecycleBinAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
 
-        // Assert
-        Assert.That(media.ParentId, Is.EqualTo(-21));
+        Assert.That(result.Success, Is.True);
+        Assert.That(media.ParentId, Is.EqualTo(Constants.System.RecycleBinMedia));
         Assert.That(media.Trashed, Is.True);
     }
 
     [Test]
-    public void Can_Move_Media_From_RecycleBin()
+    public async Task Can_Move_Media_From_RecycleBin()
     {
-        // Arrange
-        var mediaItems = CreateTrashedTestMedia();
-        var media = MediaService.GetById(mediaItems.Item4.Id);
+        var mediaItems = await CreateTrashedTestMedia();
+        var media = await MediaService.GetByIdAsync(mediaItems.Item4.Key, CancellationToken.None);
 
-        // Act - moving out of recycle bin
-        MediaService.Move(media, mediaItems.Item1.Id);
-        var mediaChild = MediaService.GetById(mediaItems.Item5.Id);
+        var result = await MediaService.MoveAsync(media, mediaItems.Item1.Key, true, Constants.Security.SuperUserKey, CancellationToken.None);
+        var mediaChild = await MediaService.GetByIdAsync(mediaItems.Item5.Key, CancellationToken.None);
 
-        // Assert
+        Assert.That(result.Success, Is.True);
         Assert.That(media.ParentId, Is.EqualTo(mediaItems.Item1.Id));
         Assert.That(media.Trashed, Is.False);
         Assert.That(mediaChild.ParentId, Is.EqualTo(mediaItems.Item4.Id));
@@ -324,13 +297,14 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Cannot_Save_Media_With_Empty_Name()
     {
-        // Arrange
         var mediaType = MediaTypeBuilder.CreateNewMediaType();
         await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
-        var media = MediaService.CreateMedia(string.Empty, -1, Constants.Conventions.MediaTypes.VideoAlias);
+        var media = await MediaService.CreateAsync(string.Empty, (Guid?)null, Constants.Conventions.MediaTypes.VideoAlias, Constants.Security.SuperUserKey, CancellationToken.None);
 
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => MediaService.Save(media));
+        var result = await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Result, Is.EqualTo(ContentSaveOperationStatus.InvalidName));
     }
 
     [Test]
@@ -340,10 +314,10 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         var media = MediaBuilder.CreateMediaImage(mediaType, -1);
-        MediaService.Save(media);
+        await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var mediaPath = "/media/test-image.png";
-        var resolvedMedia = MediaService.GetMediaByPath(mediaPath);
+        var resolvedMedia = await MediaService.GetMediaByPathAsync(mediaPath, CancellationToken.None);
 
         Assert.IsNotNull(resolvedMedia);
         Assert.That(resolvedMedia.GetValue(Constants.Conventions.Media.File).ToString() == mediaPath);
@@ -356,10 +330,10 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         var media = MediaBuilder.CreateMediaImageWithCrop(mediaType, -1);
-        MediaService.Save(media);
+        await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var mediaPath = "/media/test-image.png";
-        var resolvedMedia = MediaService.GetMediaByPath(mediaPath);
+        var resolvedMedia = await MediaService.GetMediaByPathAsync(mediaPath, CancellationToken.None);
 
         Assert.IsNotNull(resolvedMedia);
         Assert.That(resolvedMedia.GetValue(Constants.Conventions.Media.File).ToString().Contains(mediaPath));
@@ -373,17 +347,17 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         for (var i = 0; i < 10; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(mediaType, -1);
-            MediaService.Save(c1);
+            await MediaService.SaveAsync(c1, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         var service = MediaService;
 
-        var entities = service.GetPagedChildren(-1, 0, 6, out var total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(6));
-        Assert.That(total, Is.EqualTo(10));
-        entities = service.GetPagedChildren(-1, 1, 6, out total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(4));
-        Assert.That(total, Is.EqualTo(10));
+        var page = await service.GetChildrenAsync(null, 0, 6, null, null, CancellationToken.None);
+        Assert.That(page.Items.Count(), Is.EqualTo(6));
+        Assert.That(page.Total, Is.EqualTo(10));
+        page = await service.GetChildrenAsync(null, 6, 6, null, null, CancellationToken.None);
+        Assert.That(page.Items.Count(), Is.EqualTo(4));
+        Assert.That(page.Total, Is.EqualTo(10));
     }
 
     [Test]
@@ -396,63 +370,58 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         for (var i = 0; i < 9; i++)
         {
             var m1 = MediaBuilder.CreateMediaImage(mediaType, -1);
-            MediaService.Save(m1);
+            await MediaService.SaveAsync(m1, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         var mediaTypeForFolder = MediaTypeBuilder.CreateImageMediaType("Folder2");
         await MediaTypeService.CreateAsync(mediaTypeForFolder, Constants.Security.SuperUserKey);
         var mediaFolder = MediaBuilder.CreateMediaFolder(mediaTypeForFolder, -1);
-        MediaService.Save(mediaFolder);
+        await MediaService.SaveAsync(mediaFolder, Constants.Security.SuperUserKey, CancellationToken.None);
         for (var i = 0; i < 10; i++)
         {
             var m1 = MediaBuilder.CreateMediaImage(mediaType, mediaFolder.Id);
-            MediaService.Save(m1);
+            await MediaService.SaveAsync(m1, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         var service = MediaService;
 
         // Children in root including the folder - not the descendants in the folder.
-        var entities = service.GetPagedChildren(-1, 0, 6, out var total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(6));
-        Assert.That(total, Is.EqualTo(10));
-        entities = service.GetPagedChildren(-1, 1, 6, out total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(4));
-        Assert.That(total, Is.EqualTo(10));
+        var page = await service.GetChildrenAsync(null, 0, 6, null, null, CancellationToken.None);
+        Assert.That(page.Items.Count(), Is.EqualTo(6));
+        Assert.That(page.Total, Is.EqualTo(10));
+        page = await service.GetChildrenAsync(null, 6, 6, null, null, CancellationToken.None);
+        Assert.That(page.Items.Count(), Is.EqualTo(4));
+        Assert.That(page.Total, Is.EqualTo(10));
 
         // Children in folder.
-        entities = service.GetPagedChildren(mediaFolder.Id, 0, 6, out total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(6));
-        Assert.That(total, Is.EqualTo(10));
-        entities = service.GetPagedChildren(mediaFolder.Id, 1, 6, out total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(4));
-        Assert.That(total, Is.EqualTo(10));
+        page = await service.GetChildrenAsync(mediaFolder.Key, 0, 6, null, null, CancellationToken.None);
+        Assert.That(page.Items.Count(), Is.EqualTo(6));
+        Assert.That(page.Total, Is.EqualTo(10));
+        page = await service.GetChildrenAsync(mediaFolder.Key, 6, 6, null, null, CancellationToken.None);
+        Assert.That(page.Items.Count(), Is.EqualTo(4));
+        Assert.That(page.Total, Is.EqualTo(10));
     }
 
-    private Tuple<IMedia, IMedia, IMedia, IMedia, IMedia> CreateTrashedTestMedia()
+    private async Task<Tuple<IMedia, IMedia, IMedia, IMedia, IMedia>> CreateTrashedTestMedia()
     {
-        // Create and Save folder-Media -> 1050
-        var folderMediaType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
+        var folderMediaType = await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.Folder);
         var folder = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
-        MediaService.Save(folder);
+        await MediaService.SaveAsync(folder, Constants.Security.SuperUserKey, CancellationToken.None);
 
-        // Create and Save folder-Media -> 1051
         var folder2 = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
-        MediaService.Save(folder2);
+        await MediaService.SaveAsync(folder2, Constants.Security.SuperUserKey, CancellationToken.None);
 
-        // Create and Save image-Media  -> 1052
-        var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
-        var image = MediaBuilder.CreateMediaImage(imageMediaType, 1050);
-        MediaService.Save(image);
+        var imageMediaType = await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.Image);
+        var image = MediaBuilder.CreateMediaImage(imageMediaType, folder.Id);
+        await MediaService.SaveAsync(image, Constants.Security.SuperUserKey, CancellationToken.None);
 
-        // Create and Save folder-Media that is trashed -> 1053
-        var folderTrashed = MediaBuilder.CreateMediaFolder(folderMediaType, -21);
+        var folderTrashed = MediaBuilder.CreateMediaFolder(folderMediaType, Constants.System.RecycleBinMedia);
         folderTrashed.Trashed = true;
-        MediaService.Save(folderTrashed);
+        await MediaService.SaveAsync(folderTrashed, Constants.Security.SuperUserKey, CancellationToken.None);
 
-        // Create and Save image-Media child of folderTrashed -> 1054
         var imageTrashed = MediaBuilder.CreateMediaImage(imageMediaType, folderTrashed.Id);
         imageTrashed.Trashed = true;
-        MediaService.Save(imageTrashed);
+        await MediaService.SaveAsync(imageTrashed, Constants.Security.SuperUserKey, CancellationToken.None);
 
         return new Tuple<IMedia, IMedia, IMedia, IMedia, IMedia>(folder, folder2, image, folderTrashed, imageTrashed);
     }
@@ -460,15 +429,15 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     #region Concurrency Tests
 
     public static void ConfigureConcurrencyTest(IUmbracoBuilder builder) =>
-        builder.AddNotificationHandler<MediaSavingNotification, ReadLockAcquiringMediaSavingHandler>();
+        builder.AddNotificationAsyncHandler<MediaSavingNotification, ReadLockAcquiringMediaSavingHandler>();
 
     /// <summary>
     /// Verifies that parallel media saves don't deadlock when a notification handler acquires a read lock.
     /// </summary>
     /// <remarks>
     /// Before the fix (issue #21125), this test would deadlock because:
-    /// 1. Thread A publishes MediaSavingNotification, handler calls GetById (acquires read lock).
-    /// 2. Thread B publishes MediaSavingNotification, handler calls GetById (acquires read lock).
+    /// 1. Thread A publishes MediaSavingNotification, handler calls GetByIdAsync (acquires read lock).
+    /// 2. Thread B publishes MediaSavingNotification, handler calls GetByIdAsync (acquires read lock).
     /// 3. Thread A tries to acquire write lock - blocked waiting for Thread B's read lock.
     /// 4. Thread B tries to acquire write lock - blocked waiting for Thread A's read lock.
     /// = Deadlock
@@ -479,7 +448,6 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     [ConfigureBuilder(ActionName = nameof(ConfigureConcurrencyTest))]
     public async Task Parallel_Media_Save_Does_Not_Deadlock_When_Notification_Handler_Acquires_Read_Lock()
     {
-        // Arrange
         var mediaType = MediaTypeBuilder.CreateSimpleMediaType("testMedia", "Test Media");
         await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
@@ -490,20 +458,19 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         for (var i = 0; i < numberOfMediaItems; i++)
         {
             var media = MediaBuilder.CreateSimpleMedia(mediaType, $"Test Media {i}", Constants.System.Root);
-            MediaService.Save(media);
+            await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
             mediaItems.Add(media);
         }
 
         var exceptions = new List<Exception>();
         var lockObj = new Lock();
 
-        // Act - update all media items in parallel.
-        var tasks = mediaItems.Select(media => RunWithSuppressedExecutionContext(() =>
+        var tasks = mediaItems.Select(media => RunWithSuppressedExecutionContext(async () =>
         {
             try
             {
                 media.Name += " Updated";
-                MediaService.Save(media);
+                await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -512,13 +479,10 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
                     exceptions.Add(ex);
                 }
             }
-
-            return Task.CompletedTask;
         })).ToList();
 
         await Task.WhenAll(tasks);
 
-        // Assert
         Assert.IsEmpty(
             exceptions,
             $"Expected no exceptions but got {exceptions.Count}: {string.Join(", ", exceptions.Select(e => e.Message))}");
@@ -526,7 +490,7 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         // Verify all media items were updated successfully
         foreach (var media in mediaItems)
         {
-            var retrieved = MediaService.GetById(media.Id);
+            var retrieved = await MediaService.GetByIdAsync(media.Key, CancellationToken.None);
             Assert.That(retrieved, Is.Not.Null, $"Media '{media.Name}' should be retrievable after save");
             Assert.That(retrieved!.Name, Does.EndWith("Updated"), $"Media should have been updated");
         }
@@ -540,30 +504,27 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     [ConfigureBuilder(ActionName = nameof(ConfigureConcurrencyTest))]
     public async Task Parallel_Media_Delete_Does_Not_Deadlock()
     {
-        // Arrange
         var mediaType = MediaTypeBuilder.CreateSimpleMediaType("testMedia", "Test Media");
         await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         const int numberOfMediaItems = 5;
         var mediaItems = new List<IMedia>();
 
-        // Create media items.
         for (var i = 0; i < numberOfMediaItems; i++)
         {
             var media = MediaBuilder.CreateSimpleMedia(mediaType, $"Test Media {i}", Constants.System.Root);
-            MediaService.Save(media);
+            await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
             mediaItems.Add(media);
         }
 
         var exceptions = new List<Exception>();
         var lockObj = new Lock();
 
-        // Act - delete all media items in parallel.
-        var tasks = mediaItems.Select(media => RunWithSuppressedExecutionContext(() =>
+        var tasks = mediaItems.Select(media => RunWithSuppressedExecutionContext(async () =>
         {
             try
             {
-                MediaService.Delete(media);
+                await MediaService.DeleteAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -572,13 +533,10 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
                     exceptions.Add(ex);
                 }
             }
-
-            return Task.CompletedTask;
         })).ToList();
 
         await Task.WhenAll(tasks);
 
-        // Assert
         Assert.IsEmpty(
             exceptions,
             $"Expected no exceptions but got {exceptions.Count}: {string.Join(", ", exceptions.Select(e => e.Message))}");
@@ -586,7 +544,7 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         // Verify all media items were deleted
         foreach (var media in mediaItems)
         {
-            var retrieved = MediaService.GetById(media.Id);
+            var retrieved = await MediaService.GetByIdAsync(media.Key, CancellationToken.None);
             Assert.That(retrieved, Is.Null, $"Media '{media.Name}' should have been deleted");
         }
     }
@@ -600,25 +558,25 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     }
 
     /// <summary>
-    /// A notification handler that acquires a read lock by calling MediaService.GetById.
+    /// A notification handler that acquires a read lock by calling MediaService.GetByIdAsync.
     /// This simulates real-world scenarios where handlers need to read related data.
     /// </summary>
     /// <remarks>
     /// Before the fix for issue #21125, this handler would cause deadlocks when multiple
     /// media items are saved in parallel because:
     /// 1. The notification is published BEFORE the write lock is acquired
-    /// 2. This handler calls GetById which acquires a read lock
+    /// 2. This handler calls GetByIdAsync which acquires a read lock
     /// 3. Multiple threads each hold read locks and then try to upgrade to write locks
     /// 4. SQL Server detects this as a deadlock; SQLite hangs indefinitely
     /// </remarks>
-    internal sealed class ReadLockAcquiringMediaSavingHandler : INotificationHandler<MediaSavingNotification>
+    internal sealed class ReadLockAcquiringMediaSavingHandler : INotificationAsyncHandler<MediaSavingNotification>
     {
         private readonly IMediaService _mediaService;
 
         public ReadLockAcquiringMediaSavingHandler(IMediaService mediaService) =>
             _mediaService = mediaService;
 
-        public void Handle(MediaSavingNotification notification)
+        public async Task HandleAsync(MediaSavingNotification notification, CancellationToken cancellationToken)
         {
             foreach (var media in notification.SavedEntities)
             {
@@ -626,7 +584,7 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
                 // Before the fix, this could cause deadlocks when combined with parallel saves.
                 if (media.HasIdentity)
                 {
-                    _mediaService.GetById(media.Id);
+                    await _mediaService.GetByIdAsync(media.Key, cancellationToken);
                 }
             }
         }
@@ -635,37 +593,38 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     #endregion
 
     [Test]
-    public void SortChildren_Persists_The_Supplied_Order()
+    public async Task SortChildren_Persists_The_Supplied_Order()
     {
-        var folderMediaType = MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.Folder).GetAwaiter().GetResult()!;
+        var folderMediaType = (await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.Folder))!;
 
         var root = MediaBuilder.CreateMediaFolder(folderMediaType, Constants.System.Root);
         root.Name = "Root";
-        MediaService.Save(root);
+        await MediaService.SaveAsync(root, Constants.Security.SuperUserKey, CancellationToken.None);
 
-        var childIds = new List<int>();
+        var childKeys = new List<Guid>();
         for (var i = 0; i < 5; i++)
         {
             var child = MediaBuilder.CreateMediaFolder(folderMediaType, root.Id);
             child.Name = $"Folder {i}";
-            MediaService.Save(child);
-            childIds.Add(child.Id);
+            await MediaService.SaveAsync(child, Constants.Security.SuperUserKey, CancellationToken.None);
+            childKeys.Add(child.Key);
         }
 
-        int[] ChildIdsInSortOrder() => MediaService
-            .GetPagedChildren(root.Id, 0, 100, out _)
+        async Task<Guid[]> ChildKeysInSortOrder() => (await MediaService
+            .GetChildrenAsync(root.Key, 0, 100, null, null, CancellationToken.None))
+            .Items
             .OrderBy(child => child.SortOrder)
-            .Select(child => child.Id)
+            .Select(child => child.Key)
             .ToArray();
 
         // Children were created in ascending sort order.
-        Assert.AreEqual(childIds.ToArray(), ChildIdsInSortOrder());
+        Assert.AreEqual(childKeys.ToArray(), await ChildKeysInSortOrder());
 
-        var reversed = Enumerable.Reverse(childIds).ToArray();
-        var result = MediaService.SortChildren(root.Id, reversed, Constants.Security.SuperUserId);
+        var reversed = Enumerable.Reverse(childKeys).ToArray();
+        var result = await MediaService.SortChildrenAsync(root.Key, reversed, Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.IsTrue(result.Success);
-        Assert.AreEqual(reversed, ChildIdsInSortOrder());
+        Assert.AreEqual(reversed, await ChildKeysInSortOrder());
     }
 
     [Test]
@@ -673,9 +632,9 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     {
         var mediaType = await CreateMediaType();
 
-        var first = SaveMedia(mediaType, "image");
-        var second = SaveMedia(mediaType, "image");
-        var third = SaveMedia(mediaType, "image");
+        var first = await SaveMedia(mediaType, "image");
+        var second = await SaveMedia(mediaType, "image");
+        var third = await SaveMedia(mediaType, "image");
 
         Assert.Multiple(() =>
         {
@@ -690,8 +649,8 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     {
         var mediaType = await CreateMediaType();
 
-        var first = SaveMedia(mediaType, "Image");
-        var second = SaveMedia(mediaType, "image");
+        var first = await SaveMedia(mediaType, "Image");
+        var second = await SaveMedia(mediaType, "image");
 
         Assert.Multiple(() =>
         {
@@ -707,11 +666,11 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
 
         // Decoys that share a prefix with "image" but are not the same name; these must not
         // consume a suffix nor otherwise perturb the result.
-        SaveMedia(mediaType, "image");
-        SaveMedia(mediaType, "imagery");
-        SaveMedia(mediaType, "image detail");
+        await SaveMedia(mediaType, "image");
+        await SaveMedia(mediaType, "imagery");
+        await SaveMedia(mediaType, "image detail");
 
-        var duplicate = SaveMedia(mediaType, "image");
+        var duplicate = await SaveMedia(mediaType, "image");
 
         Assert.That(duplicate.Name, Is.EqualTo("image (1)"));
     }
@@ -723,8 +682,8 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     {
         var mediaType = await CreateMediaType();
 
-        var first = SaveMedia(mediaType, name);
-        var second = SaveMedia(mediaType, name);
+        var first = await SaveMedia(mediaType, name);
+        var second = await SaveMedia(mediaType, name);
 
         Assert.Multiple(() =>
         {
@@ -738,21 +697,21 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     {
         var mediaType = await CreateMediaType();
 
-        SaveMedia(mediaType, "image");
-        var one = SaveMedia(mediaType, "image"); // image (1)
-        SaveMedia(mediaType, "image");           // image (2)
+        await SaveMedia(mediaType, "image");
+        var one = await SaveMedia(mediaType, "image"); // image (1)
+        await SaveMedia(mediaType, "image");           // image (2)
 
-        MediaService.Delete(one); // frees "image (1)"
+        await MediaService.DeleteAsync(one, Constants.Security.SuperUserKey, CancellationToken.None); // frees "image (1)"
 
-        var reused = SaveMedia(mediaType, "image");
+        var reused = await SaveMedia(mediaType, "image");
 
         Assert.That(reused.Name, Is.EqualTo("image (1)"));
     }
 
-    private IMedia SaveMedia(IMediaType mediaType, string name)
+    private async Task<IMedia> SaveMedia(IMediaType mediaType, string name)
     {
         IMedia media = MediaBuilder.CreateSimpleMedia(mediaType, name, Constants.System.Root);
-        MediaService.Save(media);
+        await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
         return media;
     }
 }

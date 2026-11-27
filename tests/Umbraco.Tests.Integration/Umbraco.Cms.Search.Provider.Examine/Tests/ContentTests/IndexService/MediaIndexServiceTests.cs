@@ -37,15 +37,16 @@ public class MediaIndexServiceTests : IndexTestBase
             .Build();
         await GetRequiredService<IMediaTypeService>().CreateAsync(mediaType, Cms.Core.Constants.Security.SuperUserKey);
 
-        await WaitForIndexing(Constants.Search.IndexAliases.DraftMedia, () =>
+        await WaitForIndexing(Constants.Search.IndexAliases.DraftMedia, async () =>
         {
-            GetRequiredService<IMediaService>().Save(
+            await GetRequiredService<IMediaService>().SaveAsync(
                 new MediaBuilder()
                     .WithMediaType(mediaType)
                     .WithName("The Media")
                     .WithPropertyValues(new { altText = "The media alt text" })
-                    .Build());
-            return Task.CompletedTask;
+                    .Build(),
+                Cms.Core.Constants.Security.SuperUserKey,
+                CancellationToken.None);
         });
     }
 }

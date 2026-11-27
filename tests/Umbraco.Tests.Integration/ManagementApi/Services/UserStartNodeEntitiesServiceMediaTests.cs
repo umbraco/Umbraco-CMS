@@ -36,7 +36,7 @@ public partial class UserStartNodeEntitiesServiceMediaTests : UserStartNodeEntit
                 .WithMediaType(mediaType)
                 .WithName($"{rootNumber}")
                 .Build();
-            MediaService.Save(root);
+            await MediaService.SaveAsync(root, Constants.Security.SuperUserKey, CancellationToken.None);
             ItemsByName[root.Name!] = (root.Id, root.Key);
 
             foreach (var childNumber in Enumerable.Range(1, 10))
@@ -46,7 +46,7 @@ public partial class UserStartNodeEntitiesServiceMediaTests : UserStartNodeEntit
                     .WithName($"{rootNumber}-{childNumber}")
                     .Build();
                 child.SetParent(root);
-                MediaService.Save(child);
+                await MediaService.SaveAsync(child, Constants.Security.SuperUserKey, CancellationToken.None);
                 ItemsByName[child.Name!] = (child.Id, child.Key);
 
                 foreach (var grandChildNumber in Enumerable.Range(1, 5))
@@ -56,7 +56,7 @@ public partial class UserStartNodeEntitiesServiceMediaTests : UserStartNodeEntit
                         .WithName($"{rootNumber}-{childNumber}-{grandChildNumber}")
                         .Build();
                     grandchild.SetParent(child);
-                    MediaService.Save(grandchild);
+                    await MediaService.SaveAsync(grandchild, Constants.Security.SuperUserKey, CancellationToken.None);
                     ItemsByName[grandchild.Name!] = (grandchild.Id, grandchild.Key);
                 }
             }

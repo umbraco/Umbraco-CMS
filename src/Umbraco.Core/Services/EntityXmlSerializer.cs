@@ -242,8 +242,9 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             var total = long.MaxValue;
             while (page * pageSize < total)
             {
-                IEnumerable<IMedia> children = _mediaService.GetPagedChildren(media.Id, page++, pageSize, out total);
-                SerializeChildren(children, xml, onMediaItemSerialized);
+                PagedModel<IMedia> children = _mediaService.GetChildrenAsync(media.Key, page++ * pageSize, pageSize, propertyAliases: null, ordering: null, CancellationToken.None).GetAwaiter().GetResult();
+                total = children.Total;
+                SerializeChildren(children.Items, xml, onMediaItemSerialized);
             }
         }
 
@@ -821,11 +822,11 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             var total = long.MaxValue;
             while (page * pageSize < total)
             {
-                IEnumerable<IMedia> grandChildren =
-                    _mediaService.GetPagedChildren(child.Id, page++, pageSize, out total);
+                PagedModel<IMedia> grandChildren = _mediaService.GetChildrenAsync(child.Key, page++ * pageSize, pageSize, propertyAliases: null, ordering: null, CancellationToken.None).GetAwaiter().GetResult();
+                total = grandChildren.Total;
 
                 // recurse
-                SerializeChildren(grandChildren, childXml, onMediaItemSerialized);
+                SerializeChildren(grandChildren.Items, childXml, onMediaItemSerialized);
             }
         }
     }

@@ -130,7 +130,7 @@ internal class MediaPickerValueEditorValidationTests
 
         if (valueProvidesMediaTypeAlias is false)
         {
-            mediaServiceMock.Setup(x => x.GetByIds(It.Is<IEnumerable<Guid>>(y => y.First() == mediaKey))).Returns([mediaMock.Object]);
+            mediaServiceMock.Setup(x => x.GetByIdsAsync(It.Is<IEnumerable<Guid>>(y => y.First() == mediaKey), It.IsAny<CancellationToken>())).ReturnsAsync([mediaMock.Object]);
         }
 
         var providedMediaTypeAlias = valueProvidesMediaTypeAlias ? mediaTypeAlias : string.Empty;
@@ -161,12 +161,12 @@ internal class MediaPickerValueEditorValidationTests
         {
             var mediaMock = new Mock<IMedia>();
             mediaMock.SetupGet(x => x.ContentType.Alias).Returns(mediaTypeAlias);
-            mediaServiceMock.Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>())).Returns([mediaMock.Object]);
+            mediaServiceMock.Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>())).ReturnsAsync([mediaMock.Object]);
         }
         else
         {
             // The selected media (looked up because no type alias was provided) cannot be found.
-            mediaServiceMock.Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>())).Returns([]);
+            mediaServiceMock.Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
         }
 
         var value = "[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"" + mediaKey + "\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]";
@@ -193,7 +193,7 @@ internal class MediaPickerValueEditorValidationTests
 
         var mediaMock = new Mock<IMedia>();
         mediaMock.SetupGet(x => x.ContentType.Alias).Returns(mediaTypeAlias);
-        mediaServiceMock.Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>())).Returns([mediaMock.Object]);
+        mediaServiceMock.Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>())).ReturnsAsync([mediaMock.Object]);
 
         // The same media key selected twice (no provided alias) must not be reported as missing.
         var value = "[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"" + mediaKey + "\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n}, {\n  \" key\" : \"1C70519E-C3AE-4D45-8E48-30B3D02E455E\",\n  \"mediaKey\" : \"" + mediaKey + "\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]";

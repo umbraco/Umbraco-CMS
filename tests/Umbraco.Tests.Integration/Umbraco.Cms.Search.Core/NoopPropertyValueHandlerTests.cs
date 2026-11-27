@@ -25,7 +25,7 @@ public class NoopPropertyValueHandlerTests : ContentTestBase
             .WithMediaType(GetMediaType())
             .WithName("The media")
             .Build();
-        GetRequiredService<IMediaService>().Save(media);
+        await GetRequiredService<IMediaService>().SaveAsync(media, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
 
         Content content = new ContentBuilder()
             .WithContentType(GetContentType())

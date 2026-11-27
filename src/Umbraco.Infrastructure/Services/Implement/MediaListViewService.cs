@@ -59,7 +59,7 @@ internal sealed class MediaListViewService : AsyncContentListViewServiceBase<IMe
         int take)
     {
         IMedia? media = key.HasValue
-            ? _mediaService.GetById(key.Value)
+            ? await _mediaService.GetByIdAsync(key.Value, CancellationToken.None)
             : null;
 
         if (key.HasValue && media is null)

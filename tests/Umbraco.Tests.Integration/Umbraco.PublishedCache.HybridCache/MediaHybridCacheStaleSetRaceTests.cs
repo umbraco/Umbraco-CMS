@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Scoping;
@@ -48,7 +49,7 @@ internal sealed class MediaHybridCacheStaleSetRaceTests : UmbracoIntegrationTest
             .WithName("Test Media Item")
             .WithMediaType(mediaType)
             .Build();
-        GetRequiredService<IMediaService>().Save(_mediaItem);
+        await GetRequiredService<IMediaService>().SaveAsync(_mediaItem, Constants.Security.SuperUserKey, CancellationToken.None);
 
         _oldNode = BuildMediaCacheNode(mediaType.Id, OldName);
         _newNode = BuildMediaCacheNode(mediaType.Id, NewName);

@@ -28,7 +28,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
     private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
 
-    private IMediaRepository MediaRepository => GetRequiredService<IMediaRepository>();
+    private IAsyncMediaRepository MediaRepository => GetRequiredService<IAsyncMediaRepository>();
 
     private IMediaTypeRepository MediaTypeRepository => GetRequiredService<IMediaTypeRepository>();
 
@@ -703,11 +703,11 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await MediaTypeRepository.SaveAsync(mediaType, CancellationToken.None);
 
             var media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
-            MediaRepository.Save(media1);
+            await MediaRepository.SaveAsync(media1, CancellationToken.None);
 
             var media2 = MediaBuilder.CreateMediaImage(mediaType, -1);
             media2.Trashed = true;
-            MediaRepository.Save(media2);
+            await MediaRepository.SaveAsync(media2, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags =
@@ -781,7 +781,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await MediaTypeRepository.SaveAsync(mediaType, CancellationToken.None);
 
             var media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
-            MediaRepository.Save(media1);
+            await MediaRepository.SaveAsync(media1, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags =
@@ -838,7 +838,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await MediaTypeRepository.SaveAsync(mediaType, CancellationToken.None);
 
             var media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
-            MediaRepository.Save(media1);
+            await MediaRepository.SaveAsync(media1, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags =
@@ -930,7 +930,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await MediaTypeRepository.SaveAsync(mediaType, CancellationToken.None);
 
             var media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
-            MediaRepository.Save(media1);
+            await MediaRepository.SaveAsync(media1, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags =
@@ -1024,7 +1024,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await MediaTypeRepository.SaveAsync(mediaType, CancellationToken.None);
 
             var media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
-            MediaRepository.Save(media1);
+            await MediaRepository.SaveAsync(media1, CancellationToken.None);
 
             var repository = CreateRepository(provider);
             Tag[] tags =

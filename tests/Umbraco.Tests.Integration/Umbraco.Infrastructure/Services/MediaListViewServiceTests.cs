@@ -35,7 +35,7 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
     {
         // Arrange
         await CreateTenMediaItemsFromTwoMediaTypesAtRoot();
-        var descendants = MediaService.GetPagedDescendants(Constants.System.Root, 0, int.MaxValue, out _);
+        var descendants = (await MediaService.GetDescendantsAsync(Constants.System.RootSystemKey, 0, int.MaxValue, null, CancellationToken.None)).Items;
 
         // Act
         var result = await MediaListViewService.GetListViewItemsByKeyAsync(
@@ -95,7 +95,7 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
     {
         // Arrange
         var root = await CreateRootMediaWithFiveChildrenAsListViewItems();
-        var descendants = MediaService.GetPagedDescendants(root.Id, 0, int.MaxValue, out _);
+        var descendants = (await MediaService.GetDescendantsAsync(root.Key, 0, int.MaxValue, null, CancellationToken.None)).Items;
 
         // Act
         var result = await MediaListViewService.GetListViewItemsByKeyAsync(
@@ -132,12 +132,12 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
         // Media item that the user doesn't have access to
         var imageMediaType = await MediaTypeService.GetAsync(Constants.Conventions.MediaTypes.Image);
         var image = MediaBuilder.CreateMediaImage(imageMediaType, -1);
-        MediaService.Save(image);
+        await MediaService.SaveAsync(image, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Media item that serves as a start node
         var album = await CreateRootMediaWithFiveChildrenAsListViewItems();
 
-        MediaService.GetPagedChildren(Constants.System.Root, 0, int.MaxValue, out var totalChildren);
+        var totalChildren = (await MediaService.GetChildrenAsync(null, 0, int.MaxValue, null, null, CancellationToken.None)).Total;
 
         // New user and user group
         var userGroup = new UserGroupBuilder()
@@ -193,9 +193,9 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
         for (var i = 0; i < 5; i++)
         {
             var m1 = MediaBuilder.CreateMediaImage(mediaType1, -1);
-            MediaService.Save(m1);
+            await MediaService.SaveAsync(m1, Constants.Security.SuperUserKey, CancellationToken.None);
             var m2 = MediaBuilder.CreateMediaImage(mediaType2, -1);
-            MediaService.Save(m2);
+            await MediaService.SaveAsync(m2, Constants.Security.SuperUserKey, CancellationToken.None);
         }
     }
 

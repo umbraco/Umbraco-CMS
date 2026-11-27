@@ -796,7 +796,7 @@ public class PackagesRepository : ICreatedPackagesRepository
             }
         }
 
-        IEnumerable<IMedia> medias = _mediaService.GetByIds(definition.MediaUdis);
+        IEnumerable<IMedia> medias = _mediaService.GetByIdsAsync(definition.MediaUdis, CancellationToken.None).GetAwaiter().GetResult();
 
         var mediaXml = new XElement(
             "MediaItems",

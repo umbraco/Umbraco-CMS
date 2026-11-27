@@ -73,7 +73,7 @@ public class ResizeImagingController : ImagingControllerBase
             CurrentUser(_backOfficeSecurityAccessor),
             ids,
             dataTypeId);
-        IEnumerable<IMedia> items = _mediaService.GetByIds(authorizedIds);
+        IEnumerable<IMedia> items = await _mediaService.GetByIdsAsync(authorizedIds, cancellationToken);
         var options = new ImageResizeOptions(height, width, mode, format);
 
         return Ok(_resizeImageUrlFactory.CreateUrlSets(items, options));

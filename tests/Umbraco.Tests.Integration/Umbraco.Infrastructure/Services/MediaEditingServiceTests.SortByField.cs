@@ -35,8 +35,8 @@ internal sealed partial class MediaEditingServiceTests
         var result = await MediaEditingService.SortByFieldAsync(root.Key, field, direction, Constants.Security.SuperUserKey);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result);
 
-        var actualChildKeys = MediaService
-            .GetPagedChildren(root.Id, 0, 100, out _)
+        var actualChildKeys = (await MediaService.GetChildrenAsync(root.Key, 0, 100, null, null, CancellationToken.None))
+            .Items
             .OrderBy(c => c.SortOrder)
             .Select(c => c.Key)
             .ToArray();
@@ -74,8 +74,8 @@ internal sealed partial class MediaEditingServiceTests
         var result = await MediaEditingService.SortByFieldAsync(parentKey: null, field, direction, Constants.Security.SuperUserKey);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result);
 
-        var actualRootKeys = MediaService
-            .GetPagedChildren(Constants.System.Root, 0, 100, out _)
+        var actualRootKeys = (await MediaService.GetChildrenAsync(null, 0, 100, null, null, CancellationToken.None))
+            .Items
             .OrderBy(c => c.SortOrder)
             .Select(c => c.Key)
             .ToArray();
@@ -109,7 +109,7 @@ internal sealed partial class MediaEditingServiceTests
             // Setting the dates marks them dirty, so they are persisted as-is rather than being stamped with "now".
             child.CreateDate = baseDate.AddDays(createOffset);
             child.UpdateDate = baseDate.AddDays(100 + updateOffset);
-            MediaService.Save(child);
+            await MediaService.SaveAsync(child, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         return (root, childKeys);
@@ -129,7 +129,7 @@ internal sealed partial class MediaEditingServiceTests
             // Setting the dates marks them dirty, so they are persisted as-is rather than being stamped with "now".
             media.CreateDate = baseDate.AddDays(createOffset);
             media.UpdateDate = baseDate.AddDays(100 + updateOffset);
-            MediaService.Save(media);
+            await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         return rootKeys;

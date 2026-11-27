@@ -55,7 +55,7 @@ internal sealed class MediaCacheServiceTests : UmbracoIntegrationTestWithContent
             .WithName("Test Media Item")
             .WithMediaType(MediaType)
             .Build();
-        MediaService.Save(MediaItem);
+        await MediaService.SaveAsync(MediaItem, Constants.Security.SuperUserKey, CancellationToken.None);
     }
 
     [Test]
@@ -90,7 +90,7 @@ internal sealed class MediaCacheServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Rebuild_Replaces_Existing_Media_Database_Cache_Records()
+    public async Task Rebuild_Replaces_Existing_Media_Database_Cache_Records()
     {
         // Arrange - First rebuild to create initial records
         MediaCacheService.Rebuild([MediaType.Id]);
@@ -110,7 +110,7 @@ internal sealed class MediaCacheServiceTests : UmbracoIntegrationTestWithContent
 
         // Modify content
         MediaItem.Name += " - Modified";
-        MediaService.Save(MediaItem);
+        await MediaService.SaveAsync(MediaItem, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act - Rebuild again
         MediaCacheService.Rebuild([MediaType.Id]);
@@ -183,7 +183,7 @@ internal sealed class MediaCacheServiceTests : UmbracoIntegrationTestWithContent
             .WithName("Composed Media Item")
             .WithMediaType(composedMediaType)
             .Build();
-        MediaService.Save(composedMedia);
+        await MediaService.SaveAsync(composedMedia, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act - Rebuild the cache for the composed media type
         MediaCacheService.Rebuild([composedMediaType.Id]);

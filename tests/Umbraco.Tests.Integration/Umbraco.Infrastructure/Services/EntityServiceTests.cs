@@ -383,17 +383,17 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Can_Get_Paged_Media_Children()
+    public async Task EntityService_Can_Get_Paged_Media_Children()
     {
         var folderType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
         var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
 
         var root = MediaBuilder.CreateMediaFolder(folderType, -1);
-        MediaService.Save(root);
+        await MediaService.SaveAsync(root, Constants.Security.SuperUserKey, CancellationToken.None);
         for (var i = 0; i < 10; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(imageMediaType, root.Id);
-            MediaService.Save(c1);
+            await MediaService.SaveAsync(c1, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         var entities = EntityService.GetPagedChildren(root.Id, UmbracoObjectTypes.Media, 0, 6, out var total).ToArray();
@@ -449,24 +449,24 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void EntityService_Can_Get_Paged_Media_Descendants()
+    public async Task EntityService_Can_Get_Paged_Media_Descendants()
     {
         var folderType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
         var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
 
         var root = MediaBuilder.CreateMediaFolder(folderType, -1);
-        MediaService.Save(root);
+        await MediaService.SaveAsync(root, Constants.Security.SuperUserKey, CancellationToken.None);
         var count = 0;
         for (var i = 0; i < 10; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(imageMediaType, root.Id);
-            MediaService.Save(c1);
+            await MediaService.SaveAsync(c1, Constants.Security.SuperUserKey, CancellationToken.None);
             count++;
 
             for (var j = 0; j < 5; j++)
             {
                 var c2 = MediaBuilder.CreateMediaImage(imageMediaType, c1.Id);
-                MediaService.Save(c2);
+                await MediaService.SaveAsync(c2, Constants.Security.SuperUserKey, CancellationToken.None);
                 count++;
             }
         }
@@ -482,18 +482,18 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void EntityService_Can_Get_Paged_Media_Descendants_Including_Recycled()
+    public async Task EntityService_Can_Get_Paged_Media_Descendants_Including_Recycled()
     {
         var folderType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
         var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
 
         var root = MediaBuilder.CreateMediaFolder(folderType, -1);
-        MediaService.Save(root);
+        await MediaService.SaveAsync(root, Constants.Security.SuperUserKey, CancellationToken.None);
         var toDelete = new List<IMedia>();
         for (var i = 0; i < 10; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(imageMediaType, root.Id);
-            MediaService.Save(c1);
+            await MediaService.SaveAsync(c1, Constants.Security.SuperUserKey, CancellationToken.None);
 
             if (i % 2 == 0)
             {
@@ -503,13 +503,13 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             for (var j = 0; j < 5; j++)
             {
                 var c2 = MediaBuilder.CreateMediaImage(imageMediaType, c1.Id);
-                MediaService.Save(c2);
+                await MediaService.SaveAsync(c2, Constants.Security.SuperUserKey, CancellationToken.None);
             }
         }
 
         foreach (var content in toDelete)
         {
-            MediaService.MoveToRecycleBin(content);
+            await MediaService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // search at root to see if it returns recycled
@@ -525,18 +525,18 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void EntityService_Can_Get_Paged_Media_Descendants_Without_Recycled()
+    public async Task EntityService_Can_Get_Paged_Media_Descendants_Without_Recycled()
     {
         var folderType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
         var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
 
         var root = MediaBuilder.CreateMediaFolder(folderType, -1);
-        MediaService.Save(root);
+        await MediaService.SaveAsync(root, Constants.Security.SuperUserKey, CancellationToken.None);
         var toDelete = new List<IMedia>();
         for (var i = 0; i < 10; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(imageMediaType, root.Id);
-            MediaService.Save(c1);
+            await MediaService.SaveAsync(c1, Constants.Security.SuperUserKey, CancellationToken.None);
 
             if (i % 2 == 0)
             {
@@ -546,13 +546,13 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             for (var j = 0; j < 5; j++)
             {
                 var c2 = MediaBuilder.CreateMediaImage(imageMediaType, c1.Id);
-                MediaService.Save(c2);
+                await MediaService.SaveAsync(c2, Constants.Security.SuperUserKey, CancellationToken.None);
             }
         }
 
         foreach (var content in toDelete)
         {
-            MediaService.MoveToRecycleBin(content);
+            await MediaService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // search at root to see if it returns recycled
@@ -569,18 +569,18 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void EntityService_Can_Get_Paged_Trashed_Media_Children()
+    public async Task EntityService_Can_Get_Paged_Trashed_Media_Children()
     {
         var folderType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
         var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
 
         var root = MediaBuilder.CreateMediaFolder(folderType, -1);
-        MediaService.Save(root);
+        await MediaService.SaveAsync(root, Constants.Security.SuperUserKey, CancellationToken.None);
         var toDelete = new List<IMedia>();
         for (var i = 0; i < 10; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(imageMediaType, root.Id);
-            MediaService.Save(c1);
+            await MediaService.SaveAsync(c1, Constants.Security.SuperUserKey, CancellationToken.None);
 
             if (i % 2 == 0)
             {
@@ -590,13 +590,13 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             for (var j = 0; j < 5; j++)
             {
                 var c2 = MediaBuilder.CreateMediaImage(imageMediaType, c1.Id);
-                MediaService.Save(c2);
+                await MediaService.SaveAsync(c2, Constants.Security.SuperUserKey, CancellationToken.None);
             }
         }
 
         foreach (var content in toDelete)
         {
-            MediaService.MoveToRecycleBin(content);
+            await MediaService.MoveToRecycleBinAsync(content, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // get paged entities at recycle bin root
@@ -614,25 +614,25 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void EntityService_Can_Get_Paged_Media_Descendants_With_Search()
+    public async Task EntityService_Can_Get_Paged_Media_Descendants_With_Search()
     {
         var folderType = MediaTypeService.GetAsync(1031).GetAwaiter().GetResult();
         var imageMediaType = MediaTypeService.GetAsync(1032).GetAwaiter().GetResult();
 
         var root = MediaBuilder.CreateMediaFolder(folderType, -1);
-        MediaService.Save(root);
+        await MediaService.SaveAsync(root, Constants.Security.SuperUserKey, CancellationToken.None);
 
         for (var i = 0; i < 10; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(imageMediaType, root.Id);
             c1.Name = "ssss" + Guid.NewGuid();
-            MediaService.Save(c1);
+            await MediaService.SaveAsync(c1, Constants.Security.SuperUserKey, CancellationToken.None);
 
             for (var j = 0; j < 5; j++)
             {
                 var c2 = MediaBuilder.CreateMediaImage(imageMediaType, c1.Id);
                 c2.Name = "tttt" + Guid.NewGuid();
-                MediaService.Save(c2);
+                await MediaService.SaveAsync(c2, Constants.Security.SuperUserKey, CancellationToken.None);
             }
         }
 
@@ -1379,26 +1379,26 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             // Create and Save folder-Media -> 1057
             _folderMediaType = await MediaTypeService.GetAsync(1031);
             _folder = MediaBuilder.CreateMediaFolder(_folderMediaType, -1);
-            MediaService.Save(_folder, -1);
+            await MediaService.SaveAsync(_folder, Constants.Security.SuperUserKey, CancellationToken.None);
             _folderId = _folder.Id;
 
             // Create and Save image-Media -> 1058
             _imageMediaType = await MediaTypeService.GetAsync(1032);
             _image = MediaBuilder.CreateMediaImage(_imageMediaType, _folder.Id);
-            MediaService.Save(_image, -1);
+            await MediaService.SaveAsync(_image, Constants.Security.SuperUserKey, CancellationToken.None);
 
             // Create and Save file-Media -> 1059
             var fileMediaType = await MediaTypeService.GetAsync(1033);
             var file = MediaBuilder.CreateMediaFile(fileMediaType, _folder.Id);
-            MediaService.Save(file, -1);
+            await MediaService.SaveAsync(file, Constants.Security.SuperUserKey, CancellationToken.None);
 
             // Create and save sub folder -> 1060
             _subfolder = MediaBuilder.CreateMediaFolder(_folderMediaType, _folder.Id);
-            MediaService.Save(_subfolder, -1);
+            await MediaService.SaveAsync(_subfolder, Constants.Security.SuperUserKey, CancellationToken.None);
 
             // Create and save sub folder -> 1061
             _subfolder2 = MediaBuilder.CreateMediaFolder(_folderMediaType, _subfolder.Id);
-            MediaService.Save(_subfolder2, -1);
+            await MediaService.SaveAsync(_subfolder2, Constants.Security.SuperUserKey, CancellationToken.None);
 
             // Setup document type folder structure for tests on paged children with or without folders
             await CreateStructureForPagedDocumentTypeChildrenTest();

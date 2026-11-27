@@ -37,7 +37,7 @@ public class DatabaseIntegrityCheck : HealthCheck
 
     /// <inheritdoc />
     public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() =>
-        new[] { await CheckDocumentsAsync(false), CheckMedia(false) };
+        new[] { await CheckDocumentsAsync(false), await CheckMediaAsync(false) };
 
     /// <inheritdoc />
     public override async Task<HealthCheckStatus> ExecuteActionAsync(HealthCheckAction action)
@@ -47,7 +47,7 @@ public class DatabaseIntegrityCheck : HealthCheck
             case SFixContentPaths:
                 return await CheckDocumentsAsync(true);
             case SSsFixMediaPaths:
-                return CheckMedia(true);
+                return await CheckMediaAsync(true);
             default:
                 throw new InvalidOperationException("Action not supported");
         }
@@ -90,13 +90,13 @@ public class DatabaseIntegrityCheck : HealthCheck
         return sb.ToString();
     }
 
-    private HealthCheckStatus CheckMedia(bool fix) =>
+    private async Task<HealthCheckStatus> CheckMediaAsync(bool fix) =>
         CheckPaths(
             SSsFixMediaPaths,
             SFixMediaPathsTitle,
             Constants.UdiEntityType.Media,
             fix,
-            _mediaService.CheckDataIntegrity(new ContentDataIntegrityReportOptions { FixIssues = fix }));
+            await _mediaService.CheckDataIntegrityAsync(new ContentDataIntegrityReportOptions { FixIssues = fix }, CancellationToken.None));
 
     private async Task<HealthCheckStatus> CheckDocumentsAsync(bool fix) =>
         CheckPaths(

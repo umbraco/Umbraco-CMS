@@ -155,7 +155,7 @@ internal sealed class ImportPackageBuilderExpression : MigrationExpressionBase
                                         mediaStream);
                                 }
 
-                                _mediaService.Save(media);
+                                _mediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
                             }
                         }
                     }

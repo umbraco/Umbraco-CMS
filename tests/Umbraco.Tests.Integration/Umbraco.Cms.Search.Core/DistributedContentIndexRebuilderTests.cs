@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Search.Indexing;
 using Umbraco.Cms.Core.Services;
@@ -64,7 +63,7 @@ public class DistributedContentIndexRebuilderTests : TestBase
                 .WithMediaType(mediaType)
                 .WithName($"Media {i}")
                 .Build();
-            MediaService.Save(media);
+            await MediaService.SaveAsync(media, Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         IMemberType memberType = new MemberTypeBuilder()

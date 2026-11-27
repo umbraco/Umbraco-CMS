@@ -64,9 +64,9 @@ internal sealed class UserGroupPermissionServiceTests : UmbracoIntegrationTest
         _deniedContent = ContentBuilder.CreateSimpleContent(contentType, "denied");
         await ContentService.SaveAsync(_deniedContent, Constants.Security.SuperUserKey, null, CancellationToken.None);
 
-        IMedia allowedMedia = CreateMediaFolder("allowed", Constants.System.Root);
-        _allowedMediaChild = CreateMediaFolder("allowed child", allowedMedia.Id);
-        _deniedMedia = CreateMediaFolder("denied", Constants.System.Root);
+        IMedia allowedMedia = await CreateMediaFolderAsync("allowed", null);
+        _allowedMediaChild = await CreateMediaFolderAsync("allowed child", allowedMedia.Key);
+        _deniedMedia = await CreateMediaFolderAsync("denied", null);
 
         EntityContainer allowedElementFolder = await CreateElementFolderAsync("allowed", null);
         _allowedElementFolderChild = await CreateElementFolderAsync("allowed child", allowedElementFolder.Key);
@@ -291,12 +291,8 @@ internal sealed class UserGroupPermissionServiceTests : UmbracoIntegrationTest
         return (await UserService.GetAsync(user.Key))!;
     }
 
-    private IMedia CreateMediaFolder(string name, int parentId)
-    {
-        IMedia media = MediaService.CreateMedia(name, parentId, Constants.Conventions.MediaTypes.Folder);
-        MediaService.Save(media);
-        return media;
-    }
+    private async Task<IMedia> CreateMediaFolderAsync(string name, Guid? parentKey)
+        => await MediaService.CreateAndSaveAsync(name, parentKey, Constants.Conventions.MediaTypes.Folder, Constants.Security.SuperUserKey, CancellationToken.None);
 
     private async Task<EntityContainer> CreateElementFolderAsync(string name, Guid? parentKey)
     {

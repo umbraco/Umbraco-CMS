@@ -1,476 +1,458 @@
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
-///     Defines the Media Service, which is an easy access to operations involving <see cref="IMedia" />
+///     Defines the Media Service, which is an easy access to operations involving <see cref="IMedia" />.
 /// </summary>
-public interface IMediaService : IContentServiceBase<IMedia>, IAsyncContentServiceBase<IMedia>
+/// <remarks>
+///     Every persistence member is asynchronous, takes Guid keys and reports expected failures through an
+///     <see cref="Attempt{TStatus}" />; only the four file-system members, which wrap the media file system rather than
+///     persistence, are synchronous.
+/// </remarks>
+public interface IMediaService : IAsyncContentServiceBase<IMedia>
 {
     /// <summary>
-    ///     Gets the count of media items that are not in the recycle bin.
+    ///     Gets media items by their unique identifiers.
     /// </summary>
-    /// <param name="contentTypeAlias">Optional alias of the <see cref="IMediaType" /> to filter by.</param>
-    /// <returns>The count of media items not in the recycle bin.</returns>
-    int CountNotTrashed(string? contentTypeAlias = null);
+    /// <param name="keys">The unique identifiers of the media items.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The media items, in the order requested.</returns>
+    Task<IEnumerable<IMedia>> GetByIdsAsync(IEnumerable<Guid> keys, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets the total count of media items.
+    ///     Gets media items by their unique identifiers, loading only the requested properties.
     /// </summary>
-    /// <param name="mediaTypeAlias">Optional alias of the <see cref="IMediaType" /> to filter by.</param>
-    /// <returns>The total count of media items.</returns>
-    int Count(string? mediaTypeAlias = null);
-
-    /// <summary>
-    ///     Gets the count of child media items under the specified parent.
-    /// </summary>
-    /// <param name="parentId">The Id of the parent <see cref="IMedia" /> to count children for.</param>
-    /// <param name="mediaTypeAlias">Optional alias of the <see cref="IMediaType" /> to filter by.</param>
-    /// <returns>The count of child media items.</returns>
-    int CountChildren(int parentId, string? mediaTypeAlias = null);
-
-    /// <summary>
-    ///     Gets the count of descendant media items under the specified parent.
-    /// </summary>
-    /// <param name="parentId">The Id of the parent <see cref="IMedia" /> to count descendants for.</param>
-    /// <param name="mediaTypeAlias">Optional alias of the <see cref="IMediaType" /> to filter by.</param>
-    /// <returns>The count of descendant media items.</returns>
-    int CountDescendants(int parentId, string? mediaTypeAlias = null);
-
-    /// <summary>
-    ///     Gets a collection of <see cref="IMedia" /> objects by their integer Ids.
-    /// </summary>
-    /// <param name="ids">The collection of integer Ids to retrieve media for.</param>
-    /// <returns>An enumerable collection of <see cref="IMedia" /> objects.</returns>
-    IEnumerable<IMedia> GetByIds(IEnumerable<int> ids);
-
-    /// <summary>
-    ///     Gets a collection of <see cref="IMedia" /> objects by their unique Guids.
-    /// </summary>
-    /// <param name="ids">The collection of <see cref="Guid" /> keys to retrieve media for.</param>
-    /// <returns>An enumerable collection of <see cref="IMedia" /> objects.</returns>
-    IEnumerable<IMedia> GetByIds(IEnumerable<Guid> ids);
-
-    /// <summary>
-    ///     Gets a collection of <see cref="IMedia" /> objects by their unique Guids, loading only the requested properties.
-    /// </summary>
-    /// <param name="ids">The collection of <see cref="Guid" /> keys to retrieve media for.</param>
+    /// <param name="keys">The unique identifiers of the media items.</param>
     /// <param name="propertyAliases">
-    ///     The property aliases to load. If null, all properties are loaded.
-    ///     If empty array, no custom properties are loaded.
+    ///     The property aliases to load. If <c>null</c>, all properties are loaded.
+    ///     If empty, no custom properties are loaded (only system properties).
     /// </param>
-    /// <returns>An enumerable collection of <see cref="IMedia" /> objects, in the order of <paramref name="ids" />.</returns>
-    IEnumerable<IMedia> GetByIds(IEnumerable<Guid> ids, string[]? propertyAliases);
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The media items, in the order requested.</returns>
+    Task<IEnumerable<IMedia>> GetByIdsAsync(IEnumerable<Guid> keys, string[]? propertyAliases, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Creates an <see cref="IMedia" /> object using the alias of the <see cref="IMediaType" />
-    ///     that this Media should based on.
+    ///     Counts media items of a given media type.
     /// </summary>
-    /// <remarks>
-    ///     Note that using this method will simply return a new IMedia without any identity
-    ///     as it has not yet been persisted. It is intended as a shortcut to creating new media objects
-    ///     that does not invoke a save operation against the database.
-    /// </remarks>
-    /// <param name="name">Name of the Media object</param>
-    /// <param name="parentId">Id of Parent for the new Media item</param>
-    /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType" /></param>
-    /// <param name="userId">Optional id of the user creating the media item</param>
-    /// <returns>
-    ///     <see cref="IMedia" />
-    /// </returns>
-    IMedia CreateMedia(string name, Guid parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId);
+    /// <param name="mediaTypeAlias">The media type alias, or <c>null</c> for all types.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The media item count.</returns>
+    Task<int> CountAsync(string? mediaTypeAlias, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Creates an <see cref="IMedia" /> object using the alias of the <see cref="IMediaType" />
-    ///     that this Media should based on.
+    ///     Counts child media items of a given parent, of a given media type.
     /// </summary>
-    /// <remarks>
-    ///     Note that using this method will simply return a new IMedia without any identity
-    ///     as it has not yet been persisted. It is intended as a shortcut to creating new media objects
-    ///     that does not invoke a save operation against the database.
-    /// </remarks>
-    /// <param name="name">Name of the Media object</param>
-    /// <param name="parentId">Id of Parent for the new Media item</param>
-    /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType" /></param>
-    /// <param name="userId">Optional id of the user creating the media item</param>
-    /// <returns>
-    ///     <see cref="IMedia" />
-    /// </returns>
-    IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId);
+    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for the root of the media tree.</param>
+    /// <param name="mediaTypeAlias">The media type alias, or <c>null</c> for all types.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The child media item count.</returns>
+    Task<int> CountChildrenAsync(Guid? parentKey, string? mediaTypeAlias, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Creates an <see cref="IMedia" /> object using the alias of the <see cref="IMediaType" />
-    ///     that this Media should based on.
+    ///     Counts descendant media items of a given parent, of a given media type.
     /// </summary>
-    /// <remarks>
-    ///     Note that using this method will simply return a new IMedia without any identity
-    ///     as it has not yet been persisted. It is intended as a shortcut to creating new media objects
-    ///     that does not invoke a save operation against the database.
-    /// </remarks>
-    /// <param name="name">Name of the Media object</param>
-    /// <param name="parent">Parent <see cref="IMedia" /> for the new Media item</param>
-    /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType" /></param>
-    /// <param name="userId">Optional id of the user creating the media item</param>
-    /// <returns>
-    ///     <see cref="IMedia" />
-    /// </returns>
-    IMedia CreateMedia(string name, IMedia? parent, string mediaTypeAlias, int userId = Constants.Security.SuperUserId);
+    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for the root of the media tree.</param>
+    /// <param name="mediaTypeAlias">The media type alias, or <c>null</c> for all types.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The descendant media item count.</returns>
+    Task<int> CountDescendantsAsync(Guid? parentKey, string? mediaTypeAlias, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets an <see cref="IMedia" /> object by Id
+    ///     Gets a value indicating whether a media item has children.
     /// </summary>
-    /// <param name="id">Id of the Content to retrieve</param>
-    /// <returns>
-    ///     <see cref="IMedia" />
-    /// </returns>
-    IMedia? GetById(int id);
+    /// <param name="key">The Guid key of the media item.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns><c>true</c> if the media item has children; otherwise, <c>false</c>.</returns>
+    Task<bool> HasChildrenAsync(Guid key, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets a collection of <see cref="IMedia" /> objects by Parent Id
+    ///     Gets a paged list of direct children of a media node.
     /// </summary>
-    /// <param name="id">Id of the Parent to retrieve Children from</param>
-    /// <param name="pageIndex">Page number</param>
-    /// <param name="pageSize">Page size</param>
-    /// <param name="totalRecords">Total records query would return without paging</param>
-    /// <param name="filter"></param>
-    /// <param name="ordering"></param>
-    /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
-    IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null);
-
-    /// <summary>
-    ///     Gets a collection of <see cref="IMedia" /> objects by Parent Id, loading only the requested properties.
-    /// </summary>
-    /// <param name="id">Id of the Parent to retrieve Children from.</param>
-    /// <param name="pageIndex">Page number.</param>
-    /// <param name="pageSize">Page size.</param>
-    /// <param name="totalRecords">Total records query would return without paging.</param>
+    /// <param name="parentKey">The Guid key of the parent node, or <c>null</c> for the root of the media tree.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
     /// <param name="propertyAliases">
-    ///     The property aliases to load. If null, all properties are loaded.
-    ///     If empty array, no custom properties are loaded.
+    ///     Optional array of property aliases to load. If <c>null</c>, all properties are loaded.
+    ///     If empty, no custom properties are loaded (only system properties).
     /// </param>
-    /// <param name="filter">Query filter.</param>
-    /// <param name="ordering">Ordering infos.</param>
-    /// <returns>An Enumerable list of <see cref="IMedia" /> objects.</returns>
-    IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IMedia>? filter, Ordering? ordering);
+    /// <param name="ordering">The ordering specification, or <c>null</c> to order by sort order.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the matching children.</returns>
+    Task<PagedModel<IMedia>> GetChildrenAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets a collection of <see cref="IMedia" /> objects by Parent Id
+    ///     Gets a paged list of all descendants of a media node.
     /// </summary>
-    /// <param name="id">Id of the Parent to retrieve Descendants from</param>
-    /// <param name="pageIndex">Page number</param>
-    /// <param name="pageSize">Page size</param>
-    /// <param name="totalRecords">Total records query would return without paging</param>
-    /// <param name="ordering"></param>
-    /// <param name="filter"></param>
-    /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
-    IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null);
+    /// <param name="ancestorKey">The Guid key of the ancestor node.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification, or <c>null</c> to order by path (ancestors before their own descendants).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="includeTrashed">Whether to include descendants that are currently in the recycle bin. Default is <c>true</c>.</param>
+    /// <returns>A paged result containing the matching descendants.</returns>
+    Task<PagedModel<IMedia>> GetDescendantsAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true);
 
     /// <summary>
-    ///     Gets paged documents of a content
+    ///     Gets a paged list of media items of a given media type.
     /// </summary>
-    /// <param name="contentTypeId">The page number.</param>
-    /// <param name="pageIndex">The page number.</param>
-    /// <param name="pageSize">The page size.</param>
-    /// <param name="totalRecords">Total number of documents.</param>
-    /// <param name="filter">Search text filter.</param>
-    /// <param name="ordering">Ordering infos.</param>
-    IEnumerable<IMedia> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null);
+    /// <param name="mediaTypeKey">The Guid key of the media type.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification, or <c>null</c> to order by sort order.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the matching media items.</returns>
+    Task<PagedModel<IMedia>> GetPagedOfTypeAsync(Guid mediaTypeKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets paged documents for specified content types
+    ///     Gets a paged list of media items whose media type is one of the specified media types.
     /// </summary>
-    /// <param name="contentTypeIds">The page number.</param>
-    /// <param name="pageIndex">The page number.</param>
-    /// <param name="pageSize">The page size.</param>
-    /// <param name="totalRecords">Total number of documents.</param>
-    /// <param name="filter">Search text filter.</param>
-    /// <param name="ordering">Ordering infos.</param>
-    IEnumerable<IMedia> GetPagedOfTypes(
-        int[] contentTypeIds,
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        IQuery<IMedia>? filter = null,
-        Ordering? ordering = null);
+    /// <param name="mediaTypeKeys">The Guid keys of the media types.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification, or <c>null</c> to order by sort order.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the matching media items.</returns>
+    Task<PagedModel<IMedia>> GetPagedOfTypesAsync(Guid[] mediaTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets a collection of <see cref="IMedia" /> objects, which reside at the first level / root
+    ///     Gets root-level media items.
     /// </summary>
-    /// <returns>An Enumerable list of <see cref="IMedia" /> objects</returns>
-    IEnumerable<IMedia> GetRootMedia();
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The root-level media items.</returns>
+    Task<IEnumerable<IMedia>> GetRootMediaAsync(CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets a collection of an <see cref="IMedia" /> objects, which resides in the Recycle Bin
+    ///     Gets a paged list of media items in the recycle bin.
     /// </summary>
-    /// <returns>An Enumerable list of <see cref="IMedia" /> objects</returns>
-    IEnumerable<IMedia> GetPagedMediaInRecycleBin(
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        IQuery<IMedia>? filter = null,
-        Ordering? ordering = null);
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification, or <c>null</c> to order by path.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the matching recycle bin items.</returns>
+    Task<PagedModel<IMedia>> GetPagedMediaInRecycleBinAsync(int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Moves an <see cref="IMedia" /> object to a new location
+    ///     Gets a paged list of media items at a given level.
     /// </summary>
-    /// <param name="media">The <see cref="IMedia" /> to move</param>
-    /// <param name="parentId">Id of the Media's new Parent</param>
-    /// <param name="userId">Id of the User moving the Media</param>
-    /// <returns>True if moving succeeded, otherwise False</returns>
-    Attempt<OperationResult?> Move(IMedia media, int parentId, int userId = Constants.Security.SuperUserId);
+    /// <remarks>
+    ///     Contrary to most methods, this method filters out trashed media items.
+    /// </remarks>
+    /// <param name="level">The level.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification. Must not be <c>null</c>: items at the same level may belong to unrelated parents, so there is no single ordering that applies by default.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the matching, non-trashed media items.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
+    Task<PagedModel<IMedia>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Moves an <see cref="IMedia" /> object to a new location, optionally leaving its descendants behind.
+    ///     Gets a paged list of ancestor media items of a media item, ordered root-first.
     /// </summary>
-    /// <param name="media">The <see cref="IMedia" /> to move.</param>
-    /// <param name="parentId">Id of the Media's new Parent.</param>
+    /// <param name="key">The Guid key of the media item to retrieve ancestors for.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the media item's ancestors, root-first.</returns>
+    Task<PagedModel<IMedia>> GetAncestorsAsync(Guid key, int skip, int take, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets a paged list of ancestor media items of a media item, ordered root-first.
+    /// </summary>
+    /// <param name="media">The media item to retrieve ancestors for.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the media item's ancestors, root-first.</returns>
+    Task<PagedModel<IMedia>> GetAncestorsAsync(IMedia media, int skip, int take, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets the parent of a media item.
+    /// </summary>
+    /// <param name="key">The Guid key of the media item.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The parent media item, or <c>null</c> if not found.</returns>
+    Task<IMedia?> GetParentAsync(Guid key, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets the parent of a media item.
+    /// </summary>
+    /// <param name="media">The media item.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The parent media item, or <c>null</c> if not found.</returns>
+    Task<IMedia?> GetParentAsync(IMedia? media, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Creates a media item.
+    /// </summary>
+    /// <remarks>
+    ///     The media item is not persisted; it has no identity until it is saved.
+    /// </remarks>
+    /// <param name="name">The name of the media item.</param>
+    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for the root of the media tree.</param>
+    /// <param name="mediaTypeAlias">The media type alias.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The created media item.</returns>
+    Task<IMedia> CreateAsync(string name, Guid? parentKey, string mediaTypeAlias, Guid userKey, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Creates a media item.
+    /// </summary>
+    /// <remarks>
+    ///     The media item is not persisted; it has no identity until it is saved.
+    /// </remarks>
+    /// <param name="name">The name of the media item.</param>
+    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for the root of the media tree.</param>
+    /// <param name="mediaType">The media type.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The created media item.</returns>
+    Task<IMedia> CreateAsync(string name, Guid? parentKey, IMediaType mediaType, Guid userKey, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Creates a media item.
+    /// </summary>
+    /// <remarks>
+    ///     The media item is not persisted; it has no identity until it is saved.
+    /// </remarks>
+    /// <param name="name">The name of the media item.</param>
+    /// <param name="parent">The parent media item.</param>
+    /// <param name="mediaTypeAlias">The media type alias.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The created media item.</returns>
+    Task<IMedia> CreateAsync(string name, IMedia parent, string mediaTypeAlias, Guid userKey, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Creates and saves a media item.
+    /// </summary>
+    /// <param name="name">The name of the media item.</param>
+    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for the root of the media tree.</param>
+    /// <param name="mediaTypeAlias">The media type alias.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The created and saved media item.</returns>
+    /// <exception cref="InvalidOperationException">The media item cannot be saved because its name or key is invalid.</exception>
+    /// <remarks>
+    ///     When a saving notification cancels the save, the media item is returned unsaved (without an identity).
+    /// </remarks>
+    Task<IMedia> CreateAndSaveAsync(string name, Guid? parentKey, string mediaTypeAlias, Guid userKey, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Creates and saves a media item.
+    /// </summary>
+    /// <param name="name">The name of the media item.</param>
+    /// <param name="parent">The parent media item.</param>
+    /// <param name="mediaTypeAlias">The media type alias.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The created and saved media item.</returns>
+    /// <exception cref="InvalidOperationException">The media item cannot be saved because its name or key is invalid.</exception>
+    /// <remarks>
+    ///     When a saving notification cancels the save, the media item is returned unsaved (without an identity).
+    /// </remarks>
+    Task<IMedia> CreateAndSaveAsync(string name, IMedia parent, string mediaTypeAlias, Guid userKey, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Saves a media item.
+    /// </summary>
+    /// <param name="media">The media item to save.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>
+    ///     An attempt carrying the operation status: <see cref="ContentSaveOperationStatus.InvalidName" /> for an empty
+    ///     or over-long name, <see cref="ContentSaveOperationStatus.InvalidKey" /> when the item's key is a version 7
+    ///     Guid the registered media path scheme cannot use, <see cref="ContentSaveOperationStatus.DuplicateKey" />
+    ///     when a new item's key already exists, and <see cref="ContentSaveOperationStatus.CancelledByNotification" />
+    ///     when a saving notification handler cancelled the save.
+    /// </returns>
+    Task<Attempt<ContentSaveOperationStatus>> SaveAsync(IMedia media, Guid userKey, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Deletes a media item.
+    /// </summary>
+    /// <param name="media">The media item to delete.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status.</returns>
+    /// <remarks>
+    ///     <para>This method will also delete the media item's descendants.</para>
+    ///     <para>This method entirely clears the media item from the database; the media files are deleted by the notification handlers.</para>
+    /// </remarks>
+    Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(IMedia media, Guid userKey, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Deletes all media of a given media type.
+    /// </summary>
+    /// <param name="mediaTypeKey">The Guid key of the media type.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <remarks>
+    ///     <para>Every descendant of the deleted media that is not of the deleted type is moved to the recycle bin.</para>
+    ///     <para>This operation is potentially dangerous and expensive.</para>
+    /// </remarks>
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteOfTypeAsync(Guid mediaTypeKey, Guid userKey, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Deletes all media of the given media types.
+    /// </summary>
+    /// <param name="mediaTypeKeys">The Guid keys of the media types.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <remarks>
+    ///     <para>Every descendant of the deleted media that is not of the deleted types is moved to the recycle bin.</para>
+    ///     <para>This operation is potentially dangerous and expensive.</para>
+    /// </remarks>
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteOfTypesAsync(IEnumerable<Guid> mediaTypeKeys, Guid userKey, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Moves a media item under a new parent, optionally leaving its descendants behind.
+    /// </summary>
+    /// <param name="media">The media item to move.</param>
+    /// <param name="parentKey">The Guid key of the new parent, or <c>null</c> for the root of the media tree.</param>
     /// <param name="includeDescendants">
-    ///     Whether to move the descendants of the media along with it. When restoring media out of the recycle bin
-    ///     this can be set to <c>false</c> to restore only the media item itself, leaving its descendants in the
+    ///     Whether to move the descendants of the media item along with it. When restoring an item out of the recycle
+    ///     bin this can be set to <c>false</c> to restore only the item itself, leaving its descendants in the
     ///     recycle bin as top-level bin items.
     /// </param>
-    /// <param name="userId">Id of the User moving the Media.</param>
-    /// <returns>True if moving succeeded, otherwise False.</returns>
-#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
-    Attempt<OperationResult?> Move(IMedia media, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
-#pragma warning restore CS0618 // Type or member is obsolete
-    {
-        // Only the whole-tree move can be satisfied by delegating to the existing method; there is no way to honour
-        // includeDescendants: false without the concrete implementation, so fail fast rather than silently move
-        // the descendants after all.
-        if (includeDescendants is false)
-        {
-            throw new NotImplementedException("This IMediaService implementation does not support moving without descendants. Override the Move overload that takes an includeDescendants parameter to support it.");
-        }
-
-        return Move(media, parentId, userId);
-    }
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentMoveOperationStatus>> MoveAsync(IMedia media, Guid? parentKey, bool includeDescendants, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Deletes an <see cref="IMedia" /> object by moving it to the Recycle Bin
+    ///     Moves a media item to the recycle bin.
     /// </summary>
-    /// <param name="media">The <see cref="IMedia" /> to delete</param>
-    /// <param name="userId">Id of the User deleting the Media</param>
-    Attempt<OperationResult?> MoveToRecycleBin(IMedia media, int userId = Constants.Security.SuperUserId);
+    /// <param name="media">The media item to move to the recycle bin.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentMoveToRecycleBinOperationStatus>> MoveToRecycleBinAsync(IMedia media, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Empties the Recycle Bin by deleting all <see cref="IMedia" /> that resides in the bin
+    ///     Empties the recycle bin by deleting every media item that resides in it.
     /// </summary>
-    /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>
-    OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId);
+    /// <param name="userKey">The Guid key of the user emptying the recycle bin.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentEmptyRecycleBinOperationStatus>> EmptyRecycleBinAsync(Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Returns true if there is any media in the recycle bin
+    ///     Gets a value indicating whether there is any media in the recycle bin.
     /// </summary>
-    bool RecycleBinSmells();
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns><c>true</c> if there is media in the recycle bin; otherwise, <c>false</c>.</returns>
+    Task<bool> RecycleBinSmellsAsync(CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Deletes all media of specified type. All children of deleted media is moved to Recycle Bin.
+    ///     Sorts media items by persisting the supplied (already ordered) keys as the new sort order,
+    ///     firing the cancelable saving notification (flagged as a sort), one saved notification for the batch, and
+    ///     an audit record for every item whose position actually changes.
     /// </summary>
-    /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
-    /// <param name="mediaTypeId">Id of the <see cref="IMediaType" /></param>
-    /// <param name="userId">Optional Id of the user deleting Media</param>
-    void DeleteMediaOfType(int mediaTypeId, int userId = Constants.Security.SuperUserId);
+    /// <param name="orderedKeys">The Guid keys of the media items, in the desired order.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status.</returns>
+    /// <remarks>
+    ///     Unlike <see cref="SortChildrenAsync" />, this reloads each item, fires the cancelable
+    ///     saving notification, and only persists/audits items whose sort position changes.
+    /// </remarks>
+    Task<Attempt<ContentSortOperationStatus>> SortAsync(IReadOnlyList<Guid> orderedKeys, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Deletes all media of the specified types. All Descendants of deleted media that is not of these types is moved to
-    ///     Recycle Bin.
+    ///     Sorts the children of a parent by persisting the supplied (already ordered) child keys as the
+    ///     new sort order, in a single batched operation.
     /// </summary>
-    /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
-    /// <param name="mediaTypeIds">Ids of the <see cref="IMediaType" />s</param>
-    /// <param name="userId">Optional Id of the user issuing the delete operation</param>
-    void DeleteMediaOfTypes(IEnumerable<int> mediaTypeIds, int userId = Constants.Security.SuperUserId);
+    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for the root of the media tree.</param>
+    /// <param name="orderedChildKeys">The Guid keys of the children, in the desired order.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status.</returns>
+    /// <remarks>
+    ///     Unlike <see cref="SortAsync" />, this does not load the children or fire per-item
+    ///     save notifications; it persists the order directly and refreshes the affected cache branch.
+    /// </remarks>
+    Task<Attempt<ContentSortChildrenOperationStatus>> SortChildrenAsync(Guid? parentKey, IReadOnlyList<Guid> orderedChildKeys, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Permanently deletes an <see cref="IMedia" /> object
+    ///     Gets a version of a media item.
     /// </summary>
     /// <remarks>
-    ///     Please note that this method will completely remove the Media from the database,
-    ///     but current not from the file system.
+    ///     Int-keyed rather than Guid-keyed: unlike media items, versions have no Guid key resolvable
+    ///     from a caller-facing identifier today, so this takes the version's raw database id directly.
     /// </remarks>
-    /// <param name="media">The <see cref="IMedia" /> to delete</param>
-    /// <param name="userId">Id of the User deleting the Media</param>
-    Attempt<OperationResult?> Delete(IMedia media, int userId = Constants.Security.SuperUserId);
+    /// <param name="versionId">The version identifier.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The media version, or <c>null</c> if not found.</returns>
+    Task<IMedia?> GetVersionAsync(int versionId, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Saves a single <see cref="IMedia" /> object
+    ///     Gets all versions of a media item.
     /// </summary>
-    /// <param name="media">The <see cref="IMedia" /> to save</param>
-    /// <param name="userId">Id of the User saving the Media</param>
-    Attempt<OperationResult?> Save(IMedia media, int userId = Constants.Security.SuperUserId);
-
-
-    /// <summary>
-    ///     Gets a collection of <see cref="IMedia" /> objects by Level
-    /// </summary>
-    /// <param name="level">The level to retrieve Media from</param>
-    /// <returns>An Enumerable list of <see cref="IMedia" /> objects</returns>
-    IEnumerable<IMedia> GetByLevel(int level);
+    /// <param name="key">The Guid key of the media item.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The media versions.</returns>
+    /// <remarks>Versions are ordered with current first, then most recent first. A media item keeps one version.</remarks>
+    Task<IEnumerable<IMedia>> GetVersionsAsync(Guid key, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets a specific version of an <see cref="IMedia" /> item.
+    ///     Deletes versions of a media item prior to a given date.
     /// </summary>
-    /// <param name="versionId">Id of the version to retrieve</param>
-    /// <returns>An <see cref="IMedia" /> item</returns>
-    IMedia? GetVersion(int versionId);
+    /// <param name="key">The Guid key of the media item.</param>
+    /// <param name="versionDate">The date before which versions should be deleted.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentVersionOperationStatus>> DeleteVersionsAsync(Guid key, DateTime versionDate, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets a collection of an <see cref="IMedia" /> objects versions by Id
+    ///     Deletes a version of a media item.
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns>An Enumerable list of <see cref="IMedia" /> objects</returns>
-    IEnumerable<IMedia> GetVersions(int id);
+    /// <param name="key">The Guid key of the media item.</param>
+    /// <param name="versionId">The version identifier to delete.</param>
+    /// <param name="deletePriorVersions">Whether to also delete versions prior to the specified version.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentVersionOperationStatus>> DeleteVersionAsync(Guid key, int versionId, bool deletePriorVersions, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Checks whether an <see cref="IMedia" /> item has any children
+    ///     Gets a media item from the path stored in its file property.
     /// </summary>
-    /// <param name="id">Id of the <see cref="IMedia" /></param>
-    /// <returns>True if the media has any children otherwise False</returns>
-    bool HasChildren(int id);
+    /// <param name="mediaPath">The path of the media item to retrieve (for example <c>/media/1024/koala_403x328.jpg</c>).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The media item, or <c>null</c> if no media item stores that path.</returns>
+    Task<IMedia?> GetMediaByPathAsync(string mediaPath, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Permanently deletes versions from an <see cref="IMedia" /> object prior to a specific date.
+    ///     Gets the content of a media file as a stream.
     /// </summary>
-    /// <param name="id">Id of the <see cref="IMedia" /> object to delete versions from</param>
-    /// <param name="versionDate">Latest version date</param>
-    /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-    void DeleteVersions(int id, DateTime versionDate, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Permanently deletes specific version(s) from an <see cref="IMedia" /> object.
-    /// </summary>
-    /// <param name="id">Id of the <see cref="IMedia" /> object to delete a version from</param>
-    /// <param name="versionId">Id of the version to delete</param>
-    /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
-    /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-    void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Gets an <see cref="IMedia" /> object from the path stored in the 'umbracoFile' property.
-    /// </summary>
-    /// <param name="mediaPath">Path of the media item to retrieve (for example: /media/1024/koala_403x328.jpg)</param>
-    /// <returns>
-    ///     <see cref="IMedia" />
-    /// </returns>
-    IMedia? GetMediaByPath(string mediaPath);
-
-    /// <summary>
-    ///     Gets a collection of <see cref="IMedia" /> objects, which are ancestors of the current media.
-    /// </summary>
-    /// <param name="id">Id of the <see cref="IMedia" /> to retrieve ancestors for</param>
-    /// <returns>An Enumerable list of <see cref="IMedia" /> objects</returns>
-    IEnumerable<IMedia> GetAncestors(int id);
-
-    /// <summary>
-    ///     Gets a collection of <see cref="IMedia" /> objects, which are ancestors of the current media.
-    /// </summary>
-    /// <param name="media"><see cref="IMedia" /> to retrieve ancestors for</param>
-    /// <returns>An Enumerable list of <see cref="IMedia" /> objects</returns>
-    IEnumerable<IMedia> GetAncestors(IMedia media);
-
-    /// <summary>
-    ///     Gets the parent of the current media as an <see cref="IMedia" /> item.
-    /// </summary>
-    /// <param name="id">Id of the <see cref="IMedia" /> to retrieve the parent from</param>
-    /// <returns>Parent <see cref="IMedia" /> object</returns>
-    IMedia? GetParent(int id);
-
-    /// <summary>
-    ///     Gets the parent of the current media as an <see cref="IMedia" /> item.
-    /// </summary>
-    /// <param name="media"><see cref="IMedia" /> to retrieve the parent from</param>
-    /// <returns>Parent <see cref="IMedia" /> object</returns>
-    IMedia? GetParent(IMedia media);
-
-    /// <summary>
-    ///     Sorts a collection of <see cref="IMedia" /> objects by updating the SortOrder according
-    ///     to the ordering of items in the passed in <see cref="IEnumerable{T}" />.
-    /// </summary>
-    /// <param name="items"></param>
-    /// <param name="userId"></param>
-    /// <returns>True if sorting succeeded, otherwise False</returns>
-    bool Sort(IEnumerable<IMedia> items, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Sorts the children of a parent by persisting the supplied (already ordered) child identifiers
-    ///     as the new sort order, in a single set-based update.
-    /// </summary>
-    /// <param name="parentId">The identifier of the parent, or <see cref="Constants.System.Root"/> for the root.</param>
-    /// <param name="orderedChildIds">The child media identifiers, in the desired order.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <returns>The operation result.</returns>
-    /// <remarks>
-    ///     Unlike <see cref="Sort(IEnumerable{IMedia}, int)" />, this does not load the children or fire per-item
-    ///     save/sort notifications; it persists the order directly and refreshes the affected cache branch.
-    /// </remarks>
-    OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Creates an <see cref="IMedia" /> object using the alias of the <see cref="IMediaType" />
-    ///     that this Media should based on.
-    /// </summary>
-    /// <remarks>
-    ///     This method returns an <see cref="IMedia" /> object that has been persisted to the database
-    ///     and therefor has an identity.
-    /// </remarks>
-    /// <param name="name">Name of the Media object</param>
-    /// <param name="parent">Parent <see cref="IMedia" /> for the new Media item</param>
-    /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType" /></param>
-    /// <param name="userId">Optional id of the user creating the media item</param>
-    /// <returns>
-    ///     <see cref="IMedia" />
-    /// </returns>
-    IMedia CreateMediaWithIdentity(string name, IMedia parent, string mediaTypeAlias, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Creates an <see cref="IMedia" /> object using the alias of the <see cref="IMediaType" />
-    ///     that this Media should based on.
-    /// </summary>
-    /// <remarks>
-    ///     This method returns an <see cref="IMedia" /> object that has been persisted to the database
-    ///     and therefor has an identity.
-    /// </remarks>
-    /// <param name="name">Name of the Media object</param>
-    /// <param name="parentId">Id of Parent for the new Media item</param>
-    /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType" /></param>
-    /// <param name="userId">Optional id of the user creating the media item</param>
-    /// <returns>
-    ///     <see cref="IMedia" />
-    /// </returns>
-    IMedia CreateMediaWithIdentity(string name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Gets the content of a media as a stream.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the media.</param>
-    /// <returns>The content of the media.</returns>
+    /// <param name="filepath">The filesystem path to the media file.</param>
+    /// <returns>The content of the media file.</returns>
     Stream GetMediaFileContentStream(string filepath);
 
     /// <summary>
-    ///     Sets the content of a media.
+    ///     Sets the content of a media file.
     /// </summary>
-    /// <param name="filepath">The filesystem path to the media.</param>
-    /// <param name="content">The content of the media.</param>
+    /// <param name="filepath">The filesystem path to the media file.</param>
+    /// <param name="content">The content of the media file.</param>
     void SetMediaFileContent(string filepath, Stream content);
 
     /// <summary>
     ///     Deletes a media file.
     /// </summary>
-    /// <param name="filepath">The filesystem path to the media.</param>
+    /// <param name="filepath">The filesystem path to the media file.</param>
     void DeleteMediaFile(string filepath);
 
     /// <summary>
-    ///     Gets the size of a media.
+    ///     Gets the size of a media file.
     /// </summary>
-    /// <param name="filepath">The filesystem path to the media.</param>
-    /// <returns>The size of the media.</returns>
+    /// <param name="filepath">The filesystem path to the media file.</param>
+    /// <returns>The size of the media file.</returns>
     long GetMediaFileSize(string filepath);
-
-    /// <summary>
-    ///     Empties the Recycle Bin asynchronously by deleting all <see cref="IMedia" /> that resides in the bin.
-    /// </summary>
-    /// <param name="userId">The <see cref="Guid" /> key of the user emptying the Recycle Bin.</param>
-    /// <returns>A <see cref="Task{TResult}" /> representing the asynchronous operation with an <see cref="OperationResult" />.</returns>
-    Task<OperationResult> EmptyRecycleBinAsync(Guid userId);
 }

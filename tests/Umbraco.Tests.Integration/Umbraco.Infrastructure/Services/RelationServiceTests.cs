@@ -59,7 +59,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         for (var i = 0; i < 3; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(imageType, -1);
-            MediaService.Save(c1);
+            await MediaService.SaveAsync(c1, Constants.Security.SuperUserKey, CancellationToken.None);
             createdMedia.Add(c1);
         }
 
@@ -97,7 +97,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
         await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
         var m1 = MediaBuilder.CreateSimpleMedia(mt, "hello 1", -1);
-        MediaService.Save(m1);
+        await MediaService.SaveAsync(m1, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest");
         ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
@@ -310,7 +310,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         var c1 = ContentBuilder.CreateBasicContent(ct);
         var c2 = MediaBuilder.CreateMediaImage(mt, -1);
         await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
-        MediaService.Save(c2);
+        await MediaService.SaveAsync(c2, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var r = new Relation(c1.Id, c2.Id, rt);
         await RelationService.SaveAsync(r);
@@ -342,7 +342,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
             var c1 = ContentBuilder.CreateBasicContent(ct);
             var c2 = MediaBuilder.CreateMediaImage(mt, -1);
             await ContentService.SaveAsync(c1, Constants.Security.SuperUserKey, null, CancellationToken.None);
-            MediaService.Save(c2);
+            await MediaService.SaveAsync(c2, Constants.Security.SuperUserKey, CancellationToken.None);
 
             relations.Add(new Relation(c1.Id, c2.Id, rt));
         }

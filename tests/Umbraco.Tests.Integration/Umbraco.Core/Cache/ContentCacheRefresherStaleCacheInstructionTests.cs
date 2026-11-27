@@ -129,13 +129,13 @@ internal sealed class ContentCacheRefresherStaleCacheInstructionTests : UmbracoI
         await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         var media = MediaBuilder.CreateSimpleMedia(mediaType, "Test Media", -1);
-        MediaService.Save(media);
+        await MediaService.SaveAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var mediaKey = media.Key;
         var mediaId = media.Id;
 
         // Delete the media
-        MediaService.Delete(media);
+        await MediaService.DeleteAsync(media, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act - Simulate processing a stale RefreshBranch cache instruction
         var stalePayload = new MediaCacheRefresher.JsonPayload(mediaId, mediaKey, TreeChangeTypes.RefreshBranch);

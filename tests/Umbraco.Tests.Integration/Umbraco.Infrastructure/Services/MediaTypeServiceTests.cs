@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
 internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
 {
-    private MediaService MediaService => (MediaService)GetRequiredService<IMediaService>();
+    private IMediaService MediaService => GetRequiredService<IMediaService>();
 
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
@@ -65,7 +65,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         IMediaType[] contentTypes = { contentType1, contentType2, contentType3 };
         var parentId = -1;
 
-        var ids = new List<int>();
+        var keys = new List<Guid>();
 
         for (var i = 0; i < 2; i++)
         {
@@ -73,17 +73,17 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
             {
                 var contentType = contentTypes[index];
                 var contentItem = MediaBuilder.CreateSimpleMedia(contentType, "MyName_" + index + "_" + i, parentId);
-                MediaService.Save(contentItem);
+                await MediaService.SaveAsync(contentItem, Constants.Security.SuperUserKey, CancellationToken.None);
                 parentId = contentItem.Id;
 
-                ids.Add(contentItem.Id);
+                keys.Add(contentItem.Key);
             }
         }
 
         // delete the first content type, all other content of different content types should be in the recycle bin
         await MediaTypeService.DeleteAsync(contentTypes[0], Constants.Security.SuperUserKey);
 
-        var found = MediaService.GetByIds(ids);
+        var found = await MediaService.GetByIdsAsync(keys, CancellationToken.None);
 
         Assert.AreEqual(4, found.Count());
         foreach (var content in found)
@@ -110,8 +110,6 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
             IMediaType[] contentTypes = { contentType1, contentType2, contentType3 };
             var parentId = -1;
 
-            var ids = new List<int>();
-
             for (var i = 0; i < 2; i++)
             {
                 for (var index = 0; index < contentTypes.Length; index++)
@@ -119,10 +117,8 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
                     var contentType = contentTypes[index];
                     var contentItem =
                         MediaBuilder.CreateSimpleMedia(contentType, "MyName_" + index + "_" + i, parentId);
-                    MediaService.Save(contentItem);
+                    await MediaService.SaveAsync(contentItem, Constants.Security.SuperUserKey, CancellationToken.None);
                     parentId = contentItem.Id;
-
-                    ids.Add(contentItem.Id);
                 }
             }
 
@@ -142,7 +138,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         foreach (var item in notification.MoveInfoCollection)
         {
             // if this item doesn't exist then Fail!
-            var exists = MediaService.GetById(item.Entity.Id);
+            var exists = MediaService.GetByIdAsync(item.Entity.Key, CancellationToken.None).GetAwaiter().GetResult();
             if (exists == null)
             {
                 Assert.Fail("The item doesn't exist");

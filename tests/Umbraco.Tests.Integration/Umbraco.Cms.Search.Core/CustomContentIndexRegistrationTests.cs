@@ -76,7 +76,7 @@ public class CustomContentIndexRegistrationTests : ContentBaseTestBase
             .Build();
         await GetRequiredService<IMediaTypeService>().CreateAsync(mediaType, CoreConstants.Security.SuperUserKey);
 
-        MediaService.Save(
+        await MediaService.SaveAsync(
             new MediaBuilder()
                 .WithKey(MediaKey)
                 .WithMediaType(mediaType)
@@ -86,7 +86,9 @@ public class CustomContentIndexRegistrationTests : ContentBaseTestBase
                     {
                         altText = "The media alt text"
                     })
-                .Build());
+                .Build(),
+            Cms.Core.Constants.Security.SuperUserKey,
+            CancellationToken.None);
 
         IMemberType memberType = new MemberTypeBuilder()
             .WithAlias("theMemberType")
@@ -119,7 +121,7 @@ public class CustomContentIndexRegistrationTests : ContentBaseTestBase
     public async Task CustomIndexRegistration_CanContainAllTypesOfContent()
     {
         await ContentService.SaveAsync(Content(), Cms.Core.Constants.Security.SuperUserKey, null, CancellationToken.None);
-        MediaService.Save(Media());
+        await MediaService.SaveAsync(Media(), Cms.Core.Constants.Security.SuperUserKey, CancellationToken.None);
         MemberService.Save(Member());
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump("My_Index");
@@ -145,7 +147,7 @@ public class CustomContentIndexRegistrationTests : ContentBaseTestBase
 
     private IContent Content() => ContentService.GetByIdAsync(ContentKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Content was not found");
 
-    private IMedia Media() => MediaService.GetById(MediaKey) ?? throw new InvalidOperationException("Media was not found");
+    private IMedia Media() => MediaService.GetByIdAsync(MediaKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Media was not found");
 
     private IMember Member() => MemberService.GetById(MemberKey) ?? throw new InvalidOperationException("Member was not found");
 }
