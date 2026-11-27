@@ -27,14 +27,21 @@ export class UmbRollbackServerDataSource {
 	 * Get a list of versions for a document
 	 * @param {string} id - The document unique identifier.
 	 * @param {string} [culture] - The culture to get versions for.
+	 * @param {number} [skip] - The number of versions to skip.
+	 * @param {number} [take] - The number of versions to return.
 	 * @returns {Promise<UmbDataSourceResponse<PagedDocumentVersionItemResponseModel>>} The versions for the document.
 	 * @memberof UmbRollbackServerDataSource
 	 */
 	getVersionsByDocumentId(
 		id: string,
 		culture?: string,
+		skip?: number,
+		take?: number,
 	): Promise<UmbDataSourceResponse<PagedDocumentVersionItemResponseModel>> {
-		return tryExecute(this.#host, DocumentVersionService.getDocumentVersion({ query: { documentId: id, culture } }));
+		return tryExecute(
+			this.#host,
+			DocumentVersionService.getDocumentVersion({ query: { documentId: id, culture, skip, take } }),
+		);
 	}
 
 	/**

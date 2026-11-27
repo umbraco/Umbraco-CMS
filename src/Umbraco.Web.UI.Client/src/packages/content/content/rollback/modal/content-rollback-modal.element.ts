@@ -1,13 +1,18 @@
 import type { UmbContentRollbackRepository } from '../rollback-repository.interface.js';
 import type { UmbContentDetailModel } from '../../types.js';
 import type { UmbContentRollbackModalData, UmbContentRollbackModalValue } from './types.js';
-import { diffWords, type UmbDiffChange } from '@umbraco-cms/backoffice/utils';
+import {
+	diffWords,
+	UMB_DATE_TIME_FORMAT_OPTIONS,
+	UmbPaginationManager,
+	type UmbDiffChange,
+} from '@umbraco-cms/backoffice/utils';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIPaginationEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -20,6 +25,7 @@ type ContentVersion = {
 	id: string;
 	date: string;
 	user: string;
+	isCurrentDraftVersion: boolean;
 	isCurrentlyPublishedVersion: boolean;
 	preventCleanup: boolean;
 };
@@ -59,15 +65,15 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 	@state()
 	private _showDiff = false;
 
+	@state()
+	private _currentPageNumber = 1;
+
+	@state()
+	private _totalPages = 1;
+
 	#rollbackRepository?: UmbContentRollbackRepository;
 	#userItemRepository = new UmbUserItemRepository(this);
-
-	#localizeDateOptions: Intl.DateTimeFormatOptions = {
-		day: 'numeric',
-		month: 'long',
-		hour: 'numeric',
-		minute: '2-digit',
-	};
+	#pagination = new UmbPaginationManager();
 
 	#currentDocument: UmbContentDetailModel | undefined;
 	#currentAppCulture: string | undefined;
@@ -75,6 +81,10 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 
 	constructor() {
 		super();
+
+		this.#pagination.setPageSize(20);
+		this.observe(this.#pagination.currentPage, (number) => (this._currentPageNumber = number), null);
+		this.observe(this.#pagination.totalPages, (number) => (this._totalPages = number), null);
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (instance) => {
 			this.#currentDatasetCulture = instance?.getVariantId().culture ?? undefined;
@@ -139,7 +149,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 				this.data!.rollbackRepositoryAlias,
 			);
 
-			this.#requestVersions();
+			void this.#requestVersions();
 		});
 	}
 
@@ -160,8 +170,12 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 		const { data } = await this.#rollbackRepository.requestVersionsByEntityId(
 			this.#currentDocument.unique,
 			this._selectedCulture ?? undefined,
+			this.#pagination.getSkip(),
+			this.#pagination.getPageSize(),
 		);
 		if (!data) return;
+
+		this.#pagination.setTotalItems(data.total);
 
 		const tempItems: Array<ContentVersion> = [];
 
@@ -170,12 +184,11 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 		const { data: userItems } = await this.#userItemRepository.requestItems(uniqueUserIds);
 
 		data?.items.forEach((item) => {
-			if (item.isCurrentDraftVersion) return;
-
 			tempItems.push({
 				date: item.versionDate,
 				user:
 					userItems?.find((user) => user.unique === item.user.id)?.name || this.localize.term('general_unknownUser'),
+				isCurrentDraftVersion: item.isCurrentDraftVersion,
 				isCurrentlyPublishedVersion: item.isCurrentPublishedVersion,
 				id: item.id,
 				preventCleanup: item.preventCleanup,
@@ -183,10 +196,13 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 		});
 
 		this._versions = tempItems;
-		const id = tempItems.find((item) => item.isCurrentlyPublishedVersion)?.id;
+
+		if (this._selectedVersion) return;
+
+		const id = tempItems.find((item) => item.isCurrentlyPublishedVersion && !item.isCurrentDraftVersion)?.id;
 
 		if (id) {
-			this.#selectVersion(id);
+			void this.#selectVersion(id);
 		}
 	}
 
@@ -274,7 +290,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 	}
 
 	#onVersionClicked(id: string) {
-		this.#selectVersion(id);
+		void this.#selectVersion(id);
 	}
 
 	async #onPreventCleanup(event: Event, id: string, preventCleanup: boolean) {
@@ -297,7 +313,15 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 		const value = event.target.value;
 
 		this._selectedCulture = value.toString();
-		this.#requestVersions();
+		this._selectedVersion = undefined;
+		this._diffs = [];
+		this.#pagination.setCurrentPageNumber(1);
+		void this.#requestVersions();
+	}
+
+	#onPageChange(event: UUIPaginationEvent) {
+		this.#pagination.setCurrentPageNumber(event.target.current);
+		void this.#requestVersions();
 	}
 
 	#onToggleDiff(event: Event) {
@@ -306,7 +330,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 
 		// If we have toggled on and have a selected version, immediately show the diff.
 		if (this._showDiff && this._selectedVersion) {
-			this.#setDiffs();
+			void this.#setDiffs();
 		}
 	}
 
@@ -341,16 +365,24 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 				this._versions,
 				(item) => item.id,
 				(item) => {
+					if (item.isCurrentDraftVersion) {
+						return html`
+							<div class="rollback-item draft">
+								<div>
+									${this.#renderVersionDetails(item)}
+									<p>${this.localize.term('rollback_currentDraftVersion')}</p>
+								</div>
+							</div>
+						`;
+					}
+
 					return html`
 						<div
 							@click=${() => this.#onVersionClicked(item.id)}
 							@keydown=${() => {}}
 							class="rollback-item ${this._selectedVersion?.id === item.id ? 'active' : ''}">
 							<div>
-								<p class="rollback-item-date">
-									<umb-localize-date date="${item.date}" .options=${this.#localizeDateOptions}></umb-localize-date>
-								</p>
-								<p>${item.user}</p>
+								${this.#renderVersionDetails(item)}
 								<p>${item.isCurrentlyPublishedVersion ? this.localize.term('rollback_currentPublishedVersion') : ''}</p>
 							</div>
 							<uui-button
@@ -362,8 +394,32 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 						</div>
 					`;
 				},
-			)}</uui-box
+			)}
+			${this.#renderPagination()}</uui-box
 		>`;
+	}
+
+	#renderVersionDetails(item: ContentVersion) {
+		return html`
+			<p class="rollback-item-date">
+				<umb-localize-date date="${item.date}" .options=${UMB_DATE_TIME_FORMAT_OPTIONS}></umb-localize-date>
+			</p>
+			<p>${item.user}</p>
+		`;
+	}
+
+	#renderPagination() {
+		if (this._totalPages <= 1) return nothing;
+		return html`
+			<uui-pagination
+				.current=${this._currentPageNumber}
+				.total=${this._totalPages}
+				firstlabel=${this.localize.term('general_first')}
+				previouslabel=${this.localize.term('general_previous')}
+				nextlabel=${this.localize.term('general_next')}
+				lastlabel=${this.localize.term('general_last')}
+				@change=${this.#onPageChange}></uui-pagination>
+		`;
 	}
 
 	async #setDiffs() {
@@ -461,7 +517,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 
 	get currentVersionHeader() {
 		return (
-			this.localize.date(this._selectedVersion?.date ?? new Date(), this.#localizeDateOptions) +
+			this.localize.date(this._selectedVersion?.date ?? new Date(), UMB_DATE_TIME_FORMAT_OPTIONS) +
 			' - ' +
 			this._selectedVersion?.user
 		);
@@ -563,6 +619,9 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 				padding: var(--uui-size-space-5);
 				cursor: pointer;
 			}
+			.rollback-item.draft {
+				cursor: default;
+			}
 			.rollback-item::after {
 				content: '';
 				position: absolute;
@@ -572,7 +631,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 				pointer-events: none;
 			}
 			.rollback-item.active::after,
-			.rollback-item:hover::after {
+			.rollback-item:not(.draft):hover::after {
 				border-color: var(--uui-color-selected);
 			}
 			.rollback-item:not(.active):hover::after {
@@ -598,6 +657,11 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 
 			#versions-box {
 				--uui-box-default-padding: 0;
+			}
+
+			#versions-box uui-pagination {
+				display: block;
+				padding: var(--uui-size-space-5);
 			}
 
 			#box-left {
