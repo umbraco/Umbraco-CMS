@@ -22,16 +22,12 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 				width: 100%;
 				height: 100%;
 
-				--umb-log-viewer-debug-color: color-mix(in srgb, var(--uui-color-default-emphasis) 75%, var(--uui-color-text));
-				--umb-log-viewer-information-color: color-mix(in srgb, var(--uui-color-positive) 75%, var(--uui-color-text));
-				--umb-log-viewer-warning-color: color-mix(
-					in oklch,
-					color-mix(in oklch, var(--uui-color-warning) 70%, var(--uui-color-danger)) 75%,
-					var(--uui-color-text)
-				);
-				--umb-log-viewer-error-color: color-mix(in srgb, var(--uui-color-danger) 80%, var(--uui-color-text));
-				--umb-log-viewer-fatal-color: var(--uui-color-text);
-				--umb-log-viewer-verbose-color: color-mix(in srgb, var(--uui-color-text) 55%, var(--uui-color-surface));
+				--umb-log-viewer-debug-color: var(--uui-color-default-emphasis);
+				--umb-log-viewer-information-color: var(--uui-color-positive);
+				--umb-log-viewer-warning-color: var(--uui-color-warning);
+				--umb-log-viewer-error-color: var(--uui-color-danger);
+				--umb-log-viewer-fatal-color: var(--uui-palette-black);
+				--umb-log-viewer-verbose-color: var(--uui-color-current);
 			}
 
 			uui-tab-group {

@@ -126,6 +126,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 			}
 
 			#log-level {
+				color: var(--uui-color-positive);
 				text-align: center;
 				margin: 0;
 			}
@@ -157,7 +158,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 			#error-count {
 				font-size: 3rem;
 				text-align: center;
-				color: var(--umb-log-viewer-error-color);
+				color: var(--uui-color-danger);
 				margin: 0;
 			}
 
