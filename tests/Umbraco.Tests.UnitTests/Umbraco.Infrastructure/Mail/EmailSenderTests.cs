@@ -6,6 +6,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.Email;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Mail;
 using Umbraco.Cms.Infrastructure.Mail.Interfaces;
@@ -17,6 +18,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Mail;
 public class EmailSenderTests
 {
     private static readonly SmtpSettings _smtpServerSettings = new() { From = "from@test.com", Host = "smtp.test.com" };
+
+    private static readonly SmtpSettings _sendInBackgroundSettings = new() { From = "from@test.com", Host = "smtp.test.com", SendInBackground = true };
 
     [Test]
     public async Task IsEmailAvailableAsync_Returns_False_When_Nothing_Is_Configured()
@@ -235,6 +238,85 @@ public class EmailSenderTests
         Assert.IsTrue(await otherCaller);
     }
 
+    [Test]
+    public async Task SendAsync_Queues_Email_Instead_Of_Sending_When_SendInBackground_Is_Enabled()
+    {
+        var queueMock = CreateQueueMock(accepts: true);
+        var clientMock = new Mock<IEmailSenderClient>();
+        var sender = CreateSender(_sendInBackgroundSettings, clientMock.Object, emailDeliveryQueue: queueMock.Object);
+        var message = CreateMessage();
+        var expires = TimeSpan.FromHours(1);
+
+        await sender.SendAsync(message, "Test", expires: expires);
+
+        queueMock.Verify(x => x.TryEnqueueAsync(message, "Test", expires, It.IsAny<CancellationToken>()), Times.Once);
+        clientMock.Verify(x => x.SendAsync(It.IsAny<EmailMessage>(), It.IsAny<TimeSpan?>()), Times.Never);
+    }
+
+    [Test]
+    public async Task SendAsync_Sends_Immediately_When_The_Queue_Cannot_Accept_The_Email()
+    {
+        var queueMock = CreateQueueMock(accepts: false);
+        var clientMock = new Mock<IEmailSenderClient>();
+        var sender = CreateSender(_sendInBackgroundSettings, clientMock.Object, emailDeliveryQueue: queueMock.Object);
+        var message = CreateMessage();
+        var expires = TimeSpan.FromHours(1);
+
+        await sender.SendAsync(message, "Test", expires: expires);
+
+        queueMock.Verify(x => x.TryEnqueueAsync(message, "Test", expires, It.IsAny<CancellationToken>()), Times.Once);
+        clientMock.Verify(x => x.SendAsync(message, expires), Times.Once);
+    }
+
+    [Test]
+    public void SendAsync_Reports_Send_Failure_To_Caller_When_SendInBackground_Is_Disabled()
+    {
+        var queueMock = new Mock<IEmailDeliveryQueue>();
+        var clientMock = new Mock<IEmailSenderClient>();
+        clientMock
+            .Setup(x => x.SendAsync(It.IsAny<EmailMessage>(), It.IsAny<TimeSpan?>()))
+            .ThrowsAsync(new SocketException());
+        var sender = CreateSender(_smtpServerSettings, clientMock.Object, emailDeliveryQueue: queueMock.Object);
+
+        Assert.ThrowsAsync<SocketException>(async () => await sender.SendAsync(CreateMessage(), "Test"));
+        queueMock.Verify(
+            x => x.TryEnqueueAsync(It.IsAny<EmailMessage>(), It.IsAny<string>(), It.IsAny<TimeSpan?>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task SendAsync_Does_Not_Queue_Email_Handled_By_A_Notification_Handler_When_SendInBackground_Is_Enabled()
+    {
+        var eventAggregatorMock = new Mock<IEventAggregator>();
+        eventAggregatorMock
+            .Setup(x => x.PublishAsync(It.IsAny<SendEmailNotification>(), It.IsAny<CancellationToken>()))
+            .Callback((SendEmailNotification notification, CancellationToken _) => notification.HandleEmail())
+            .Returns(Task.CompletedTask);
+        var queueMock = new Mock<IEmailDeliveryQueue>();
+        var sender = CreateSender(
+            _sendInBackgroundSettings,
+            Mock.Of<IEmailSenderClient>(),
+            emailDeliveryQueue: queueMock.Object,
+            eventAggregator: eventAggregatorMock.Object);
+
+        await sender.SendAsync(CreateMessage(), "Test", enableNotification: true);
+
+        queueMock.Verify(
+            x => x.TryEnqueueAsync(It.IsAny<EmailMessage>(), It.IsAny<string>(), It.IsAny<TimeSpan?>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    private static EmailMessage CreateMessage() => new("from@test.com", "to@test.com", "Subject", "Body", false);
+
+    private static Mock<IEmailDeliveryQueue> CreateQueueMock(bool accepts)
+    {
+        var queueMock = new Mock<IEmailDeliveryQueue>();
+        queueMock
+            .Setup(x => x.TryEnqueueAsync(It.IsAny<EmailMessage>(), It.IsAny<string>(), It.IsAny<TimeSpan?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(accepts);
+        return queueMock;
+    }
+
     private static Mock<IEmailSenderClient> CreateUnreachableClientMock()
     {
         var clientMock = new Mock<IEmailSenderClient>();
@@ -248,24 +330,30 @@ public class EmailSenderTests
         SmtpSettings smtpSettings,
         IEmailSenderClient emailSenderClient,
         INotificationAsyncHandler<SendEmailNotification>? handler = null,
-        TimeProvider? timeProvider = null)
+        TimeProvider? timeProvider = null,
+        IEmailDeliveryQueue? emailDeliveryQueue = null,
+        IEventAggregator? eventAggregator = null)
         => CreateSender(
             new TestOptionsMonitor<GlobalSettings>(new GlobalSettings { Smtp = smtpSettings }),
             emailSenderClient,
             handler,
-            timeProvider);
+            timeProvider,
+            emailDeliveryQueue,
+            eventAggregator);
 
     private static EmailSender CreateSender(
         IOptionsMonitor<GlobalSettings> globalSettings,
         IEmailSenderClient emailSenderClient,
         INotificationAsyncHandler<SendEmailNotification>? handler = null,
-        TimeProvider? timeProvider = null)
+        TimeProvider? timeProvider = null,
+        IEmailDeliveryQueue? emailDeliveryQueue = null,
+        IEventAggregator? eventAggregator = null)
         => new(
             NullLogger<EmailSender>.Instance,
             globalSettings,
-            Mock.Of<IEventAggregator>(),
+            eventAggregator ?? Mock.Of<IEventAggregator>(),
             emailSenderClient,
-            null,
-            handler,
+            emailDeliveryQueue ?? Mock.Of<IEmailDeliveryQueue>(),
+            handler is not null,
             timeProvider ?? TimeProvider.System);
 }
