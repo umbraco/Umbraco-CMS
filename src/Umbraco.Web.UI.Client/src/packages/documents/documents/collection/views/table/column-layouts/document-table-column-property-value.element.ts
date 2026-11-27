@@ -12,7 +12,8 @@ import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '
  */
 function getFlatTreeText(node: Node): string {
 	if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? '';
-	if (node instanceof HTMLStyleElement) return '';
+	// `display: contents` (slots included) has no box of its own but still renders its children.
+	if (node instanceof Element && !node.checkVisibility() && getComputedStyle(node).display !== 'contents') return '';
 	const children =
 		node instanceof HTMLSlotElement
 			? node.assignedNodes({ flatten: true })
