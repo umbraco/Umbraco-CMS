@@ -27,6 +27,7 @@ import {
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/document';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UmbSegmentCollectionRepository } from '@umbraco-cms/backoffice/segment';
 
 type ContentModel = UmbDocumentBlueprintDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -41,6 +42,8 @@ export class UmbDocumentBlueprintWorkspaceContext
 	implements UmbContentWorkspaceContext<ContentModel, UmbDocumentTypeDetailModel, UmbDocumentBlueprintVariantModel>
 {
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.documentType.unique);
+
+	#segmentCollectionRepository = new UmbSegmentCollectionRepository(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -118,6 +121,11 @@ export class UmbDocumentBlueprintWorkspaceContext
 
 	getCollectionAlias() {
 		return UMB_DOCUMENT_COLLECTION_ALIAS;
+	}
+
+	protected override async _loadSegmentsFor(): Promise<void> {
+		const { data } = await this.#segmentCollectionRepository.requestCollection({ skip: 0, take: 9999 });
+		this._segments.setValue(data?.items.map((item) => ({ alias: item.alias, name: item.name })) ?? []);
 	}
 
 	/**
