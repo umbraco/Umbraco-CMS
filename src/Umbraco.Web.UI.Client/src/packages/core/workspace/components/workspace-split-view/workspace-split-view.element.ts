@@ -148,6 +148,7 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 			#header {
 				flex: 1 1 auto;
 				display: block;
+				min-width: 0;
 			}
 
 			#icon {

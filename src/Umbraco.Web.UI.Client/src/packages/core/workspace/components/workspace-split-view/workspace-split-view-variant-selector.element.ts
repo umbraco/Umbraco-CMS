@@ -623,6 +623,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 			#toggle {
 				white-space: nowrap;
+				min-width: 0;
 			}
 
 			#popover {
@@ -643,6 +644,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 			#variant-close {
 				white-space: nowrap;
+				/* Keep the close button whole when a narrow split view squeezes the input's append slot. */
+				flex-shrink: 0;
 			}
 
 			#read-only-tag {
