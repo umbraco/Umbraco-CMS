@@ -86,6 +86,30 @@ describe('UmbInputRichMediaElement', () => {
 		});
 	});
 
+	describe('readonly', () => {
+		const getCards = () => Array.from(element.shadowRoot?.querySelectorAll('uui-card-media') ?? []);
+
+		beforeEach(async () => {
+			element.value = [{ key: 'entry-1', mediaKey: 'media-1', mediaTypeAlias: '', crops: [], focalPoint: null }];
+			await element.updateComplete;
+		});
+
+		it('renders the media cards as interactive when editable', () => {
+			const cards = getCards();
+			expect(cards).to.have.lengthOf(1);
+			expect(cards.every((card) => !card.disabled)).to.be.true;
+		});
+
+		it('renders the media cards as non-interactive when readonly', async () => {
+			element.readonly = true;
+			await element.updateComplete;
+
+			const cards = getCards();
+			expect(cards).to.have.lengthOf(1);
+			expect(cards.every((card) => card.disabled)).to.be.true;
+		});
+	});
+
 	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
 		it('passes the a11y audit', async () => {
 			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
