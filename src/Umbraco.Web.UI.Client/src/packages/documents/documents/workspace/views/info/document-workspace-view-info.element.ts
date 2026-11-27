@@ -231,7 +231,11 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			${this.#renderTemplateInput()}
 			<div class="general-item">
 				<strong><umb-localize key="template_id">Id</umb-localize></strong>
-				<span>${this._documentUnique}</span>
+				<span
+					><uui-button-copy-text class="opaque" .text=${this._documentUnique}
+						>${this._documentUnique}</uui-button-copy-text
+					></span
+				>
 			</div>
 		`;
 	}
@@ -394,6 +398,15 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 			.variant-state > span {
 				color: var(--uui-color-divider-emphasis);
+			}
+
+			uui-button-copy-text.opaque {
+				text-align: left;
+				--uui-button-content-align: left;
+				--uui-button-padding-top-factor: 0;
+				--uui-button-padding-bottom-factor: 0;
+				--uui-button-padding-left-factor: 0;
+				--uui-button-padding-right-factor: 0;
 			}
 		`,
 	];

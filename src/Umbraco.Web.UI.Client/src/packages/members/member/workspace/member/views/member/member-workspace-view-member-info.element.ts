@@ -137,7 +137,7 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 				</div>
 				<div>
 					<h4><umb-localize key="template_id">Id</umb-localize></h4>
-					<span>${this._unique}</span>
+					<span><uui-button-copy-text class="opaque" .text=${this._unique}>${this._unique}</uui-button-copy-text></span>
 				</div>
 			</umb-stack>
 		`;
@@ -148,6 +148,15 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 		css`
 			h4 {
 				margin: 0;
+			}
+
+			uui-button-copy-text.opaque {
+				text-align: left;
+				--uui-button-content-align: left;
+				--uui-button-padding-top-factor: 0;
+				--uui-button-padding-bottom-factor: 0;
+				--uui-button-padding-left-factor: 0;
+				--uui-button-padding-right-factor: 0;
 			}
 		`,
 	];
