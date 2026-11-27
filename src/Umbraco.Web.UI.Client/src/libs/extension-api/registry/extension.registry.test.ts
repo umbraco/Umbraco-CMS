@@ -8,6 +8,7 @@ import type {
 } from '../types/index.js';
 import { UmbExtensionRegistry } from './extension.registry.js';
 import { expect } from '@open-wc/testing';
+import { createObservablePart, umbIsStatefulObservable } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 interface TestManifestWithMeta extends ManifestBase {
@@ -805,5 +806,64 @@ describe('Add Conditions', () => {
 				}
 			})
 			.unsubscribe();
+	});
+});
+
+describe('UmbExtensionRegistry observables', () => {
+	let extensionRegistry: UmbExtensionRegistry<ManifestBase>;
+
+	beforeEach(() => {
+		extensionRegistry = new UmbExtensionRegistry();
+		extensionRegistry.register({ type: 'section', alias: 'Umb.Test.Section', name: 'Test Section' });
+	});
+
+	it('are stateful observables', () => {
+		const observables = [
+			extensionRegistry.byAlias('Umb.Test.Section'),
+			extensionRegistry.byType('section'),
+			extensionRegistry.byTypes(['section']),
+			extensionRegistry.byTypeAndAlias('section', 'Umb.Test.Section'),
+			extensionRegistry.byTypeAndAliases('section', ['Umb.Test.Section']),
+			extensionRegistry.byTypeAndFilter('section', () => true),
+			extensionRegistry.byTypesAndFilter(['section'], () => true),
+		];
+		for (const observable of observables) {
+			expect(umbIsStatefulObservable(observable)).to.be.true;
+		}
+	});
+
+	it('evaluate their filter for parts derived from them while those parts are observed', () => {
+		let filterCalls = 0;
+		const part = createObservablePart(
+			extensionRegistry.byTypeAndFilter('section', () => {
+				filterCalls++;
+				return true;
+			}),
+			(x) => x[0]?.alias,
+		);
+		const subscription = part.subscribe();
+		filterCalls = 0;
+
+		extensionRegistry.register({ type: 'section', alias: 'Umb.Test.Section.Another', name: 'Another Test Section' });
+		subscription.unsubscribe();
+
+		expect(filterCalls).to.be.greaterThan(0);
+	});
+
+	it('stop evaluating their filter once parts derived from them have no subscribers left', () => {
+		let filterCalls = 0;
+		const part = createObservablePart(
+			extensionRegistry.byTypeAndFilter('section', () => {
+				filterCalls++;
+				return true;
+			}),
+			(x) => x[0]?.alias,
+		);
+		part.subscribe().unsubscribe();
+		filterCalls = 0;
+
+		extensionRegistry.register({ type: 'section', alias: 'Umb.Test.Section.Another', name: 'Another Test Section' });
+
+		expect(filterCalls).to.equal(0);
 	});
 });
