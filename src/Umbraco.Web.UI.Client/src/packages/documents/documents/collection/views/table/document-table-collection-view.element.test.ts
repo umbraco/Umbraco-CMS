@@ -4,9 +4,11 @@ import type { UmbDocumentCollectionItemModel } from '../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
 import { UmbDocumentVariantState } from '../../../variant-state.js';
 import { expect, fixture, html, waitUntil } from '@open-wc/testing';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, type PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbValueSummaryDefaultApi, UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-test-document-collection-host')
@@ -15,9 +17,48 @@ class UmbTestDocumentCollectionHostElement extends UmbElementMixin(HTMLElement) 
 	variantContext = new UmbVariantContext(this);
 }
 
-const LONG_NAME = 'A document name that is long enough to fill the whole table on its own '.repeat(4).trim();
+customElements.define(
+	'umb-test-slotted-text',
+	class extends HTMLElement {
+		constructor() {
+			super();
+			this.attachShadow({ mode: 'open' }).innerHTML = '<slot></slot>';
+		}
+	},
+);
 
-function makeItem(unique: string, name: string, subtitle: string): UmbDocumentCollectionItemModel {
+const renderedSummaries = new Set<Element>();
+
+@customElement('umb-test-long-text-value-summary')
+class UmbTestLongTextValueSummaryElement extends UmbValueSummaryElementBase<string> {
+	override render() {
+		return html`<umb-test-slotted-text>Summary: ${this._value}</umb-test-slotted-text>`;
+	}
+
+	override updated(changedProperties: PropertyValues) {
+		super.updated(changedProperties);
+		if (this._value) renderedSummaries.add(this);
+	}
+}
+
+@customElement('umb-test-hidden-text-value-summary')
+class UmbTestHiddenTextValueSummaryElement extends UmbTestLongTextValueSummaryElement {
+	override render() {
+		return html`<style>
+				span {
+					color: inherit;
+				}
+			</style>
+			<span hidden>Hidden helper</span><svg><title>Icon name</title></svg>${super.render()}`;
+	}
+}
+
+const TEST_VALUE_TYPE = 'Umb.Test.LongText';
+const TEST_HIDDEN_TEXT_VALUE_TYPE = 'Umb.Test.HiddenText';
+const LONG_NAME = 'A document name that is long enough to fill the whole table on its own '.repeat(4).trim();
+const LONG_SUBTITLE = 'A subtitle long enough to wrap '.repeat(6).trim();
+
+function makeItem(unique: string, name: string, subtitle: string, editorAlias = ''): UmbDocumentCollectionItemModel {
 	return {
 		unique,
 		entityType: UMB_DOCUMENT_ENTITY_TYPE,
@@ -28,7 +69,7 @@ function makeItem(unique: string, name: string, subtitle: string): UmbDocumentCo
 		isProtected: false,
 		isTrashed: false,
 		sortOrder: 0,
-		values: [{ alias: 'subtitle', value: subtitle, editorAlias: '' }],
+		values: [{ alias: 'subtitle', value: subtitle, editorAlias }],
 		variants: [{ culture: 'en-US', name, state: UmbDocumentVariantState.PUBLISHED, flags: [] }],
 	};
 }
@@ -99,5 +140,74 @@ describe('UmbDocumentTableCollectionViewElement', () => {
 
 		const [short, long] = getCells('umb-document-table-column-property-value');
 		expect(long.getBoundingClientRect().height).to.equal(short.getBoundingClientRect().height);
+	});
+
+	describe('truncated values', () => {
+		const summaryAlias = 'Umb.Test.ValueSummary.LongText';
+		const hiddenTextSummaryAlias = 'Umb.Test.ValueSummary.HiddenText';
+
+		beforeEach(() => {
+			renderedSummaries.clear();
+			umbExtensionsRegistry.registerMany([
+				{
+					type: 'valueSummary',
+					alias: summaryAlias,
+					name: 'Test Long Text Value Summary',
+					forValueType: TEST_VALUE_TYPE as keyof UmbValueTypeMap,
+					element: UmbTestLongTextValueSummaryElement,
+					api: UmbValueSummaryDefaultApi,
+				},
+				{
+					type: 'valueSummary',
+					alias: hiddenTextSummaryAlias,
+					name: 'Test Hidden Text Value Summary',
+					forValueType: TEST_HIDDEN_TEXT_VALUE_TYPE as keyof UmbValueTypeMap,
+					element: UmbTestHiddenTextValueSummaryElement,
+					api: UmbValueSummaryDefaultApi,
+				},
+			]);
+		});
+
+		afterEach(() => {
+			umbExtensionsRegistry.unregisterMany([summaryAlias, hiddenTextSummaryAlias]);
+		});
+
+		function hover(columnElement: HTMLElement) {
+			columnElement.dispatchEvent(new PointerEvent('pointerenter'));
+		}
+
+		it('shows the full text of a truncated value on hover', async () => {
+			await render([makeItem('1', 'Long', LONG_SUBTITLE)]);
+
+			const [value] = getCells('umb-document-table-column-property-value');
+			hover(value);
+			expect(value.title).to.equal(LONG_SUBTITLE);
+		});
+
+		it('shows the full text of a truncated value summary on hover, read through its shadow roots', async () => {
+			await render([makeItem('1', 'Long', LONG_SUBTITLE, TEST_VALUE_TYPE)]);
+			await waitUntil(() => renderedSummaries.size === 1, 'the value summary did not render');
+
+			const [value] = getCells('umb-document-table-column-property-value');
+			hover(value);
+			expect(value.title).to.equal(`Summary: ${LONG_SUBTITLE}`);
+		});
+
+		it('leaves text that is not rendered out of the title', async () => {
+			await render([makeItem('1', 'Long', LONG_SUBTITLE, TEST_HIDDEN_TEXT_VALUE_TYPE)]);
+			await waitUntil(() => renderedSummaries.size === 1, 'the value summary did not render');
+
+			const [value] = getCells('umb-document-table-column-property-value');
+			hover(value);
+			expect(value.title).to.equal(`Summary: ${LONG_SUBTITLE}`);
+		});
+
+		it('does not add a title to a value that fits', async () => {
+			await render([makeItem('1', 'Short', 'Short')]);
+
+			const [value] = getCells('umb-document-table-column-property-value');
+			hover(value);
+			expect(value.hasAttribute('title')).to.be.false;
+		});
 	});
 });

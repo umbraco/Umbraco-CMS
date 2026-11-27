@@ -5,6 +5,22 @@ import { css, customElement, html, nothing, property, state, when } from '@umbra
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
 
+/**
+ * Reads the text a node renders, through shadow roots and slotted content, which `innerText` does not see.
+ * @param {Node} node - The node to read.
+ * @returns {string} The rendered text, whitespace as authored.
+ */
+function getFlatTreeText(node: Node): string {
+	if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? '';
+	// `display: contents` (slots included) has no box of its own but still renders its children.
+	if (node instanceof Element && !node.checkVisibility() && getComputedStyle(node).display !== 'contents') return '';
+	const children =
+		node instanceof HTMLSlotElement
+			? node.assignedNodes({ flatten: true })
+			: Array.from(((node as Element).shadowRoot ?? node).childNodes);
+	return children.map(getFlatTreeText).join('');
+}
+
 @customElement('umb-document-table-column-property-value')
 export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement implements UmbTableColumnLayoutElement {
 	#resolver = new UmbDocumentItemDataResolver(this);
@@ -40,7 +56,19 @@ export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement im
 		this.#resolver.observe(this.#resolver.state, (state) => (this._state = state || ''));
 		this.#resolver.observe(this.#resolver.createDate, (createDate) => (this._createDate = createDate));
 		this.#resolver.observe(this.#resolver.updateDate, (updateDate) => (this._updateDate = updateDate));
+		this.addEventListener('pointerenter', this.#onPointerEnter);
 	}
+
+	// Value summaries and label templates render later, inside nested shadow roots, so the text is read on hover.
+	#onPointerEnter = () => {
+		const isClamped = this.scrollHeight > this.clientHeight || this.scrollWidth > this.clientWidth;
+		const text = isClamped ? getFlatTreeText(this).replace(/\s+/g, ' ').trim() : '';
+		if (text) {
+			this.title = text;
+		} else {
+			this.removeAttribute('title');
+		}
+	};
 
 	#getPropertyValueByAlias() {
 		const alias = this.column.alias;
