@@ -1,7 +1,7 @@
 import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
 import { UmbDocumentItemDataResolver } from '../../../../item/index.js';
 import { UmbDocumentVariantState } from '../../../../variant-state.js';
-import { customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
 
@@ -81,6 +81,20 @@ export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement im
 					: value,
 		);
 	}
+
+	static override styles = [
+		css`
+			/* Clamped here rather than with the cell's clip-text, so the column can still size to the value. */
+			:host {
+				display: -webkit-box;
+				-webkit-box-orient: vertical;
+				-webkit-line-clamp: 1;
+				overflow: hidden;
+				overflow-wrap: anywhere;
+				max-inline-size: 25ch;
+			}
+		`,
+	];
 }
 
 export default UmbDocumentTableColumnPropertyValueElement;
