@@ -31,50 +31,60 @@ export class UmbThemeContext extends UmbContextBase {
 		this.#theme.setValue(themeAlias);
 
 		this.#themeObserver?.destroy();
-		if (themeAlias) {
-			localStorage.setItem(LOCAL_STORAGE_KEY, themeAlias);
-			this.#themeObserver = this.observe(
-				umbExtensionsRegistry.byTypeAndFilter('theme', (extension) => extension.alias === themeAlias),
-				async (themes) => {
-					this.#styleElement?.remove();
-					if (themes.length > 0 && themes[0].css) {
-						const activeTheme = themes[0];
-						if (typeof activeTheme.css === 'function') {
-							this.#styleElement = document.createElement('style') as HTMLStyleElement;
-							// We store the current style element so we can check if it has been replaced by another theme in between.
-							const currentStyleEl = this.#styleElement;
-							currentStyleEl.setAttribute('type', 'text/css');
-
-							const result = await loadManifestPlainCss(activeTheme.css);
-							// Checking that this is still our styleElement, it has not been replaced with another theme in between.
-							if (result && currentStyleEl === this.#styleElement) {
-								currentStyleEl.appendChild(document.createTextNode(result));
-								document.head.appendChild(currentStyleEl);
-							}
-						} else if (typeof activeTheme.css === 'string') {
-							this.#styleElement = document.createElement('link');
-							this.#styleElement.setAttribute('rel', 'stylesheet');
-							this.#styleElement.setAttribute('href', activeTheme.css);
-							document.head.appendChild(this.#styleElement);
-						}
-					} else {
-						// We could not load a theme for this alias, so we remove the theme.
-						localStorage.removeItem(LOCAL_STORAGE_KEY);
-						this.#styleElement?.childNodes.forEach((node) => node.remove());
-						this.#styleElement?.setAttribute('href', '');
-						this.#styleElement = null;
-					}
-				},
-			);
-		} else {
+		if (!themeAlias) {
 			// Super clean, we got a falsy value, so we remove the theme.
-
 			localStorage.removeItem(LOCAL_STORAGE_KEY);
-			this.#styleElement?.remove();
-			this.#styleElement?.childNodes.forEach((node) => node.remove());
-			this.#styleElement?.setAttribute('href', '');
-			this.#styleElement = null;
+			this.#detachTheme();
+			return;
 		}
+
+		localStorage.setItem(LOCAL_STORAGE_KEY, themeAlias);
+		this.#themeObserver = this.observe(
+			umbExtensionsRegistry.byTypeAndFilter('theme', (extension) => extension.alias === themeAlias),
+			async (themes) => {
+				const theme = themes[0];
+				if (theme?.css) {
+					await this.#attachTheme(theme);
+					return;
+				}
+				// We could not load a theme for this alias, so we remove the theme.
+				// Themes from packages can be registered after this context is created, so only forget
+				// the stored alias when the theme is registered without CSS (e.g. the Light theme).
+				if (theme) {
+					localStorage.removeItem(LOCAL_STORAGE_KEY);
+				}
+				this.#detachTheme();
+			},
+		);
+	}
+
+	async #attachTheme(theme: ManifestTheme) {
+		this.#styleElement?.remove();
+		if (typeof theme.css === 'function') {
+			this.#styleElement = document.createElement('style') as HTMLStyleElement;
+			// We store the current style element so we can check if it has been replaced by another theme in between.
+			const currentStyleEl = this.#styleElement;
+			currentStyleEl.setAttribute('type', 'text/css');
+
+			const result = await loadManifestPlainCss(theme.css);
+			// Checking that this is still our styleElement, it has not been replaced with another theme in between.
+			if (result && currentStyleEl === this.#styleElement) {
+				currentStyleEl.appendChild(document.createTextNode(result));
+				document.head.appendChild(currentStyleEl);
+			}
+		} else if (typeof theme.css === 'string') {
+			this.#styleElement = document.createElement('link');
+			this.#styleElement.setAttribute('rel', 'stylesheet');
+			this.#styleElement.setAttribute('href', theme.css);
+			document.head.appendChild(this.#styleElement);
+		}
+	}
+
+	#detachTheme() {
+		this.#styleElement?.remove();
+		this.#styleElement?.childNodes.forEach((node) => node.remove());
+		this.#styleElement?.setAttribute('href', '');
+		this.#styleElement = null;
 	}
 }
 
