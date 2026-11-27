@@ -733,33 +733,37 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	}
 
 	#buildTableItems(items: Array<UmbMediaTreeItemModel | UmbMediaSearchItemModel>): Array<UmbTableItem> {
-		return items.map((item) => {
-			const canNavigate = this.#allowNavigateToMedia(item);
-			const selectable = this._selectableFilter(item);
-			// When not in selection mode, navigable items open on click (matching card behaviour).
-			// Mark them as non-selectable so the row doesn't intercept the click for selection.
-			const selectableInTable = this._isSelectionMode ? selectable : !canNavigate && selectable;
-			const nameColumnValue: UmbMediaPickerTableColumnNameValue = {
-				name: item.name,
-				ancestorPath: this.#getAncestorPath(item) || undefined,
-				navigate: canNavigate && !this._isSelectionMode ? () => this.#onOpen(item) : undefined,
-			};
-			return {
-				id: item.unique,
-				icon: item.mediaType.icon,
-				selectable: selectableInTable,
-				data: [
-					{
-						columnAlias: 'name',
-						value: nameColumnValue,
-					},
-					{
-						columnAlias: 'createDate',
-						value: 'createDate' in item ? this.localize.dateTime(item.createDate) : '',
-					},
-				],
-			};
-		});
+		return items.map((item) => this.#buildTableItem(item));
+	}
+
+	#buildTableItem(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel): UmbTableItem {
+		const canNavigate = this.#allowNavigateToMedia(item);
+		const selectable = this._selectableFilter(item);
+		// When not in selection mode, navigable items open on click (matching card behaviour).
+		// Mark them as non-selectable so the row doesn't intercept the click for selection.
+		const navigable = canNavigate && !this._isSelectionMode;
+		const selectableInTable = this._isSelectionMode ? selectable : !canNavigate && selectable;
+		const nameColumnValue: UmbMediaPickerTableColumnNameValue = {
+			name: item.name,
+			ancestorPath: this.#getAncestorPath(item) || undefined,
+			navigate: navigable ? () => this.#onOpen(item) : undefined,
+		};
+		return {
+			id: item.unique,
+			icon: item.mediaType.icon,
+			selectable: selectableInTable,
+			selectOnly: navigable ? false : undefined,
+			data: [
+				{
+					columnAlias: 'name',
+					value: nameColumnValue,
+				},
+				{
+					columnAlias: 'createDate',
+					value: 'createDate' in item ? this.localize.dateTime(item.createDate) : '',
+				},
+			],
+		};
 	}
 
 	#onTableSelected(event: UmbTableSelectedEvent) {
