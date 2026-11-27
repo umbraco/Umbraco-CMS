@@ -14,6 +14,12 @@
       [CS9042] not obsolete
     -->
     <WarningsNotAsErrors>$(WarningsNotAsErrors),SA1117,SA1401,SA1134,CS9042</WarningsNotAsErrors>
+    <!--
+      [SA1600] Documenting the schema properties changes the generated schema: NJsonSchema emits
+      the summary as a description, which wraps the property's $ref in a oneOf. The property names
+      already match the configuration sections they map to, so suppress rather than document.
+    -->
+    <NoWarn>$(NoWarn),SA1600</NoWarn>
   </PropertyGroup>
   
   <ItemGroup>
@@ -23,5 +29,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Umbraco.Core\Umbraco.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 </Project>
