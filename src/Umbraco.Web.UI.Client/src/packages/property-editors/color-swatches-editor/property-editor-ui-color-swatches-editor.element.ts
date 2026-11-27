@@ -1,4 +1,4 @@
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbMultipleColorPickerInputElement } from '@umbraco-cms/backoffice/components';
 import type {
@@ -13,17 +13,10 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
  */
 @customElement('umb-property-editor-ui-color-swatches-editor')
 export class UmbPropertyEditorUIColorSwatchesEditorElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	#defaultShowLabels = false;
-
 	@property({ type: Array })
 	value: Array<UmbSwatchDetails> = [];
 
-	@state()
-	private _showLabels = this.#defaultShowLabels;
-
-	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this._showLabels = config?.getValueByAlias('useLabel') ?? this.#defaultShowLabels;
-	}
+	public config?: UmbPropertyEditorConfigCollection;
 
 	#onChange(event: CustomEvent & { target: UmbMultipleColorPickerInputElement }) {
 		this.value = event.target.items;
@@ -34,7 +27,7 @@ export class UmbPropertyEditorUIColorSwatchesEditorElement extends UmbLitElement
 		return html`
 			<umb-multiple-color-picker-input
 				.items=${this.value}
-				?showLabels=${this._showLabels}
+				showLabels
 				@change=${this.#onChange}></umb-multiple-color-picker-input>
 		`;
 	}

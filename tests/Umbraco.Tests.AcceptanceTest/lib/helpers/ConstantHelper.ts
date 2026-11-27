@@ -57,8 +57,8 @@
   }
 
   public static readonly approvedColorSettings = {
-    0: ['Include labels?', 'Displays colored field and a label for each color in the color picker, rather than just a colored field.'],
-    1: ['Colors', 'Add, remove or sort colors (and labels).'],
+    0: ['Show labels?', 'Shows the label of each color in the color picker, rather than just the color.'],
+    1: ['Colors', 'Add, remove or sort colors. Give each color a label so assistive technology can identify it, even when labels are not shown.'],
   }
 
   public static readonly checkboxListSettings = {

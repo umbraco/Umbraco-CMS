@@ -1298,10 +1298,10 @@ export default {
 	},
 	colorPickerConfigurations: {
 		colorsTitle: 'Cores',
-		colorsDescription: 'Adicionar, remover ou ordenar cores',
-		showLabelTitle: 'Incluir etiquetas?',
-		showLabelDescription:
-			'Armazena cores como um objeto JSON contendo tanto a string hexadecimal da cor como a etiqueta, em vez de apenas a string hexadecimal.',
+		colorsDescription:
+			'Adicione, remova ou ordene cores. Dê a cada cor uma etiqueta para que as tecnologias de apoio a possam identificar, mesmo quando as etiquetas não são mostradas.',
+		showLabelTitle: 'Mostrar etiquetas?',
+		showLabelDescription: 'Mostra a etiqueta de cada cor no seletor de cores, em vez de apenas a cor.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'Só pode selecionar itens do(s) tipo(s): %0%',
