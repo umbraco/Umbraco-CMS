@@ -43,7 +43,7 @@ const MEDIA_MEMORY_UNIQUE = 'UmbLinkPickerMedia';
 @customElement('umb-link-picker-modal')
 export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalValue> {
 	#propertyLayoutOrientation: 'horizontal' | 'vertical' = 'vertical';
-	#userEditedTitle = false;
+	#userEditedTitle?: boolean = false;
 
 	#validationContext = new UmbValidationContext(this);
 
@@ -131,7 +131,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		if (type === 'document' && culture) {
 			await this.#variantContext.setCulture(culture);
 		}
-		this.#userEditedTitle = !!this.value.link.name;
+		// A saved title may have been filled in from its target, which is settled when the target changes.
+		this.#userEditedTitle = this.value.link.name ? undefined : false;
 
 		this.populateLinkUrl();
 	}
@@ -196,24 +197,40 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 	#onLinkUrlInput(event: UUIInputEvent) {
 		const url = event.target.value as string;
-
-		let name: string | undefined;
-		if (url && this.#shouldAutofillName()) {
-			if (URL.canParse(url)) {
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				const parts = URL.parse(url);
-				name = parts?.hostname ?? url;
-			} else {
-				name = url;
-			}
-		}
+		this.#userEditedTitle ??= this.value.link.name !== this.#getTitleFromUrl(this.value.link.url);
+		const title = this.#shouldAutofillName() ? this.#getTitleFromUrl(url) : undefined;
 
 		this.#partialUpdateLink({
-			name: this.#userEditedTitle ? this.value.link.name : (name ?? ''),
+			name: this.#userEditedTitle ? this.value.link.name : (title ?? ''),
 			type: 'external',
 			url,
 		});
+	}
+
+	#getTitleFromUrl(url?: string | null) {
+		if (!url) return undefined;
+		if (!URL.canParse(url)) return url;
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		const parts = URL.parse(url);
+		return parts?.hostname ?? url;
+	}
+
+	async #settleUserEditedTitle() {
+		this.#userEditedTitle ??= this.value.link.name !== (await this.#getTargetTitle());
+	}
+
+	/**
+	 * The title the dialog fills in for the link's current target.
+	 * @returns {Promise<string | undefined>} The target's name, or the host name of a manual URL.
+	 */
+	async #getTargetTitle() {
+		const { type, unique, url } = this.value.link;
+		if (type === 'external') return this.#getTitleFromUrl(url);
+		if (!unique) return undefined;
+		if (type === 'document') return this.#documentItemDataResolver?.getName();
+		if (type === 'media') return (await this.#requestMediaItem(unique))?.variants[0].name;
+		return undefined;
 	}
 
 	async #onPickerSelection(event: UmbInputPickerEvent, type: 'document' | 'media') {
@@ -223,6 +240,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	}
 
 	async #pickerSelect(type: 'document' | 'media', unique?: string, culture?: string) {
+		await this.#settleUserEditedTitle();
 		let icon, name, url;
 
 		if (unique) {
@@ -237,9 +255,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					break;
 				}
 				case 'media': {
-					this.#mediaItemRepository ??= new UmbMediaItemRepository(this);
-					const { data: mediaData } = await this.#mediaItemRepository.requestItems([unique]);
-					const mediaItem = mediaData?.[0];
+					const mediaItem = await this.#requestMediaItem(unique);
 					if (mediaItem) {
 						icon = mediaItem.mediaType.icon;
 						name = mediaItem.variants[0].name;
@@ -277,6 +293,12 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			this.#documentItemDataResolver = new UmbDocumentItemDataResolver(this);
 			this.#documentItemDataResolver.setData(this._documentItem);
 		}
+	}
+
+	async #requestMediaItem(unique: string) {
+		this.#mediaItemRepository ??= new UmbMediaItemRepository(this);
+		const { data } = await this.#mediaItemRepository.requestItems([unique]);
+		return data?.[0];
 	}
 
 	async #getUrlForDocument(unique: string) {
@@ -326,7 +348,11 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	async #triggerDocumentLinkPicker() {
 		const value = await umbOpenModal(this, UMB_DOCUMENT_LINK_PICKER_MODAL, {
 			data: { allowCultureSpecificLinks: this._config.documentLinksConfig?.allowCultureSpecificLinks },
-		});
+		}).catch(() => undefined);
+		if (!value) return;
+
+		// Before switching culture, so the current document's name is read in the culture it was picked in.
+		await this.#settleUserEditedTitle();
 
 		// If a culture is selected for the document, we need to set the variant context to make sure we get the correct name and url for the document.
 		// This will make a local variant context for the link picker when a Document with a culture is selected,
@@ -425,6 +451,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					standalone
 					?readonly=${!this.modalContext?.router}>
 					<uui-action-bar slot="actions">
+						<uui-button
+							label=${this.localize.term('actions_replace')}
+							@click=${this.#triggerDocumentLinkPicker}></uui-button>
 						<uui-button
 							label=${this.localize.term('general_remove')}
 							@click=${() => this.#onDocumentRemove()}></uui-button>

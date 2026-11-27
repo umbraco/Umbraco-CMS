@@ -201,6 +201,11 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 		this.#pickerContext.requestRemoveItem(unique);
 	}
 
+	#renderReplaceAction() {
+		if (this.readonly || this.max !== 1) return nothing;
+		return html`<uui-button label=${this.localize.term('actions_replace')} @click=${this.#openPicker}></uui-button>`;
+	}
+
 	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
@@ -244,6 +249,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 									!this.readonly,
 									() => html`
 										<uui-action-bar slot="actions">
+											${this.#renderReplaceAction()}
 											<uui-button
 												label=${this.localize.term('general_remove')}
 												@click=${() => this.#onRemove(unique)}></uui-button>

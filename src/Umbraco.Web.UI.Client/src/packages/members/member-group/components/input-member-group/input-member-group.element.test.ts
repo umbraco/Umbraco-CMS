@@ -35,6 +35,7 @@ const memberGroupItem = (unique: string): MemberGroupItemResponseModel => ({
 describe('UmbInputMemberGroupElement', () => {
 	let element: UmbInputMemberGroupElement;
 	let openedWith: Array<UmbMemberGroupPickerModalData>;
+	let submitValue: unknown;
 
 	const openPicker = async () => {
 		element.shadowRoot!.querySelector<HTMLElement>('#btn-add')!.click();
@@ -83,11 +84,14 @@ describe('UmbInputMemberGroupElement', () => {
 		await element.updateComplete;
 
 		openedWith = [];
+		submitValue = undefined;
 		const modalManager = {
 			getHostElement: () => host,
 			open: (_host: unknown, _token: unknown, args: { data: UmbMemberGroupPickerModalData }) => {
 				openedWith.push(args.data);
-				return { onSubmit: () => Promise.reject(new Error('Cancelled')) };
+				return {
+					onSubmit: () => (submitValue ? Promise.resolve(submitValue) : Promise.reject(new Error('Cancelled'))),
+				};
 			},
 		};
 		new UmbContextProvider(
@@ -132,6 +136,30 @@ describe('UmbInputMemberGroupElement', () => {
 		await renderWith(['group-a', 'group-b']);
 
 		expect(isDraggableAfterMouseDown(refNodes()[0])).to.be.false;
+	});
+
+	describe('replace action', () => {
+		const replaceButton = () =>
+			element.shadowRoot!.querySelector<HTMLElement>(
+				`uui-action-bar uui-button[label="${element.localize.term('actions_replace')}"]`,
+			);
+
+		it('replaces the only item with the one picked, when a single item is allowed', async () => {
+			submitValue = { selection: ['group-b'] };
+			await renderWith(['group-a'], 1);
+			expect(replaceButton(), 'replace button').to.exist;
+
+			replaceButton()!.click();
+			await waitUntil(() => element.selection[0] === 'group-b', 'the item was not changed');
+
+			expect(openedWith).to.have.lengthOf(1);
+			expect(element.selection).to.deep.equal(['group-b']);
+		});
+
+		it('does not offer replace when more than one item is allowed', async () => {
+			await renderWith(['group-a'], 2);
+			expect(replaceButton()).to.be.null;
+		});
 	});
 
 	describe('pickable filters', () => {
