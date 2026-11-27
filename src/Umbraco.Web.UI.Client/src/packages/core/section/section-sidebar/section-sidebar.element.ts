@@ -29,7 +29,7 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 				flex: 0 0 var(--umb-section-sidebar-width);
 				background-color: var(--uui-color-surface);
 				height: 100%;
-				border-right: 1px solid var(--uui-color-border);
+				border-inline-end: 1px solid var(--uui-color-border);
 				font-weight: 500;
 				display: flex;
 				flex-direction: column;

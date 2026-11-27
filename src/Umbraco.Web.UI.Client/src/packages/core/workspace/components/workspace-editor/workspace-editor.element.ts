@@ -306,7 +306,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 			}
 
 			.back-button {
-				margin-right: var(--uui-size-space-4);
+				margin-inline-end: var(--uui-size-space-4);
 			}
 
 			uui-input {

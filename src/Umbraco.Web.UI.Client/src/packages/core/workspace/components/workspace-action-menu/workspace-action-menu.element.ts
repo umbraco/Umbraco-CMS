@@ -96,6 +96,11 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				transform: rotate(-90deg);
 			}
 
+			/* The symbol turns the other way in right-to-left, so turn it back to keep the caret pointing up. */
+			#expand-symbol:dir(rtl) {
+				transform: rotate(90deg);
+			}
+
 			#expand-symbol[open] {
 				transform: rotate(0deg);
 			}
