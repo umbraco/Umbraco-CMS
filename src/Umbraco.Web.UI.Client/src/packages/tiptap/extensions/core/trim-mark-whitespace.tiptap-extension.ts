@@ -1,0 +1,83 @@
+import { Extension, Plugin, TextSelection, commands, getMarkType, isMarkActive } from '../../externals.js';
+import type { CommandProps, ProseMirrorNode, Selection } from '../../externals.js';
+
+const getTrimmedSelection = (selection: Selection, keepWhitespace: (node: ProseMirrorNode) => boolean) => {
+	if (!(selection instanceof TextSelection) || selection.empty) return null;
+
+	const { $from, $to, from, to } = selection;
+	const start = $from.nodeAfter;
+	const end = $to.nodeBefore;
+	const leading = start?.isText && !keepWhitespace(start) ? start.text!.length - start.text!.trimStart().length : 0;
+	const trailing = end?.isText && !keepWhitespace(end) ? end.text!.length - end.text!.trimEnd().length : 0;
+
+	return from + leading < to - trailing ? TextSelection.create($from.doc, from + leading, to - trailing) : null;
+};
+
+// The command `state` caches its selection until `tr` is read, so reading it makes `state` see the current selection.
+const refreshSelection = ({ state }: CommandProps) => state.tr;
+
+const runOnTrimmedSelection = (
+	props: CommandProps,
+	typeOrName: Parameters<typeof getMarkType>[0],
+	run: () => boolean,
+) => {
+	const { tr } = props;
+	const original = tr.selection;
+	const type = getMarkType(typeOrName, props.state.schema);
+	const trimmed = getTrimmedSelection(original, (node) => !!type.isInSet(node.marks));
+
+	if (!trimmed) return run();
+
+	tr.setSelection(trimmed);
+	refreshSelection(props);
+	const result = run();
+	tr.setSelection(TextSelection.create(tr.doc, original.anchor, original.head));
+	refreshSelection(props);
+	return result;
+};
+
+/**
+ * Keeps leading and trailing whitespace of a selection outside of any mark that is applied to it,
+ * e.g. when a word is double-clicked on a platform that includes the trailing space in the selection.
+ *
+ * Commands are merged by name, so any further `setMark` or `toggleMark` behaviour belongs in these overrides
+ * rather than in a second one.
+ */
+export const UmbTrimMarkWhitespace = Extension.create({
+	name: 'umbTrimMarkWhitespace',
+
+	addCommands() {
+		return {
+			setMark: (typeOrName, attributes) => (props) =>
+				runOnTrimmedSelection(props, typeOrName, () => commands.setMark(typeOrName, attributes)(props)),
+
+			toggleMark: (typeOrName, attributes, options) => (props) => {
+				const toggle = () => commands.toggleMark(typeOrName, attributes, options)(props);
+				return isMarkActive(props.state, typeOrName, attributes)
+					? toggle()
+					: runOnTrimmedSelection(props, typeOrName, toggle);
+			},
+		};
+	},
+
+	// TODO: [LK] Review when `prosemirror-view` is upgraded to 1.43.0 or later, where the library handles mouse selection
+	// itself and a double-click selects only the word. This plugin should then be redundant and can be removed.
+	addProseMirrorPlugins() {
+		return [
+			new Plugin({
+				props: {
+					handleDOMEvents: {
+						dblclick: (view) => {
+							setTimeout(() => {
+								if (view.isDestroyed) return;
+								const trimmed = getTrimmedSelection(view.state.selection, (node) => node.marks.length > 0);
+								if (trimmed) view.dispatch(view.state.tr.setSelection(trimmed));
+							});
+							return false;
+						},
+					},
+				},
+			}),
+		];
+	},
+});

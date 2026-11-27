@@ -1,7 +1,9 @@
 import type { UmbMemberItemModel } from '../../item/types.js';
+import type { UmbMemberSearchItemModel } from '../../search/types.js';
+import type { UmbMemberDetailModel } from '../../types.js';
 import { UmbMemberPickerInputContext } from './input-member.context.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { splitStringToArray, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import {
 	isAboveZeroAndBelowMinimum,
@@ -50,13 +52,13 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	/**
-	 * Min validation message.
+	 * Min validation message. When not set, a localized message stating the minimum and how many more items are needed is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field needs more items';
+	minMessage?: string;
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -74,13 +76,13 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	/**
-	 * Max validation message.
+	 * Max validation message. When not set, a localized message stating the maximum and how many items are over it is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'max-message' })
-	maxMessage = 'This field exceeds the allowed amount of items';
+	maxMessage?: string;
 
 	public set selection(ids: Array<string>) {
 		this.#pickerContext.setSelection(ids);
@@ -102,8 +104,39 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
+	#hasWarnedFilterDeprecation = false;
+
+	/**
+	 * @deprecated Deprecated since v17. Filtering members on the client breaks server-side pagination. Use `browsePickableFilter` and `searchPickableFilter` to prevent members from being picked instead. Scheduled for removal in Umbraco 21.
+	 */
 	@property({ type: Object, attribute: false })
-	public filter: (member: UmbMemberItemModel) => boolean = () => true;
+	public set filter(value: ((member: UmbMemberDetailModel) => boolean) | undefined) {
+		if (value && !this.#hasWarnedFilterDeprecation) {
+			this.#hasWarnedFilterDeprecation = true;
+			new UmbDeprecation({
+				deprecated: 'The `filter` property of umb-input-member',
+				removeInVersion: '21.0.0',
+				solution: 'Use `browsePickableFilter` and `searchPickableFilter` to prevent members from being picked instead.',
+			}).warn();
+		}
+		this.#filter = value;
+	}
+	public get filter(): (member: UmbMemberDetailModel) => boolean {
+		return this.#filter ?? (() => true);
+	}
+	#filter?: (member: UmbMemberDetailModel) => boolean;
+
+	/**
+	 * Prevents items from being picked while browsing. Items for which this returns false are shown but cannot be picked.
+	 */
+	@property({ type: Object, attribute: false })
+	public browsePickableFilter?: (member: UmbMemberDetailModel) => boolean;
+
+	/**
+	 * Prevents search results from being picked. Results for which this returns false are shown but cannot be picked.
+	 */
+	@property({ type: Object, attribute: false })
+	public searchPickableFilter?: (member: UmbMemberSearchItemModel) => boolean;
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -158,13 +191,17 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 
 		this.addValidator(
 			'rangeUnderflow',
-			() => this.minMessage,
+			() =>
+				this.minMessage ||
+				this.localize.term('validation_entriesShort', this.min, (this.min ?? 0) - this.selection.length),
 			() => !this.readonly && isAboveZeroAndBelowMinimum(this.selection.length, this.min),
 		);
 
 		this.addValidator(
 			'rangeOverflow',
-			() => this.maxMessage,
+			() =>
+				this.maxMessage ||
+				this.localize.term('validation_entriesExceed', this.max, this.selection.length - (this.max ?? 0)),
 			() => !this.readonly && !!this.max && this.selection.length > this.max,
 		);
 
@@ -176,7 +213,11 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 	#openPicker() {
 		this.#pickerContext.openPicker(
 			{
-				filter: this.filter,
+				filter: this.#filter,
+				pickableFilter: this.browsePickableFilter,
+				search: {
+					pickableFilter: this.searchPickableFilter,
+				},
 			},
 			{
 				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({

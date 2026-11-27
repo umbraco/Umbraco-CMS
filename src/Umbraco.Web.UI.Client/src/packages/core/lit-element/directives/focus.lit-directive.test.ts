@@ -35,7 +35,7 @@ describe('umbFocus directive', () => {
 	});
 
 	it('does not steal focus back once the user has moved it elsewhere', async () => {
-		const other = await fixture(html`<input id="already-here" />`);
+		const other = await fixture<HTMLInputElement>(html`<input id="already-here" />`);
 
 		// The directive attempts to focus while the element cannot take focus yet,
 		// so a retry is scheduled.

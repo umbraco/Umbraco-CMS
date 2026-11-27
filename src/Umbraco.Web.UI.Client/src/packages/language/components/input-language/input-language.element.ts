@@ -1,7 +1,7 @@
 import type { UmbLanguageItemModel } from '../../types.js';
 import { UmbLanguagePickerInputContext } from './input-language.context.js';
 import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
-import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { splitStringToArray, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -43,13 +43,13 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	/**
-	 * Min validation message.
+	 * Min validation message. When not set, a localized message stating the minimum and how many more items are needed is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field needs more items';
+	minMessage?: string;
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -67,16 +67,41 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	/**
-	 * Max validation message.
+	 * Max validation message. When not set, a localized message stating the maximum and how many items are over it is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'max-message' })
-	maxMessage = 'This field exceeds the allowed amount of items';
+	maxMessage?: string;
 
+	#hasWarnedFilterDeprecation = false;
+
+	/**
+	 * @deprecated Deprecated since v17. Use `browsePickableFilter` to prevent languages from being picked instead. Scheduled for removal in Umbraco 21.
+	 */
 	@property({ type: Object, attribute: false })
-	public filter: (language: UmbLanguageItemModel) => boolean = () => true;
+	public set filter(value: ((language: UmbLanguageItemModel) => boolean) | undefined) {
+		if (value && !this.#hasWarnedFilterDeprecation) {
+			this.#hasWarnedFilterDeprecation = true;
+			new UmbDeprecation({
+				deprecated: 'The `filter` property of umb-input-language',
+				removeInVersion: '21.0.0',
+				solution: 'Use `browsePickableFilter` to prevent languages from being picked instead.',
+			}).warn();
+		}
+		this.#filter = value;
+	}
+	public get filter(): (language: UmbLanguageItemModel) => boolean {
+		return this.#filter ?? (() => true);
+	}
+	#filter?: (language: UmbLanguageItemModel) => boolean;
+
+	/**
+	 * Prevents items from being picked while browsing. Items for which this returns false are shown but cannot be picked.
+	 */
+	@property({ type: Object, attribute: false })
+	public browsePickableFilter?: (language: UmbLanguageItemModel) => boolean;
 
 	@property({ type: Array })
 	public set selection(uniques: Array<string>) {
@@ -133,13 +158,25 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 
 		this.addValidator(
 			'rangeUnderflow',
-			() => this.minMessage,
+			() =>
+				this.minMessage ||
+				this.localize.term(
+					'validation_entriesShort',
+					this.min,
+					(this.min ?? 0) - this.#pickerContext.getSelection().length,
+				),
 			() => isAboveZeroAndBelowMinimum(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(
 			'rangeOverflow',
-			() => this.maxMessage,
+			() =>
+				this.maxMessage ||
+				this.localize.term(
+					'validation_entriesExceed',
+					this.max,
+					this.#pickerContext.getSelection().length - (this.max ?? 0),
+				),
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
@@ -154,7 +191,8 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 
 	#openPicker() {
 		this.#pickerContext.openPicker({
-			filter: this.filter,
+			filter: this.#filter,
+			pickableFilter: this.browsePickableFilter,
 			multiple: this.max > 1 ? true : false,
 		});
 	}
@@ -168,13 +206,15 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	#renderAddButton() {
+		if (this.readonly && this.selection.length > 0) return nothing;
 		if (this.max > 0 && this.selection.length >= this.max) return nothing;
 		return html`
 			<uui-button
 				id="btn-add"
 				look="placeholder"
 				@click=${this.#openPicker}
-				label="${this.localize.term('general_choose')}"></uui-button>
+				label="${this.localize.term('general_choose')}"
+				?disabled=${this.readonly}></uui-button>
 		`;
 	}
 

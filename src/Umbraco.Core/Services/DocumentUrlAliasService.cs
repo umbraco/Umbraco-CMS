@@ -501,7 +501,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     public bool HasAny()
     {
         ThrowIfNotInitialized();
-        return _aliasCache.Count > 0;
+        return _aliasCache.IsEmpty is false;
     }
 
     /// <inheritdoc/>

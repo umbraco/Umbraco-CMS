@@ -1,4 +1,5 @@
 import type { UmbUserItemModel } from '../../repository/index.js';
+import type { UmbUserDetailModel } from '../../types.js';
 import { UmbUserPickerInputContext } from './user-input.context.js';
 import {
 	css,
@@ -93,13 +94,13 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 	}
 
 	/**
-	 * Min validation message.
+	 * Min validation message. When not set, a localized message stating the minimum and how many more items are needed is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field needs more items';
+	minMessage?: string;
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -117,13 +118,13 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 	}
 
 	/**
-	 * Max validation message.
+	 * Max validation message. When not set, a localized message stating the maximum and how many items are over it is used.
 	 * @type {string}
 	 * @attr
-	 * @default
+	 * @default undefined
 	 */
 	@property({ type: String, attribute: 'max-message' })
-	maxMessage = 'This field exceeds the allowed amount of items';
+	maxMessage?: string;
 
 	@property({ type: Array })
 	public set selection(uniques: Array<string>) {
@@ -140,6 +141,17 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 	}
 	public override get value(): string | undefined {
 		return this.selection.join(',');
+	}
+
+	/**
+	 * Prevents items from being picked while browsing. Items for which this returns false are shown but cannot be picked.
+	 */
+	@property({ type: Object, attribute: false })
+	public set browsePickableFilter(value: ((user: UmbUserDetailModel) => boolean) | undefined) {
+		this.#pickerContext.setModalData({ ...this.#pickerContext.getModalData(), pickableFilter: value });
+	}
+	public get browsePickableFilter(): ((user: UmbUserDetailModel) => boolean) | undefined {
+		return this.#pickerContext.getModalData()?.pickableFilter;
 	}
 
 	@state()
@@ -164,13 +176,25 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 
 		this.addValidator(
 			'rangeUnderflow',
-			() => this.minMessage,
+			() =>
+				this.minMessage ||
+				this.localize.term(
+					'validation_entriesShort',
+					this.min,
+					(this.min ?? 0) - this.#pickerContext.getSelection().length,
+				),
 			() => isAboveZeroAndBelowMinimum(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(
 			'rangeOverflow',
-			() => this.maxMessage,
+			() =>
+				this.maxMessage ||
+				this.localize.term(
+					'validation_entriesExceed',
+					this.max,
+					this.#pickerContext.getSelection().length - (this.max ?? 0),
+				),
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 

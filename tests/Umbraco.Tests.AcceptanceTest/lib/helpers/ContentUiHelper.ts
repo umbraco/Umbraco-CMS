@@ -1581,7 +1581,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickEditBlockListEntryWithName(blockListElementName: string) {
-    await this.click(this.blockListEntry.filter({hasText: blockListElementName}).getByLabel('edit'), {force: true});
+    await this.click(this.blockListEntry.filter({hasText: blockListElementName}).getByLabel('edit'));
   }
 
   async clickEditBlockGridEntryWithName(blockGridElementName: string) {
@@ -1960,9 +1960,9 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickBlockCardWithName(name: string, toForce: boolean = false) {
-    const blockWithNameLocator = this.page.locator('uui-card-block-type', {
-      hasText: name,
-    });
+    const blockWithNameLocator = this.page
+      .locator('umb-block-catalogue-modal')
+      .locator('umb-figure-card', {hasText: name});
     // The card can sit below the fold in the nested-block picker; scrollIntoView brings it in and, unlike
     // the raw scrollIntoViewIfNeeded, waits for visibility first so a missing card fails fast.
     await this.scrollIntoView(blockWithNameLocator);

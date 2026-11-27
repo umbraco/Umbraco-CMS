@@ -17,6 +17,11 @@ export interface UmbLinkPickerDocumentLinksConfig {
 export interface UmbLinkPickerConfig {
 	hideAnchor?: boolean;
 	hideTarget?: boolean;
+	/**
+	 * Prevents the name from being filled in from the picked item or the entered URL, so it only holds what the user entered.
+	 * For example, a consumer that uses the name as the link's title rather than as its text.
+	 */
+	disableNameAutofill?: boolean;
 	documentLinksConfig?: UmbLinkPickerDocumentLinksConfig;
 }
 

@@ -234,7 +234,7 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("No member type with that alias.", nameof(memberTypeAlias));
             }
 
-            var member = new Member(name, email.ToLower().Trim(), username, memberType, 0);
+            var member = new Member(name, email.ToLowerInvariant().Trim(), username, memberType, 0);
 
             return member;
         }
@@ -257,7 +257,7 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentNullException(nameof(memberType));
             }
 
-            var member = new Member(name, email.ToLower().Trim(), username, memberType, 0);
+            var member = new Member(name, email.ToLowerInvariant().Trim(), username, memberType, 0);
 
             return member;
         }
@@ -328,7 +328,7 @@ namespace Umbraco.Cms.Core.Services
                     throw new ArgumentException("No member type with that alias.", nameof(memberTypeAlias)); // causes rollback // causes rollback
                 }
 
-                var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved, -1);
+                var member = new Member(name, email.ToLowerInvariant().Trim(), username, passwordValue, memberType, isApproved, -1);
 
                 Save(member);
 
@@ -404,7 +404,7 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException($"Member type with alias {memberType.Alias} does not exist or is a different member type."); // causes rollback
             }
 
-            var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved, -1);
+            var member = new Member(name, email.ToLowerInvariant().Trim(), username, passwordValue, memberType, isApproved, -1);
 
             Save(member);
 
@@ -1008,7 +1008,7 @@ namespace Umbraco.Cms.Core.Services
             var savingNotification = new MemberSavingNotification(member, evtMsgs);
             savingNotification.State.Add(Constants.Conventions.Member.LoginPropertiesOnlyStateKey, true);
             savingNotification.State.Add(Constants.Conventions.Member.IndexableFieldsChangedStateKey, false);
-            if (scope.Notifications.PublishCancelable(savingNotification))
+            if (await scope.Notifications.PublishCancelableAsync(savingNotification))
             {
                 scope.Complete();
                 return;

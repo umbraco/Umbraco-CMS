@@ -1,9 +1,10 @@
-import { Code, CodeBlock } from '../../externals.js';
+import { CodeBlock } from '../../externals.js';
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
+import { UmbCode } from './code.tiptap-extension.js';
 import { css } from '@umbraco-cms/backoffice/external/lit';
 
 export default class UmbTiptapCodeBlockExtensionApi extends UmbTiptapExtensionApiBase {
-	getTiptapExtensions = () => [Code, CodeBlock];
+	getTiptapExtensions = () => [UmbCode, CodeBlock];
 
 	override getStyles = () => css`
 		pre {

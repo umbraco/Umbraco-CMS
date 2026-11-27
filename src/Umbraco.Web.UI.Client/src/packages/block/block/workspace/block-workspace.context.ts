@@ -21,6 +21,7 @@ import {
 	UmbClassState,
 	UmbObjectState,
 	UmbStringState,
+	mergeObservables,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -91,6 +92,29 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	#exposed = new UmbBooleanState<undefined>(undefined);
 	readonly exposed = this.#exposed.asObservable();
+
+	#forceHideContentEditorInOverlay = new UmbBooleanState(false);
+
+	/**
+	 * Whether the content editor view should be shown: the content element type has properties
+	 * and the block type does not hide the content editor.
+	 */
+	readonly showContentEdit = mergeObservables(
+		[this.content.structure.contentTypeHasProperties, this.#forceHideContentEditorInOverlay.asObservable()],
+		([hasProperties, forceHide]) => hasProperties === true && forceHide === false,
+	);
+
+	/**
+	 * Whether the content type of the block varies by culture or segment.
+	 */
+	readonly variesByVariant = observeMultiple([
+		this.content.structure.variesByCulture,
+		this.content.structure.variesBySegment,
+	]).pipe(
+		map(([variesByCulture, variesBySegment]) =>
+			variesByCulture === undefined || variesBySegment === undefined ? undefined : variesByCulture || variesBySegment,
+		),
+	);
 
 	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
@@ -268,6 +292,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				this.observe(
 					contentTypeId ? manager.blockTypeOf(contentTypeId) : undefined,
 					async (blockType) => {
+						this.#setForceHideContentEditorInOverlay(blockType);
 						if (blockType?.editorSize) {
 							const editorConfig = manager.getEditorConfiguration();
 							const useInlineEditing = editorConfig?.find((x) => x.alias === 'useInlineEditingAsDefault')?.value;
@@ -287,6 +312,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			},
 			'observeContentTypeId',
 		);
+	}
+
+	#setForceHideContentEditorInOverlay(blockType: { forceHideContentEditorInOverlay?: boolean } | undefined) {
+		this.#forceHideContentEditorInOverlay.setValue(blockType?.forceHideContentEditorInOverlay ?? false);
 	}
 
 	#gotLabel(label: string | undefined) {
@@ -609,6 +638,36 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 
 	async submit() {
+		const layoutData = await this.#storeData();
+		this.#expose(layoutData.contentKey);
+		this.setIsNew(false);
+
+		this.#reportValidation();
+	}
+
+	/**
+	 * Stores the edits and sets the block as not exposed for the current variant, without validating.
+	 * The content of the variant is kept, so exposing the block again restores it.
+	 */
+	async submitAndUnexpose() {
+		const layoutData = await this.#storeData();
+		const variantId = this.#variantId.getValue();
+		if (!variantId) throw new Error('Failed to unexpose block, missing variant id.');
+		this.#blockManager?.removeOneExpose(layoutData.contentKey, variantId);
+		this.#clearVariantValidationMessages();
+		this.#reportValidation();
+		this.setIsNew(false);
+		this._closeModal();
+	}
+
+	#clearVariantValidationMessages() {
+		for (const manager of [this.content, this.settings]) {
+			const messages = manager.validation.messages;
+			messages.removeMessageByKeys(messages.getMessages().map((x) => x.key));
+		}
+	}
+
+	async #storeData(): Promise<LayoutDataType> {
 		const layoutData = this.#layout.value;
 		const contentData = this.content.getData();
 		if (!layoutData || !this.#blockManager || !this.#blockEntries || !contentData || !this.#originData) {
@@ -641,10 +700,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			}
 		}
 
-		this.#expose(layoutData.contentKey);
-		this.setIsNew(false);
-
-		this.#reportValidation();
+		return layoutData;
 	}
 
 	#reportValidation() {

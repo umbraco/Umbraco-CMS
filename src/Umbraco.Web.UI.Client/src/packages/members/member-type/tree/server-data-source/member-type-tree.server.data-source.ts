@@ -11,6 +11,7 @@ import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeDataSource,
+	UmbTreeItemsRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
 
@@ -58,12 +59,24 @@ export class UmbMemberTypeTreeServerDataSource
 		return { data: mappedData, error };
 	}
 
+	async getItems(args: UmbTreeItemsRequestArgs) {
+		const { data, error } = await this.#treeRequestManager.getBatch(args);
+
+		const mappedData = data?.map((item) => this.#mapItem(item));
+
+		return { data: mappedData, error };
+	}
+
 	#mapItem(item: MemberTypeTreeItemResponseModel): UmbMemberTypeTreeItemModel {
 		return {
 			unique: item.id,
 			parent: {
 				unique: item.parent ? item.parent.id : null,
-				entityType: item.parent ? UMB_MEMBER_TYPE_FOLDER_ENTITY_TYPE : UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE,
+				entityType: item.parent
+					? item.parentIsFolder
+						? UMB_MEMBER_TYPE_FOLDER_ENTITY_TYPE
+						: UMB_MEMBER_TYPE_ENTITY_TYPE
+					: UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE,
 			},
 			name: item.name,
 			entityType: item.isFolder ? UMB_MEMBER_TYPE_FOLDER_ENTITY_TYPE : UMB_MEMBER_TYPE_ENTITY_TYPE,
