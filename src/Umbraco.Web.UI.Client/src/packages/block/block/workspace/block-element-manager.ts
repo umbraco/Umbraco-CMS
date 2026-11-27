@@ -59,9 +59,18 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		new UmbDocumentTypeDetailRepository(this),
 	);
 
+	// The variant limited to what this element type varies by; a property composed from a varying type cannot vary further than its owner.
+	readonly #ownerVariantId = mergeObservables(
+		[this.variantId, this.structure.variesByCulture, this.structure.variesBySegment],
+		([variantId, variesByCulture, variesBySegment]) =>
+			variantId && variesByCulture !== undefined && variesBySegment !== undefined
+				? variantId.toVariant(variesByCulture, variesBySegment)
+				: undefined,
+	);
+
 	// The values resolved to a single entry per property, matching the current variant. [NL]
 	readonly variantValues = mergeObservables(
-		[this.structure.contentTypeProperties, this.values, this.variantId],
+		[this.structure.contentTypeProperties, this.values, this.#ownerVariantId],
 		([properties, values, variantId]) => {
 			if (!variantId) {
 				return [];
@@ -213,7 +222,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 
 	async propertyVariantId(propertyAlias: string) {
 		return mergeObservables(
-			[await this.structure.propertyStructureByAlias(propertyAlias), this.variantId],
+			[await this.structure.propertyStructureByAlias(propertyAlias), this.#ownerVariantId],
 			([property, variantId]) =>
 				property && variantId ? this.#createPropertyVariantId(property, variantId) : undefined,
 		);

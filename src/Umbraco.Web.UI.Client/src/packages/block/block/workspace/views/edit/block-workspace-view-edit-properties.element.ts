@@ -6,7 +6,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 import './block-workspace-view-edit-property.element.js';
 
@@ -88,12 +88,14 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 		}
 
 		const propertyViewGuard = this._dataOwner.propertyViewGuard;
+		const structure = this._dataOwner.structure;
+		const ownerVariantId = this._workspaceVariantId.toVariant(
+			structure.getVariesByCulture(),
+			structure.getVariesBySegment(),
+		);
 
 		this.#properties.forEach((property) => {
-			const propertyVariantId = new UmbVariantId(
-				property.variesByCulture ? this._workspaceVariantId!.culture : null,
-				property.variesBySegment ? this._workspaceVariantId!.segment : null,
-			);
+			const propertyVariantId = ownerVariantId.toVariant(property.variesByCulture, property.variesBySegment);
 			this.observe(
 				propertyViewGuard.isPermittedForVariantAndProperty(propertyVariantId, property, this._workspaceVariantId!),
 				(permitted) => {
