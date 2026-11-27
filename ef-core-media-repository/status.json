@@ -237,10 +237,10 @@
       "id": 7,
       "slug": "media-service-cutover",
       "title": "MediaService onto the engine, IMediaService reshaped, consumers cut over, NPoco repository deleted",
-      "status": "planned",
-      "branch": "",
-      "pr": "",
-      "prUrl": "",
+      "status": "in-review",
+      "branch": "v20/feature/ef-core-media-repository-6-media-service-cutover",
+      "pr": "#24824",
+      "prUrl": "https://github.com/umbraco/Umbraco-CMS/pull/24824",
       "dependsOn": [
         5
       ],
@@ -248,31 +248,31 @@
       "tasks": [
         {
           "text": "IMediaService reshaped per the old-to-new table in CAMPAIGN.md §5 PR 6; ContentSaveOperationStatus gains InvalidKey and DuplicateKey",
-          "done": false
+          "done": true
         },
         {
           "text": "MediaService : RepositoryService, IMediaService, self-contained, each member diffed against its ContentService / PublishableContentServiceBase origin",
-          "done": false
+          "done": true
         },
         {
           "text": "Consumers in Core, Infrastructure, Api.Management and Search.Core cut over (IIdKeyMap only at the edges)",
-          "done": false
+          "done": true
         },
         {
           "text": "NPoco MediaRepository, IMediaRepository, MediaDto, factory builders, DI line and MediaRepositoryTest deleted",
-          "done": false
+          "done": true
         },
         {
           "text": "Test fixtures ported; UmbracoIntegrationTestWithMediaEditing exposes keys; MediaBuilder gains key helpers",
-          "done": false
+          "done": true
         },
         {
           "text": "4b parity tests and 4b change tests green and red first; DI resolves IMediaService",
-          "done": false
+          "done": true
         }
       ],
       "acceptance": "Every media fixture green on SQLite; SQL Server differs only by the known-flaky search jobs; no IMediaRepository or IContentServiceBase<IMedia> reference left; no sync public member on MediaService except the constructor and the four file-system members; no OperationResult, int userId, IQuery, int parentId or sync bridge in the three media service files.",
-      "notes": "Numbered PR 6 in CAMPAIGN.md. Depends on PR 4 only since PR 5 was withdrawn on 27-11-2026; CAMPAIGN.md §5 PR 6 lists the members to write.",
+      "notes": "Numbered PR 6 in CAMPAIGN.md. Started 27-11-2026, stacked on PR 4 at 83630724b17 (the user's call; rebase onto the integration branch with git rebase --onto once #24808 merges). Implemented the same day: IMediaService reshaped (async, Guid keys, Attempt statuses, PagedModel; file-system members unchanged; CountNotTrashed, the IQuery filters and the UDI create extension dropped), MediaService self-contained on IAsyncMediaRepository with each member copied from the document service and the §4b rules applied in place, ContentSaveOperationStatus gains InvalidKey and DuplicateKey, 47 src consumer files ported across Core, Infrastructure, Management API and Search (ints resolved at the edges, sync bridges only behind sync contracts), NPoco MediaRepository, IMediaRepository, MediaDto, the NPoco media builders, the DI line and MediaRepositoryTest deleted. Tests: about 60 files ported by five agents (one test deleted: the media wildcard-filter literal search, no IQuery equivalent), new MediaServiceParityTests (14 tests) pins the §4b keeps and changes; the sorting flag and the delete-of-types seams proven red by sabotage. Independent review: one must-fix (delete-of-types skipped the notification and audit on an empty match) and should-fixes (scope completion on the move validation returns, a tightened delete-of-types descendant rule so nothing is moved twice, the import service throws instead of falling back to the root, the media type service logs a failed delete, docs, two distinguishing parity tests), all applied. Verification on SQLite: unit project 8241 passed; media-touching integration fixtures 1242 passed, 0 failed (pre-fix tree) and the 91 fixtures touched by the fixes green again on the fixed tree; IDE0005 clean on the touched files; full solution build clean. SQL Server run of the media fixtures: 976 passed, 0 failed. Second review pass: no must-fix; its should-fixes applied (a scope-completion test for the rejected move parents, a test for the empty delete-of-types path, both red-proven by sabotage, the media type warning reworded, field placement), 16 parity tests. Committed as eab17d4827a and opened as draft #24824 on 27-11-2026 with base = PR 4's branch; retarget to the integration branch and rebase with git rebase --onto once #24808 merges.",
       "mergeCommit": ""
     },
     {
@@ -303,6 +303,18 @@
     }
   ],
   "log": [
+    {
+      "date": "27-11-2026",
+      "text": "PR 6 committed (eab17d4827a) and opened as draft #24824, stacked on PR 4's branch. Retarget after #24808 merges."
+    },
+    {
+      "date": "27-11-2026",
+      "text": "PR 6 second review pass clean; SQL Server media fixtures 976 passed; two more parity tests red-proven. Awaiting the user's call to commit and open the draft PR."
+    },
+    {
+      "date": "27-11-2026",
+      "text": "PR 6 (MediaService cutover) implemented on v20/feature/ef-core-media-repository-6-media-service-cutover, stacked on PR 4: contract reshaped, self-contained async MediaService, 47 src consumers and about 60 test files ported, NPoco media repository deleted, 14 parity tests. First review applied; SQLite green (1242 integration, 8241 unit). SQL Server run and second review pass in progress; not committed."
+    },
     {
       "date": "27-11-2026",
       "text": "PR 5 (service engine hoist) withdrawn on the user's call after implementation and two clean review passes: the wide service base was judged clunky and unnecessary. MediaService follows the NPoco layout as a self-contained async service in PR 6, which now depends on PR 4 only. The patch is kept under withdrawn/ in the campaign folder; the branch was deleted without a commit."
