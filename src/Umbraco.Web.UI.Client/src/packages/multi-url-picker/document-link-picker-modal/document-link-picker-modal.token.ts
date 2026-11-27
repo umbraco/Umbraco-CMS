@@ -16,6 +16,6 @@ export const UMB_DOCUMENT_LINK_PICKER_MODAL = new UmbModalToken<
 >('Umb.MultiUrlLinkPicker.Document', {
 	modal: {
 		type: 'sidebar',
-		size: 'small',
+		size: 'medium',
 	},
 });
