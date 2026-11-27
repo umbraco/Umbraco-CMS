@@ -31,4 +31,10 @@ public class ServerInformationResponseModel
     /// Gets or sets a value indicating whether the Umbraco server is running in debug mode.
     /// </summary>
     public bool IsDebugMode { get; set; }
+
+    /// <summary>
+    /// Gets or sets the permission verbs the environment denies, for example <c>Umb.DocumentType.Create</c>. Any verb not
+    /// listed is permitted.
+    /// </summary>
+    public IEnumerable<string> DeniedPermissions { get; set; } = [];
 }

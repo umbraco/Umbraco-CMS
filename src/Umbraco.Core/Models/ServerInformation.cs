@@ -16,7 +16,7 @@ public class ServerInformation
     /// <param name="runtimeMode">The current runtime mode of the server.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public ServerInformation(SemVersion semVersion, TimeZoneInfo timeZoneInfo, RuntimeMode runtimeMode)
-        : this(semVersion, timeZoneInfo, runtimeMode, isDebugMode: false)
+        : this(semVersion, timeZoneInfo, runtimeMode, isDebugMode: false, deniedPermissions: Array.Empty<string>())
     {
     }
 
@@ -27,12 +27,32 @@ public class ServerInformation
     /// <param name="timeZoneInfo">The time zone information for the server.</param>
     /// <param name="runtimeMode">The current runtime mode of the server.</param>
     /// <param name="isDebugMode">A value indicating whether the server is running in debug mode.</param>
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 21.")]
     public ServerInformation(SemVersion semVersion, TimeZoneInfo timeZoneInfo, RuntimeMode runtimeMode, bool isDebugMode)
+        : this(semVersion, timeZoneInfo, runtimeMode, isDebugMode, Array.Empty<string>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ServerInformation"/> class.
+    /// </summary>
+    /// <param name="semVersion">The semantic version of the Umbraco installation.</param>
+    /// <param name="timeZoneInfo">The time zone information for the server.</param>
+    /// <param name="runtimeMode">The current runtime mode of the server.</param>
+    /// <param name="isDebugMode">A value indicating whether the server is running in debug mode.</param>
+    /// <param name="deniedPermissions">The permission verbs the environment denies.</param>
+    public ServerInformation(
+        SemVersion semVersion,
+        TimeZoneInfo timeZoneInfo,
+        RuntimeMode runtimeMode,
+        bool isDebugMode,
+        IReadOnlyCollection<string> deniedPermissions)
     {
         SemVersion = semVersion;
         TimeZoneInfo = timeZoneInfo;
         RuntimeMode = runtimeMode;
         IsDebugMode = isDebugMode;
+        DeniedPermissions = deniedPermissions;
     }
 
     /// <summary>
@@ -54,4 +74,10 @@ public class ServerInformation
     /// Gets a value indicating whether the server is running in debug mode.
     /// </summary>
     public bool IsDebugMode { get; }
+
+    /// <summary>
+    /// Gets the permission verbs the environment denies, for example <c>Umb.DocumentType.Create</c>. Any verb not listed
+    /// is permitted.
+    /// </summary>
+    public IReadOnlyCollection<string> DeniedPermissions { get; }
 }

@@ -2549,6 +2549,7 @@ export type ServerInformationResponseModel = {
     baseUtcOffset: string;
     runtimeMode: RuntimeModeModel;
     isDebugMode: boolean;
+    deniedPermissions: Array<string>;
 };
 
 export type ServerStatusResponseModel = {

@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Permissions;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 
@@ -50,10 +51,24 @@ public class ServerInformationServiceTests
         Assert.AreEqual(TestTimeZone, result.TimeZoneInfo);
     }
 
+    [Test]
+    public void GetServerInformation_Returns_DeniedPermissions_From_EnvironmentPermissions()
+    {
+        ServerInformation result = CreateSut(deniedPermissions: ["Umb.Template.Update", "Umb.DataType.Create", "Umb.DataType.Update"])
+            .GetServerInformation();
+
+        Assert.That(result.DeniedPermissions, Is.EquivalentTo(new[] { "Umb.DataType.Create", "Umb.DataType.Update", "Umb.Template.Update" }));
+    }
+
+    [Test]
+    public void GetServerInformation_Returns_No_DeniedPermissions_When_None_Are_Denied()
+        => Assert.That(CreateSut().GetServerInformation().DeniedPermissions, Is.Empty);
+
     private static ServerInformationService CreateSut(
         SemVersion? semVersion = null,
         RuntimeMode runtimeMode = RuntimeMode.BackofficeDevelopment,
-        bool isDebugMode = false)
+        bool isDebugMode = false,
+        IReadOnlyCollection<string>? deniedPermissions = null)
     {
         var timeProvider = new FakeTimeProvider();
         timeProvider.SetLocalTimeZone(TestTimeZone);
@@ -62,6 +77,7 @@ public class ServerInformationServiceTests
             Mock.Of<IUmbracoVersion>(x => x.SemanticVersion == (semVersion ?? new SemVersion(17, 0, 0))),
             timeProvider,
             Mock.Of<IOptionsMonitor<RuntimeSettings>>(x => x.CurrentValue == new RuntimeSettings { Mode = runtimeMode }),
-            Mock.Of<IHostingEnvironment>(x => x.IsDebugMode == isDebugMode));
+            Mock.Of<IHostingEnvironment>(x => x.IsDebugMode == isDebugMode),
+            Mock.Of<IEnvironmentPermissions>(x => x.DeniedPermissions == (deniedPermissions ?? Array.Empty<string>())));
     }
 }
