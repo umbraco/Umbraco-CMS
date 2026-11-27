@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -21,11 +22,35 @@ namespace Umbraco.Cms.Api.Management.Controllers.Security;
 [ApiExplorerSettings(IgnoreApi = true)]
 public class BackOfficeGraphicsController : Controller
 {
+    /// <summary>
+    /// The route name of the <see cref="Logo"/> endpoint.
+    /// </summary>
     public const string LogoRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(Logo);
+
+    /// <summary>
+    /// The route name of the <see cref="LogoAlternative"/> endpoint.
+    /// </summary>
     public const string LogoAlternativeRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LogoAlternative);
+
+    /// <summary>
+    /// The route name of the <see cref="LoginBackground"/> endpoint.
+    /// </summary>
     public const string LoginBackGroundRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginBackground);
+
+    /// <summary>
+    /// The route name of the <see cref="LoginLogo"/> endpoint.
+    /// </summary>
     public const string LoginLogoRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginLogo);
+
+    /// <summary>
+    /// The route name of the <see cref="LoginLogoAlternative"/> endpoint.
+    /// </summary>
     public const string LoginLogoAlternativeRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(LoginLogoAlternative);
+
+    /// <summary>
+    /// The route name of the <see cref="Favicon"/> endpoint.
+    /// </summary>
+    public const string FaviconRouteName = nameof(BackOfficeGraphicsController) + "." + nameof(Favicon);
 
     private readonly IOptions<ContentSettings> _contentSettings;
     private readonly IContentTypeProvider _contentTypeProvider;
@@ -95,20 +120,40 @@ public class BackOfficeGraphicsController : Controller
     [MapToApiVersion("1.0")]
     public IActionResult LoginLogoAlternative() => HandleFileRequest(_contentSettings.Value.LoginLogoImageAlternative);
 
+    /// <summary>
+    /// Gets the favicon for the back office and its login screen.
+    /// </summary>
+    /// <returns>An <see cref="IActionResult"/> containing the favicon, or a 404 response if the configured file does not exist.</returns>
+    [HttpGet("favicon", Name = FaviconRouteName)]
+    [EndpointSummary("Gets the back office favicon.")]
+    [EndpointDescription("Gets the custom back office favicon if configured.")]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
+    public IActionResult Favicon() => HandleFileRequest(_contentSettings.Value.BackOfficeFavicon);
+
+    private static EntityTagHeaderValue CreateEntityTag(IFileInfo fileInfo)
+        => new($"\"{fileInfo.LastModified.UtcTicks:x}-{fileInfo.Length:x}\"");
+
     private IActionResult HandleFileRequest(string virtualPath)
     {
         var filePath = $"{Constants.SystemDirectories.Umbraco}/{virtualPath}".TrimStart(Constants.CharArrays.Tilde);
         IFileInfo fileInfo = _webHostEnvironment.WebRootFileProvider.GetFileInfo(filePath);
 
-        if (fileInfo.PhysicalPath is null)
+        if (fileInfo.Exists is false || fileInfo.PhysicalPath is null)
         {
             return NotFound();
         }
 
         if (_contentTypeProvider.TryGetContentType(fileInfo.PhysicalPath, out var contentType))
         {
+            Response.GetTypedHeaders().CacheControl = new CacheControlHeaderValue
+            {
+                Public = true,
+                MaxAge = TimeSpan.FromDays(1),
+            };
+
             Stream fileStream = fileInfo.CreateReadStream();
-            return File(fileStream, contentType);
+            return File(fileStream, contentType, fileInfo.LastModified, CreateEntityTag(fileInfo));
         }
 
         return StatusCode(StatusCodes.Status412PreconditionFailed);

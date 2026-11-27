@@ -14,3 +14,5 @@ The assets are structured in the following way:
 | `logo_light.svg` | The Umbraco logo in light mode for the login screen.               | /umbraco/management/api/v1/security/back-office/graphics/login-logo             |
 
 All assets are linked up through the BackOfficeGraphicsController which uses the constants defined in [ContentSettings](../../../../Umbraco.Core/Configuration/Models/ContentSettings.cs).
+
+The favicon for the Backoffice and the login screen is linked up the same way, through /umbraco/management/api/v1/security/back-office/graphics/favicon. It isn't stored in this directory: by default it is the Backoffice's own `backoffice/assets/favicon.svg`, and the `BackOfficeFavicon` setting can point it at another file.
