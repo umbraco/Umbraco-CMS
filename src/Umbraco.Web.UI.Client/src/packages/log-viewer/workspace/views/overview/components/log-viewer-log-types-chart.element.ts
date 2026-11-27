@@ -1,6 +1,7 @@
 import type { UmbLogLevelCounts } from '../../../../../log-viewer/types.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { umbFormatDonutShare } from '../../../../components/donut-chart/index.js';
+import { classMap, css, html, customElement, nothing, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
@@ -85,6 +86,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	}
 
 	override render() {
+		const shownTotal = this._logLevelCount.reduce((sum, [, count]) => sum + count, 0);
 		return html`
 			<uui-box id="types" headline=${this.localize.term('logViewer_logTypes')}>
 				<p id="description">
@@ -93,7 +95,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 					</umb-localize>
 				</p>
 				<div id="log-types-container">
-					<umb-donut-chart>
+					<umb-donut-chart border-size="8" .description=${this.localize.term('logViewer_logTypes')}>
 						${repeat(
 							this._logLevelCount,
 							([level]) => level,
@@ -103,6 +105,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 									.amount=${number}
 									.kind=${this.localize.term('logViewer_messagesCount')}
 									.href=${this.#buildSearchUrl(level)}
+									.label=${this.localize.term('logViewer_viewLogsLabel', level)}
 									.color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice>`,
 						)}
 					</umb-donut-chart>
@@ -111,26 +114,39 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 							${repeat(
 								this._logLevelKeys,
 								([level]) => level,
-								([level, count]) =>
-									html`<li>
+								([level, count]) => {
+									const shown = !this._logLevelCountFilter.includes(level);
+									const viewLogsLabel = this.localize.term('logViewer_viewLogsLabel', level);
+									return html`<li>
 										<button
-											@click=${(e: Event) => {
-												(e.target as HTMLElement)?.classList.toggle('active');
-												this.#setCountFilter(level);
-											}}>
-											<uui-icon
-												name="icon-record"
-												style="color: var(--umb-log-viewer-${level.toLowerCase()}-color);"></uui-icon>
-											${level}
+											class=${classMap({ active: !shown })}
+											aria-pressed=${shown}
+											@click=${() => this.#setCountFilter(level)}>
+											<span
+												class="swatch"
+												aria-hidden="true"
+												style="background: var(--umb-log-viewer-${level.toLowerCase()}-color);"></span>
+											<span>${level}</span>
 											<span class="count">
-												(${this.localize.number(count, {
+												${this.localize.number(count, {
 													notation: 'compact',
 													minimumFractionDigits: count > 1000 ? 1 : 0,
 													maximumFractionDigits: 2,
-												})})
+												})}
+											</span>
+											<span class="share">
+												${shown ? umbFormatDonutShare(count / shownTotal, this.localize) : nothing}
 											</span>
 										</button>
-									</li>`,
+										<a
+											class="view-logs"
+											href=${this.#buildSearchUrl(level)}
+											aria-label=${viewLogsLabel}
+											title=${viewLogsLabel}>
+											<uui-icon name="icon-search"></uui-icon>
+										</a>
+									</li>`;
+								},
 							)}
 						</ul>
 					</div>
@@ -141,10 +157,6 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 
 	static override styles = [
 		css`
-			uui-box {
-				container-type: inline-size;
-			}
-
 			#description {
 				text-align: center;
 				font-size: var(--uui-type-small-size);
@@ -153,69 +165,66 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 			}
 
 			#log-types-container {
-				display: grid;
-				gap: var(--uui-size-space-4);
-				grid-template-columns: 1fr;
-				place-items: center;
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: center;
+				align-items: flex-start;
+				gap: var(--uui-size-space-4) var(--uui-size-space-2);
 			}
 
 			umb-donut-chart {
-				width: 100%;
+				flex: 1 1 120px;
+				min-width: 120px;
 				max-width: 200px;
 			}
 
 			#legend {
-				width: 100%;
-				display: flex;
-				justify-content: center;
-			}
-
-			@container (min-width: 312px) {
-				#log-types-container {
-					grid-template-columns: auto 1fr;
-					place-items: start;
-				}
-
-				umb-donut-chart {
-					max-width: 200px;
-				}
-
-				#legend {
-					width: auto;
-					justify-content: flex-start;
-				}
+				flex: none;
 			}
 
 			button {
 				all: unset;
-				display: flex;
+				display: grid;
+				grid-column: 1 / 5;
+				grid-template-columns: subgrid;
 				align-items: center;
+				min-height: 24px;
 				cursor: pointer;
 			}
 
-			button:focus {
-				outline: 1px solid var(--uui-color-focus);
+			.view-logs {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 24px;
+				min-height: 24px;
+				color: var(--uui-color-interactive);
+			}
+
+			.view-logs:hover {
+				color: var(--uui-color-interactive-emphasis);
+			}
+
+			button:focus-visible,
+			.view-logs:focus-visible {
+				outline: 2px solid var(--uui-color-text);
+				outline-offset: 2px;
+				box-shadow: 0 0 0 2px var(--uui-color-surface);
+			}
+
+			button > * + * {
+				padding-inline-start: var(--uui-size-space-1);
+			}
+
+			.swatch {
+				width: var(--uui-size-3);
+				height: var(--uui-size-3);
+				border-radius: 50%;
+				forced-color-adjust: none;
 			}
 
 			button.active {
 				text-decoration: line-through;
-			}
-
-			#chart {
-				width: 150px;
-				aspect-ratio: 1;
-				background:
-					radial-gradient(white 40%, transparent 41%),
-					conic-gradient(
-						var(--umb-log-viewer-debug-color) 0% 20%,
-						var(--umb-log-viewer-information-color) 20% 40%,
-						var(--umb-log-viewer-warning-color) 40% 60%,
-						var(--umb-log-viewer-error-color) 60% 80%,
-						var(--umb-log-viewer-fatal-color) 80% 100%
-					);
-				margin: 10px;
-				display: inline-block;
-				border-radius: 50%;
 			}
 
 			ul {
@@ -223,23 +232,23 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 				margin: 0;
 				padding: 0;
 				border: 0;
-				font-size: 100%;
 				font: inherit;
-				vertical-align: baseline;
+				display: grid;
+				grid-template-columns: repeat(5, auto);
 			}
 
 			li {
-				display: flex;
-				align-items: center;
+				display: grid;
+				grid-column: 1 / -1;
+				grid-template-columns: subgrid;
 			}
 
-			li uui-icon {
-				margin-right: 1em;
-			}
-
-			.count {
-				margin-left: 0.3em;
+			.count,
+			.share {
 				color: var(--uui-color-text-alt);
+				font-size: var(--uui-type-small-size);
+				font-variant-numeric: tabular-nums;
+				text-align: end;
 			}
 		`,
 	];

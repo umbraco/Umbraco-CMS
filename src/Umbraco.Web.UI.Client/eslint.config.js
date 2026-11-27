@@ -234,6 +234,54 @@ export default [
 		},
 	},
 	{
+		// The donut chart folder is self-contained, so it can move to another package without edits: its runtime code
+		// imports only Lit, the Umbraco Lit element, the shared text styles and (type-only) the localization API, besides
+		// its own files.
+		files: ['src/packages/log-viewer/components/donut-chart/**/*.ts'],
+		ignores: ['**/*.test.ts', '**/*.stories.ts'],
+		rules: {
+			'@typescript-eslint/no-restricted-imports': [
+				'error',
+				{
+					patterns: [
+						{
+							regex: '\\.\\./',
+							message: 'The donut chart imports nothing from outside its own folder.',
+						},
+						{
+							regex: '^(?!\\./|@umbraco-cms/backoffice/(external/lit|lit-element|style|localization-api)$)',
+							message:
+								'The donut chart imports only @umbraco-cms/backoffice/external/lit, @umbraco-cms/backoffice/lit-element, @umbraco-cms/backoffice/style, type-only @umbraco-cms/backoffice/localization-api and files in its own folder.',
+						},
+						{
+							group: ['@umbraco-cms/backoffice/localization-api'],
+							allowTypeImports: true,
+							message: 'The donut chart may only import types from @umbraco-cms/backoffice/localization-api.',
+						},
+					],
+				},
+			],
+		},
+	},
+	{
+		// Code outside the donut chart folder uses it only through its index.
+		files: ['src/**/*.ts'],
+		ignores: ['src/packages/log-viewer/components/donut-chart/**'],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					patterns: [
+						{
+							group: ['**/donut-chart/*', '!**/donut-chart/index.js'],
+							message: 'Import the donut chart from its index.js only.',
+						},
+					],
+				},
+			],
+		},
+	},
+	{
 		// This file is annotated for `typescript-json-schema` (https://github.com/YousefED/typescript-json-schema),
 		// whose `@examples` values are multi-line JSON literals — valid for the schema generator, but the
 		// jsdoc comment parser reads the array/object brackets as an (invalid) tag name spanning lines.

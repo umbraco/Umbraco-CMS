@@ -84,6 +84,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 			:host {
 				display: block;
 				margin: var(--uui-size-layout-1);
+				container-type: inline-size;
 			}
 
 			#logviewer-layout {
@@ -159,6 +160,16 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 				text-align: center;
 				color: var(--uui-color-danger);
 				margin: 0;
+			}
+
+			@container (max-width: 800px) {
+				#logviewer-layout {
+					grid-template-columns: minmax(0, 1fr);
+					grid-template-areas:
+						'info'
+						'saved-searches'
+						'common-messages';
+				}
 			}
 		`,
 	];
