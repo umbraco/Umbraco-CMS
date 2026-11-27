@@ -175,6 +175,23 @@ export class UserGroupApiHelper {
     return await this.create(userGroup);
   }
   
+  async createUserGroupWithDocumentStartNodeAndCreatePermission(name: string, startNodeId: string) {
+    await this.ensureNameNotExists(name);
+
+    const userGroup = new UserGroupBuilder()
+      .withName(name)
+      .addSection('Umb.Section.Content')
+      .withDocumentRootAccess(false)
+      .withDocumentStartNodeId(startNodeId)
+      .addFallbackPermission()
+        .withReadPermission(true)
+        .withCreatePermission(true)
+        .done()
+      .build();
+
+    return await this.create(userGroup);
+  }
+
   async createUserGroupWithMediaStartNode(name: string, startNodeId: string) {
     await this.ensureNameNotExists(name);
 
@@ -708,6 +725,33 @@ export class UserGroupApiHelper {
           .addVerbs()
             .withDeletePermission(enabled)
             .withReadPermission(true)
+            .done()
+          .done()
+        .done()
+      .build();
+
+    return await this.create(userGroup);
+  }
+
+  async createUserGroupWithDeletePermissionAndDeletePermissionForSpecificDocument(name: string, documentId: string, deleteEnabled: boolean = true, documentDeleteEnabled: boolean = false) {
+    await this.ensureNameNotExists(name);
+
+    const userGroup = new UserGroupBuilder()
+      .withName(name)
+      .addSection('Umb.Section.Content')
+      .withDocumentRootAccess(true)
+      .addFallbackPermission()
+        .withReadPermission(true)
+        .withCreatePermission(true)
+        .withDeletePermission(deleteEnabled)
+        .done()
+      .addPermissions()
+        .addDocumentPermission()
+          .withDocumentId(documentId)
+          .addVerbs()
+            .withReadPermission(true)
+            .withCreatePermission(true)
+            .withDeletePermission(documentDeleteEnabled)
             .done()
           .done()
         .done()
