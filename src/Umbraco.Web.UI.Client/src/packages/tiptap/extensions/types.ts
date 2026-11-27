@@ -21,7 +21,9 @@ export interface UmbTiptapExtensionApi extends UmbApi {
 	setEditor(editor: Editor): void;
 
 	/**
-	 * Gets the styles for the extension
+	 * Gets the styles for the extension.
+	 * These are applied within the editor inside a cascade layer (`umb-tiptap-extensions`), so any unlayered rule in the
+	 * editor (including the stylesheets configured on the data type) takes precedence, regardless of selector specificity.
 	 */
 	getStyles(): CSSResultGroup | null | undefined;
 
