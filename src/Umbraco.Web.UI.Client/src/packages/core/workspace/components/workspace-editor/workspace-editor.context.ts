@@ -18,72 +18,8 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 
 	#manifests = new UmbBasicState<Array<ManifestWorkspaceView>>([]);
 	#overrides = new UmbBasicState<Array<UmbDeepPartialObject<ManifestWorkspaceView>>>([]);
-	public readonly views = mergeObservables(
-		[this.#manifests.asObservable(), this.#overrides.asObservable()],
-		([manifests, overrides]): Array<UmbWorkspaceViewController> => {
-			let contexts = this.#contexts;
-
-			// remove ones that are no longer contained in the workspaceViews (And thereby make the new array):
-			const contextsToKeep = contexts.filter((view) => {
-				const keep = manifests.some((manifest) => manifest.alias === view.manifest.alias);
-				if (!keep) {
-					view.destroy();
-				}
-				return keep;
-			});
-
-			const hasDiff = contextsToKeep.length !== manifests.length;
-			if (hasDiff) {
-				contexts = [...contextsToKeep];
-
-				// Add ones that are new:
-				manifests
-					.filter((manifest) => !contextsToKeep.some((x) => x.manifest.alias === manifest.alias))
-					.forEach((manifest) => {
-						const context = new UmbWorkspaceViewController(this, manifest);
-						context.setVariantId(this.#variantId);
-						context.setTitle(manifest.meta.label);
-						context.inherit();
-						contexts.push(context);
-					});
-			}
-
-			// Apply overrides:
-			let hasOverrideChange = false;
-			contexts.forEach((context) => {
-				const override = overrides.find((x) => x.alias === context.manifest.alias);
-				if (override) {
-					// Test to see if there is a change, to avoid unnecessary updates, this prevents re-setting the manifest again and again. [NL]
-					const overrideKeys = Object.keys(override) as Array<keyof ManifestWorkspaceView>;
-					const hasOverrideDiff = overrideKeys.some((key) => context.manifest[key] !== override[key]);
-					if (hasOverrideDiff) {
-						context.manifest = {
-							...context.manifest,
-							...(override as ManifestWorkspaceView),
-							meta: { ...context.manifest.meta, ...override.meta },
-						};
-						hasOverrideChange = true;
-					}
-				}
-			});
-
-			// sort contexts to match manifests weights:
-			contexts.sort((a, b): number => (b.manifest.weight || 0) - (a.manifest.weight || 0));
-
-			this.#contexts = contexts;
-			// Return a new array reference when overrides changed, so distinctUntilChanged can detect it:
-			return hasOverrideChange || hasDiff ? [...contexts] : contexts;
-		},
-		// Custom memoize method, to check context instance and manifest instance:
-		(previousValue: Array<UmbWorkspaceViewController>, currentValue: Array<UmbWorkspaceViewController>): boolean => {
-			return (
-				previousValue === currentValue &&
-				currentValue.every(
-					(x) => x.manifest === previousValue.find((y) => y.manifest.alias === x.manifest.alias)?.manifest,
-				)
-			);
-		},
-	);
+	#views = new UmbBasicState<Array<UmbWorkspaceViewController>>([]);
+	public readonly views = this.#views.asObservable();
 	// A storage and cache for the current contexts, to enable communicating to them and to avoid re-initializing them every time there is a change of manifests/overrides. [NL]
 	#contexts = new Array<UmbWorkspaceViewController>();
 
@@ -101,6 +37,78 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 				this.#manifests.setValue(workspaceViews.map((controller) => controller.manifest));
 			},
 		).asPromise();
+
+		// The view controllers are owned by this context, so it keeps them in sync with the manifests and overrides,
+		// whether or not anyone observes the views.
+		this.observe(
+			mergeObservables(
+				[this.#manifests.asObservable(), this.#overrides.asObservable()],
+				(sources) => sources,
+				(previous, current) => previous[0] === current[0] && previous[1] === current[1],
+			),
+			([manifests, overrides]) => this.#updateViews(manifests, overrides),
+			null,
+		);
+	}
+
+	#updateViews(
+		manifests: Array<ManifestWorkspaceView>,
+		overrides: Array<UmbDeepPartialObject<ManifestWorkspaceView>>,
+	): void {
+		let contexts = this.#contexts;
+
+		// remove ones that are no longer contained in the workspaceViews (And thereby make the new array):
+		const contextsToKeep = contexts.filter((view) => {
+			const keep = manifests.some((manifest) => manifest.alias === view.manifest.alias);
+			if (!keep) {
+				view.destroy();
+			}
+			return keep;
+		});
+
+		const hasDiff = contextsToKeep.length !== manifests.length;
+		if (hasDiff) {
+			contexts = [...contextsToKeep];
+
+			// Add ones that are new:
+			manifests
+				.filter((manifest) => !contextsToKeep.some((x) => x.manifest.alias === manifest.alias))
+				.forEach((manifest) => {
+					const context = new UmbWorkspaceViewController(this, manifest);
+					context.setVariantId(this.#variantId);
+					context.setTitle(manifest.meta.label);
+					context.inherit();
+					contexts.push(context);
+				});
+		}
+
+		// Apply overrides:
+		let hasOverrideChange = false;
+		contexts.forEach((context) => {
+			const override = overrides.find((x) => x.alias === context.manifest.alias);
+			if (override) {
+				// Test to see if there is a change, to avoid unnecessary updates, this prevents re-setting the manifest again and again. [NL]
+				const overrideKeys = Object.keys(override) as Array<keyof ManifestWorkspaceView>;
+				const hasOverrideDiff = overrideKeys.some((key) => context.manifest[key] !== override[key]);
+				if (hasOverrideDiff) {
+					context.manifest = {
+						...context.manifest,
+						...(override as ManifestWorkspaceView),
+						meta: { ...context.manifest.meta, ...override.meta },
+					};
+					hasOverrideChange = true;
+				}
+			}
+		});
+
+		// sort contexts to match manifests weights:
+		contexts.sort((a, b): number => (b.manifest.weight || 0) - (a.manifest.weight || 0));
+
+		this.#contexts = contexts;
+		// A new array, so observers of the views also get changes made to the manifests of existing views:
+		if (hasDiff || hasOverrideChange) {
+			this.#views.setValue([...contexts]);
+		}
 	}
 
 	setVariantId(variantId: UmbVariantId | undefined): void {

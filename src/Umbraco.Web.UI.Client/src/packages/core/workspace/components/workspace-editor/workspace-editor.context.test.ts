@@ -101,4 +101,13 @@ describe('UmbWorkspaceEditorContext', () => {
 		expect(overriddenView?.manifest.meta.label).to.equal(OVERRIDDEN_LABEL);
 		expect(overriddenView?.manifest.meta.icon).to.equal(OVERRIDDEN_ICON);
 	});
+
+	it('applies overrides to its view contexts while the views are not observed', async () => {
+		await firstValueFrom(context.views.pipe(filter((views) => views.length === manifests.length)));
+
+		context.setOverrides([{ alias: VIEW_1_ALIAS, meta: { label: OVERRIDDEN_LABEL } }]);
+
+		const viewContext = await context.getViewContext(VIEW_1_ALIAS);
+		expect(viewContext?.manifest.meta.label).to.equal(OVERRIDDEN_LABEL);
+	});
 });
