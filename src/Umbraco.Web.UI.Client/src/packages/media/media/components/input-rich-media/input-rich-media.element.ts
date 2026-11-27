@@ -461,6 +461,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 		const href = this.readonly ? undefined : this._routeBuilder?.({ key: item.unique });
 
+		// `uui-card-media` doesn't honour `readonly`, so `disabled` is what stops a read-only card being styled as clickable.
 		return html`
 			<uui-card-media
 				id=${item.unique}
@@ -468,7 +469,8 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				title=${item.name}
 				name=${item.name}
 				.href=${href}
-				?readonly=${this.readonly}>
+				?readonly=${this.readonly}
+				?disabled=${this.readonly}>
 				<umb-media-thumbnail
 					.unique=${item.media}
 					.alt=${item.name}
