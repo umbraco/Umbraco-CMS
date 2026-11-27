@@ -1,0 +1,3492 @@
+diff --git a/src/Umbraco.Core/Notifications/ElementEmptiedRecycleBinNotification.cs b/src/Umbraco.Core/Notifications/ElementEmptiedRecycleBinNotification.cs
+index de9e4f88f29..0709a99b351 100644
+--- a/src/Umbraco.Core/Notifications/ElementEmptiedRecycleBinNotification.cs
++++ b/src/Umbraco.Core/Notifications/ElementEmptiedRecycleBinNotification.cs
+@@ -1,13 +1,35 @@
+ ﻿using Umbraco.Cms.Core.Events;
++using Umbraco.Cms.Core.Models;
+ 
+ namespace Umbraco.Cms.Core.Notifications;
+ 
+-public class ElementEmptiedRecycleBinNotification : StatefulNotification
++/// <summary>
++///     Notification that is published after the element recycle bin has been emptied.
++/// </summary>
++/// <remarks>
++///     It is not cancelable since the operation has already completed. The deleted elements are carried when the
++///     publisher knows them; emptying the bin through the container service, which deletes containers and elements
++///     alike, carries none.
++/// </remarks>
++public class ElementEmptiedRecycleBinNotification : EmptiedRecycleBinNotification<IElement>
+ {
++    /// <summary>
++    ///     Initializes a new instance of the <see cref="ElementEmptiedRecycleBinNotification" /> class without the
++    ///     deleted elements.
++    /// </summary>
++    /// <param name="messages">The event messages collection.</param>
+     public ElementEmptiedRecycleBinNotification(EventMessages messages)
+-        => Messages = messages;
++        : base([], messages)
++    {
++    }
+ 
+-    public EventMessages Messages { get; }
+-
+-    public bool Cancel { get; set; }
++    /// <summary>
++    ///     Initializes a new instance of the <see cref="ElementEmptiedRecycleBinNotification" /> class.
++    /// </summary>
++    /// <param name="deletedEntities">The collection of elements that were permanently deleted.</param>
++    /// <param name="messages">The event messages collection.</param>
++    public ElementEmptiedRecycleBinNotification(IEnumerable<IElement> deletedEntities, EventMessages messages)
++        : base(deletedEntities, messages)
++    {
++    }
+ }
+diff --git a/src/Umbraco.Core/Notifications/ElementEmptyingRecycleBinNotification.cs b/src/Umbraco.Core/Notifications/ElementEmptyingRecycleBinNotification.cs
+index 793582d7537..bf03c3abfb3 100644
+--- a/src/Umbraco.Core/Notifications/ElementEmptyingRecycleBinNotification.cs
++++ b/src/Umbraco.Core/Notifications/ElementEmptyingRecycleBinNotification.cs
+@@ -1,13 +1,35 @@
+ ﻿using Umbraco.Cms.Core.Events;
++using Umbraco.Cms.Core.Models;
+ 
+ namespace Umbraco.Cms.Core.Notifications;
+ 
+-public class ElementEmptyingRecycleBinNotification : StatefulNotification, ICancelableNotification
++/// <summary>
++///     Notification that is published before the element recycle bin is emptied.
++/// </summary>
++/// <remarks>
++///     This notification is cancelable, allowing handlers to prevent the empty recycle bin operation. The elements
++///     being deleted are carried when the publisher knows them; emptying the bin through the container service, which
++///     deletes containers and elements alike, carries none.
++/// </remarks>
++public class ElementEmptyingRecycleBinNotification : EmptyingRecycleBinNotification<IElement>
+ {
++    /// <summary>
++    ///     Initializes a new instance of the <see cref="ElementEmptyingRecycleBinNotification" /> class without the
++    ///     elements being deleted.
++    /// </summary>
++    /// <param name="messages">The event messages collection.</param>
+     public ElementEmptyingRecycleBinNotification(EventMessages messages)
+-        => Messages = messages;
++        : base(null, messages)
++    {
++    }
+ 
+-    public EventMessages Messages { get; }
+-
+-    public bool Cancel { get; set; }
++    /// <summary>
++    ///     Initializes a new instance of the <see cref="ElementEmptyingRecycleBinNotification" /> class.
++    /// </summary>
++    /// <param name="deletedEntities">The collection of elements being permanently deleted.</param>
++    /// <param name="messages">The event messages collection.</param>
++    public ElementEmptyingRecycleBinNotification(IEnumerable<IElement>? deletedEntities, EventMessages messages)
++        : base(deletedEntities, messages)
++    {
++    }
+ }
+diff --git a/src/Umbraco.Core/Notifications/ElementMovedNotification.cs b/src/Umbraco.Core/Notifications/ElementMovedNotification.cs
+index cb148693943..58c46385b9c 100644
+--- a/src/Umbraco.Core/Notifications/ElementMovedNotification.cs
++++ b/src/Umbraco.Core/Notifications/ElementMovedNotification.cs
+@@ -12,4 +12,9 @@ public ElementMovedNotification(MoveEventInfo<IElement> target, EventMessages me
+         : base(target, messages)
+     {
+     }
++
++    public ElementMovedNotification(IEnumerable<MoveEventInfo<IElement>> target, EventMessages messages)
++        : base(target, messages)
++    {
++    }
+ }
+diff --git a/src/Umbraco.Core/Notifications/ElementMovedToRecycleBinNotification.cs b/src/Umbraco.Core/Notifications/ElementMovedToRecycleBinNotification.cs
+index e28ad3adcb9..b6db888bc6e 100644
+--- a/src/Umbraco.Core/Notifications/ElementMovedToRecycleBinNotification.cs
++++ b/src/Umbraco.Core/Notifications/ElementMovedToRecycleBinNotification.cs
+@@ -12,4 +12,9 @@ public ElementMovedToRecycleBinNotification(MoveToRecycleBinEventInfo<IElement>
+         : base(target, messages)
+     {
+     }
++
++    public ElementMovedToRecycleBinNotification(IEnumerable<MoveToRecycleBinEventInfo<IElement>> target, EventMessages messages)
++        : base(target, messages)
++    {
++    }
+ }
+diff --git a/src/Umbraco.Core/Notifications/ElementMovingNotification.cs b/src/Umbraco.Core/Notifications/ElementMovingNotification.cs
+index 52053cd1da6..65549b4183e 100644
+--- a/src/Umbraco.Core/Notifications/ElementMovingNotification.cs
++++ b/src/Umbraco.Core/Notifications/ElementMovingNotification.cs
+@@ -12,4 +12,9 @@ public ElementMovingNotification(MoveEventInfo<IElement> target, EventMessages m
+         : base(target, messages)
+     {
+     }
++
++    public ElementMovingNotification(IEnumerable<MoveEventInfo<IElement>> target, EventMessages messages)
++        : base(target, messages)
++    {
++    }
+ }
+diff --git a/src/Umbraco.Core/Notifications/ElementMovingToRecycleBinNotification.cs b/src/Umbraco.Core/Notifications/ElementMovingToRecycleBinNotification.cs
+index fe4ee6b8ddc..c6a2d835eb8 100644
+--- a/src/Umbraco.Core/Notifications/ElementMovingToRecycleBinNotification.cs
++++ b/src/Umbraco.Core/Notifications/ElementMovingToRecycleBinNotification.cs
+@@ -12,4 +12,9 @@ public ElementMovingToRecycleBinNotification(MoveToRecycleBinEventInfo<IElement>
+         : base(target, messages)
+     {
+     }
++
++    public ElementMovingToRecycleBinNotification(IEnumerable<MoveToRecycleBinEventInfo<IElement>> target, EventMessages messages)
++        : base(target, messages)
++    {
++    }
+ }
+diff --git a/src/Umbraco.Core/Services/ContentService.cs b/src/Umbraco.Core/Services/ContentService.cs
+index ff6f4a31dca..de3e3a9fb64 100644
+--- a/src/Umbraco.Core/Services/ContentService.cs
++++ b/src/Umbraco.Core/Services/ContentService.cs
+@@ -142,133 +142,24 @@ public async Task<EntityPermissionCollection> GetPermissionsAsync(Guid contentKe
+     #region Create
+ 
+     /// <inheritdoc />
+-    public async Task<IContent> CreateAsync(string name, Guid? parentKey, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken)
+-    {
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-
+-        IContentType contentType = await GetContentTypeAsync(scope, contentTypeAlias, cancellationToken);
+-        IContent content = await CreateAsync(name, parentKey, contentType, userKey, cancellationToken);
+-
+-        scope.Complete();
+-        return content;
+-    }
++    public Task<IContent> CreateAsync(string name, Guid? parentKey, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken) =>
++        CreateCoreAsync(name, parentKey, contentTypeAlias, userKey, cancellationToken);
+ 
+     /// <inheritdoc />
+-    public async Task<IContent> CreateAsync(string name, Guid? parentKey, IContentType contentType, Guid userKey, CancellationToken cancellationToken)
+-    {
+-        ArgumentNullException.ThrowIfNull(contentType);
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-
+-        int userId = await _userIdKeyResolver.GetAsync(userKey);
+-
+-        IContent? parent = null;
+-        if (parentKey.HasValue)
+-        {
+-            parent = await GetByIdAsync(parentKey.Value, cancellationToken);
+-            if (parent is null)
+-            {
+-                throw new ArgumentException("No content with that key.", nameof(parentKey));
+-            }
+-        }
+-
+-        Content content = parent is not null
+-            ? new Content(name, parent, contentType, userId)
+-            : new Content(name, Constants.System.Root, contentType, userId);
+-
+-        scope.Complete();
+-        return content;
+-    }
++    public Task<IContent> CreateAsync(string name, Guid? parentKey, IContentType contentType, Guid userKey, CancellationToken cancellationToken) =>
++        CreateCoreAsync(name, parentKey, contentType, userKey, cancellationToken);
+ 
+     /// <inheritdoc />
+-    public async Task<IContent> CreateAsync(string name, IContent parent, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken)
+-    {
+-        ArgumentNullException.ThrowIfNull(parent);
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-
+-        int userId = await _userIdKeyResolver.GetAsync(userKey);
+-        IContentType contentType = await GetContentTypeAsync(scope, contentTypeAlias, cancellationToken);
+-
+-        var content = new Content(name, parent, contentType, userId);
+-
+-        scope.Complete();
+-        return content;
+-    }
++    public Task<IContent> CreateAsync(string name, IContent parent, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken) =>
++        CreateCoreAsync(name, parent, contentTypeAlias, userKey, cancellationToken);
+ 
+     /// <inheritdoc />
+-    public async Task<IContent> CreateAndSaveAsync(string name, Guid? parentKey, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken)
+-    {
+-        // TODO: what about culture?
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-
+-        // locking the content tree secures content types too
+-        scope.WriteLock(Constants.Locks.ContentTree);
+-
+-        int userId = await _userIdKeyResolver.GetAsync(userKey);
+-
+-        IContentType contentType = await GetContentTypeAsync(scope, contentTypeAlias, cancellationToken);
+-
+-        IContent? parent = null;
+-        if (parentKey.HasValue)
+-        {
+-            parent = await GetByIdAsync(parentKey.Value, cancellationToken); // + locks
+-            if (parent is null)
+-            {
+-                throw new ArgumentException("No content with that key.", nameof(parentKey)); // causes rollback
+-            }
+-        }
+-
+-        Content content = parent is not null
+-            ? new Content(name, parent, contentType, userId)
+-            : new Content(name, Constants.System.Root, contentType, userId);
+-
+-        Attempt<ContentSaveOperationStatus> saveResult = await SaveAsync(content, userKey, null, cancellationToken);
+-        ThrowIfSaveRejected(content, saveResult);
+-
+-        scope.Complete();
+-
+-        return content;
+-    }
++    public Task<IContent> CreateAndSaveAsync(string name, Guid? parentKey, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken) =>
++        CreateAndSaveCoreAsync(name, parentKey, contentTypeAlias, userKey, cancellationToken);
+ 
+     /// <inheritdoc />
+-    public async Task<IContent> CreateAndSaveAsync(string name, IContent parent, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken)
+-    {
+-        // TODO: what about culture?
+-        ArgumentNullException.ThrowIfNull(parent);
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-
+-        // locking the content tree secures content types too
+-        scope.WriteLock(Constants.Locks.ContentTree);
+-
+-        int userId = await _userIdKeyResolver.GetAsync(userKey);
+-
+-        IContentType contentType = await GetContentTypeAsync(scope, contentTypeAlias, cancellationToken);
+-
+-        var content = new Content(name, parent, contentType, userId);
+-
+-        Attempt<ContentSaveOperationStatus> saveResult = await SaveAsync(content, userKey, null, cancellationToken);
+-        ThrowIfSaveRejected(content, saveResult);
+-
+-        scope.Complete();
+-        return content;
+-    }
+-
+-    // Saving rejects an invalid name or published state with a status; creating-and-saving surfaces it as an
+-    // exception so the caller is never handed back an item that was silently left unsaved.
+-    private static void ThrowIfSaveRejected(IContent content, Attempt<ContentSaveOperationStatus> saveResult)
+-    {
+-        switch (saveResult.Result)
+-        {
+-            case ContentSaveOperationStatus.InvalidPublishedState:
+-                throw new InvalidOperationException(
+-                    $"Cannot save (un)publishing content with name: {content.Name} - and state: {content.PublishedState}.");
+-            case ContentSaveOperationStatus.InvalidName:
+-                throw new InvalidOperationException(
+-                    $"Content with the name {content.Name} cannot be more than 255 characters in length.");
+-        }
+-    }
++    public Task<IContent> CreateAndSaveAsync(string name, IContent parent, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken) =>
++        CreateAndSaveCoreAsync(name, parent, contentTypeAlias, userKey, cancellationToken);
+ 
+     #endregion
+ 
+@@ -298,18 +189,6 @@ public async Task<PagedModel<IContent>> GetAncestorsAsync(Guid key, int skip, in
+     public Task<PagedModel<IContent>> GetAncestorsAsync(IContent content, int skip, int take, CancellationToken cancellationToken) =>
+         GetAncestorsAsync(content.Key, skip, take, cancellationToken);
+ 
+-    /// <inheritdoc />
+-    public async Task<PagedModel<IContent>> GetChildrenAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken)
+-    {
+-        ordering ??= Ordering.By("sortOrder");
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.ReadLock(Constants.Locks.ContentTree);
+-        PagedModel<IContent> result = await _documentRepository.GetChildrenAsync(parentKey, skip, take, propertyAliases, ordering, cancellationToken);
+-        scope.Complete();
+-        return result;
+-    }
+-
+     /// <inheritdoc />
+     public async Task<PagedModel<IContent>> GetChildrenWithoutTemplatesAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken)
+     {
+@@ -322,18 +201,6 @@ public async Task<PagedModel<IContent>> GetChildrenWithoutTemplatesAsync(Guid? p
+         return result;
+     }
+ 
+-    /// <inheritdoc />
+-    public async Task<PagedModel<IContent>> GetDescendantsAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true)
+-    {
+-        ordering ??= Ordering.By("Path");
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.ReadLock(Constants.Locks.ContentTree);
+-        PagedModel<IContent> result = await _documentRepository.GetDescendantsAsync(ancestorKey, skip, take, ordering, cancellationToken, includeTrashed);
+-        scope.Complete();
+-        return result;
+-    }
+-
+     /// <inheritdoc />
+     public async Task<PagedModel<IContent>> GetDescendantsWithoutTemplatesAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true)
+     {
+@@ -347,41 +214,8 @@ public async Task<PagedModel<IContent>> GetDescendantsWithoutTemplatesAsync(Guid
+     }
+ 
+     /// <inheritdoc />
+-    public async Task<IContent?> GetParentAsync(Guid key, CancellationToken cancellationToken)
+-    {
+-        IContent? content = await GetByIdAsync(key, cancellationToken);
+-        if (content is null || content.ParentId == Constants.System.Root || content.ParentId == Constants.System.RecycleBinContent)
+-        {
+-            return null;
+-        }
+-
+-        Guid? parentKey = content.ParentKey;
+-        return parentKey is null
+-            ? null
+-            : await GetByIdAsync(parentKey.Value, cancellationToken);
+-    }
+-
+-    /// <inheritdoc />
+-    public async Task<IEnumerable<IContent>> GetRootContentAsync(CancellationToken cancellationToken)
+-    {
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.ReadLock(Constants.Locks.ContentTree);
+-        IEnumerable<IContent> result = await _documentRepository.GetRootContentAsync(cancellationToken);
+-        scope.Complete();
+-        return result;
+-    }
+-
+-    /// <inheritdoc />
+-    public async Task<PagedModel<IContent>> GetPagedContentInRecycleBinAsync(int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
+-    {
+-        ordering ??= Ordering.By("Path");
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.ReadLock(Constants.Locks.ContentTree);
+-        PagedModel<IContent> result = await _documentRepository.GetPagedRecycleBinAsync(skip, take, ordering, cancellationToken);
+-        scope.Complete();
+-        return result;
+-    }
++    public Task<PagedModel<IContent>> GetPagedContentInRecycleBinAsync(int skip, int take, Ordering? ordering, CancellationToken cancellationToken) =>
++        GetPagedRecycleBinAsync(skip, take, ordering, cancellationToken);
+ 
+     /// <inheritdoc />
+     public async Task<bool> RecycleBinSmellsAsync(CancellationToken cancellationToken)
+@@ -798,289 +632,24 @@ void TrackPublishedCultures(IContent publishedDocument, HashSet<string>? documen
+ 
+     #endregion
+ 
+-    #region Move, RecycleBin
++    #region Move, RecycleBin, Sort
+ 
+     /// <inheritdoc />
+-    public async Task<Attempt<ContentMoveToRecycleBinOperationStatus>> MoveToRecycleBinAsync(IContent content, Guid userKey, CancellationToken cancellationToken)
+-    {
+-        EventMessages eventMessages = EventMessagesFactory.Get();
+-        var moves = new List<(IContent, string)>();
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.WriteLock(Constants.Locks.ContentTree);
+-
+-        var originalPath = content.Path;
+-        var moveEventInfo = new MoveToRecycleBinEventInfo<IContent>(content, originalPath);
+-
+-        var movingToRecycleBinNotification = new ContentMovingToRecycleBinNotification(moveEventInfo, eventMessages);
+-        if (await scope.Notifications.PublishCancelableAsync(movingToRecycleBinNotification))
+-        {
+-            scope.Complete();
+-            return Attempt.Fail(ContentMoveToRecycleBinOperationStatus.CancelledByNotification);
+-        }
+-
+-        int userId = await _userIdKeyResolver.GetAsync(userKey);
+-
+-        // if it's published we may want to force-unpublish it - that would be backward-compatible... but...
+-        // making a radical decision here: trashing is equivalent to moving under an unpublished node so
+-        // it's NOT unpublishing, only the content is now masked - allowing us to restore it if wanted
+-        // if (content.HasPublishedVersion)
+-        // { }
+-        await PerformMoveLockedAsync(content, Constants.System.RecycleBinContent, null, userId, moves, true, cancellationToken);
+-        scope.Notifications.Publish(
+-            new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
+-
+-        MoveToRecycleBinEventInfo<IContent>[] moveInfo = [.. moves.Select(x => new MoveToRecycleBinEventInfo<IContent>(x.Item1, x.Item2))];
+-
+-        scope.Notifications.Publish(
+-            new ContentMovedToRecycleBinNotification(moveInfo, eventMessages).WithStateFrom(
+-                movingToRecycleBinNotification));
+-
+-        await AuditAsync(AuditType.Move, userId, content.Id, $"Moved to recycle bin from parent {originalPath.GetParentIdFromPath()}");
+-
+-        scope.Complete();
+-
+-        return Attempt.Succeed(ContentMoveToRecycleBinOperationStatus.Success);
+-    }
++    public Task<Attempt<ContentMoveOperationStatus>> MoveAsync(IContent content, Guid? parentKey, bool includeDescendants, Guid userKey, CancellationToken cancellationToken) =>
++        MoveCoreAsync(content, parentKey, includeDescendants, userKey, cancellationToken);
+ 
+     /// <inheritdoc />
+-    public async Task<Attempt<ContentMoveOperationStatus>> MoveAsync(IContent content, Guid? parentKey, bool includeDescendants, Guid userKey, CancellationToken cancellationToken)
+-    {
+-        EventMessages eventMessages = EventMessagesFactory.Get();
+-
+-        // if moving to the recycle bin then use the proper method
+-        if (parentKey == Constants.System.RecycleBinContentKey)
+-        {
+-            if (content.ParentId == Constants.System.RecycleBinContent)
+-            {
+-                return Attempt.Succeed(ContentMoveOperationStatus.Success);
+-            }
+-
+-            Attempt<ContentMoveToRecycleBinOperationStatus> recycleBinResult = await MoveToRecycleBinAsync(content, userKey, cancellationToken);
+-            return recycleBinResult.Success
+-                ? Attempt.Succeed(ContentMoveOperationStatus.Success)
+-                : Attempt.Fail(ContentMoveOperationStatus.CancelledByNotification);
+-        }
+-
+-        if (parentKey is null && content.ParentId == Constants.System.Root)
+-        {
+-            return Attempt.Succeed(ContentMoveOperationStatus.Success);
+-        }
++    public Task<Attempt<ContentSortChildrenOperationStatus>> SortChildrenAsync(Guid? parentKey, IReadOnlyList<Guid> orderedChildKeys, Guid userKey, CancellationToken cancellationToken) =>
++        SortChildrenCoreAsync(parentKey, orderedChildKeys, userKey, cancellationToken);
+ 
+-        int userId = await _userIdKeyResolver.GetAsync(userKey);
+-        var moves = new List<(IContent, string)>();
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.WriteLock(Constants.Locks.ContentTree);
+-
+-        IContent? parent = parentKey.HasValue ? await GetByIdAsync(parentKey.Value, cancellationToken) : null;
+-        if (parentKey.HasValue && parent is null)
+-        {
+-            return Attempt.Fail(ContentMoveOperationStatus.ParentNotFound);
+-        }
+-
+-        if (parent?.Trashed is true)
+-        {
+-            return Attempt.Fail(ContentMoveOperationStatus.ParentTrashed);
+-        }
+-
+-        int parentId = parent?.Id ?? Constants.System.Root;
+-
+-        // A null ParentKey means either "at the root" or "not populated", so the int id is the unambiguous comparison.
+-        if (content.ParentId == parentId)
+-        {
+-            scope.Complete();
+-            return Attempt.Succeed(ContentMoveOperationStatus.Success);
+-        }
+-
+-        var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentKey);
+-
+-        var movingNotification = new ContentMovingNotification(moveEventInfo, eventMessages);
+-        if (await scope.Notifications.PublishCancelableAsync(movingNotification))
+-        {
+-            scope.Complete();
+-            return Attempt.Fail(ContentMoveOperationStatus.CancelledByNotification);
+-        }
+-
+-        // if content was trashed, and since we're not moving to the recycle bin,
+-        // indicate that the trashed status should be changed to false, else just
+-        // leave it unchanged
+-        var trashed = content.Trashed ? false : (bool?)null;
+-
+-        // when restoring a single item out of the recycle bin without its descendants, those descendants stay
+-        // trashed and are re-homed under the recycle bin root - see PerformMoveLockedAsync
+-        var leaveDescendantsInRecycleBin = includeDescendants is false && content.Trashed;
+-
+-        // if the content was trashed under another content, and so has a published version,
+-        // it cannot move back as published but has to be unpublished first - that's for the
+-        // root content, everything underneath will retain its published status
+-        if (content.Trashed && content.Published)
+-        {
+-            // however, it had been masked when being trashed, so there's no need for
+-            // any special event here - just change its state
+-            content.PublishedState = PublishedState.Unpublishing;
+-        }
+-
+-        await PerformMoveLockedAsync(content, parentId, parent, userId, moves, trashed, cancellationToken, includeDescendants);
+-
+-        if (leaveDescendantsInRecycleBin)
+-        {
+-            // The single RefreshBranch above cannot reconcile the descendants left in the bin (they are no longer
+-            // descendants of the restored item), so also refresh the re-homed direct children. The navigation
+-            // reconciler then moves them - and their sub-trees - back under the recycle bin root.
+-            IContent[] rehomedChildren = [.. moves
+-                .Select(x => x.Item1)
+-                .Where(x => x.ParentId == Constants.System.RecycleBinContent)];
+-            scope.Notifications.Publish(
+-                new ContentTreeChangeNotification(content.Yield().Concat(rehomedChildren), TreeChangeTypes.RefreshBranch, eventMessages));
+-        }
+-        else
+-        {
+-            scope.Notifications.Publish(
+-                new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
+-        }
+-
+-        // changes
+-        MoveEventInfo<IContent>[] moveInfo = [.. moves.Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentKey))];
+-
+-        scope.Notifications.Publish(
+-            new ContentMovedNotification(moveInfo, eventMessages).WithStateFrom(movingNotification));
+-
+-        await AuditAsync(AuditType.Move, userId, content.Id);
+-
+-        scope.Complete();
+-        return Attempt.Succeed(ContentMoveOperationStatus.Success);
+-    }
+-
+-    // MUST be called from within a write lock on Constants.Locks.ContentTree.
+-    // trash indicates whether we are trashing, un-trashing, or not changing anything.
+-    private async Task PerformMoveLockedAsync(IContent content, int parentId, IContent? parent, int userId, List<(IContent Content, string OriginalPath)> moves, bool? trash, CancellationToken cancellationToken, bool includeDescendants = true)
+-    {
+-        content.WriterId = userId;
+-        content.ParentId = parentId;
+-        content.ParentKey = parentId switch
+-        {
+-            Constants.System.Root => null,
+-            Constants.System.RecycleBinContent => Constants.System.RecycleBinContentKey,
+-            _ => parent?.Key,
+-        };
+-
+-        var levelDelta = 1 - content.Level + (parent?.Level ?? 0);
+-        var originalLevel = content.Level;
+-        var originalPath = content.Path;
+-        moves.Add((content, originalPath));
+-
+-        // Fetch descendants by content's key before saving its own new parent below - GetDescendantsAsync
+-        // matches descendants via content's NodeId embedded in their own Path strings, so this must happen
+-        // before those descendant rows are mutated by the moves later in this method.
+-        var descendants = new List<IContent>();
+-        const int pageSize = 500;
+-        var page = 0;
+-        var total = long.MaxValue;
+-        while (page * pageSize < total)
+-        {
+-            PagedModel<IContent> descendantsPage = await GetDescendantsAsync(content.Key, page++ * pageSize, pageSize, Ordering.By("Path"), cancellationToken);
+-            descendants.AddRange(descendantsPage.Items);
+-            total = descendantsPage.Total;
+-        }
+-
+-        await PerformMoveContentLockedAsync(content, userId, trash, cancellationToken);
+-
+-        var paths = new Dictionary<int, string>
+-        {
+-            [content.Id] = (parent is null
+-                ? parentId == Constants.System.RecycleBinContent ? "-1,-20" : Constants.System.RootString
+-                : parent.Path) + "," + content.Id,
+-        };
+-
+-        // When restoring a single item out of the recycle bin without its descendants, the descendants must stay
+-        // trashed: the item's direct children are re-homed to the recycle bin root (and the rest of the subtree keeps
+-        // its relative structure), so nothing is orphaned and it can still be restored on its own later.
+-        var leaveDescendantsInRecycleBin = includeDescendants is false
+-            && parentId != Constants.System.RecycleBinContent
+-            && originalPath.Contains(Constants.System.RecycleBinContentString);
+-
+-        foreach (IContent descendant in descendants)
+-        {
+-            moves.Add((descendant, descendant.Path));
+-
+-            if (leaveDescendantsInRecycleBin)
+-            {
+-                await LeaveDescendantInRecycleBinLockedAsync(descendant, content.Id, originalLevel, userId, paths, cancellationToken);
+-            }
+-            else
+-            {
+-                await PerformMoveDescendantLockedAsync(descendant, levelDelta, userId, trash, paths, cancellationToken);
+-            }
+-        }
+-    }
+-
+-    // Re-homes a descendant of a restored item within the recycle bin: the restored item's direct children become
+-    // top-level recycle bin items, while deeper descendants keep their relative structure below their (now re-homed)
+-    // ancestor. The trashed state is left untouched so these items remain in the recycle bin.
+-    private async Task LeaveDescendantInRecycleBinLockedAsync(IContent descendant, int restoredItemId, int originalLevel, int userId, Dictionary<int, string> paths, CancellationToken cancellationToken)
+-    {
+-        var isDirectChild = descendant.ParentId == restoredItemId;
+-        descendant.Path = paths[descendant.Id] = isDirectChild
+-            ? Constants.System.RecycleBinContentPathPrefix + descendant.Id
+-            : paths[descendant.ParentId] + "," + descendant.Id;
+-        descendant.Level -= originalLevel;
+-        if (isDirectChild)
+-        {
+-            descendant.ParentId = Constants.System.RecycleBinContent;
+-            descendant.ParentKey = Constants.System.RecycleBinContentKey;
+-        }
+-
+-        await PerformMoveContentLockedAsync(descendant, userId, null, cancellationToken);
+-    }
+-
+-    // Moves a descendant along with the item being moved, updating its path and level (parentId is unchanged).
+-    private async Task PerformMoveDescendantLockedAsync(IContent descendant, int levelDelta, int userId, bool? trash, Dictionary<int, string> paths, CancellationToken cancellationToken)
+-    {
+-        descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
+-        descendant.Level += levelDelta;
+-        await PerformMoveContentLockedAsync(descendant, userId, trash, cancellationToken);
+-    }
+-
+-    private async Task PerformMoveContentLockedAsync(IContent content, int userId, bool? trash, CancellationToken cancellationToken)
+-    {
+-        if (trash.HasValue)
+-        {
+-            ((ContentBase)content).Trashed = trash.Value;
+-        }
+-
+-        content.WriterId = userId;
+-        await _documentRepository.SaveAsync(content, cancellationToken);
+-    }
++    /// <inheritdoc />
++    public Task<Attempt<ContentEmptyRecycleBinOperationStatus>> EmptyRecycleBinAsync(Guid userKey, CancellationToken cancellationToken) =>
++        EmptyRecycleBinCoreAsync(userKey, cancellationToken);
+ 
+-    /// <summary>
+-    /// Empties the Recycle Bin by deleting all <see cref="IContent"/> items that reside in the bin asynchronously.
+-    /// </summary>
+-    /// <param name="userKey">The unique key of the user performing the operation.</param>
+-    /// <param name="cancellationToken">The cancellation token.</param>
+-    /// <returns>An attempt carrying the operation status.</returns>
+-    public async Task<Attempt<ContentEmptyRecycleBinOperationStatus>> EmptyRecycleBinAsync(Guid userKey, CancellationToken cancellationToken)
++    /// <inheritdoc />
++    protected override async Task<List<IContent>> DeleteRecycleBinContentsLockedAsync(ICoreScope scope, IReadOnlyList<IContent> contents, EventMessages eventMessages, CancellationToken cancellationToken)
+     {
+         var deleted = new List<IContent>();
+-        EventMessages eventMessages = EventMessagesFactory.Get();
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.WriteLock(Constants.Locks.ContentTree);
+-
+-        int intUserId = await _userIdKeyResolver.GetAsync(userKey);
+-
+-        // emptying the recycle bin means deleting whatever is in there - do it properly!
+-        PagedModel<IContent> contentsPage = await GetChildrenAsync(Constants.System.RecycleBinContentKey, 0, int.MaxValue, propertyAliases: null, ordering: null, cancellationToken);
+-        IContent[] contents = [.. contentsPage.Items];
+-
+-        var emptyingRecycleBinNotification = new ContentEmptyingRecycleBinNotification(contents, eventMessages);
+-        var deletingContentNotification = new ContentDeletingNotification(contents, eventMessages);
+-        if (await scope.Notifications.PublishCancelableAsync(emptyingRecycleBinNotification)
+-            || await scope.Notifications.PublishCancelableAsync(deletingContentNotification))
+-        {
+-            scope.Complete();
+-            return Attempt.Fail(ContentEmptyRecycleBinOperationStatus.CancelledByNotification);
+-        }
+ 
+         // When checking if an item is related, we need to exclude the "relate parent on delete" relation type,
+         // as this is automatically created when items are trashed and would prevent emptying the recycle bin.
+@@ -1107,16 +676,7 @@ public async Task<Attempt<ContentEmptyRecycleBinOperationStatus>> EmptyRecycleBi
+             deleted.Add(content);
+         }
+ 
+-        scope.Notifications.Publish(
+-            new ContentEmptiedRecycleBinNotification(deleted, eventMessages).WithStateFrom(
+-                emptyingRecycleBinNotification));
+-        scope.Notifications.Publish(
+-            new ContentTreeChangeNotification(deleted, TreeChangeTypes.Remove, eventMessages));
+-        await AuditAsync(AuditType.Delete, intUserId, Constants.System.RecycleBinContent, "Recycle bin emptied");
+-
+-        scope.Complete();
+-
+-        return Attempt.Succeed(ContentEmptyRecycleBinOperationStatus.Success);
++        return deleted;
+     }
+ 
+     #endregion
+@@ -1346,131 +906,6 @@ public async Task<Attempt<ContentSendToPublicationOperationStatus>> SendToPublic
+         return Attempt.Succeed(ContentSendToPublicationOperationStatus.Success);
+     }
+ 
+-    /// <inheritdoc />
+-    public async Task<Attempt<ContentSortOperationStatus>> SortAsync(IReadOnlyList<Guid> orderedKeys, Guid userKey, CancellationToken cancellationToken)
+-    {
+-        if (orderedKeys.Count == 0)
+-        {
+-            return Attempt.Fail(ContentSortOperationStatus.NoOperation);
+-        }
+-
+-        EventMessages eventMessages = EventMessagesFactory.Get();
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.WriteLock(Constants.Locks.ContentTree);
+-
+-        // Reload within the lock so sorting operates on fully-loaded entities. Callers may pass
+-        // partially-loaded content (e.g. loaded with loadTemplates: false or without property data),
+-        // and saving those directly would wipe the template and property data (#23120).
+-        // GetByIdsAsync returns items in the requested order, preserving the caller's ordering that drives the sort.
+-        IContent[] itemsA = [.. (await GetByIdsAsync(orderedKeys, cancellationToken))];
+-
+-        var sortingNotification = new ContentSortingNotification(itemsA, eventMessages);
+-        if (await scope.Notifications.PublishCancelableAsync(sortingNotification))
+-        {
+-            scope.Complete();
+-            return Attempt.Fail(ContentSortOperationStatus.CancelledByNotification);
+-        }
+-
+-        var savingNotification = new ContentSavingNotification(itemsA, eventMessages);
+-        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+-        {
+-            scope.Complete();
+-            return Attempt.Fail(ContentSortOperationStatus.CancelledByNotification);
+-        }
+-
+-        int userId = await _userIdKeyResolver.GetAsync(userKey);
+-
+-        var published = new List<IContent>();
+-        var saved = new List<IContent>();
+-        var sortOrder = 0;
+-
+-        foreach (IContent content in itemsA)
+-        {
+-            // if the current sort order equals that of the content we don't
+-            // need to update it, so just increment the sort order and continue.
+-            if (content.SortOrder == sortOrder)
+-            {
+-                sortOrder++;
+-                continue;
+-            }
+-
+-            // else update
+-            content.SortOrder = sortOrder++;
+-            content.WriterId = userId;
+-
+-            // if it's published, register it, no point running StrategyPublish
+-            // since we're not really publishing it and it cannot be cancelled etc
+-            if (content.Published)
+-            {
+-                published.Add(content);
+-            }
+-
+-            // save
+-            saved.Add(content);
+-            await _documentRepository.SaveAsync(content, cancellationToken);
+-            await AuditAsync(AuditType.Sort, userId, content.Id, "Sorting content performed by user");
+-        }
+-
+-        // first saved, then sorted
+-        scope.Notifications.Publish(
+-            new ContentSavedNotification(itemsA, eventMessages).WithStateFrom(savingNotification));
+-        scope.Notifications.Publish(
+-            new ContentSortedNotification(itemsA, eventMessages).WithStateFrom(sortingNotification));
+-
+-        scope.Notifications.Publish(
+-            new ContentTreeChangeNotification(saved, TreeChangeTypes.RefreshNode, eventMessages));
+-
+-        if (published.Count > 0)
+-        {
+-            scope.Notifications.Publish(new ContentPublishedNotification(published, eventMessages));
+-        }
+-
+-        scope.Complete();
+-        return Attempt.Succeed(ContentSortOperationStatus.Success);
+-    }
+-
+-    /// <inheritdoc />
+-    public async Task<Attempt<ContentSortChildrenOperationStatus>> SortChildrenAsync(Guid? parentKey, IReadOnlyList<Guid> orderedChildKeys, Guid userKey, CancellationToken cancellationToken)
+-    {
+-        EventMessages evtMsgs = EventMessagesFactory.Get();
+-        if (orderedChildKeys.Count == 0)
+-        {
+-            return Attempt.Fail(ContentSortChildrenOperationStatus.NoOperation);
+-        }
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.WriteLock(Constants.Locks.ContentTree);
+-
+-        await _documentRepository.UpdateSortOrderAsync(orderedChildKeys, cancellationToken);
+-
+-        // Sort order lives in umbracoNode; neither the published cache nor the content repository cache keeps
+-        // a separate serialized copy of it, so refreshing the affected branch (which invalidates both and has
+-        // them reload from umbracoNode) is enough to pick up the new order without re-saving each child.
+-        int parentId;
+-        if (parentKey.HasValue)
+-        {
+-            IContent? parent = await GetByIdAsync(parentKey.Value, cancellationToken);
+-            parentId = parent?.Id ?? Constants.System.Root;
+-            if (parent is not null)
+-            {
+-                scope.Notifications.Publish(new ContentTreeChangeNotification(parent, TreeChangeTypes.RefreshBranch, evtMsgs));
+-            }
+-        }
+-        else
+-        {
+-            parentId = Constants.System.Root;
+-            IEnumerable<IContent> roots = await GetByIdsAsync(orderedChildKeys, cancellationToken);
+-            scope.Notifications.Publish(new ContentTreeChangeNotification(roots, TreeChangeTypes.RefreshNode, evtMsgs));
+-        }
+-
+-        int userId = await _userIdKeyResolver.GetAsync(userKey);
+-        await AuditAsync(AuditType.Sort, userId, parentId);
+-
+-        scope.Complete();
+-        return Attempt.Succeed(ContentSortChildrenOperationStatus.Success);
+-    }
+-
+     /// <inheritdoc />
+     public override Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(ContentDataIntegrityReportOptions options, CancellationToken cancellationToken)
+         => CheckDataIntegrityAsync(
+@@ -1583,10 +1018,6 @@ public override async Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteO
+         return Attempt.Succeed(ContentDeleteOfTypesOperationStatus.Success);
+     }
+ 
+-    /// <inheritdoc />
+-    public Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteOfTypeAsync(Guid contentTypeKey, Guid userKey, CancellationToken cancellationToken) =>
+-        DeleteOfTypesAsync(new[] { contentTypeKey }, userKey, cancellationToken);
+-
+     #endregion
+ 
+     #region Blueprints
+@@ -1832,7 +1263,13 @@ public async Task<Attempt<ContentBlueprintOperationStatus>> DeleteBlueprintsOfTy
+ 
+     protected override ILogger<ContentService> Logger => _logger;
+ 
+-    /// <inheritdoc cref="PublishableContentServiceBase{TContent}.DeleteLockedAsync" />
++    /// <inheritdoc />
++    protected override IContent CreateEntity(string name, IContent? parent, IContentType contentType, int userId)
++        => parent is not null
++            ? new Content(name, parent, contentType, userId)
++            : new Content(name, Constants.System.Root, contentType, userId);
++
++    /// <inheritdoc cref="ContentServiceBase{TContent, TContentType}.DeleteLockedAsync" />
+     protected override async Task DeleteLockedAsync(ICoreScope scope, IContent content, EventMessages evtMsgs, CancellationToken cancellationToken)
+     {
+         async Task DoDeleteAsync(IContent c)
+@@ -1889,6 +1326,33 @@ protected override TreeChangeNotification<IContent> CreateTreeChangeNotification
+     protected override DeletingNotification<IContent> CreateDeletingNotification(IContent content, EventMessages eventMessages)
+         => new ContentDeletingNotification(content, eventMessages);
+ 
++    protected override DeletingNotification<IContent> CreateDeletingNotification(IEnumerable<IContent> content, EventMessages eventMessages)
++        => new ContentDeletingNotification(content, eventMessages);
++
++    protected override MovingNotification<IContent> CreateMovingNotification(MoveEventInfo<IContent> moveInfo, EventMessages eventMessages)
++        => new ContentMovingNotification(moveInfo, eventMessages);
++
++    protected override MovedNotification<IContent> CreateMovedNotification(IEnumerable<MoveEventInfo<IContent>> moveInfos, EventMessages eventMessages)
++        => new ContentMovedNotification(moveInfos, eventMessages);
++
++    protected override MovingToRecycleBinNotification<IContent> CreateMovingToRecycleBinNotification(MoveToRecycleBinEventInfo<IContent> moveInfo, EventMessages eventMessages)
++        => new ContentMovingToRecycleBinNotification(moveInfo, eventMessages);
++
++    protected override MovedToRecycleBinNotification<IContent> CreateMovedToRecycleBinNotification(IEnumerable<MoveToRecycleBinEventInfo<IContent>> moveInfos, EventMessages eventMessages)
++        => new ContentMovedToRecycleBinNotification(moveInfos, eventMessages);
++
++    protected override EmptyingRecycleBinNotification<IContent> CreateEmptyingRecycleBinNotification(IEnumerable<IContent> content, EventMessages eventMessages)
++        => new ContentEmptyingRecycleBinNotification(content, eventMessages);
++
++    protected override EmptiedRecycleBinNotification<IContent> CreateEmptiedRecycleBinNotification(IEnumerable<IContent> content, EventMessages eventMessages)
++        => new ContentEmptiedRecycleBinNotification(content, eventMessages);
++
++    protected override SortingNotification<IContent> CreateSortingNotification(IEnumerable<IContent> content, EventMessages eventMessages)
++        => new ContentSortingNotification(content, eventMessages);
++
++    protected override SortedNotification<IContent> CreateSortedNotification(IEnumerable<IContent> content, EventMessages eventMessages)
++        => new ContentSortedNotification(content, eventMessages);
++
+     protected override CancelableEnumerableObjectNotification<IContent> CreatePublishingNotification(IContent content, EventMessages eventMessages)
+         => new ContentPublishingNotification(content, eventMessages);
+ 
+diff --git a/src/Umbraco.Core/Services/ContentServiceBase.cs b/src/Umbraco.Core/Services/ContentServiceBase.cs
+new file mode 100644
+index 00000000000..250857e80b2
+--- /dev/null
++++ b/src/Umbraco.Core/Services/ContentServiceBase.cs
+@@ -0,0 +1,1716 @@
++using Microsoft.Extensions.Logging;
++using Umbraco.Cms.Core.Events;
++using Umbraco.Cms.Core.Models;
++using Umbraco.Cms.Core.Notifications;
++using Umbraco.Cms.Core.Persistence.Repositories;
++using Umbraco.Cms.Core.Scoping;
++using Umbraco.Cms.Core.Services.Changes;
++using Umbraco.Cms.Core.Services.OperationStatus;
++using Umbraco.Extensions;
++
++namespace Umbraco.Cms.Core.Services;
++
++/// <summary>
++///     Base class for services that manage one kind of content through an
++///     <see cref="IAsyncContentRepository{TEntity}" />.
++/// </summary>
++/// <typeparam name="TContent">The type of content managed by the concrete implementation.</typeparam>
++/// <typeparam name="TContentType">The type of content type the content is built from.</typeparam>
++/// <remarks>
++///     Implements the shared lookup, count, version, save, delete, create, move, recycle bin and sort behaviour, leaving
++///     the kind-specific parts (object type, lock ids, notifications, entity construction) to the derived service.
++///     Publishing is layered on top by <see cref="PublishableContentServiceBase{TContent}" />.
++/// </remarks>
++public abstract class ContentServiceBase<TContent, TContentType> : RepositoryService, IAsyncContentServiceBase<TContent>
++    where TContent : class, IContentBase
++    where TContentType : class, IContentTypeComposition
++{
++    private readonly IAuditService _auditService;
++    private readonly IAsyncContentTypeRepositoryBase<TContentType> _contentTypeRepository;
++    private readonly IAsyncContentRepository<TContent> _contentRepository;
++    private readonly ILanguageRepository _languageRepository;
++    private readonly IUserIdKeyResolver _userIdKeyResolver;
++    private readonly IIdKeyMap _idKeyMap;
++
++    /// <summary>
++    ///     Initializes a new instance of the <see cref="ContentServiceBase{TContent, TContentType}" /> class.
++    /// </summary>
++    /// <param name="provider">The core scope provider.</param>
++    /// <param name="loggerFactory">The logger factory.</param>
++    /// <param name="eventMessagesFactory">The event messages factory.</param>
++    /// <param name="auditService">The audit service.</param>
++    /// <param name="contentTypeRepository">The backing content type repository.</param>
++    /// <param name="contentRepository">The backing content repository.</param>
++    /// <param name="languageRepository">The language repository.</param>
++    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
++    /// <param name="idKeyMap">The ID key map.</param>
++    protected ContentServiceBase(
++        ICoreScopeProvider provider,
++        ILoggerFactory loggerFactory,
++        IEventMessagesFactory eventMessagesFactory,
++        IAuditService auditService,
++        IAsyncContentTypeRepositoryBase<TContentType> contentTypeRepository,
++        IAsyncContentRepository<TContent> contentRepository,
++        ILanguageRepository languageRepository,
++        IUserIdKeyResolver userIdKeyResolver,
++        IIdKeyMap idKeyMap)
++        : base(provider, loggerFactory, eventMessagesFactory)
++    {
++        _auditService = auditService;
++        _contentTypeRepository = contentTypeRepository;
++        _contentRepository = contentRepository;
++        _languageRepository = languageRepository;
++        _userIdKeyResolver = userIdKeyResolver;
++        _idKeyMap = idKeyMap;
++    }
++
++    protected abstract UmbracoObjectTypes ContentObjectType { get; }
++
++    protected abstract int RecycleBinId { get; }
++
++    protected abstract int[] ReadLockIds { get; }
++
++    protected abstract int[] WriteLockIds { get; }
++
++    protected abstract ILogger<ContentServiceBase<TContent, TContentType>> Logger { get; }
++
++    /// <summary>
++    ///     Gets the Guid key of the recycle bin node for this kind of content.
++    /// </summary>
++    protected Guid RecycleBinKey => _contentRepository.RecycleBinKey;
++
++    // The path of the recycle bin node itself ("-1,<bin id>"), the prefix of every trashed item's path.
++    private string RecycleBinPath => Constants.System.RootString + "," + RecycleBinId.ToInvariantString();
++
++    /// <summary>
++    ///     Creates a new, unsaved content item of this kind.
++    /// </summary>
++    /// <param name="name">The name of the content item.</param>
++    /// <param name="parent">The parent content item, or <c>null</c> for the root of the tree.</param>
++    /// <param name="contentType">The content type.</param>
++    /// <param name="userId">The identifier of the user creating the content item.</param>
++    /// <returns>The new content item.</returns>
++    protected abstract TContent CreateEntity(string name, TContent? parent, TContentType contentType, int userId);
++
++    /// <summary>
++    ///     Deletes a content item inside the scope of a delete, once the deleting notification has passed, and
++    ///     publishes the deleted notification. Whether its descendants go with it is up to the kind.
++    /// </summary>
++    /// <param name="scope">The scope the delete runs in.</param>
++    /// <param name="content">The content item to delete.</param>
++    /// <param name="evtMsgs">The event messages collection.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    protected abstract Task DeleteLockedAsync(ICoreScope scope, TContent content, EventMessages evtMsgs, CancellationToken cancellationToken);
++
++    protected abstract SavingNotification<TContent> CreateSavingNotification(TContent content, EventMessages eventMessages);
++
++    protected abstract SavedNotification<TContent> CreateSavedNotification(TContent content, EventMessages eventMessages);
++
++    protected abstract SavingNotification<TContent> CreateSavingNotification(IEnumerable<TContent> content, EventMessages eventMessages);
++
++    protected abstract SavedNotification<TContent> CreateSavedNotification(IEnumerable<TContent> content, EventMessages eventMessages);
++
++    protected abstract TreeChangeNotification<TContent> CreateTreeChangeNotification(TContent content, TreeChangeTypes changeTypes, EventMessages eventMessages);
++
++    protected abstract TreeChangeNotification<TContent> CreateTreeChangeNotification(IEnumerable<TContent> content, TreeChangeTypes changeTypes, EventMessages eventMessages);
++
++    protected abstract DeletingNotification<TContent> CreateDeletingNotification(TContent content, EventMessages eventMessages);
++
++    protected abstract DeletingNotification<TContent> CreateDeletingNotification(IEnumerable<TContent> content, EventMessages eventMessages);
++
++    protected abstract MovingNotification<TContent> CreateMovingNotification(MoveEventInfo<TContent> moveInfo, EventMessages eventMessages);
++
++    protected abstract MovedNotification<TContent> CreateMovedNotification(IEnumerable<MoveEventInfo<TContent>> moveInfos, EventMessages eventMessages);
++
++    protected abstract MovingToRecycleBinNotification<TContent> CreateMovingToRecycleBinNotification(MoveToRecycleBinEventInfo<TContent> moveInfo, EventMessages eventMessages);
++
++    protected abstract MovedToRecycleBinNotification<TContent> CreateMovedToRecycleBinNotification(IEnumerable<MoveToRecycleBinEventInfo<TContent>> moveInfos, EventMessages eventMessages);
++
++    protected abstract EmptyingRecycleBinNotification<TContent> CreateEmptyingRecycleBinNotification(IEnumerable<TContent> content, EventMessages eventMessages);
++
++    protected abstract EmptiedRecycleBinNotification<TContent> CreateEmptiedRecycleBinNotification(IEnumerable<TContent> content, EventMessages eventMessages);
++
++    /// <summary>
++    ///     Creates the cancelable notification published before versions of a content item are deleted.
++    /// </summary>
++    /// <param name="key">The key of the content item whose versions are deleted.</param>
++    /// <param name="eventMessages">The event messages collection.</param>
++    /// <param name="specificVersion">The identifier of the version to delete, or <c>default</c> when deleting by date.</param>
++    /// <param name="dateToRetain">The date before which versions are deleted, or <c>default</c> when deleting a specific version.</param>
++    /// <returns>The notification to publish.</returns>
++    protected abstract DeletingVersionsNotification<TContent> CreateDeletingVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain);
++
++    /// <summary>
++    ///     Creates the notification published after versions of a content item have been deleted.
++    /// </summary>
++    /// <param name="key">The key of the content item whose versions were deleted.</param>
++    /// <param name="eventMessages">The event messages collection.</param>
++    /// <param name="specificVersion">The identifier of the deleted version, or <c>default</c> when deleted by date.</param>
++    /// <param name="dateToRetain">The date before which versions were deleted, or <c>default</c> when a specific version was deleted.</param>
++    /// <returns>The notification to publish.</returns>
++    protected abstract DeletedVersionsNotification<TContent> CreateDeletedVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain);
++
++    /// <summary>
++    ///     Creates the "saved" notification for a single item, carrying the cultures that were saved.
++    /// </summary>
++    /// <remarks>
++    ///     Defaults to the culture-agnostic <see cref="CreateSavedNotification(TContent, EventMessages)"/> overload so external
++    ///     subclasses keep working; the concrete services override this to carry the map on the concrete notification.
++    ///     See <see cref="BuildCultureMap"/> for why the cultures are captured at raise-time.
++    /// </remarks>
++    /// <param name="content">The item that was saved.</param>
++    /// <param name="eventMessages">The event messages collection.</param>
++    /// <param name="savedCultures">The cultures that were saved, keyed by item key, or <c>null</c> if not tracked.</param>
++    /// <returns>The notification to publish.</returns>
++    protected virtual SavedNotification<TContent> CreateSavedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
++        => CreateSavedNotification(content, eventMessages);
++
++    /// <summary>
++    ///     Creates the "saved" notification for multiple items, carrying the cultures that were saved per item.
++    /// </summary>
++    /// <remarks>
++    ///     Defaults to the culture-agnostic <see cref="CreateSavedNotification(IEnumerable{TContent}, EventMessages)"/> overload
++    ///     so external subclasses keep working; the concrete services override this to carry the map on the concrete
++    ///     notification.
++    /// </remarks>
++    /// <param name="content">The items that were saved.</param>
++    /// <param name="eventMessages">The event messages collection.</param>
++    /// <param name="savedCultures">The cultures that were saved, keyed by item key.</param>
++    /// <returns>The notification to publish.</returns>
++    protected virtual SavedNotification<TContent> CreateSavedNotification(IEnumerable<TContent> content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
++        => CreateSavedNotification(content, eventMessages);
++
++    /// <summary>
++    ///     Builds the per-item culture map carried on the notifications, keyed by item <see cref="Umbraco.Cms.Core.Models.Entities.IEntity.Key"/>.
++    /// </summary>
++    /// <remarks>
++    ///     Persisting the entity resets its change tracking, so the cultures are captured here when the notification is
++    ///     raised, because a handler cannot recompute them from the entity afterwards. <c>ToArray()</c> takes a copy so the
++    ///     notification holds a stable snapshot: some callers pass a live view over the entity's own collection (e.g.
++    ///     <see cref="IPublishableContentBase.PublishedCultures"/>) that would otherwise change as the entity is mutated.
++    /// </remarks>
++    /// <param name="content">The item the cultures belong to.</param>
++    /// <param name="cultures">
++    ///     The affected cultures. A <c>null</c> value means the category of change does not apply to this notification, so
++    ///     the map is <c>null</c>; a non-null-but-empty value means the change was tracked but affected no cultures for
++    ///     this item, so a present-but-empty map is returned rather than conflating that with "not tracked".
++    /// </param>
++    /// <returns>The per-item culture map, or <c>null</c> when <paramref name="cultures"/> is <c>null</c>.</returns>
++    protected static Dictionary<Guid, IReadOnlyCollection<string>>? BuildCultureMap(TContent content, IEnumerable<string>? cultures)
++    {
++        if (cultures is null)
++        {
++            return null;
++        }
++
++        string[] cultureList = [.. cultures];
++        return cultureList.Length == 0
++            ? new Dictionary<Guid, IReadOnlyCollection<string>>()
++            : new Dictionary<Guid, IReadOnlyCollection<string>> { [content.Key] = cultureList };
++    }
++
++    /// <summary>
++    ///     Creates the cancelable notification published before content items are sorted, or <c>null</c> when this
++    ///     kind has no such notification.
++    /// </summary>
++    /// <param name="content">The items being sorted.</param>
++    /// <param name="eventMessages">The event messages collection.</param>
++    /// <returns>The notification to publish, or <c>null</c>.</returns>
++    protected virtual SortingNotification<TContent>? CreateSortingNotification(IEnumerable<TContent> content, EventMessages eventMessages) => null;
++
++    /// <summary>
++    ///     Creates the notification published after content items have been sorted, or <c>null</c> when this kind
++    ///     has no such notification.
++    /// </summary>
++    /// <param name="content">The items that were sorted.</param>
++    /// <param name="eventMessages">The event messages collection.</param>
++    /// <returns>The notification to publish, or <c>null</c>.</returns>
++    protected virtual SortedNotification<TContent>? CreateSortedNotification(IEnumerable<TContent> content, EventMessages eventMessages) => null;
++
++    /// <summary>
++    ///     Creates the "saving" notification for multiple items, saying whether the save is part of a sort.
++    /// </summary>
++    /// <remarks>
++    ///     Defaults to the plain <see cref="CreateSavingNotification(IEnumerable{TContent}, EventMessages)" /> overload;
++    ///     a kind whose saving notification carries the sorting flag overrides this to set it.
++    /// </remarks>
++    /// <param name="content">The items being saved.</param>
++    /// <param name="eventMessages">The event messages collection.</param>
++    /// <param name="isSorting">Whether the items are saved as part of a sort.</param>
++    /// <returns>The notification to publish.</returns>
++    protected virtual SavingNotification<TContent> CreateSavingNotification(IEnumerable<TContent> content, EventMessages eventMessages, bool isSorting)
++        => CreateSavingNotification(content, eventMessages);
++
++    /// <summary>
++    ///     Validates a content item before it is saved, beyond the checks every kind shares.
++    /// </summary>
++    /// <param name="content">The content item about to be saved.</param>
++    /// <returns>
++    ///     <see cref="ContentSaveOperationStatus.Success" /> when the item may be saved, otherwise the status the save
++    ///     is rejected with.
++    /// </returns>
++    protected virtual ContentSaveOperationStatus ValidateForSave(TContent content) => ContentSaveOperationStatus.Success;
++
++    /// <summary>
++    ///     Called inside the delete scope, after the deleting notification has passed and before the item is deleted.
++    /// </summary>
++    /// <param name="scope">The scope the delete runs in.</param>
++    /// <param name="content">The content item about to be deleted.</param>
++    /// <param name="eventMessages">The event messages collection.</param>
++    protected virtual void BeforeDeleteLocked(ICoreScope scope, TContent content, EventMessages eventMessages)
++    {
++    }
++
++    /// <summary>
++    ///     Called when a trashed content item is about to be moved out of the recycle bin, before it is persisted.
++    /// </summary>
++    /// <param name="content">The content item being restored.</param>
++    protected virtual void OnRestoringFromRecycleBin(TContent content)
++    {
++    }
++
++    /// <summary>
++    ///     Called inside the sort scope once the items whose position changed have been saved and the saved, sorted
++    ///     and tree change notifications have been published.
++    /// </summary>
++    /// <param name="scope">The scope the sort runs in.</param>
++    /// <param name="sorted">The items whose sort order changed, in their new order.</param>
++    /// <param name="eventMessages">The event messages collection.</param>
++    protected virtual void OnSortedLocked(ICoreScope scope, IReadOnlyList<TContent> sorted, EventMessages eventMessages)
++    {
++    }
++
++    /// <summary>
++    ///     Gets a value indicating whether a version of a content item may be deleted.
++    /// </summary>
++    /// <param name="content">The content item, at its current version.</param>
++    /// <param name="versionId">The id of the version to delete.</param>
++    /// <returns><c>true</c> when the version is not one the kind must keep; otherwise, <c>false</c>.</returns>
++    protected virtual bool IsVersionDeletable(TContent content, int versionId) => content.VersionId != versionId;
++
++    /// <summary>
++    ///     Deletes the items found in the recycle bin, inside the scope that empties it, and returns the ones deleted.
++    /// </summary>
++    /// <param name="scope">The scope the operation runs in.</param>
++    /// <param name="contents">The items directly under the recycle bin.</param>
++    /// <param name="eventMessages">The event messages collection.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>The items that were deleted.</returns>
++    protected virtual async Task<List<TContent>> DeleteRecycleBinContentsLockedAsync(ICoreScope scope, IReadOnlyList<TContent> contents, EventMessages eventMessages, CancellationToken cancellationToken)
++    {
++        var deleted = new List<TContent>();
++        foreach (TContent content in contents)
++        {
++            await DeleteLockedAsync(scope, content, eventMessages, cancellationToken);
++            deleted.Add(content);
++        }
++
++        return deleted;
++    }
++
++    #region Create
++
++    /// <summary>
++    ///     Creates a content item.
++    /// </summary>
++    /// <param name="name">The name of the content item.</param>
++    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for the root of the tree.</param>
++    /// <param name="contentTypeAlias">The content type alias.</param>
++    /// <param name="userKey">The Guid key of the user performing the action.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>The created content item.</returns>
++    /// <remarks>
++    ///     Protected and exposed per kind: the parent is looked up as an item of this kind, which elements, parented by
++    ///     containers, cannot do.
++    /// </remarks>
++    protected async Task<TContent> CreateCoreAsync(string name, Guid? parentKey, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken)
++    {
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++
++        TContentType contentType = await GetContentTypeAsync(scope, contentTypeAlias, cancellationToken);
++        TContent content = await CreateCoreAsync(name, parentKey, contentType, userKey, cancellationToken);
++
++        scope.Complete();
++        return content;
++    }
++
++    /// <summary>
++    ///     Creates a content item.
++    /// </summary>
++    /// <param name="name">The name of the content item.</param>
++    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for the root of the tree.</param>
++    /// <param name="contentType">The content type.</param>
++    /// <param name="userKey">The Guid key of the user performing the action.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>The created content item.</returns>
++    /// <remarks>
++    ///     Protected and exposed per kind: the parent is looked up as an item of this kind, which elements, parented by
++    ///     containers, cannot do.
++    /// </remarks>
++    protected async Task<TContent> CreateCoreAsync(string name, Guid? parentKey, TContentType contentType, Guid userKey, CancellationToken cancellationToken)
++    {
++        ArgumentNullException.ThrowIfNull(contentType);
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++
++        int userId = await _userIdKeyResolver.GetAsync(userKey);
++
++        TContent? parent = null;
++        if (parentKey.HasValue)
++        {
++            parent = await GetByIdAsync(parentKey.Value, cancellationToken);
++            if (parent is null)
++            {
++                throw new ArgumentException("No content with that key.", nameof(parentKey));
++            }
++        }
++
++        TContent content = CreateEntity(name, parent, contentType, userId);
++
++        scope.Complete();
++        return content;
++    }
++
++    /// <summary>
++    ///     Creates a content item.
++    /// </summary>
++    /// <param name="name">The name of the content item.</param>
++    /// <param name="parent">The parent content item.</param>
++    /// <param name="contentTypeAlias">The content type alias.</param>
++    /// <param name="userKey">The Guid key of the user performing the action.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>The created content item.</returns>
++    /// <remarks>
++    ///     Protected and exposed per kind: the parent is an item of this kind, which elements, parented by containers,
++    ///     cannot supply.
++    /// </remarks>
++    protected async Task<TContent> CreateCoreAsync(string name, TContent parent, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken)
++    {
++        ArgumentNullException.ThrowIfNull(parent);
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++
++        int userId = await _userIdKeyResolver.GetAsync(userKey);
++        TContentType contentType = await GetContentTypeAsync(scope, contentTypeAlias, cancellationToken);
++
++        TContent content = CreateEntity(name, parent, contentType, userId);
++
++        scope.Complete();
++        return content;
++    }
++
++    /// <summary>
++    ///     Creates and saves a content item.
++    /// </summary>
++    /// <param name="name">The name of the content item.</param>
++    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for the root of the tree.</param>
++    /// <param name="contentTypeAlias">The content type alias.</param>
++    /// <param name="userKey">The Guid key of the user performing the action.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>The created and saved content item.</returns>
++    /// <exception cref="InvalidOperationException">The content item cannot be saved because it fails the kind's save validation.</exception>
++    /// <remarks>
++    ///     When a saving notification cancels the save, the content item is returned unsaved (without an identity).
++    ///     Protected and exposed per kind: the parent is looked up as an item of this kind, which elements, parented by
++    ///     containers, cannot do.
++    /// </remarks>
++    protected async Task<TContent> CreateAndSaveCoreAsync(string name, Guid? parentKey, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken)
++    {
++        // TODO: what about culture?
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++
++        // locking the content tree secures content types too
++        scope.WriteLock(WriteLockIds);
++
++        int userId = await _userIdKeyResolver.GetAsync(userKey);
++
++        TContentType contentType = await GetContentTypeAsync(scope, contentTypeAlias, cancellationToken);
++
++        TContent? parent = null;
++        if (parentKey.HasValue)
++        {
++            parent = await GetByIdAsync(parentKey.Value, cancellationToken); // + locks
++            if (parent is null)
++            {
++                throw new ArgumentException("No content with that key.", nameof(parentKey)); // causes rollback
++            }
++        }
++
++        TContent content = CreateEntity(name, parent, contentType, userId);
++
++        Attempt<ContentSaveOperationStatus> saveResult = await SaveAsync(content, userKey, cancellationToken);
++        ThrowIfSaveRejected(content, saveResult);
++
++        scope.Complete();
++
++        return content;
++    }
++
++    /// <summary>
++    ///     Creates and saves a content item.
++    /// </summary>
++    /// <param name="name">The name of the content item.</param>
++    /// <param name="parent">The parent content item.</param>
++    /// <param name="contentTypeAlias">The content type alias.</param>
++    /// <param name="userKey">The Guid key of the user performing the action.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>The created and saved content item.</returns>
++    /// <exception cref="InvalidOperationException">The content item cannot be saved because it fails the kind's save validation.</exception>
++    /// <remarks>
++    ///     When a saving notification cancels the save, the content item is returned unsaved (without an identity).
++    ///     Protected and exposed per kind: the parent is an item of this kind, which elements, parented by containers,
++    ///     cannot supply.
++    /// </remarks>
++    protected async Task<TContent> CreateAndSaveCoreAsync(string name, TContent parent, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken)
++    {
++        // TODO: what about culture?
++        ArgumentNullException.ThrowIfNull(parent);
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++
++        // locking the content tree secures content types too
++        scope.WriteLock(WriteLockIds);
++
++        int userId = await _userIdKeyResolver.GetAsync(userKey);
++
++        TContentType contentType = await GetContentTypeAsync(scope, contentTypeAlias, cancellationToken);
++
++        TContent content = CreateEntity(name, parent, contentType, userId);
++
++        Attempt<ContentSaveOperationStatus> saveResult = await SaveAsync(content, userKey, cancellationToken);
++        ThrowIfSaveRejected(content, saveResult);
++
++        scope.Complete();
++        return content;
++    }
++
++    /// <summary>
++    ///     Throws when a save was rejected with a status, so that creating-and-saving never hands the caller an item
++    ///     that was silently left unsaved. A kind with further save validation extends it.
++    /// </summary>
++    /// <param name="content">The content item that was to be saved.</param>
++    /// <param name="saveResult">The result of the save.</param>
++    protected virtual void ThrowIfSaveRejected(TContent content, Attempt<ContentSaveOperationStatus> saveResult)
++    {
++        if (saveResult.Result is ContentSaveOperationStatus.InvalidName)
++        {
++            throw new InvalidOperationException(
++                $"Content with the name {content.Name} cannot be more than 255 characters in length.");
++        }
++    }
++
++    #endregion
++
++    #region Count
++
++    /// <summary>
++    /// Gets the count of all <typeparamref name="TContent"/> items.
++    /// </summary>
++    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>The count of content items.</returns>
++    public async Task<int> CountAsync(string? contentTypeAlias, CancellationToken cancellationToken)
++    {
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.ReadLock(ReadLockIds);
++        int result = contentTypeAlias is null
++            ? await _contentRepository.CountAsync(cancellationToken)
++            : await _contentRepository.CountAsync(contentTypeAlias, cancellationToken);
++        scope.Complete();
++        return result;
++    }
++
++    /// <summary>
++    /// Gets the count of child <typeparamref name="TContent"/> items under a specified parent.
++    /// </summary>
++    /// <param name="parentKey">The Guid key of the parent content.</param>
++    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>The count of child content items.</returns>
++    public async Task<int> CountChildrenAsync(Guid? parentKey, string? contentTypeAlias, CancellationToken cancellationToken)
++    {
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.ReadLock(ReadLockIds);
++        int result = contentTypeAlias is null
++            ? await _contentRepository.CountChildrenAsync(parentKey, cancellationToken)
++            : await _contentRepository.CountChildrenAsync(parentKey, contentTypeAlias, cancellationToken);
++        scope.Complete();
++        return result;
++    }
++
++    /// <summary>
++    /// Gets the count of descendant <typeparamref name="TContent"/> items under a specified parent.
++    /// </summary>
++    /// <param name="parentKey">The Guid key of the parent content.</param>
++    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>The count of descendant content items.</returns>
++    public async Task<int> CountDescendantsAsync(Guid? parentKey, string? contentTypeAlias, CancellationToken cancellationToken)
++    {
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.ReadLock(ReadLockIds);
++        int result = contentTypeAlias is null
++            ? await _contentRepository.CountDescendantsAsync(parentKey, cancellationToken)
++            : await _contentRepository.CountDescendantsAsync(parentKey, contentTypeAlias, cancellationToken);
++        scope.Complete();
++        return result;
++    }
++
++    #endregion
++
++    #region Get, Has, Is
++
++    /// <inheritdoc/>
++    public async Task<TContent?> GetByIdAsync(Guid key, CancellationToken cancellationToken)
++    {
++        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
++        {
++            scope.ReadLock(ReadLockIds);
++            TContent? result = await _contentRepository.GetAsync(key, cancellationToken);
++            scope.Complete();
++            return result;
++        }
++    }
++
++    /// <summary>
++    ///     Gets content items by their unique identifiers.
++    /// </summary>
++    /// <param name="ids">The unique identifiers of the content items.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>The content items, in the order requested.</returns>
++    public async Task<IEnumerable<TContent>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken)
++    {
++        Guid[] idsA = [.. ids];
++        if (idsA.Length == 0)
++        {
++            return [];
++        }
++
++        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
++        {
++            scope.ReadLock(ReadLockIds);
++            IEnumerable<TContent> items = await _contentRepository.GetManyAsync(idsA, cancellationToken);
++            var index = items.ToDictionary(x => x.Key, x => x);
++            IEnumerable<TContent> result = idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
++            scope.Complete();
++            return result;
++        }
++    }
++
++    /// <summary>
++    ///     Gets a paged list of content items of a given content type.
++    /// </summary>
++    /// <param name="contentTypeKey">The Guid key of the content type.</param>
++    /// <param name="skip">The number of items to skip.</param>
++    /// <param name="take">The maximum number of items to return.</param>
++    /// <param name="ordering">The ordering specification, or <c>null</c> to order by sort order.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>A paged result containing the matching content items.</returns>
++    public async Task<PagedModel<TContent>> GetPagedOfTypeAsync(Guid contentTypeKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
++    {
++        ordering ??= Ordering.By("sortOrder");
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.ReadLock(ReadLockIds);
++        PagedModel<TContent> result = await _contentRepository.GetPagedOfContentTypesAsync([contentTypeKey], skip, take, ordering, cancellationToken);
++        scope.Complete();
++        return result;
++    }
++
++    /// <summary>
++    ///     Gets a paged list of content items whose content type is one of the specified content types.
++    /// </summary>
++    /// <param name="contentTypeKeys">The keys of the content types.</param>
++    /// <param name="skip">The number of items to skip.</param>
++    /// <param name="take">The maximum number of items to return.</param>
++    /// <param name="ordering">The ordering specification, or <c>null</c> to order by sort order.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>A paged result containing the matching content items.</returns>
++    public async Task<PagedModel<TContent>> GetPagedOfTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
++    {
++        ordering ??= Ordering.By("sortOrder");
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.ReadLock(ReadLockIds);
++        PagedModel<TContent> result = await _contentRepository.GetPagedOfContentTypesAsync(contentTypeKeys, skip, take, ordering, cancellationToken);
++        scope.Complete();
++        return result;
++    }
++
++    /// <summary>
++    ///     Gets a version of a content item.
++    /// </summary>
++    /// <remarks>
++    ///     Int-keyed rather than Guid-keyed: unlike content items, versions have no Guid key resolvable
++    ///     from a caller-facing identifier today, so this takes the version's raw database id directly.
++    /// </remarks>
++    /// <param name="versionId">The version identifier.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>The content version, or <c>null</c> if not found.</returns>
++    public async Task<TContent?> GetVersionAsync(int versionId, CancellationToken cancellationToken)
++    {
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.ReadLock(ReadLockIds);
++        TContent? result = await _contentRepository.GetVersionAsync(versionId, cancellationToken);
++        scope.Complete();
++        return result;
++    }
++
++    /// <summary>
++    ///     Gets all versions of a content item.
++    /// </summary>
++    /// <param name="contentKey">The Guid key of the content item.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>The content versions.</returns>
++    /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
++    public async Task<IEnumerable<TContent>> GetVersionsAsync(Guid contentKey, CancellationToken cancellationToken)
++    {
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.ReadLock(ReadLockIds);
++        IEnumerable<TContent> result = await _contentRepository.GetAllVersionsAsync(contentKey, cancellationToken);
++        scope.Complete();
++        return result;
++    }
++
++    /// <summary>
++    ///     Gets a page of versions of a content item.
++    /// </summary>
++    /// <param name="contentKey">The Guid key of the content item.</param>
++    /// <param name="skip">The number of versions to skip.</param>
++    /// <param name="take">The number of versions to take.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>The content versions.</returns>
++    /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
++    public async Task<IEnumerable<TContent>> GetVersionsSlimAsync(Guid contentKey, int skip, int take, CancellationToken cancellationToken)
++    {
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.ReadLock(ReadLockIds);
++        IEnumerable<TContent> result = await _contentRepository.GetAllVersionsSlimAsync(contentKey, skip, take, cancellationToken);
++        scope.Complete();
++        return result;
++    }
++
++    /// <summary>
++    ///     Gets a page of version ids of a content item.
++    /// </summary>
++    /// <param name="contentKey">The Guid key of the content item.</param>
++    /// <param name="skip">The number of versions to skip.</param>
++    /// <param name="take">The maximum number of version ids to return.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>The version ids.</returns>
++    /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
++    public async Task<IEnumerable<int>> GetVersionIdsAsync(Guid contentKey, int skip, int take, CancellationToken cancellationToken)
++    {
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.ReadLock(ReadLockIds);
++        IEnumerable<int> result = await _contentRepository.GetVersionIdsAsync(contentKey, skip, take, cancellationToken);
++        scope.Complete();
++        return result;
++    }
++
++    /// <summary>
++    ///     Checks whether an <typeparamref name="TContent" /> item has any children
++    /// </summary>
++    /// <param name="key">Guid key of the <typeparamref name="TContent" /></param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>True if the content has any children otherwise False</returns>
++    public async Task<bool> HasChildrenAsync(Guid key, CancellationToken cancellationToken) =>
++        await CountChildrenAsync(key, null, cancellationToken) > 0;
++
++    /// <summary>
++    ///     Gets the parent of the current content as an <typeparamref name="TContent" /> item.
++    /// </summary>
++    /// <param name="content"><typeparamref name="TContent" /> to retrieve the parent from</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>Parent <typeparamref name="TContent" /> object</returns>
++    public async Task<TContent?> GetParentAsync(TContent? content, CancellationToken cancellationToken)
++    {
++        if (content?.ParentId == Constants.System.Root || content?.ParentId == RecycleBinId ||
++            content is null)
++        {
++            return null;
++        }
++
++        // content is caller-supplied and not guaranteed to have gone through a read path that populated
++        // ParentKey (e.g. a freshly constructed, unsaved entity), so resolve it here when it is unknown.
++        // Everywhere else ParentKey is expected to already be populated.
++        if (content.TryGetParentKey(out Guid? parentKey) is false)
++        {
++            Attempt<Guid> parentKeyAttempt = await _idKeyMap.GetKeyForIdAsync(content.ParentId, ContentObjectType);
++            parentKey = parentKeyAttempt.Success ? parentKeyAttempt.Result : null;
++        }
++
++        return parentKey is null
++            ? null
++            : await GetByIdAsync(parentKey.Value, cancellationToken);
++    }
++
++    /// <summary>
++    ///     Gets a paged list of direct children of a content node.
++    /// </summary>
++    /// <param name="parentKey">The Guid key of the parent node, or <c>null</c> for the root of the tree.</param>
++    /// <param name="skip">The number of items to skip.</param>
++    /// <param name="take">The maximum number of items to return.</param>
++    /// <param name="propertyAliases">
++    ///     Optional array of property aliases to load. If <c>null</c>, all properties are loaded.
++    ///     If empty, no custom properties are loaded (only system properties).
++    /// </param>
++    /// <param name="ordering">The ordering specification, or <c>null</c> to order by sort order.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>A paged result containing the matching children.</returns>
++    public async Task<PagedModel<TContent>> GetChildrenAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken)
++    {
++        ordering ??= Ordering.By("sortOrder");
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.ReadLock(ReadLockIds);
++        PagedModel<TContent> result = await _contentRepository.GetChildrenAsync(parentKey, skip, take, propertyAliases, ordering, cancellationToken);
++        scope.Complete();
++        return result;
++    }
++
++    /// <summary>
++    ///     Gets a paged list of all descendants of a content node.
++    /// </summary>
++    /// <param name="ancestorKey">The Guid key of the ancestor node.</param>
++    /// <param name="skip">The number of items to skip.</param>
++    /// <param name="take">The maximum number of items to return.</param>
++    /// <param name="ordering">The ordering specification, or <c>null</c> to order by path (ancestors before their own descendants).</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <param name="includeTrashed">Whether to include descendants that are currently in the recycle bin. Default is <c>true</c>.</param>
++    /// <returns>A paged result containing the matching descendants.</returns>
++    public async Task<PagedModel<TContent>> GetDescendantsAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true)
++    {
++        ordering ??= Ordering.By("Path");
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.ReadLock(ReadLockIds);
++        PagedModel<TContent> result = await _contentRepository.GetDescendantsAsync(ancestorKey, skip, take, ordering, cancellationToken, includeTrashed);
++        scope.Complete();
++        return result;
++    }
++
++    /// <summary>
++    ///     Gets the parent of a content item.
++    /// </summary>
++    /// <param name="key">The Guid key of the content item.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>The parent content item, or <c>null</c> if not found.</returns>
++    public async Task<TContent?> GetParentAsync(Guid key, CancellationToken cancellationToken)
++    {
++        TContent? content = await GetByIdAsync(key, cancellationToken);
++        if (content is null || content.ParentId == Constants.System.Root || content.ParentId == RecycleBinId)
++        {
++            return null;
++        }
++
++        Guid? parentKey = content.ParentKey;
++        return parentKey is null
++            ? null
++            : await GetByIdAsync(parentKey.Value, cancellationToken);
++    }
++
++    /// <summary>
++    ///     Gets root-level content items.
++    /// </summary>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>The root-level content items.</returns>
++    public async Task<IEnumerable<TContent>> GetRootContentAsync(CancellationToken cancellationToken)
++    {
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.ReadLock(ReadLockIds);
++        IEnumerable<TContent> result = await _contentRepository.GetRootContentAsync(cancellationToken);
++        scope.Complete();
++        return result;
++    }
++
++    /// <summary>
++    ///     Gets a paged list of content items in the recycle bin.
++    /// </summary>
++    /// <param name="skip">The number of items to skip.</param>
++    /// <param name="take">The maximum number of items to return.</param>
++    /// <param name="ordering">The ordering specification, or <c>null</c> to order by path.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>A paged result containing the matching recycle bin items.</returns>
++    public async Task<PagedModel<TContent>> GetPagedRecycleBinAsync(int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
++    {
++        ordering ??= Ordering.By("Path");
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.ReadLock(ReadLockIds);
++        PagedModel<TContent> result = await _contentRepository.GetPagedRecycleBinAsync(skip, take, ordering, cancellationToken);
++        scope.Complete();
++        return result;
++    }
++
++    #endregion
++
++    #region Save
++
++    /// <summary>
++    ///     Saves a content item.
++    /// </summary>
++    /// <param name="content">The content item to save.</param>
++    /// <param name="userKey">The key of the user performing the action.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>An attempt carrying the operation status.</returns>
++    /// <remarks>Protected until a kind whose contract carries this shape derives from the base.</remarks>
++    protected Task<Attempt<ContentSaveOperationStatus>> SaveAsync(TContent content, Guid userKey, CancellationToken cancellationToken)
++        => PerformSaveAsync(content, userKey, persistAlongside: null, cancellationToken);
++
++    /// <summary>
++    ///     Saves a content item, running the kind's save validation first and persisting whatever accompanies the
++    ///     item in the same scope, before the saved notification is published.
++    /// </summary>
++    /// <param name="content">The content item to save.</param>
++    /// <param name="userKey">The key of the user performing the action.</param>
++    /// <param name="persistAlongside">
++    ///     What to persist right after the item itself, or <c>null</c> when nothing accompanies it; a publishable kind
++    ///     persists the item's schedule here.
++    /// </param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>An attempt carrying the operation status.</returns>
++    protected async Task<Attempt<ContentSaveOperationStatus>> PerformSaveAsync(TContent content, Guid userKey, Func<Task>? persistAlongside, CancellationToken cancellationToken)
++    {
++        ContentSaveOperationStatus validationStatus = ValidateForSave(content);
++        if (validationStatus is not ContentSaveOperationStatus.Success)
++        {
++            return Attempt.Fail(validationStatus);
++        }
++
++        if (content.Name is { Length: > Constants.Validation.MaxNameLength })
++        {
++            return Attempt.Fail(ContentSaveOperationStatus.InvalidName);
++        }
++
++        EventMessages eventMessages = EventMessagesFactory.Get();
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.WriteLock(WriteLockIds);
++
++        SavingNotification<TContent> savingNotification = CreateSavingNotification(content, eventMessages);
++        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
++        {
++            scope.Complete();
++            return Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification);
++        }
++
++        int userId = await _userIdKeyResolver.GetAsync(userKey);
++
++        if (content.HasIdentity is false)
++        {
++            content.CreatorId = userId;
++        }
++
++        content.WriterId = userId;
++
++        List<string>? culturesChanging = content.ContentType.VariesByCulture()
++            ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
++            : null;
++
++        IReadOnlyCollection<string>? savedCultures = content.ContentType.VariesByCulture()
++            ? culturesChanging
++            : content.IsDirty() ? ["*"] : [];
++
++        await _contentRepository.SaveAsync(content, cancellationToken);
++
++        if (persistAlongside is not null)
++        {
++            await persistAlongside();
++        }
++
++        scope.Notifications.Publish(
++            CreateSavedNotification(content, eventMessages, BuildCultureMap(content, savedCultures)).WithStateFrom(savingNotification));
++
++        scope.Notifications.Publish(CreateTreeChangeNotification(content, TreeChangeTypes.RefreshNode, eventMessages));
++
++        if (culturesChanging is not null)
++        {
++            IEnumerable<ILanguage> allLangs = await _languageRepository.GetAllAsync(cancellationToken);
++            var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesChanging);
++            await AuditAsync(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
++        }
++        else
++        {
++            await AuditAsync(AuditType.Save, userId, content.Id);
++        }
++
++        scope.Complete();
++
++        return Attempt.Succeed(ContentSaveOperationStatus.Success);
++    }
++
++    /// <inheritdoc />
++    public async Task<Attempt<ContentSaveOperationStatus>> SaveAsync(IEnumerable<TContent> contents, Guid userKey, CancellationToken cancellationToken)
++    {
++        EventMessages eventMessages = EventMessagesFactory.Get();
++        TContent[] contentsA = [.. contents];
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.WriteLock(WriteLockIds);
++
++        SavingNotification<TContent> savingNotification = CreateSavingNotification(contentsA, eventMessages);
++        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
++        {
++            scope.Complete();
++            return Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification);
++        }
++
++        int userId = await _userIdKeyResolver.GetAsync(userKey);
++
++        var savedCultures = new Dictionary<Guid, IReadOnlyCollection<string>>();
++        foreach (TContent content in contentsA)
++        {
++            if (content.HasIdentity is false)
++            {
++                content.CreatorId = userId;
++            }
++
++            content.WriterId = userId;
++
++            // capture the changing cultures before saving resets change tracking on the entity. Invariant content
++            // reports the "*" marker, but only when something actually changed (mirroring the variant delta).
++            IReadOnlyCollection<string>? culturesChanging = content.ContentType.VariesByCulture()
++                ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToArray()
++                : content.IsDirty() ? ["*"] : [];
++            if (culturesChanging is { Count: > 0 })
++            {
++                savedCultures[content.Key] = culturesChanging;
++            }
++
++            await _contentRepository.SaveAsync(content, cancellationToken);
++        }
++
++        scope.Notifications.Publish(
++            CreateSavedNotification(contentsA, eventMessages, savedCultures).WithStateFrom(savingNotification));
++
++        // TODO: See note above about supressing events
++        scope.Notifications.Publish(CreateTreeChangeNotification(contentsA, TreeChangeTypes.RefreshNode, eventMessages));
++
++        await AuditAsync(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items (#{contentsA.Length})");
++
++        scope.Complete();
++
++        return Attempt.Succeed(ContentSaveOperationStatus.Success);
++    }
++
++    #endregion
++
++    #region Delete
++
++    /// <summary>
++    ///     Deletes a content item.
++    /// </summary>
++    /// <param name="content">The content item to delete.</param>
++    /// <param name="userKey">The key of the user performing the action.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>An attempt carrying the operation status.</returns>
++    /// <remarks>
++    ///     Publishes the cancelable deleting notification, lets the kind act on the item before it goes, deletes it
++    ///     through <see cref="DeleteLockedAsync" />, then publishes the tree change and writes the audit entry. The
++    ///     item is entirely removed from the database.
++    /// </remarks>
++    public async Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(TContent content, Guid userKey, CancellationToken cancellationToken)
++    {
++        int userId = await _userIdKeyResolver.GetAsync(userKey);
++        EventMessages eventMessages = EventMessagesFactory.Get();
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.WriteLock(WriteLockIds);
++
++        if (await scope.Notifications.PublishCancelableAsync(CreateDeletingNotification(content, eventMessages)))
++        {
++            scope.Complete();
++            return Attempt.Fail(ContentDeleteOperationStatus.CancelledByNotification);
++        }
++
++        BeforeDeleteLocked(scope, content, eventMessages);
++
++        await DeleteLockedAsync(scope, content, eventMessages, cancellationToken);
++
++        scope.Notifications.Publish(CreateTreeChangeNotification(content, TreeChangeTypes.Remove, eventMessages));
++        await AuditAsync(AuditType.Delete, userId, content.Id);
++
++        scope.Complete();
++
++        return Attempt.Succeed(ContentDeleteOperationStatus.Success);
++    }
++
++    // TODO: both DeleteVersions methods below have an issue. Sort of. They do NOT take care of files the way
++    // Delete does - for a good reason: the file may be referenced by other, non-deleted, versions. BUT,
++    // if that's not the case, then the file will never be deleted, because when we delete the content,
++    // the version referencing the file will not be there anymore. SO, we can leak files.
++
++    /// <summary>
++    ///     Permanently deletes versions from an <typeparamref name="TContent" /> object prior to a specific date.
++    ///     This method will never delete the latest version of a content item.
++    /// </summary>
++    /// <param name="key">Guid key of the <typeparamref name="TContent" /> object to delete versions from</param>
++    /// <param name="versionDate">Latest version date</param>
++    /// <param name="userKey">Guid key of the User deleting versions of a Content object</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    public async Task<Attempt<ContentVersionOperationStatus>> DeleteVersionsAsync(Guid key, DateTime versionDate, Guid userKey, CancellationToken cancellationToken)
++    {
++        int userId = await _userIdKeyResolver.GetAsync(userKey);
++        EventMessages evtMsgs = EventMessagesFactory.Get();
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.WriteLock(WriteLockIds);
++
++        DeletingVersionsNotification<TContent> deletingVersionsNotification =
++            CreateDeletingVersionsNotification(key, evtMsgs, specificVersion: default, dateToRetain: versionDate);
++        if (await scope.Notifications.PublishCancelableAsync(deletingVersionsNotification))
++        {
++            scope.Complete();
++            return Attempt.Fail(ContentVersionOperationStatus.CancelledByNotification);
++        }
++
++        await _contentRepository.DeleteVersionsAsync(key, versionDate, cancellationToken);
++
++        scope.Notifications.Publish(
++            CreateDeletedVersionsNotification(key, evtMsgs, specificVersion: default, dateToRetain: versionDate).WithStateFrom(
++                deletingVersionsNotification));
++        await AuditAsync(AuditType.Delete, userId, Constants.System.Root, "Delete (by version date)");
++
++        scope.Complete();
++        return Attempt.Succeed(ContentVersionOperationStatus.Success);
++    }
++
++    /// <summary>
++    ///     Permanently deletes specific version(s) from an <typeparamref name="TContent" /> object.
++    ///     This method will never delete the latest version of a content item.
++    /// </summary>
++    /// <param name="key">Guid key of the <typeparamref name="TContent" /> object to delete a version from</param>
++    /// <param name="versionId">Id of the version to delete</param>
++    /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
++    /// <param name="userKey">Guid key of the User deleting versions of a Content object</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>An attempt carrying the operation status.</returns>
++    public async Task<Attempt<ContentVersionOperationStatus>> DeleteVersionAsync(Guid key, int versionId, bool deletePriorVersions, Guid userKey, CancellationToken cancellationToken)
++    {
++        int userId = await _userIdKeyResolver.GetAsync(userKey);
++        EventMessages evtMsgs = EventMessagesFactory.Get();
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.WriteLock(WriteLockIds);
++        DeletingVersionsNotification<TContent> deletingVersionsNotification =
++            CreateDeletingVersionsNotification(key, evtMsgs, versionId, dateToRetain: default);
++        if (await scope.Notifications.PublishCancelableAsync(deletingVersionsNotification))
++        {
++            scope.Complete();
++            return Attempt.Fail(ContentVersionOperationStatus.CancelledByNotification);
++        }
++
++        if (deletePriorVersions)
++        {
++            TContent? content = await GetVersionAsync(versionId, cancellationToken);
++            await DeleteVersionsAsync(key, content?.UpdateDate ?? DateTime.UtcNow, userKey, cancellationToken);
++        }
++
++        TContent? c = await _contentRepository.GetAsync(key, cancellationToken);
++
++        // don't delete the current version, nor any other version the kind keeps
++        if (c is null || IsVersionDeletable(c, versionId))
++        {
++            await _contentRepository.DeleteVersionAsync(versionId, cancellationToken);
++        }
++
++        scope.Notifications.Publish(
++            CreateDeletedVersionsNotification(key, evtMsgs, versionId, dateToRetain: default).WithStateFrom(
++                deletingVersionsNotification));
++        await AuditAsync(AuditType.Delete, userId, Constants.System.Root, "Delete (by version)");
++
++        scope.Complete();
++        return Attempt.Succeed(ContentVersionOperationStatus.Success);
++    }
++
++    #endregion
++
++    #region Move, RecycleBin
++
++    /// <summary>
++    ///     Moves a content item to the recycle bin.
++    /// </summary>
++    /// <param name="content">The content item to move to the recycle bin.</param>
++    /// <param name="userKey">The Guid key of the user performing the action.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>An attempt carrying the operation status.</returns>
++    public async Task<Attempt<ContentMoveToRecycleBinOperationStatus>> MoveToRecycleBinAsync(TContent content, Guid userKey, CancellationToken cancellationToken)
++    {
++        EventMessages eventMessages = EventMessagesFactory.Get();
++        var moves = new List<(TContent, string)>();
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.WriteLock(WriteLockIds);
++
++        var originalPath = content.Path;
++        var moveEventInfo = new MoveToRecycleBinEventInfo<TContent>(content, originalPath);
++
++        MovingToRecycleBinNotification<TContent> movingToRecycleBinNotification = CreateMovingToRecycleBinNotification(moveEventInfo, eventMessages);
++        if (await scope.Notifications.PublishCancelableAsync(movingToRecycleBinNotification))
++        {
++            scope.Complete();
++            return Attempt.Fail(ContentMoveToRecycleBinOperationStatus.CancelledByNotification);
++        }
++
++        int userId = await _userIdKeyResolver.GetAsync(userKey);
++
++        await PerformMoveLockedAsync(content, RecycleBinId, null, userId, moves, true, cancellationToken);
++        scope.Notifications.Publish(
++            CreateTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
++
++        MoveToRecycleBinEventInfo<TContent>[] moveInfo = [.. moves.Select(x => new MoveToRecycleBinEventInfo<TContent>(x.Item1, x.Item2))];
++
++        scope.Notifications.Publish(
++            CreateMovedToRecycleBinNotification(moveInfo, eventMessages).WithStateFrom(
++                movingToRecycleBinNotification));
++
++        await AuditAsync(AuditType.Move, userId, content.Id, $"Moved to recycle bin from parent {originalPath.GetParentIdFromPath()}");
++
++        scope.Complete();
++
++        return Attempt.Succeed(ContentMoveToRecycleBinOperationStatus.Success);
++    }
++
++    /// <summary>
++    ///     Moves a content item under a new parent, optionally leaving its descendants behind.
++    /// </summary>
++    /// <param name="content">The content item to move.</param>
++    /// <param name="parentKey">The Guid key of the new parent, or <c>null</c> for the root of the tree.</param>
++    /// <param name="includeDescendants">
++    ///     Whether to move the descendants of the content item along with it. When restoring an item out of the recycle
++    ///     bin this can be set to <c>false</c> to restore only the item itself, leaving its descendants in the
++    ///     recycle bin as top-level bin items.
++    /// </param>
++    /// <param name="userKey">The Guid key of the user performing the action.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>An attempt carrying the operation status.</returns>
++    /// <remarks>
++    ///     Protected and exposed per kind: the new parent is looked up as an item of this kind, which elements, parented
++    ///     by containers, cannot do.
++    /// </remarks>
++    protected async Task<Attempt<ContentMoveOperationStatus>> MoveCoreAsync(TContent content, Guid? parentKey, bool includeDescendants, Guid userKey, CancellationToken cancellationToken)
++    {
++        EventMessages eventMessages = EventMessagesFactory.Get();
++
++        // if moving to the recycle bin then use the proper method
++        if (parentKey == RecycleBinKey)
++        {
++            if (content.ParentId == RecycleBinId)
++            {
++                return Attempt.Succeed(ContentMoveOperationStatus.Success);
++            }
++
++            Attempt<ContentMoveToRecycleBinOperationStatus> recycleBinResult = await MoveToRecycleBinAsync(content, userKey, cancellationToken);
++            return recycleBinResult.Success
++                ? Attempt.Succeed(ContentMoveOperationStatus.Success)
++                : Attempt.Fail(ContentMoveOperationStatus.CancelledByNotification);
++        }
++
++        if (parentKey is null && content.ParentId == Constants.System.Root)
++        {
++            return Attempt.Succeed(ContentMoveOperationStatus.Success);
++        }
++
++        int userId = await _userIdKeyResolver.GetAsync(userKey);
++        var moves = new List<(TContent, string)>();
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.WriteLock(WriteLockIds);
++
++        TContent? parent = parentKey.HasValue ? await GetByIdAsync(parentKey.Value, cancellationToken) : null;
++        if (parentKey.HasValue && parent is null)
++        {
++            return Attempt.Fail(ContentMoveOperationStatus.ParentNotFound);
++        }
++
++        if (parent?.Trashed is true)
++        {
++            return Attempt.Fail(ContentMoveOperationStatus.ParentTrashed);
++        }
++
++        int parentId = parent?.Id ?? Constants.System.Root;
++
++        // A null ParentKey means either "at the root" or "not populated", so the int id is the unambiguous comparison.
++        if (content.ParentId == parentId)
++        {
++            scope.Complete();
++            return Attempt.Succeed(ContentMoveOperationStatus.Success);
++        }
++
++        var moveEventInfo = new MoveEventInfo<TContent>(content, content.Path, parentKey);
++
++        MovingNotification<TContent> movingNotification = CreateMovingNotification(moveEventInfo, eventMessages);
++        if (await scope.Notifications.PublishCancelableAsync(movingNotification))
++        {
++            scope.Complete();
++            return Attempt.Fail(ContentMoveOperationStatus.CancelledByNotification);
++        }
++
++        // if content was trashed, and since we're not moving to the recycle bin,
++        // indicate that the trashed status should be changed to false, else just
++        // leave it unchanged
++        var trashed = content.Trashed ? false : (bool?)null;
++
++        // when restoring a single item out of the recycle bin without its descendants, those descendants stay
++        // trashed and are re-homed under the recycle bin root - see PerformMoveLockedAsync
++        var leaveDescendantsInRecycleBin = includeDescendants is false && content.Trashed;
++
++        if (content.Trashed)
++        {
++            OnRestoringFromRecycleBin(content);
++        }
++
++        await PerformMoveLockedAsync(content, parentId, parent, userId, moves, trashed, cancellationToken, includeDescendants);
++
++        if (leaveDescendantsInRecycleBin)
++        {
++            // The single RefreshBranch above cannot reconcile the descendants left in the bin (they are no longer
++            // descendants of the restored item), so also refresh the re-homed direct children. The navigation
++            // reconciler then moves them - and their sub-trees - back under the recycle bin root.
++            TContent[] rehomedChildren = [.. moves
++                .Select(x => x.Item1)
++                .Where(x => x.ParentId == RecycleBinId)];
++            scope.Notifications.Publish(
++                CreateTreeChangeNotification(content.Yield().Concat(rehomedChildren), TreeChangeTypes.RefreshBranch, eventMessages));
++        }
++        else
++        {
++            scope.Notifications.Publish(
++                CreateTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
++        }
++
++        // changes
++        MoveEventInfo<TContent>[] moveInfo = [.. moves.Select(x => new MoveEventInfo<TContent>(x.Item1, x.Item2, x.Item1.ParentKey))];
++
++        scope.Notifications.Publish(
++            CreateMovedNotification(moveInfo, eventMessages).WithStateFrom(movingNotification));
++
++        await AuditAsync(AuditType.Move, userId, content.Id);
++
++        scope.Complete();
++        return Attempt.Succeed(ContentMoveOperationStatus.Success);
++    }
++
++    /// <summary>
++    ///     Moves a content item and its descendants under a new parent, inside a write lock on <see cref="WriteLockIds" />.
++    /// </summary>
++    /// <param name="content">The content item to move.</param>
++    /// <param name="parentId">The id of the new parent, the root, or the recycle bin.</param>
++    /// <param name="parent">The new parent, or <c>null</c> for the root and the recycle bin.</param>
++    /// <param name="userId">The identifier of the user performing the move.</param>
++    /// <param name="moves">Collects every moved item with its original path, for the moved notification.</param>
++    /// <param name="trash">Whether the items are trashed, un-trashed, or left as they are (<c>null</c>).</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <param name="includeDescendants">
++    ///     Whether the descendants move along; when <c>false</c> and the item is restored out of the recycle bin,
++    ///     they stay there, re-homed under the bin.
++    /// </param>
++    protected async Task PerformMoveLockedAsync(TContent content, int parentId, TContent? parent, int userId, List<(TContent Content, string OriginalPath)> moves, bool? trash, CancellationToken cancellationToken, bool includeDescendants = true)
++    {
++        content.WriterId = userId;
++        content.ParentId = parentId;
++        content.ParentKey = parentId switch
++        {
++            Constants.System.Root => null,
++            _ when parentId == RecycleBinId => RecycleBinKey,
++            _ => parent?.Key,
++        };
++
++        var levelDelta = 1 - content.Level + (parent?.Level ?? 0);
++        var originalLevel = content.Level;
++        var originalPath = content.Path;
++        moves.Add((content, originalPath));
++
++        // Fetch descendants by content's key before saving its own new parent below - GetDescendantsAsync
++        // matches descendants via content's NodeId embedded in their own Path strings, so this must happen
++        // before those descendant rows are mutated by the moves later in this method.
++        var descendants = new List<TContent>();
++        const int pageSize = 500;
++        var page = 0;
++        var total = long.MaxValue;
++        while (page * pageSize < total)
++        {
++            PagedModel<TContent> descendantsPage = await GetDescendantsAsync(content.Key, page++ * pageSize, pageSize, Ordering.By("Path"), cancellationToken);
++            descendants.AddRange(descendantsPage.Items);
++            total = descendantsPage.Total;
++        }
++
++        await PerformMoveContentLockedAsync(content, userId, trash, cancellationToken);
++
++        var paths = new Dictionary<int, string>
++        {
++            [content.Id] = (parent is null
++                ? parentId == RecycleBinId ? RecycleBinPath : Constants.System.RootString
++                : parent.Path) + "," + content.Id,
++        };
++
++        // When restoring a single item out of the recycle bin without its descendants, the descendants must stay
++        // trashed: the item's direct children are re-homed to the recycle bin root (and the rest of the subtree keeps
++        // its relative structure), so nothing is orphaned and it can still be restored on its own later.
++        var leaveDescendantsInRecycleBin = includeDescendants is false
++            && parentId != RecycleBinId
++            && originalPath.Contains(RecycleBinId.ToInvariantString());
++
++        foreach (TContent descendant in descendants)
++        {
++            moves.Add((descendant, descendant.Path));
++
++            if (leaveDescendantsInRecycleBin)
++            {
++                await LeaveDescendantInRecycleBinLockedAsync(descendant, content.Id, originalLevel, userId, paths, cancellationToken);
++            }
++            else
++            {
++                await PerformMoveDescendantLockedAsync(descendant, levelDelta, userId, trash, paths, cancellationToken);
++            }
++        }
++    }
++
++    // Re-homes a descendant of a restored item within the recycle bin: the restored item's direct children become
++    // top-level recycle bin items, while deeper descendants keep their relative structure below their (now re-homed)
++    // ancestor. The trashed state is left untouched so these items remain in the recycle bin.
++    private async Task LeaveDescendantInRecycleBinLockedAsync(TContent descendant, int restoredItemId, int originalLevel, int userId, Dictionary<int, string> paths, CancellationToken cancellationToken)
++    {
++        var isDirectChild = descendant.ParentId == restoredItemId;
++        descendant.Path = paths[descendant.Id] = isDirectChild
++            ? RecycleBinPath + "," + descendant.Id
++            : paths[descendant.ParentId] + "," + descendant.Id;
++        descendant.Level -= originalLevel;
++        if (isDirectChild)
++        {
++            descendant.ParentId = RecycleBinId;
++            descendant.ParentKey = RecycleBinKey;
++        }
++
++        await PerformMoveContentLockedAsync(descendant, userId, null, cancellationToken);
++    }
++
++    // Moves a descendant along with the item being moved, updating its path and level (parentId is unchanged).
++    private async Task PerformMoveDescendantLockedAsync(TContent descendant, int levelDelta, int userId, bool? trash, Dictionary<int, string> paths, CancellationToken cancellationToken)
++    {
++        descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
++        descendant.Level += levelDelta;
++        await PerformMoveContentLockedAsync(descendant, userId, trash, cancellationToken);
++    }
++
++    private async Task PerformMoveContentLockedAsync(TContent content, int userId, bool? trash, CancellationToken cancellationToken)
++    {
++        if (trash.HasValue)
++        {
++            ((ContentBase)(object)content).Trashed = trash.Value;
++        }
++
++        content.WriterId = userId;
++        await _contentRepository.SaveAsync(content, cancellationToken);
++    }
++
++    /// <summary>
++    ///     Empties the recycle bin by deleting every item directly under it, with its descendants.
++    /// </summary>
++    /// <remarks>
++    ///     Kept protected and exposed per kind: a kind whose recycle bin also holds things that are not its content
++    ///     (elements share theirs with containers) empties it elsewhere.
++    /// </remarks>
++    /// <param name="userKey">The unique key of the user performing the operation.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>An attempt carrying the operation status.</returns>
++    protected async Task<Attempt<ContentEmptyRecycleBinOperationStatus>> EmptyRecycleBinCoreAsync(Guid userKey, CancellationToken cancellationToken)
++    {
++        EventMessages eventMessages = EventMessagesFactory.Get();
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.WriteLock(WriteLockIds);
++
++        int intUserId = await _userIdKeyResolver.GetAsync(userKey);
++
++        // emptying the recycle bin means deleting whatever is in there - do it properly!
++        PagedModel<TContent> contentsPage = await GetChildrenAsync(RecycleBinKey, 0, int.MaxValue, propertyAliases: null, ordering: null, cancellationToken);
++        TContent[] contents = [.. contentsPage.Items];
++
++        EmptyingRecycleBinNotification<TContent> emptyingRecycleBinNotification = CreateEmptyingRecycleBinNotification(contents, eventMessages);
++        DeletingNotification<TContent> deletingContentNotification = CreateDeletingNotification(contents, eventMessages);
++        if (await scope.Notifications.PublishCancelableAsync(emptyingRecycleBinNotification)
++            || await scope.Notifications.PublishCancelableAsync(deletingContentNotification))
++        {
++            scope.Complete();
++            return Attempt.Fail(ContentEmptyRecycleBinOperationStatus.CancelledByNotification);
++        }
++
++        List<TContent> deleted = await DeleteRecycleBinContentsLockedAsync(scope, contents, eventMessages, cancellationToken);
++
++        scope.Notifications.Publish(
++            CreateEmptiedRecycleBinNotification(deleted, eventMessages).WithStateFrom(
++                emptyingRecycleBinNotification));
++        scope.Notifications.Publish(
++            CreateTreeChangeNotification(deleted, TreeChangeTypes.Remove, eventMessages));
++        await AuditAsync(AuditType.Delete, intUserId, RecycleBinId, "Recycle bin emptied");
++
++        scope.Complete();
++
++        return Attempt.Succeed(ContentEmptyRecycleBinOperationStatus.Success);
++    }
++
++    #endregion
++
++    #region Sort
++
++    /// <summary>
++    ///     Sorts content items by persisting the supplied (already ordered) keys as the new sort order,
++    ///     firing the kind's cancelable sorting notification, if it has one, the cancelable saving notification,
++    ///     and per-item saved/sorted/audit records for every item whose position actually changes.
++    /// </summary>
++    /// <param name="orderedKeys">The Guid keys of the content items, in the desired order.</param>
++    /// <param name="userKey">The Guid key of the user performing the action.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>An attempt carrying the operation status.</returns>
++    /// <remarks>
++    ///     Unlike <see cref="SortChildrenCoreAsync" />, this reloads each item, fires cancelable
++    ///     sorting/saving notifications, and only persists/audits items whose sort position changes.
++    /// </remarks>
++    public async Task<Attempt<ContentSortOperationStatus>> SortAsync(IReadOnlyList<Guid> orderedKeys, Guid userKey, CancellationToken cancellationToken)
++    {
++        if (orderedKeys.Count == 0)
++        {
++            return Attempt.Fail(ContentSortOperationStatus.NoOperation);
++        }
++
++        EventMessages eventMessages = EventMessagesFactory.Get();
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.WriteLock(WriteLockIds);
++
++        // Reload within the lock so sorting operates on fully-loaded entities. Callers may pass
++        // partially-loaded content (e.g. loaded with loadTemplates: false or without property data),
++        // and saving those directly would wipe the template and property data (#23120).
++        // GetByIdsAsync returns items in the requested order, preserving the caller's ordering that drives the sort.
++        TContent[] itemsA = [.. (await GetByIdsAsync(orderedKeys, cancellationToken))];
++
++        SortingNotification<TContent>? sortingNotification = CreateSortingNotification(itemsA, eventMessages);
++        if (sortingNotification is not null && await scope.Notifications.PublishCancelableAsync(sortingNotification))
++        {
++            scope.Complete();
++            return Attempt.Fail(ContentSortOperationStatus.CancelledByNotification);
++        }
++
++        SavingNotification<TContent> savingNotification = CreateSavingNotification(itemsA, eventMessages, isSorting: true);
++        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
++        {
++            scope.Complete();
++            return Attempt.Fail(ContentSortOperationStatus.CancelledByNotification);
++        }
++
++        int userId = await _userIdKeyResolver.GetAsync(userKey);
++
++        var saved = new List<TContent>();
++        var sortOrder = 0;
++
++        foreach (TContent content in itemsA)
++        {
++            // if the current sort order equals that of the content we don't
++            // need to update it, so just increment the sort order and continue.
++            if (content.SortOrder == sortOrder)
++            {
++                sortOrder++;
++                continue;
++            }
++
++            // else update
++            content.SortOrder = sortOrder++;
++            content.WriterId = userId;
++
++            // save
++            saved.Add(content);
++            await _contentRepository.SaveAsync(content, cancellationToken);
++            await AuditAsync(AuditType.Sort, userId, content.Id, "Sorting content performed by user");
++        }
++
++        // first saved, then sorted
++        scope.Notifications.Publish(
++            CreateSavedNotification(itemsA, eventMessages).WithStateFrom(savingNotification));
++        SortedNotification<TContent>? sortedNotification = CreateSortedNotification(itemsA, eventMessages);
++        if (sortedNotification is not null)
++        {
++            scope.Notifications.Publish(sortingNotification is null ? sortedNotification : sortedNotification.WithStateFrom(sortingNotification));
++        }
++
++        scope.Notifications.Publish(
++            CreateTreeChangeNotification(saved, TreeChangeTypes.RefreshNode, eventMessages));
++
++        OnSortedLocked(scope, saved, eventMessages);
++
++        scope.Complete();
++        return Attempt.Succeed(ContentSortOperationStatus.Success);
++    }
++
++    /// <summary>
++    ///     Sorts the children of a parent by persisting the supplied (already ordered) child keys as the
++    ///     new sort order, in a single batched operation.
++    /// </summary>
++    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for the root of the tree.</param>
++    /// <param name="orderedChildKeys">The Guid keys of the children, in the desired order.</param>
++    /// <param name="userKey">The Guid key of the user performing the action.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <returns>An attempt carrying the operation status.</returns>
++    /// <remarks>
++    ///     Unlike <see cref="SortAsync" />, this does not load the children or fire per-item
++    ///     save/sort notifications; it persists the order directly and refreshes the affected cache branch.
++    ///     Protected and exposed per kind: the parent is looked up as an item of this kind, which elements, parented by
++    ///     containers, cannot do.
++    /// </remarks>
++    protected async Task<Attempt<ContentSortChildrenOperationStatus>> SortChildrenCoreAsync(Guid? parentKey, IReadOnlyList<Guid> orderedChildKeys, Guid userKey, CancellationToken cancellationToken)
++    {
++        EventMessages evtMsgs = EventMessagesFactory.Get();
++        if (orderedChildKeys.Count == 0)
++        {
++            return Attempt.Fail(ContentSortChildrenOperationStatus.NoOperation);
++        }
++
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        scope.WriteLock(WriteLockIds);
++
++        await _contentRepository.UpdateSortOrderAsync(orderedChildKeys, cancellationToken);
++
++        // Sort order lives in umbracoNode; neither the published cache nor the content repository cache keeps
++        // a separate serialized copy of it, so refreshing the affected branch (which invalidates both and has
++        // them reload from umbracoNode) is enough to pick up the new order without re-saving each child.
++        int parentId;
++        if (parentKey.HasValue)
++        {
++            TContent? parent = await GetByIdAsync(parentKey.Value, cancellationToken);
++            parentId = parent?.Id ?? Constants.System.Root;
++            if (parent is not null)
++            {
++                scope.Notifications.Publish(CreateTreeChangeNotification(parent, TreeChangeTypes.RefreshBranch, evtMsgs));
++            }
++        }
++        else
++        {
++            parentId = Constants.System.Root;
++            IEnumerable<TContent> roots = await GetByIdsAsync(orderedChildKeys, cancellationToken);
++            scope.Notifications.Publish(CreateTreeChangeNotification(roots, TreeChangeTypes.RefreshNode, evtMsgs));
++        }
++
++        int userId = await _userIdKeyResolver.GetAsync(userKey);
++        await AuditAsync(AuditType.Sort, userId, parentId);
++
++        scope.Complete();
++        return Attempt.Succeed(ContentSortChildrenOperationStatus.Success);
++    }
++
++    #endregion
++
++    #region Others
++
++    protected static bool HasUnsavedChanges(TContent content) => content.HasIdentity is false || content.IsDirty();
++
++    /// <inheritdoc />
++    public abstract Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(ContentDataIntegrityReportOptions options, CancellationToken cancellationToken);
++
++    protected async Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(ContentDataIntegrityReportOptions options, Func<ICoreScope, Task> notifyIssuesFixed, CancellationToken cancellationToken)
++    {
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++
++        scope.WriteLock(WriteLockIds);
++
++        ContentDataIntegrityReport report = await _contentRepository.CheckDataIntegrityAsync(options, cancellationToken);
++
++        if (report.FixedIssues.Count > 0)
++        {
++            await notifyIssuesFixed(scope);
++        }
++
++        scope.Complete();
++
++        return report;
++    }
++
++    #endregion
++
++    #region Auditing
++
++    protected async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
++    {
++        // A content operation must never fail because its audit metadata could not be attributed - a
++        // user id with no matching key (e.g. unknown/imported content) skips the audit entry rather
++        // than aborting the caller.
++        Attempt<Guid> userKeyAttempt = await _userIdKeyResolver.TryGetAsync(userId);
++        if (userKeyAttempt.Success is false)
++        {
++            Logger.LogWarning("Could not resolve a user key for user id {UserId} - skipping the {AuditType} audit entry for {ObjectId}.", userId, type, objectId);
++            return;
++        }
++
++        await _auditService.AddAsync(
++            type,
++            userKeyAttempt.Result,
++            objectId,
++            ContentObjectType.GetName(),
++            message,
++            parameters);
++    }
++
++    protected static string GetLanguageDetailsForAuditEntry(IEnumerable<ILanguage> languages, IEnumerable<string> affectedCultures)
++    {
++        IEnumerable<string> languageIsoCodes = languages
++            .Where(x => affectedCultures.InvariantContains(x.IsoCode))
++            .Select(x => x.IsoCode);
++        return string.Join(", ", languageIsoCodes);
++    }
++
++    #endregion
++
++    #region Content Types
++
++    /// <summary>
++    ///     Deletes all content of given types.
++    /// </summary>
++    /// <param name="contentTypeKeys">The Guid keys of the content types.</param>
++    /// <param name="userKey">The Guid key of the user performing the action.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <remarks>
++    ///     <para>All non-deleted descendants of the deleted content is moved to the recycle bin.</para>
++    ///     <para>This operation is potentially dangerous and expensive.</para>
++    /// </remarks>
++    /// <returns>An attempt carrying the operation status.</returns>
++    public abstract Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteOfTypesAsync(IEnumerable<Guid> contentTypeKeys, Guid userKey, CancellationToken cancellationToken);
++
++    /// <summary>
++    ///     Deletes all content of a given type.
++    /// </summary>
++    /// <param name="contentTypeKey">The Guid key of the content type.</param>
++    /// <param name="userKey">The Guid key of the user performing the action.</param>
++    /// <param name="cancellationToken">The cancellation token.</param>
++    /// <remarks>
++    ///     <para>All non-deleted descendants of the deleted content are moved to the recycle bin.</para>
++    ///     <para>This operation is potentially dangerous and expensive.</para>
++    /// </remarks>
++    /// <returns>An attempt carrying the operation status.</returns>
++    public Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteOfTypeAsync(Guid contentTypeKey, Guid userKey, CancellationToken cancellationToken) =>
++        DeleteOfTypesAsync(new[] { contentTypeKey }, userKey, cancellationToken);
++
++    protected async Task<TContentType> GetContentTypeAsync(ICoreScope scope, string contentTypeAlias, CancellationToken cancellationToken)
++    {
++        if (contentTypeAlias is null)
++        {
++            throw new ArgumentNullException(nameof(contentTypeAlias));
++        }
++
++        if (string.IsNullOrWhiteSpace(contentTypeAlias))
++        {
++            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(contentTypeAlias));
++        }
++
++        scope.ReadLock(ReadLockIds);
++
++        TContentType? contentType = await _contentTypeRepository.GetAsync(contentTypeAlias, cancellationToken)
++                                    ??
++                                    // causes rollback
++                                    throw new Exception($"No ContentType matching the passed in Alias: '{contentTypeAlias}'" +
++                                                        $" was found");
++
++        return contentType;
++    }
++
++    #endregion
++}
+diff --git a/src/Umbraco.Core/Services/ElementService.cs b/src/Umbraco.Core/Services/ElementService.cs
+index 8422830c768..96b875115c0 100644
+--- a/src/Umbraco.Core/Services/ElementService.cs
++++ b/src/Umbraco.Core/Services/ElementService.cs
+@@ -169,7 +169,13 @@ public override async Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteO
+ 
+     protected override ILogger<ElementService> Logger => _logger;
+ 
+-    /// <inheritdoc cref="PublishableContentServiceBase{TContent}.DeleteLockedAsync" />
++    /// <inheritdoc />
++    protected override IElement CreateEntity(string name, IElement? parent, IContentType contentType, int userId)
++        => parent is not null
++            ? new Element(name, parent.Id, contentType, userId)
++            : new Element(name, contentType, userId);
++
++    /// <inheritdoc cref="ContentServiceBase{TContent, TContentType}.DeleteLockedAsync" />
+     protected override async Task DeleteLockedAsync(ICoreScope scope, IElement content, EventMessages evtMsgs, CancellationToken cancellationToken)
+     {
+         await _elementRepository.DeleteAsync(content, cancellationToken);
+@@ -206,6 +212,27 @@ protected override TreeChangeNotification<IElement> CreateTreeChangeNotification
+     protected override DeletingNotification<IElement> CreateDeletingNotification(IElement content, EventMessages eventMessages)
+         => new ElementDeletingNotification(content, eventMessages);
+ 
++    protected override DeletingNotification<IElement> CreateDeletingNotification(IEnumerable<IElement> content, EventMessages eventMessages)
++        => new ElementDeletingNotification(content, eventMessages);
++
++    protected override MovingNotification<IElement> CreateMovingNotification(MoveEventInfo<IElement> moveInfo, EventMessages eventMessages)
++        => new ElementMovingNotification(moveInfo, eventMessages);
++
++    protected override MovedNotification<IElement> CreateMovedNotification(IEnumerable<MoveEventInfo<IElement>> moveInfos, EventMessages eventMessages)
++        => new ElementMovedNotification(moveInfos, eventMessages);
++
++    protected override MovingToRecycleBinNotification<IElement> CreateMovingToRecycleBinNotification(MoveToRecycleBinEventInfo<IElement> moveInfo, EventMessages eventMessages)
++        => new ElementMovingToRecycleBinNotification(moveInfo, eventMessages);
++
++    protected override MovedToRecycleBinNotification<IElement> CreateMovedToRecycleBinNotification(IEnumerable<MoveToRecycleBinEventInfo<IElement>> moveInfos, EventMessages eventMessages)
++        => new ElementMovedToRecycleBinNotification(moveInfos, eventMessages);
++
++    protected override EmptyingRecycleBinNotification<IElement> CreateEmptyingRecycleBinNotification(IEnumerable<IElement> content, EventMessages eventMessages)
++        => new ElementEmptyingRecycleBinNotification(content, eventMessages);
++
++    protected override EmptiedRecycleBinNotification<IElement> CreateEmptiedRecycleBinNotification(IEnumerable<IElement> content, EventMessages eventMessages)
++        => new ElementEmptiedRecycleBinNotification(content, eventMessages);
++
+     protected override CancelableEnumerableObjectNotification<IElement> CreatePublishingNotification(IElement content, EventMessages eventMessages)
+         => new ElementPublishingNotification(content, eventMessages);
+ 
+diff --git a/src/Umbraco.Core/Services/PublishableContentServiceBase.cs b/src/Umbraco.Core/Services/PublishableContentServiceBase.cs
+index b46692cd3ab..ecc9d440da2 100644
+--- a/src/Umbraco.Core/Services/PublishableContentServiceBase.cs
++++ b/src/Umbraco.Core/Services/PublishableContentServiceBase.cs
+@@ -21,22 +21,20 @@ namespace Umbraco.Cms.Core.Services;
+ /// </summary>
+ /// <typeparam name="TContent">The type of content managed by the concrete implementation.</typeparam>
+ /// <remarks>
+-/// Implements the shared save, publish, unpublish, rollback, schedule and query behaviour of
+-/// <see cref="IPublishableContentService{TContent}"/>, leaving the content-type specific parts (object type, lock ids,
+-/// notifications) to the derived service.
++/// Implements the publish, unpublish, rollback and schedule behaviour of
++/// <see cref="IPublishableContentService{TContent}"/> on top of the engine every content kind shares,
++/// <see cref="ContentServiceBase{TContent, TContentType}"/>, leaving the content-type specific parts (object type,
++/// lock ids, notifications) to the derived service.
+ /// </remarks>
+-public abstract class PublishableContentServiceBase<TContent> : RepositoryService, IPublishableContentService<TContent>
++public abstract class PublishableContentServiceBase<TContent> : ContentServiceBase<TContent, IContentType>, IPublishableContentService<TContent>
+     where TContent : class, IPublishableContentBase
+ {
+-    private readonly IAuditService _auditService;
+-    private readonly IContentTypeRepository _contentTypeRepository;
+     private readonly IPublishableContentRepository<TContent> _contentRepository;
+     private readonly ILanguageRepository _languageRepository;
+     private readonly Lazy<IPropertyValidationService> _propertyValidationService;
+     private readonly ICultureImpactFactory _cultureImpactFactory;
+     private readonly IUserIdKeyResolver _userIdKeyResolver;
+     private readonly PropertyEditorCollection _propertyEditorCollection;
+-    private readonly IIdKeyMap _idKeyMap;
+     private readonly Lazy<IUserService> _userService;
+ 
+     /// <summary>
+@@ -69,32 +67,28 @@ protected PublishableContentServiceBase(
+         PropertyEditorCollection propertyEditorCollection,
+         IIdKeyMap idKeyMap,
+         Lazy<IUserService> userService)
+-        : base(provider, loggerFactory, eventMessagesFactory)
++        : base(
++            provider,
++            loggerFactory,
++            eventMessagesFactory,
++            auditService,
++            contentTypeRepository,
++            contentRepository,
++            languageRepository,
++            userIdKeyResolver,
++            idKeyMap)
+     {
+-        _auditService = auditService;
+-        _contentTypeRepository = contentTypeRepository;
+         _contentRepository = contentRepository;
+         _languageRepository = languageRepository;
+         _propertyValidationService = propertyValidationService;
+         _cultureImpactFactory = cultureImpactFactory;
+         _userIdKeyResolver = userIdKeyResolver;
+         _propertyEditorCollection = propertyEditorCollection;
+-        _idKeyMap = idKeyMap;
+         _userService = userService;
+     }
+ 
+-    protected abstract UmbracoObjectTypes ContentObjectType { get; }
+-
+-    protected abstract int RecycleBinId { get; }
+-
+-    protected abstract int[] ReadLockIds { get; }
+-
+-    protected abstract int[] WriteLockIds { get; }
+-
+     protected abstract bool SupportsBranchPublishing { get; }
+ 
+-    protected abstract ILogger<PublishableContentServiceBase<TContent>> Logger { get; }
+-
+     /// <summary>
+     ///     Persists the pending changes of a content item, publishing or unpublishing it as its published state dictates.
+     /// </summary>
+@@ -129,24 +123,8 @@ protected virtual Task<PublishResult> CommitContentChangesAsync(
+             cancellationToken,
+             includeInvariantForVariant: includeInvariantForVariant);
+ 
+-    protected abstract Task DeleteLockedAsync(ICoreScope scope, TContent content, EventMessages evtMsgs, CancellationToken cancellationToken);
+-
+-    protected abstract SavingNotification<TContent> CreateSavingNotification(TContent content, EventMessages eventMessages);
+-
+-    protected abstract SavedNotification<TContent> CreateSavedNotification(TContent content, EventMessages eventMessages);
+-
+-    protected abstract SavingNotification<TContent> CreateSavingNotification(IEnumerable<TContent> content, EventMessages eventMessages);
+-
+-    protected abstract SavedNotification<TContent> CreateSavedNotification(IEnumerable<TContent> content, EventMessages eventMessages);
+-
+-    protected abstract TreeChangeNotification<TContent> CreateTreeChangeNotification(TContent content, TreeChangeTypes changeTypes, EventMessages eventMessages);
+-
+     protected abstract TreeChangeNotification<TContent> CreateTreeChangeNotification(TContent content, TreeChangeTypes changeTypes, IEnumerable<string>? publishedCultures, IEnumerable<string>? unpublishedCultures, EventMessages eventMessages);
+ 
+-    protected abstract TreeChangeNotification<TContent> CreateTreeChangeNotification(IEnumerable<TContent> content, TreeChangeTypes changeTypes, EventMessages eventMessages);
+-
+-    protected abstract DeletingNotification<TContent> CreateDeletingNotification(TContent content, EventMessages eventMessages);
+-
+     protected abstract CancelableEnumerableObjectNotification<TContent> CreatePublishingNotification(TContent content, EventMessages eventMessages);
+ 
+     protected abstract IStatefulNotification CreatePublishedNotification(TContent content, EventMessages eventMessages);
+@@ -161,56 +139,6 @@ protected virtual Task<PublishResult> CommitContentChangesAsync(
+ 
+     protected abstract RolledBackNotification<TContent> CreateRolledBackNotification(TContent target, EventMessages messages);
+ 
+-    /// <summary>
+-    ///     Creates the cancelable notification published before versions of a content item are deleted.
+-    /// </summary>
+-    /// <param name="key">The key of the content item whose versions are deleted.</param>
+-    /// <param name="eventMessages">The event messages collection.</param>
+-    /// <param name="specificVersion">The identifier of the version to delete, or <c>default</c> when deleting by date.</param>
+-    /// <param name="dateToRetain">The date before which versions are deleted, or <c>default</c> when deleting a specific version.</param>
+-    /// <returns>The notification to publish.</returns>
+-    protected abstract DeletingVersionsNotification<TContent> CreateDeletingVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain);
+-
+-    /// <summary>
+-    ///     Creates the notification published after versions of a content item have been deleted.
+-    /// </summary>
+-    /// <param name="key">The key of the content item whose versions were deleted.</param>
+-    /// <param name="eventMessages">The event messages collection.</param>
+-    /// <param name="specificVersion">The identifier of the deleted version, or <c>default</c> when deleted by date.</param>
+-    /// <param name="dateToRetain">The date before which versions were deleted, or <c>default</c> when a specific version was deleted.</param>
+-    /// <returns>The notification to publish.</returns>
+-    protected abstract DeletedVersionsNotification<TContent> CreateDeletedVersionsNotification(Guid key, EventMessages eventMessages, int specificVersion, DateTime dateToRetain);
+-
+-    /// <summary>
+-    ///     Creates the "saved" notification for a single item, carrying the cultures that were saved.
+-    /// </summary>
+-    /// <remarks>
+-    ///     Defaults to the culture-agnostic <see cref="CreateSavedNotification(TContent, EventMessages)"/> overload so external
+-    ///     subclasses keep working; <c>ContentService</c> and <c>ElementService</c> override this to carry the map on the
+-    ///     concrete notification. See <see cref="BuildCultureMap"/> for why the cultures are captured at raise-time.
+-    /// </remarks>
+-    /// <param name="content">The item that was saved.</param>
+-    /// <param name="eventMessages">The event messages collection.</param>
+-    /// <param name="savedCultures">The cultures that were saved, keyed by item key, or <c>null</c> if not tracked.</param>
+-    /// <returns>The notification to publish.</returns>
+-    protected virtual SavedNotification<TContent> CreateSavedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+-        => CreateSavedNotification(content, eventMessages);
+-
+-    /// <summary>
+-    ///     Creates the "saved" notification for multiple items, carrying the cultures that were saved per item.
+-    /// </summary>
+-    /// <remarks>
+-    ///     Defaults to the culture-agnostic <see cref="CreateSavedNotification(IEnumerable{TContent}, EventMessages)"/> overload
+-    ///     so external subclasses keep working; <c>ContentService</c> and <c>ElementService</c> override this to carry the
+-    ///     map on the concrete notification.
+-    /// </remarks>
+-    /// <param name="content">The items that were saved.</param>
+-    /// <param name="eventMessages">The event messages collection.</param>
+-    /// <param name="savedCultures">The cultures that were saved, keyed by item key.</param>
+-    /// <returns>The notification to publish.</returns>
+-    protected virtual SavedNotification<TContent> CreateSavedNotification(IEnumerable<TContent> content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? savedCultures)
+-        => CreateSavedNotification(content, eventMessages);
+-
+     /// <summary>
+     ///     Creates the "published" notification for a single item, carrying the cultures that were published and
+     ///     unpublished by the operation.
+@@ -244,35 +172,6 @@ protected virtual IStatefulNotification CreatePublishedNotification(TContent con
+     protected virtual IStatefulNotification CreateUnpublishedNotification(TContent content, EventMessages eventMessages, IReadOnlyDictionary<Guid, IReadOnlyCollection<string>>? unpublishedCultures)
+         => CreateUnpublishedNotification(content, eventMessages);
+ 
+-    /// <summary>
+-    ///     Builds the per-item culture map carried on the notifications, keyed by item <see cref="Umbraco.Cms.Core.Models.Entities.IEntity.Key"/>.
+-    /// </summary>
+-    /// <remarks>
+-    ///     Persisting the entity resets its change tracking, so the cultures are captured here when the notification is
+-    ///     raised, because a handler cannot recompute them from the entity afterwards. <c>ToArray()</c> takes a copy so the
+-    ///     notification holds a stable snapshot: some callers pass a live view over the entity's own collection (e.g.
+-    ///     <see cref="IPublishableContentBase.PublishedCultures"/>) that would otherwise change as the entity is mutated.
+-    /// </remarks>
+-    /// <param name="content">The item the cultures belong to.</param>
+-    /// <param name="cultures">
+-    ///     The affected cultures. A <c>null</c> value means the category of change does not apply to this notification, so
+-    ///     the map is <c>null</c>; a non-null-but-empty value means the change was tracked but affected no cultures for
+-    ///     this item, so a present-but-empty map is returned rather than conflating that with "not tracked".
+-    /// </param>
+-    /// <returns>The per-item culture map, or <c>null</c> when <paramref name="cultures"/> is <c>null</c>.</returns>
+-    protected static Dictionary<Guid, IReadOnlyCollection<string>>? BuildCultureMap(TContent content, IEnumerable<string>? cultures)
+-    {
+-        if (cultures is null)
+-        {
+-            return null;
+-        }
+-
+-        string[] cultureList = [.. cultures];
+-        return cultureList.Length == 0
+-            ? new Dictionary<Guid, IReadOnlyCollection<string>>()
+-            : new Dictionary<Guid, IReadOnlyCollection<string>> { [content.Key] = cultureList };
+-    }
+-
+     #region Rollback
+ 
+     /// <inheritdoc />
+@@ -336,95 +235,10 @@ public async Task<int> CountPublishedAsync(string? contentTypeAlias, Cancellatio
+         }
+     }
+ 
+-    /// <summary>
+-    /// Gets the count of all <see cref="TContent"/> items.
+-    /// </summary>
+-    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
+-    /// <param name="cancellationToken">The cancellation token.</param>
+-    /// <returns>The count of content items.</returns>
+-    public async Task<int> CountAsync(string? contentTypeAlias, CancellationToken cancellationToken)
+-    {
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.ReadLock(ReadLockIds);
+-        int result = contentTypeAlias is null
+-            ? await _contentRepository.CountAsync(cancellationToken)
+-            : await _contentRepository.CountAsync(contentTypeAlias, cancellationToken);
+-        scope.Complete();
+-        return result;
+-    }
+-
+-    /// <summary>
+-    /// Gets the count of child <see cref="TContent"/> items under a specified parent.
+-    /// </summary>
+-    /// <param name="parentKey">The Guid key of the parent content.</param>
+-    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
+-    /// <param name="cancellationToken">The cancellation token.</param>
+-    /// <returns>The count of child content items.</returns>
+-    public async Task<int> CountChildrenAsync(Guid? parentKey, string? contentTypeAlias, CancellationToken cancellationToken)
+-    {
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.ReadLock(ReadLockIds);
+-        int result = contentTypeAlias is null
+-            ? await _contentRepository.CountChildrenAsync(parentKey, cancellationToken)
+-            : await _contentRepository.CountChildrenAsync(parentKey, contentTypeAlias, cancellationToken);
+-        scope.Complete();
+-        return result;
+-    }
+-
+-    /// <summary>
+-    /// Gets the count of descendant <see cref="TContent"/> items under a specified parent.
+-    /// </summary>
+-    /// <param name="parentKey">The Guid key of the parent content.</param>
+-    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
+-    /// <param name="cancellationToken">The cancellation token.</param>
+-    /// <returns>The count of descendant content items.</returns>
+-    public async Task<int> CountDescendantsAsync(Guid? parentKey, string? contentTypeAlias, CancellationToken cancellationToken)
+-    {
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.ReadLock(ReadLockIds);
+-        int result = contentTypeAlias is null
+-            ? await _contentRepository.CountDescendantsAsync(parentKey, cancellationToken)
+-            : await _contentRepository.CountDescendantsAsync(parentKey, contentTypeAlias, cancellationToken);
+-        scope.Complete();
+-        return result;
+-    }
+-
+     #endregion
+ 
+     #region Get, Has, Is
+ 
+-    /// <inheritdoc/>
+-    public async Task<TContent?> GetByIdAsync(Guid key, CancellationToken cancellationToken)
+-    {
+-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+-        {
+-            scope.ReadLock(ReadLockIds);
+-            TContent? result = await _contentRepository.GetAsync(key, cancellationToken);
+-            scope.Complete();
+-            return result;
+-        }
+-    }
+-
+-    /// <inheritdoc/>
+-    public async Task<IEnumerable<TContent>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken)
+-    {
+-        Guid[] idsA = [.. ids];
+-        if (idsA.Length == 0)
+-        {
+-            return [];
+-        }
+-
+-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+-        {
+-            scope.ReadLock(ReadLockIds);
+-            IEnumerable<TContent> items = await _contentRepository.GetManyAsync(idsA, cancellationToken);
+-            var index = items.ToDictionary(x => x.Key, x => x);
+-            IEnumerable<TContent> result = idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
+-            scope.Complete();
+-            return result;
+-        }
+-    }
+-
+     /// <inheritdoc/>
+     public async Task<IEnumerable<TContent>> GetByIdsAsync(IEnumerable<Guid> ids, string[]? propertyAliases, bool loadTemplates, CancellationToken cancellationToken)
+     {
+@@ -470,18 +284,6 @@ public async Task<IDictionary<Guid, IEnumerable<ContentSchedule>>> GetContentSch
+         return result;
+     }
+ 
+-    /// <inheritdoc />
+-    public async Task<PagedModel<TContent>> GetPagedOfTypeAsync(Guid contentTypeKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
+-    {
+-        ordering ??= Ordering.By("sortOrder");
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.ReadLock(ReadLockIds);
+-        PagedModel<TContent> result = await _contentRepository.GetPagedOfContentTypesAsync([contentTypeKey], skip, take, ordering, cancellationToken);
+-        scope.Complete();
+-        return result;
+-    }
+-
+     /// <inheritdoc />
+     public async Task<Attempt<ContentScheduleOperationStatus>> PersistContentScheduleAsync(IPublishableContentBase content, ContentScheduleCollection contentSchedule, CancellationToken cancellationToken)
+     {
+@@ -492,58 +294,6 @@ public async Task<Attempt<ContentScheduleOperationStatus>> PersistContentSchedul
+         return Attempt.Succeed(ContentScheduleOperationStatus.Success);
+     }
+ 
+-    /// <inheritdoc />
+-    public async Task<PagedModel<TContent>> GetPagedOfTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
+-    {
+-        ordering ??= Ordering.By("sortOrder");
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.ReadLock(ReadLockIds);
+-        PagedModel<TContent> result = await _contentRepository.GetPagedOfContentTypesAsync(contentTypeKeys, skip, take, ordering, cancellationToken);
+-        scope.Complete();
+-        return result;
+-    }
+-
+-    /// <inheritdoc />
+-    public async Task<TContent?> GetVersionAsync(int versionId, CancellationToken cancellationToken)
+-    {
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.ReadLock(ReadLockIds);
+-        TContent? result = await _contentRepository.GetVersionAsync(versionId, cancellationToken);
+-        scope.Complete();
+-        return result;
+-    }
+-
+-    /// <inheritdoc />
+-    public async Task<IEnumerable<TContent>> GetVersionsAsync(Guid contentKey, CancellationToken cancellationToken)
+-    {
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.ReadLock(ReadLockIds);
+-        IEnumerable<TContent> result = await _contentRepository.GetAllVersionsAsync(contentKey, cancellationToken);
+-        scope.Complete();
+-        return result;
+-    }
+-
+-    /// <inheritdoc />
+-    public async Task<IEnumerable<TContent>> GetVersionsSlimAsync(Guid contentKey, int skip, int take, CancellationToken cancellationToken)
+-    {
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.ReadLock(ReadLockIds);
+-        IEnumerable<TContent> result = await _contentRepository.GetAllVersionsSlimAsync(contentKey, skip, take, cancellationToken);
+-        scope.Complete();
+-        return result;
+-    }
+-
+-    /// <inheritdoc />
+-    public async Task<IEnumerable<int>> GetVersionIdsAsync(Guid contentKey, int skip, int take, CancellationToken cancellationToken)
+-    {
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.ReadLock(ReadLockIds);
+-        IEnumerable<int> result = await _contentRepository.GetVersionIdsAsync(contentKey, skip, take, cancellationToken);
+-        scope.Complete();
+-        return result;
+-    }
+-
+     /// <summary>
+     ///     Gets content having an expiration date before (lower than, or equal to) a specified date.
+     /// </summary>
+@@ -582,15 +332,6 @@ public async Task<IEnumerable<TContent>> GetContentForReleaseAsync(DateTime date
+         return result;
+     }
+ 
+-    /// <summary>
+-    ///     Checks whether an <see cref="TContent" /> item has any children
+-    /// </summary>
+-    /// <param name="key">Guid key of the <see cref="TContent" /></param>
+-    /// <param name="cancellationToken">The cancellation token.</param>
+-    /// <returns>True if the content has any children otherwise False</returns>
+-    public async Task<bool> HasChildrenAsync(Guid key, CancellationToken cancellationToken) =>
+-        await CountChildrenAsync(key, null, cancellationToken) > 0;
+-
+     /// <inheritdoc />
+     public async Task<bool> IsPathPublishedAsync(TContent? content, CancellationToken cancellationToken)
+     {
+@@ -601,161 +342,37 @@ public async Task<bool> IsPathPublishedAsync(TContent? content, CancellationToke
+         return result;
+     }
+ 
+-    /// <summary>
+-    ///     Gets the parent of the current content as an <see cref="TContent" /> item.
+-    /// </summary>
+-    /// <param name="content"><see cref="TContent" /> to retrieve the parent from</param>
+-    /// <param name="cancellationToken">The cancellation token.</param>
+-    /// <returns>Parent <see cref="TContent" /> object</returns>
+-    public async Task<TContent?> GetParentAsync(TContent? content, CancellationToken cancellationToken)
+-    {
+-        if (content?.ParentId == Constants.System.Root || content?.ParentId == RecycleBinId ||
+-            content is null)
+-        {
+-            return null;
+-        }
+-
+-        // content is caller-supplied and not guaranteed to have gone through a read path that populated
+-        // ParentKey (e.g. a freshly constructed, unsaved entity), so resolve it here when it is unknown.
+-        // Everywhere else ParentKey is expected to already be populated.
+-        if (content.TryGetParentKey(out Guid? parentKey) is false)
+-        {
+-            Attempt<Guid> parentKeyAttempt = await _idKeyMap.GetKeyForIdAsync(content.ParentId, ContentObjectType);
+-            parentKey = parentKeyAttempt.Success ? parentKeyAttempt.Result : null;
+-        }
+-
+-        return parentKey is null
+-            ? null
+-            : await GetByIdAsync(parentKey.Value, cancellationToken);
+-    }
+-
+     #endregion
+ 
+     #region Save, Publish, Unpublish
+ 
+     /// <inheritdoc />
+-    public async Task<Attempt<ContentSaveOperationStatus>> SaveAsync(TContent content, Guid userKey, ContentScheduleCollection? contentSchedule, CancellationToken cancellationToken)
++    public Task<Attempt<ContentSaveOperationStatus>> SaveAsync(TContent content, Guid userKey, ContentScheduleCollection? contentSchedule, CancellationToken cancellationToken)
++        => PerformSaveAsync(
++            content,
++            userKey,
++            contentSchedule is null ? null : () => _contentRepository.PersistContentScheduleAsync(content, contentSchedule, cancellationToken),
++            cancellationToken);
++
++    /// <inheritdoc />
++    protected override ContentSaveOperationStatus ValidateForSave(TContent content)
+     {
+         PublishedState publishedState = content.PublishedState;
+-        if (publishedState is not (PublishedState.Published or PublishedState.Unpublished))
+-        {
+-            return Attempt.Fail(ContentSaveOperationStatus.InvalidPublishedState);
+-        }
+-
+-        if (content.Name is { Length: > Constants.Validation.MaxNameLength })
+-        {
+-            return Attempt.Fail(ContentSaveOperationStatus.InvalidName);
+-        }
+-
+-        EventMessages eventMessages = EventMessagesFactory.Get();
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.WriteLock(WriteLockIds);
+-
+-        SavingNotification<TContent> savingNotification = CreateSavingNotification(content, eventMessages);
+-        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+-        {
+-            scope.Complete();
+-            return Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification);
+-        }
+-
+-        int userId = await _userIdKeyResolver.GetAsync(userKey);
+-
+-        if (content.HasIdentity is false)
+-        {
+-            content.CreatorId = userId;
+-        }
+-
+-        content.WriterId = userId;
+-
+-        List<string>? culturesChanging = content.ContentType.VariesByCulture()
+-            ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
+-            : null;
+-
+-        IReadOnlyCollection<string>? savedCultures = content.ContentType.VariesByCulture()
+-            ? culturesChanging
+-            : content.IsDirty() ? ["*"] : [];
+-
+-        await _contentRepository.SaveAsync(content, cancellationToken);
+-
+-        if (contentSchedule is not null)
+-        {
+-            await _contentRepository.PersistContentScheduleAsync(content, contentSchedule, cancellationToken);
+-        }
+-
+-        scope.Notifications.Publish(
+-            CreateSavedNotification(content, eventMessages, BuildCultureMap(content, savedCultures)).WithStateFrom(savingNotification));
+-
+-        scope.Notifications.Publish(CreateTreeChangeNotification(content, TreeChangeTypes.RefreshNode, eventMessages));
+-
+-        if (culturesChanging is not null)
+-        {
+-            IEnumerable<ILanguage> allLangs = await _languageRepository.GetAllAsync(cancellationToken);
+-            var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesChanging);
+-            await AuditAsync(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
+-        }
+-        else
+-        {
+-            await AuditAsync(AuditType.Save, userId, content.Id);
+-        }
+-
+-        scope.Complete();
+-
+-        return Attempt.Succeed(ContentSaveOperationStatus.Success);
++        return publishedState is not (PublishedState.Published or PublishedState.Unpublished)
++            ? ContentSaveOperationStatus.InvalidPublishedState
++            : ContentSaveOperationStatus.Success;
+     }
+ 
+     /// <inheritdoc />
+-    public async Task<Attempt<ContentSaveOperationStatus>> SaveAsync(IEnumerable<TContent> contents, Guid userKey, CancellationToken cancellationToken)
++    protected override void ThrowIfSaveRejected(TContent content, Attempt<ContentSaveOperationStatus> saveResult)
+     {
+-        EventMessages eventMessages = EventMessagesFactory.Get();
+-        TContent[] contentsA = [.. contents];
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.WriteLock(WriteLockIds);
+-
+-        SavingNotification<TContent> savingNotification = CreateSavingNotification(contentsA, eventMessages);
+-        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+-        {
+-            scope.Complete();
+-            return Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification);
+-        }
+-
+-        int userId = await _userIdKeyResolver.GetAsync(userKey);
+-
+-        var savedCultures = new Dictionary<Guid, IReadOnlyCollection<string>>();
+-        foreach (TContent content in contentsA)
++        if (saveResult.Result is ContentSaveOperationStatus.InvalidPublishedState)
+         {
+-            if (content.HasIdentity is false)
+-            {
+-                content.CreatorId = userId;
+-            }
+-
+-            content.WriterId = userId;
+-
+-            // capture the changing cultures before saving resets change tracking on the entity. Invariant content
+-            // reports the "*" marker, but only when something actually changed (mirroring the variant delta).
+-            IReadOnlyCollection<string>? culturesChanging = content.ContentType.VariesByCulture()
+-                ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToArray()
+-                : content.IsDirty() ? ["*"] : [];
+-            if (culturesChanging is { Count: > 0 })
+-            {
+-                savedCultures[content.Key] = culturesChanging;
+-            }
+-
+-            await _contentRepository.SaveAsync(content, cancellationToken);
++            throw new InvalidOperationException(
++                $"Cannot save (un)publishing content with name: {content.Name} - and state: {content.PublishedState}.");
+         }
+ 
+-        scope.Notifications.Publish(
+-            CreateSavedNotification(contentsA, eventMessages, savedCultures).WithStateFrom(savingNotification));
+-
+-        // TODO: See note above about supressing events
+-        scope.Notifications.Publish(CreateTreeChangeNotification(contentsA, TreeChangeTypes.RefreshNode, eventMessages));
+-
+-        await AuditAsync(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items (#{contentsA.Length})");
+-
+-        scope.Complete();
+-
+-        return Attempt.Succeed(ContentSaveOperationStatus.Success);
++        base.ThrowIfSaveRejected(content, saveResult);
+     }
+ 
+     /// <inheritdoc/>
+@@ -1245,7 +862,6 @@ private async Task PerformScheduledPublishingReleaseAsync(DateTime date, List<Pu
+                         continue;
+                     }
+ 
+-
+                     var publishing = true;
+                     foreach (var culture in pendingCultures)
+                     {
+@@ -1742,23 +1358,21 @@ async Task SaveContentAsync(TContent c)
+ 
+     #endregion
+ 
+-    #region Delete
++    #region Others
++
++    /// <summary>
++    ///     Gets the user performing an operation, so that their permissions can be applied to it.
++    /// </summary>
++    /// <param name="userId">The identifier of the user.</param>
++    /// <returns>The user.</returns>
++    /// <exception cref="ArgumentException">No user exists with the supplied identifier.</exception>
++    protected IUser GetRequiredUser(int userId)
++        => _userService.Value.GetUserById(userId)
++           ?? throw new ArgumentException("Could not find the supplied user", nameof(userId));
+ 
+     /// <inheritdoc />
+-    public async Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(TContent content, Guid userKey, CancellationToken cancellationToken)
++    protected override void BeforeDeleteLocked(ICoreScope scope, TContent content, EventMessages eventMessages)
+     {
+-        int userId = await _userIdKeyResolver.GetAsync(userKey);
+-        EventMessages eventMessages = EventMessagesFactory.Get();
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.WriteLock(WriteLockIds);
+-
+-        if (await scope.Notifications.PublishCancelableAsync(CreateDeletingNotification(content, eventMessages)))
+-        {
+-            scope.Complete();
+-            return Attempt.Fail(ContentDeleteOperationStatus.CancelledByNotification);
+-        }
+-
+         // if it's not trashed yet, and published, we should unpublish
+         // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
+         // just raise the event
+@@ -1769,142 +1383,37 @@ public async Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(TContent co
+                 eventMessages,
+                 BuildCultureMap(content, content.ContentType.VariesByCulture() ? content.PublishedCultures : ["*"])));
+         }
+-
+-        await DeleteLockedAsync(scope, content, eventMessages, cancellationToken);
+-
+-        scope.Notifications.Publish(CreateTreeChangeNotification(content, TreeChangeTypes.Remove, eventMessages));
+-        await AuditAsync(AuditType.Delete, userId, content.Id);
+-
+-        scope.Complete();
+-
+-        return Attempt.Succeed(ContentDeleteOperationStatus.Success);
+     }
+ 
+-    // TODO: both DeleteVersions methods below have an issue. Sort of. They do NOT take care of files the way
+-    // Delete does - for a good reason: the file may be referenced by other, non-deleted, versions. BUT,
+-    // if that's not the case, then the file will never be deleted, because when we delete the content,
+-    // the version referencing the file will not be there anymore. SO, we can leak files.
+-
+-    /// <summary>
+-    ///     Permanently deletes versions from an <see cref="TContent" /> object prior to a specific date.
+-    ///     This method will never delete the latest version of a content item.
+-    /// </summary>
+-    /// <param name="key">Guid key of the <see cref="TContent" /> object to delete versions from</param>
+-    /// <param name="versionDate">Latest version date</param>
+-    /// <param name="userKey">Guid key of the User deleting versions of a Content object</param>
+-    /// <param name="cancellationToken">The cancellation token.</param>
+-    public async Task<Attempt<ContentVersionOperationStatus>> DeleteVersionsAsync(Guid key, DateTime versionDate, Guid userKey, CancellationToken cancellationToken)
++    /// <inheritdoc />
++    protected override void OnRestoringFromRecycleBin(TContent content)
+     {
+-        int userId = await _userIdKeyResolver.GetAsync(userKey);
+-        EventMessages evtMsgs = EventMessagesFactory.Get();
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.WriteLock(WriteLockIds);
+-
+-        DeletingVersionsNotification<TContent> deletingVersionsNotification =
+-            CreateDeletingVersionsNotification(key, evtMsgs, specificVersion: default, dateToRetain: versionDate);
+-        if (await scope.Notifications.PublishCancelableAsync(deletingVersionsNotification))
++        // if the content was trashed under another content, and so has a published version,
++        // it cannot move back as published but has to be unpublished first - that's for the
++        // root content, everything underneath will retain its published status
++        if (content.Published)
+         {
+-            scope.Complete();
+-            return Attempt.Fail(ContentVersionOperationStatus.CancelledByNotification);
++            // however, it had been masked when being trashed, so there's no need for
++            // any special event here - just change its state
++            content.PublishedState = PublishedState.Unpublishing;
+         }
+-
+-        await _contentRepository.DeleteVersionsAsync(key, versionDate, cancellationToken);
+-
+-        scope.Notifications.Publish(
+-            CreateDeletedVersionsNotification(key, evtMsgs, specificVersion: default, dateToRetain: versionDate).WithStateFrom(
+-                deletingVersionsNotification));
+-        await AuditAsync(AuditType.Delete, userId, Constants.System.Root, "Delete (by version date)");
+-
+-        scope.Complete();
+-        return Attempt.Succeed(ContentVersionOperationStatus.Success);
+     }
+ 
+-    /// <summary>
+-    ///     Permanently deletes specific version(s) from an <see cref="TContent" /> object.
+-    ///     This method will never delete the latest version of a content item.
+-    /// </summary>
+-    /// <param name="key">Guid key of the <see cref="TContent" /> object to delete a version from</param>
+-    /// <param name="versionId">Id of the version to delete</param>
+-    /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
+-    /// <param name="userKey">Guid key of the User deleting versions of a Content object</param>
+-    /// <param name="cancellationToken">The cancellation token.</param>
+-    /// <returns>An attempt carrying the operation status.</returns>
+-    public async Task<Attempt<ContentVersionOperationStatus>> DeleteVersionAsync(Guid key, int versionId, bool deletePriorVersions, Guid userKey, CancellationToken cancellationToken)
++    /// <inheritdoc />
++    protected override void OnSortedLocked(ICoreScope scope, IReadOnlyList<TContent> sorted, EventMessages eventMessages)
+     {
+-        int userId = await _userIdKeyResolver.GetAsync(userKey);
+-        EventMessages evtMsgs = EventMessagesFactory.Get();
+-
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-        scope.WriteLock(WriteLockIds);
+-        DeletingVersionsNotification<TContent> deletingVersionsNotification =
+-            CreateDeletingVersionsNotification(key, evtMsgs, versionId, dateToRetain: default);
+-        if (await scope.Notifications.PublishCancelableAsync(deletingVersionsNotification))
+-        {
+-            scope.Complete();
+-            return Attempt.Fail(ContentVersionOperationStatus.CancelledByNotification);
+-        }
+-
+-        if (deletePriorVersions)
++        // a published item is reported as published again, no point running StrategyPublish
++        // since we're not really publishing it and it cannot be cancelled etc
++        List<TContent> published = [.. sorted.Where(x => x.Published)];
++        if (published.Count > 0)
+         {
+-            TContent? content = await GetVersionAsync(versionId, cancellationToken);
+-            await DeleteVersionsAsync(key, content?.UpdateDate ?? DateTime.UtcNow, userKey, cancellationToken);
++            scope.Notifications.Publish(CreatePublishedNotification(published, eventMessages));
+         }
+-
+-        TContent? c = await _contentRepository.GetAsync(key, cancellationToken);
+-
+-        // don't delete the current or published version
+-        if (c?.VersionId != versionId &&
+-            c?.PublishedVersionId != versionId)
+-        {
+-            await _contentRepository.DeleteVersionAsync(versionId, cancellationToken);
+-        }
+-
+-        scope.Notifications.Publish(
+-            CreateDeletedVersionsNotification(key, evtMsgs, versionId, dateToRetain: default).WithStateFrom(
+-                deletingVersionsNotification));
+-        await AuditAsync(AuditType.Delete, userId, Constants.System.Root, "Delete (by version)");
+-
+-        scope.Complete();
+-        return Attempt.Succeed(ContentVersionOperationStatus.Success);
+     }
+ 
+-    #endregion
+-
+-    #region Others
+-
+-    protected static bool HasUnsavedChanges(TContent content) => content.HasIdentity is false || content.IsDirty();
+-
+-    /// <summary>
+-    ///     Gets the user performing an operation, so that their permissions can be applied to it.
+-    /// </summary>
+-    /// <param name="userId">The identifier of the user.</param>
+-    /// <returns>The user.</returns>
+-    /// <exception cref="ArgumentException">No user exists with the supplied identifier.</exception>
+-    protected IUser GetRequiredUser(int userId)
+-        => _userService.Value.GetUserById(userId)
+-           ?? throw new ArgumentException("Could not find the supplied user", nameof(userId));
+-
+     /// <inheritdoc />
+-    public abstract Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(ContentDataIntegrityReportOptions options, CancellationToken cancellationToken);
+-
+-    protected async Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(ContentDataIntegrityReportOptions options, Func<ICoreScope, Task> notifyIssuesFixed, CancellationToken cancellationToken)
+-    {
+-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+-
+-        scope.WriteLock(WriteLockIds);
+-
+-        ContentDataIntegrityReport report = await _contentRepository.CheckDataIntegrityAsync(options, cancellationToken);
+-
+-        if (report.FixedIssues.Count > 0)
+-        {
+-            await notifyIssuesFixed(scope);
+-        }
+-
+-        scope.Complete();
+-
+-        return report;
+-    }
++    protected override bool IsVersionDeletable(TContent content, int versionId)
++        => base.IsVersionDeletable(content, versionId) && content.PublishedVersionId != versionId;
+ 
+     #endregion
+ 
+@@ -1957,69 +1466,6 @@ internal async Task<IReadOnlyCollection<TContent>> GetPublishedDescendantsLocked
+ 
+     #endregion
+ 
+-    #region Auditing
+-
+-    protected async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
+-    {
+-        // A content operation must never fail because its audit metadata could not be attributed - a
+-        // user id with no matching key (e.g. unknown/imported content) skips the audit entry rather
+-        // than aborting the caller.
+-        Attempt<Guid> userKeyAttempt = await _userIdKeyResolver.TryGetAsync(userId);
+-        if (userKeyAttempt.Success is false)
+-        {
+-            Logger.LogWarning("Could not resolve a user key for user id {UserId} - skipping the {AuditType} audit entry for {ObjectId}.", userId, type, objectId);
+-            return;
+-        }
+-
+-        await _auditService.AddAsync(
+-            type,
+-            userKeyAttempt.Result,
+-            objectId,
+-            ContentObjectType.GetName(),
+-            message,
+-            parameters);
+-    }
+-
+-    protected static string GetLanguageDetailsForAuditEntry(IEnumerable<ILanguage> languages, IEnumerable<string> affectedCultures)
+-    {
+-        IEnumerable<string> languageIsoCodes = languages
+-            .Where(x => affectedCultures.InvariantContains(x.IsoCode))
+-            .Select(x => x.IsoCode);
+-        return string.Join(", ", languageIsoCodes);
+-    }
+-
+-    #endregion
+-
+-    #region Content Types
+-
+-    /// <inheritdoc />
+-    public abstract Task<Attempt<ContentDeleteOfTypesOperationStatus>> DeleteOfTypesAsync(IEnumerable<Guid> contentTypeKeys, Guid userKey, CancellationToken cancellationToken);
+-
+-    protected async Task<IContentType> GetContentTypeAsync(ICoreScope scope, string contentTypeAlias, CancellationToken cancellationToken)
+-    {
+-        if (contentTypeAlias is null)
+-        {
+-            throw new ArgumentNullException(nameof(contentTypeAlias));
+-        }
+-
+-        if (string.IsNullOrWhiteSpace(contentTypeAlias))
+-        {
+-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(contentTypeAlias));
+-        }
+-
+-        scope.ReadLock(ReadLockIds);
+-
+-        IContentType? contentType = await _contentTypeRepository.GetAsync(contentTypeAlias, cancellationToken)
+-                                    ??
+-                                    // causes rollback
+-                                    throw new Exception($"No ContentType matching the passed in Alias: '{contentTypeAlias}'" +
+-                                                        $" was found");
+-
+-        return contentType;
+-    }
+-
+-    #endregion
+-
+     #region Publishing Strategies
+ 
+     private async Task<PublishResult> StrategyCanPublishAsync(
