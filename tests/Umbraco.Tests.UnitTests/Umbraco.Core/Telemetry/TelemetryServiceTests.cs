@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry;
+using Umbraco.Cms.Core.Telemetry.Models;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry;
 
@@ -63,6 +64,7 @@ public class TelemetryServiceTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual("9.1.1-rc", result.Version);
+        Assert.AreEqual(TelemetryReportData.CurrentSchemaVersion, result.SchemaVersion);
     }
 
     [Test]

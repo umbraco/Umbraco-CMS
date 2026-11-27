@@ -10,6 +10,21 @@ namespace Umbraco.Cms.Core.Telemetry.Models;
 public class TelemetryReportData
 {
     /// <summary>
+    ///     The current version of the telemetry payload shape.
+    /// </summary>
+    /// <remarks>
+    ///     Increase this when the shape of the payload changes, so the receiving end can tell old and new payloads apart.
+    ///     Payloads from versions of Umbraco that do not send a schema version have the same shape as version 1.
+    /// </remarks>
+    public const int CurrentSchemaVersion = 1;
+
+    /// <summary>
+    ///     Gets or sets the version of the payload shape.
+    /// </summary>
+    [DataMember(Name = "schemaVersion")]
+    public int SchemaVersion { get; set; } = CurrentSchemaVersion;
+
+    /// <summary>
     ///     Gets or sets a random GUID to prevent an instance posting multiple times pr. day.
     /// </summary>
     [DataMember(Name = "id")]
