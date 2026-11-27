@@ -12,6 +12,7 @@ import { manifests as iconRegistryManifests } from './icon-registry/manifests.js
 import { manifests as localizationManifests } from './localization/manifests.js';
 import { manifests as menuManifests } from './menu/manifests.js';
 import { manifests as modalManifests } from './modal/manifests.js';
+import { manifests as permissionManifests } from './permission/manifests.js';
 import { manifests as pickerManifests } from './picker/manifests.js';
 import { manifests as propertyActionManifests } from './property-action/manifests.js';
 import { manifests as propertyEditorDataSourceManifests } from './property-editor-data-source/manifests.js';
@@ -47,6 +48,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...localizationManifests,
 	...menuManifests,
 	...modalManifests,
+	...permissionManifests,
 	...pickerManifests,
 	...propertyActionManifests,
 	...propertyEditorDataSourceManifests,
