@@ -5,7 +5,7 @@ export const manifests: Array<ManifestLocalization> = [
 		type: 'localization',
 		alias: 'Umb.Localization.AR',
 		name: 'Arabic Backoffice UI Localization',
-		meta: { culture: 'ar' },
+		meta: { culture: 'ar', direction: 'rtl' },
 		js: () => import('../../../assets/lang/ar.js'),
 	},
 	{
@@ -123,14 +123,14 @@ export const manifests: Array<ManifestLocalization> = [
 		type: 'localization',
 		alias: 'Umb.Localization.HE',
 		name: 'Hebrew Backoffice UI Localization',
-		meta: { culture: 'he' },
+		meta: { culture: 'he', direction: 'rtl' },
 		js: () => import('../../../assets/lang/he.js'),
 	},
 	{
 		type: 'localization',
 		alias: 'Umb.Localization.HE_IL',
 		name: 'Hebrew (Israel) Backoffice UI Localization',
-		meta: { culture: 'he-IL' },
+		meta: { culture: 'he-IL', direction: 'rtl' },
 	},
 	{
 		type: 'localization',

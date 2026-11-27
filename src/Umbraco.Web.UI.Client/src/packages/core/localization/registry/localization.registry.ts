@@ -167,8 +167,8 @@ export class UmbLocalizationRegistry {
 							// Load the translations into the localization manager
 							umbLocalizationManager.registerManyLocalizations(translations);
 
-							// Set the browser language and direction based on the translations
-							this.#setBrowserLanguage(locale!, translations);
+							// Set the browser language and direction based on the extensions
+							this.#setBrowserLanguage(locale!, extensions);
 						})().then(
 							() => subscriber.complete(),
 							(error) => subscriber.error(error),
@@ -226,15 +226,19 @@ export class UmbLocalizationRegistry {
 		} satisfies UmbLocalizationSetBase & { $weight: number };
 	};
 
-	#setBrowserLanguage(locale: Intl.Locale, translations: UmbLocalizationSetBase[]) {
+	#setBrowserLanguage(locale: Intl.Locale, extensions: Array<ManifestLocalization>) {
 		const newLang = locale.baseName.toLowerCase();
 
+		// Same precedence as the translations (lowest weight wins), among the extensions that declare a direction.
+		const declaringDirection = extensions
+			.filter((extension) => extension.meta.direction)
+			.sort((a, b) => (b.weight ?? 100) - (a.weight ?? 100))
+			.reverse();
 		// Regional match wins, then language-only match, then default to LTR.
-		const reverseTranslations = translations.slice().reverse();
 		const bestMatch =
-			reverseTranslations.find((t) => t.$code.toLowerCase() === newLang) ??
-			reverseTranslations.find((t) => t.$code.toLowerCase() === locale.language.toLowerCase());
-		const direction: 'ltr' | 'rtl' = bestMatch?.$dir ?? 'ltr';
+			declaringDirection.find((extension) => extension.meta.culture.toLowerCase() === newLang) ??
+			declaringDirection.find((extension) => extension.meta.culture.toLowerCase() === locale.language.toLowerCase());
+		const direction: 'ltr' | 'rtl' = bestMatch?.meta.direction ?? 'ltr';
 
 		if (document.documentElement.dir !== direction) {
 			document.documentElement.dir = direction;
