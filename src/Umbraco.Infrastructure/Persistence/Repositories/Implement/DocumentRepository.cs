@@ -2281,6 +2281,10 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     /// If a collision is detected (e.g. "Title" and "Title." both produce segment "title"),
     /// a numeric suffix is appended to the name until uniqueness is achieved.
     /// </summary>
+    /// <remarks>
+    /// If no suffix yields a distinct URL segment (for example, when the short string helper truncates
+    /// segments before the suffix), the name is returned unchanged.
+    /// </remarks>
     internal static string? EnsureUniqueUrlSegment(
         string? nodeName,
         int nodeId,
@@ -2321,8 +2325,10 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             return nodeName;
         }
 
-        // Increment a (N) suffix on the name until the resulting URL segment is unique.
-        for (var i = 1; ; i++)
+        // Increment a (N) suffix on the name until the resulting URL segment is unique. If every suffix produced
+        // a distinct segment, one of the first (sibling count + 1) candidates would be free, so beyond that the
+        // suffix is not reaching the segment.
+        for (var i = 1; i <= siblingSegments.Count + 1; i++)
         {
             var candidateName = $"{nodeName} ({i})";
             var candidateSegment = shortStringHelper.CleanStringForUrlSegment(candidateName, culture);
@@ -2331,6 +2337,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 return candidateName;
             }
         }
+
+        return nodeName;
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local

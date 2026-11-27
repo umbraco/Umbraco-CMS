@@ -17,6 +17,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -3918,6 +3919,69 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         // Save again to verify the name is stable (idempotent).
         ContentService.Save(child2);
         Assert.AreEqual("Title. (1)", child2.GetCultureName(langUk.IsoCode));
+    }
+
+    [Test]
+    public void Can_Save_Invariant_Siblings_With_Names_Differing_Beyond_Url_Segment_Length()
+    {
+        AssertNamesShareUrlSegment(null);
+
+        var contentType = ContentTypeService.Get("umbTextpage")!;
+
+        var parent = new Content("root", Constants.System.Root, contentType);
+        ContentService.Save(parent);
+
+        var child1 = new Content($"{NameTruncatedBeforeUrlSegmentSuffix} (12/26)", parent, contentType);
+        ContentService.Save(child1);
+
+        var child2 = new Content($"{NameTruncatedBeforeUrlSegmentSuffix} (13/26)", parent, contentType);
+        ContentService.Save(child2);
+
+        Assert.AreEqual($"{NameTruncatedBeforeUrlSegmentSuffix} (12/26)", child1.Name);
+        Assert.AreEqual($"{NameTruncatedBeforeUrlSegmentSuffix} (13/26)", child2.Name);
+    }
+
+    [Test]
+    public async Task Can_Save_Culture_Variant_Siblings_With_Names_Differing_Beyond_Url_Segment_Length()
+    {
+        var langUk = new LanguageBuilder()
+            .WithCultureInfo("en-GB")
+            .WithIsDefault(true)
+            .Build();
+        await LanguageService.CreateAsync(langUk, Constants.Security.SuperUserKey);
+
+        AssertNamesShareUrlSegment(langUk.IsoCode);
+
+        var contentType = ContentTypeService.Get("umbTextpage")!;
+        contentType.Variations = ContentVariation.Culture;
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var parent = new Content(null, Constants.System.Root, contentType);
+        parent.SetCultureName("root", langUk.IsoCode);
+        ContentService.Save(parent);
+
+        var child1 = new Content(null, parent, contentType);
+        child1.SetCultureName($"{NameTruncatedBeforeUrlSegmentSuffix} (12/26)", langUk.IsoCode);
+        ContentService.Save(child1);
+
+        var child2 = new Content(null, parent, contentType);
+        child2.SetCultureName($"{NameTruncatedBeforeUrlSegmentSuffix} (13/26)", langUk.IsoCode);
+        ContentService.Save(child2);
+
+        Assert.AreEqual($"{NameTruncatedBeforeUrlSegmentSuffix} (12/26)", child1.GetCultureName(langUk.IsoCode));
+        Assert.AreEqual($"{NameTruncatedBeforeUrlSegmentSuffix} (13/26)", child2.GetCultureName(langUk.IsoCode));
+    }
+
+    // 239 characters, so with the default 240 character URL segment limit, any trailing suffix is truncated away.
+    private static string NameTruncatedBeforeUrlSegmentSuffix => string.Join(" ", Enumerable.Repeat("Word", 48));
+
+    private void AssertNamesShareUrlSegment(string? culture)
+    {
+        IShortStringHelper shortStringHelper = GetRequiredService<IShortStringHelper>();
+        Assert.AreEqual(
+            shortStringHelper.CleanStringForUrlSegment($"{NameTruncatedBeforeUrlSegmentSuffix} (12/26)", culture),
+            shortStringHelper.CleanStringForUrlSegment($"{NameTruncatedBeforeUrlSegmentSuffix} (13/26)", culture),
+            "Precondition: the names must share a URL segment for this test to exercise the fallback.");
     }
 
     [Test]
