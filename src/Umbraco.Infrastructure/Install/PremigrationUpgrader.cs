@@ -1,9 +1,13 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Extensions;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -21,6 +25,8 @@ public class PremigrationUpgrader : INotificationAsyncHandler<RuntimePremigratio
     private readonly IRuntimeState _runtimeState;
     private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
     private readonly IKeyValueService _keyValueService;
+    private readonly IOptions<RuntimeSettings> _runtimeSettings;
+    private readonly Microsoft.Extensions.Logging.ILogger<PremigrationUpgrader> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PremigrationUpgrader"/> class.
@@ -30,18 +36,50 @@ public class PremigrationUpgrader : INotificationAsyncHandler<RuntimePremigratio
     /// <param name="runtimeState">Represents the current runtime state of the Umbraco application.</param>
     /// <param name="umbracoDatabaseFactory">Factory for creating Umbraco database connections.</param>
     /// <param name="keyValueService">Service for accessing and storing key-value pairs in the database.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
     public PremigrationUpgrader(
         IProfilingLogger profilingLogger,
         DatabaseBuilder databaseBuilder,
         IRuntimeState runtimeState,
         IUmbracoDatabaseFactory umbracoDatabaseFactory,
         IKeyValueService keyValueService)
+        : this(
+            profilingLogger,
+            databaseBuilder,
+            runtimeState,
+            umbracoDatabaseFactory,
+            keyValueService,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>(),
+            StaticServiceProvider.Instance.GetRequiredService<Microsoft.Extensions.Logging.ILogger<PremigrationUpgrader>>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PremigrationUpgrader"/> class.
+    /// </summary>
+    /// <param name="profilingLogger">Provides logging and profiling capabilities for the upgrade process.</param>
+    /// <param name="databaseBuilder">Handles database schema creation and migration tasks.</param>
+    /// <param name="runtimeState">Represents the current runtime state of the Umbraco application.</param>
+    /// <param name="umbracoDatabaseFactory">Factory for creating Umbraco database connections.</param>
+    /// <param name="keyValueService">Service for accessing and storing key-value pairs in the database.</param>
+    /// <param name="runtimeSettings">The runtime settings.</param>
+    /// <param name="logger">The logger.</param>
+    public PremigrationUpgrader(
+        IProfilingLogger profilingLogger,
+        DatabaseBuilder databaseBuilder,
+        IRuntimeState runtimeState,
+        IUmbracoDatabaseFactory umbracoDatabaseFactory,
+        IKeyValueService keyValueService,
+        IOptions<RuntimeSettings> runtimeSettings,
+        Microsoft.Extensions.Logging.ILogger<PremigrationUpgrader> logger)
     {
         _profilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
         _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
         _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
         _umbracoDatabaseFactory = umbracoDatabaseFactory;
         _keyValueService = keyValueService;
+        _runtimeSettings = runtimeSettings;
+        _logger = logger;
     }
 
     /// <summary>
@@ -87,6 +125,11 @@ public class PremigrationUpgrader : INotificationAsyncHandler<RuntimePremigratio
     {
         var premigrationState = _keyValueService.GetValue(Constants.Conventions.Migrations.UmbracoUpgradePlanPremigrationsKey);
 
-        return umbracoPremigrationPlan.FinalState != premigrationState;
+        if (umbracoPremigrationPlan.FinalState == premigrationState)
+        {
+            return false;
+        }
+
+        return _runtimeSettings.Value.MigrationBehavior.ShouldMigrate(umbracoPremigrationPlan, premigrationState, _logger);
     }
 }

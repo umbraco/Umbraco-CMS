@@ -32,10 +32,18 @@ public class PendingPackageMigrations
     /// </param>
     /// <returns></returns>
     public IReadOnlyList<string> GetPendingPackageMigrations(IReadOnlyDictionary<string, string?>? keyValues)
+        => GetPendingPackageMigrationPlans(keyValues).Select(x => x.Name).ToList();
+
+    /// <summary>
+    /// Returns the package migration plans that are pending.
+    /// </summary>
+    /// <param name="keyValues">The key/value pairs from the key/value storage of migration names and their states.</param>
+    /// <returns>The package migration plans whose state in the key/value storage is missing or differs from their final state.</returns>
+    internal IReadOnlyList<PackageMigrationPlan> GetPendingPackageMigrationPlans(IReadOnlyDictionary<string, string?>? keyValues)
     {
         var packageMigrationPlans = _packageMigrationPlans.ToList();
 
-        var pendingMigrations = new List<string>(packageMigrationPlans.Count);
+        var pendingMigrations = new List<PackageMigrationPlan>(packageMigrationPlans.Count);
 
         foreach (PackageMigrationPlan plan in packageMigrationPlans)
         {
@@ -48,13 +56,13 @@ public class PendingPackageMigrations
                 if (!plan.FinalState.InvariantEquals(value))
                 {
                     // Not equal so we need to run
-                    pendingMigrations.Add(plan.Name);
+                    pendingMigrations.Add(plan);
                 }
             }
             else
             {
                 // If there is nothing in the DB then we need to run
-                pendingMigrations.Add(plan.Name);
+                pendingMigrations.Add(plan);
             }
             if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
             {

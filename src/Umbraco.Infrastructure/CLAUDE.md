@@ -548,6 +548,11 @@ using (var outer = ScopeProvider.CreateCoreScope())
 - Keep the Guids in **one place** (a shared `Constants` value referenced by both `DatabaseDataCreator`
   and the migration) so they cannot drift.
 
+**Minor and patch migrations MUST be forward-compatible**:
+- With `Umbraco:CMS:Runtime:MigrationBehavior` set to `RollingUpgrade` (or including `IgnoreUnknown`), an earlier version of the same major keeps running against a database a newer version has already migrated, for example during a deployment slot swap.
+- So within a major, a migration may add to the schema and data (new tables, nullable or defaulted columns, new rows), but must not rename, remove or reshape anything an earlier version of that major reads. Breaking that makes the earlier version fail at runtime when it queries the changed table or data, not at boot.
+- Changes that aren't forward-compatible (renames, removals, data format changes such as rewriting stored configuration) belong in a major version, which isn't deployed as a rolling upgrade.
+
 ### Repository Edge Cases
 
 **Cache Invalidation**:
