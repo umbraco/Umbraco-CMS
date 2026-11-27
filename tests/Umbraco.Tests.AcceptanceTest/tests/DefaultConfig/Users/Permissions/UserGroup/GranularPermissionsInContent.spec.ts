@@ -315,3 +315,83 @@ test('can rollback a specific content with rollback permission enabled', async (
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, documentText);
   await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
+
+test('can not delete a specific content with delete permission disabled for it and enabled by default', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithDeletePermissionAndDeletePermissionForSpecificDocument(userGroupName, firstDocumentId, true, false);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(firstDocumentName);
+
+  // Assert
+  await umbracoUi.content.isPermissionInActionsMenuVisible('Create…', true);
+  await umbracoUi.content.isPermissionInActionsMenuVisible('Trash…', false);
+});
+
+test('can not delete children of a specific content with delete permission disabled for it and enabled by default', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.document.createDefaultDocumentWithParent(childDocumentName, childDocumentTypeId, firstDocumentId);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithDeletePermissionAndDeletePermissionForSpecificDocument(userGroupName, firstDocumentId, true, false);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+
+  // Act
+  await umbracoUi.content.openContentCaretButtonForName(firstDocumentName);
+  await umbracoUi.content.clickActionsMenuForContent(childDocumentName);
+
+  // Assert
+  await umbracoUi.content.isPermissionInActionsMenuVisible('Create…', true);
+  await umbracoUi.content.isPermissionInActionsMenuVisible('Trash…', false);
+});
+
+test('can delete other content when delete permission is disabled for a specific content and enabled by default', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithDeletePermissionAndDeletePermissionForSpecificDocument(userGroupName, firstDocumentId, true, false);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(secondDocumentName);
+
+  // Assert
+  await umbracoUi.content.isPermissionInActionsMenuVisible('Trash…', true);
+});
+
+test('can delete a specific content with delete permission enabled for it and disabled by default', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithDeletePermissionAndDeletePermissionForSpecificDocument(userGroupName, firstDocumentId, false, true);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(firstDocumentName);
+
+  // Assert
+  await umbracoUi.content.isPermissionInActionsMenuVisible('Trash…', true);
+});
+
+test('can not delete other content with delete permission enabled for a specific content and disabled by default', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithDeletePermissionAndDeletePermissionForSpecificDocument(userGroupName, firstDocumentId, false, true);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(secondDocumentName);
+
+  // Assert
+  await umbracoUi.content.isPermissionInActionsMenuVisible('Create…', true);
+  await umbracoUi.content.isPermissionInActionsMenuVisible('Trash…', false);
+});

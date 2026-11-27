@@ -342,7 +342,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.selectLoginPageDocument = page.locator('.select-item').filter({hasText: 'Login Page'}).locator('umb-input-document').locator('#button');
     this.selectErrorPageDocument = page.locator('.select-item').filter({hasText: 'Error Page'}).locator('umb-input-document').locator('#button');
     this.rollbackItem = page.locator('.rollback-item');
-    this.actionsMenu = page.locator('uui-scroll-container');
+    this.actionsMenu = page.locator('#action-modal[open] umb-entity-action-list');
     this.linkToDocumentBtn = this.linkPickerModal.getByTestId('action:document').locator('#button');
     this.linkToMediaBtn = this.linkPickerModal.getByTestId('action:media').locator('#button');
     this.linkToManualBtn = this.linkPickerModal.getByTestId('action:external').locator('#button');
@@ -834,6 +834,10 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async isContentNameVisible(contentName: string, isVisible: boolean = true) {
     return await this.isVisible(this.sidebarModal.getByText(contentName), isVisible);
+  }
+
+  async isContentRootInTreeVisible(isVisible: boolean = true) {
+    await this.isVisible(this.page.getByRole('button', {name: "View actions for 'Content'", exact: true}), isVisible);
   }
 
   async isContentInTreeVisible(name: string, isVisible: boolean = true) {

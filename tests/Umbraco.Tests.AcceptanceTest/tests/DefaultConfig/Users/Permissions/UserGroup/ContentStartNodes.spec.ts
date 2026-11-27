@@ -90,3 +90,18 @@ test('can not see any content when no start nodes specified', async ({umbracoApi
   // Assert
   await umbracoUi.content.isDocumentTreeEmpty();
 });
+
+test('can not create content at the root without root access', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithDocumentStartNodeAndCreatePermission(userGroupName, rootDocumentId);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+
+  // Act
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+
+  // Assert
+  await umbracoUi.content.isContentInTreeVisible(rootDocumentName);
+  await umbracoUi.content.isContentRootInTreeVisible(false);
+});
