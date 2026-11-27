@@ -46,6 +46,7 @@ export default defineConfig({
 			'models/index': './models/index.ts',
 			'notification/index': './notification/index.ts',
 			'object-type/index': './object-type/index.ts',
+			'permission/index': './permission/index.ts',
 			'picker-input/index': './picker-input/index.ts',
 			'picker-data-source/index': './picker-data-source/index.ts',
 			'picker/index': './picker/index.ts',

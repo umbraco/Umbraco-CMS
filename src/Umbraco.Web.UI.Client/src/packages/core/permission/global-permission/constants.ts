@@ -1,0 +1,1 @@
+export const UMB_GLOBAL_PERMISSION_MANIFEST_SOURCE_ALIAS = 'Umb.GlobalContext.GlobalPermissionManifestSource';

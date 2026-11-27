@@ -1,3 +1,4 @@
+import type { UmbReason } from '../type/index.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -5,6 +6,8 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 export interface UmbState {
 	unique: string;
 	message?: string;
+	/** Explains the state to the user. */
+	reason?: UmbReason;
 }
 
 export class UmbStateManager<StateType extends UmbState = UmbState> extends UmbControllerBase {

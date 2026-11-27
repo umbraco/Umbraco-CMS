@@ -3,7 +3,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityDeletedEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, type UmbState } from '@umbraco-cms/backoffice/utils';
 
 let umbBackPathDeprecation: UmbDeprecation | undefined;
 
@@ -50,7 +50,7 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 	private _isLoading = false;
 
 	@state()
-	private _isForbidden = false;
+	private _forbiddenState?: UmbState;
 
 	@state()
 	private _exists = false;
@@ -72,7 +72,7 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 			this.#context = context;
 			this.observe(this.#context?.entityType, (entityType) => (this._entityType = entityType));
 			this.observe(this.#context?.loading.isOn, (isLoading) => (this._isLoading = isLoading ?? false));
-			this.observe(this.#context?.forbidden.isOn, (isForbidden) => (this._isForbidden = isForbidden ?? false));
+			this.observe(this.#context?.forbidden.states, (states) => (this._forbiddenState = states?.[0]));
 			this.observe(this.#context?.data, (data) => (this._exists = !!data));
 			this.observe(this.#context?.isNew, (isNew) => (this._isNew = isNew));
 			this.observe(this.#context?.unique, (unique) => (this.#unique = unique));
@@ -115,9 +115,10 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 	};
 
 	#renderForbidden() {
-		if (!this._isLoading && this._isForbidden) {
+		if (!this._isLoading && this._forbiddenState) {
 			return html`<umb-entity-detail-forbidden
-				entity-type=${ifDefined(this._entityType)}></umb-entity-detail-forbidden>`;
+				entity-type=${ifDefined(this._entityType)}
+				.reason=${this._forbiddenState.reason}></umb-entity-detail-forbidden>`;
 		}
 		return nothing;
 	}
@@ -140,7 +141,7 @@ export class UmbEntityDetailWorkspaceEditorElement extends UmbLitElement {
 			<umb-workspace-editor
 				?loading=${this._isLoading}
 				.backPath=${(this.showBackToParentButton ? this._navigationParentItemPath : undefined) ?? this.#backPath}
-				class="${this._exists === false || this._isForbidden ? 'hide' : ''}">
+				class="${this._exists === false || this._forbiddenState ? 'hide' : ''}">
 				<slot name="header" slot="header"></slot>
 				${this.#renderEntityActions()}
 				<slot></slot>
