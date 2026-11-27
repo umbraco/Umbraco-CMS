@@ -1,4 +1,5 @@
 using System.Data;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -27,6 +28,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         private IUmbracoDatabase? _database;
 
         private bool _disposed;
+        private bool _deferScopedNotifications;
+        private bool _scopedNotificationsDeferred;
         private IEventDispatcher? _eventDispatcher;
 
         private EventMessages? _messages;
@@ -485,6 +488,48 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             _disposed = true;
         }
 
+        /// <summary>
+        ///     Disposes the current scope instance, publishing the pending scoped notifications of the outermost scope asynchronously.
+        /// </summary>
+        /// <remarks>
+        ///     Everything except the notification publishing runs synchronously, before anything is awaited, so changes to the
+        ///     ambient scope and scope context are visible to the caller.
+        /// </remarks>
+        /// <returns>A task that represents the asynchronous dispose operation.</returns>
+        public override ValueTask DisposeAsync()
+        {
+            // A detachable scope restores the original ambient scope after the notifications are published.
+            if (Detachable)
+            {
+                Dispose();
+                return ValueTask.CompletedTask;
+            }
+
+            ExceptionDispatchInfo? disposeException = null;
+            _deferScopedNotifications = true;
+            try
+            {
+                Dispose();
+            }
+            catch (Exception ex)
+            {
+                disposeException = ExceptionDispatchInfo.Capture(ex);
+            }
+            finally
+            {
+                _deferScopedNotifications = false;
+            }
+
+            if (!_scopedNotificationsDeferred)
+            {
+                disposeException?.Throw();
+                return ValueTask.CompletedTask;
+            }
+
+            _scopedNotificationsDeferred = false;
+            return PublishDeferredScopedNotificationsAsync(disposeException);
+        }
+
         /// <inheritdoc />
         protected override void ChildCompleted(bool? completed)
         {
@@ -580,6 +625,28 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             RobustExit(completed, false);
         }
 
+        private async ValueTask PublishDeferredScopedNotificationsAsync(ExceptionDispatchInfo? disposeException)
+        {
+            try
+            {
+                await HandleScopedNotificationsAsync();
+            }
+            catch (Exception ex)
+            {
+                // Collect the failures of every exit step, as the synchronous dispose does.
+                Exception[] exitExceptions = disposeException?.SourceException switch
+                {
+                    null => [],
+                    AggregateException aggregate => [.. aggregate.InnerExceptions],
+                    { } exception => [exception],
+                };
+
+                throw new AggregateException(exitExceptions.Append(ex));
+            }
+
+            disposeException?.Throw();
+        }
+
         // this chains some try/finally blocks to
         // - complete and dispose the scoped filesystems
         // - deal with events if appropriate
@@ -641,10 +708,21 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 }
             }
 
+            void HandleOrDeferScopedNotifications()
+            {
+                if (_deferScopedNotifications)
+                {
+                    _scopedNotificationsDeferred = true;
+                    return;
+                }
+
+                HandleScopedNotifications();
+            }
+
             TryFinally(
                 HandleScopedFileSystems,
                 HandleScopeContext,
-                HandleScopedNotifications,
+                HandleOrDeferScopedNotifications,
                 HandleDetachedScopes);
         }
 

@@ -270,7 +270,7 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             var savingNotification = new PublicAccessEntrySavingNotification(entry, eventMessages);
             if (await scope.Notifications.PublishCancelableAsync(savingNotification))
@@ -425,7 +425,7 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
     /// <inheritdoc />
     public async Task<Attempt<PublicAccessOperationStatus>> DeleteAsync(Guid key)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             Attempt<PublicAccessEntry?, PublicAccessOperationStatus> attempt = await GetEntryByContentKeyAsync(key);
 

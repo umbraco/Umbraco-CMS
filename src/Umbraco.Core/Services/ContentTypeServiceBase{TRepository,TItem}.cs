@@ -966,7 +966,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <returns>An attempt indicating the operation status.</returns>
     private async Task<Attempt<ContentTypeOperationStatus>> InternalSaveAsync(TItem item, Guid performingUserKey)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         EventMessages eventMessages = EventMessagesFactory.Get();
 
         Attempt<ContentTypeOperationStatus> validationAttempt = ValidateCommon(item);
@@ -1041,7 +1041,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <inheritdoc />
     public async Task<ContentTypeOperationStatus> DeleteAsync(Guid key, Guid performingUserKey)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         int performingUserId = await _userIdKeyResolver.GetAsync(performingUserKey);
 
@@ -1570,7 +1570,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <inheritdoc />
     public async Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         // that one is special because it works across content, media and member types
         scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
@@ -1601,7 +1601,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <inheritdoc />
     public async Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, Guid? parentContentKey, int skip, int take)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         TItem? parent = Get(key);
 
         if (parent?.AllowedContentTypes is null)
@@ -1645,7 +1645,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <inheritdoc/>
     public async Task<Attempt<IEnumerable<Guid>, ContentTypeOperationStatus>> GetAllowedParentKeysAsync(Guid key)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         TItem? content = Get(key);
         if (content is null)

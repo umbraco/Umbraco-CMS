@@ -92,7 +92,7 @@ internal sealed class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
     {
         NuCacheSerializerType serializer = _nucacheSettings.Value.NuCacheSerializerType;
         string? currentSerializerValue;
-        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true))
+        await using (ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             currentSerializerValue = _keyValueService.GetValue(NuCacheSerializerKey);
         }

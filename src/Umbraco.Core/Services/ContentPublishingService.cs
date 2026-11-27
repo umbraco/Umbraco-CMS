@@ -128,7 +128,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         CultureAndScheduleModel cultureAndSchedule,
         Guid userKey)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ContentTree);
         IContent? content = _contentService.GetById(key);
         if (content is null)
@@ -342,7 +342,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         // have access to this (e.g. webhooks).
         using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         IContent? content = _contentService.GetById(key);
         if (content is null)
         {
@@ -416,7 +416,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
     /// <inheritdoc/>
     public async Task<Attempt<ContentPublishingOperationStatus>> UnpublishAsync(Guid key, ISet<string>? cultures, Guid userKey)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         IContent? content = _contentService.GetById(key);
         if (content is null)
         {
@@ -499,7 +499,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
 
     private async Task<Attempt<ContentPublishingOperationStatus>> UnpublishMultipleCultures(IContent content, ISet<string> cultures, int userId)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         if (content.ContentType.VariesByCulture() is false)
         {

@@ -152,7 +152,7 @@ public class BackOfficeUserStore :
             return false;
         }
 
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         // We need to resolve the id from the key here...
         var id = await ResolveEntityIdFromIdentityId(userId);
@@ -275,7 +275,7 @@ public class BackOfficeUserStore :
     {
         EventMessages eventMessages = _eventMessagesFactory.Get();
 
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         var savingNotification = new UserSavingNotification(user, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))

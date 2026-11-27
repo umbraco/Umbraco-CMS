@@ -95,7 +95,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     /// <remarks>Currently implements the paging in memory on the item key property because the underlying repository does not support paging yet.</remarks>
     public async Task<PagedModel<IDictionaryItem>> GetPagedAsync(Guid? parentId, int skip, int take)
     {
-        using ICoreScope coreScope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope coreScope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         if (take == 0)
         {
@@ -225,7 +225,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     /// <inheritdoc />
     public async Task<Attempt<IDictionaryItem?, DictionaryItemOperationStatus>> DeleteAsync(Guid id, Guid userKey)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             IDictionaryItem? dictionaryItem = _dictionaryRepository.Get(id);
             if (dictionaryItem == null)
@@ -271,7 +271,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             return Attempt.FailWithStatus(DictionaryItemOperationStatus.InvalidParent, dictionaryItem);
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             IDictionaryItem? parent = parentId.HasValue ? _dictionaryRepository.Get(parentId.Value) : null;
 
@@ -344,7 +344,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         string auditMessage,
         Guid userKey)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             DictionaryItemOperationStatus status = operationValidation();
             if (status != DictionaryItemOperationStatus.Success)

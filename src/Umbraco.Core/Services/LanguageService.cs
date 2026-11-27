@@ -164,7 +164,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
     /// <inheritdoc />
     public async Task<Attempt<ILanguage?, LanguageOperationStatus>> DeleteAsync(string isoCode, Guid userKey)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             // write-lock languages to guard against race conds when dealing with default language
             scope.WriteLock(Constants.Locks.Languages);
@@ -217,7 +217,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             return Attempt.FailWithStatus(LanguageOperationStatus.InvalidFallbackIsoCode, language);
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             // write-lock languages to guard against race conds when dealing with default language
             scope.WriteLock(Constants.Locks.Languages);

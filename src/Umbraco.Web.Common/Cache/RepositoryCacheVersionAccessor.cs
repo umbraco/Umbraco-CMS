@@ -57,7 +57,7 @@ public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
             return cached;
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
 
         RepositoryCacheVersion? databaseVersion = await _repositoryCacheVersionRepository.GetAsync(cacheKey);
         return Store(cacheKey, databaseVersion, scopeCache);

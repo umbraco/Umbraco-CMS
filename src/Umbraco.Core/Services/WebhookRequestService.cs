@@ -34,7 +34,7 @@ public class WebhookRequestService : IWebhookRequestService
     /// <inheritdoc />
     public async Task<WebhookRequest> CreateAsync(Guid webhookKey, string eventAlias, object? payload)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.WebhookRequest);
         var webhookRequest = new WebhookRequest
         {
@@ -62,7 +62,7 @@ public class WebhookRequestService : IWebhookRequestService
     /// <inheritdoc />
     public async Task DeleteAsync(WebhookRequest webhookRequest)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.WebhookRequest);
         await _webhookRequestRepository.DeleteAsync(webhookRequest);
         scope.Complete();
@@ -71,7 +71,7 @@ public class WebhookRequestService : IWebhookRequestService
     /// <inheritdoc />
     public async Task<WebhookRequest> UpdateAsync(WebhookRequest webhookRequest)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.WebhookRequest);
         WebhookRequest updated = await _webhookRequestRepository.UpdateAsync(webhookRequest);
         scope.Complete();

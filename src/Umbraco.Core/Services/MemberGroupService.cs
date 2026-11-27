@@ -139,7 +139,7 @@ internal sealed class MemberGroupService : RepositoryService, IMemberGroupServic
 
         EventMessages eventMessages = EventMessagesFactory.Get();
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IMemberGroup? existingMemberGroup = await GetAsync(memberGroup.Key);
         if (existingMemberGroup is not null)
         {
@@ -170,7 +170,7 @@ internal sealed class MemberGroupService : RepositoryService, IMemberGroupServic
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IMemberGroup? memberGroup = _memberGroupRepository.Get(key);
 
         if (memberGroup is null)
@@ -203,7 +203,7 @@ internal sealed class MemberGroupService : RepositoryService, IMemberGroupServic
 
         EventMessages eventMessages = EventMessagesFactory.Get();
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         IMemberGroup? existingMemberGroup = await GetByNameAsync(memberGroup.Name!);
 

@@ -297,7 +297,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return;
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         if (SkipDatabaseWrites() is false && ShouldRebuildUrls())
         {
             _logger.LogInformation("Rebuilding all document URLs.");
@@ -361,7 +361,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return;
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
         IEnumerable<IContent> documents = _documentRepository.GetMany(Array.Empty<int>());
@@ -682,7 +682,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return;
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         var toSave = new List<PublishedDocumentUrlSegment>();
 
@@ -941,7 +941,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     /// <inheritdoc/>
     public async Task DeleteUrlsFromCacheAsync(IEnumerable<Guid> documentKeysEnumerable)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
 

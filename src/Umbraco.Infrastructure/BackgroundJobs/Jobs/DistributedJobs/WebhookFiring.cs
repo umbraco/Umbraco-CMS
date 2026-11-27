@@ -73,7 +73,7 @@ internal class WebhookFiring : IDistributedBackgroundJob
         }
 
         IEnumerable<WebhookRequest> requests;
-        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
+        await using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
         {
             scope.ReadLock(Constants.Locks.WebhookRequest);
             requests = await _webhookRequestService.GetAllAsync();

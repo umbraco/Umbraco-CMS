@@ -37,7 +37,7 @@ internal sealed class MemberFilterService : IMemberFilterService
         int skip = 0,
         int take = 100)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
         return await _repository.GetPagedByFilterAsync(filter, skip, take, Ordering.By(orderBy, orderDirection));
     }
 }

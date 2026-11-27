@@ -518,7 +518,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     /// <inheritdoc />
     public async Task RefreshMediaAsync(IMedia media)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         if (media.Trashed)
         {
@@ -538,7 +538,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     /// <inheritdoc />
     public async Task DeleteItemAsync(IContentBase media)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
         await _databaseCacheRepository.DeleteContentItemAsync(media.Id);
         scope.Complete();
     }
@@ -575,7 +575,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
                 continue;
             }
 
-            using ICoreScope scope = _scopeProvider.CreateCoreScope();
+            await using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             // Materialized because the repository defers deserialization of each node until it is enumerated,
             // and the sequence is walked more than once below.
@@ -617,7 +617,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     /// <inheritdoc />
     public async Task RefreshMemoryCacheAsync(Guid key)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         ContentCacheNode? publishedNode = await _databaseCacheRepository.GetMediaSourceAsync(key);
         if (publishedNode is not null)

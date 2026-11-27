@@ -45,4 +45,17 @@ public interface IScopedNotificationPublisher
     /// </summary>
     /// <param name="completed"></param>
     void ScopeExit(bool completed);
+
+    /// <summary>
+    ///     Invokes publishing of all pending notifications within the current scope asynchronously.
+    /// </summary>
+    /// <param name="completed">Whether the scope completed; pending notifications are only published when it did.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    // TODO (V20): Remove the default implementation.
+    Task ScopeExitAsync(bool completed, CancellationToken cancellationToken = default)
+    {
+        ScopeExit(completed);
+        return Task.CompletedTask;
+    }
 }

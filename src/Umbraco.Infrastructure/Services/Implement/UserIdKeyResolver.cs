@@ -61,7 +61,7 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
             }
 
             // Still not here, so actually fetch it now
-            using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+            await using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
             ISqlContext sqlContext = scope.SqlContext;
 
             Sql<ISqlContext> query = sqlContext.Sql()
@@ -112,7 +112,7 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
                 return Attempt.Succeed(recheckedKey);
             }
 
-            using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+            await using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
             ISqlContext sqlContext = scope.SqlContext;
 
             Sql<ISqlContext> query = sqlContext.Sql()

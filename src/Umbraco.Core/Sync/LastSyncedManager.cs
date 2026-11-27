@@ -60,7 +60,7 @@ internal sealed class LastSyncedManager : ILastSyncedManager
             return _lastSyncedExternalId;
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         _lastSyncedExternalId = await _lastSyncedRepository.GetExternalIdAsync();
         scope.Complete();
 
@@ -87,7 +87,7 @@ internal sealed class LastSyncedManager : ILastSyncedManager
             throw new ArgumentException("Invalid last synced id. Must be non-negative.");
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         await _lastSyncedRepository.SaveExternalIdAsync(id);
         _lastSyncedExternalId = id;
         scope.Complete();
@@ -96,7 +96,7 @@ internal sealed class LastSyncedManager : ILastSyncedManager
     /// <inheritdoc/>
     public async Task DeleteOlderThanAsync(DateTime date)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         await _lastSyncedRepository.DeleteEntriesOlderThanAsync(date);
         scope.Complete();
     }

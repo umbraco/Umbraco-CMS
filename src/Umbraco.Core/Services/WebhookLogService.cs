@@ -26,7 +26,7 @@ public class WebhookLogService : IWebhookLogService
     /// <inheritdoc />
     public async Task<WebhookLog> CreateAsync(WebhookLog webhookLog)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         await _webhookLogRepository.CreateAsync(webhookLog);
         scope.Complete();
 
@@ -36,14 +36,14 @@ public class WebhookLogService : IWebhookLogService
     /// <inheritdoc />
     public async Task<PagedModel<WebhookLog>> Get(int skip = 0, int take = int.MaxValue)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
         return await _webhookLogRepository.GetPagedAsync(skip, take);
     }
 
     /// <inheritdoc />
     public async Task<PagedModel<WebhookLog>> Get(Guid webhookKey, int skip = 0, int take = int.MaxValue)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
         return await _webhookLogRepository.GetPagedAsync(webhookKey, skip, take);
     }
 }

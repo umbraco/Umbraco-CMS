@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Collections.Concurrent;
+using System.Reflection;
 using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Core.Events;
@@ -26,10 +28,13 @@ public class ScopedNotificationPublisher : ScopedNotificationPublisher<INotifica
 public class ScopedNotificationPublisher<TNotificationHandler> : IScopedNotificationPublisher
     where TNotificationHandler : INotificationHandler
 {
+    private static readonly ConcurrentDictionary<Type, bool> _publishScopedNotificationsIsOverriddenByType = new();
+
     private readonly IEventAggregator _eventAggregator;
     private readonly List<INotification> _notificationOnScopeCompleted = new List<INotification>();
     private readonly bool _publishCancelableNotificationOnScopeExit;
     private readonly Lock _locker = new();
+    private readonly bool _publishScopedNotificationsIsOverridden;
     private bool _isSuppressed;
 
     /// <summary>
@@ -41,6 +46,11 @@ public class ScopedNotificationPublisher<TNotificationHandler> : IScopedNotifica
     {
         _eventAggregator = eventAggregator;
         _publishCancelableNotificationOnScopeExit |= publishCancelableNotificationOnScopeExit;
+
+        // A subclass that customizes the synchronous publishing keeps getting called when the scope exits asynchronously.
+        _publishScopedNotificationsIsOverridden = _publishScopedNotificationsIsOverriddenByType.GetOrAdd(GetType(), static type => type
+            .GetMethod(nameof(PublishScopedNotifications), BindingFlags.Instance | BindingFlags.NonPublic, [typeof(IList<INotification>)])?
+            .DeclaringType != typeof(ScopedNotificationPublisher<TNotificationHandler>));
     }
 
     /// <inheritdoc />
@@ -121,6 +131,22 @@ public class ScopedNotificationPublisher<TNotificationHandler> : IScopedNotifica
     }
 
     /// <inheritdoc />
+    public async Task ScopeExitAsync(bool completed, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (completed)
+            {
+                await PublishScopedNotificationsAsync(_notificationOnScopeCompleted, cancellationToken);
+            }
+        }
+        finally
+        {
+            _notificationOnScopeCompleted.Clear();
+        }
+    }
+
+    /// <inheritdoc />
     public IDisposable Suppress()
     {
         lock (_locker)
@@ -140,6 +166,23 @@ public class ScopedNotificationPublisher<TNotificationHandler> : IScopedNotifica
     /// <param name="notifications">The notifications to publish.</param>
     protected virtual void PublishScopedNotifications(IList<INotification> notifications)
         => _eventAggregator.Publish<INotification, TNotificationHandler>(notifications);
+
+    /// <summary>
+    ///     Publishes all pending scoped notifications asynchronously.
+    /// </summary>
+    /// <param name="notifications">The notifications to publish.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    protected virtual Task PublishScopedNotificationsAsync(IList<INotification> notifications, CancellationToken cancellationToken)
+    {
+        if (_publishScopedNotificationsIsOverridden)
+        {
+            PublishScopedNotifications(notifications);
+            return Task.CompletedTask;
+        }
+
+        return _eventAggregator.PublishAsync<INotification, TNotificationHandler>(notifications, cancellationToken);
+    }
 
     /// <summary>
     ///     A disposable class that suppresses notifications until disposed.

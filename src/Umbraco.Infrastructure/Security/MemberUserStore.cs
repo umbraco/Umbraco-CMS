@@ -145,7 +145,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
             UpdateMemberProperties(memberEntity, user, out bool _);
 
-            using ICoreScope scope = _scopeProvider.CreateCoreScope();
+            await using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             // save the member
             Attempt<OperationResult?> saveAttempt = _memberService.Save(memberEntity, PublishNotificationSaveOptions.Saving);
@@ -235,7 +235,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             // Read outside the write scope to avoid a read-to-write lock deadlock (see #24309).
             IMember? found = _memberService.GetById(asInt);
 
-            using ICoreScope scope = _scopeProvider.CreateCoreScope();
+            await using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             if (found != null)
             {

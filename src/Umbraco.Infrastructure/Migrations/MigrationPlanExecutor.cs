@@ -308,7 +308,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         // execution. This is because if a package that doesn't have their migration plan
         // executed is listening to service notifications to perform some persistence logic,
         // that packages notification handlers may explode because that package isn't fully installed yet.
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
         using (scope.Notifications.Suppress())
         {
             var context = new MigrationContext(

@@ -40,7 +40,7 @@ public class TwoFactorLoginService : ITwoFactorLoginService
     /// <inheritdoc />
     public async Task DeleteUserLoginsAsync(Guid userOrMemberKey)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
         await _twoFactorLoginRepository.DeleteUserLoginsAsync(userOrMemberKey);
 
         scope.Complete();
@@ -57,7 +57,7 @@ public class TwoFactorLoginService : ITwoFactorLoginService
     /// <inheritdoc />
     public async Task<string?> GetSecretForUserAndProviderAsync(Guid userOrMemberKey, string providerName)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
         return (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey))
             .FirstOrDefault(x => x.ProviderName == providerName)?.Secret;
     }
@@ -68,7 +68,7 @@ public class TwoFactorLoginService : ITwoFactorLoginService
     /// <inheritdoc />
     public async Task<bool> DisableAsync(Guid userOrMemberKey, string providerName)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope();
         var result = await _twoFactorLoginRepository.DeleteUserLoginsAsync(userOrMemberKey, providerName);
 
         scope.Complete();
@@ -105,7 +105,7 @@ public class TwoFactorLoginService : ITwoFactorLoginService
 
     private async Task<IEnumerable<string>> GetEnabledProviderNamesAsync(Guid userOrMemberKey)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        await using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
         var providersOnUser = (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey))
             .Select(x => x.ProviderName).ToArray();
 
