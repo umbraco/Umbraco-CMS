@@ -146,6 +146,12 @@ public class BackOfficeGraphicsController : Controller
 
         if (_contentTypeProvider.TryGetContentType(fileInfo.PhysicalPath, out var contentType))
         {
+            Response.GetTypedHeaders().CacheControl = new CacheControlHeaderValue
+            {
+                Public = true,
+                MaxAge = TimeSpan.FromDays(1),
+            };
+
             Stream fileStream = fileInfo.CreateReadStream();
             return File(fileStream, contentType, fileInfo.LastModified, CreateEntityTag(fileInfo));
         }
