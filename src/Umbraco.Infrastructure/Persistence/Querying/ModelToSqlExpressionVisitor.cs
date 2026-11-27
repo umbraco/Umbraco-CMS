@@ -117,10 +117,7 @@ internal sealed class ModelToSqlExpressionVisitor<T> : ExpressionVisitorBase
         var toString = typeof(object).GetMethod("ToString");
         var member = Expression.Call(m, toString);
         */
-        UnaryExpression member = Expression.Convert(m, typeof(object));
-        var lambda = Expression.Lambda<Func<object>>(member);
-        Func<object> getter = lambda.Compile();
-        var o = getter();
+        var o = ExpressionValueEvaluator.GetValue(m)!;
 
         SqlParameters.Add(o);
 
