@@ -1,9 +1,6 @@
-export interface UmbPermissionDenyReason {
-	/** A localization key or text. */
-	title: string;
-	/** A localization key or text. */
-	detail?: string;
-}
+import type { UmbReason } from '@umbraco-cms/backoffice/utils';
+
+export type UmbPermissionDenyReason = UmbReason;
 
 /**
  * Allows or denies permission verbs, such as `Umb.Document.Update`, within the scope its type defines.
