@@ -748,6 +748,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				id: item.unique,
 				icon: item.mediaType.icon,
 				selectable: selectableInTable,
+				selectOnly: canNavigate && !this._isSelectionMode ? false : undefined,
 				data: [
 					{
 						columnAlias: 'name',

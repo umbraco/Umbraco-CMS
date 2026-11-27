@@ -135,6 +135,23 @@ describe('UmbTableElement', () => {
 			expect(getRow('1').hasAttribute('select-only')).to.be.true;
 			expect(getRow('2').hasAttribute('select-only')).to.be.false;
 		});
+
+		it('presents selection visuals on selectable rows while a selection exists', async () => {
+			element.items = items(['1', '2']);
+			element.selection = ['1'];
+			await element.updateComplete;
+
+			expect(getRow('2').hasAttribute('data-selection-mode')).to.be.true;
+		});
+
+		it('keeps rows that cannot be selected out of selection visuals', async () => {
+			// A non-selectable row has no checkbox to present, so selection mode must not hide its icon either.
+			element.items = [item('1'), item('2', { selectable: false })];
+			element.selection = ['1'];
+			await element.updateComplete;
+
+			expect(getRow('2').hasAttribute('data-selection-mode')).to.be.false;
+		});
 	});
 
 	describe('children indicator', () => {

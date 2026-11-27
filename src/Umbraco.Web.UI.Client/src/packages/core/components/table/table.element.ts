@@ -433,7 +433,7 @@ export class UmbTableElement extends UmbLitElement {
 
 	private _renderRow = (item: UmbTableItem) => {
 		const isItemSelectable = this.#isSelectableItem(item);
-		const selectionMode = this._selectionMode || this.config.selectOnly === true;
+		const selectionMode = (this._selectionMode && isItemSelectable) || this.config.selectOnly === true;
 		return html`
 			<uui-table-row
 				${ref(this.#getRowRenderedCallback(item))}
