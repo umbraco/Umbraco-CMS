@@ -15,6 +15,12 @@ export interface UmbPropertyValueResolver<
 	processVariants?: UmbPropertyValueResolverVariantsProcessor<PropertyValueType, InnerVariantType>;
 	//ensureVariants?: UmbPropertyValueResolverEnsureVariants<PropertyValueType>;
 	compareVariants?: (a: InnerVariantType, b: InnerVariantType) => boolean;
+	/**
+	 * Returns a key that is equal for two variants exactly when `compareVariants` considers them equal.
+	 * Lets large lists of variants be matched by lookup instead of comparing every pair.
+	 * Only used together with `compareVariants`; without it, variants are matched by comparing pairs.
+	 */
+	variantKey?: (variant: InnerVariantType) => string;
 }
 
 export type UmbPropertyValueResolverValuesProcessor<

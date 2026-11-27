@@ -56,5 +56,9 @@ export abstract class UmbBlockValueResolver<ValueType> implements UmbPropertyVal
 		return a.contentKey === b.contentKey && a.culture === b.culture && a.segment === b.segment;
 	}
 
+	variantKey(variant: UmbBlockExposeModel) {
+		return `${variant.contentKey}|${variant.culture}|${variant.segment}`;
+	}
+
 	destroy(): void {}
 }

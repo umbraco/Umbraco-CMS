@@ -1,9 +1,22 @@
 import type { UmbPropertyValueDataPotentiallyWithEditorAlias } from '../index.js';
+import type { ManifestPropertyValueResolver } from '../property-value-resolver/property-value-resolver.extension.js';
+import type { ManifestPropertyValueCloner } from './property-value-cloner.extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionsManifestCache } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbPropertyValueCloneController extends UmbControllerBase {
+	#cloners = new UmbExtensionsManifestCache<ManifestPropertyValueCloner>(
+		this,
+		'propertyValueCloner',
+		(manifest, editorAlias) => manifest.forEditorAlias === editorAlias,
+	);
+	#resolvers = new UmbExtensionsManifestCache<ManifestPropertyValueResolver>(
+		this,
+		'propertyValueResolver',
+		(manifest, editorAlias) => manifest.forEditorAlias === editorAlias,
+	);
+
 	/**
 	 * Clones the property data.
 	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} property - The property data.
@@ -35,12 +48,7 @@ export class UmbPropertyValueCloneController extends UmbControllerBase {
 			return incomingProperty;
 		}
 
-		// Find the cloner for this editor alias:
-		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
-			'propertyValueCloner',
-			(x) => x.forEditorAlias === editorAlias,
-		)[0];
-
+		const manifest = this.#cloners.getManifests(editorAlias)[0];
 		if (!manifest) {
 			return incomingProperty;
 		}
@@ -50,7 +58,8 @@ export class UmbPropertyValueCloneController extends UmbControllerBase {
 			return incomingProperty;
 		}
 
-		(api as any).manifest = manifest;
+		// TODO: Setting the manifest on the api is legacy, the implementation should not have to do this. [NL]
+		(api as { manifest?: ManifestPropertyValueCloner }).manifest = manifest;
 
 		let clonedProperty = incomingProperty;
 
@@ -72,12 +81,7 @@ export class UmbPropertyValueCloneController extends UmbControllerBase {
 			return incomingProperty;
 		}
 
-		// Find the resolver for this editor alias:
-		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
-			'propertyValueResolver',
-			(x) => x.forEditorAlias === editorAlias,
-		)[0];
-
+		const manifest = this.#resolvers.getManifests(editorAlias)[0];
 		if (!manifest) {
 			return incomingProperty;
 		}
@@ -87,7 +91,8 @@ export class UmbPropertyValueCloneController extends UmbControllerBase {
 			return incomingProperty;
 		}
 
-		(api as any).manifest = manifest;
+		// TODO: Setting the manifest on the api is legacy, the implementation should not have to do this. [NL]
+		api.manifest = manifest;
 
 		if (api.processValues) {
 			return (
