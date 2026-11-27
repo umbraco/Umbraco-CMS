@@ -5,12 +5,14 @@ using Examine;
 using Examine.Lucene;
 using Examine.Lucene.Providers;
 using Lucene.Net.Documents;
+using Lucene.Net.Store;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
+using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
@@ -22,6 +24,7 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
     private readonly UmbracoExamineIndexDiagnostics _diagnostics;
     private readonly ILogger<UmbracoExamineIndex> _logger;
     private readonly IRuntimeState _runtimeState;
+    private readonly System.Threading.Lock _recoveryLock = new();
     private bool _hasLoggedInitLog;
 
     protected UmbracoExamineIndex(
@@ -57,6 +60,45 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
 
     /// <inheritdoc />
     public virtual string UniqueKeyFieldName => UmbracoExamineFieldNames.NodeKeyFieldName;
+
+    // TODO: Remove RepopulationRequired and the Searcher/CreateIndex recovery overrides once Examine recovers from
+    // index files removed from disk itself: https://github.com/Shazwazza/Examine/issues/629
+
+    /// <summary>
+    ///     Raised when the index has been cleared to recover from an unreadable state, and needs to be repopulated.
+    /// </summary>
+    internal event EventHandler? RepopulationRequired;
+
+    /// <inheritdoc />
+    /// <remarks>
+    ///     If files of the index have been removed from disk while the index is in use, the index is cleared so that it
+    ///     can be searched again, and is then repopulated.
+    /// </remarks>
+    public override ISearcher Searcher
+    {
+        get
+        {
+            try
+            {
+                return base.Searcher;
+            }
+            catch (Exception exception) when (IsMissingIndexFile(exception))
+            {
+                return RecoverSearcher(exception);
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    /// <remarks>
+    ///     Recreates the index folder on disk if it has been removed while the index is in use, so that clearing the
+    ///     index can commit and a subsequent rebuild restores it.
+    /// </remarks>
+    public override void CreateIndex()
+    {
+        EnsureIndexFolderExists();
+        base.CreateIndex();
+    }
 
     /// <summary>
     ///     override to check if we can actually initialize.
@@ -96,6 +138,53 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
 
         return canInit;
     }
+
+    private static bool IsMissingIndexFile(Exception exception)
+        => exception is FileNotFoundException or DirectoryNotFoundException;
+
+    private ISearcher RecoverSearcher(Exception missingFileException)
+    {
+        lock (_recoveryLock)
+        {
+            try
+            {
+                // Another caller may have recovered the index while this one waited for the lock.
+                return base.Searcher;
+            }
+            catch (Exception exception) when (IsMissingIndexFile(exception))
+            {
+            }
+
+            _logger.LogWarning(
+                missingFileException,
+                "Files of the index {IndexName} are missing from disk. The index will be cleared and repopulated.",
+                Name);
+
+            CreateIndex();
+            ISearcher searcher = base.Searcher;
+            RepopulationRequired?.Invoke(this, EventArgs.Empty);
+            return searcher;
+        }
+    }
+
+    private void EnsureIndexFolderExists()
+    {
+        // Lucene only recreates a missing folder based on an existence check it has cached, so a folder removed
+        // from disk after the directory was opened is never recreated and every commit fails.
+        if (GetFileSystemDirectory(GetLuceneDirectory()) is { } fileSystemDirectory)
+        {
+            System.IO.Directory.CreateDirectory(fileSystemDirectory.Directory.FullName);
+        }
+    }
+
+    private static FSDirectory? GetFileSystemDirectory(Directory directory)
+        => directory switch
+        {
+            FSDirectory fileSystemDirectory => fileSystemDirectory,
+            NRTCachingDirectory nrtCachingDirectory => GetFileSystemDirectory(nrtCachingDirectory.Delegate),
+            FilterDirectory filterDirectory => GetFileSystemDirectory(filterDirectory.Delegate),
+            _ => null,
+        };
 
     /// <summary>
     ///     This ensures that the special __Raw_ fields are indexed correctly

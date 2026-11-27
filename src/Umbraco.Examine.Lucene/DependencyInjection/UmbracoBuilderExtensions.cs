@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 
@@ -57,6 +58,8 @@ public static class UmbracoBuilderExtensions
         services.AddSingleton<IApplicationRoot, UmbracoApplicationRoot>();
         services.AddSingleton<ILockFactory, UmbracoLockFactory>();
         services.AddSingleton<ConfigurationEnabledDirectoryFactory>();
+
+        umbracoBuilder.AddNotificationHandler<UmbracoApplicationStartedNotification, RebuildOnRepopulationRequiredHandler>();
 
         return umbracoBuilder;
     }
