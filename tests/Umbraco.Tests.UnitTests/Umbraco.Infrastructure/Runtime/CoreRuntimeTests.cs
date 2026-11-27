@@ -500,6 +500,8 @@ public class CoreRuntimeTests
         mock.Setup(x => x.PublishAsync(It.IsAny<UmbracoApplicationStoppedNotification>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         mock.Setup(x => x.Publish(It.IsAny<INotification>()));
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

@@ -30,7 +30,9 @@ internal class ContentVersionCleanupServiceTest
         documentVersionRepository.Setup(x => x.GetContentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(someHistoricVersions);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         eventAggregator.Setup(x => x.PublishCancelable(It.IsAny<ContentDeletingVersionsNotification>()))
+#pragma warning restore CS0618 // Type or member is obsolete
             .Returns(true);
 
         policy.Setup(x => x.Apply(aDateTime, someHistoricVersions))
@@ -42,7 +44,9 @@ internal class ContentVersionCleanupServiceTest
         Assert.Multiple(() =>
         {
             eventAggregator.Verify(
+#pragma warning disable CS0618 // Type or member is obsolete
                 x => x.PublishCancelable(
+#pragma warning restore CS0618 // Type or member is obsolete
                     It.IsAny<ContentDeletingVersionsNotification>()),
                 Times.Exactly(someHistoricVersions.Count));
             Assert.AreEqual(0, report.Count);
@@ -63,7 +67,9 @@ internal class ContentVersionCleanupServiceTest
             .Returns(someHistoricVersions);
 
         eventAggregator
+#pragma warning disable CS0618 // Type or member is obsolete
             .Setup(x => x.PublishCancelable(It.IsAny<ICancelableNotification>()))
+#pragma warning restore CS0618 // Type or member is obsolete
             .Returns(false);
 
         policy.Setup(x => x.Apply(aDateTime, someHistoricVersions))
@@ -89,7 +95,9 @@ internal class ContentVersionCleanupServiceTest
             .Returns(someHistoricVersions);
 
         eventAggregator
+#pragma warning disable CS0618 // Type or member is obsolete
             .Setup(x => x.PublishCancelable(It.IsAny<ICancelableNotification>()))
+#pragma warning restore CS0618 // Type or member is obsolete
             .Returns(false);
 
         // # Act
@@ -116,7 +124,9 @@ internal class ContentVersionCleanupServiceTest
             .Returns(someHistoricVersions);
 
         eventAggregator
+#pragma warning disable CS0618 // Type or member is obsolete
             .Setup(x => x.PublishCancelable(It.IsAny<ICancelableNotification>()))
+#pragma warning restore CS0618 // Type or member is obsolete
             .Returns(false);
 
         policy.Setup(x => x.Apply(It.IsAny<DateTime>(), It.IsAny<IEnumerable<ContentVersionMeta>>()))
@@ -148,7 +158,9 @@ internal class ContentVersionCleanupServiceTest
             .Returns(someHistoricVersions);
 
         eventAggregator
+#pragma warning disable CS0618 // Type or member is obsolete
             .Setup(x => x.PublishCancelable(It.IsAny<ICancelableNotification>()))
+#pragma warning restore CS0618 // Type or member is obsolete
             .Returns(false);
 
         var filteredSet = someHistoricVersions.Take(1);

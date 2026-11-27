@@ -352,6 +352,7 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         return result;
     }
 
+    [Obsolete("Use NotifyRequiresTwoFactorAsync instead. Scheduled for removal in Umbraco 21.")]
     protected void NotifyRequiresTwoFactor(BackOfficeIdentityUser user) => Notify(user, currentUser => new UserTwoFactorRequestedNotification(currentUser.Key));
 
     /// <summary>
@@ -365,7 +366,9 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         where T : INotification
     {
         T notification = createNotification(currentUser);
+#pragma warning disable CS0618 // Type or member is obsolete
         _eventAggregator.Publish(notification);
+#pragma warning restore CS0618 // Type or member is obsolete
         return notification;
     }
 

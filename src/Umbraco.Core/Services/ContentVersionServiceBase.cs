@@ -211,6 +211,7 @@ internal abstract class ContentVersionServiceBase<TContent>
         }
     }
 
+#pragma warning disable CS0618 // Type or member is obsolete
     private IReadOnlyCollection<ContentVersionMeta> CleanupItemVersions(DateTime asAtDate)
     {
         List<ContentVersionMeta> versionsToDelete;
@@ -327,15 +328,14 @@ internal abstract class ContentVersionServiceBase<TContent>
 
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-#pragma warning disable CS0618 // Type or member is obsolete
             Audit(AuditType.Delete, Constants.Security.SuperUserId, -1, $"Removed {versionsToDelete.Count} ContentVersion(s) according to cleanup policy");
-#pragma warning restore CS0618 // Type or member is obsolete
 
             scope.Complete();
         }
 
         return versionsToDelete;
     }
+#pragma warning restore CS0618 // Type or member is obsolete
 
     private void Audit(AuditType type, int userId, int objectId, string? message = null, string? parameters = null) =>
         AuditAsync(type, userId, objectId, message, parameters).GetAwaiter().GetResult();

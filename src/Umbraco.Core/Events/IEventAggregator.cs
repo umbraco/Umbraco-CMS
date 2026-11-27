@@ -16,6 +16,7 @@ public interface IEventAggregator
     /// </summary>
     /// <typeparam name="TNotification">The type of notification being handled.</typeparam>
     /// <param name="notification">The notification object.</param>
+    [Obsolete("Use PublishAsync instead. Scheduled for removal in Umbraco 21.")]
     void Publish<TNotification>(TNotification notification) // TODO Convert to extension method
         where TNotification : INotification;
 
@@ -25,6 +26,7 @@ public interface IEventAggregator
     /// <typeparam name="TNotification">The type of notification being handled.</typeparam>
     /// <typeparam name="TNotificationHandler">The type of the notification handler.</typeparam>
     /// <param name="notifications">The notification objects.</param>
+    [Obsolete("Use PublishAsync instead. Scheduled for removal in Umbraco 21.")]
     void Publish<TNotification, TNotificationHandler>(IEnumerable<TNotification> notifications)
         where TNotification : INotification
         where TNotificationHandler : INotificationHandler;
@@ -63,6 +65,7 @@ public interface IEventAggregator
     /// <returns>
     ///   <c>true</c> if the notification was cancelled by a subscriber; otherwise, <c>false</c>.
     /// </returns>
+    [Obsolete("Use PublishCancelableAsync instead. Scheduled for removal in Umbraco 21.")]
     bool PublishCancelable<TCancelableNotification>(TCancelableNotification notification)
         where TCancelableNotification : ICancelableNotification;
 
@@ -89,6 +92,7 @@ public static class EventAggregatorExtensions
     /// <typeparam name="TNotification">The type of notification being handled.</typeparam>
     /// <param name="eventAggregator">The event aggregator.</param>
     /// <param name="notifications">The notification objects.</param>
+    [Obsolete("Use PublishAsync instead. Scheduled for removal in Umbraco 21.")]
     public static void Publish<TNotification>(this IEventAggregator eventAggregator, IEnumerable<TNotification> notifications)
         where TNotification : INotification
         => eventAggregator.Publish<TNotification, INotificationHandler>(notifications);
@@ -100,6 +104,7 @@ public static class EventAggregatorExtensions
     /// <typeparam name="TNotificationHandler">The type of the notification handler.</typeparam>
     /// <param name="eventAggregator">The event aggregator.</param>
     /// <param name="notification">The notification.</param>
+    [Obsolete("Use PublishAsync instead. Scheduled for removal in Umbraco 21.")]
     public static void Publish<TNotification, TNotificationHandler>(this IEventAggregator eventAggregator, TNotification notification)
         where TNotification : INotification
         where TNotificationHandler : INotificationHandler

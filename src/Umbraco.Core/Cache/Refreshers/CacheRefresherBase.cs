@@ -101,7 +101,9 @@ public abstract class CacheRefresherBase<TNotification> : ICacheRefresher
     /// <summary>
     ///     Raises the CacheUpdated event.
     /// </summary>
+#pragma warning disable CS0618 // Type or member is obsolete
     protected void OnCacheUpdated(CacheRefresherNotification notification) => EventAggregator.Publish(notification);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     #endregion
 }

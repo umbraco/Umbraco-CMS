@@ -29,19 +29,27 @@ public class ScopedNotificationPublisherTests
         using (ICoreScope scope = scopeProvider.CreateScope(notificationPublisher: notificationPublisherMock.Object))
         {
             scope.Notifications.Publish(Mock.Of<INotification>());
+#pragma warning disable CS0618 // Type or member is obsolete
             scope.Notifications.PublishCancelable(Mock.Of<ICancelableNotification>());
+#pragma warning restore CS0618 // Type or member is obsolete
 
             notificationPublisherMock.Verify(x => x.Publish(It.IsAny<INotification>()), Times.Once);
+#pragma warning disable CS0618 // Type or member is obsolete
             notificationPublisherMock.Verify(x => x.PublishCancelable(It.IsAny<ICancelableNotification>()), Times.Once);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             // Ensure that the custom scope provider is till used in inner scope.
             using (ICoreScope innerScope = scopeProvider.CreateScope())
             {
                 innerScope.Notifications.Publish(Mock.Of<INotification>());
+#pragma warning disable CS0618 // Type or member is obsolete
                 innerScope.Notifications.PublishCancelable(Mock.Of<ICancelableNotification>());
+#pragma warning restore CS0618 // Type or member is obsolete
 
                 notificationPublisherMock.Verify(x => x.Publish(It.IsAny<INotification>()), Times.Exactly(2));
+#pragma warning disable CS0618 // Type or member is obsolete
                 notificationPublisherMock.Verify(x => x.PublishCancelable(It.IsAny<ICancelableNotification>()), Times.Exactly(2));
+#pragma warning restore CS0618 // Type or member is obsolete
             }
 
             // Ensure scope exit is not called until outermost scope is being disposed
@@ -51,8 +59,10 @@ public class ScopedNotificationPublisherTests
         notificationPublisherMock.Verify(x => x.ScopeExit(It.IsAny<bool>()), Times.Once());
 
         // Ensure that the event aggregator isn't used directly.
+#pragma warning disable CS0618 // Type or member is obsolete
         eventAggregatorMock.Verify(x => x.Publish(It.IsAny<INotification>()), Times.Never);
         eventAggregatorMock.Verify(x => x.PublishCancelable(It.IsAny<ICancelableNotification>()), Times.Never);
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     [Test]

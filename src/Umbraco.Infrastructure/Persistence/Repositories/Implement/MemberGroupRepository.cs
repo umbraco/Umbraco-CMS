@@ -103,7 +103,9 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
         PersistNewItem(grp);
 
         EventMessages evtMsgs = _eventMessagesFactory.Get();
+#pragma warning disable CS0618 // Type or member is obsolete
         if (AmbientScope.Notifications.PublishCancelable(new MemberGroupSavingNotification(grp, evtMsgs)))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             return null;
         }
@@ -288,7 +290,9 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
         MemberGroup[] missingGroups = [.. missingRoles.Select(x => new MemberGroup { Name = x })];
 
         EventMessages evtMsgs = _eventMessagesFactory.Get();
+#pragma warning disable CS0618 // Type or member is obsolete
         if (AmbientScope.Notifications.PublishCancelable(new MemberGroupSavingNotification(missingGroups, evtMsgs)))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
             return;
         }

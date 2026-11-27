@@ -21,6 +21,7 @@ public interface IScopedNotificationPublisher
     /// </summary>
     /// <param name="notification"></param>
     /// <returns>True if the notification was cancelled by a subscriber, false otherwise</returns>
+    [Obsolete("Use PublishCancelableAsync instead. Scheduled for removal in Umbraco 21.")]
     bool PublishCancelable(ICancelableNotification notification);
 
     /// <summary>
