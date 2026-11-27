@@ -28,8 +28,14 @@ public interface IPublishStatusQueryService
     bool HasPublishedAncestorPath(Guid documentKey);
 
     /// <summary>
-    /// Verifies if a document has a published ancestor path (i.e. all ancestors are themselves published in at specific culture).
+    /// Verifies if a document has a published ancestor path in a specific culture.
     /// </summary>
+    /// <remarks>
+    /// A domain assigned for the culture starts the culture's route. Ancestors therefore need to be published in the
+    /// culture from the nearest one up to and including the nearest one that has a (non-wildcard) domain for the culture,
+    /// or up to the root when there is none. When the document itself has a domain for the culture, its ancestors do not
+    /// need to be published in the culture. A document that is not in the content tree has no published ancestor path.
+    /// </remarks>
     /// <param name="documentKey">The document's key.</param>
     /// <param name="culture">The culture.</param>
     /// <returns>True if document has a published ancestor path.</returns>
