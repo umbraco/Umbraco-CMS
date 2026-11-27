@@ -1392,7 +1392,8 @@ namespace Umbraco.Cms.Core.Services
                 return;
             }
 
-            if (scope.Notifications.PublishCancelable(new MemberDeletingNotification(members, evtMsgs)))
+            var deletingNotification = new MemberDeletingNotification(members, evtMsgs);
+            if (scope.Notifications.PublishCancelable(deletingNotification))
             {
                 scope.Complete();
                 return;
@@ -1402,7 +1403,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 // delete media
                 // triggers the deleted event (and handles the files)
-                DeleteLocked(scope, member, evtMsgs);
+                DeleteLocked(scope, member, evtMsgs, deletingNotification.State);
             }
 
             scope.Complete();
