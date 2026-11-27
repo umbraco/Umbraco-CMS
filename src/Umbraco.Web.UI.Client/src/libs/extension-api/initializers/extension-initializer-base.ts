@@ -16,6 +16,9 @@ export abstract class UmbExtensionInitializerBase<
 	protected host: UmbElement;
 	protected extensionRegistry: UmbExtensionRegistry<T>;
 	#extensionMap = new Map();
+	// One per instantiated extension, aborted when it is unloaded, so an instantiation that is still loading its
+	// module can tell it is no longer wanted.
+	#instantiations = new Map<string, AbortController>();
 
 	// Use the value `undefined`, as that would not resolve a observation promise. [NL]
 	#loaded = new UmbBooleanState(undefined);
@@ -60,6 +63,8 @@ export abstract class UmbExtensionInitializerBase<
 
 				this.#extensionMap.forEach((existingExt) => {
 					if (!extensions.find((b) => b.alias === existingExt.alias)) {
+						this.#instantiations.get(existingExt.alias)?.abort();
+						this.#instantiations.delete(existingExt.alias);
 						this.unloadExtension(existingExt);
 						this.#extensionMap.delete(existingExt.alias);
 					}
@@ -72,7 +77,9 @@ export abstract class UmbExtensionInitializerBase<
 					extensions.map((extension) => {
 						if (this.#extensionMap.has(extension.alias)) return;
 						this.#extensionMap.set(extension.alias, extension);
-						return this.instantiateExtension(extension);
+						const instantiation = new AbortController();
+						this.#instantiations.set(extension.alias, instantiation);
+						return this.instantiateExtension(extension, instantiation.signal);
 					}),
 				);
 
@@ -95,8 +102,12 @@ export abstract class UmbExtensionInitializerBase<
 
 	/**
 	 * Perform any logic required to instantiate the extension.
+	 * @param {T} manifest The manifest of the extension to instantiate.
+	 * @param {AbortSignal} [signal] Aborted when the extension is unloaded. An instantiation that awaits something,
+	 * such as loading the extension's module, should check it afterwards and stop if it is aborted, as the
+	 * extension has been unloaded in the meantime.
 	 */
-	abstract instantiateExtension(manifest: T): Promise<void> | void;
+	abstract instantiateExtension(manifest: T, signal?: AbortSignal): Promise<void> | void;
 
 	/**
 	 * Perform any logic required to unload the extension.

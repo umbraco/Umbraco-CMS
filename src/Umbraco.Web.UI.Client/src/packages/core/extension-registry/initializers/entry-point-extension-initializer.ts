@@ -19,13 +19,13 @@ export class UmbEntryPointExtensionInitializer extends UmbExtensionInitializerBa
 		super(host, extensionRegistry, 'entryPoint' satisfies ManifestEntryPoint['type']);
 	}
 
-	async instantiateExtension(manifest: ManifestEntryPoint) {
+	async instantiateExtension(manifest: ManifestEntryPoint, signal?: AbortSignal) {
 		console.error('The `entryPoint` extension-type is deprecated, please use the `backofficeEntryPoint`.');
 
 		if (manifest.js) {
 			const moduleInstance = await loadManifestPlainJs(manifest.js);
 
-			if (!moduleInstance) return;
+			if (!moduleInstance || signal?.aborted) return;
 
 			this.#instanceMap.set(manifest.alias, moduleInstance);
 

@@ -143,4 +143,24 @@ describe('UmbEntryPointExtensionInitializer', () => {
 		expect(called).to.be.false;
 		initializer.destroy();
 	});
+
+	it('does not run onInit for an extension that is unregistered while its module is still loading', async () => {
+		const initializer = new UmbEntryPointExtensionInitializer(host, registry);
+
+		let initCount = 0;
+		const moduleInstance = { onInit: () => initCount++, onUnload: () => {} };
+		registry.register({
+			type: 'entryPoint',
+			alias: 'Umb.Test.SlowEntryPoint',
+			name: 'slow-entry-point',
+			js: () => new Promise((resolve) => setTimeout(() => resolve(moduleInstance), 100)),
+		} as never);
+
+		await aTimeout(20);
+		registry.unregister('Umb.Test.SlowEntryPoint');
+		await aTimeout(200);
+		expect(initCount).to.equal(0);
+
+		initializer.destroy();
+	});
 });
