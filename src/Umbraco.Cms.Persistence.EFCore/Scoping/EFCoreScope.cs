@@ -234,6 +234,11 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
             {
                 DbTransaction? transaction = _innerScope?.Database.Transaction;
                 _dbContext.Database.SetDbConnection(transaction?.Connection);
+                if (transaction?.Connection is not null)
+                {
+                    _efCoreScopeProvider.InitializeSharedConnection(_dbContext, transaction.Connection);
+                }
+
                 Locks.EnsureLocks(InstanceId);
 
                 if (transaction is null)
